@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+export R_CUSTOM=$* 
+/usr/bin/R -q --no-save
+
