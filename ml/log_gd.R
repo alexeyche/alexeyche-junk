@@ -43,14 +43,12 @@ grad.descent <- function (x, y, maxit, alpha) {
 theta <- grad.descent(x.n, y, 1000, 0.01)
 
 # th1 + th2*x1 + th3*x2 = 0
-plot_func <- function (x_val,theta) {
-   (-theta[2]*x_val -theta[1])/theta[3]
+plot_func <- function (x_val) {
+       
 }
 
 plot(subset(x.n[,2:3], y == 0), col="red", type="p")
 points(subset(x.n[,2:3], y == 1), col="green")
-lines(plot_func, col="black")
-
-
-
+x_val = seq(-2,2,by=0.1)
+lines(x_val,(-theta[2]*x_val -theta[1])/theta[3], col="black")
 
