@@ -30,6 +30,16 @@ cost_func <- function (x_val,y_val,theta) {
     sum(-y_val*log(h_sigm(x_val,theta)) - (1-y_val)*log(1-h_sigm(x_val,theta)))/m
 }
 
+cost_func_test <- function (x_val,y_val,theta) {
+    sum <- 0
+    for( i in 1:length(y_val)) { 
+#        str(x_val[i])
+#        str(y_val[i])
+        sum = sum + (-y_val[i]*log(h_sigm(x_val[i,],theta)) - (1-y_val[i])*log(1-h_sigm(x_val[i,],theta)))/m
+    }
+    return(sum)
+}
+
 grad <- function (x, y, theta) {
     gradient <- (1/m) * (t(x) %*% ( h_sigm(x,theta) - y ))
     return(t(gradient))
@@ -45,7 +55,7 @@ grad.descent <- function (x, y, maxit, alpha) {
     return(theta)
 }
 
-theta <- grad.descent(x.n, y, 10000, 0.5)
+theta <- grad.descent(x.n, y, 500, 0.1)
 
 # th1 + th2*x1 + th3*x2 + th4*x1^2 = 0
 # x2 = -th1 - th2*x1 - th4*x1^2 / th3 
@@ -56,8 +66,8 @@ plot_func <- function (x_val) {
 
 
 
-plot(subset(x.n[,2:3], y == 0), col="red", type="p")
-points(subset(x.n[,2:3], y == 1), col="green")
-x_val = seq(-2,2,by=0.1)
-lines(x_val,(-theta[2]*x_val -theta[1] - theta[4]*x_val^2)/theta[3], col="black")
+#plot(subset(x.n[,2:3], y == 0), col="red", type="p")
+#points(subset(x.n[,2:3], y == 1), col="green")
+#x_val = seq(-2,2,by=0.1)
+#lines(x_val,(-theta[2]*x_val -theta[1] - theta[4]*x_val^2)/theta[3], col="black")
 
