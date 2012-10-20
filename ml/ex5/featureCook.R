@@ -1,9 +1,10 @@
 #!/usr/bin/RScript
 
 mapFeature <- function(x, degree, bindOne = T) {
-    if (degree <= 1) return(x)
-    for(i in 2:degree) {
-        x <- cbind(x, x[,1]^i)
+    if (degree > 1) { 
+        for(i in 2:degree) {
+            x <- cbind(x, x[,1]^i)
+        }
     }
     if(bindOne) {
         x <- cbind(rep(1,nrow(x)), x)
