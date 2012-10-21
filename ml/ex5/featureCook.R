@@ -1,14 +1,12 @@
 #!/usr/bin/RScript
 
-mapFeature <- function(x, degree, bindOne = T) {
+mapFeature <- function(x, degree) {
     if (degree > 1) { 
         for(i in 2:degree) {
             x <- cbind(x, x[,1]^i)
         }
     }
-    if(bindOne) {
-        x <- cbind(rep(1,nrow(x)), x)
-    }
+    x <- cbind(rep(1,nrow(x)), x)
     return(x)
 }
 
@@ -20,7 +18,6 @@ featureNormalize <- function(x) {
 }
 
 cookFeature <- function(x, degree) {
-    x <- mapFeature(x, degree, F)
+    x <- mapFeature(x, degree)
     x <- featureNormalize(x)
-    x <- cbind(rep(1,nrow(x)), x)
 }
