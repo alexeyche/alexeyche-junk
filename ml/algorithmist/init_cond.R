@@ -1,5 +1,5 @@
 #!/usr/bin/RScript
-set.seed(2)
+set.seed(3)
 
 "gen" <- function(x){  
     return(3*x^2 + 2*x + 2 + rnorm(length(x))*0.5)  

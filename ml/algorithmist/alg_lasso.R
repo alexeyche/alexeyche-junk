@@ -43,7 +43,7 @@ for(i in 1:15) {
 legend("topleft", c("Train","Cross-validation"), pch=20, col=c('red','blue'))
 legend("bottomright",inset=0.05, legend=ls, pch=20, col=cs, text.col=cs, bty="n")
 
-plot(stats[,2], ylim=c(0,5), type="l", col="red", ylab="error", xlab="log(lambda)")
-lines(stats[,3], col='blue')
-coef(lasso, s=1, mode='lambda')
+#plot(stats[,2], ylim=c(0,5), type="l", col="red", ylab="error", xlab="log(lambda)")
+#lines(stats[,3], col='blue')
+#coef(lasso, s=1, mode='lambda')
 
