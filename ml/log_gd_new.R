@@ -6,7 +6,7 @@ data <- read.csv("ex2/ex2data2.txt", sep=",", header=F)
 mapFeature <- function(x) {
     x1 <- x[,1]
     x2 <- x[,2]
-    return(cbind(x, x1*x2, x1^2, x2^2, x1^3, x2^3))
+    return(cbind(x, x1*x2, x1^2, x2^2,x1^2*x2^2, x1^3, x2^3, x1^3*x2^3,x1^4, x2^4,x1^4*x2^4))
 }
 
 x.data <- cbind(data$V1,data$V2)
@@ -46,27 +46,23 @@ grad <- function(x, y, theta) {
     t((1/m) * t(x) %*% ( h(x,theta) - y ))
 }
 
-grad.descent <- function(x, y, theta, maxit, alpha) {
+grad.descent <- function(x, y, theta, maxit, alpha, lambda) {
+    reg <- t(rbind(0,as.matrix(rep(lambda/m,n-1))))
     for(i in 1:maxit) {
         str(err(x, y, theta))
-        theta <- theta - alpha * grad(x, y, theta)    
+        theta <- theta - alpha * ( grad(x, y, theta) + reg )   
     }
     return(theta)
 }
 
-theta <- grad.descent(x, y, theta, 5000, 0.1)
+
+
+theta <- grad.descent(x, y, theta, 10000, 0.1, 0.1)
 
 x.plot <- cbind(seq(-2,2,by=0.01), seq(-2,2,by=0.01))
 x.plot <- as.matrix(expand.grid(x.plot[,1],x.plot[,2]))
 y.plot <- h( cbind(1,mapFeature(x.plot)), theta )
-x.plot.l <- subset(x.plot,y.plot < 0.504 & y.plot > 0.496)
+x.plot.l <- subset(x.plot,y.plot < 0.506 & y.plot > 0.494)
 plot(subset(x.data, y >= 0.5), col="blue", ylim=c(-1.5,1.5), xlim=c(-1.5,1.5))
 points(subset(x.data, y < 0.5), col="red")
 points(x.plot.l, type="p", pch=16)
-#x.plot <- subset(x.plot, y.plot <
-#y.plot <-  apply(y.plot, 1, function(y_val) { ifelse(y_val<0.5,0,1) })
-
-#plot.log_data(x.data,y)
-#par(new=TRUE)
-#plot.log_data(x.plot,y.plot)
-
