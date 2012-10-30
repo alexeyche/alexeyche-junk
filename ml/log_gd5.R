@@ -4,36 +4,39 @@ require('R.matlab')
 
 mat <- readMat('ex5/ex5data1.mat')
 
-x <- mat$X
+x.data <- mat$X
 y <- mat$y
-xval <- mat$Xval # for cv
+xval.data <- mat$Xval # for cv
 yval <- mat$yval
-xtest <- mat$Xtest
+xtest.data <- mat$Xtest
 ytest <- mat$ytest
 
 rm(mat)
+#x <- x.data
+m <- nrow(x.data) # count of measurement
 
-m <- nrow(x) # count of measurement
-
-mapFeature <- function(x) {
-    x1 <- x[,1]
-    return(x1)
+mapFeature <- function(x, degree = 1) {
+    if (degree <= 1) return(x)
+    for(i in 2:degree) {
+        x <- cbind(x, x[,1]^i)
+    }
+    return(x)
 }
 
-x <- mapFeature(x)  # apply our mapFeature
+#x <- mapFeature(x)  # apply our mapFeature
 
-x <- cbind(rep(1,m),x)  # 1'th feature  
-xval <- cbind(rep(1,length(xval)),xval)  # 1'th feature  
-xtest <- cbind(rep(1,length(xtest)),xtest)  # 1'th feature  
+#x <- cbind(rep(1,m),x)  # 1'th feature  
+#xval <- cbind(rep(1,length(xval)),xval)  # 1'th feature  
+#xtest <- cbind(rep(1,length(xtest)),xtest)  # 1'th feature  
 
-n <- ncol(x) # count of features
-
-
-theta <- matrix(rep(1,n), nrow=1)
+#n <- ncol(x) # count of features
 
 
 h <- function(x,theta) {
-    x %*% t(theta) 
+#    print(x)
+#    print(theta)
+#    print('//-----------------')
+    tryCatch(x %*% t(theta) , error = function(e) { str(x); str(theta) } )
 }
 
 err <- function(x, y, theta) {
@@ -56,24 +59,56 @@ grad.descent <- function(x, y, theta, maxit, alpha, lambda) {
     return(theta)
 }
 
-
-#x.plot <- cbind(seq(-40,40,by=0.1))
-#x.plot <- as.matrix(expand.grid(x.plot[,1],x.plot[,2]))
-#y.plot <- h( cbind(1,mapFeature(x.plot)), theta )
-
-#plot(x[,2],y)
-#lines(x.plot,y.plot)
-
-stats <- NULL
-
-for(i in 2:m) {
-    theta <- matrix(rep(1,n), nrow=1)
-    x_temp <- x[1:i,]
-    y_temp <- y[1:i,]
-    theta <- grad.descent(x_temp, y_temp, theta, 5000, 0.002, 0)
-    
-    stats <- rbind( stats, c( i, err(x_temp, y_temp, theta), err(xval, yval, theta) ) )
+get_stats <- function(x, y, it, alpha) {
+    stats <- NULL
+    for(i in 2:m) {
+        theta <- matrix(rep(1,n), nrow=1)
+        x_temp <- x[1:i,]
+        y_temp <- y[1:i,]
+#        str(x_temp)
+#        str(y_temp)
+#        str(theta)
+#        print('//------------------------------------')
+        theta <- grad.descent(x_temp, y_temp, theta, it, alpha, 0)
+        
+        stats <- rbind( stats, c( i, err(x_temp, y_temp, theta), err(xval, yval, theta) ) )
+    }
+    return(stats)
 }
 
-plot(stats[,c(1,3)], type="l", col="blue", ylim=c(0,200))
-lines(stats[,c(1,2)], col="green")
+featureNormalize <- function(x) {
+    means <- apply(x,2,mean)
+    sds <- apply(x,2,sd)
+    x <- t((t(x) - means )/ sds)
+    return(x)
+}
+
+cookFeature <- function(x, degree) {
+    x <- mapFeature(x, degree)
+    x <- featureNormalize(x)
+    x <- cbind(rep(1,m), x)
+}
+
+x <- NULL
+st <- NULL
+yval <- featureNormalize(yval)
+ytest <- featureNormalize(ytest)
+y <- featureNormalize(y)
+
+for( i in 1:10 ) {
+    x <- cookFeature(x.data, i)
+    xval <- cookFeature(xval.data, i)
+    xtest <- cookFeature(xtest.data, i)
+    n <- ncol(x)    
+    st[[i]] <- get_stats(x, y, 5000, 0.002)
+}
+
+par(mfrom = c(3,3))
+for( i in 1:10 ) {
+    data <- st[[i]]
+    plot(data[,1],data[,3], ylim = c(0,max(data[,3])/3), type ="l" )
+    #par(new=T)
+    #plot(data[,1],data[,2])
+}
+#plot(stats[,c(1,3)], type="l", col="blue", ylim=c(0,200))
+#lines(stats[,c(1,2)], col="green")
