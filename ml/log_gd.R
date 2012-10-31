@@ -66,8 +66,8 @@ plot_func <- function (x_val) {
 
 
 
-#plot(subset(x.n[,2:3], y == 0), col="red", type="p")
-#points(subset(x.n[,2:3], y == 1), col="green")
-#x_val = seq(-2,2,by=0.1)
-#lines(x_val,(-theta[2]*x_val -theta[1] - theta[4]*x_val^2)/theta[3], col="black")
+plot(subset(x.n[,2:3], y == 0), col="red", type="p")
+points(subset(x.n[,2:3], y == 1), col="green")
+x_val = seq(-2,2,by=0.1)
+lines(x_val,(-theta[2]*x_val -theta[1] - theta[4]*x_val^2)/theta[3], col="black")
 
