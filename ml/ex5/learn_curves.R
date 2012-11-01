@@ -20,17 +20,36 @@ get_stats <- function(x, y, x_cv, y_cv, it, alpha) {
 learn_curves <- function(maxpow = 15) {
     st <- NULL
     for( i in 1:maxpow ) {
-        x.w <- cookFeature(x.n, i)
+        x.w <- mapFeature(x.n, i)
         y.w <- y.n
-        x.cv <- cookFeature(xval.n, i)
+        x.cv <- mapFeature(xval.n, i)
         y.cv <- yval.n
-        n <- ncol(x.w)    
-        st[[i]] <- get_stats(x.w, y.w, x.cv, y.cv, 5000, 0.04)
+        
+        st[[i]] <- get_stats(x.w, y.w, x.cv, y.cv, 2000, 0.01)
     }
     return(st)
 }
 
+select_lambda <- function(maxlambda = 10) {
+    lambda <- 0.0001    
+    stats <- NULL
+    while(lambda<=maxlambda) {
+        degree <- 5
+        x.m <- mapFeature(x.n, degree)
+        y.m <- y.n
+        x.cv <- mapFeature(xval.n, degree)
+        y.cv <- yval.n
+        
+        theta <- grad.descent(x.m, y.m, 2000, 0.01, lambda)
+        
+        stats <- rbind( stats, c( lambda, err(x.m, y.m, theta), err(x.cv, y.cv, theta) ) )
+        lambda <- lambda * 10
+    }
+    return(stats)
+}
+
 #st <- learn_curves()
+st <- select_lambda()
 #save.image()
 #load('.RData')
 

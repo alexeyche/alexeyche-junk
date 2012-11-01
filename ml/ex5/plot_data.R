@@ -1,8 +1,11 @@
 #!/usr/bin/RScript
 
-plot_hypothesis <- function(theta, degree) {
-    x <- seq(-40,40, length.out=300)        
-    x <- cookFeature(x, degree)
+plot_hypothesis <- function(theta, degree, x, y) {
+    x.plot <- as.matrix(seq(-2, 2, length.out = 300))
+    x.plot <- mapFeature(x.plot, degree)
+    y.plot <- h(x.plot, theta)
+    plot(x, y)
+    lines(x.plot[,2], y.plot)
 }
 
 plot_learn_curves <- function(st) {
