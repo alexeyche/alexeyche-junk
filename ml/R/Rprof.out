@@ -1,0 +1,2 @@
+sample.interval=20000
+"objects" "match" "checkConflicts" "attach" "attachNamespace" "doTryCatch" "tryCatchOne" "tryCatchList" "tryCatch" "try" "library" "doTryCatch" "tryCatchOne" "tryCatchList" "tryCatch" "require" ".First.sys" 
