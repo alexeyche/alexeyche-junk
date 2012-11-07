@@ -6,8 +6,10 @@ options(prompt="R> ")
   library(utils)
   library(base)
   library(graphics)
+  library(stats)
+  library(datasets)
   for ( filename in strsplit(Sys.getenv("R_CUSTOM")," ")[[1]] )   {
-   source( filename )
+   source( filename, echo = T )
   }
  }
 }  

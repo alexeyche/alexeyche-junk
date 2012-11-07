@@ -61,9 +61,10 @@ test_real <- function() {
     x.m <- mapFeature(x.n, degree)
     y.m <- y.n
     
-    theta <- grad.descent(x.m, y.m, 5000, 0.01, 1)
+    theta <- grad.descent(x.m, y.m, 5000, 0.05, 0.8)
     source('plot_data.R')
     plot_hypothesis(theta, degree, x.n, y.n)
+    points(xtest.n, ytest.n, col="blue")
 }
 
 

@@ -36,27 +36,27 @@ test_p <- function(p, x.all) {
 }    
 #x.test <- 
 #p(
-x.test <- c(0,0)
-
-p0t.x1 <- p(x.test[1], x0[,1], 0.5)  # P(x1 | y == 0)
-p1t.x1 <- p(x.test[1], x1[,1], 0.5)  # P(x1 | y == 1)
-
-p0t.x2 <- p(x.test[2], x0[,2], 0.5)  # P(x2 | y == 0)
-p1t.x2 <- p(x.test[2], x1[,2], 0.5)  # P(x2 | y == 1)
-
-x1_is_0 <- p0t.x1 * Py0 
-x1_is_1 <- p1t.x1 * Py1
-x2_is_0 <- p0t.x2 * Py0
-x2_is_1 <- p1t.x2 * Py1
-
-cat(x1_is_0, x1_is_1, x2_is_0, x2_is_1, '\n')
-
-if(x1_is_0 > x1_is_1 & x2_is_0 > x2_is_1) {
-    print('x.test is 0 class')
-}
-if(x1_is_0 < x1_is_1 & x2_is_0 < x2_is_1) {
-    print('x.test is 1 class')
-}
+#x.test <- c(0,0)
+#
+#p0t.x1 <- p(x.test[1], x0[,1], 0.5)  # P(x1 | y == 0)
+#p1t.x1 <- p(x.test[1], x1[,1], 0.5)  # P(x1 | y == 1)
+#
+#p0t.x2 <- p(x.test[2], x0[,2], 0.5)  # P(x2 | y == 0)
+#p1t.x2 <- p(x.test[2], x1[,2], 0.5)  # P(x2 | y == 1)
+#
+#x1_is_0 <- p0t.x1 * Py0 
+#x1_is_1 <- p1t.x1 * Py1
+#x2_is_0 <- p0t.x2 * Py0
+#x2_is_1 <- p1t.x2 * Py1
+#
+#cat(x1_is_0, x1_is_1, x2_is_0, x2_is_1, '\n')
+#
+#if(x1_is_0 > x1_is_1 & x2_is_0 > x2_is_1) {
+#    print('x.test is 0 class')
+#}
+#if(x1_is_0 < x1_is_1 & x2_is_0 < x2_is_1) {
+#    print('x.test is 1 class')
+#}
 
 plot(x0[,1],x0[,2], col = "green")
 points(x1[,1],x1[,2], col = "red")
