@@ -43,11 +43,50 @@ sub levenshtein {
     return \@dist;
 }
 
-my @arr1=(1,2,3,4,5,6);
-#my @arr2=(3,2,1,4,5,6);
-#my @arr2=(5,4,6,1,3,2);
-my @arr2=('a','b','c','d');
+my @ar1=(1,2,3,4,5,6);
+#my @ar2=(1,2,3,4,6,7);
+#my @ar2=(3,2,1,4,5,6);
+#my @ar2=(1,1,1,1,1,1);
+my @ar2=(1,3);
+my @dist;
+foreach my $i (0 .. $#ar1) {
+    foreach my $j (0 .. $#ar2) {
+        $dist[$i][$j] = 0;
+    }
+}
+print Dumper(\@dist);
+#exit(0);
+my @sums;
+foreach my $i (0 .. $#ar1) {
+    foreach my $j (0 .. $#ar2) {
+        if ($ar1[$i] == $ar2[$j]) {
+            if($i == $j) {
+                $dist[$i][$j] = 1;
+            } else {
+                $dist[$i][$j] = 1 -abs($i-$j)/($#ar2+1);
+            }    
+        } else {
+            $dist[$i][$j] = 0;
+        }
+    }
+    my $sum = 0;
+    foreach my $j (0 ..$#ar2) {
+        $sum = $sum + $dist[$i][$j];        
+    }
+    push @sums, $sum/($#ar2+1) . "\n";
+}
+my $mega_sum=0;
+foreach(@sums) {
+   $mega_sum = $mega_sum + $_; 
+}
+print $mega_sum . "\n";
 
-my $l = levenshtein(\@arr1,\@arr2);
-print Dumper($l);
+
+#foreach my $i (0 .. $#ar1) {
+#    foreach my $j (0 .. $#ar2) {
+#        $dist[$i][$j] = 0;
+#    }
+#}
+#my $l = levenshtein(\@arr1,\@arr2);
+print Dumper(\@dist);
 
