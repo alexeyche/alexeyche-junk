@@ -3,6 +3,20 @@
 use strict;
 use Data::Dumper;
 use List::Util qw(sum);
+use IO::Handle '_IOLBF';
+
+sub uniq {
+        return keys %{{ map { $_ => 1 } @_ }};
+}
+
+# load query classes
+open(QCLASS, '<q_class.c');
+my %query_class;
+while(<QCLASS>) {
+    my @line = split('\t',$_);
+    $query_class{$line[0]} = $line[1];    
+}
+close(QCLASS);
 
 open(TRAIN,'<dataset/train');
 open(OUT, '>parse_out');
@@ -13,17 +27,14 @@ my $train_set_l=52001965;
 my $lines_num = 0;
 
 # variables of common use
-#my @pattern; 
-my @click_query_pos;
-my $click_count = 0;
-my $aband_rate = 0;
-my $current_serp_id;
+my @pattern; 
+my $curr_serp;
 my %serp;
-
+my $switch_detected=0;
 while(<TRAIN>) {
     chomp($_);
     my $line = $_;
-    my @line = split('\t',$_,6);
+    my @line = split('\t',$line,6);
     my $sess_id = $line[0];
     my $sess_type = $line[2];
 # percentage
@@ -37,53 +48,58 @@ while(<TRAIN>) {
             $first_time = 0;
         } else {
             # write stats
-#            my $patt_j = join('',@pattern);
-#            print PATTERNS $patt_j . "\n";
-#            undef(@pattern);
-             my $AvgClickPos = sum(@click_query_pos)/@click_query_pos;           
-             print OUT $AvgClickPos ."\t". $click_count ."\t".$aband_rate ."\n";
-             
-             # clean for yourself!!!
-             foreach my $k (keys %serp) {
+            if (not $switch_detected) {  # if switch not detected, decided to add switch manually
+                push @pattern, 'S';
+            }
+            print OUT join(',', @pattern) . "\n";
+            undef(@pattern);
+            foreach my $k (keys %serp) {
                 undef($serp{$k});
-             }
-             undef(%serp);
-             $click_count = 0;
-             $aband_rate = 0;
+            }
+            undef(%serp);
+            $switch_detected=0;
         }
         next;
     }
-    #counts stats
-#    if (($sess_type eq "Q") or ($sess_type eq "C")) {
-#        push(@pattern,$sess_type);
-#    }
     if ($sess_type eq "Q") {
-        my @urls = split(/\t/,$line[5]);     
-        my $serp_id = $line[3];
-        $current_serp_id = $serp_id;
+        $curr_serp = $line[3];
+        my $query_id = $line[4];
+        if (exists $query_class{$query_id}) {
+            my $cl = $query_class{$query_id};
+            chomp($cl);
+            push @pattern, "Q".$cl;
+            undef($cl);
+        } else {
+            push @pattern, "Q";
+        }
         my %current_query;
+        my @urls = split(/\t/,$line[5]);
         @current_query{@urls} = (1 .. ($#urls+1));
-        $serp{$serp_id} = \%current_query;
-#        print Dumper(\%serp);
-#        close(TRAIN);
-#        exit(0);
+        $serp{$curr_serp} = \%current_query;
+        undef($query_id);
+        undef(@urls);
     }
     if ($sess_type eq "C") {
-        $click_count++;
-        my $click_query = $line[4];
-        my $serp_id = $line[3];
-        if($serp_id != $current_serp_id) {
-            $aband_rate ++;
-        }
-        my %current_query = %{ $serp{$serp_id} };
-        if(exists $current_query{$click_query}) {
-            push @click_query_pos, $current_query{$click_query};   
+        my $serp_id = $line[3];        
+        my $query_id = $line[4];
+        my $click_pos = $serp{$serp_id}{$query_id};
+        if( $curr_serp == $serp_id ) {
+             push @pattern, "C" . $click_pos; 
         } else {
-            print "Click on query which not presented in session, ID $sess_id\n";
-            exit(1);
+             push @pattern, "Cbad" . $click_pos; 
         }
+        undef($serp_id);
+        undef($query_id);
+        undef($click_pos);
     }
-
+    if ($sess_type eq "S") {
+        $switch_detected = 1;
+        push @pattern, "S";
+    }
+    undef($sess_id);
+    undef($line);
+    undef(@line);
+    undef($sess_type);
 }
 
 close(TRAIN);
