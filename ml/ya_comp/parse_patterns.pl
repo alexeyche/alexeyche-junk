@@ -10,37 +10,27 @@ sub uniq {
 }
 
 # load query classes
-open(QCLASS, '<q_class');
+open(QCLASS, '<q_class.c');
 my %query_class;
-my %query_prob;
 while(<QCLASS>) {
     my @line = split('\t',$_);
-    $query_prob{$line[0]} = $line[1];    
-    $query_class{$line[0]} = $line[2];    
+    $query_class{$line[0]} = $line[1];    
 }
 close(QCLASS);
 
-open(TRAIN,'<dataset/test');
-open(OUT, '>parse_out.test');
+open(TRAIN,'<dataset/train');
+open(OUT, '>parse_out');
 
 my $first_time=1;
 
 my $train_set_l=52001965;
 my $lines_num = 0;
 
-# features
-my $AvgPosCount=0;
-my $DwellTimeUntilClick=0;
-my $SumDensBadQuery=0;
-my $NumBackSerp=0;
-# sevice vars
-my @clicks_pos;
-my @dwell_times_until_click;
-my $last_was_query=0;
+# variables of common use
+my @pattern; 
 my $curr_serp;
 my %serp;
-my $click_count=0;
-
+my $switch_detected=0;
 while(<TRAIN>) {
     chomp($_);
     my $line = $_;
@@ -58,61 +48,53 @@ while(<TRAIN>) {
             $first_time = 0;
         } else {
             # write stats
-            if ($click_count != 0) {
-                $AvgPosCount = sum(@clicks_pos)/@clicks_pos;
-                $DwellTimeUntilClick = sum(@dwell_times_until_click)/@dwell_times_until_click;
-            } else {
-                $AvgPosCount=-1;
-                $DwellTimeUntilClick=-1;    
+            if (not $switch_detected) {  # if switch not detected, decided to add switch manually
+                push @pattern, 'S';
             }
-            print OUT $AvgPosCount ."\t". $DwellTimeUntilClick ."\t". $SumDensBadQuery ."\t". $NumBackSerp . "\n";
-
+            print OUT join(',', @pattern) . "\n";
+            undef(@pattern);
             foreach my $k (keys %serp) {
                 undef($serp{$k});
             }
             undef(%serp);
-            undef(@clicks_pos);
-            undef(@dwell_times_until_click);
-            $last_was_query=0;
-            $click_count=0;            
-            
-            $AvgPosCount=0;
-            $DwellTimeUntilClick=0;
-            $SumDensBadQuery=0;
-            $NumBackSerp=0;
+            $switch_detected=0;
         }
         next;
     }
     if ($sess_type eq "Q") {
         $curr_serp = $line[3];
         my $query_id = $line[4];
-        if (exists $query_prob{$query_id}) {
-            $SumDensBadQuery += $query_prob{$query_id};
+        if (exists $query_class{$query_id}) {
+            my $cl = $query_class{$query_id};
+            chomp($cl);
+            push @pattern, "Q".$cl;
+            undef($cl);
+        } else {
+            push @pattern, "Q";
         }
         my %current_query;
         my @urls = split(/\t/,$line[5]);
         @current_query{@urls} = (1 .. ($#urls+1));
         $serp{$curr_serp} = \%current_query;
-        
-        #for DwellTimeUntilClick 
-        $last_was_query=1;
-        
         undef($query_id);
         undef(@urls);
-    } else {
-        $last_was_query=0;
     }
     if ($sess_type eq "C") {
-        $click_count += 1;
         my $serp_id = $line[3];        
         my $query_id = $line[4];
-        push @clicks_pos, $serp{$serp_id}{$query_id};
-        if(not $curr_serp == $serp_id ) {
-             $NumBackSerp += 1;
+        my $click_pos = $serp{$serp_id}{$query_id};
+        if( $curr_serp == $serp_id ) {
+             push @pattern, "C" . $click_pos; 
+        } else {
+             push @pattern, "Cbad" . $click_pos; 
         }
-        push @dwell_times_until_click, $line[1];
         undef($serp_id);
         undef($query_id);
+        undef($click_pos);
+    }
+    if ($sess_type eq "S") {
+        $switch_detected = 1;
+        push @pattern, "S";
     }
     undef($sess_id);
     undef($line);

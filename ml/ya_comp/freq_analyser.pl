@@ -3,7 +3,8 @@
 use strict;
 use Data::Dumper;
 
-open(PATTERNS, "<patterns");
+my $file = $ARGV[0];
+open(PATTERNS, "<$file");
 
 my %patterns;
 while(<PATTERNS>) {

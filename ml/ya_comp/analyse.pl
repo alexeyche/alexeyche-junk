@@ -2,14 +2,17 @@
 
 use strict;
 
+# initial data
 my $uniq_q = 9415777;
+my $q_file = "queries_freq.sort.top1000";
+my $top = 1000;
 
-open(TOPQ, "<queries_freq.sort.top350");
+open(TOPQ, "<$q_file");
 open(OUT, ">q_class");
 my $line_count = 0;
 while(<TOPQ>) {
     my $class = "bad3";
-    my $perc_l = $line_count/350;
+    my $perc_l = $line_count/$top;
     if ($perc_l <= 0.02) {
         $class = "bad1";
     } elsif ($perc_l <= 0.5) {
