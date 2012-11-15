@@ -3,10 +3,9 @@
 use strict;
 use Data::Dumper;
 use List::Util qw(sum);
-use IO::Handle '_IOLBF';
 
 sub uniq {
-        return keys %{{ map { $_ => 1 } @_ }};
+    return keys %{{ map { $_ => 1 } @_ }};
 }
 
 # load query classes
