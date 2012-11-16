@@ -3,9 +3,23 @@
 use strict;
 use Data::Dumper;
 use List::Util qw(sum);
+#require 'alg.pl'; # similarity
 
 sub uniq {
     return keys %{{ map { $_ => 1 } @_ }};
+}
+
+sub similarity {
+    my ($arr1, $arr2) = @_;
+    my @arr1 = @{$arr1};
+    my %arr1 = map { $_ => 1 } @arr1;
+    my $sim = 0;
+    foreach my $el (@{$arr2}) {
+        if(exists($arr1{$el})) {
+            $sim += 1/$#arr1;
+        }
+    }
+    return $sim;
 }
 
 # load query classes
@@ -19,8 +33,13 @@ while(<QCLASS>) {
 }
 close(QCLASS);
 
-open(TRAIN,'<dataset/test');
-open(OUT, '>parse_out.test');
+if($ARGV[0] eq "-t") {
+    open(TRAIN,'<dataset/test');
+    open(OUT, '>parse_out.test');
+} else {
+    open(TRAIN,'<dataset/train');
+    open(OUT, '>parse_out');
+}
 
 my $first_time=1;
 
@@ -32,6 +51,7 @@ my $AvgPosCount=0;
 my $DwellTimeUntilClick=0;
 my $SumDensBadQuery=0;
 my $NumBackSerp=0;
+my $QuerySimilarity = 0;
 # sevice vars
 my @clicks_pos;
 my @dwell_times_until_click;
@@ -39,6 +59,7 @@ my $last_was_query=0;
 my $curr_serp;
 my %serp;
 my $click_count=0;
+my @last_query_urls;
 
 while(<TRAIN>) {
     chomp($_);
@@ -64,7 +85,7 @@ while(<TRAIN>) {
                 $AvgPosCount=-1;
                 $DwellTimeUntilClick=-1;    
             }
-            print OUT $AvgPosCount ."\t". $DwellTimeUntilClick ."\t". $SumDensBadQuery ."\t". $NumBackSerp . "\n";
+            print OUT $sess_id ."\t". $AvgPosCount ."\t". $DwellTimeUntilClick ."\t". $SumDensBadQuery ."\t". $NumBackSerp ."\t". $QuerySimilarity ."\n";
 
             foreach my $k (keys %serp) {
                 undef($serp{$k});
@@ -72,6 +93,7 @@ while(<TRAIN>) {
             undef(%serp);
             undef(@clicks_pos);
             undef(@dwell_times_until_click);
+            undef(@last_query_urls);
             $last_was_query=0;
             $click_count=0;            
             
@@ -79,6 +101,7 @@ while(<TRAIN>) {
             $DwellTimeUntilClick=0;
             $SumDensBadQuery=0;
             $NumBackSerp=0;
+            $QuerySimilarity=0;
         }
         next;
     }
@@ -88,9 +111,14 @@ while(<TRAIN>) {
         if (exists $query_prob{$query_id}) {
             $SumDensBadQuery += $query_prob{$query_id};
         }
-        my %current_query;
         my @urls = split(/\t/,$line[5]);
-        @current_query{@urls} = (1 .. ($#urls+1));
+        if (@last_query_urls) {
+            $QuerySimilarity += similarity(\@last_query_urls, \@urls);
+        }
+        @last_query_urls = @urls;
+        
+        my %current_query;
+        @current_query{@last_query_urls} = (1 .. ($#urls+1));
         $serp{$curr_serp} = \%current_query;
         
         #for DwellTimeUntilClick 

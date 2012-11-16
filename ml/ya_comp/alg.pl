@@ -43,50 +43,67 @@ sub levenshtein {
     return \@dist;
 }
 
-my @ar1=(1,2,3,4,5,6);
-#my @ar2=(1,2,3,4,6,7);
-#my @ar2=(3,2,1,4,5,6);
-#my @ar2=(1,1,1,1,1,1);
-my @ar2=(1,3);
-my @dist;
-foreach my $i (0 .. $#ar1) {
-    foreach my $j (0 .. $#ar2) {
-        $dist[$i][$j] = 0;
-    }
-}
-print Dumper(\@dist);
-#exit(0);
-my @sums;
-foreach my $i (0 .. $#ar1) {
-    foreach my $j (0 .. $#ar2) {
-        if ($ar1[$i] == $ar2[$j]) {
-            if($i == $j) {
-                $dist[$i][$j] = 1;
-            } else {
-                $dist[$i][$j] = 1 -abs($i-$j)/($#ar2+1);
-            }    
-        } else {
+sub my_levenstein {
+    my @ar1=(1,2,3,4,5,6);
+    #my @ar2=(1,2,3,4,6,7);
+    #my @ar2=(3,2,1,4,5,6);
+    #my @ar2=(1,1,1,1,1,1);
+    my @ar2=(1,3);
+    my @dist;
+    foreach my $i (0 .. $#ar1) {
+        foreach my $j (0 .. $#ar2) {
             $dist[$i][$j] = 0;
         }
     }
-    my $sum = 0;
-    foreach my $j (0 ..$#ar2) {
-        $sum = $sum + $dist[$i][$j];        
+    print Dumper(\@dist);
+    #exit(0);
+    my @sums;
+    foreach my $i (0 .. $#ar1) {
+        foreach my $j (0 .. $#ar2) {
+            if ($ar1[$i] == $ar2[$j]) {
+                if($i == $j) {
+                    $dist[$i][$j] = 1;
+                } else {
+                    $dist[$i][$j] = 1 -abs($i-$j)/($#ar2+1);
+                }    
+            } else {
+                $dist[$i][$j] = 0;
+            }
+        }
+        my $sum = 0;
+        foreach my $j (0 ..$#ar2) {
+            $sum = $sum + $dist[$i][$j];        
+        }
+        push @sums, $sum/($#ar2+1) . "\n";
     }
-    push @sums, $sum/($#ar2+1) . "\n";
+    my $mega_sum=0;
+    foreach(@sums) {
+       $mega_sum = $mega_sum + $_; 
+    }
+    print $mega_sum . "\n";
+
+
+    #foreach my $i (0 .. $#ar1) {
+    #    foreach my $j (0 .. $#ar2) {
+    #        $dist[$i][$j] = 0;
+    #    }
+    #}
+    #my $l = levenshtein(\@arr1,\@arr2);
+    print Dumper(\@dist);
 }
-my $mega_sum=0;
-foreach(@sums) {
-   $mega_sum = $mega_sum + $_; 
+
+
+sub similarity {
+    my ($arr1, $arr2) = @_;
+    my @arr1 = @{$arr1};
+    my %arr1 = map { $_ => 1 } @arr1;
+    my $sim = 0;
+    foreach my $el (@{$arr2}) {
+        if(exists($arr1{$el})) {
+            $sim += 1/$#arr1;
+        }
+    }
+    return $sim;
 }
-print $mega_sum . "\n";
 
-
-#foreach my $i (0 .. $#ar1) {
-#    foreach my $j (0 .. $#ar2) {
-#        $dist[$i][$j] = 0;
-#    }
-#}
-#my $l = levenshtein(\@arr1,\@arr2);
-print Dumper(\@dist);
-
+1;        
