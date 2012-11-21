@@ -3,7 +3,8 @@
 use strict;
 use Data::Dumper;
 use List::Util qw(sum);
-#require 'alg.pl'; # similarity
+use POSIX;
+require 'rate.pl';
 
 sub uniq {
     return keys %{{ map { $_ => 1 } @_ }};
@@ -22,6 +23,20 @@ sub similarity {
     return $sim;
 }
 
+sub make_out_s {
+    my @arr = @_;
+    my $ind = $#arr;
+    my $str = "";
+    for(my $i=0; $i <= $ind; $i++) {
+        my $sym = "\t";
+        if($i == $ind) {
+            $sym = "\n"            
+        }
+        $str = $str . $arr[$i] . $sym;             
+    }
+    return $str;
+}
+
 # load query classes
 open(QCLASS, '<q_class');
 my %query_class;
@@ -33,17 +48,21 @@ while(<QCLASS>) {
 }
 close(QCLASS);
 
+my $train_file;
 if($ARGV[0] eq "-t") {
-    open(TRAIN,'<dataset/test');
-    open(OUT, '>parse_out.test');
+    $train_file = "dataset/test";    
+    open(TRAIN,"<$train_file");
+    open(OUT, '>parse_out.2.test');
 } else {
-    open(TRAIN,'<dataset/train');
-    open(OUT, '>parse_out');
+    $train_file = "dataset/train";    
+    open(TRAIN,"<$train_file");
+    open(OUT, '>parse_out.2');
 }
 
 my $first_time=1;
 
-my $train_set_l=52001965;
+my $train_set_l=`./proc count_rows $train_file`;
+my $ten_portion = floor($train_set_l/10);
 my $lines_num = 0;
 
 # features
@@ -52,13 +71,14 @@ my $DwellTimeUntilClick=0;
 my $SumDensBadQuery=0;
 my $NumBackSerp=0;
 my $QuerySimilarity = 0;
+my $ClickCount=0;
+my $QueryWOClick=0;
 # sevice vars
 my @clicks_pos;
 my @dwell_times_until_click;
 my $last_was_query=0;
 my $curr_serp;
 my %serp;
-my $click_count=0;
 my @last_query_urls;
 
 while(<TRAIN>) {
@@ -69,39 +89,54 @@ while(<TRAIN>) {
     my $sess_type = $line[2];
 # percentage
     $lines_num = $lines_num+1; 
-    if ($lines_num % 5000000 == 0) {
+    if ($lines_num % $ten_portion == 0) {
         print $lines_num/$train_set_l . "\n";
     }
 # ------    
-    if ($sess_type eq "M") {
+    if ($sess_type eq "M" ) {
         if ($first_time) {
             $first_time = 0;
         } else {
             # write stats
-            if ($click_count != 0) {
+            if ($ClickCount != 0) {
                 $AvgPosCount = sum(@clicks_pos)/@clicks_pos;
                 $DwellTimeUntilClick = sum(@dwell_times_until_click)/@dwell_times_until_click;
             } else {
-                $AvgPosCount=-1;
+                $AvgPosCount=11;
                 $DwellTimeUntilClick=-1;    
             }
-            print OUT $sess_id ."\t". $AvgPosCount ."\t". $DwellTimeUntilClick ."\t". $SumDensBadQuery ."\t". $NumBackSerp ."\t". $QuerySimilarity ."\n";
-
             foreach my $k (keys %serp) {
-                undef($serp{$k});
-            }
+                if ($serp{$k}{'clicks'} == 0) {
+                    $QueryWOClick++;
+                }
+                undef($serp{$k}{'query'});
+                undef($serp{$k})
+            } 
+            ($AvgPosCount, $DwellTimeUntilClick, $SumDensBadQuery, $NumBackSerp, $QuerySimilarity, $ClickCount, $QueryWOClick) = 
+                (AvgPosCountRate($AvgPosCount), 
+                 DwellTimeUntilClickRate($DwellTimeUntilClick),
+                 SumDensBadQueryRate($SumDensBadQuery),
+                 NumBackSerpRate($NumBackSerp),
+                 QuerySimilarityRate($QuerySimilarity),
+                 ClickCountRate($ClickCount),
+                 QueryWOClickRate($QueryWOClick) 
+                 );
+            print OUT &make_out_s($AvgPosCount, $DwellTimeUntilClick, $SumDensBadQuery, $NumBackSerp, $QuerySimilarity, $ClickCount, $QueryWOClick);
+
+            
             undef(%serp);
             undef(@clicks_pos);
             undef(@dwell_times_until_click);
             undef(@last_query_urls);
             $last_was_query=0;
-            $click_count=0;            
             
             $AvgPosCount=0;
             $DwellTimeUntilClick=0;
             $SumDensBadQuery=0;
             $NumBackSerp=0;
             $QuerySimilarity=0;
+            $ClickCount=0;            
+            $QueryWOClick=0;
         }
         next;
     }
@@ -118,8 +153,11 @@ while(<TRAIN>) {
         @last_query_urls = @urls;
         
         my %current_query;
+        my %query_prop;
+        $query_prop{'clicks'} = 0;
         @current_query{@last_query_urls} = (1 .. ($#urls+1));
-        $serp{$curr_serp} = \%current_query;
+        $query_prop{'query'} = \%current_query;
+        $serp{$curr_serp} = \%query_prop;
         
         #for DwellTimeUntilClick 
         $last_was_query=1;
@@ -130,16 +168,58 @@ while(<TRAIN>) {
         $last_was_query=0;
     }
     if ($sess_type eq "C") {
-        $click_count += 1;
+        $ClickCount += 1;
         my $serp_id = $line[3];        
         my $query_id = $line[4];
-        push @clicks_pos, $serp{$serp_id}{$query_id};
+        $serp{$serp_id}{'clicks'} += 1;
+        push @clicks_pos, $serp{$serp_id}{'query'}{$query_id};
         if(not $curr_serp == $serp_id ) {
              $NumBackSerp += 1;
         }
         push @dwell_times_until_click, $line[1];
         undef($serp_id);
         undef($query_id);
+    }
+    if($lines_num == $train_set_l) {
+            # write stats
+            if ($ClickCount != 0) {
+                $AvgPosCount = sum(@clicks_pos)/@clicks_pos;
+                $DwellTimeUntilClick = sum(@dwell_times_until_click)/@dwell_times_until_click;
+            } else {
+                $AvgPosCount=-1;
+                $DwellTimeUntilClick=-1;    
+            }
+            foreach my $k (keys %serp) {
+                if ($serp{$k}{'clicks'} == 0) {
+                    $QueryWOClick++;
+                }
+                undef($serp{$k}{'query'});
+                undef($serp{$k})
+            } 
+            ($AvgPosCount, $DwellTimeUntilClick, $SumDensBadQuery, $NumBackSerp, $QuerySimilarity, $ClickCount, $QueryWOClick) = 
+                (AvgPosCountRate($AvgPosCount), 
+                 DwellTimeUntilClickRate($DwellTimeUntilClick),
+                 SumDensBadQueryRate($SumDensBadQuery),
+                 NumBackSerpRate($NumBackSerp),
+                 QuerySimilarityRate($QuerySimilarity),
+                 ClickCountRate($ClickCount),
+                 QueryWOClickRate($QueryWOClick) 
+                 );
+            print OUT &make_out_s($AvgPosCount, $DwellTimeUntilClick, $SumDensBadQuery, $NumBackSerp, $QuerySimilarity, $ClickCount, $QueryWOClick);
+            
+            undef(%serp);
+            undef(@clicks_pos);
+            undef(@dwell_times_until_click);
+            undef(@last_query_urls);
+            $last_was_query=0;
+            
+            $AvgPosCount=0;
+            $DwellTimeUntilClick=0;
+            $SumDensBadQuery=0;
+            $NumBackSerp=0;
+            $QuerySimilarity=0;
+            $ClickCount=0;            
+            $QueryWOClick=0;   
     }
     undef($sess_id);
     undef($line);

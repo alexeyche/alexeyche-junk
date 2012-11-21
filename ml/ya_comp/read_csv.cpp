@@ -50,7 +50,7 @@ double* split(char *line, char delim,char delCount) {
     return ret;
 }
 
-double *read_csv_file(const char *filename, char delim, int nrows, int ncols, int buffer = 100) {
+double *read_csv_file(const char *filename, char delim, int nrows, int ncols, int buffer = 300) {
     double *x = (double*) malloc(nrows * ncols * sizeof(double));
     char *buf = (char*) malloc(buffer * sizeof(char));
     FILE *fp;

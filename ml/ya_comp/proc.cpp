@@ -85,6 +85,20 @@ int main(int argc, char *argv[]) {
         }
         hist_func(in_filename,out_filename, precision);
         return 0;
+    } else if (strcmp(func_name,"hist_pw") == 0) {
+        char *in_filename;
+        char *out_filename;
+        int precision;
+        if(argc>4) {
+            in_filename = argv[2];
+            out_filename = argv[3];
+            precision = atoi(argv[4]);
+        } else {
+            help();
+            return 1;
+        }
+        hist_pw_func(in_filename,out_filename, precision);
+        return 0;
     } else {
         help();
         return 1;

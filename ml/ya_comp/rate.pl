@@ -2,11 +2,12 @@
 
 
 sub AvgPosCountRate {
-    my $avg_pos_count = @_[0];
-    if($avg_pos_count <= 2) { 
+    my $param = @_[0];
+    if($param <= 2) { 
         return 0;
     }    
-    return(($avg_pos_count)/11);
+    my $val = 1-1/exp(($param-2)/10);
+    return($val);
 }
 
 sub DwellTimeUntilClickRate {
@@ -14,7 +15,7 @@ sub DwellTimeUntilClickRate {
     if ($param == -1) {
         return 1;
     }
-    my $val = 1-1/exp(3*$param/3000);
+    my $val = 1-1/exp(3*$param/200);
     return($val);
 }
 
@@ -25,17 +26,17 @@ sub SumDensBadQueryRate {
 
 sub NumBackSerpRate {
     my $param = @_[0];
-    return(1-1/exp(4*$param/15));
+    return(1-1/exp($param/2));
 }
 
 sub QuerySimilarityRate {
     my $param = @_[0];
-    return(1-1/exp(10*$param/50));
+    return(1-1/exp($param/4));
 }
 
 sub ClickCountRate {
     my $param = @_[0];
-    return(1-1/exp($param/50));
+    return(1-1/exp($param/25));
 }
 
 sub QueryWOClickRate {
@@ -44,7 +45,7 @@ sub QueryWOClickRate {
 }
 
 sub test {
-    printf(AvgPosCountRate(3)."\n");
+    printf(AvgPosCountRate(4)."\n");
     printf(DwellTimeUntilClickRate(3000)."\n");
     printf(SumDensBadQueryRate(0.003)."\n");
     printf(NumBackSerpRate(1)."\n");
@@ -53,7 +54,4 @@ sub test {
     printf(QueryWOClickRate(10)."\n");
 }
 
-
-
-
-
+1;

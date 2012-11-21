@@ -1,4 +1,6 @@
+#include <cmath>
 
+#include "pw_for_feat.cpp"
 
 double* max(double *x, int nrow, int ncol) {
     double *max_out = (double*) malloc(ncol *sizeof(double));
@@ -18,11 +20,13 @@ double* max(double *x, int nrow, int ncol) {
 double* min(double *x, int nrow, int ncol) {
     double *min_out = (double*) malloc(ncol *sizeof(double));
     for(int j=0; j<ncol; j++) {
-        min_out[j] = 0;
+        min_out[j] = -1;
     }
     for(int i=0; i<nrow; i++) {
         for(int j=0; j<ncol; j++) {
-            if( min_out[j] > x[i*ncol+j] ) {
+            if( min_out[j] == -1) {
+                min_out[j] = x[i*ncol+j];
+            } else if( min_out[j] > x[i*ncol+j] ) {
                min_out[j] = x[i*ncol+j];
             }
         }
@@ -41,7 +45,7 @@ double* hist(double *x, int nrow, int ncol, int precision = 10000) {
     double *max_w = max(x,nrow,ncol);
     double *min_w = min(x,nrow,ncol);
     for(int j=0; j<ncol; j++) {
-        steps[j] = ((double)abs(max_w[j])+(double)abs(min_w[j]))/precision;
+        steps[j] = ((double)fabs(max_w[j])+(double)fabs(min_w[j]))/precision;
     }
     for(int i=0; i<nrow; i++) {
         for(int j=0; j<ncol; j++) {
@@ -66,6 +70,42 @@ void hist_func(char *in_filename, char *out_filename, int precision) {
     double *x = read_csv_file(in_filename,'\t',nrow,ncol);
     double *h = hist(x, nrow, ncol, precision);
     write_csv_file(h, out_filename,'\t',precision+2,ncol);    
+    free(x);
+    free(h);
+}
+
+
+double* hist_pw(double *x_all, int nrow, int ncol, double min,double max,double step, double h) {
+    int prec = (abs(abs(max)-abs(min)))/step;
+    double *p_ret = new double[prec * ncol];
+    double p = min;
+    for(int j=0; j<prec; j++) {
+        p += step;
+        double *x = new double[ncol];
+        for(int i=0; i<ncol; i++) {
+            x[i] = p; 
+        }
+        for(int i=0; i<ncol; i++) {
+            p_ret[j*ncol + i] = parzen_window(x, x_all, nrow, ncol, i);        
+        }
+        delete x;
+    }
+    return p_ret;
+}
+
+void hist_pw_func(char *in_filename, char *out_filename, int precision) {
+    int nrow = count_rows(in_filename);
+    int ncol = count_cols(in_filename, '\t');
+    double *x = read_csv_file(in_filename,'\t',nrow,ncol);
+    double *h = hist_pw(x, nrow, ncol, 0, 1, 0.01, 0.1);
+    int prec = (abs(abs(0)-abs(1)))/0.01;
+    for(int i=0; i<prec; i++) {
+        for(int j=0; j<ncol; j++) {
+            printf("%f\t", h[i*ncol+j]); 
+        }
+        printf("\n");
+    }
+//    write_csv_file(h, out_filename,'\t',precision+2,ncol);    
     free(x);
     free(h);
 }

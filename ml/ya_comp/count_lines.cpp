@@ -23,9 +23,7 @@ int count_cols(char *filename, char delim) {
             }
             i++;
         }
-        if (col_count>0) {
-            col_count++;
-        }
+        col_count++;
 
     }
     free(buf);

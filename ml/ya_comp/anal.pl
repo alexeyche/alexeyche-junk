@@ -5,7 +5,7 @@ use Data::Dumper;
 use List::Util qw(sum);
 use POSIX;
 
-open(HIST,'<parse_out.hist');
+open(HIST,'<parse_out.norm.hist');
 
 my @hist;
 while(<HIST>) {
@@ -32,22 +32,23 @@ while(<TEST>) {
         my $step = (abs($mins[$i])+abs($maxs[$i]))/$prec;
         my $cell = floor(abs($line[$i]/$step));
         my $cur_den = $hist[$cell][$i];
-        if($cur_den != 0) {
-            $den = $den * $cur_den;
-        }
+        $den += $cur_den;
     }
     push @dens, $den;
 }
 close(TEST);
+
+my @dens_sorted = sort { $b <=> $a } @dens;
+my %den_to_range;
+@den_to_range{@dens_sorted} = (0 .. $#dens);
 
 my $i=0;
 open(TASK_TEST,'<dataset/test');
 while(<TASK_TEST>) {
     my @line = split('\t',$_);
     if ($line[2] eq 'M') {
-        print $dens[$i] ."\t". $line[0] . "\n";
+        print $line[0] ."\t". $den_to_range{$dens[$i]}. "\n";
         $i++;
     }    
 }
-
 close(TASK_TEST);
