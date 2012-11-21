@@ -75,8 +75,8 @@ void hist_func(char *in_filename, char *out_filename, int precision) {
 }
 
 
-double* hist_pw(double *x_all, int nrow, int ncol, double min,double max,double step, double h) {
-    int prec = (abs(abs(max)-abs(min)))/step;
+double* hist_pw(double *x_all, int nrow, int ncol, double min,double max, int prec, double h) {
+    double step = std::abs(std::abs(max) - std::abs(min))/prec;
     double *p_ret = new double[prec * ncol];
     double p = min;
     for(int j=0; j<prec; j++) {
@@ -86,7 +86,7 @@ double* hist_pw(double *x_all, int nrow, int ncol, double min,double max,double 
             x[i] = p; 
         }
         for(int i=0; i<ncol; i++) {
-            p_ret[j*ncol + i] = parzen_window(x, x_all, nrow, ncol, i);        
+            p_ret[j*ncol + i] = parzen_window(x, x_all, nrow, ncol, i, h);        
         }
         delete x;
     }
@@ -97,15 +97,8 @@ void hist_pw_func(char *in_filename, char *out_filename, int precision) {
     int nrow = count_rows(in_filename);
     int ncol = count_cols(in_filename, '\t');
     double *x = read_csv_file(in_filename,'\t',nrow,ncol);
-    double *h = hist_pw(x, nrow, ncol, 0, 1, 0.01, 0.1);
-    int prec = (abs(abs(0)-abs(1)))/0.01;
-    for(int i=0; i<prec; i++) {
-        for(int j=0; j<ncol; j++) {
-            printf("%f\t", h[i*ncol+j]); 
-        }
-        printf("\n");
-    }
-//    write_csv_file(h, out_filename,'\t',precision+2,ncol);    
+    double *h = hist_pw(x, nrow, ncol, 0, 1, precision, 0.05);
+    write_csv_file(h, out_filename,'\t',precision,ncol);    
     free(x);
     free(h);
 }
