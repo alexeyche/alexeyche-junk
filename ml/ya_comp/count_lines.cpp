@@ -2,6 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define _LARGEFILE_SOURCE 1
+#define _LARGEFILE64_SOURCE 1
+#define _FILE_OFFSET_BITS   64
+
 int count_cols(char *filename, char delim) {
     unsigned int col_count = 0;
     FILE *fp;

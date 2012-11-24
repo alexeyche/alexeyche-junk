@@ -55,13 +55,14 @@ if($ARGV[0] eq "-t") {
     open(OUT, '>parse_out.2.test');
 } else {
     $train_file = "dataset/train";    
-    open(TRAIN,"<$train_file");
+    open(TRAIN,"<$train_file") or die "$!";
     open(OUT, '>parse_out.2');
 }
 
 my $first_time=1;
 
-my $train_set_l=`./proc count_rows $train_file`;
+#my $train_set_l=`./proc count_rows $train_file`;
+my $train_set_l=52001965;
 my $ten_portion = floor($train_set_l/10);
 my $lines_num = 0;
 
