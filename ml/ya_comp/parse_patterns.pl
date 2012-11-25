@@ -10,16 +10,16 @@ sub uniq {
 }
 
 # load query classes
-open(QCLASS, '<q_class.c');
+open(QCLASS, '<q_class');
 my %query_class;
 while(<QCLASS>) {
     my @line = split('\t',$_);
-    $query_class{$line[0]} = $line[1];    
+    $query_class{$line[0]} = $line[2];    
 }
 close(QCLASS);
 
 open(TRAIN,'<dataset/train');
-open(OUT, '>parse_out');
+open(OUT, '>patterns_out');
 
 my $first_time=1;
 
@@ -30,7 +30,7 @@ my $lines_num = 0;
 my @pattern; 
 my $curr_serp;
 my %serp;
-my $switch_detected=0;
+my $switch_detected=1;
 while(<TRAIN>) {
     chomp($_);
     my $line = $_;
@@ -48,16 +48,14 @@ while(<TRAIN>) {
             $first_time = 0;
         } else {
             # write stats
-            if (not $switch_detected) {  # if switch not detected, decided to add switch manually
-                push @pattern, 'S';
-            }
-            print OUT join(',', @pattern) . "\n";
+            if ($switch_detected) {  
+                print OUT join(',', @pattern) . "\n";
+            }    
             undef(@pattern);
             foreach my $k (keys %serp) {
                 undef($serp{$k});
             }
             undef(%serp);
-            $switch_detected=0;
         }
         next;
     }
@@ -83,25 +81,31 @@ while(<TRAIN>) {
         my $serp_id = $line[3];        
         my $query_id = $line[4];
         my $click_pos = $serp{$serp_id}{$query_id};
+        my $click_class = "0";
+        if ($click_pos<4) {
+           $click_class = "1"; 
+        }
         if( $curr_serp == $serp_id ) {
-             push @pattern, "C" . $click_pos; 
+            push @pattern, "C" . $click_class;             
         } else {
-             push @pattern, "Cbad" . $click_pos; 
+             push @pattern, "Cb" . $click_class; 
         }
         undef($serp_id);
         undef($query_id);
         undef($click_pos);
     }
     if ($sess_type eq "S") {
-        $switch_detected = 1;
-        push @pattern, "S";
+#        $switch_detected = 1;
+#        push @pattern, "S";
     }
     undef($sess_id);
     undef($line);
     undef(@line);
     undef($sess_type);
 }
-
+if ($switch_detected) {  
+    print OUT join(',', @pattern) . "\n";
+}
 close(TRAIN);
-#close(PATTERNS);
+close(OUT);
 exit(0);
