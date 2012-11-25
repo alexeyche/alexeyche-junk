@@ -95,6 +95,7 @@ em <- function(x, mean.start, cov.start, delta.min) {
         }
     }
     list(mean = mean.calc, cov = cov.calc)
+    
 }
 
 
@@ -113,8 +114,9 @@ plot_gauss <- function(mean,cov) {
 }
 
 ret <- em(x,mean.start,cov.start,0.01)
-par(mfrow=c(1,4))
-for(j in 1:k) {
-    plot_gauss(ret$mean[,,j],ret$cov[,,j])
-}
-plot(x[,1],x[,2])
+plot_gauss()
+#par(mfrow=c(1,4))
+#for(j in 1:k) {
+#    plot_gauss(ret$mean[,,j],ret$cov[,,j])
+#}
+#plot(x[,1],x[,2])
