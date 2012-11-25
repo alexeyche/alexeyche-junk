@@ -4,7 +4,7 @@ x <- cbind( sample( c(rnorm(100, mean=5, sd=3), rnorm(100, mean=-5,sd=3)) ),
             sample( c(rnorm(130, mean=2, sd=0.5), rnorm(70, mean=0,sd=1)) )
           )  
 
-
+123
 m <- nrow(x)
 n <- ncol(x)
 
