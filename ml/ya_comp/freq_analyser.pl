@@ -21,10 +21,10 @@ close(PATTERNS);
 
 print "Patterns is counted\nWriting to file...\n";
 
-open(PATTERN_STAT, ">pattern_stat");
+open(PATTERNS_STAT, ">patterns_stat");
 
 foreach my $k (keys %patterns) {
-    print PATTERN_STAT "$k\t$patterns{$k}\n";
+    print PATTERNS_STAT "$k\t$patterns{$k}\n";
 }
 
-close(PATTERN_STAT);    
+close(PATTERNS_STAT);    
