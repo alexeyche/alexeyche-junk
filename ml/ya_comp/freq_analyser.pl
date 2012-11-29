@@ -19,12 +19,10 @@ while(<PATTERNS>) {
 
 close(PATTERNS); 
 
-print "Patterns is counted\nWriting to file...\n";
-
-open(PATTERNS_STAT, ">patterns_stat");
+#open(PATTERNS_STAT, ">patterns_stat");
 
 foreach my $k (keys %patterns) {
-    print PATTERNS_STAT "$k\t$patterns{$k}\n";
+    print "$k\t$patterns{$k}\n";
 }
 
-close(PATTERNS_STAT);    
+#close(PATTERNS_STAT);    
