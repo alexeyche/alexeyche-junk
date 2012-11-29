@@ -113,16 +113,38 @@ while(<TRAIN>) {
                 undef($serp{$k}{'query'});
                 undef($serp{$k})
             } 
-            ($AvgPosCount, $DwellTimeUntilClick, $SumDensBadQuery, $NumBackSerp, $QuerySimilarity, $ClickCount, $QueryWOClick) = 
-                (AvgPosCountRate($AvgPosCount), 
-                 DwellTimeUntilClickRate($DwellTimeUntilClick),
-                 SumDensBadQueryRate($SumDensBadQuery),
-                 NumBackSerpRate($NumBackSerp),
-                 QuerySimilarityRate($QuerySimilarity),
-                 ClickCountRate($ClickCount),
-                 QueryWOClickRate($QueryWOClick) 
-                 );
-            print OUT &make_out_s($AvgPosCount, $DwellTimeUntilClick, $SumDensBadQuery, $NumBackSerp, $QuerySimilarity, $ClickCount, $QueryWOClick);
+#            ($AvgPosCount, $DwellTimeUntilClick, $SumDensBadQuery, $NumBackSerp, $QuerySimilarity, $ClickCount, $QueryWOClick) = 
+#                (AvgPosCountRate($AvgPosCount), 
+#                 DwellTimeUntilClickRate($DwellTimeUntilClick),
+#                 SumDensBadQueryRate($SumDensBadQuery),
+#                 NumBackSerpRate($NumBackSerp),
+#                 QuerySimilarityRate($QuerySimilarity),
+#                 ClickCountRate($ClickCount),
+#                 QueryWOClickRate($QueryWOClick) 
+#                 );
+            my $label = '';
+            if($AvgPosCount>4) {
+               $label = $label . "f1";
+            }
+            if($DwellTimeUntilClick>300){
+               $label = $label . "f2";
+            }
+            if($SumDensBadQuery>0.0005){
+               $label = $label . "f3";
+            }
+            if($NumBackSerp>0){
+               $label = $label . "f4";
+            }
+            if($QuerySimilarity>0){
+               $label = $label . "f5";
+            }
+            if($ClickCount>0){
+               $label = $label . "f6";
+            }
+            if($QueryWOClick>0){
+               $label = $label . "f7";
+            }
+            print OUT &make_out_s($AvgPosCount, $DwellTimeUntilClick, $SumDensBadQuery, $NumBackSerp, $QuerySimilarity, $ClickCount, $QueryWOClick, $label);
 
             
             undef(%serp);
@@ -197,16 +219,39 @@ while(<TRAIN>) {
                 undef($serp{$k}{'query'});
                 undef($serp{$k})
             } 
-            ($AvgPosCount, $DwellTimeUntilClick, $SumDensBadQuery, $NumBackSerp, $QuerySimilarity, $ClickCount, $QueryWOClick) = 
-                (AvgPosCountRate($AvgPosCount), 
-                 DwellTimeUntilClickRate($DwellTimeUntilClick),
-                 SumDensBadQueryRate($SumDensBadQuery),
-                 NumBackSerpRate($NumBackSerp),
-                 QuerySimilarityRate($QuerySimilarity),
-                 ClickCountRate($ClickCount),
-                 QueryWOClickRate($QueryWOClick) 
-                 );
-            print OUT &make_out_s($AvgPosCount, $DwellTimeUntilClick, $SumDensBadQuery, $NumBackSerp, $QuerySimilarity, $ClickCount, $QueryWOClick);
+#            ($AvgPosCount, $DwellTimeUntilClick, $SumDensBadQuery, $NumBackSerp, $QuerySimilarity, $ClickCount, $QueryWOClick) = 
+#                (AvgPosCountRate($AvgPosCount), 
+#                 DwellTimeUntilClickRate($DwellTimeUntilClick),
+#                 SumDensBadQueryRate($SumDensBadQuery),
+#                 NumBackSerpRate($NumBackSerp),
+#                 QuerySimilarityRate($QuerySimilarity),
+#                 ClickCountRate($ClickCount),
+#                 QueryWOClickRate($QueryWOClick) 
+#                 );
+            my $label = '';
+            if($AvgPosCount>4) {
+               $label = $label . "f1";
+            }
+            if($DwellTimeUntilClick>300){
+               $label = $label . "f2";
+            }
+            if($SumDensBadQuery>0.0005){
+               $label = $label . "f3";
+            }
+            if($NumBackSerp>0){
+               $label = $label . "f4";
+            }
+            if($QuerySimilarity>0){
+               $label = $label . "f5";
+            }
+            if($ClickCount>0){
+               $label = $label . "f6";
+            }
+            if($QueryWOClick>0){
+               $label = $label . "f7";
+            }
+
+            print OUT &make_out_s($AvgPosCount, $DwellTimeUntilClick, $SumDensBadQuery, $NumBackSerp, $QuerySimilarity, $ClickCount, $QueryWOClick, $label);
             
             undef(%serp);
             undef(@clicks_pos);

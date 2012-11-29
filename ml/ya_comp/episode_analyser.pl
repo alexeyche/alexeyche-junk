@@ -41,7 +41,9 @@ while(<PATT_OUT>) {
                  if(isQueryBad($el) or isQueryBad($last)) {
                      $new_stat = "Qbadn";
                  } else {
-                     $new_stat = "Qn";
+                     if(not $stat eq "Qbadn") {
+                        $new_stat = "Qn";
+                     }
                  }
             }
             if(isClick($el) and isQuery($last)) {
@@ -51,7 +53,9 @@ while(<PATT_OUT>) {
                 $new_stat = "Cn";              
             } 
             if(not $stat eq $new_stat) {
-                push @stats, $stat;  # saving already old stat
+                if($stat) {
+                    push @stats, $stat;  # saving already old stat
+                }
                 $stat = $new_stat;
             }
         }
