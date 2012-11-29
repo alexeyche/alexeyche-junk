@@ -80,9 +80,8 @@ double* split(char *line, char delim,char delCount) {
 //        return str;
 //}
 
-void add_feat_to_model(ME_Model & model, double *feat, int nfeat = 7)
+void add_feat_to_model(ME_Model & model, double *feat, char *label, int nfeat = 7)
 {
-    char *label = label_sample(feat); 
     ME_Sample samp(label);
     for(int i=0; i<nfeat; i++) {
         char *mark = (char*) malloc(10 * sizeof(char));
@@ -92,12 +91,8 @@ void add_feat_to_model(ME_Model & model, double *feat, int nfeat = 7)
     model.add_training_sample(samp);
 }
 
-
-
-int main(int argc, char *argv[]) {
-    ME_Model model;
+int process_file(char *filename, ME_Model & model, char *label, int countLines) {
     int ncols = 7;
-    char *filename = argv[1];
     int buffer = 300;
     char *buf = (char*) malloc( buffer * sizeof(char));
     FILE *fp;
@@ -107,12 +102,14 @@ int main(int argc, char *argv[]) {
         while ( fgets( buf, buffer, fp ) != NULL ) {
             double *spl = split(buf, '\t', ncols);
             for(unsigned char i=0; i<ncols; i++) {
-                add_feat_to_model(model, spl);
+                add_feat_to_model(model, spl, label);
             }
-//            printf("%d processed\n", count);
+            if(count%100000 == 0) {
+                printf("%d processed\n", count);
+            }
             count++;
             free(spl);
-            if(count>2000000) {
+            if(count>countLines) {
                 break;
             }
         }                
@@ -124,9 +121,22 @@ int main(int argc, char *argv[]) {
         free(buf);
         return 1;
     }
+    free(buf);
+}
+
+
+int main(int argc, char *argv[]) {
+    ME_Model model;
+    int test_size = 4546558;
+    char *train = argv[1];
+    char *test = argv[2];
+    // for train data, bad label:
+    char *bad_label = "bad";
+    char *good_label = "good";
+    process_file(train, model, bad_label, test_size/6);
+    process_file(test, model, good_label, test_size/10);
     printf("Start training\n");
     model.train();
     model.save_to_file("model");
-    free(buf);
     return 0;
 }    

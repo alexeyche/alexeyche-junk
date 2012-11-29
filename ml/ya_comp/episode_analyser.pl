@@ -38,13 +38,13 @@ while(<PATT_OUT>) {
         chomp($el);
         if($last) {
             if(isQuery($el) and isQuery($last)) {
-                 if(isQueryBad($el) or isQueryBad($last)) {
-                     $new_stat = "Qbadn";
-                 } else {
-                     if(not $stat eq "Qbadn") {
+#                 if(isQueryBad($el) or isQueryBad($last)) {
+#                     $new_stat = "Qbadn";
+#                 } else {
+#                     if(not $stat eq "Qbadn") {
                         $new_stat = "Qn";
-                     }
-                 }
+#                     }
+#                 }
             }
             if(isClick($el) and isQuery($last)) {
                 $new_stat = "QCn";              
@@ -61,7 +61,9 @@ while(<PATT_OUT>) {
         }
         $last = $el;
     }
-    print PATT_CALC join(",",@line) . " = ". join(",", @stats)."\n";
+    push @stats, $stat;
+#    print PATT_CALC join(",",@line) . " = ". join(",", @stats)."\n";
+    print PATT_CALC join(",", @stats)."\n";
 }
 close(PATT_OUT);
 close(PATT_CALC);

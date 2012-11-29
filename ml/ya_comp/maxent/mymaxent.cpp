@@ -97,7 +97,8 @@ void add_feat_to_model(ME_Model & model, double *feat, int nfeat = 7)
 int main(int argc, char *argv[]) {
     ME_Model model;
     int ncols = 7;
-    char *filename = argv[1];
+    char *train = argv[1];
+    char *test = argv[2];
     int buffer = 300;
     char *buf = (char*) malloc( buffer * sizeof(char));
     FILE *fp;
