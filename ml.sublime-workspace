@@ -1,0 +1,309 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"plo",
+				"plot_gauss"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "/home/che/prog/ya_comp/parse.pl",
+			"settings":
+			{
+				"buffer_size": 6815,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "#!/usr/bin/RScript\n\n\n",
+			"file": "ml/maxent/ex.R",
+			"file_size": 19,
+			"file_write_time": 1354123484000000,
+			"settings":
+			{
+				"buffer_size": 21,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "Packages/User/RScript.sublime-build",
+	"command_palette":
+	{
+		"height": 243.0,
+		"selected_items":
+		[
+			[
+				"defa",
+				"Preferences: Key Bindings - Default"
+			],
+			[
+				"setting",
+				"Preferences: Settings - User"
+			],
+			[
+				"in",
+				"Package Control: Install Package"
+			],
+			[
+				"",
+				"Preferences: Settings - User"
+			],
+			[
+				"Load",
+				"Snippet: Load Dataset"
+			],
+			[
+				"repl",
+				"SublimeREPL: Erlang"
+			],
+			[
+				"ins",
+				"Package Control: Install Package"
+			],
+			[
+				"bui",
+				"Build: Build"
+			],
+			[
+				":$",
+				":$ - EOF"
+			],
+			[
+				"Package Control: ",
+				"Package Control: List Packages"
+			],
+			[
+				"dens",
+				"Snippet: Density"
+			]
+		],
+		"width": 449.0
+	},
+	"console":
+	{
+		"height": 139.0
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/home/che/Downloads/What_about_Bob_1991_[torrents.ru]/What_about_Bob_1991_[torrents.ru].sub",
+		"/home/che/prog/alexeyche-junk/ml/density_split/spl.R",
+		"/home/che/.config/sublime-text-2/Packages/Default/Default (Linux).sublime-keymap",
+		"/home/che/.config/sublime-text-2/Packages/User/Default (Linux).sublime-keymap",
+		"/home/che/.config/sublime-text-2/Packages/User/Preferences.sublime-settings",
+		"/home/che/.config/sublime-text-2/Packages/Default/Preferences.sublime-settings",
+		"/home/che/prog/alexeyche-junk/ml/ya_comp/episode_analyser.pl",
+		"/home/che/prog/alexeyche-junk/ml/ya_comp/egh.pl",
+		"/home/che/prog/alexeyche-junk/ml/ya_comp/parse_patterns.pl",
+		"/home/che/prog/alexeyche-junk/ml/ya_comp/freq_analyser.pl",
+		"/home/che/.config/sublime-text-2/Packages/User/Git.sublime-settings",
+		"/home/che/.config/sublime-text-2/Packages/User/RScript.sublime-build",
+		"/home/che/.config/sublime-text-2/Packages/SublimeREPL/SublimeREPL.sublime-settings",
+		"/home/che/.config/sublime-text-2/Packages/User/SublimeREPL.sublime-settings",
+		"/home/che/.config/sublime-text-2/Packages/Vintage Numbers/README.md",
+		"/home/che/.config/sublime-text-2/Packages/Package Control/Package Control.sublime-settings",
+		"/home/che/.config/sublime-text-2/Packages/User/Package Control.sublime-settings",
+		"/home/che/.config/sublime-text-2/Packages/R/Load-Dataset.sublime-snippet",
+		"/home/che/.config/sublime-text-2/Packages/R/Divide-Into-Intervals.sublime-snippet"
+	],
+	"find":
+	{
+		"height": 35.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"insert",
+			"ctrl+b",
+			"plot_gauss",
+			"shift+f7",
+			"ctrl+f7",
+			"ctrl+r",
+			"ctrl+v",
+			"sep",
+			"word_sep",
+			"word_spe",
+			"keybin",
+			"keybu",
+			"Rncol",
+			"Vinta",
+			"vinta",
+			"Vin",
+			"vinta",
+			"ignore_pac",
+			"vim",
+			"Vinta",
+			"vinta",
+			"mean.reg",
+			")\n",
+			"mean.reg"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 1,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "/home/che/prog/ya_comp/parse.pl",
+					"settings":
+					{
+						"buffer_size": 6815,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Perl/Perl.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "ml/maxent/ex.R",
+					"settings":
+					{
+						"buffer_size": 21,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/R/R.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 34.0
+	},
+	"input":
+	{
+		"height": 33.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 112.0
+	},
+	"output.git":
+	{
+		"height": 112.0
+	},
+	"replace":
+	{
+		"height": 0.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+			[
+				"",
+				"/home/che/prog/alexeyche-junk/ml/density_split/spl.R"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"selected_items":
+		[
+		],
+		"width": 380.0
+	},
+	"show_minimap": true,
+	"show_open_files": true,
+	"show_tabs": true,
+	"side_bar_visible": false,
+	"side_bar_width": 150.0,
+	"status_bar_visible": true
+}
