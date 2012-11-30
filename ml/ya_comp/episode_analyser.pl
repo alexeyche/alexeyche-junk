@@ -25,8 +25,8 @@ sub isClick {
     return 0;
 }
 
-open(PATT_OUT, "<patterns_out");
-open(PATT_CALC, ">patterns_calc");
+my $file = $ARGV[0];
+open(PATT_OUT, "<$file");
 
 while(<PATT_OUT>) {
     my @line = split(',',$_);
@@ -68,7 +68,6 @@ while(<PATT_OUT>) {
     }
     
 #    print PATT_CALC join(",",@line) . " = ". join(",", @stats)."\n";
-    print PATT_CALC join(",", @stats)."\n";
+    print join(",", @stats)."\n";
 }
 close(PATT_OUT);
-close(PATT_CALC);

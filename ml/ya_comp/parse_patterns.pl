@@ -18,8 +18,8 @@ while(<QCLASS>) {
 }
 close(QCLASS);
 
-open(TRAIN,'<dataset/train');
-open(OUT, '>patterns_out');
+my $file = $ARGV[0];
+open(TRAIN, "<$file");
 
 my $first_time=1;
 
@@ -49,7 +49,7 @@ while(<TRAIN>) {
         } else {
             # write stats
             if ($switch_detected) {  
-                print OUT join(',', @pattern) . "\n";
+                print join(',', @pattern) . "\n";
             }    
             undef(@pattern);
             foreach my $k (keys %serp) {
@@ -104,8 +104,7 @@ while(<TRAIN>) {
     undef($sess_type);
 }
 if ($switch_detected) {  
-    print OUT join(',', @pattern) . "\n";
+    print join(',', @pattern) . "\n";
 }
 close(TRAIN);
-close(OUT);
 exit(0);
