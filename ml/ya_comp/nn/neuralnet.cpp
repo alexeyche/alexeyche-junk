@@ -13,14 +13,14 @@ int main(int argc, char* argv[])
 
 	// prepare XOR traing data
 	double data[][4]={
-				{0,	0,	0,	0},
+				{0,	0,	0,	1},
 			    {0,	0,	1,	1},
 				{0,	1,	0,	1},
-				{0,	1,	1,	0},
+				{0,	1,	1,	1},
 				{1,	0,	0,	1},
-				{1,	0,	1,	0},
-				{1,	1,	0,	0},
-				{1,	1,	1,	1}};
+				{1,	0,	1,	1},
+				{1,	1,	0,	1}};
+//				{1,	1,	1,	0}};
 
 	// prepare test data	
 	double testData[][3]={
@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
 	// defining a net with 4 layers having 3,3,3, and 1 neuron respectively,
 	// the first layer is input layer i.e. simply holder for the input parameters
 	// and has to be the same size as the no of input parameters, in out example 3
-	int numLayers = 4, lSz[4] = {3,3,3,1};
+	int numLayers = 3, lSz[3] = {3,20,1};
 
 	
 	// Learing rate - beta

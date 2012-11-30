@@ -61,7 +61,12 @@ while(<PATT_OUT>) {
         }
         $last = $el;
     }
-    push @stats, $stat;
+    if(not $stat and not @stats) {
+        push @stats, $last;
+    } else {
+        push @stats, $stat;
+    }
+    
 #    print PATT_CALC join(",",@line) . " = ". join(",", @stats)."\n";
     print PATT_CALC join(",", @stats)."\n";
 }
