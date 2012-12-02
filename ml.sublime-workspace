@@ -4,6 +4,14 @@
 		"selected_items":
 		[
 			[
+				"data",
+				"data"
+			],
+			[
+				"data.",
+				"data.f1"
+			],
+			[
 				"plo",
 				"plot_gauss"
 			]
@@ -11,32 +19,25 @@
 	},
 	"buffers":
 	[
-		{
-			"file": "/home/che/prog/ya_comp/parse.pl",
-			"settings":
-			{
-				"buffer_size": 6815,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"contents": "#!/usr/bin/RScript\n\n\n",
-			"file": "ml/maxent/ex.R",
-			"file_size": 19,
-			"file_write_time": 1354123484000000,
-			"settings":
-			{
-				"buffer_size": 21,
-				"line_ending": "Unix"
-			}
-		}
 	],
 	"build_system": "Packages/User/RScript.sublime-build",
 	"command_palette":
 	{
-		"height": 243.0,
+		"height": 369.0,
 		"selected_items":
 		[
+			[
+				"git p",
+				"Git: Push"
+			],
+			[
+				"git c",
+				"Git: Commit"
+			],
+			[
+				"git add",
+				"Git: Add Current File"
+			],
 			[
 				"defa",
 				"Preferences: Key Bindings - Default"
@@ -99,6 +100,13 @@
 	},
 	"file_history":
 	[
+		"/home/che/prog/alexeyche-junk/ml/maxent/ex.R",
+		"/home/che/prog/ya_comp/rate.pl",
+		"/home/che/prog/ya_comp/parse.pl",
+		"/home/che/prog/mcm.R",
+		"/home/che/prog/ya_comp/parse_out.subl",
+		"/home/che/prog/alexeyche-junk/ml/maxent/test_set",
+		"/home/che/prog/alexeyche-junk/ml.sublime-project",
 		"/home/che/Downloads/What_about_Bob_1991_[torrents.ru]/What_about_Bob_1991_[torrents.ru].sub",
 		"/home/che/prog/alexeyche-junk/ml/density_split/spl.R",
 		"/home/che/.config/sublime-text-2/Packages/Default/Default (Linux).sublime-keymap",
@@ -176,63 +184,8 @@
 	"groups":
 	[
 		{
-			"selected": 1,
 			"sheets":
 			[
-				{
-					"buffer": 0,
-					"file": "/home/che/prog/ya_comp/parse.pl",
-					"settings":
-					{
-						"buffer_size": 6815,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Perl/Perl.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "ml/maxent/ex.R",
-					"settings":
-					{
-						"buffer_size": 21,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/R/R.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				}
 			]
 		}
 	],

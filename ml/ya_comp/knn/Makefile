@@ -1,4 +1,4 @@
-CFLAGS = -O2 -Wall -DNDEBUG -g
+CFLAGS = -Wall -DNDEBUG -g #-O2 -Wall -DNDEBUG -g
 OBJS = 
 
 all: knn

@@ -12,8 +12,11 @@ double* mean(double *x, int nrow, int ncol) {
     for(int i=0; i<nrow; i++) {
         for(int j=0; j<ncol; j++) {
             double val = x[i*ncol+j];
-            means[j] += val/nrow;
+            means[j] = means[j] + val;
         }
+    }
+    for(int j=0; j<ncol; j++) {
+        means[j] = means[j]/nrow;
     }
     return means;
 }

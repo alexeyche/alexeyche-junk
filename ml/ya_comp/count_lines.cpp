@@ -13,7 +13,7 @@ int count_cols(char *filename, char delim) {
     char *buf = (char*) malloc(buffer * sizeof(char));
     if ( ( fp = fopen( filename, "r" ) ) != NULL )
     {
-        char *first_row;
+        //char *first_row;
         if (fgets( buf, buffer, fp ) == NULL) {
             fclose( fp );
             free(buf);

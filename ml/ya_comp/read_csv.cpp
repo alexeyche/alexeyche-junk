@@ -7,10 +7,11 @@ char* spliceChar(char *array, int start, int end) {
         return NULL;
     }
     int delta = end - start;
-    char *splice_out = (char*) malloc(delta * sizeof(char));
-    for(unsigned int i=0; i<delta;i++) {
+    char *splice_out = new char[delta+1];
+    for(int i=0; i<delta;i++) {
         splice_out[i] = array[start+i];
     }
+    splice_out[delta] = '\0';
     return splice_out;
 }
 
@@ -20,7 +21,7 @@ double* splice(double *array, int start, int end) {
     }
     int delta = end - start;
     double *splice_out = (double*) malloc(delta * sizeof(double));
-    for(unsigned int i=0; i<delta;i++) {
+    for(int i=0; i<delta;i++) {
         splice_out[i] = array[start+i];
     }
     return splice_out;
@@ -29,19 +30,19 @@ double* splice(double *array, int start, int end) {
 double* split(char *line, char delim,char delCount) {
     double *ret = (double*) malloc(delCount * sizeof(double));
     int length = strlen(line);
-    unsigned int ret_c = 0;
-    unsigned int last_d = 0;
-    for(unsigned int i=0; i<length; i++) {
+    int ret_c = 0;
+    int last_d = -1;
+    for(int i=0; i<length; i++) {
         if ((line[i] == delim) || (line[i] == '\n')) {
-            char *buff = spliceChar(line,last_d,i);
+            char *buff = spliceChar(line,last_d+1,i);
             if(buff == NULL) {
                 break;
             }
             ret[ret_c] = atof(buff);
-            free(buff);
+            delete buff;
            
             ret_c++;
-            if(ret_c == delCount) {
+            if((ret_c == delCount)) {// ||(line[i+1] == '\n')) {
                 break;
             }
             last_d = i; 
@@ -54,13 +55,12 @@ double *read_csv_file(const char *filename, char delim, int nrows, int ncols, in
     double *x = (double*) malloc(nrows * ncols * sizeof(double));
     char *buf = (char*) malloc(buffer * sizeof(char));
     FILE *fp;
-    char test_buf[ buffer ];
     int count=0;
     if ( ( fp = fopen( filename, "r" ) ) != NULL )
     {
         while ( fgets( buf, buffer, fp ) != NULL ) {
             double *spl = split(buf, delim, ncols);
-            for(unsigned char i=0; i<ncols; i++) {
+            for(int i=0; i<ncols; i++) {
                 x[ count * ncols + i ] = spl[i];           
             }
             count++;

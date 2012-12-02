@@ -40,7 +40,7 @@ while(<TRAIN>) {
 # percentage
     $lines_num = $lines_num+1; 
     if ($lines_num % 5000000 == 0) {
-        print $lines_num/$train_set_l . "\n";
+        print STDERR $lines_num/$train_set_l . "\n";
     }
 # ------    
     if ($sess_type eq "M") {

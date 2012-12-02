@@ -49,15 +49,8 @@ while(<QCLASS>) {
 close(QCLASS);
 
 my $train_file;
-if($ARGV[0] eq "-t") {
-    $train_file = "dataset/test";    
-    open(TRAIN,"<$train_file");
-    open(OUT, '>parse_out.2.test');
-} else {
-    $train_file = "dataset/train";    
-    open(TRAIN,"<$train_file") or die "$!";
-    open(OUT, '>parse_out.2');
-}
+my $file = $ARGV[0];
+open(TRAIN, "<$file");
 
 my $first_time=1;
 
@@ -72,8 +65,10 @@ my $DwellTimeUntilClick=0;
 my $SumDensBadQuery=0;
 my $NumBackSerp=0;
 my $QuerySimilarity = 0;
-my $ClickCount=0;
+my $Click2Query=0;
 my $QueryWOClick=0;
+my $UserBack=0;
+my $WholeSessionTime=0;
 # sevice vars
 my @clicks_pos;
 my @dwell_times_until_click;
@@ -81,7 +76,9 @@ my $last_was_query=0;
 my $curr_serp;
 my %serp;
 my @last_query_urls;
-
+my $user_id;
+my $query_count=0;
+my $click_count=0;
 while(<TRAIN>) {
     chomp($_);
     my $line = $_;
@@ -91,15 +88,16 @@ while(<TRAIN>) {
 # percentage
     $lines_num = $lines_num+1; 
     if ($lines_num % $ten_portion == 0) {
-        print $lines_num/$train_set_l . "\n";
+        print STDERR $lines_num/$train_set_l . "\n";
     }
 # ------    
     if ($sess_type eq "M" ) {
         if ($first_time) {
+            $user_id = $line[3];
             $first_time = 0;
         } else {
             # write stats
-            if ($ClickCount != 0) {
+            if ($click_count != 0) {
                 $AvgPosCount = sum(@clicks_pos)/@clicks_pos;
                 $DwellTimeUntilClick = sum(@dwell_times_until_click)/@dwell_times_until_click;
             } else {
@@ -113,57 +111,45 @@ while(<TRAIN>) {
                 undef($serp{$k}{'query'});
                 undef($serp{$k})
             } 
-#            ($AvgPosCount, $DwellTimeUntilClick, $SumDensBadQuery, $NumBackSerp, $QuerySimilarity, $ClickCount, $QueryWOClick) = 
+            $Click2Query = $click_count/$query_count;
+#            ($AvgPosCount, $DwellTimeUntilClick, $SumDensBadQuery, $NumBackSerp, $QuerySimilarity, $click_count, $QueryWOClick) = 
 #                (AvgPosCountRate($AvgPosCount), 
 #                 DwellTimeUntilClickRate($DwellTimeUntilClick),
 #                 SumDensBadQueryRate($SumDensBadQuery),
 #                 NumBackSerpRate($NumBackSerp),
 #                 QuerySimilarityRate($QuerySimilarity),
-#                 ClickCountRate($ClickCount),
+#                 click_countRate($click_count),
 #                 QueryWOClickRate($QueryWOClick) 
 #                 );
-            my $label = '';
-            if($AvgPosCount>4) {
-               $label = $label . "f1";
+           
+            print &make_out_s($AvgPosCount, $DwellTimeUntilClick, $SumDensBadQuery, $NumBackSerp, $QuerySimilarity, $Click2Query, $QueryWOClick, $WholeSessionTime);
+            if($line[3] == $user_id) {
+                $UserBack++;
+            } else {
+                $UserBack=0;
             }
-            if($DwellTimeUntilClick>300){
-               $label = $label . "f2";
-            }
-            if($SumDensBadQuery>0.0005){
-               $label = $label . "f3";
-            }
-            if($NumBackSerp>0){
-               $label = $label . "f4";
-            }
-            if($QuerySimilarity>0){
-               $label = $label . "f5";
-            }
-            if($ClickCount>0){
-               $label = $label . "f6";
-            }
-            if($QueryWOClick>0){
-               $label = $label . "f7";
-            }
-            print OUT &make_out_s($AvgPosCount, $DwellTimeUntilClick, $SumDensBadQuery, $NumBackSerp, $QuerySimilarity, $ClickCount, $QueryWOClick, $label);
-
             
             undef(%serp);
             undef(@clicks_pos);
             undef(@dwell_times_until_click);
             undef(@last_query_urls);
             $last_was_query=0;
+            $click_count=0;            
+            $query_count=0;
             
             $AvgPosCount=0;
             $DwellTimeUntilClick=0;
             $SumDensBadQuery=0;
             $NumBackSerp=0;
             $QuerySimilarity=0;
-            $ClickCount=0;            
             $QueryWOClick=0;
+            $WholeSessionTime=0;
         }
         next;
     }
     if ($sess_type eq "Q") {
+        $WholeSessionTime = $line[1];
+        $query_count += 1;
         $curr_serp = $line[3];
         my $query_id = $line[4];
         if (exists $query_prob{$query_id}) {
@@ -191,7 +177,8 @@ while(<TRAIN>) {
         $last_was_query=0;
     }
     if ($sess_type eq "C") {
-        $ClickCount += 1;
+        $WholeSessionTime = $line[1];
+        $click_count += 1;
         my $serp_id = $line[3];        
         my $query_id = $line[4];
         $serp{$serp_id}{'clicks'} += 1;
@@ -203,9 +190,12 @@ while(<TRAIN>) {
         undef($serp_id);
         undef($query_id);
     }
+    if($sess_type eq 'S') {
+        $WholeSessionTime = $line[1];
+    }
     if($lines_num == $train_set_l) {
             # write stats
-            if ($ClickCount != 0) {
+            if ($click_count != 0) {
                 $AvgPosCount = sum(@clicks_pos)/@clicks_pos;
                 $DwellTimeUntilClick = sum(@dwell_times_until_click)/@dwell_times_until_click;
             } else {
@@ -219,39 +209,17 @@ while(<TRAIN>) {
                 undef($serp{$k}{'query'});
                 undef($serp{$k})
             } 
-#            ($AvgPosCount, $DwellTimeUntilClick, $SumDensBadQuery, $NumBackSerp, $QuerySimilarity, $ClickCount, $QueryWOClick) = 
+#            ($AvgPosCount, $DwellTimeUntilClick, $SumDensBadQuery, $NumBackSerp, $QuerySimilarity, $click_count, $QueryWOClick) = 
 #                (AvgPosCountRate($AvgPosCount), 
 #                 DwellTimeUntilClickRate($DwellTimeUntilClick),
 #                 SumDensBadQueryRate($SumDensBadQuery),
 #                 NumBackSerpRate($NumBackSerp),
 #                 QuerySimilarityRate($QuerySimilarity),
-#                 ClickCountRate($ClickCount),
+#                 click_countRate($click_count),
 #                 QueryWOClickRate($QueryWOClick) 
 #                 );
-            my $label = '';
-            if($AvgPosCount>4) {
-               $label = $label . "f1";
-            }
-            if($DwellTimeUntilClick>300){
-               $label = $label . "f2";
-            }
-            if($SumDensBadQuery>0.0005){
-               $label = $label . "f3";
-            }
-            if($NumBackSerp>0){
-               $label = $label . "f4";
-            }
-            if($QuerySimilarity>0){
-               $label = $label . "f5";
-            }
-            if($ClickCount>0){
-               $label = $label . "f6";
-            }
-            if($QueryWOClick>0){
-               $label = $label . "f7";
-            }
-
-            print OUT &make_out_s($AvgPosCount, $DwellTimeUntilClick, $SumDensBadQuery, $NumBackSerp, $QuerySimilarity, $ClickCount, $QueryWOClick, $label);
+            $Click2Query = $click_count/$query_count;
+            print &make_out_s($AvgPosCount, $DwellTimeUntilClick, $SumDensBadQuery, $NumBackSerp, $QuerySimilarity, $Click2Query, $QueryWOClick, $WholeSessionTime);
             
             undef(%serp);
             undef(@clicks_pos);
@@ -264,8 +232,9 @@ while(<TRAIN>) {
             $SumDensBadQuery=0;
             $NumBackSerp=0;
             $QuerySimilarity=0;
-            $ClickCount=0;            
+            $Click2Query=0;            
             $QueryWOClick=0;   
+            $WholeSessionTime=0;
     }
     undef($sess_id);
     undef($line);
@@ -274,5 +243,4 @@ while(<TRAIN>) {
 }
 
 close(TRAIN);
-#close(PATTERNS);
 exit(0);
