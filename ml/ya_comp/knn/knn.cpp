@@ -7,12 +7,12 @@
 #define PI 3.14159265358979
 
 
-double euclidean_dist(double *x1, double *x2, int n) {
-    double sq_dist = 0;
+double euclidean_dist(double *x1, double *x2,  int n, int grad = 2) {
+    double unp_dist = 0;
     for(int i=0; i<n; i++) {
-        sq_dist = sq_dist + pow(x1[i]-x2[i],2);
+        unp_dist = unp_dist + pow(x1[i]-x2[i],grad);
     }
-    return sqrt(sq_dist);
+    return pow(unp_dist,(double)1/grad);
 }
 
 template <typename T>
@@ -23,11 +23,10 @@ void shift_and_insert(T *arr, T value, int i, int n) {
     arr[i] = value;
 }
 
-void insert_in_min_seq(double *min_seq, int *min_index, double value, int index, int n) {
+void insert_in_min_seq(double *min_seq, double value, int n) {
     for(int i=0; i<n; i++) {
         if(value < min_seq[i]) {
             shift_and_insert<double>(min_seq, value, i, n);             
-            shift_and_insert<int>(min_index, index, i, n);
             break;
         }
     }
@@ -57,35 +56,44 @@ double hypersphere_volume(double r, int n) {
     }
 }
 
+template <typename T>
+int compare(const void* a, const void* b)
+{
+    if (*(T*)a < *(T*)b)
+        return -1;
+    else if (*(T*)a > *(T*)b)
+        return 1;
+    else
+        return 0;
+}
+
 double* knn(double *x, int m, int n, int k) {
-    for(int cur=0; cur<7; cur++) {
-        double *x_et = splice(x,cur*n,cur*n+n);  // first element 
-        double *min_dist = new double[k];
-        int *min_index = new int[k];
-        //init min_dist
-        for(int it=0; it<k; it++) {
-            min_dist[it] = 999;
-            min_index[it] = -1;
+    double *y = new double[m];
+    double *dists = new double[m];
+    for(int cur=0; cur<m; cur++) {
+        if(cur%10000 == 0) {
+            printf("%d lines processed\n", cur);
         }
+        double *x_et = splice(x,cur*n,cur*n+n);  // first element 
         for(int i=0; i<m; i++) {
             if(i != cur) {    // exclude myself
                 double *x_cur = splice(x,i*n, i*n+n);
-                double dist = euclidean_dist(x_et,x_cur,n);
+                dists[i] = euclidean_dist(x_et,x_cur,n);
                 free(x_cur);
-                insert_in_min_seq(min_dist, min_index, dist, i, k);
+            } else {
+                dists[i] = -1;
             }
         }
-//        printf("%f %f %f %f\n", min_dist[0],min_dist[1],min_dist[2],min_dist[3]);
-//        printf("%d %d %d %d\n", min_index[0],min_index[1],min_index[2],min_index[3]);
-//        printf("//------------------------------------------\n");
-        double rad = min_dist[k-1];
+        qsort(dists,m,sizeof(double),compare<double>);
+        double rad = dists[k];
         double Vhs = hypersphere_volume(rad, n);
-        double y = (k/(m-1))/Vhs;
-        printf("%f %f %f \n", rad, Vhs, y);
-        delete []min_dist;
-        delete []min_index;
+        double y_cur = ((double)(k-1)/(m-1))/Vhs;
+        y[cur] = y_cur;
+        printf("%f %f %f\n", rad, Vhs, y[cur]);
         free(x_et);
     }
+    delete []dists;
+    return y;
 }
 
 void test_euclidean_dist() {
@@ -109,9 +117,10 @@ int main(int argc, char *argv[]) {
     int nrow = count_rows(input_f);
     int ncol = count_cols(input_f, '\t');
     double *x = read_csv_file(input_f,'\t',nrow,ncol);
-    double k1 = 1;
+    double k1 = 100;
     int kn_1 = k1 * sqrt(nrow-1);
     double *y = knn(x, nrow, ncol, kn_1);
+    write_csv_file(y,"responce",'\t',nrow,1);
     return 0;
 }
 

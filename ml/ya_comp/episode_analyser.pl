@@ -62,7 +62,9 @@ while(<PATT_OUT>) {
         $last = $el;
     }
     if(not $stat and not @stats) {
-        push @stats, $last;
+        if (isQuery($last)) {
+            push @stats, 'Q';
+        }
     } else {
         push @stats, $stat;
     }
