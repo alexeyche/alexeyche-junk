@@ -1,4 +1,4 @@
-CFLAGS = -O2 -Wall -DNDEBUG -g
+CFLAGS = -Wall -DNDEBUG -g
 #CFLAGS = -g -Wall
 OBJS = maxent.o lbfgs.o owlqn.o sgd.o
 

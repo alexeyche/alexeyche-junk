@@ -2,6 +2,8 @@
 #include <list>
 #include <cstdio>
 #include "maxent.h"
+#include <stack>
+#include "../count_lines.cpp"
 
 using namespace std;
 
@@ -42,7 +44,7 @@ double* split(char *line, char delim,char delCount) {
             }
             ret[ret_c] = atof(buff);
             free(buff);
-           
+                       
             ret_c++;
             if(ret_c == delCount) {
                 break;
@@ -52,33 +54,6 @@ double* split(char *line, char delim,char delCount) {
     }
     return ret;
 }
-
-//char* label_sample(double *feat, int nfeat=7) {
-//        char *str = (char*) malloc( 20 *sizeof(char));
-//        strcpy(str,"");
-//        if(feat[0]>4) {
-//            strcat(str,"f1");
-//        }
-//        if(feat[1]>300){
-//            strcat(str,"f2");
-//        }
-//        if(feat[2]>0.0005){
-//            strcat(str,"f3");
-//        }
-//        if(feat[3]>0){
-//            strcat(str,"f4");
-//        }
-//        if(feat[4]>0){
-//            strcat(str,"f5");
-//        }
-//        if(feat[5]>0){
-//            strcat(str,"f6");
-//        }
-//        if(feat[6]>0){
-//            strcat(str,"f7");
-//        }
-//        return str;
-//}
 
 void add_feat_to_model(ME_Model & model, double *feat, char *label, int nfeat = 7)
 {
@@ -91,8 +66,7 @@ void add_feat_to_model(ME_Model & model, double *feat, char *label, int nfeat = 
     model.add_training_sample(samp);
 }
 
-int process_file(char *filename, ME_Model & model, char *label, int countLines) {
-    int ncols = 7;
+int process_file(char *filename, ME_Model & model, char *label, int ncol, int countLines = 0) {
     int buffer = 300;
     char *buf = (char*) malloc( buffer * sizeof(char));
     FILE *fp;
@@ -100,15 +74,15 @@ int process_file(char *filename, ME_Model & model, char *label, int countLines) 
     if ( ( fp = fopen( filename, "r" ) ) != NULL )
     {
         while ( fgets( buf, buffer, fp ) != NULL ) {
-            double *spl = split(buf, '\t', ncols);
-            for(unsigned char i=0; i<ncols; i++) {
-                add_feat_to_model(model, spl, label);
+            double *spl = split(buf, '\t', ncol);
+            for(unsigned char i=0; i<ncol; i++) {
+                add_feat_to_model(model, spl, label, ncol);
             }
             if(count%100000 == 0) {
                 printf("%d processed\n", count);
             }
-            count++;
             free(spl);
+            count++;
             if(count>countLines) {
                 break;
             }
@@ -124,19 +98,44 @@ int process_file(char *filename, ME_Model & model, char *label, int countLines) 
     free(buf);
 }
 
+char* basename(char *filename) {
+    int n = strlen(filename);
+    n--; // index
+    char ch = filename[n];
+    std::stack<char> symbols;
+    while(ch != '/') {
+        symbols.push(ch);
+        n--;
+        ch = filename[n];            
+    }
+    int n_s = symbols.size();
+    char *out = new char[n_s+1];
+    for(int i=0; i<n_s; i++) {
+        out[i] = symbols.top();
+        symbols.pop();
+    }
+    out[n_s] = '\0';
+    return out;
+}
 
 int main(int argc, char *argv[]) {
     ME_Model model;
-    int test_size = 4546558;
+        
     char *train = argv[1];
     char *test = argv[2];
+    char *name = basename(train);
+    int nrow_train = count_rows(train);
+    int nrow_test = count_rows(test);
+    int ncol = count_cols(train, '\t');
     // for train data, bad label:
     char *bad_label = "bad";
     char *good_label = "good";
-    process_file(train, model, bad_label, test_size/6);
-    process_file(test, model, good_label, test_size/10);
-    printf("Start training\n");
+    process_file(train, model, bad_label, ncol, nrow_train);
+    process_file(test, model, good_label, ncol, nrow_test);
+    printf("Start training %s. nrow train: %d, nrow test: %d\n", name, nrow_train, nrow_test);
     model.train();
-    model.save_to_file("model");
+    char *model_name = new char[200];
+    sprintf(model_name, "model_%s",name);    
+    model.save_to_file(model_name);
     return 0;
 }    
