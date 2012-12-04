@@ -32,15 +32,16 @@ if [ ! "`find ./episodes -type f`" ]; then
 fi
 for i in `find ./episodes -type f`; do 
     filename=${i#./episodes/}
-    if [ ! -f "model_$filename" ]; then
+    ( ([ ! -f ./episodes/${filename}_sid ]) && (awk -F ' ' '{ $1 = 1; print }' $i > ./episodes/${filename}_sid) ) & 
+    if [ ! -f "models/model_$filename" ]; then
         [ ! -d models ] && mkdir models
         echo "SVM running for $filename"
-        nice ./svm-train -b 1 $i models/model_$filename
+        nice ./svm-train -b 1 -h 0 $i models/model_$filename
     else
         echo "model_$filename was found. Missing"
     fi
 done
-#( awk -F ' ' '{ $1 = 1; print }' ./parse_out.svm.test.scale > ./parse_out.svm.test.scale.class ) && 
+
 
 
 
