@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 dataset_dir=$1
 episode_file=$2
-set -x
 if [ ! -d "$dataset_dir" ]; then  echo "need dataset dir"; exit 1; fi
 if [ ! -f parse_out.svm ]; then 
     echo "train parse for svm started"
@@ -23,12 +22,25 @@ fi
 
 wait
 
-[ ! -p episodes ] && mkdir episodes
-echo "lets distribute episodes"
-./episode_distributor_svm.pl 
-echo "lets distribute episodes for test"
-./episode_distributor_svm.pl -t
-#    ( awk -F ' ' '{ $1 = 1; print }' ./parse_out.svm.test.scale > ./parse_out.svm.test.scale.class ) && 
+[ ! -d episodes ] && mkdir episodes
+
+if [ ! "`find ./episodes -type f`" ]; then
+    echo "lets distribute episodes"
+    ./episode_distributor_svm.pl 
+    echo "lets distribute episodes for test"
+    ./episode_distributor_svm.pl -t
+fi
+for i in `find ./episodes -type f`; do 
+    filename=${i#./episodes/}
+    if [ ! -f "model_$filename" ]; then
+        [ ! -d models ] && mkdir models
+        echo "SVM running for $filename"
+        nice ./svm-train -b 1 $i models/model_$filename
+    else
+        echo "model_$filename was found. Missing"
+    fi
+done
+#( awk -F ' ' '{ $1 = 1; print }' ./parse_out.svm.test.scale > ./parse_out.svm.test.scale.class ) && 
 
 
 
