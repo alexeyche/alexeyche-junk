@@ -17,8 +17,9 @@ if [ ! -f parse_out.svm.test ]; then
     ( echo "test parse for svm finished" ) && 
     (./svm-scale parse_out.svm.test >  parse_out.svm.test.scale) && 
     (echo "scaling test finished") &&
-    (awk -F ' ' '{ $1 = 1; print }' parse_out.svm.test.scale > parse_out.svm.test.scale.class ) ) &
+    (awk -F ' ' '{ $1 = 1; print }' parse_out.svm.test.scale > parse_out.svm.test.scale.class ) ) & #& 
 fi    
+
 
 wait
 
@@ -73,12 +74,10 @@ for i in `find ./models -type f`; do
     modelname=${i#./models/model_}
     if [ -f ./episodes_quest/$modelname ]; then
         ./svm-predict -b 1 ./episodes_quest/$modelname $i ./prediction/$modelname
-        tmpfile1=`mktemp` 
-        cut -d ' ' -f 1 ./episodes_quest/$modelname > $tmpfile1
-        tmpfile2=`mktemp`
-        cut -d ' ' -f 2 ./prediction/$modelname > $tmpfile2
-        paste -d ' ' $tmpfile1 $tmpfile2 > ./prediction/${modelname}_answer
-        rm -rf $tmpfile1 $tmpfile2
+        tmpfile=`mktemp`
+        cut -d ' ' -f 2 ./prediction/$modelname > $tmpfile
+        paste -d ' ' ./episodes_quest/$modelname $tmpfile > ./prediction/${modelname}_answer
+        rm -rf $tmpfile
         echo "$modelname prediction done"
     else 
         echo "answer for $modelname was found. missing"

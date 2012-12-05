@@ -11,7 +11,7 @@ sub read_file_line {
   if ($fh) { 
     my $line = <$fh>;
     chomp $line;
-    return [ split(/\t/, $line) ];
+    return [ split(/ /, $line) ];
   }
   return;
 }
@@ -44,7 +44,7 @@ if((@ARGV > 0)&&($ARGV[0] eq '-t')) {
   open($episodes, "<episode_out.test");
 } elsif((@ARGV > 0)&&($ARGV[0] eq '-q')) {
     $distr_for_q=1;
-    open($feats, "<parse_out.svm.test.scale");
+    open($feats, "<parse_out.svm.test");
     open($episodes, "<episode_out.test");
 } else {
     open($feats, "<parse_out.svm.scale");
@@ -70,7 +70,12 @@ while($feat and $episode) {
             $patt_to_file{$episode} = $fh;
         }
         my $cur_fh = $patt_to_file{$episode};
-        print $cur_fh join("\t", @$feat) ."\n";
+        if(!$distr_for_q) {
+            print $cur_fh join("\t", @$feat) ."\n";
+        } else {
+            print $cur_fh $$feat[0] ."\n";
+        }
+
     }
     $feat = read_file_line($feats);
     $episode_arr = read_file_line($episodes);
