@@ -38,14 +38,18 @@ my %top_episodes = map { $_ => 1 } @top_episodes_arr;
 my $test_postfix = "";
 my $feats;
 my $episodes;
+my $distr_for_q = 0;
 if((@ARGV > 0)&&($ARGV[0] eq '-t')) {
   open($feats, "<parse_out.svm.test.scale.class");
   open($episodes, "<episode_out.test");
+} elsif((@ARGV > 0)&&($ARGV[0] eq '-q')) {
+    $distr_for_q=1;
+    open($feats, "<parse_out.svm.test.scale");
+    open($episodes, "<episode_out.test");
 } else {
     open($feats, "<parse_out.svm.scale");
     open($episodes, "<episode_out");
 }
-
 
 my $feat = read_file_line($feats);
 my $episode_arr = read_file_line($episodes);
@@ -57,7 +61,12 @@ while($feat and $episode) {
         if(! exists($patt_to_file{$episode}) ) {
             my $episode_filename = $episode;
             $episode_filename =~ s/,/_/g;
-            open(my $fh, ">>./episodes/$episode_filename");
+            my $fh;
+            if(!$distr_for_q) {
+                open($fh, ">>./episodes/$episode_filename");
+            } else {
+                open($fh, ">>./episodes_quest/$episode_filename");
+            }
             $patt_to_file{$episode} = $fh;
         }
         my $cur_fh = $patt_to_file{$episode};
