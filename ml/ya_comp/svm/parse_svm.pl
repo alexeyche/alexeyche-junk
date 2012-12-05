@@ -48,7 +48,6 @@ while(<QCLASS>) {
 }
 close(QCLASS);
 
-my $train_file;
 my $file = $ARGV[0];
 open(TRAIN, "<$file");
 my $class = 0;
@@ -58,8 +57,8 @@ if($ARGV[1] eq "-t") {
 }
 my $first_time=1;
 
-#my $train_set_l=`./proc count_rows $train_file`;
-my $train_set_l=52001965;
+my $train_set_l=`cat $file | wc -l`;
+#my $train_set_l=52001965;
 my $ten_portion = floor($train_set_l/10);
 my $lines_num = 0;
 
@@ -227,6 +226,7 @@ while(<TRAIN>) {
     }
     if($lines_num == $train_set_l) {
             # write stats
+            # write stats
             if ($click_count != 0) {
                 $AvgPosCount = sum(@clicks_pos)/@clicks_pos;
                 $DwellTimeUntilClick = sum(@dwell_times_until_click)/@dwell_times_until_click;
@@ -249,7 +249,8 @@ while(<TRAIN>) {
             } 
             $Click2Query = $click_count/$query_count;
             
-            print &make_out_s($AvgPosCount, $DwellTimeUntilClick, $SumDensBadQuery, $NumBackSerp, $QuerySimilarity, $Click2Query, $QueryWOClick, $WholeSessionTime, $AvgClickClickDwellTime, $AvgQueryQueryDwellTime);
+            print "$class " . &make_out_s($AvgPosCount, $DwellTimeUntilClick, $SumDensBadQuery, $NumBackSerp, $QuerySimilarity, $Click2Query, $QueryWOClick, $WholeSessionTime, $AvgClickClickDwellTime, $AvgQueryQueryDwellTime);
+            #            print "$class " . &make_out_s($AvgPosCount, $DwellTimeUntilClick, $SumDensBadQuery, $NumBackSerp, $QuerySimilarity, $Click2Query, $QueryWOClick, $WholeSessionTime, $AvgClickClickDwellTime, $AvgQueryQueryDwellTime);
             
 #            if($line[3] == $user_id) {
 #                $UserBack++;

@@ -38,14 +38,16 @@ my %top_episodes = map { $_ => 1 } @top_episodes_arr;
 my $test_postfix = "";
 my $feats;
 my $episodes;
+my $sid_file;
 my $distr_for_q = 0;
 if((@ARGV > 0)&&($ARGV[0] eq '-t')) {
   open($feats, "<parse_out.svm.test.scale.class");
   open($episodes, "<episode_out.test");
 } elsif((@ARGV > 0)&&($ARGV[0] eq '-q')) {
     $distr_for_q=1;
-    open($feats, "<parse_out.svm.test");
+    open($feats, "<parse_out.svm.test.scale");
     open($episodes, "<episode_out.test");
+    open($sid_file, "<parse_out.svm.test");
 } else {
     open($feats, "<parse_out.svm.scale");
     open($episodes, "<episode_out");
@@ -54,32 +56,50 @@ if((@ARGV > 0)&&($ARGV[0] eq '-t')) {
 my $feat = read_file_line($feats);
 my $episode_arr = read_file_line($episodes);
 my $episode = @$episode_arr[0];
+my $sid_line;
+if($distr_for_q) {
+    $sid_line = read_file_line($sid_file);    
+}
 
 my %patt_to_file;
+my @others_patt;
 while($feat and $episode) {
-    if ( exists($top_episodes{$episode}) ) {
-        if(! exists($patt_to_file{$episode}) ) {
-            my $episode_filename = $episode;
-            $episode_filename =~ s/,/_/g;
-            my $fh;
-            if(!$distr_for_q) {
-                open($fh, ">>./episodes/$episode_filename");
-            } else {
-                open($fh, ">>./episodes_quest/$episode_filename");
-            }
-            $patt_to_file{$episode} = $fh;
-        }
-        my $cur_fh = $patt_to_file{$episode};
-        if(!$distr_for_q) {
-            print $cur_fh join("\t", @$feat) ."\n";
-        } else {
-            print $cur_fh $$feat[0] ."\n";
-        }
-
+    if (! exists($top_episodes{$episode}) ) {
+        push @others_patt, $episode;
+        $episode = "others";
     }
+    if(! exists($patt_to_file{$episode}) ) {
+        my $episode_filename = $episode;
+        $episode_filename =~ s/,/_/g;
+        my $fh;
+        if(!$distr_for_q) {
+            open($fh, ">>./episodes/$episode_filename");
+        } else {
+            open($fh, ">>./episodes_quest/$episode_filename");
+        }
+        $patt_to_file{$episode} = $fh;
+    }
+    my $cur_fh = $patt_to_file{$episode};
+    if(!$distr_for_q) {
+        print $cur_fh join(" ", @$feat) ."\n";
+    } else {
+        print $cur_fh $$sid_line[0] . " ";
+        print $cur_fh join(" ", @$feat[1..@$feat]) ."\n";
+    }
+
     $feat = read_file_line($feats);
     $episode_arr = read_file_line($episodes);
     $episode = @$episode_arr[0];
+    if($distr_for_q) {
+        $sid_line = read_file_line($sid_file);    
+    } 
+}
+
+if(@others_patt) {
+    open(OTHERS,">others_patt");
+    foreach my $el(@others_patt) {
+    
+    }
 }
 
 foreach my $ep (keys %patt_to_file) {
@@ -88,3 +108,6 @@ foreach my $ep (keys %patt_to_file) {
 }
 close($feats);
 close($episodes);
+if($distr_for_q) {
+    close($sid_file);
+}

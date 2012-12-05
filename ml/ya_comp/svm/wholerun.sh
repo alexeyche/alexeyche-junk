@@ -32,35 +32,36 @@ if [ ! "`find ./episodes -type f`" ]; then
     ./episode_distributor_svm.pl 
     echo "lets distribute episodes for test"
     ./episode_distributor_svm.pl -t
+    sed -i "" -e '/^$/d' ./episodes/Qn_QCn_Cn_Qn_QCn
+fi
+if [ ! "`find ./episodes -type f`" ]; then
     echo "lets distribute episodes for questions"
     ./episode_distributor_svm.pl -q
-fi
-
+fi    
 
 STRAT_LIM=10000
-
-for i in `find ./episodes -type f`; do 
-    filename=${i#./episodes/}    
-    [ -f ./episodes_strat/$filename ] && continue
-    lines=`cat $i | wc -l`
-    echo -n "$i : $lines, so"
-    ( ([ ! -f ./episodes_quest/${filename} ]) && ( sed -ne '/^1/p' $i > ./episodes_quest/${filename} ) ) & 
-    if [ $lines -ge $STRAT_LIM ]; then
-        echo " strat"
-        python ../tools/subset.py $i $STRAT_LIM ./episodes_strat/${filename}
-    else 
-        echo " copy"
-        cp $i ./episodes_strat
-    fi 
-done
-
+if [ ! "`find ./episodes -type f`" ]; then
+    for i in `find ./episodes -type f`; do 
+        filename=${i#./episodes/}    
+        [ -f ./episodes_strat/$filename ] && continue
+        lines=`cat $i | wc -l`
+        echo -n "$i : $lines, so"
+        if [ $lines -ge $STRAT_LIM ]; then
+            echo " strat"
+            python ../tools/subset.py $i $STRAT_LIM ./episodes_strat/${filename}
+        else 
+            echo " copy"
+            cp $i ./episodes_strat
+        fi 
+    done
+fi 
 
 for i in `find ./episodes_strat -type f`; do 
     filename=${i#./episodes_strat/}
     if [ ! -f "models/model_$filename" ]; then
         [ ! -d models ] && mkdir models
         echo "SVM running for $filename"
-        nice ./svm-train -b 1 -h 0 $i models/model_$filename
+        ./svm-train -b 1 -h 0 -w0 25 -w1 75 $i models/model_$filename
     else
         echo "model_$filename was found. Missing"
     fi
@@ -75,6 +76,7 @@ for i in `find ./models -type f`; do
     if [ -f ./episodes_quest/$modelname ]; then
         ./svm-predict -b 1 ./episodes_quest/$modelname $i ./prediction/$modelname
         tmpfile=`mktemp`
+        sed -i"" -e '1d' ./prediction/$modelname 
         cut -d ' ' -f 2 ./prediction/$modelname > $tmpfile
         paste -d ' ' ./episodes_quest/$modelname $tmpfile > ./prediction/${modelname}_answer
         rm -rf $tmpfile
