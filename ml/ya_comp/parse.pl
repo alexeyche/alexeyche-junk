@@ -4,7 +4,6 @@ use strict;
 use Data::Dumper;
 use List::Util qw(sum);
 use POSIX;
-require 'rate.pl';
 
 sub uniq {
     return keys %{{ map { $_ => 1 } @_ }};
@@ -125,7 +124,7 @@ while(<TRAIN>) {
             } 
             $Click2Query = $click_count/$query_count;
             
-            print &make_out_s($AvgPosCount, $DwellTimeUntilClick, $SumDensBadQuery, $NumBackSerp, $QuerySimilarity, $Click2Query, $QueryWOClick, $WholeSessionTime, $AvgClickClickDwellTime, $AvgQueryQueryDwellTime);
+            print &make_out_s($AvgPosCount, $DwellTimeUntilClick, $SumDensBadQuery, $NumBackSerp, $QuerySimilarity, $Click2Query, $QueryWOClick, $AvgClickClickDwellTime, $AvgQueryQueryDwellTime);
             
 #            if($line[3] == $user_id) {
 #                $UserBack++;
@@ -241,7 +240,7 @@ while(<TRAIN>) {
             } 
             $Click2Query = $click_count/$query_count;
             
-            print &make_out_s($AvgPosCount, $DwellTimeUntilClick, $SumDensBadQuery, $NumBackSerp, $QuerySimilarity, $Click2Query, $QueryWOClick, $WholeSessionTime, $AvgClickClickDwellTime, $AvgQueryQueryDwellTime);
+            print &make_out_s($AvgPosCount, $DwellTimeUntilClick, $SumDensBadQuery, $NumBackSerp, $QuerySimilarity, $Click2Query, $QueryWOClick, $AvgClickClickDwellTime, $AvgQueryQueryDwellTime);
             
 #            if($line[3] == $user_id) {
 #                $UserBack++;

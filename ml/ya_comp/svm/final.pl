@@ -14,9 +14,12 @@ open(FREQ, "<episode_out.freq.sort");
 while(<FREQ>) {
     chomp($_);
     my @line = split(/\t/,$_);
-    $model_to_freq{$line[0]} = $line[1];
+    my $model = $line[0];
+    $model =~ s/,/_/g;   
+    $model_to_freq{$model} = $line[1];
 }
 
+my $avg_others_freq = 10.30835;
 
 for(my $i=0; $i<@files; $i++) {
     my @filename_line = split(/\//, $files[$i]);
@@ -26,14 +29,16 @@ for(my $i=0; $i<@files; $i++) {
     while(<$cur_fh>) {
         chomp($_);
         my @line = split(/ /, $_);
-        my $rank = $line[-1] * $model_to_freq{$model};
-        if(($model eq "others" ) && ($rank == 0 )) {
-            $rank = $line[-1];
-        }
+        my $freq = $model_to_freq{$model};
+        if($model eq "others" ) {
+            $freq = $avg_others_freq;
+        } 
+        my $rank = $line[-1] * $freq;
+        
         if($model eq 'Q') {
             $rank =  $model_to_freq{$model};
         }
-        print $line[0] ." " .$rank . " " . $model ."\n";    
+        print $line[0] ." " .$rank . " " . $model ." " .$line[-1] ."\n";    
     }
 }
 

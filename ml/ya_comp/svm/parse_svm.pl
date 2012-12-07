@@ -88,15 +88,16 @@ my $click_count=0;
 my @query_query_dwell_time;
 my @click_click_dwell_time;
 my $timeline=0;
+my $last_sess;
 while(<TRAIN>) {
     chomp($_);
     my $line = $_;
     my @line = split('\t',$line,6);
     my $sess_id = $line[0];
-    if($test_set) {
+    my $sess_type = $line[2];
+    if( ($test_set == 1) && ( $sess_type ne "M") ) {
         $class = $sess_id;
     }
-    my $sess_type = $line[2];
 # percentage
     $lines_num = $lines_num+1; 
     if ($lines_num % $ten_portion == 0) {
@@ -131,7 +132,7 @@ while(<TRAIN>) {
             } 
             $Click2Query = $click_count/$query_count;
             
-            print "$class " . &make_out_s($AvgPosCount, $DwellTimeUntilClick, $SumDensBadQuery, $NumBackSerp, $QuerySimilarity, $Click2Query, $QueryWOClick, $WholeSessionTime, $AvgClickClickDwellTime, $AvgQueryQueryDwellTime);
+            print "$class " . &make_out_s($AvgPosCount, $DwellTimeUntilClick, $SumDensBadQuery, $NumBackSerp, $QuerySimilarity, $Click2Query, $QueryWOClick, $AvgClickClickDwellTime, $AvgQueryQueryDwellTime);
             #            print "$class " . &make_out_s($AvgPosCount, $DwellTimeUntilClick, $SumDensBadQuery, $NumBackSerp, $QuerySimilarity, $Click2Query, $QueryWOClick, $WholeSessionTime, $AvgClickClickDwellTime, $AvgQueryQueryDwellTime);
             
 #            if($line[3] == $user_id) {
@@ -224,9 +225,16 @@ while(<TRAIN>) {
     if($sess_type eq 'S') {
         $WholeSessionTime = $line[1];
     }
-    if($lines_num == $train_set_l) {
+#    if($lines_num == $train_set_l) {
             # write stats
             # write stats
+ #    }
+#    undef($sess_id);
+#    undef($line);
+#    undef(@line);
+#    undef($sess_type);
+}
+           
             if ($click_count != 0) {
                 $AvgPosCount = sum(@clicks_pos)/@clicks_pos;
                 $DwellTimeUntilClick = sum(@dwell_times_until_click)/@dwell_times_until_click;
@@ -280,12 +288,6 @@ while(<TRAIN>) {
             $WholeSessionTime=0;
             $AvgQueryQueryDwellTime=0;
             $AvgClickClickDwellTime=0;
-    }
-    undef($sess_id);
-    undef($line);
-    undef(@line);
-    undef($sess_type);
-}
 
 close(TRAIN);
 exit(0);

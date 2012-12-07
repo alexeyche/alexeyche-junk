@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 dataset_dir=$1
-episode_file=$2
 if [ ! -d "$dataset_dir" ]; then  echo "need dataset dir"; exit 1; fi
 if [ ! -f parse_out.svm ]; then 
     echo "train parse for svm started"
@@ -32,20 +31,25 @@ if [ ! "`find ./episodes -type f`" ]; then
     ./episode_distributor_svm.pl 
     echo "lets distribute episodes for test"
     ./episode_distributor_svm.pl -t
-    sed -i "" -e '/^$/d' ./episodes/Qn_QCn_Cn_Qn_QCn
+    sed -i"" -e '/^$/d' ./episodes/Qn_QCn_Cn_Qn_QCn
 fi
-if [ ! "`find ./episodes -type f`" ]; then
+if [ ! "`find ./episodes_quest -type f`" ]; then
     echo "lets distribute episodes for questions"
     ./episode_distributor_svm.pl -q
 fi    
 
-STRAT_LIM=10000
-if [ ! "`find ./episodes -type f`" ]; then
+STRAT_LIM=30000
+if [ ! "`find ./episodes_strat -type f`" ]; then
     for i in `find ./episodes -type f`; do 
         filename=${i#./episodes/}    
         [ -f ./episodes_strat/$filename ] && continue
         lines=`cat $i | wc -l`
         echo -n "$i : $lines, so"
+#        if [ "$filename" == "QCn" ]; then
+#            echo " copy QCn"
+#            cp $i ./episodes_strat
+#            continue
+#        fi    
         if [ $lines -ge $STRAT_LIM ]; then
             echo " strat"
             python ../tools/subset.py $i $STRAT_LIM ./episodes_strat/${filename}
@@ -56,12 +60,13 @@ if [ ! "`find ./episodes -type f`" ]; then
     done
 fi 
 
+[ ! -d models ] && mkdir models
+
 for i in `find ./episodes_strat -type f`; do 
     filename=${i#./episodes_strat/}
     if [ ! -f "models/model_$filename" ]; then
-        [ ! -d models ] && mkdir models
         echo "SVM running for $filename"
-        ./svm-train -b 1 -h 0 -w0 25 -w1 75 $i models/model_$filename
+        ./svm-train -b 1 -h 0 -w0 30 -w1 70 $i models/model_$filename
     else
         echo "model_$filename was found. Missing"
     fi
@@ -85,7 +90,7 @@ for i in `find ./models -type f`; do
         echo "answer for $modelname was found. missing"
     fi        
 done    
-
+./final.pl | sort -t ' ' -k 2 -n -r > final
 
 
 
