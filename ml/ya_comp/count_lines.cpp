@@ -22,7 +22,7 @@ int count_cols(char *filename, char delim) {
         fclose( fp );
         unsigned int i = 0;
         while(buf[i] != '\n') {
-            if(buf[i] == '\t') {
+            if(buf[i] == delim) {
                 col_count++;
             }
             i++;

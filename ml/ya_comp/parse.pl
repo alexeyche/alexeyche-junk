@@ -5,6 +5,10 @@ use Data::Dumper;
 use List::Util qw(sum);
 use POSIX;
 
+
+#config
+our $delim = ",";
+
 sub uniq {
     return keys %{{ map { $_ => 1 } @_ }};
 }
@@ -27,7 +31,7 @@ sub make_out_s {
     my $ind = $#arr;
     my $str = "";
     for(my $i=0; $i <= $ind; $i++) {
-        my $sym = "\t";
+        my $sym = $delim;
         if($i == $ind) {
             $sym = "\n"            
         }
@@ -49,7 +53,12 @@ close(QCLASS);
 
 my $train_file;
 my $file = $ARGV[0];
+my $opt2 = $ARGV[1];
 open(TRAIN, "<$file");
+my $test_parse=0;
+if($opt2 eq '-t') {
+    $test_parse=1;
+}
 
 my $first_time=1;
 
@@ -70,6 +79,7 @@ my $UserBack=0;
 my $WholeSessionTime=0;
 my $AvgQueryQueryDwellTime=0;
 my $AvgClickClickDwellTime=0;
+my $SwitchPos=0;
 # sevice vars
 my @clicks_pos;
 my @dwell_times_until_click;
@@ -84,6 +94,7 @@ my $click_count=0;
 my @query_query_dwell_time;
 my @click_click_dwell_time;
 my $timeline=0;
+my $pos=0;
 while(<TRAIN>) {
     chomp($_);
     my $line = $_;
@@ -102,6 +113,7 @@ while(<TRAIN>) {
             $first_time = 0;
         } else {
             # write stats
+            if(($SwitchPos == 0) &&($test_parse == 0)) { next; }
             if ($click_count != 0) {
                 $AvgPosCount = sum(@clicks_pos)/@clicks_pos;
                 $DwellTimeUntilClick = sum(@dwell_times_until_click)/@dwell_times_until_click;
@@ -123,8 +135,11 @@ while(<TRAIN>) {
                 undef($serp{$k})
             } 
             $Click2Query = $click_count/$query_count;
-            
-            print &make_out_s($AvgPosCount, $DwellTimeUntilClick, $SumDensBadQuery, $NumBackSerp, $QuerySimilarity, $Click2Query, $QueryWOClick, $AvgClickClickDwellTime, $AvgQueryQueryDwellTime);
+if($test_parse == 0) {            
+            print &make_out_s($AvgPosCount, $DwellTimeUntilClick, $SumDensBadQuery, $NumBackSerp, $QuerySimilarity, $Click2Query, $QueryWOClick, $AvgClickClickDwellTime, $AvgQueryQueryDwellTime, $click_count, $query_count, $SwitchPos);
+} else {
+            print &make_out_s($AvgPosCount, $DwellTimeUntilClick, $SumDensBadQuery, $NumBackSerp, $QuerySimilarity, $Click2Query, $QueryWOClick, $AvgClickClickDwellTime, $AvgQueryQueryDwellTime, $click_count, $query_count);
+}
             
 #            if($line[3] == $user_id) {
 #                $UserBack++;
@@ -144,6 +159,7 @@ while(<TRAIN>) {
             $click_count=0;            
             $query_count=0;
             $timeline=0;            
+            $pos=0;
 
             $AvgPosCount=0;
             $DwellTimeUntilClick=0;
@@ -154,10 +170,12 @@ while(<TRAIN>) {
             $WholeSessionTime=0;
             $AvgQueryQueryDwellTime=0;
             $AvgClickClickDwellTime=0;
+            $SwitchPos=0;
         }
         next;
     }
     if ($sess_type eq "Q") {
+        $pos++;
         if($last_was_query) {
             my $delta_query_time = $line[1] - $WholeSessionTime;
             push @query_query_dwell_time, $delta_query_time;            
@@ -191,6 +209,7 @@ while(<TRAIN>) {
         $last_was_query=0;
     }
     if ($sess_type eq "C") {
+        $pos++;
         if($last_was_click) {
             my $delta_click_time = $line[1] - $WholeSessionTime;
             push @click_click_dwell_time, $delta_click_time;            
@@ -215,8 +234,14 @@ while(<TRAIN>) {
     }
     if($sess_type eq 'S') {
         $WholeSessionTime = $line[1];
+        $SwitchPos = $pos;
     }
-    if($lines_num == $train_set_l) {
+            
+#    undef($sess_id);
+#    undef($line);
+#    undef(@line);
+#    undef($sess_type);
+}
             # write stats
             if ($click_count != 0) {
                 $AvgPosCount = sum(@clicks_pos)/@clicks_pos;
@@ -239,9 +264,13 @@ while(<TRAIN>) {
                 undef($serp{$k})
             } 
             $Click2Query = $click_count/$query_count;
-            
-            print &make_out_s($AvgPosCount, $DwellTimeUntilClick, $SumDensBadQuery, $NumBackSerp, $QuerySimilarity, $Click2Query, $QueryWOClick, $AvgClickClickDwellTime, $AvgQueryQueryDwellTime);
-            
+            if(($SwitchPos != 0) && ($test_parse==0)) {
+           
+            print &make_out_s($AvgPosCount, $DwellTimeUntilClick, $SumDensBadQuery, $NumBackSerp, $QuerySimilarity, $Click2Query, $QueryWOClick, $AvgClickClickDwellTime, $AvgQueryQueryDwellTime, $click_count, $query_count, $SwitchPos);
+            }
+            if($test_parse == 1) {
+            print &make_out_s($AvgPosCount, $DwellTimeUntilClick, $SumDensBadQuery, $NumBackSerp, $QuerySimilarity, $Click2Query, $QueryWOClick, $AvgClickClickDwellTime, $AvgQueryQueryDwellTime, $click_count, $query_count);
+            }
 #            if($line[3] == $user_id) {
 #                $UserBack++;
 #            } else {
@@ -260,6 +289,7 @@ while(<TRAIN>) {
             $click_count=0;            
             $query_count=0;
             $timeline=0;            
+            $pos=0;
 
             $AvgPosCount=0;
             $DwellTimeUntilClick=0;
@@ -270,12 +300,7 @@ while(<TRAIN>) {
             $WholeSessionTime=0;
             $AvgQueryQueryDwellTime=0;
             $AvgClickClickDwellTime=0;
-    }
-    undef($sess_id);
-    undef($line);
-    undef(@line);
-    undef($sess_type);
-}
+            $SwitchPos=0;
 
 close(TRAIN);
 exit(0);

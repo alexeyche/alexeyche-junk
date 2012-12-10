@@ -62,14 +62,16 @@ int main(int argc, char *argv[]) {
     } else if (strcmp(func_name,"norm") == 0) {
         char *in_filename;
         char *out_filename;
-        if(argc>3) {
+        char delim;
+        if(argc>4) {
             in_filename = argv[2];
             out_filename = argv[3];
+            delim = *argv[4];
         } else {
             help();
             return 1;
         }
-        normalize_func(in_filename,out_filename);
+        normalize_func(in_filename,out_filename, delim);
         return 0;
     } else if (strcmp(func_name,"hist") == 0) {
         char *in_filename;

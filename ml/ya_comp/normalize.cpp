@@ -74,11 +74,11 @@ void normalize(double *x, int nrow, int ncol) {
     }
 }
 
-void normalize_func(char *in_filename, char *out_filename) {
+void normalize_func(char *in_filename, char *out_filename, char delim) {
     int nrow = count_rows(in_filename);
-    int ncol = count_cols(in_filename, '\t');
-    double *x = read_csv_file(in_filename,'\t',nrow,ncol);
+    int ncol = count_cols(in_filename, delim);
+    double *x = read_csv_file(in_filename,delim,nrow,ncol);
     normalize(x, nrow, ncol);
-    write_csv_file(x, out_filename,'\t',nrow,ncol);    
+    write_csv_file(x, out_filename,delim,nrow,ncol);    
 }
 
