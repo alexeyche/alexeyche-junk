@@ -2,8 +2,9 @@ cmake_minimum_required(VERSION 2.8)
 
 ## recurse
 set(DIRS
-  turn
+    turn
 )
+
 foreach(dir ${DIRS})
     add_subdirectory(${dir})
 endforeach()

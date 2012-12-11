@@ -85,21 +85,21 @@ int main(int argc, char* argv[])
 
   // Calculate number of classes.
   size_t classes = (size_t) max(trainingData.row(trainingData.n_rows - 1)) + 1;
-  Log::Info << "classes found: " << classes << std::endl;
+
   // Create and train the classifier.
   Timer::Start("training");
   NaiveBayesClassifier<> nbc(trainingData, classes);
   Timer::Stop("training");
 
   // Timing the running of the Naive Bayes Classifier.
-  arma::Col<double> results;
+  arma::Col<size_t> results;
   Timer::Start("testing");
   nbc.Classify(testingData, results);
   Timer::Stop("testing");
 
   // Output results.
   const string outputFilename = CLI::GetParam<string>("output");
-  data::Save(outputFilename.c_str(), results, true, false);
+  data::Save(outputFilename.c_str(), results, true);
 
   return 0;
 }

@@ -3,7 +3,6 @@ cmake_minimum_required(VERSION 2.8)
 # Define the files we need to compile.
 # Anything not in this list will not be compiled into MLPACK.
 set(SOURCES
-  turn.cpp	  
 )
 
 # Add directory name to sources.
@@ -15,7 +14,7 @@ endforeach()
 # the parent scope).
 set(MLPACK_SRCS ${MLPACK_SRCS} ${DIR_SRCS} PARENT_SCOPE)
 
-# The main TURN* executable.
+# The main TURN executable.
 add_executable(turn
   turn_main.cpp
 )

@@ -8,6 +8,7 @@ set(DIRS
   core
   methods
   tests
+  my
 )
 
 foreach(dir ${DIRS})

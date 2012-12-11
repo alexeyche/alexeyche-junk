@@ -3,23 +3,47 @@
 	{
 		"selected_items":
 		[
+			[
+				"in",
+				"inputFile"
+			],
+			[
+				"de",
+				"dimensionality"
+			]
 		]
 	},
 	"buffers":
 	[
 	],
-	"build_system": "Packages/Python/Python.sublime-build",
+	"build_system": "Packages/User/turn_build.sublime-build",
 	"command_palette":
 	{
 		"height": 392.0,
 		"selected_items":
 		[
+			[
+				"gdb",
+				"SublimeGDB: Start Debugging"
+			],
+			[
+				"ins",
+				"Package Control: Install Package"
+			],
+			[
+				"Ins",
+				"Package Control: Install Package"
+			],
+			[
+				"GDB",
+				"SublimeGDB: Start Debugging"
+			]
 		],
-		"width": 404.0
+		"width": 449.0
 	},
 	"console":
 	{
-		"height": 0.0
+		"height": 146.0
 	},
 	"distraction_free":
 	{
@@ -32,32 +56,75 @@
 	},
 	"file_history":
 	[
+		"/home/alexeyche/my/git/alexeyche-junk/ml/mlpack/src/mlpack/core/util/cli.cpp",
+		"/home/alexeyche/my/git/alexeyche-junk/ml/mlpack/src/mlpack/core/util/cli_impl.hpp",
+		"/home/alexeyche/my/git/alexeyche-junk/ml/mlpack/src/mlpack/core/util/cli.hpp",
+		"/home/alexeyche/my/git/alexeyche-junk/ml/mlpack/src/mlpack/tests/nbc_test.cpp",
+		"/home/alexeyche/my/git/alexeyche-junk/ml/mlpack/src/mlpack/methods/kmeans/kmeans_main.cpp",
+		"/home/alexeyche/my/git/alexeyche-junk/ml/mlpack/src/mlpack/methods/kmeans/kmeans_impl.hpp",
+		"/home/alexeyche/tmp/turn_main.cpp",
+		"/home/alexeyche/my/git/alexeyche-junk/ml/mlpack/src/mlpack/tests/CMakeLists.txt",
+		"/home/alexeyche/my/git/alexeyche-junk/ml/mlpack/src/mlpack/core/util/option_impl.hpp",
+		"/home/alexeyche/.config/sublime-text-2/Packages/SublimeGDB/SublimeGDB.sublime-settings",
+		"/home/alexeyche/my/git/alexeyche-junk/ml/mlpack/src/mlpack/mlpack.sublime-workspace",
+		"/home/alexeyche/my/git/alexeyche-junk/ml/mlpack/src/mlpack/mlpack.sublime-project",
+		"/home/alexeyche/.config/sublime-text-2/Packages/SublimeGDB/Default.sublime-keymap",
+		"/home/alexeyche/.config/sublime-text-2/Packages/User/SublimeGDB.sublime-settings",
+		"/home/alexeyche/.config/sublime-text-2/Packages/User/Default (Linux).sublime-keymap",
+		"/home/alexeyche/my/git/alexeyche-junk/ml/mlpack/src/mlpack/core.hpp",
+		"/home/alexeyche/.config/sublime-text-2/Packages/User/turn_build.sublime-build",
+		"/home/alexeyche/my/git/alexeyche-junk/ml/mlpack/src/mlpack/my/turn/turn_main.cpp",
+		"/home/alexeyche/my/git/alexeyche-junk/ml/mlpack/src/mlpack/my/turn_main.cpp",
+		"/home/alexeyche/my/git/alexeyche-junk/ml/mlpack/src/mlpack/methods/kmeans/CMakeLists.txt",
+		"/home/alexeyche/my/git/alexeyche-junk/ml/mlpack/src/mlpack/my/turn/CMakeLists.txt",
+		"/home/alexeyche/my/git/alexeyche-junk/ml/mlpack/src/mlpack/my/CMakeLists.txt",
+		"/home/alexeyche/my/git/alexeyche-junk/ml/mlpack/src/mlpack/methods/CMakeLists.txt",
+		"/home/alexeyche/my/git/alexeyche-junk/ml/mlpack/src/mlpack/core/data/load_impl.hpp",
+		"/home/alexeyche/my/git/alexeyche-junk/ml/mlpack/src/mlpack/methods/range_search/range_search.hpp",
 		"/home/alexeyche/.config/sublime-text-2/Packages/User/python.sublime-build",
 		"/home/alexeyche/.gvfs/SFTP for alexeyche on twalrus/home/alexeyche/scripts/py/script_parser/parse_ui/parse.py"
 	],
 	"find":
 	{
-		"height": 0.0
+		"height": 35.0
 	},
 	"find_in_files":
 	{
 		"height": 0.0,
 		"where_history":
 		[
+			""
 		]
 	},
 	"find_state":
 	{
-		"case_sensitive": false,
+		"case_sensitive": true,
 		"find_history":
 		[
+			"PARAM_STRING_REQ",
+			"Option",
+			"PARAM_STRING_REQ",
+			"CLI::Add",
+			"PARAM_STRING_REQ",
+			"Caught exception from parsing command line",
+			"\\<PARAM\\>",
+			"PARAM",
+			"<PARAM>",
+			"\\<PARAM\\>",
+			"PARAM_STRING_REQ",
+			"Caught exception from parsing command line",
+			"ambiguous option",
+			"ambiguous option -i",
+			"RandInt",
+			"random",
+			"size_t",
 			"']:",
 			"            "
 		],
 		"highlight": true,
 		"in_selection": false,
 		"preserve_case": false,
-		"regex": false,
+		"regex": true,
 		"replace_history":
 		[
 		],
@@ -81,7 +148,7 @@
 	},
 	"input":
 	{
-		"height": 0.0
+		"height": 34.0
 	},
 	"layout":
 	{
@@ -108,7 +175,7 @@
 	"menu_visible": true,
 	"output.exec":
 	{
-		"height": 244.0
+		"height": 263.0
 	},
 	"replace":
 	{

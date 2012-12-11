@@ -70,7 +70,7 @@ NaiveBayesClassifier<MatType>::NaiveBayesClassifier(const MatType& data,
 
 template<typename MatType>
 void NaiveBayesClassifier<MatType>::Classify(const MatType& data,
-                                             arma::Col<double>& results)
+                                             arma::Col<size_t>& results)
 {
   // Check that the number of features in the test data is same as in the
   // training data.
@@ -99,10 +99,12 @@ void NaiveBayesClassifier<MatType>::Classify(const MatType& data,
       probs(i) += log(gmm::phi(data.unsafe_col(n), means.unsafe_col(i),
           diagmat(variances.unsafe_col(i))));
     }
+
     // Find the index of the maximum value in tmp_vals.
     arma::uword maxIndex = 0;
     probs.max(maxIndex);
-    results[n] = probs(maxIndex);
+
+    results[n] = maxIndex;
   }
 
   return;

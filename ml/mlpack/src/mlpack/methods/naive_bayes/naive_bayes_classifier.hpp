@@ -99,7 +99,7 @@ class NaiveBayesClassifier
    * @param data List of data points.
    * @param results Vector that class predictions will be placed into.
    */
-  void Classify(const MatType& data, arma::Col<double>& results);
+  void Classify(const MatType& data, arma::Col<size_t>& results);
 
   //! Get the sample means for each class.
   const MatType& Means() const { return means; }
