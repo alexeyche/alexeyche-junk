@@ -4,8 +4,16 @@
 		"selected_items":
 		[
 			[
+				"dist",
+				"dist_r2"
+			],
+			[
+				"de",
+				"Debug"
+			],
+			[
 				"data",
-				"data"
+				"dataset"
 			],
 			[
 				"data.",
@@ -23,9 +31,13 @@
 	"build_system": "Packages/User/RScript.sublime-build",
 	"command_palette":
 	{
-		"height": 369.0,
+		"height": 392.0,
 		"selected_items":
 		[
+			[
+				"In",
+				"Package Control: Install Package"
+			],
 			[
 				"git p",
 				"Git: Push"
@@ -100,6 +112,20 @@
 	},
 	"file_history":
 	[
+		"/home/che/prog/alexeyche-junk/ml/mlpack/src/mlpack/core/data/save_impl.hpp",
+		"/home/che/prog/alexeyche-junk/ml/mlpack/src/mlpack/methods/kmeans/kmeans_main.cpp",
+		"/home/che/prog/alexeyche-junk/ml/mlpack/src/mlpack/my/turn/turn_main.cpp",
+		"/home/che/prog/alexeyche-junk/ml/mlpack/src/mlpack/my/turn/turn.cpp",
+		"/home/che/prog/alexeyche-junk/ml/mlpack/src/mlpack/core/tree/cover_tree/cover_tree_impl.hpp",
+		"/home/che/prog/alexeyche-junk/ml/mlpack/src/mlpack/methods/gmm/em_fit_impl.hpp",
+		"/home/che/.config/sublime-text-2/Packages/Default/Default (Linux).sublime-keymap",
+		"/home/che/prog/alexeyche-junk/ml/mlpack/src/mlpack/core/data/save.hpp",
+		"/home/che/prog/alexeyche-junk/ml/mlpack/src/mlpack/core/tree/cover_tree/cover_tree.hpp",
+		"/home/che/prog/alexeyche-junk/ml/mlpack/src/mlpack/methods/gmm/em_fit.hpp",
+		"/home/che/.config/sublime-text-2/Packages/User/Default (Linux).sublime-keymap",
+		"/home/che/prog/alexeyche-junk/ml/mlpack/src/mlpack/core/dists/gaussian_distribution.cpp",
+		"/home/che/prog/alexeyche-junk/ml/mlpack/src/mlpack/core/dists/discrete_distribution.hpp",
+		"/home/che/prog/alexeyche-junk/ml/mlpack/src/mlpack/core/dists/discrete_distribution.cpp",
 		"/home/che/prog/alexeyche-junk/ml.sublime-project",
 		"/home/che/Downloads/Misfits.S4.2012.XviD.HDTVRip/Misfits.4x04.HDTV.XviD-AFG.srt",
 		"/home/che/Downloads/Misfits.S4.2012.XviD.HDTVRip/Misfits.4x03.HDTV.XviD-AFG.srt",
@@ -112,8 +138,6 @@
 		"/home/che/prog/alexeyche-junk/ml/maxent/test_set",
 		"/home/che/Downloads/What_about_Bob_1991_[torrents.ru]/What_about_Bob_1991_[torrents.ru].sub",
 		"/home/che/prog/alexeyche-junk/ml/density_split/spl.R",
-		"/home/che/.config/sublime-text-2/Packages/Default/Default (Linux).sublime-keymap",
-		"/home/che/.config/sublime-text-2/Packages/User/Default (Linux).sublime-keymap",
 		"/home/che/.config/sublime-text-2/Packages/User/Preferences.sublime-settings",
 		"/home/che/.config/sublime-text-2/Packages/Default/Preferences.sublime-settings",
 		"/home/che/prog/alexeyche-junk/ml/ya_comp/episode_analyser.pl",
@@ -136,9 +160,10 @@
 	},
 	"find_in_files":
 	{
-		"height": 0.0,
+		"height": 93.0,
 		"where_history":
 		[
+			""
 		]
 	},
 	"find_state":
@@ -146,6 +171,18 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"for",
+			"zeros",
+			"sort_index",
+			"floor",
+			"std::vec",
+			"std:vec",
+			"SortPointSet",
+			"sort",
+			"condProb",
+			"arma::mat",
+			"abs",
+			"arma::vec",
 			"insert",
 			"ctrl+b",
 			"plot_gauss",
@@ -260,6 +297,6 @@
 	"show_open_files": true,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 150.0,
+	"side_bar_width": 265.0,
 	"status_bar_visible": true
 }
