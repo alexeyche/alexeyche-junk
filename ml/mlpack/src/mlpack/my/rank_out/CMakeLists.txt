@@ -3,6 +3,12 @@ cmake_minimum_required(VERSION 2.8)
 # Define the files we need to compile.
 # Anything not in this list will not be compiled into MLPACK.
 set(SOURCES
+    turn.cpp
+    scaling.cpp
+    turn.hpp
+    scaling.hpp
+    rank_out.cpp
+    rank_out.hpp
 )
 
 # Add directory name to sources.
@@ -15,10 +21,10 @@ endforeach()
 set(MLPACK_SRCS ${MLPACK_SRCS} ${DIR_SRCS} PARENT_SCOPE)
 
 # The main TURN executable.
-add_executable(turn
-  turn_main.cpp
+add_executable(rank_out
+  rank_out_main.cpp
 )
-target_link_libraries(turn
+target_link_libraries(rank_out
   mlpack
 )
-install(TARGETS turn RUNTIME DESTINATION bin)
+install(TARGETS rank_out RUNTIME DESTINATION bin)

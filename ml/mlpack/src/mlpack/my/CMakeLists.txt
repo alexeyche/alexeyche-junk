@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 
 ## recurse
 set(DIRS
-    turn
+    rank_out
 )
 
 foreach(dir ${DIRS})

@@ -1,4 +1,4 @@
-
+#include "turn.hpp"
 
 std::pair<arma::uvec,arma::vec> 
 calculate_clusters(const arma::mat& dataset, double r, size_t d1, size_t d2) 
@@ -56,27 +56,4 @@ calculate_clusters(const arma::mat& dataset, double r, size_t d1, size_t d2)
 	}
 	std::pair<arma::uvec,arma::vec> clust_inf(SNN,dens);
 	return clust_inf;
-}
-
-
-void turn(const arma::mat& dataset, double r) {
-	//Lets choose 2 dims
-	size_t dimensionality = dataset.n_cols;
-	
-	size_t d1 = math::RandInt(0,dimensionality);
-	size_t d2_step = math::RandInt(0,dimensionality-1);
-	size_t d2 = d1+d2_step;
-	if(d2>dimensionality) {
-		d2 -= dimensionality;
-	}
-	
-
-	//debug
-//	d1=0;
-//	d2=1;
-//	Log::Debug << d1 << "," << d2 << " from " << dimensionality << std::endl;	
-//	std::pair<arma::uvec,arma::vec> clust_inf = calculate_clusters(dataset,r,d1,d2);
-		
-//	string outputFile = "output.csv";
-//	data::Save(outputFile.c_str(), clust_inf.first,false,false);
 }
