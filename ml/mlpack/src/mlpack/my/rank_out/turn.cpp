@@ -53,33 +53,32 @@ calculate_clusters(const arma::mat& dataset, double r, size_t d1, size_t d2)
 
 	std::vector<Cluster*> clusters;
 	Cluster *cur_cl = NULL;
+	size_t cur_cl_id = 0;
 	if(num_clust1 >= num_clust2) {
 		for(size_t i=0; i<m; i++) {
 			size_t cur = c1_s[i];
-			if (SNN(cur)>0)  {
-				if(!cur_cl) {
+			if ((SNN(cur)>0) && (SNN2(cur)>0))  {
+				if((cur_cl_id == 0) || (SNN(cur) != cur_cl_id)) {
 					cur_cl = new Cluster();
 					clusters.push_back(cur_cl);
-				}
+					cur_cl_id = SNN(cur);
+				}							
 				cur_cl->point_id.push_back(cur);
 				cur_cl->size++;
-			} else {
-				cur_cl = NULL;
-			}
+			} 
 		}	
 	} else {
 		for(size_t i=0; i<m; i++) {
 			size_t cur = c2_s[i];
-			if (SNN2(cur)>0) {
-				if(!cur_cl) {
-					cur_cl = new Cluster();
+			if ((SNN(cur)>0) && (SNN2(cur)>0))  {
+				if((cur_cl_id == 0) || (SNN2(cur) != cur_cl_id)) {
+					cur_cl = new Cluster();	
 					clusters.push_back(cur_cl);
-				}
+					cur_cl_id = SNN2(cur);
+				}							
 				cur_cl->point_id.push_back(cur);
 				cur_cl->size++;
-			} else {
-				cur_cl = NULL;
-			}
+			} 
 		}	
 	}
 	
