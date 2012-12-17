@@ -11,7 +11,7 @@ void rank_out(const arma::mat& dataset) {
 	if(d2>dimensionality) {
 		d2 -= dimensionality;
 	}
-	double r = 100;
+	double r = 1.5;
 	d1 = 0;
 	d2 = 1;
 	std::vector<Cluster*> clusters = calculate_clusters(dataset,r,d1,d2);	

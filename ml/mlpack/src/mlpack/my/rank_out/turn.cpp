@@ -17,90 +17,84 @@ calculate_clusters(const arma::mat& dataset, double r, size_t d1, size_t d2)
 	SNN.zeros();
 	SNN2.zeros();
 	
-	Cluster *cur_cl = NULL;	
-	std::vector<Cluster*> clusters1;
+	size_t clust_id=0;	
+	bool in_clust=false;
 	for(size_t i=1; i<(m-1); i++) {
 		size_t cur = c1_s[i];
 		size_t prev = c1_s[i-1];
 		size_t next = c1_s[i+1];
 		double dist_l = fabs(col1(cur) - col1(prev));
 		double dist_r = fabs(col1(cur) - col1(next));
-		double dist_l2 = fabs(col2(cur) - col2(prev));
-		double dist_r2 = fabs(col2(cur) - col2(next));
-		if((dist_l <= r) && (dist_l2<=r)) {	
-			SNN[cur]++;					
-		}
-		if((dist_r <= r) && (dist_r2<=r)) {	
-			SNN[cur]++;					
-		} 
-		if(SNN[cur] == 2) {			
-			dens[cur] = sqrt(pow(dist_l,2.0) + pow(dist_r,2.0));
-			if(!cur_cl) {
-				cur_cl = new Cluster();
-				clusters1.push_back(cur_cl);
-			}
-			cur_cl->point_id.push_back(cur);			
-			cur_cl->size++;
+		if((dist_l <= r) && (dist_r <= r)) { 	
+			if(!in_clust) { clust_id++; in_clust = true; }
+			SNN[cur] = clust_id;					
 		} else {
-			//if(cur_cl) {
-			//	clusters1.push_back(cur_cl);
-			//}
-			cur_cl = NULL;
-		}
+			in_clust = false;
+		}		
 	}
-	cur_cl = NULL;
-	std::vector<Cluster*> clusters2;
+	size_t num_clust1 = clust_id;
+	clust_id=0;
+	in_clust=false;
 	for(size_t i=1; i<(m-1); i++) {
 		size_t cur = c2_s[i];
 		size_t prev = c2_s[i-1];
 		size_t next = c2_s[i+1];
 		double dist_l = fabs(col2(cur) - col2(prev));
 		double dist_r = fabs(col2(cur) - col2(next));
-		double dist_l2 = fabs(col1(cur) - col1(prev));
-		double dist_r2 = fabs(col1(cur) - col1(next));
-		if((dist_l <= r) && (dist_l2<=r)) {	
-			SNN2[cur]++;					
-		}
-		if((dist_r <= r) && (dist_r2<=r)) {	
-			SNN2[cur]++;					
-		}
-		if(SNN2[cur] == 2) {
-			dens[cur] = 1/( dens[cur] + sqrt(pow(dist_l,2.0) + pow(dist_r,2.0))); // calculate density for out SNN			
-			if(!cur_cl) {
-				cur_cl = new Cluster();
-				clusters2.push_back(cur_cl);
-			}
-			cur_cl->point_id.push_back(cur);			
-			cur_cl->size++;
+		if((dist_l <= r) && (dist_r <= r)) { 	
+			if(!in_clust) { clust_id++; in_clust = true; }
+			SNN2[cur] = clust_id;					
 		} else {
-			if(dens[cur] != 0) {  // it is mean that we calculate this for nothing, but had to try 
-				dens[cur] = 0;
-			}			
-			cur_cl = NULL;
-		}			
+			in_clust = false;
+		}				
 
 	}
-	for(size_t i=0; i<clusters1.size(); i++) {
-		Cluster *cl = clusters1[i];
-		Log::Debug << "c1: Cluster number " << i << ", size:" << cl->size << std::endl;
- 		//Log::Debug << "elements: ";
-		
- 		//for(size_t p_i=0; p_i<cl->size; p_i++) {
- 		//	Log::Debug << cl->point_id[p_i] << ": " << dataset(cl->point_id[p_i],d1) << ", " << dataset(cl->point_id[p_i],d2) << "; ";
-  		//}
+	size_t num_clust2 = clust_id;
+
+	std::vector<Cluster*> clusters;
+	Cluster *cur_cl = NULL;
+	if(num_clust1 >= num_clust2) {
+		for(size_t i=0; i<m; i++) {
+			size_t cur = c1_s[i];
+			if (SNN(cur)>0)  {
+				if(!cur_cl) {
+					cur_cl = new Cluster();
+					clusters.push_back(cur_cl);
+				}
+				cur_cl->point_id.push_back(cur);
+				cur_cl->size++;
+			} else {
+				cur_cl = NULL;
+			}
+		}	
+	} else {
+		for(size_t i=0; i<m; i++) {
+			size_t cur = c2_s[i];
+			if (SNN2(cur)>0) {
+				if(!cur_cl) {
+					cur_cl = new Cluster();
+					clusters.push_back(cur_cl);
+				}
+				cur_cl->point_id.push_back(cur);
+				cur_cl->size++;
+			} else {
+				cur_cl = NULL;
+			}
+		}	
 	}
-	for(size_t i=0; i<clusters2.size(); i++) {
-		Cluster *cl = clusters2[i];
-		Log::Debug << "c2: Cluster number " << i << ", size:" << cl->size << std::endl;
- 		//Log::Debug << "elements: ";
-		
- 		//for(size_t p_i=0; p_i<cl->size; p_i++) {
- 		//	Log::Debug << cl->point_id[p_i] << ": " << dataset(cl->point_id[p_i],d1) << ", " << dataset(cl->point_id[p_i],d2) << "; ";
-  		//}
+	
+	string outputFile1 = "output1.csv";
+	data::Save(outputFile1.c_str(), SNN,false,false);
+	string outputFile2 = "output2.csv";
+	data::Save(outputFile2.c_str(), SNN2,false,false);	
+
+	for(size_t i=0; i<clusters.size(); i++) {
+		Cluster *cl = clusters[i];
+		Log::Debug << "Cluster number " << i << ", size:" << cl->size << std::endl;
 	}
 	// Log::Info << "Clustering count finished" << std::endl;
 	// Log::Info << "Clustering analising" << std::endl;
-	std::vector<Cluster*> clusters;
+	
 	// Cluster *cur_cl = NULL;
 	// for(size_t i=1; i<m; i++) {
 	// 	int ind = c1_s[i];
