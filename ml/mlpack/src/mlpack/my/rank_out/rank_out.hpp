@@ -4,4 +4,4 @@
 using namespace mlpack;
 using namespace std;
 
-arma::colvec rank_out(const arma::mat& dataset);
+void rank_out(const arma::mat& dataset);

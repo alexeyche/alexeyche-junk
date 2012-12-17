@@ -32,8 +32,9 @@ int main(int argc, char** argv)
   data::Load(inputFile.c_str(), dataset,true,false);
   //perform scaling
   ScaleMat(dataset,-1,1);
-  string outputFile = "output.csv";
-  data::Save(outputFile.c_str(), dataset,false,false);
+  // string outputFile = "output.csv";
+  // data::Save(outputFile.c_str(), dataset,false,false);
+  rank_out(dataset);
   //turn(dataset,r);  
   
 }
