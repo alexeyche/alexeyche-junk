@@ -1,13 +1,13 @@
 #!/usr/bin/RScript
 
-cl <- read.csv("output_all.csv", header=F)
+cl <- read.csv("output0.csv", header=F)
 data <- read.csv("test.csv", header=F)
 
 n <- ncol(cl)
 m <- nrow(cl)
 
 #par(mfrow=c(d,d))
-set.seed(1)
+set.seed(2)
 
 #for(i in 1:n) {
     j <- 1
