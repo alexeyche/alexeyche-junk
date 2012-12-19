@@ -76,20 +76,18 @@ calculate_clusters(const arma::mat& dataset, double r, size_t d1, size_t d2)
 
 	Clusters clusts(m);
 	
-	size_t cur_cl_id = 0;
-	string snnout = "snn.csv";
-	data::Save(snnout.c_str(),SNN,false,false);
+	
 
 	in_clust=false;
 	for(size_t i=0; i<m; i++) {
 		size_t cur = c1_s(i);				
-		if ( (SNN(cur,0)>0) && (SNN(cur,1)>0) )  {					
+		if ( (SNN(cur,0)>0) || (SNN(cur,1)>0) )  {					
 			//Log::Debug << "clust" << std::endl;
 			if(!in_clust) {
 				in_clust=true;
 				clusts.clust_num++;
 			}
-			clusts.clust_ind(cur) = 1; //clusts.clust_num;
+			clusts.clust_ind(cur) = SNN(cur,0) + SNN(cur,1); //clusts.clust_num;
 		} else {
 			//Log::Debug << "clust not found" << std::endl;
 			in_clust = false;

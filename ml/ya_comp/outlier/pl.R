@@ -7,8 +7,10 @@ n <- ncol(cl)
 m <- nrow(cl)
 
 #par(mfrow=c(d,d))
-set.seed(2)
-
+#set.seed(0)
+cols <- c("black", "red","green","tan","violet","brown","blue","yellow","cyan", "gray",'purple',"maroon")
+cols_big <- colors()
+n_cols <- length(cols)
 #for(i in 1:n) {
     j <- 1
     max_cl = max(cl[,j])
@@ -23,8 +25,13 @@ set.seed(2)
         }
         
     }
-    for(cl in clusts) {
-        plot(cl[,1],cl[,2],xlim=c(-4,3), ylim=c(-4,3), col=sample(colors(), 1)) 
+    choosed_cols <- cols
+    if (length(names(clusts))>length(cols)) {
+        choosed_cols <- cols_big
+    }        
+    for(cl_n in names(clusts)) {
+        cl <- clusts[[cl_n]]
+        plot(cl[,1],cl[,2],xlim=c(-4,3), ylim=c(-4,3), col=choosed_cols[as.numeric(cl_n)+1]) 
         par(new=TRUE)
     }
 
