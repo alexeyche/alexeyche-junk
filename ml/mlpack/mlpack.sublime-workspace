@@ -4,6 +4,22 @@
 		"selected_items":
 		[
 			[
+				"clust",
+				"clust_id"
+			],
+			[
+				"snn",
+				"snn_out"
+			],
+			[
+				"in",
+				"in_clust"
+			],
+			[
+				"max",
+				"max_d"
+			],
+			[
 				"dist",
 				"dist_r2"
 			],
@@ -112,10 +128,22 @@
 	},
 	"file_history":
 	[
-		"/home/che/prog/alexeyche-junk/ml/mlpack/src/mlpack/core/data/save_impl.hpp",
-		"/home/che/prog/alexeyche-junk/ml/mlpack/src/mlpack/methods/kmeans/kmeans_main.cpp",
+		"/home/che/prog/alexeyche-junk/ml/mlpack/src/mlpack/my/rank_out/rank_out_main.cpp",
+		"/home/che/prog/alexeyche-junk/ml/mlpack/src/mlpack/my/rank_out/rank_out.cpp",
+		"/home/che/prog/alexeyche-junk/ml/mlpack/src/mlpack/my/rank_out/turn.hpp",
+		"/home/che/prog/alexeyche-junk/ml/mlpack/src/mlpack/my/rank_out/turn.cpp",
+		"/home/che/prog/alexeyche-junk/ml/mlpack/src/mlpack/my/rank_out/turn_old.cpp",
 		"/home/che/prog/alexeyche-junk/ml/mlpack/src/mlpack/my/turn/turn_main.cpp",
 		"/home/che/prog/alexeyche-junk/ml/mlpack/src/mlpack/my/turn/turn.cpp",
+		"/home/che/prog/alexeyche-junk/ml/mlpack/src/mlpack/my/turn/scaling.cpp",
+		"/home/che/prog/alexeyche-junk/ml/mlpack/src/mlpack/methods/pca/pca.cpp",
+		"/home/che/prog/alexeyche-junk/ml/mlpack/src/mlpack/methods/radical/radical.hpp",
+		"/home/che/prog/alexeyche-junk/ml/mlpack/src/mlpack/methods/sparse_coding/data_dependent_random_initializer.hpp",
+		"/home/che/prog/alexeyche-junk/ml/mlpack/src/mlpack/core/optimizers/lbfgs/lbfgs.hpp",
+		"/home/che/prog/alexeyche-junk/ml/mlpack/src/mlpack/core/optimizers/lbfgs/lbfgs_impl.hpp",
+		"/home/che/prog/alexeyche-junk/ml/mlpack/src/mlpack/core/optimizers/aug_lagrangian/aug_lagrangian_function_impl.hpp",
+		"/home/che/prog/alexeyche-junk/ml/mlpack/src/mlpack/core/data/save_impl.hpp",
+		"/home/che/prog/alexeyche-junk/ml/mlpack/src/mlpack/methods/kmeans/kmeans_main.cpp",
 		"/home/che/prog/alexeyche-junk/ml/mlpack/src/mlpack/core/tree/cover_tree/cover_tree_impl.hpp",
 		"/home/che/prog/alexeyche-junk/ml/mlpack/src/mlpack/methods/gmm/em_fit_impl.hpp",
 		"/home/che/.config/sublime-text-2/Packages/Default/Default (Linux).sublime-keymap",
@@ -160,7 +188,7 @@
 	},
 	"find_in_files":
 	{
-		"height": 93.0,
+		"height": 0.0,
 		"where_history":
 		[
 			""
@@ -171,6 +199,12 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"in_clust",
+			"PCA::Apply",
+			"arma::mat",
+			"pair",
+			"sqrt",
+			"pow",
 			"for",
 			"zeros",
 			"sort_index",

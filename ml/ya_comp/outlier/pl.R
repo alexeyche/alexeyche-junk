@@ -1,6 +1,6 @@
 #!/usr/bin/RScript
 
-cl <- read.csv("output0.csv", header=F)
+cl <- read.csv("clusts.csv", header=F)
 data <- read.csv("test.csv", header=F)
 
 n <- ncol(cl)
@@ -8,7 +8,7 @@ m <- nrow(cl)
 
 #par(mfrow=c(d,d))
 #set.seed(0)
-cols <- c("black", "red","green","tan","violet","brown","blue","yellow","cyan", "gray",'purple',"maroon")
+cols <- c("red","green","tan","violet","brown","blue","yellow","cyan", "gray",'purple',"maroon")
 cols_big <- colors()
 n_cols <- length(cols)
 #for(i in 1:n) {
@@ -31,7 +31,11 @@ n_cols <- length(cols)
     }        
     for(cl_n in names(clusts)) {
         cl <- clusts[[cl_n]]
-        plot(cl[,1],cl[,2],xlim=c(-4,3), ylim=c(-4,3), col=choosed_cols[as.numeric(cl_n)+1]) 
+        plot_col <- choosed_cols[as.numeric(cl_n)+1]
+        if(cl_n == "0") {
+            plot_col <- "black"
+        }
+        plot(cl[,1],cl[,2],xlim=c(-4,3), ylim=c(-4,3), col=plot_col) 
         par(new=TRUE)
     }
 

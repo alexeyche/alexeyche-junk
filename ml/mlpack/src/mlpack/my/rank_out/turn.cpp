@@ -15,14 +15,13 @@ calculate_clusters(const arma::mat& dataset, double r, size_t d1, size_t d2)
 	
 	arma::umat SNN(m,dim); //SNN for dim independent axis 
 	arma::vec dens(m); // density for each point
+	arma::uvec clusts(m); //id clust for each point
 	dens.zeros();
-	SNN.zeros();	
+	SNN.zeros();
+	clusts.zeros();
 	
-	size_t clust_axis = 0;
-	size_t max_clust = 0;
-	for(int ax=0; ax<dim; ax++) {
-		//size_t ax = 0;
-		size_t clust_id=0;	// start clusters count from 1, 0 means no cluster
+	size_t clust_id=1;	// start clusters count from 1, 0 means no cluster
+	for(int ax=0; ax<1; ax++) {		
 		bool in_clust=false;
 		for(size_t i=1; i<(m-1); i++) {
 			size_t cur = col_sort_ind[ax]->at(i);
@@ -59,41 +58,52 @@ calculate_clusters(const arma::mat& dataset, double r, size_t d1, size_t d2)
 					}
 				}
 			}
-			if((dist_l <= r) && (dist_r <= r) && (dist_l2 <= r) && (dist_r2 <= r)) { 	
-				if(!in_clust) { clust_id++; in_clust = true; }
-				SNN(cur,ax) += 2;					
-				SNN(prev,ax) += 1;
-				SNN(next,ax) += 1;
-			} else {
-				in_clust = false;
+			if((dist_l <= r) && (dist_r <= r) && (dist_l2 <= r) && (dist_r2 <= r)) { 					
+				SNN(cur,ax) += 2;								
+				//SNN(prev,ax) += 1;				
+				//SNN(next,ax) += 1;
+				
+				if(clusts(cur)>0) {										
+					clusts(prev) = clusts(cur);
+					clusts(next) = clusts(cur);
+				} else if (clusts(prev)>0) {
+					clusts(cur) = clusts(prev);
+					clusts(next) = clusts(cur);
+				} else {
+					clusts(cur) = clust_id;;	
+					clusts(next) = clust_id;
+					clusts(prev) = clust_id;
+					clust_id++;
+				}		
 			}		
 		}
-		if(clust_id > max_clust) {
-			max_clust = clust_id;   //choosing axis with max clusters
-			clust_axis = ax; 
-		}
 	}
-	Log::Info << "Clusters for each axis perfomed. Axis with max clusters choosing for clustering (";
-	Log::Info << clust_axis << ": " << max_clust << " clusters)";
-	Log::Info << std::endl;
 
-	Clusters clusts(m);
+	//Log::Info << "Clusters for each axis perfomed. Axis with max clusters choosing for clustering (";
+	//Log::Info << clust_axis << ": " << max_clust << " clusters)";
+	//Log::Info << std::endl;
+
+	Clusters clusts0(m);
 	
 	size_t cur_cl_id = 0;
-	string snnout = "snn.csv";
-	data::Save(snnout.c_str(),SNN,false,false);	
-	bool in_clust = false;
-	for(size_t i=0; i<m; i++) {
-		size_t cur = col_sort_ind[clust_axis]->at(i);				
-		if ((SNN(cur,0)>0) || (SNN(cur,1)>0))  {
-			if(!in_clust) { 
-				clusts.clust_num++; 
-				in_clust = true; 
-			}				
-			clusts.clust_ind(cur) = SNN(cur,0) + SNN(cur,1);			
-		} else {
-			in_clust = false;
-		}
-	}	
-	return clusts;	
+	
+	string clust_out = "clusts.csv";
+	data::Save(clust_out.c_str(),clusts,false,false);	
+	
+	string snn_out = "snn.csv";
+	data::Save(snn_out.c_str(),SNN,false,false);	
+	// bool in_clust = false;
+	// for(size_t i=0; i<m; i++) {
+	// 	size_t cur = col_sort_ind[clust_axis]->at(i);				
+	// 	if ((SNN(cur,0)>0) || (SNN(cur,1)>0))  {
+	// 		if(!in_clust) { 
+	// 			clusts.clust_num++; 
+	// 			in_clust = true; 
+	// 		}				
+	// 		clusts.clust_ind(cur) = SNN(cur,0) + SNN(cur,1);			
+	// 	} else {
+	// 		in_clust = false;
+	// 	}
+	// }	
+	return clusts0;	
 }
