@@ -1,5 +1,4 @@
 #!/usr/bin/RScript
-
 cl <- read.csv("clusts.csv", header=F)
 data <- read.csv("test.csv", header=F)
 
@@ -39,6 +38,20 @@ n_cols <- length(cols)
         par(new=TRUE)
     }
 
+
+point_point <- function(point) {
+    p <- point
+    for(i in 1:length(p)) {
+        p[i] = p[i] + 1
+        points(data[p[i],1],data[p[i],2], col="red", pch=3)
+    }
+}
+
+p<-c(42, 39)
+plot_p <- T
+if(plot_p) {
+    point_point(p)
+}
 
 #}    
 

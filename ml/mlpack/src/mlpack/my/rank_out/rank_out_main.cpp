@@ -15,7 +15,7 @@ using namespace std;
 PROGRAM_INFO("TURN* Clustering", "Just TURN clustering");
 PARAM_STRING_REQ("inputFile", "Input dataset to perform clustering on.", "i");
 PARAM_INT("seed", "Random seed.  If 0, 'std::time(NULL)' is used.", "s", 0);
-PARAM_DOUBLE("resolution", "resolution", "r", 0.05);
+PARAM_DOUBLE("resolution", "resolution", "r", 0.3);
 int main(int argc, char** argv)
 {
   CLI::ParseCommandLine(argc, argv);
@@ -34,7 +34,7 @@ int main(int argc, char** argv)
   //ScaleMat(dataset,-1,1);
   // string outputFile = "output.csv";
   // data::Save(outputFile.c_str(), dataset,false,false);
-  rank_out(dataset);
+  rank_out(dataset,r);
   //turn(dataset,r);  
   
 }

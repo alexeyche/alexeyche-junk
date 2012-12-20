@@ -2,7 +2,7 @@
 #include "rank_out.hpp"
 #include "turn.hpp"
 
-void rank_out(const arma::mat& dataset) {
+void rank_out(const arma::mat& dataset, double r) {
 	size_t dimensionality = dataset.n_cols;
 	Log::Debug << "dim: " << dimensionality << std::endl;
 	size_t d1 = math::RandInt(0,dimensionality);
@@ -14,8 +14,7 @@ void rank_out(const arma::mat& dataset) {
 	d1 = 0;
 	d2 = 1;
 	size_t counter=0;
-//	for(double r=0.005; r<=2; r*=2) {
-		double r=1;
+//	for(double r=0.005; r<=2; r*=2) {		
 		Clusters clusts = calculate_clusters(dataset,r,d1,d2);	
 		string outputFile = boost::str( boost::format("output%d.csv") % counter );
 		data::Save(outputFile.c_str(),clusts.clust_ind,false,false);
