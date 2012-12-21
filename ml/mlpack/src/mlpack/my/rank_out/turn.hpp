@@ -25,3 +25,8 @@ calculate_clusters(const arma::mat& dataset, double r, size_t d1, size_t d2);
 void
 turn_iteration(const int i,const std::vector<arma::uvec*> &col_sort_ind, const arma::mat &dataset, 
 					const int ax,const double r, arma::uvec &clusts, size_t &clust_id, bool back = false);
+
+std::vector<int> find_near_left(int i, const std::vector<arma::uvec*> &col_sort_ind, const arma::mat &dataset, 
+					const int ax,const double r);
+std::vector<int> find_near_right(int i, const std::vector<arma::uvec*> &col_sort_ind, const arma::mat &dataset, 
+	const int ax,const double r);

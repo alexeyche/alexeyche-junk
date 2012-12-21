@@ -4,6 +4,14 @@
 		"selected_items":
 		[
 			[
+				"choo",
+				"choosed_clust"
+			],
+			[
+				"right",
+				"right_count"
+			],
+			[
 				"clust",
 				"clust_id"
 			],
@@ -128,10 +136,11 @@
 	},
 	"file_history":
 	[
-		"/home/che/prog/alexeyche-junk/ml/mlpack/src/mlpack/my/rank_out/rank_out_main.cpp",
-		"/home/che/prog/alexeyche-junk/ml/mlpack/src/mlpack/my/rank_out/rank_out.cpp",
 		"/home/che/prog/alexeyche-junk/ml/mlpack/src/mlpack/my/rank_out/turn.hpp",
 		"/home/che/prog/alexeyche-junk/ml/mlpack/src/mlpack/my/rank_out/turn.cpp",
+		"/home/che/prog/alexeyche-junk/ml/mlpack/src/mlpack/my/rank_out/turn_old2.cpp",
+		"/home/che/prog/alexeyche-junk/ml/mlpack/src/mlpack/my/rank_out/rank_out_main.cpp",
+		"/home/che/prog/alexeyche-junk/ml/mlpack/src/mlpack/my/rank_out/rank_out.cpp",
 		"/home/che/prog/alexeyche-junk/ml/mlpack/src/mlpack/my/rank_out/turn_old.cpp",
 		"/home/che/prog/alexeyche-junk/ml/mlpack/src/mlpack/my/turn/turn_main.cpp",
 		"/home/che/prog/alexeyche-junk/ml/mlpack/src/mlpack/my/turn/turn.cpp",
@@ -199,6 +208,8 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"choosed_clust",
+			"return",
 			"in_clust",
 			"PCA::Apply",
 			"arma::mat",
@@ -331,6 +342,6 @@
 	"show_open_files": true,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 265.0,
+	"side_bar_width": 185.0,
 	"status_bar_visible": true
 }

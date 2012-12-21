@@ -7,7 +7,8 @@ m <- nrow(cl)
 
 #par(mfrow=c(d,d))
 #set.seed(0)
-cols <- c("red","green","tan","violet","brown","blue","yellow","cyan", "gray",'purple',"maroon")
+#jpeg('pl.jpg')
+cols <- c("red","green","violet","brown","blue","yellow","cyan", "gray",'purple',"maroon")
 cols_big <- colors()
 n_cols <- length(cols)
 #for(i in 1:n) {
@@ -47,12 +48,12 @@ point_point <- function(point) {
     }
 }
 
-p<-c(42, 39)
+p<-c(32, 29, 7)
 plot_p <- T
 if(plot_p) {
     point_point(p)
 }
-
+#dev.off()
 #}    
 
 #plot(d[d[,3] == 1], xlim = c(-1,1), ylim=c(-1,1))
