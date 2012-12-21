@@ -18,20 +18,16 @@ calculate_clusters(const arma::mat& dataset, double r, size_t d1, size_t d2)
 	dens.zeros();
 	
 	clusts.zeros();
-	std::vector< std::pair< int,int >* > equals_clusters;
-
-	size_t clust_id=1;	// start clusters count from 1, 0 means no cluster
+	
+	size_t clust_id=0;	// start clusters count from 1, 0 means no cluster
 	for(int ax=0; ax<1; ax++) {				
 		for(size_t i=0; i<(m-1); i++) {			
-			turn_iteration(i,col_sort_ind,dataset,ax,r,clusts,clust_id,equals_clusters);									;
+			turn_iteration(i,col_sort_ind,dataset,ax,r,clusts,clust_id);									;
 		}
 	}
-	string clust_out = "clusts.csv";
-	data::Save(clust_out.c_str(),clusts,false,false);	
-	
-	Log::Info << "Clustering is perfomed." << std::endl;
-	Clusters cl_full_info(m);
-	cl_full_info.clust_ind = clusts;
+
+	Log::Info << "Clustering is perfomed. Was found " << clust_id << " clusters." << std::endl;
+	Clusters cl_full_info(clusts ,m, clust_id);	
 	return cl_full_info;	
 }
 
@@ -78,7 +74,7 @@ std::vector<int> find_near_right(int i, const std::vector<arma::uvec*> &col_sort
 	return out;
 }
 void turn_iteration(const int i,const std::vector<arma::uvec*> &col_sort_ind, const arma::mat &dataset, 
-					const int ax,const double r, arma::uvec &clusts, size_t &clust_id, std::vector< std::pair< int,int >* > &equals_clusters) 
+					const int ax,const double r, arma::uvec &clusts, size_t &clust_id) 
 {
 	Log::Debug << "iteration num " << i << std::endl;
 	size_t cur;
@@ -97,22 +93,21 @@ void turn_iteration(const int i,const std::vector<arma::uvec*> &col_sort_ind, co
 		for(size_t j=0; j<left_count; j++) {
 			if(clusts(left_side[j]) > 0) {				
 				if((choosed_clust != 0) && (clusts(left_side[j]) != choosed_clust)) {
-					// Log::Debug << "!!!: equals clusters: " << clusts(left_side[j]) << " == " << choosed_clust << std::endl;
-					// for(int cl; cl<clusts.n_rows; cl++) {
-					// 	if(clusts(cl) == clusts(left_side[j])) {
-					// 		clusts(cl) = choosed_clust;
-					// 	}
-					// }
-					// equals_clusters.push_back(new std::pair< int,int > (clusts(left_side[j]),choosed_clust));
+					Log::Debug << "!!!: equals clusters: " << clusts(left_side[j]) << " == " << choosed_clust << std::endl;
+					for(int cl; cl<clusts.n_rows; cl++) {
+					 	if(clusts(cl) == clusts(left_side[j])) {
+					 		clusts(cl) = choosed_clust;
+					 	}
+					}					
 				} 
 				choosed_clust = clusts(left_side[j]);
 				Log::Debug << "Left was found, his clust taken - " << choosed_clust << std::endl;									
 			}
 		}
 		if(choosed_clust == 0) { 
-			choosed_clust = clust_id;
-			Log::Debug << "Left was not found, clust_id taken - " << clust_id << std::endl;
 			clust_id++;
+			choosed_clust = clust_id;
+			Log::Debug << "Left was not found, clust_id taken - " << clust_id << std::endl;			
 		}
 		Log::Debug << "Left side was clustered (" << choosed_clust << "): "; 
 		for(size_t j=0; j<left_count; j++) {

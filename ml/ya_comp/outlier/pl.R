@@ -8,7 +8,7 @@ m <- nrow(cl)
 #par(mfrow=c(d,d))
 set.seed(2)
 #jpeg('pl.jpg')
-cols <- c("red","green","violet","brown","blue","yellow","cyan", "gray",'purple',"maroon")
+cols <- c("red","green","violet","brown","blue","yellow","cyan", "gray",'purple',"maroon","red2","orangered","pink2","ivory3")
 cols_big <- colors()
 n_cols <- length(cols)
 #for(i in 1:n) {
