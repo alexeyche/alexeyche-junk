@@ -6,7 +6,7 @@ n <- ncol(cl)
 m <- nrow(cl)
 
 #par(mfrow=c(d,d))
-#set.seed(0)
+set.seed(2)
 #jpeg('pl.jpg')
 cols <- c("red","green","violet","brown","blue","yellow","cyan", "gray",'purple',"maroon")
 cols_big <- colors()
@@ -27,11 +27,12 @@ n_cols <- length(cols)
     }
     choosed_cols <- cols
     if (length(names(clusts))>length(cols)) {
+        print("choosed big")
         choosed_cols <- cols_big
     }        
     for(cl_n in names(clusts)) {
         cl <- clusts[[cl_n]]
-        plot_col <- choosed_cols[as.numeric(cl_n)+1]
+        plot_col <- choosed_cols[as.numeric(cl_n)]
         if(cl_n == "0") {
             plot_col <- "black"
         }
@@ -48,8 +49,7 @@ point_point <- function(point) {
     }
 }
 
-p<-c(32, 29, 7)
-plot_p <- T
+plot_p <- F
 if(plot_p) {
     point_point(p)
 }

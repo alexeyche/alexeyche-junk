@@ -4,4 +4,4 @@
 using namespace mlpack;
 using namespace std;
 
-void rank_out(const arma::mat& dataset, double r);
+void rank_out(const arma::mat& dataset,double r_given);

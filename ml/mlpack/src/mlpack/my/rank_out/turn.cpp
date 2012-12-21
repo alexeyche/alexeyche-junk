@@ -11,49 +11,28 @@ calculate_clusters(const arma::mat& dataset, double r, size_t d1, size_t d2)
 	for(size_t ax=0; ax<dim; ax++) {
 		arma::colvec col_cur = dataset.unsafe_col(ax);			
 		col_sort_ind.push_back(new arma::uvec(arma::sort_index(col_cur, 0)));
-	}
+	}	
 	
-	arma::umat SNN(m,dim); //SNN for dim independent axis 
 	arma::vec dens(m); // density for each point
 	arma::uvec clusts(m); //id clust for each point
 	dens.zeros();
-	SNN.zeros();
-	clusts.zeros();
 	
+	clusts.zeros();
+	std::vector< std::pair< int,int >* > equals_clusters;
+
 	size_t clust_id=1;	// start clusters count from 1, 0 means no cluster
-	for(int ax=0; ax<1; ax++) {		
-		bool in_clust=false;
+	for(int ax=0; ax<1; ax++) {				
 		for(size_t i=0; i<(m-1); i++) {			
-			turn_iteration(i,col_sort_ind,dataset,ax,r,clusts,clust_id);									
-			// string clust_out = "clusts.csv";
-			// data::Save(clust_out.c_str(),clusts,false,false);	
-			// std::cin.get();
+			turn_iteration(i,col_sort_ind,dataset,ax,r,clusts,clust_id,equals_clusters);									;
 		}
-		for(size_t i=(m-2); i>0; i--) {			
-			//if(i==9) { 
-			//	Log::Debug << std::endl; 
-			//}
-		//	turn_iteration(i,col_sort_ind,dataset,ax,r,clusts,clust_id,true);
-		}
-		//for(size_t i=(m-2); i>0; i--) {
-		//	turn_iteration(i,col_sort_ind,dataset,ax,r,clusts,clust_id);
-		//}
 	}
 	string clust_out = "clusts.csv";
 	data::Save(clust_out.c_str(),clusts,false,false);	
-	//Log::Info << "Clusters for each axis perfomed. Axis with max clusters choosing for clustering (";
-	//Log::Info << clust_axis << ": " << max_clust << " clusters)";
-	//Log::Info << std::endl;
-
-	Clusters clusts0(m);
 	
-	size_t cur_cl_id = 0;
-	
-
-	
-	string snn_out = "snn.csv";
-	data::Save(snn_out.c_str(),SNN,false,false);		
-	return clusts0;	
+	Log::Info << "Clustering is perfomed." << std::endl;
+	Clusters cl_full_info(m);
+	cl_full_info.clust_ind = clusts;
+	return cl_full_info;	
 }
 
 
@@ -99,7 +78,7 @@ std::vector<int> find_near_right(int i, const std::vector<arma::uvec*> &col_sort
 	return out;
 }
 void turn_iteration(const int i,const std::vector<arma::uvec*> &col_sort_ind, const arma::mat &dataset, 
-					const int ax,const double r, arma::uvec &clusts, size_t &clust_id, bool back) 
+					const int ax,const double r, arma::uvec &clusts, size_t &clust_id, std::vector< std::pair< int,int >* > &equals_clusters) 
 {
 	Log::Debug << "iteration num " << i << std::endl;
 	size_t cur;
@@ -117,11 +96,17 @@ void turn_iteration(const int i,const std::vector<arma::uvec*> &col_sort_ind, co
 	if((left_count>=2)&&(right_count>=2)) {
 		for(size_t j=0; j<left_count; j++) {
 			if(clusts(left_side[j]) > 0) {				
-				if((choosed_clust != 0) &&(clusts(left_side[j]) != choosed_clust)) {
-					Log::Debug << "!!!: equals clusters: " << clusts(left_side[j]) << " == " << choosed_clust << std::endl;
+				if((choosed_clust != 0) && (clusts(left_side[j]) != choosed_clust)) {
+					// Log::Debug << "!!!: equals clusters: " << clusts(left_side[j]) << " == " << choosed_clust << std::endl;
+					// for(int cl; cl<clusts.n_rows; cl++) {
+					// 	if(clusts(cl) == clusts(left_side[j])) {
+					// 		clusts(cl) = choosed_clust;
+					// 	}
+					// }
+					// equals_clusters.push_back(new std::pair< int,int > (clusts(left_side[j]),choosed_clust));
 				} 
 				choosed_clust = clusts(left_side[j]);
-				Log::Debug << "Left was found, his clust taken - " << choosed_clust << std::endl;
+				Log::Debug << "Left was found, his clust taken - " << choosed_clust << std::endl;									
 			}
 		}
 		if(choosed_clust == 0) { 
