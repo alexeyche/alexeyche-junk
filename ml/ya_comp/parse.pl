@@ -7,7 +7,7 @@ use POSIX;
 
 
 #config
-our $delim = ",";
+our $delim = "\t";
 
 sub uniq {
     return keys %{{ map { $_ => 1 } @_ }};
@@ -241,6 +241,7 @@ while(<TRAIN>) {
 #    undef($sess_type);
 }
             # write stats
+#            if(($SwitchPos == 0) &&($test_parse == 0)) { next; }
             if ($click_count != 0) {
                 $AvgPosCount = sum(@clicks_pos)/@clicks_pos;
                 $DwellTimeUntilClick = sum(@dwell_times_until_click)/@dwell_times_until_click;
@@ -262,13 +263,10 @@ while(<TRAIN>) {
                 undef($serp{$k})
             } 
             $Click2Query = $click_count/$query_count;
-            if(($SwitchPos != 0) && ($test_parse==0)) {
-           
-            print &make_out_s($AvgPosCount, $DwellTimeUntilClick, $SumDensBadQuery, $NumBackSerp, $QuerySimilarity, $Click2Query, $QueryWOClick, $AvgClickClickDwellTime, $AvgQueryQueryDwellTime, $click_count, $query_count, $SwitchPos);
-            }
-            if($test_parse == 1) {
-            print &make_out_s($AvgPosCount, $DwellTimeUntilClick, $SumDensBadQuery, $NumBackSerp, $QuerySimilarity, $Click2Query, $QueryWOClick, $AvgClickClickDwellTime, $AvgQueryQueryDwellTime, $click_count, $query_count);
-            }
+            
+            print &make_out_s($AvgPosCount, $DwellTimeUntilClick, $SumDensBadQuery, $NumBackSerp, $QuerySimilarity, $Click2Query, $QueryWOClick, $AvgClickClickDwellTime, $AvgQueryQueryDwellTime);
+
+            
 #            if($line[3] == $user_id) {
 #                $UserBack++;
 #            } else {

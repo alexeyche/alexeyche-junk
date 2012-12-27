@@ -123,6 +123,7 @@ int main(int argc, char *argv[]) {
         
     char *train = argv[1];
     char *test = argv[2];
+    char *num = argv[3];
     char *name = basename(train);
     int nrow_train = count_rows(train);
     int nrow_test = count_rows(test);
@@ -133,9 +134,10 @@ int main(int argc, char *argv[]) {
     process_file(train, model, bad_label, ncol, nrow_train);
     process_file(test, model, good_label, ncol, nrow_test);
     printf("Start training %s. nrow train: %d, nrow test: %d\n", name, nrow_train, nrow_test);
+    model.use_l1_regularizer(50);
     model.train();
     char *model_name = new char[200];
-    sprintf(model_name, "model_%s",name);    
+    sprintf(model_name, "model_%s",num);    
     model.save_to_file(model_name);
     return 0;
 }    

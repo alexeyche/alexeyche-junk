@@ -38,6 +38,8 @@ n_cols <- length(cols)
         }
         plot(cl[,1],cl[,2],xlim=c(-4,3), ylim=c(-4,3), col=plot_col) 
         par(new=TRUE)
+#        print(cl_n)
+#        scan()
     }
 
 
