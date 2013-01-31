@@ -49,8 +49,6 @@ fprop <- function(input_batch, word_embedding_weights, embed_to_hid_weights,
   embedding_layer_state <- matrix(t(word_embedding_weights[as.vector(input_batch),]), nrow = numhid1 * numwords)
   # COMPUTE STATE OF HIDDEN LAYER.
   # Compute inputs to hidden units.
-  #inputs_to_hidden_units = embed_to_hid_weights' * embedding_layer_state + ...
-  #repmat(hid_bias, 1, batchsize);
   
   inputs_to_hidden_units <- t(embed_to_hid_weights) %*% embedding_layer_state + matrix(rep(hid_bias,batchsize),nrow=numhid2)
   
