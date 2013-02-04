@@ -21,8 +21,8 @@ finalmomentum    <- 0.9
 c(numcases, numdims, numbatches) := dim(batchdata)
 
 if (restart == TRUE) {
-    restart<-0
-    epoch<-1
+    restart <- FALSE
+    epoch <- 1
     
     # Initializing symmetric weights and biases. 
     vishid     <- 0.1* array(rnorm(numdims * numhid), dim = c(numdims, numhid))
@@ -46,13 +46,15 @@ for (epoch in epoch:maxepoch) {
     for (batch in 1:numbatches) {
         batch <- 1
         printf('epoch %d batch %d\r',epoch,batch); 
-        
-        data <- batchdatar[,,batch]
-        poshidprobs <- 1 /(1 + exp(-data %*% vishid - repmat(hidbiases,numcases,1)));    
-        batchposhidprobs(:,:,batch)=poshidprobs;
-        posprods    = t(data) %*% poshidprobs;
-        poshidact   = sum(poshidprobs);
-        posvisact = sum(data);
+
+######### START POSITIVE PHASE ###################################################
+        data <- batchdata[,,batch]
+        # p( h_i == 1 | v,W ) = sigma( sum_j v_j * h_ij - b_j)
+        poshidprobs <- 1 /(1 + exp(-data %*% vishid - matrix(rep(hidbiases,numcases), nrow = numcases, byrow=TRUE) ))    
+        batchposhidprobs[,,batch] <- poshidprobs
+        posprods    <- t(data) %*% poshidprobs
+        poshidact   <- sum(poshidprobs);
+        posvisact <- sum(data);
 
     }
 }

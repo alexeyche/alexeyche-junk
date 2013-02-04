@@ -1,13 +1,13 @@
 #!/usr/bin/RScript
 
 
-load_data_and_make_bacthes <- function() {
+makebatches <- function() {
     set.seed(0)
     library(R.matlab)
     
     num_digits <- 10
     batchsize <- 100
- #   if( ! file.exists(".RData")) {
+    if( ! file.exists(".RData")) {
         digitdata <- NULL
         digitdata.t <- NULL
         targets <- NULL
@@ -66,10 +66,10 @@ load_data_and_make_bacthes <- function() {
             }
         }
         save.image()
-#    } else {
- #       load(".RData")
-#    }
-     list(batchdata = batchdata, batchtargets = batchtargets, testbatchdata = testbatchdata, testbatchtargets = testbatchtargets)
+    } else {
+        load(".RData")
+    }
+    list(batchdata = batchdata, batchtargets = batchtargets, testbatchdata = testbatchdata, testbatchtargets = testbatchtargets)
 }
 
 
