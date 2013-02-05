@@ -29,3 +29,11 @@
 sum.row <- function(m) {
     apply(m,2,sum)
 }
+sum.col <- function(m) {
+    matrix(apply(m,1,sum), ncol=1)
+}
+
+# matlab stuff
+rep.row <- function(row,n) {
+    matrix(rep(row,n),nrow = n, byrow=TRUE)
+}
