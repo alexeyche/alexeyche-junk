@@ -25,3 +25,7 @@
     }    
 }
 
+# matlab way to sum
+sum.row <- function(m) {
+    apply(m,2,sum)
+}

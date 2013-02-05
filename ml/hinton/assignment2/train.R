@@ -55,6 +55,27 @@ source('fprop.R')
             # and all weights and biases
             c(embedding_layer_state, hidden_layer_state, output_layer_state) := fprop(input_batch, word_embedding_weights, embed_to_hid_weights, 
                                                                                       hid_to_output_weights, hid_bias, output_bias);
+            # COMPUTE DERIVATIVE.
+            ## Expand the target to a sparse 1-of-K vector.
+            expanded_target_batch <- expansion_matrix[, target_batch]
+            ## Compute derivative of cross-entropy loss function.
+            error_deriv <- output_layer_state - expanded_target_batch
+            CE <- -sum(expanded_target_batch * log(output_layer_state + tiny))/batchsize
+            count =  count + 1
+            this_chunk_CE <- this_chunk_CE + (CE - this_chunk_CE) / count
+            trainset_CE <- trainset_CE + (CE - trainset_CE) / m
+            
+            if ( m %% show_training_CE_after == 0) {
+              cat('\r','Batch ',m,' Train CE',this_chunk_CE)
+              cat('\n')
+              count <- 0
+              this_chunk_CE <- 0
+            }
+            # BACK PROPAGATE.
+            ## OUTPUT LAYER.
+            hid_to_output_weights_gradient =  hidden_layer_state %*% t(error_deriv)
+            output_bias_gradient = apply(error_deriv, 1, sum)
+            back_propagated_deriv_1 = (hid_to_output_weights * error_deriv)  .* hidden_layer_state .* (1 - hidden_layer_state);
             break 
         }
         break
