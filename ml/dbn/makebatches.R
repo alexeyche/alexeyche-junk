@@ -7,7 +7,7 @@ makebatches <- function() {
     
     num_digits <- 10
     batchsize <- 100
-    if( ! file.exists(".RData")) {
+    if( ! file.exists("mnist.RData")) {
         digitdata <- NULL
         digitdata.t <- NULL
         targets <- NULL
@@ -65,9 +65,9 @@ makebatches <- function() {
                 testbatchtargets[,,b] <- targets.t[ randomorder.t[(1+(b-1)*batchsize):(b*batchsize)], ]
             }
         }
-        save.image()
+        save(batchdata, batchtargets, testbatchdata, testbatchtargets, file="mnist.RData")
     } else {
-        load(".RData")
+        load("mnist.RData")
     }
     list(batchdata = batchdata, batchtargets = batchtargets, testbatchdata = testbatchdata, testbatchtargets = testbatchtargets)
 }
