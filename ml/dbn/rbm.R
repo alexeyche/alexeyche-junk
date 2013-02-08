@@ -34,12 +34,24 @@ free_energy <- function(v,W,hid_bias,vis_bias) {
     - v %*% t(vis_bias) - sum.col(log(1+exp(v %*% W + rep.row(hid_bias,n) )) )
 }
 
-gibbs_hvh <- function(hid_sample,model) {
-    n <- nrow(hid_sample)
+prop_up <- function(given_v, model) {    
+    sigmoid( given_v %*% model$W + rep.row(model$hid_bias, model$num.cases) )
+}
+
+prop_down <- function(given_h, model) {    
+    sigmoid( given_h %*% t(model$W) + rep.row(model$vis_bias, model$num.cases) )    
+}
+
+gibbs_hvh <- function(hid_sample,model) {    
     # p(v_model|h) calculate visible state with given hidden units state from positive phase
-    vis.probs <- sigmoid( hid_sample %*% t(model$W) + rep.row(model$vis_bias, n) )    
-    # p(h|v_model) calculate hidden state with given visible units
-    hid.probs <- sigmoid( vis.probs %*% model$W + rep.row(model$hid_bias, n) )
+    vis.probs <- prop_down(hid_sample, model)
+    # p(h|v_model) calculate hidden state with given probs of visible units
+    hid.probs <- prop_up(vis.probs, model)
+    list(hid.probs = hid.probs,vis.probs = vis.probs)
+}
+gibbs_vhv <- function(vis_sample,model) {    
+    hid.probs <- prop_up(vis_sample, model)
+    vis.probs <- prop_down(hid_sample, model)
     list(hid.probs = hid.probs,vis.probs = vis.probs)
 }
 
@@ -60,7 +72,8 @@ train_rbm <- function(batched.data, params, num.hid = NULL, model = NULL) {
     if(is.null(model)) {  # need to create new model
         model <- list(W = array(0.1*rnorm(num.vis*num.hid),dim=c(num.vis,num.hid)), # visible units for row, hidden units for col
                       vis_bias = array(0,dim = c(1,num.vis)), 
-                      hid_bias = array(0,dim = c(1,num.hid)))
+                      hid_bias = array(0,dim = c(1,num.hid)),
+                      num.cases = num.cases)
         
         epoch <- 1
         batch.pos.hid.probs <- array(0, dim = c(num.cases, num.hid, num.batches))
@@ -72,13 +85,15 @@ train_rbm <- function(batched.data, params, num.hid = NULL, model = NULL) {
     
     W.inc <- hid_bias.inc <- vis_bias.inc <- 0
     for(epoch in epoch:epochs) {
-        cat("Epoch # ", epoch)
         err.total <- 0
         for(batch in 1:num.batches) {
             data <- batched.data[,,batch]
             # positive phase
             # p(h|x) calculate hidden states with given visible units state
-            hid_prob <- sigmoid( data %*% model$W + rep.row(model$hid_bias,num.cases) ) # col for each hidden unit, row for each case
+            hid_prob <- prop_up(data, model) # col for each hidden unit, row for each case
+            if (epoch == epochs) { # last epoch, saving hidden probabilites
+                batch.pos.hid.probs[,,batch] <- hid_prob
+            }
             # negative phase
             c(hid_prob.model, vis_prob.model) := contrastive_divergence(hid_prob, model, iter = cd.iter)
             err <- sum((data - vis_prob.model)^2)
