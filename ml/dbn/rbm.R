@@ -29,9 +29,8 @@ sample_bernoulli <- function(probs) {
     matrix(rbinom(prod(dims),size=1,prob=c(probs)),dims[1],dims[2])
 }
 
-free_energy <- function(v,W,hid_bias,vis_bias) {
-    n <- nrow(v)    
-    - v %*% t(vis_bias) - sum.col(log(1+exp(v %*% W + rep.row(hid_bias,n) )) )
+free_energy <- function(v,model) {    
+    - v %*% t(model$vis_bias) - sum.col(log(1+exp(v %*% model$W + rep.row(model$hid_bias,model$num.cases) )) )
 }
 
 prop_up <- function(given_v, model) {    
@@ -42,12 +41,16 @@ prop_down <- function(given_h, model) {
     sigmoid( given_h %*% t(model$W) + rep.row(model$vis_bias, model$num.cases) )    
 }
 
-gibbs_hvh <- function(hid_sample,model) {    
-    # p(v_model|h) calculate visible state with given hidden units state from positive phase
-    vis.probs <- prop_down(hid_sample, model)
-    # p(h|v_model) calculate hidden state with given probs of visible units
-    hid.probs <- prop_up(vis.probs, model)
-    list(hid.probs = hid.probs,vis.probs = vis.probs)
+gibbs_hvh <- function(hid_probs,model) {    
+    hid_states <- sample_bernoulli(hid_probs)
+    # p(v_model|h) calculate visible state with given hidden units state from positive phase    
+    vis_probs <- prop_down(hid_states, model)
+    
+    vis_states <- sample_bernoulli(vis_probs)
+    # p(h|v_model) calculate hidden state with given state of visible units    
+    hid_probs <- prop_up(vis_states, model)
+    
+    list(vis_states = vis_states, hid_probs = hid_probs)
 }
 gibbs_vhv <- function(vis_sample,model) {    
     hid.probs <- prop_up(vis_sample, model)
@@ -55,12 +58,12 @@ gibbs_vhv <- function(vis_sample,model) {
     list(hid.probs = hid.probs,vis.probs = vis.probs)
 }
 
-contrastive_divergence <- function(hid_prob, model, iter = 10) {    
+contrastive_divergence <- function(hid_probs, model, iter = 10) {    
     for(it in 1:iter) {
-        hid_states <- sample_bernoulli(hid_prob) # col for each hidden unit, row for each case
-        c(hid_prob, vis_prob) := gibbs_hvh(hid_states,model)
+         # col for each hidden unit, row for each case
+        c(vis_states, hid_probs) := gibbs_hvh(hid_probs, model)
     }
-    return(list(hid.probs.end = hid_prob, vis.probs.end = vis_prob))
+    return(list(vis_states.end = vis_states, hid_probs.end = hid_probs))
 }
 
 train_rbm <- function(batched.data, params, num.hid = NULL, model = NULL) {
@@ -90,15 +93,15 @@ train_rbm <- function(batched.data, params, num.hid = NULL, model = NULL) {
             data <- batched.data[,,batch]
             # positive phase
             # p(h|x) calculate hidden states with given visible units state
-            hid_prob <- prop_up(data, model) # col for each hidden unit, row for each case
+            hid_probs <- prop_up(data, model) # col for each hidden unit, row for each case
             if (epoch == epochs) { # last epoch, saving hidden probabilites
-                batch.pos.hid.probs[,,batch] <- hid_prob
+                batch.pos.hid.probs[,,batch] <- hid_probs
             }
             # negative phase
-            c(hid_prob.model, vis_prob.model) := contrastive_divergence(hid_prob, model, iter = cd.iter)
-            err <- sum((data - vis_prob.model)^2)
+            c( vis_states.model, hid_prob.model) := contrastive_divergence(hid_probs, model, iter = cd.iter)
+            err <- sum((data - vis_states.model)^2)
             err.total <- err.total + err
-            E.free.mean <- sum(free_energy(data, model$W, model$hid_bias, model$vis_bias))/num.cases
+            E.free.mean <- sum(free_energy(data, model))/num.cases
             cat("Epoch # ", epoch, " batch # ", batch," err: ", err," free energy: ", E.free.mean,"\n") 
             # moment stuff 
             momentum <- fin.moment
@@ -108,11 +111,11 @@ train_rbm <- function(batched.data, params, num.hid = NULL, model = NULL) {
             
             # deravatives over log p(v)
             # d_log_p(v) / d_W_ij
-            W.inc <- momentum*W.inc + e.w*( ( t(data) %*% hid_prob - t(vis_prob.model) %*% hid_prob.model)/num.cases - w_cost*model$W)
+            W.inc <- momentum*W.inc + e.w*( ( t(data) %*% hid_probs - t(vis_states.model) %*% hid_prob.model)/num.cases - w_cost*model$W)
             # d_log_p(v) / d_hid_bias_j
-            hid_bias.inc <- momentum*hid_bias.inc + e.h*(sum.row(hid_prob) - sum.row(hid_prob.model))/num.cases
+            hid_bias.inc <- momentum*hid_bias.inc + e.h*(sum.row(hid_probs) - sum.row(hid_prob.model))/num.cases
             # d_log_p(v) / d_vis_bias_i
-            vis_bias.inc <- momentum*vis_bias.inc + e.v*(sum.row(data) - sum.row(vis_prob.model))/num.cases
+            vis_bias.inc <- momentum*vis_bias.inc + e.v*(sum.row(data) - sum.row(vis_states.model))/num.cases
             model$W <- model$W + W.inc
             model$hid_bias <- model$hid_bias + hid_bias.inc
             model$vis_bias <- model$vis_bias + vis_bias.inc    

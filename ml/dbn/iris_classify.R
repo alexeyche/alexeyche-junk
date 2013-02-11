@@ -30,18 +30,18 @@ l2 <- nrow(w_class)-1
 test_err <- NULL
 train_err <- NULL
 
-maxepoch <- 100
+#maxepoch <- 100
 
 #for(epoch in 1:maxepoch) {
-    err <-0
-    err_cr <- 0
-    counter <- 0
-    c(numcases numdims numbatches) := dim(batchdata)
-    N <- numcases
+#    err <-0
+#    err_cr <- 0
+#    counter <- 0
+#    c(numcases numdims numbatches) := dim(batchdata)
+#    N <- numcases
 #    for(batch in 1:numbatches) {
-        batch <-1
-        data <- batchdata[,,batch]
-        targetdata <- 
+#        batch <-1
+#        data <- batchdata[,,batch]
+#       targetdata <- 
 
 
 #    }
