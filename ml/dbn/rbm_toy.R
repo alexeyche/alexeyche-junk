@@ -4,21 +4,36 @@ source('rbm.R')
 source('sys.R')
 
 plot_data <- function(data,model) {
+    n.h <- ncol(model$W)
+    vis.states <- data
+    for(i in 1:2000) {    
+        hid.probs <- prop_up(vis.states, model)
+        hid.states <- sample_bernoulli(hid.probs)   
+        
+        vis.probs <- prop_down(hid.states,model)
+        vis.states <- sample_bernoulli(vis.probs)
+    }
+    gg <- ggplot(melt(hid.states),aes(Var1,Var2))+
+        geom_tile(aes(fill=value))+
+        scale_fill_gradient(low="white",high="black",limits=c(0,1))+
+        coord_equal()
     par(mfrow=c(2,2))
-    hist(data)
+    plot(gg)
+    hist(data[vis.states == 0], xlim=c(0,1))
+    hist(data[vis.states == 1],xlim=c(0,1))
+    #hist(data[hid.states == 1], col='red', xlim=c(min(data), max(data)) )    
+    #hist(data[hid.states == 0], col='blue',xlim=c(min(data), max(data)) )
     
-    hid.probs <- prop_up(data, model)
-    hid.states <- sample_bernoulli(hid.probs)   
-    
-    hist(data[hid.states == 1], col='red', xlim=c(min(data), max(data)) )    
-    hist(data[hid.states == 0], col='blue',xlim=c(min(data), max(data)) )
+    #plot(density(data))
+    #high_energy <- data[free_energy(data,model) > 0]
+    #points(high_energy, rep(0,length(high_energy)), col='red')
 }
 
 
 # o    | j = 1
 # o     | i = 1
 num.vis <- 1
-num.hid <- 1
+num.hid <- 2
 
 
 num.cases <- 100
@@ -28,15 +43,19 @@ train.params = list(e.w = 0.1, e.v = 1, e.h = 1, w_cost = 0.0002,
                     init.moment = 0.5, fin.moment = 0.9, 
                     epochs = 50, cd.iter = 1)   
 
-set.seed(0)
+set.seed(2)
 model <- list(W = array(0.1*rnorm(num.vis*num.hid),dim=c(num.vis,num.hid)), # visible units for row, hidden units for col
               vis_bias = array(0,dim = c(1,num.vis)), 
               hid_bias = array(0,dim = c(1,num.hid)),
               num.cases = num.cases)
 
 
-data <- as.matrix(rnorm(num.cases, mean=0.5, sd=1), ncol=1) # mean = 0, sd = 1
+#data <- as.matrix(sample(c(rnorm(num.cases/2, mean=0.2, sd=0.03),
+#                           rnorm(num.cases/2, mean=0.7, sd=0.03)), num.cases), ncol=1) # mean = 0, sd = 1
+data <- as.matrix(rep(0,num.cases), ncol=1)
 
+data[data < 0] <- 0
+data[data > 1] <- 0
 plot_data(data,model)
 readline("Press <Enter> to continue")
 
@@ -44,14 +63,16 @@ for (v in 1:length(train.params)) assign(names(train.params)[v], train.params[[v
 
 
 W.inc <- hid_bias.inc <- vis_bias.inc <- 0
-maxepoch <- 1000
-plot_epoch <- 1000
+maxepoch <- 5000
+plot_epoch <- 5000
+epoch <- 1
 for(epoch in 1:maxepoch) {
     # positive part, given data
     hid_probs <- prop_up(data,model) # v*W + bias_v
+
     hid_probs.w <- hid_probs
     
-    cdk.steps <- 10
+    cdk.steps <- 1
     for(cdk.step in 1:cdk.steps) {
         hid_states <- sample_bernoulli(hid_probs.w)    
         vis_probs.fantasy <- prop_down(hid_states, model) # h*W' + bias_v
