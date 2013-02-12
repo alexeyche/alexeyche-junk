@@ -30,15 +30,15 @@ sample_bernoulli <- function(probs) {
 }
 
 free_energy <- function(v,model) {    
-    - v %*% t(model$vis_bias) - sum.col(log(1+exp(v %*% model$W + rep.row(model$hid_bias,model$num.cases) )) )
+    - v %*% t(model$vis_bias) - sum.col(log(1+exp(v %*% model$W + rep.row(model$hid_bias,model$batch.size) )) )
 }
 
 prop_up <- function(given_v, model) {    
-    sigmoid( given_v %*% model$W + rep.row(model$hid_bias, model$num.cases) )
+    sigmoid( given_v %*% model$W + rep.row(model$hid_bias, model$batch.size) )
 }
 
 prop_down <- function(given_h, model) {    
-    sigmoid( given_h %*% t(model$W) + rep.row(model$vis_bias, model$num.cases) )    
+    sigmoid( given_h %*% t(model$W) + rep.row(model$vis_bias, model$batch.size) )    
 }
 
 gibbs_hvh <- function(hid_probs,model) {    
