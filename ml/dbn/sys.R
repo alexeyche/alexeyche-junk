@@ -53,12 +53,21 @@ integer.base.b <- function(x, b=2){
     if(N ==1) Base.b[1, ] else Base.b
 }
 
+scale.vector <- function(vector,up=1,down=0) {
+    f.max <- max(vector)
+    f.min <- min(vector)
+    down+(up-down)*(vector-f.min)/(f.max-f.min)
+}
+
 scale <- function(data, up=1, down=0) {
     out <- NULL
-    for(j in 1:ncol(data)) {
-        f.max <- max(data[,j])
-        f.min <- min(data[,j])
-        out <- cbind( out, down+(up-down)*(data-f.min)/(f.max-f.min) )
+    if(is.matrix(data)) {
+        for(j in 1:ncol(data)) {            
+            out <- cbind( out, scale.vector(data[,j],up,down) ) 
+        }
+        return(out)
     }
-    return(out)
+    if(is.vector(data)) {
+        return(scale.vector(data,up,down))
+    }
 }

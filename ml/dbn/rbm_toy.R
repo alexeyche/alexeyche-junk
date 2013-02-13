@@ -7,10 +7,10 @@ source('rbm.R')
 source('sys.R')
 source('makebatches.R')
 
-gray_plot <- function(data) {
+gray_plot <- function(data, lims = c(min(data),max(data)) ) {
     gg <- ggplot(melt(data),aes(Var1,Var2))+
         geom_tile(aes(fill=value))+
-        scale_fill_gradient(low="black",high="white",limits=c(min(data),max(data)))+
+        scale_fill_gradient(low="black",high="white",limits=lims)+
         coord_equal()
     plot(gg)
 }
@@ -28,17 +28,23 @@ energy_all <- function(v,h,model) {
     return(E)
 }
 
-plot_data <- function(data,model) {
+plot_data <- function(model) {
     n.h <- ncol(model$W)    
-    vis.states <- data
-    for(i in 1:2000) {    
-        hid.probs <- prop_up(vis.states, model)
-        
+    n.v <- nrow(model$W)
+    test.num <- 10
+    vis.states <- matrix(abs(0.01*rnorm(test.num*n.v)),ncol=n.v, nrow=test.num)
+    for(i in 1:2000) {            
+        hid.probs <- prop_up(vis.states, model)        
         hid.states <- sample_bernoulli(hid.probs)           
         vis.probs <- prop_down(hid.states,model)
         vis.states <- sample_bernoulli(vis.probs)
-    }
-    gray_plot(energy_all(vis.states,hid.probs,model))
+        if(i %% 100 == 0) {
+            gray_plot(vis.probs,lim=c(0,1))            
+            readline("Press <Enter> to continue")
+        }
+    }    
+    #gray_plot(energy_all(vis.states,hid.probs,model))
+    #gray_plot(model$W)
 }
 
 
@@ -48,54 +54,56 @@ plot_data <- function(data,model) {
 
 # o     | j = 1
 # o     | i = 1
-num.vis <- 1
-num.hid <- 3
-
-
-num.cases <- 5000
-num.dims <- 1
+num.vis <- 4
+num.hid <- 2
+num.dims <- num.vis
 err.total <- 0
-batch.size <- 10
 
-train.params = list(e.w = 0.1, e.v = 1, e.h = 1, w_cost = 0.0002, 
+
+train.params = list(e.w = 1, e.v = 0.1, e.h = 0.1, w_cost = 0.0002, 
                     init.moment = 0.5, fin.moment = 0.9, 
-                    epochs = 50, cd.iter = 1)   
+                    epochs = 50, cd.iter = 1)
 
 set.seed(2)
-model <- list(W = array(0.1*rnorm(num.vis*num.hid),dim=c(num.vis,num.hid)), # visible units for row, hidden units for col
+#data <- sample(c(rnorm(500,mean=-0.5,sd=0.6),rnorm(500,mean=4.5,sd=1)))
+#data <- data[data > -0.5]
+#data <- data[data <= 4.5]
+#data <- scale(data,up=-1,down=1)
+data.all <- rbind(rep.row(c(1,0,1,0),100),rep.row(c(0,0,1,1),100))
+num.cases <- length(data)
+batch.size <- num.cases
+
+
+
+model <- list(W = array(0.1*rnorm(num.vis*num.hid,mean=0.5,sd=0.3),dim=c(num.vis,num.hid)), # visible units for row, hidden units for col
               vis_bias = array(0,dim = c(1,num.vis)), 
               hid_bias = array(0,dim = c(1,num.hid)),
               num.cases = num.cases, batch.size = batch.size)
 
 
-#data <- as.matrix(sample(c(rnorm(num.cases/2, mean=0.2, sd=0.03),
-#                           rnorm(num.cases/2, mean=0.7, sd=0.03)), num.cases), ncol=1) # mean = 0, sd = 1
-data <- matrix(sample(c(rnorm(10000,mean=0,sd=0.6),rnorm(10000,mean=5,sd=1))), ncol=num.vis, nrow=20000)
-
-
-data <- data[data < 0]
-data[data > 5] <- 0
 
 #gray_plot(data)
-plot_data(data,model)
+#plot_data(data,model)
 
-readline("Press <Enter> to continue")
+
 
 for (v in 1:length(train.params)) assign(names(train.params)[v], train.params[[v]])
 
-c(data.b, data.b.t) := makebatches(data = data, target.data = data, batch.size = batch.size, normalize=FALSE)
+c(data.b, data.b.t) := makebatches(data = data.all, target.data = data.all, batch.size = 10, normalize=FALSE)
+num.batches <- dim(data.b)[3]
+
 
 W.inc <- hid_bias.inc <- vis_bias.inc <- 0
-maxepoch <- 5000
-plot_epoch <- 1000
+maxepoch <- 100
+plot_epoch <- 100
 epoch <- 1
-for(epoch in 1:maxepoch) {
-    for(batch in 1:10) {
+readline("Press <Enter> to continue")
+for(epoch in 1:maxepoch) {               
+    for(batch in 1:num.batches) {
+        # positive part, given data                        
         batch <- 1
         data <- data.b[,,batch]
-        # positive part, given data        
-        hid_probs <- prop_up(data,model) # v*W + bias_v
-        
+        hid_probs <- prop_up(data,model) # v*W + bias_h    
         hid_probs.w <- hid_probs
         
         cdk.steps <- 1
@@ -107,7 +115,7 @@ for(epoch in 1:maxepoch) {
             #vis_sample.fantasy <- vis_probs.fantasy
             hid_probs.w <- prop_up(vis_sample.fantasy, model) # v*W + bias_v
         }
-        hid_probs.fantasy <- hid_probs.w    
+        hid_probs.fantasy <- hid_probs.w
         
         err <- sum((data - vis_probs.fantasy)^2) 
         err.total <- err.total + err
@@ -127,13 +135,13 @@ for(epoch in 1:maxepoch) {
         vis_bias.inc <- momentum*vis_bias.inc + e.v*(sum.row(data) - sum.row(vis_sample.fantasy))/num.cases
         model$W <- model$W + W.inc
         model$hid_bias <- model$hid_bias + hid_bias.inc
-        model$vis_bias <- model$vis_bias + vis_bias.inc    
-        if(epoch %% plot_epoch == 0) {
-            plot_data(data,model)
-            readline("Press <Enter> to continue")
-        }
+        model$vis_bias <- model$vis_bias + vis_bias.inc        
+    }
+    if(epoch %% plot_epoch == 0) {
+        #plot_data(data,model)
+        #readline("Press <Enter> to continue")
+    }
     
-    }    
 }
 
 

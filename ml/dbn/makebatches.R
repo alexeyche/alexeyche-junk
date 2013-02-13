@@ -24,8 +24,8 @@ makebatches <- function( data, target.data, batch.size = ceiling(nrow(data)/10),
     batch.targets <- array(0, dim=c(batch.size, num.dims.target, num.batches))
     
     for(b in 1:num.batches) {
-        batch.data[,,b] <- data[ randomorder[(1+(b-1)*batch.size):(b*batch.size)] ]
-        batch.targets[,,b] <- target.data[ randomorder[(1+(b-1)*batch.size):(b*batch.size)] ]
+        batch.data[,,b] <- data[ randomorder[(1+(b-1)*batch.size):(b*batch.size)], ]
+        batch.targets[,,b] <- target.data[ randomorder[(1+(b-1)*batch.size):(b*batch.size)], ]
     }   
     return(list(batch.data,batch.targets))
 }
