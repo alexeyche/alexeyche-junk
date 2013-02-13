@@ -28,7 +28,7 @@ energy_all <- function(v,h,model) {
     return(E)
 }
 
-plot_data <- function(model) {
+daydream <- function(model) {
     n.h <- ncol(model$W)    
     n.v <- nrow(model$W)
     test.num <- 10
@@ -40,11 +40,10 @@ plot_data <- function(model) {
         vis.states <- sample_bernoulli(vis.probs)
         if(i %% 100 == 0) {
             gray_plot(vis.probs,lim=c(0,1))            
-            readline("Press <Enter> to continue")
+            Sys.sleep(1)  
+            #readline("Press <Enter> to continue")
         }
-    }    
-    #gray_plot(energy_all(vis.states,hid.probs,model))
-    #gray_plot(model$W)
+    }
 }
 
 
@@ -55,12 +54,12 @@ plot_data <- function(model) {
 # o     | j = 1
 # o     | i = 1
 num.vis <- 4
-num.hid <- 2
+num.hid <- 10
 num.dims <- num.vis
 err.total <- 0
 
 
-train.params = list(e.w = 1, e.v = 0.1, e.h = 0.1, w_cost = 0.0002, 
+train.params = list(e.w = 0.1, e.v = 0.1, e.h = 0.1, w_cost = 0.0002, 
                     init.moment = 0.5, fin.moment = 0.9, 
                     epochs = 50, cd.iter = 1)
 
@@ -69,7 +68,7 @@ set.seed(2)
 #data <- data[data > -0.5]
 #data <- data[data <= 4.5]
 #data <- scale(data,up=-1,down=1)
-data.all <- rbind(rep.row(c(1,0,1,0),100),rep.row(c(0,0,1,1),100))
+data.all <- rbind(rep.row(c(1,1,1,0),100),rep.row(c(0,0,1,1),100),rep.row(c(1,0,0,0),100))
 num.cases <- length(data)
 batch.size <- num.cases
 
@@ -94,8 +93,8 @@ num.batches <- dim(data.b)[3]
 
 
 W.inc <- hid_bias.inc <- vis_bias.inc <- 0
-maxepoch <- 100
-plot_epoch <- 100
+maxepoch <- 1000
+plot_epoch <- 1000
 epoch <- 1
 readline("Press <Enter> to continue")
 for(epoch in 1:maxepoch) {               
