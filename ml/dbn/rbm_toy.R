@@ -28,11 +28,15 @@ energy_all <- function(v,h,model) {
     return(E)
 }
 
+cross_entropy_cost <- function(input,fantasy) {
+    mean(sum.row(input*log(fantasy)+(1-input)*log(1-fantasy)))
+}
+
 daydream <- function(model) {
     n.h <- ncol(model$W)    
     n.v <- nrow(model$W)
     test.num <- 10
-    vis.states <- matrix(abs(0.01*rnorm(test.num*n.v)),ncol=n.v, nrow=test.num)
+    vis.states <- matrix(abs(0.001*rnorm(test.num*n.v)),ncol=n.v, nrow=test.num)
     for(i in 1:2000) {            
         hid.probs <- prop_up(vis.states, model)        
         hid.states <- sample_bernoulli(hid.probs)           
@@ -40,57 +44,51 @@ daydream <- function(model) {
         vis.states <- sample_bernoulli(vis.probs)
         if(i %% 100 == 0) {
             gray_plot(vis.probs,lim=c(0,1))            
-            Sys.sleep(1)  
-            #readline("Press <Enter> to continue")
+            Sys.sleep(1)            
         }
     }
 }
 
-
-# o o o
-#  \|/
-#   o o
-
-# o     | j = 1
-# o     | i = 1
-num.vis <- 4
+set.seed(2)
+num.vis <- 10
 num.hid <- 10
 num.dims <- num.vis
-err.total <- 0
+
 
 
 train.params = list(e.w = 0.1, e.v = 0.1, e.h = 0.1, w_cost = 0.0002, 
                     init.moment = 0.5, fin.moment = 0.9, 
                     epochs = 50, cd.iter = 1)
 
-set.seed(2)
-#data <- sample(c(rnorm(500,mean=-0.5,sd=0.6),rnorm(500,mean=4.5,sd=1)))
-#data <- data[data > -0.5]
-#data <- data[data <= 4.5]
-#data <- scale(data,up=-1,down=1)
-data.all <- rbind(rep.row(c(1,1,1,0),100),rep.row(c(0,0,1,1),100),rep.row(c(1,0,0,0),100))
-num.cases <- length(data)
-batch.size <- num.cases
 
 
+num.cases <- 1000
+batch.size <- 100
+
+# gen data
+data.all <- NULL
+for(c in 1:num.cases) {
+    m <- matrix(0, ncol = num.dims)
+    rb <- rbinom(10,10,0.9)
+    rb2 <- rbinom(10,10,0.1)
+    for(i in 1:length(rb)) {
+        m[rb[i]] = m[rb[i]]+1
+        m[rb2[i]] = m[rb2[i]]+1          
+    }
+    m <- m/max(m)
+    data.all <- rbind(data.all, m)
+}
+c(data.b, data.b.t) := makebatches(data = data.all, target.data = data.all, batch.size = batch.size, normalize=FALSE)
+num.batches <- dim(data.b)[3]
+
+# init model
 
 model <- list(W = array(0.1*rnorm(num.vis*num.hid,mean=0.5,sd=0.3),dim=c(num.vis,num.hid)), # visible units for row, hidden units for col
               vis_bias = array(0,dim = c(1,num.vis)), 
               hid_bias = array(0,dim = c(1,num.hid)),
               num.cases = num.cases, batch.size = batch.size)
 
-
-
-#gray_plot(data)
-#plot_data(data,model)
-
-
-
 for (v in 1:length(train.params)) assign(names(train.params)[v], train.params[[v]])
-
-c(data.b, data.b.t) := makebatches(data = data.all, target.data = data.all, batch.size = 10, normalize=FALSE)
-num.batches <- dim(data.b)[3]
-
 
 W.inc <- hid_bias.inc <- vis_bias.inc <- 0
 maxepoch <- 1000
@@ -99,11 +97,10 @@ epoch <- 1
 readline("Press <Enter> to continue")
 for(epoch in 1:maxepoch) {               
     for(batch in 1:num.batches) {
-        # positive part, given data                        
-        batch <- 1
+        # positive part, given data                                
         data <- data.b[,,batch]
         hid_probs <- prop_up(data,model) # v*W + bias_h    
-        hid_probs.w <- hid_probs
+        hid_probs.w <- hid_probs        
         
         cdk.steps <- 1
         for(cdk.step in 1:cdk.steps) {
@@ -116,10 +113,9 @@ for(epoch in 1:maxepoch) {
         }
         hid_probs.fantasy <- hid_probs.w
         
-        err <- sum((data - vis_probs.fantasy)^2) 
-        err.total <- err.total + err
+        cost <- cross_entropy_cost(data,vis_probs.fantasy)        
         E.free.mean <- sum(free_energy(data, model))/num.cases
-        cat("Epoch # ", epoch, "err: ", err," free energy: ", E.free.mean, " W:", model$W," W.inc:", W.inc,"\n") 
+        cat("Epoch # ", epoch, "cost: ", cost," free energy: ", E.free.mean, "\n") 
         # moment stuff 
         momentum <- fin.moment
         if (epoch <= 5) {
