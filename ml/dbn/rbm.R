@@ -110,7 +110,9 @@ train_rbm <- function(batched.data, params, num.hid = NULL, model = NULL) {
             cat("Need specified hidden units, or model\n")
         }
     }
-    
+    #png(filename=sprintf("0_epoch_%d",epoch,num.vis))        
+    #hist(model$W)
+    #dev.off()
     W.inc <- hid_bias.inc <- vis_bias.inc <- 0
     for(epoch in 1:epochs) {               
         for(batch in 1:num.batches) {
@@ -129,7 +131,7 @@ train_rbm <- function(batched.data, params, num.hid = NULL, model = NULL) {
                 vis_sample.fantasy <- sample_bernoulli(vis_probs.fantasy) # may be replaced by probs
                 #vis_sample.fantasy <- vis_probs.fantasy
                 hid_probs.w <- prop_up(vis_sample.fantasy, model) # v*W + bias_v
-            }
+            }            
             hid_probs.fantasy <- hid_probs.w
             
             cost <- cross_entropy_cost(data,vis_probs.fantasy)        
@@ -150,7 +152,10 @@ train_rbm <- function(batched.data, params, num.hid = NULL, model = NULL) {
             model$W <- model$W + W.inc
             model$hid_bias <- model$hid_bias + hid_bias.inc
             model$vis_bias <- model$vis_bias + vis_bias.inc        
-        }    
+        }            
+        #png(filename=sprintf("%d_epoch_%d",epoch,num.vis))        
+        #hist(model$W)
+        #dev.off()
     }
     
     return(list(model = model, batch.pos.hid.probs = batch.pos.hid.probs))

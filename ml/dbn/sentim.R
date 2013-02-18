@@ -17,29 +17,36 @@ c(data.b, data.b.t) := makebatches(data = data, target.data = data.target, batch
 
 c(num.cases, num.dims, num.batches) := dim(data.b)
 
-train.params = list(e.w = 0.02, e.v = 0.05, e.h = 0.05, w_cost = 0.0002, 
+train.params = list(e.w = 0.05, e.v = 0.05, e.h = 0.05, w_cost = 0.0002, 
                     init.moment = 0.5, fin.moment = 0.9, 
-                    epochs = 10, cd.iter = 3)   
+                    epochs = 10, cd.iter = 1)
 
 num.vis <- 2287
 num.hid <- 500
 
-c(model_1, batch.pos.hid.probs) := train_rbm(data.b, train.params, num.hid)
+c(model_1, batch.pos.hid.probs_1) := train_rbm(data.b, train.params, num.hid)
 
 num.vis <- 500
 num.hid <- 2
 
-data.b <- batch.pos.hid.probs
-c(model_2, batch.pos.hid.probs) := train_rbm(data.b, train.params, num.hid)
+train.params = list(e.w = 0.01, e.v = 0.01, e.h = 0.01, w_cost = 0.0002, 
+                    init.moment = 0.5, fin.moment = 0.9, 
+                    epochs = 5, cd.iter = 2)  
 
-#for(batch in 1:num.batches) {
-#    hidden_top <- prop_up(data.b[,,batch], model)
-#    for(i in 1:num.cases) {            
-#        color = 'blue'
-#        if(data.b.t[i,,batch] == 1) {
-#            color = 'red'
-#        }        
-#        points(hidden_top[i,][1],hidden_top[i,][2], type='p', xlim=c(0,1), ylim=c(0,1), col = color)        
-#    }
-#}
+data.b <- batch.pos.hid.probs_1
+c(model_2, batch.pos.hid.probs_2) := train_rbm(data.b, train.params, num.hid)
+
+batch.pos.hid.probs <- batch.pos.hid.probs_2
+
+plot(0,0,type='p', xlim=c(0,1), ylim=c(0,1))
+for(batch in 1:num.batches) {
+    hidden_top <- batch.pos.hid.probs[,,batch]
+    for(i in 1:num.cases) {            
+        color = 'blue'
+        if(data.b.t[i,,batch] == 1) {
+            color = 'red'
+        }        
+        points(hidden_top[i,][1],hidden_top[i,][2], type='p', xlim=c(0,1), ylim=c(0,1), col = color)        
+    }
+}
 
