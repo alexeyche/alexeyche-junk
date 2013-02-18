@@ -1,24 +1,49 @@
 #!/usr/bin/RScript
 
+require(reshape2)
+require(ggplot2)
 
-#if (restart == TRUE) {
-#    restart <- FALSE
-#    epoch <- 1
-#    
-#    # Initializing symmetric weights and biases. 
-#    vishid     <- 0.1* array(rnorm(numdims * numhid), dim = c(numdims, numhid))
-#    hidbiases  <- array(0, dim = c(1, numhid))
-#    visbiases  <- array(0, dim = c(1, numdims))
-#    
-#    poshidprobs <- array(0, dim = c(numcases, numhid))
-#    neghidprobs <- array(0, dim = c(numcases, numhid))
-#    posprods    <- array(0, dim = c(numdims, numhid))
-#    negprods    <- array(0, dim = c(numdims, numhid))
-#    vishidinc   <- array(0, dim = c(numdims, numhid))
-#    hidbiasinc  <- array(0, dim = c(1,numhid))
-#    visbiasinc  <- array(0, dim = c(1,numdims))
-#    batchposhidprobs <- array(0, dim = c(numcases,numhid,numbatches))
-#}
+gray_plot <- function(data, lims = c(min(data),max(data)) ) {
+    gg <- ggplot(melt(data),aes(Var1,Var2))+
+        geom_tile(aes(fill=value))+
+        scale_fill_gradient(low="black",high="white",limits=lims)+
+        coord_equal()
+    plot(gg)
+}
+# Energy:
+# E(v,h) = -b'v-c'h-h'Wv
+energy_vector <- function(v,h,model) {
+    - v %*% t(model$vis_bias) - h %*% t(model$hid_bias) - v %*% model$W %*% t(h)
+}
+
+energy_all <- function(v,h,model) {
+    E <- NULL
+    for(case in 1:nrow(v)) {        
+        E <- rbind(E, energy_vector(t(v[case,]), t(h[case,]),model))
+    }
+    return(E)
+}
+
+cross_entropy_cost <- function(input,fantasy) {
+    mean(sum.row(input*log(fantasy)+(1-input)*log(1-fantasy)))
+}
+
+daydream <- function(model) {
+    n.h <- ncol(model$W)    
+    n.v <- nrow(model$W)
+    test.num <- 10
+    vis.states <- matrix(abs(0.001*rnorm(test.num*n.v)),ncol=n.v, nrow=test.num)
+    for(i in 1:2000) {            
+        hid.probs <- prop_up(vis.states, model)        
+        hid.states <- sample_bernoulli(hid.probs)           
+        vis.probs <- prop_down(hid.states,model)
+        vis.states <- sample_bernoulli(vis.probs)
+        if(i %% 100 == 0) {
+            gray_plot(vis.probs,lim=c(0,1))            
+            Sys.sleep(1)            
+        }
+    }
+}
 
 sigmoid <- function(x) {
     1/(1+exp(-x))
@@ -73,7 +98,7 @@ train_rbm <- function(batched.data, params, num.hid = NULL, model = NULL) {
     for (v in 1:length(params)) assign(names(params)[v], params[[v]])
     
     if(is.null(model)) {  # need to create new model
-        model <- list(W = array(0.1*rnorm(num.vis*num.hid),dim=c(num.vis,num.hid)), # visible units for row, hidden units for col
+        model <- list(W = array(0.01*rnorm(num.vis*num.hid),dim=c(num.vis,num.hid)), # visible units for row, hidden units for col
                       vis_bias = array(0,dim = c(1,num.vis)), 
                       hid_bias = array(0,dim = c(1,num.hid)),
                       num.cases = num.cases)
@@ -85,42 +110,54 @@ train_rbm <- function(batched.data, params, num.hid = NULL, model = NULL) {
             cat("Need specified hidden units, or model\n")
         }
     }
-    
+    #png(filename=sprintf("0_epoch_%d",epoch,num.vis))        
+    #hist(model$W)
+    #dev.off()
     W.inc <- hid_bias.inc <- vis_bias.inc <- 0
-    for(epoch in epoch:epochs) {
-        err.total <- 0
+    for(epoch in 1:epochs) {               
         for(batch in 1:num.batches) {
-            data <- batched.data[,,batch]
-            # positive phase
-            # p(h|x) calculate hidden states with given visible units state
-            hid_probs <- prop_up(data, model) # col for each hidden unit, row for each case
-            if (epoch == epochs) { # last epoch, saving hidden probabilites
+            # positive part, given data                                
+            data <- data.b[,,batch]
+            hid_probs <- prop_up(data,model) # v*W + bias_h    
+            if(epoch == epochs) {
                 batch.pos.hid.probs[,,batch] <- hid_probs
             }
-            # negative phase
-            c( vis_states.model, hid_prob.model) := contrastive_divergence(hid_probs, model, iter = cd.iter)
-            err <- sum((data - vis_states.model)^2)
-            err.total <- err.total + err
+            hid_probs.w <- hid_probs                
+            
+            for(cdk.step in 1:cd.iter) {
+                hid_states <- sample_bernoulli(hid_probs.w)    
+                vis_probs.fantasy <- prop_down(hid_states, model) # h*W' + bias_v
+                
+                vis_sample.fantasy <- sample_bernoulli(vis_probs.fantasy) # may be replaced by probs
+                #vis_sample.fantasy <- vis_probs.fantasy
+                hid_probs.w <- prop_up(vis_sample.fantasy, model) # v*W + bias_v
+            }            
+            hid_probs.fantasy <- hid_probs.w
+            
+            cost <- cross_entropy_cost(data,vis_probs.fantasy)        
             E.free.mean <- sum(free_energy(data, model))/num.cases
-            cat("Epoch # ", epoch, " batch # ", batch," err: ", err," free energy: ", E.free.mean,"\n") 
+            cat("Epoch # ", epoch, "cost: ", cost," free energy: ", E.free.mean, "\n") 
             # moment stuff 
             momentum <- fin.moment
             if (epoch <= 5) {
                 momentum <- init.moment
             }
-            
             # deravatives over log p(v)
             # d_log_p(v) / d_W_ij
-            W.inc <- momentum*W.inc + e.w*( ( t(data) %*% hid_probs - t(vis_states.model) %*% hid_prob.model)/num.cases - w_cost*model$W)
+            W.inc <- momentum*W.inc + e.w*( ( t(data) %*% hid_probs - t(vis_sample.fantasy) %*% hid_probs.fantasy)/num.cases - w_cost*model$W)
             # d_log_p(v) / d_hid_bias_j
-            hid_bias.inc <- momentum*hid_bias.inc + e.h*(sum.row(hid_probs) - sum.row(hid_prob.model))/num.cases
+            hid_bias.inc <- momentum*hid_bias.inc + e.h*(sum.row(hid_probs) - sum.row(hid_probs.fantasy))/num.cases
             # d_log_p(v) / d_vis_bias_i
-            vis_bias.inc <- momentum*vis_bias.inc + e.v*(sum.row(data) - sum.row(vis_states.model))/num.cases
+            vis_bias.inc <- momentum*vis_bias.inc + e.v*(sum.row(data) - sum.row(vis_sample.fantasy))/num.cases
             model$W <- model$W + W.inc
             model$hid_bias <- model$hid_bias + hid_bias.inc
-            model$vis_bias <- model$vis_bias + vis_bias.inc    
-        }
+            model$vis_bias <- model$vis_bias + vis_bias.inc        
+        }            
+        #png(filename=sprintf("%d_epoch_%d",epoch,num.vis))        
+        #hist(model$W)
+        #dev.off()
     }
+    
     return(list(model = model, batch.pos.hid.probs = batch.pos.hid.probs))
 }
 
