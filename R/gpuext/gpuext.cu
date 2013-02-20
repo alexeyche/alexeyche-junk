@@ -8,8 +8,6 @@ char *make_info_str(cudamat *mat) {
     return info;
 }
 
-
-
 void generate_exception(int err_code) {
     if  ( err_code == -1) {
        Rprintf("Incompatible matrix dimensions.\n");
@@ -61,6 +59,7 @@ SEXP generate_list(cudamat *mat) {
 
 cudamat* process_list(SEXP list) {
     SEXP elmt;
+    // it should be checked at least somehow
     if((length(list) == 2) && (strcmp(CHAR(STRING_ELT(names, 0)), mat_ext_names[0]) == 0) && (strcmp(CHAR(STRING_ELT(names, 1)), mat_ext_names[1]) == 0)) {
         elmt = getListElement(mat_ext,mat_ext_names[0]);
         return (struct cudamat*) R_ExternalPtrAddr(elmt);

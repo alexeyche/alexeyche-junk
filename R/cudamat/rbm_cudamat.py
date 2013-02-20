@@ -25,7 +25,6 @@ num_hid = 4096
 
 # initialize weights
 w_vh = cm.CUDAMatrix(cm.reformat(0.1 * np.random.randn(num_vis, num_hid)))
-import pdb; pdb.set_trace()
 w_v = cm.CUDAMatrix(cm.reformat(np.zeros((num_vis, 1))))
 w_h = cm.CUDAMatrix(cm.reformat(-4.*np.ones((num_hid, 1))))
 

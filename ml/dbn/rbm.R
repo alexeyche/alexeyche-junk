@@ -3,13 +3,7 @@
 require(reshape2)
 require(ggplot2)
 
-gray_plot <- function(data, lims = c(min(data),max(data)) ) {
-    gg <- ggplot(melt(data),aes(Var1,Var2))+
-        geom_tile(aes(fill=value))+
-        scale_fill_gradient(low="black",high="white",limits=lims)+
-        coord_equal()
-    plot(gg)
-}
+
 # Energy:
 # E(v,h) = -b'v-c'h-h'Wv
 energy_vector <- function(v,h,model) {
@@ -28,22 +22,6 @@ cross_entropy_cost <- function(input,fantasy) {
     mean(sum.row(input*log(fantasy)+(1-input)*log(1-fantasy)))
 }
 
-daydream <- function(model) {
-    n.h <- ncol(model$W)    
-    n.v <- nrow(model$W)
-    test.num <- 10
-    vis.states <- matrix(abs(0.001*rnorm(test.num*n.v)),ncol=n.v, nrow=test.num)
-    for(i in 1:2000) {            
-        hid.probs <- prop_up(vis.states, model)        
-        hid.states <- sample_bernoulli(hid.probs)           
-        vis.probs <- prop_down(hid.states,model)
-        vis.states <- sample_bernoulli(vis.probs)
-        if(i %% 100 == 0) {
-            gray_plot(vis.probs,lim=c(0,1))            
-            Sys.sleep(1)            
-        }
-    }
-}
 
 sigmoid <- function(x) {
     1/(1+exp(-x))
@@ -75,7 +53,7 @@ gibbs_hvh <- function(hid_probs,model) {
     # p(h|v_model) calculate hidden state with given state of visible units    
     hid_probs <- prop_up(vis_states, model)
     
-    list(vis_states = vis_states, hid_probs = hid_probs)
+    list(vis_states = vis_states, vis_probs = vis_probs, hid_probs = hid_probs)
 }
 gibbs_vhv <- function(vis_sample,model) {    
     hid.probs <- prop_up(vis_sample, model)
@@ -83,17 +61,26 @@ gibbs_vhv <- function(vis_sample,model) {
     list(hid.probs = hid.probs,vis.probs = vis.probs)
 }
 
-contrastive_divergence <- function(hid_probs, model, iter = 10) {    
+contrastive_divergence <- function(hid_probs, model, iter = 1) {    
     for(it in 1:iter) {
          # col for each hidden unit, row for each case
-        c(vis_states, hid_probs) := gibbs_hvh(hid_probs, model)
+        c(vis_states, vis_probs, hid_probs) := gibbs_hvh(hid_probs, model)
     }
-    return(list(vis_states.end = vis_states, hid_probs.end = hid_probs))
+    return(list(vis_states.end = vis_states, vis_probs.end = vis_probs, hid_probs.end = hid_probs))
+}
+
+# as it done in deeplearning.net
+pseudo_likelihood <- function(v,model) {
+    num.vis <- ncol(v)
+    i <- sample(1:num.vis,1)
+    v_inv <- v
+    v_inv[,i] <- 1- v_inv[,i] 
+    mean(num.vis*log(sigmoid((free_energy(v_inv,model) - free_energy(v,model)))))
 }
 
 train_rbm <- function(batched.data, params, num.hid = NULL, model = NULL) {
-    c(num.cases, num.dims, num.batches) := dim(batched.data)
-    num.vis <- num.dims
+    c(num.cases, num.vis, num.batches) := dim(batched.data)
+
     
     for (v in 1:length(params)) assign(names(params)[v], params[[v]])
     
@@ -117,26 +104,18 @@ train_rbm <- function(batched.data, params, num.hid = NULL, model = NULL) {
     for(epoch in 1:epochs) {               
         for(batch in 1:num.batches) {
             # positive part, given data                                
-            data <- data.b[,,batch]
+            data <- batched.data[,,batch]
             hid_probs <- prop_up(data,model) # v*W + bias_h    
             if(epoch == epochs) {
                 batch.pos.hid.probs[,,batch] <- hid_probs
             }
-            hid_probs.w <- hid_probs                
-            
-            for(cdk.step in 1:cd.iter) {
-                hid_states <- sample_bernoulli(hid_probs.w)    
-                vis_probs.fantasy <- prop_down(hid_states, model) # h*W' + bias_v
-                
-                vis_sample.fantasy <- sample_bernoulli(vis_probs.fantasy) # may be replaced by probs
-                #vis_sample.fantasy <- vis_probs.fantasy
-                hid_probs.w <- prop_up(vis_sample.fantasy, model) # v*W + bias_v
-            }            
-            hid_probs.fantasy <- hid_probs.w
+            # collecting negative samples
+            c(vis_sample.fantasy, vis_probs.fantasy, hid_probs.fantasy) := contrastive_divergence(hid_probs,model, cd.iter)
             
             cost <- cross_entropy_cost(data,vis_probs.fantasy)        
+            pseudo.lh <- pseudo_likelihood(data,model)
             E.free.mean <- sum(free_energy(data, model))/num.cases
-            cat("Epoch # ", epoch, "cost: ", cost," free energy: ", E.free.mean, "\n") 
+            cat("Epoch # ", epoch, "cost: ", cost," free energy: ", E.free.mean, "pseudo lh: ",pseudo.lh,"\n") 
             # moment stuff 
             momentum <- fin.moment
             if (epoch <= 5) {
