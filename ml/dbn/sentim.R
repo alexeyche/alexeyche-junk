@@ -71,8 +71,8 @@ unbatch_data <- function(batched.data, maxbatches = 3) {
     return(whole)
 }
 
-top_hids <- unbatch_data(batch.pos.hid.probs_3,10)
-top_hids.t <- unbatch_data(data.b.t,10)
+top_hids <- unbatch_data(batch.pos.hid.probs_3,20)
+top_hids.t <- unbatch_data(data.b.t,20)
 
 tsne_dbn <- plot_tsne(top_hids, top_hids.t)
 
