@@ -9,6 +9,67 @@ char *make_info_str(cudamat *mat) {
 }
 
 
+
+void generate_exception(int err_code) {
+    if  ( err_code == -1) {
+       Rprintf("Incompatible matrix dimensions.\n");
+    } else if  ( err_code == -2) {
+       Rprintf("CUBLAS error.\n");
+    } else if  ( err_code == -3) {
+       Rprintf("CUDA error: ");
+       char *cuda_error = get_last_cuda_error(); 
+       Rprintf(cuda_error); 
+    } else if  ( err_code == -4) {
+       Rprintf("Operation not supported on views.\n");
+    } else if  ( err_code == -5) {
+       Rprintf("Operation not supported on transposed matrices.\n");
+    } else if  ( err_code == -6) {
+       Rprintf("\n");
+    } else if  ( err_code == -7) {
+       Rprintf("Incompatible transposedness.\n");
+    } else if  ( err_code == -8) {
+       Rprintf("Matrix is not in device memory.\n");
+    } else if  ( err_code == -9) {
+       Rprintf("Operation not supported.\n");
+    }
+}
+
+
+const char *mat_ext_names[2] = {"ref","info"};
+
+
+SEXP generate_list(cudamat *mat) {
+    SEXP mat_ext, list, list_names;
+    mat_ext = PROTECT(R_MakeExternalPtr(mat, R_NilValue, R_NilValue));
+    R_RegisterCFinalizerEx(mat_ext, _finalizer, Rboolean(TRUE));
+    UNPROTECT(1);
+    
+    char *info_p = make_info_str(mat);
+    info = PROTECT(mkString((char*)info_p));
+    PROTECT(list_names = allocVector(STRSXP, 2));
+    for(char i = 0; i < 2; i++)
+        SET_STRING_ELT(list_names, i,  mkChar(mat_ext_names[i]));
+    // set array
+    PROTECT(list = allocVector(VECSXP, 2)); // Creating a list with 2 vector elements
+    
+    SET_VECTOR_ELT(list, 0, mat);
+    SET_VECTOR_ELT(list, 1, info);
+    setAttrib(list, R_NamesSymbol, list_names); //and attaching the vector names
+    UNPROTECT(3);
+    return list;
+}
+
+cudamat* process_list(SEXP list) {
+    SEXP elmt;
+    if((length(list) == 2) && (strcmp(CHAR(STRING_ELT(names, 0)), mat_ext_names[0]) == 0) && (strcmp(CHAR(STRING_ELT(names, 1)), mat_ext_names[1]) == 0)) {
+        elmt = getListElement(mat_ext,mat_ext_names[0]);
+        return (struct cudamat*) R_ExternalPtrAddr(elmt);
+    } else {
+        Rprintf("Input not look like cuda matrix\n");        
+        return 0;
+    }
+}
+
 extern "C" {
     SEXP cublas_init_R() {
         cublasInit();
@@ -41,12 +102,15 @@ extern "C" {
     static void _finalizer(SEXP ext)
     {
            struct cudamat *ptr = (struct cudamat*) R_ExternalPtrAddr(ext);
+           int error = free_device_memory(ptr);
+           if(error>0) {
+                generate_exception(error);
+           }
            Free(ptr);
-           //!!! NEED FREE CUDA ARRAYS
     }
     
     SEXP init_from_array_R(SEXP matrix) {
-        SEXP mat_ext, info, list, list_names;
+        SEXP list;
         float *mat_dev;
         int nrow, ncol;
         // create cudamat object from struct
@@ -66,26 +130,27 @@ extern "C" {
             return mkString("Need matrix as input");
         }
         init_from_array(mat,mat_dev,nrow,ncol);
-        // make ref
-        mat_ext = PROTECT(R_MakeExternalPtr(mat, R_NilValue, R_NilValue));
-        R_RegisterCFinalizerEx(mat_ext, _finalizer, Rboolean(TRUE));
-        UNPROTECT(1);
-        //create info part
-        char *info_p = make_info_str(mat);
-        info = PROTECT(mkString((char*)info_p));
-        // generate list names
-        char *names[2] = {"ref","info"};
-        PROTECT(list_names = allocVector(STRSXP, 2));
-        for(char i = 0; i < 2; i++)
-            SET_STRING_ELT(list_names, i,  mkChar(names[i]));
-        // set array
-        PROTECT(list = allocVector(VECSXP, 2)); // Creating a list with 2 vector elements
-        
-        SET_VECTOR_ELT(list, 0, mat_ext);
-        SET_VECTOR_ELT(list, 1, info);
-        setAttrib(list, R_NamesSymbol, list_names); //and attaching the vector names
-        UNPROTECT(3);
+        // generate list with inf
+        list = generate_list(mat);
         // return list with ref
         return list;
+    }
+    
+    SEXP copy_to_device_R(SEXP mat_ext) {
+        SEXP list, elmt = R_NilValue, names = getAttrib(list, R_NamesSymbol);
+        
+        struct cudamat* m = process_list(list);
+        if (m) {
+            int error = copy_to_device(ptr); 
+        
+            if(error > 0) {
+                 generate_exception(error);           
+                 return R_NilValue;
+            }
+            
+            list = generate_list(ptr);                     
+            return list;
+        }
+        return R_NilValue;
     }
 }
