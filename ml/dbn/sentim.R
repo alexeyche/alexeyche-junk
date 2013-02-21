@@ -23,31 +23,33 @@ c(num.cases, num.dims, num.batches) := dim(data.b)
 
 train.params = list(e.w = 0.01, e.v = 0.01, e.h = 0.01, w_cost = 0.0002, 
                     init.moment = 0.5, fin.moment = 0.9, 
-                    epochs = 20, cd.iter = 1)
+                    epochs = 10, cd.iter = 1, persistent = FALSE)
 
 num.vis <- ncol(data)
+num.hid <- 2000
+
+model_1 <- train_rbm(data.b, train.params, num.hid)
+batched.hid_probs_1 <- collect_hidden_statistics(model_1,data.b)
+
+num.vis <- 2000
 num.hid <- 500
 
-c(model_1, batch.pos.hid.probs_1) := train_rbm(data.b, train.params, num.hid)
+train.params = list(e.w = 0.01, e.v = 0.01, e.h = 0.01, w_cost = 0.0002, 
+                    init.moment = 0.5, fin.moment = 0.9, 
+                    epochs = 10, cd.iter = 1, persistent = TRUE)
+
+model_2 <- train_rbm(batched.hid_probs_1, train.params, num.hid)
+batched.hid_probs_2 <- collect_hidden_statistics(model_2, batched.hid_probs_1)
 
 num.vis <- 500
-num.hid <- 250
-
-train.params = list(e.w = 0.01, e.v = 0.01, e.h = 0.02, w_cost = 0.0002, 
-                    init.moment = 0.5, fin.moment = 0.9, 
-                    epochs = 15, cd.iter = 1)  
-
-c(model_2, batch.pos.hid.probs_2) := train_rbm(batch.pos.hid.probs_1, train.params, num.hid)
-
-num.vis <- 250
 num.hid <- 10
 
 train.params = list(e.w = 0.01, e.v = 0.01, e.h = 0.01, w_cost = 0.0002, 
                     init.moment = 0.5, fin.moment = 0.9, 
-                    epochs = 15, cd.iter = 1)  
+                    epochs = 10, cd.iter = 1, persistent = TRUE) 
 
-c(model_3, batch.pos.hid.probs_3) := train_rbm(batch.pos.hid.probs_2, train.params, num.hid)
-
+model_3 <- train_rbm(batched.hid_probs_2, train.params, num.hid)
+batched.hid_probs_3 <- collect_hidden_statistics(model_3, batched.hid_probs_2)
 
 
 plot_tsne <- function(data,target) {    
@@ -62,17 +64,17 @@ plot_tsne <- function(data,target) {
     return(tsne_dbn)
 }
 
-unbatch_data <- function(batched.data, maxbatches = 3) {
+unbatch_data <- function(batched.data, start.batch = 1, end.batch = 3) {
     whole <- NULL
     c(num.cases, num.dims, num.batches) := dim(batched.data)
-    for(batch in 1:maxbatches) {
+    for(batch in start.batch:end.batch) {
         whole <- rbind(whole, matrix(batched.data[,,batch], nrow=num.cases, ncol=num.dims))        
     }    
     return(whole)
 }
 
-top_hids <- unbatch_data(batch.pos.hid.probs_3,20)
-top_hids.t <- unbatch_data(data.b.t,20)
+top_hids <- unbatch_data(batched.hid_probs_3,0,10)
+top_hids.t <- unbatch_data(data.b.t,0,10)
 
 tsne_dbn <- plot_tsne(top_hids, top_hids.t)
 

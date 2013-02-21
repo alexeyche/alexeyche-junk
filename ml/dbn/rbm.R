@@ -78,6 +78,17 @@ pseudo_likelihood <- function(v,model) {
     mean(num.vis*log(sigmoid((free_energy(v_inv,model) - free_energy(v,model)))))
 }
 
+collect_hidden_statistics <- function(model, batched.data) {
+    c(num.cases, num.vis, num.batches) := dim(batched.data)
+    num.hid <- ncol(model$W)
+    batched.hid_probs <- array(0, dim = c(num.cases, num.hid, num.batches))
+    for(batch in 1:num.batches) {
+        data <- batched.data[,,batch]
+        batched.hid_probs[,,batch] <- prop_up(data,model)
+    }
+    return(batched.hid_probs)
+}
+
 train_rbm <- function(batched.data, params, num.hid = NULL, model = NULL) {
     c(num.cases, num.vis, num.batches) := dim(batched.data)
 
@@ -90,12 +101,14 @@ train_rbm <- function(batched.data, params, num.hid = NULL, model = NULL) {
                       hid_bias = array(0,dim = c(1,num.hid)),
                       num.cases = num.cases)
         
-        epoch <- 1
-        batch.pos.hid.probs <- array(0, dim = c(num.cases, num.hid, num.batches))
+        epoch <- 1        
     } else {
         if(is.null(num.hid)) {
             cat("Need specified hidden units, or model\n")
         }
+    }
+    if(persistent) {
+        persist.hid_probs <- matrix(0, nrow = num.cases, ncol = num.hid)
     }
     #png(filename=sprintf("0_epoch_%d",epoch,num.vis))        
     #hist(model$W)
@@ -106,12 +119,14 @@ train_rbm <- function(batched.data, params, num.hid = NULL, model = NULL) {
             # positive part, given data                                
             data <- batched.data[,,batch]
             hid_probs <- prop_up(data,model) # v*W + bias_h    
-            if(epoch == epochs) {
-                batch.pos.hid.probs[,,batch] <- hid_probs
-            }
+
             # collecting negative samples
-            c(vis_sample.fantasy, vis_probs.fantasy, hid_probs.fantasy) := contrastive_divergence(hid_probs,model, cd.iter)
-            
+            if(persistent) {
+                c(vis_sample.fantasy, vis_probs.fantasy, hid_probs.fantasy) := contrastive_divergence(persist.hid_probs, model, cd.iter)
+                persist.hid_probs = hid_probs.fantasy
+            } else {    
+                c(vis_sample.fantasy, vis_probs.fantasy, hid_probs.fantasy) := contrastive_divergence(hid_probs,model, cd.iter)
+            }
             cost <- cross_entropy_cost(data,vis_probs.fantasy)        
             pseudo.lh <- pseudo_likelihood(data,model)
             E.free.mean <- sum(free_energy(data, model))/num.cases
@@ -137,7 +152,7 @@ train_rbm <- function(batched.data, params, num.hid = NULL, model = NULL) {
         #dev.off()
     }
     
-    return(list(model = model, batch.pos.hid.probs = batch.pos.hid.probs))
+    return(model)
 }
 
 

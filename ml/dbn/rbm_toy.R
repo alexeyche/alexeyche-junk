@@ -42,9 +42,9 @@ num.batches <- dim(data.b)[3]
 
 train.params = list(e.w = 0.1, e.v = 0.1, e.h = 0.1, w_cost = 0.0002, 
                     init.moment = 0.5, fin.moment = 0.9, 
-                    epochs = 20, cd.iter = 1)  
+                    epochs = 20, cd.iter = 10, persistent = FALSE)  
 
-c(model, batch.pos.hid.probs) := train_rbm(data.b, train.params, num.hid)
+model <- train_rbm(data.b, train.params, num.hid)
 
 
 #model <- list(W = array(0.1*rnorm(num.vis*num.hid,mean=0.5,sd=0.3),dim=c(num.vis,num.hid)), # visible units for row, hidden units for col
