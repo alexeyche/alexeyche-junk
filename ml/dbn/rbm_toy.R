@@ -19,8 +19,8 @@ train.params = list(e.w = 0.1, e.v = 0.1, e.h = 0.1, w_cost = 0.0002,
 
 
 
-num.cases <- 1000
-batch.size <- 100
+num.cases <- 100
+batch.size <- 10
 
 # gen data
 data.all <- NULL
@@ -40,12 +40,16 @@ num.batches <- dim(data.b)[3]
 
 # init model
 
-train.params = list(e.w = 0.1, e.v = 0.1, e.h = 0.1, w_cost = 0.0002, 
+train.params = list(e.w = 0.01, e.v = 0.001, e.h = 0.001, w_cost = 0.0002, 
                     init.moment = 0.5, fin.moment = 0.9, 
-                    epochs = 20, cd.iter = 10, persistent = FALSE)  
+                    epochs = 100, cd.iter = 10, persistent = TRUE)  
 
 model <- train_rbm(data.b, train.params, num.hid)
+batched.hid_probs <- collect_hidden_statistics(model, data.b)
 
+vis_data <- unbatch_data(data.b) # data.all not ok< cuz make batches mixing data
+hid_probs <- unbatch_data(batched.hid_probs)
+plot(energy_all(vis_data,hid_probs,model), type = 'l')
 
 #model <- list(W = array(0.1*rnorm(num.vis*num.hid,mean=0.5,sd=0.3),dim=c(num.vis,num.hid)), # visible units for row, hidden units for col
 #              vis_bias = array(0,dim = c(1,num.vis)), 

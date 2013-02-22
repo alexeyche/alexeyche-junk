@@ -37,28 +37,76 @@ free_energy <- function(v,model) {
 }
 
 prop_up <- function(given_v, model) {    
-    sigmoid( given_v %*% model$W + rep.row(model$hid_bias, nrow(given_v)) )
+    if(model$type == 'BB') {
+        out <- sigmoid( given_v %*% model$W + rep.row(model$hid_bias, nrow(given_v)) )
+    } else
+    if(model$type == 'BG') {
+        out <- given_v %*% model$W + rep.row(model$hid_bias, nrow(given_v))
+    } else 
+    if(model$type == 'GB') {
+        out <- sigmoid( (given_v %*% model$W)/model$sigma + rep.row(model$hid_bias, nrow(given_v)) )
+    } else {
+        cat("Unknown model type")
+    }
+    return(out)
 }
 
-prop_down <- function(given_h, model) {    
-    sigmoid( given_h %*% t(model$W) + rep.row(model$vis_bias, nrow(given_h)) )    
+prop_down <- function(given_h, model) {
+    if(model$type == 'BB') {
+        out <- sigmoid( given_h %*% t(model$W) + rep.row(model$vis_bias, nrow(given_h)) )    
+    } else
+    if(model$type == 'BG') {
+        out <- sigmoid( given_h %*% t(model$W) + rep.row(model$vis_bias, nrow(given_h)) )    
+    } else 
+    if(model$type == 'GB') {
+        out <- model$sigma * given_h %*% t(model$W) + rep.row(model$vis_bias, nrow(given_h))
+    } else {
+        cat("Unknown model type")
+    }
+    return(out)
 }
 
 gibbs_hvh <- function(hid_probs,model) {    
-    hid_states <- sample_bernoulli(hid_probs)
+    if ((model$type == 'GB' ) | (model$type == 'BB')) {
+        hid_states <- sample_bernoulli(hid_probs)
+    } else 
+    if (model$type == 'BG') {
+        hid_states <- hid_probs
+    }
     # p(v_model|h) calculate visible state with given hidden units state from positive phase    
     vis_probs <- prop_down(hid_states, model)
     
-    vis_states <- sample_bernoulli(vis_probs)
+    if ((model$type == 'BG' ) | (model$type == 'BB')) {
+        vis_states <- sample_bernoulli(vis_probs)
+    } else 
+    if (model$type == 'GB') {
+        vis_states <- vis_probs
+    }
     # p(h|v_model) calculate hidden state with given state of visible units    
     hid_probs <- prop_up(vis_states, model)
     
     list(vis_states = vis_states, vis_probs = vis_probs, hid_probs = hid_probs)
 }
-gibbs_vhv <- function(vis_sample,model) {    
-    hid.probs <- prop_up(vis_sample, model)
-    vis.probs <- prop_down(hid_sample, model)
-    list(hid.probs = hid.probs,vis.probs = vis.probs)
+gibbs_vhv <- function(vis_probs,model) {    
+    if ((model$type == 'BG' ) | (model$type == 'BB')) {
+        vis_states <- sample_bernoulli(vis_probs)
+    } else 
+    if (model$type == 'GB') {
+        vis_states <- vis_probs
+    }
+    # p(h|v_model) calculate hidden state with given state of visible units    
+    hid_probs <- prop_up(vis_states, model)
+    
+    if ((model$type == 'GB' ) | (model$type == 'BB')) {
+        hid_states <- sample_bernoulli(hid_probs)
+    } else 
+    if (model$type == 'BG') {
+        hid_states <- hid_probs
+    }
+    # p(v_model|h) calculate visible state with given hidden units state from positive phase    
+    vis_probs <- prop_down(hid_states, model)
+    
+    return(vis_probs)
 }
 
 contrastive_divergence <- function(hid_probs, model, iter = 1) {    
@@ -89,18 +137,21 @@ collect_hidden_statistics <- function(model, batched.data) {
     return(batched.hid_probs)
 }
 
-train_rbm <- function(batched.data, params, num.hid = NULL, model = NULL) {
+train_rbm <- function(batched.data, params, num.hid, type = 'BB', sigma = 1, model = NULL) {
     c(num.cases, num.vis, num.batches) := dim(batched.data)
-
+    
     
     for (v in 1:length(params)) assign(names(params)[v], params[[v]])
     
     if(is.null(model)) {  # need to create new model
+        
         model <- list(W = array(0.01*rnorm(num.vis*num.hid),dim=c(num.vis,num.hid)), # visible units for row, hidden units for col
                       vis_bias = array(0,dim = c(1,num.vis)), 
                       hid_bias = array(0,dim = c(1,num.hid)),
-                      num.cases = num.cases)
-        
+                      num.cases = num.cases, type = type)
+        if ((type == 'GB') | (type == 'BG')) {
+            model <- c(model, sigma = sigma )    
+        }
         epoch <- 1        
     } else {
         if(is.null(num.hid)) {
@@ -113,13 +164,25 @@ train_rbm <- function(batched.data, params, num.hid = NULL, model = NULL) {
     #png(filename=sprintf("0_epoch_%d",epoch,num.vis))        
     #hist(model$W)
     #dev.off()
+    cd.upd <- 0
     W.inc <- hid_bias.inc <- vis_bias.inc <- 0
     for(epoch in 1:epochs) {               
         for(batch in 1:num.batches) {
             # positive part, given data                                
             data <- batched.data[,,batch]
             hid_probs <- prop_up(data,model) # v*W + bias_h    
-
+            if((epoch/epochs > 0.5)&(cd.upd == 0)) {
+                cd.iter <- cd.iter + 1
+                cd.upd <- cd.upd + 1
+            }
+            if((epoch/epochs > 0.75)&(cd.upd == 1)) {
+                cd.iter <- cd.iter + 1
+                cd.upd <- cd.upd + 1
+            }
+            if((epoch/epochs > 0.85)&(cd.upd == 2)) {
+                cd.iter <- cd.iter + 3
+                cd.upd <- cd.upd + 1
+            }
             # collecting negative samples
             if(persistent) {
                 c(vis_sample.fantasy, vis_probs.fantasy, hid_probs.fantasy) := contrastive_divergence(persist.hid_probs, model, cd.iter)
