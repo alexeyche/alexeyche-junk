@@ -1,0 +1,54 @@
+
+R version 2.14.1 (2011-12-22)
+Copyright (C) 2011 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+R> #!/usr/bin/RScript
+R> 
+R> two_binom <- function(file = tempfile(), num.dims = 50, num.cases = 1000) {
++   data.all <- NULL
++   for(c in 1:num.cases) {
++     m <- matrix(0, ncol = num.dims)
++     rb <- rbinom(50,50,0.9)
++     rb2 <- rbinom(50,50,0.1)
++     for(i in 1:length(rb)) {
++       m[rb[i]] = m[rb[i]]+1
++       m[rb2[i]] = m[rb2[i]]+1          
++     }
++     m <- m/max(m)
++     data.all <- rbind(data.all, m)
++   }
++   write.table(data.all, file, sep=",", row.names=FALSE, col.names=FALSE)  
++   cat(file, "\n")  
++ }
+R> 
+R> args <- commandArgs(trailingOnly = TRUE)
+R> if (length(args) != 0) {
++     for (arg in seq(1,length(args))) {
++         fun <- args[arg]
++         if (fun == "two_binom") {
++             two_binom()
++         }
++     }
++ }
+R> 
+R> 
+R> 
+> proc.time()
+   user  system elapsed 
+  0.140   0.012   0.143 
