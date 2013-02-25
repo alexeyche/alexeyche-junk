@@ -26,3 +26,5 @@ def daydream(rbm):
     f = theano.function([], v1_mean[-1], updates = updates)            
     v = f()
     gray_plot(v.tolist())
+
+    

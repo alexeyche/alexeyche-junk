@@ -23,9 +23,9 @@ c(data.b, data.b.t) := makebatches(data = data, target.data = data.target, batch
 
 c(num.cases, num.dims, num.batches) := dim(data.b)
 
-train.params = list(e.w = 0.01, e.v = 0.01, e.h = 0.01, w_cost = 0.0002, 
+train.params = list(e.w = 0.1, e.v = 0.01, e.h = 0.01, w_cost = 0.0002, 
                     init.moment = 0.5, fin.moment = 0.9, 
-                    epochs = 10, cd.iter = 1, persistent = FALSE)
+                    epochs = 10, cd.iter = 2, persistent = TRUE)
 
 num.vis <- ncol(data)
 num.hid <- 500
@@ -37,8 +37,8 @@ num.vis <- 500
 num.hid <- 2
 
 train.params = list(e.w = 0.001, e.v = 0.001, e.h = 0.001, w_cost = 0.0002, 
-                    init.moment = 0.5, fin.moment = 0.9, 
-                    epochs = 10, cd.iter = 1, persistent = FALSE)
+                    init.moment = 0.8, fin.moment = 0.8, 
+                    epochs = 10, cd.iter = 2, persistent = TRUE)
 
 model_2 <- train_rbm(batched.hid_probs_1, train.params, num.hid, type = 'BG')
 batched.hid_probs_2 <- collect_hidden_statistics(model_2, batched.hid_probs_1)
@@ -51,7 +51,6 @@ names(colors) =  as.character(unique(top_hids.t))
 
 plot(top_hids,t='n')
 text(top_hids,labels=top_hids.t, col=colors[as.character(top_hids.t)])
-
 
 
 

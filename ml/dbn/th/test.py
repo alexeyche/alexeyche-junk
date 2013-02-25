@@ -30,10 +30,9 @@ def OneStep( vsample) :
 
 sample = theano.tensor.vector()
 
-csvfile = os.popen("./gen_data.R two_binom %d %d" % (100, 50,)).read()
+csvfile = os.popen("./gen_data.R two_binom %d %d" % (10, 5,)).read()
 data = genfromtxt(csvfile, delimiter=',')
-data = data[1,]
 data_sh = theano.shared(numpy.asarray(data, dtype=theano.config.floatX), borrow=True)
 
-values, updates = theano.san( OneStep, n_steps = 10 )
-gibbs10 = theano.function([], values[-1], updates = updates)
+s = T.sum(data_sh, axis=1) - T.sum(data_sh, axis=1) * T.cast(2.0, dtype=theano.config.floatX)
+f = theano.function([],s)
