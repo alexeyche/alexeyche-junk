@@ -15,7 +15,8 @@ num_vis = 50
 num_hid = 10
 num_dims = num_vis
 num_cases = 1000
-csvfile = os.popen("./gen_data.R two_binom %d %d" % (num_cases, num_dims,)).read()
+#csvfile = os.popen("./gen_data.R two_binom %d %d" % (num_cases, num_dims,)).read()
+csvfile = "two_binom.csv"
 data = genfromtxt(csvfile, delimiter=',')
 
 
@@ -44,7 +45,9 @@ train_rbm = theano.function([index], cost,
            updates=updates,
            givens=[(x, data_sh[index * batch_size: (index + 1) * batch_size])],
            name='train_rbm')
-for ep in xrange(0,10):
+
+max_epoch = 100
+for ep in xrange(0,max_epoch):
     for i in xrange(0,10):
         print train_rbm(i)
 

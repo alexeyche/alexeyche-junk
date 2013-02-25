@@ -95,8 +95,8 @@ class RBM(object):
         # determine gradients on RBM parameters
         # not that we only need the sample at the end of the chain
         chain_end = nv_samples[-1]
-
-        cost = T.mean(self.free_energy(self.input)) - T.mean(
+        current_free_energy = T.mean(self.free_energy(self.input))
+        cost = current_free_energy - T.mean(
             self.free_energy(chain_end))
         # We must not compute the gradient through the gibbs sampling
         gparams = T.grad(cost, self.params, consider_constant=[chain_end])
@@ -116,7 +116,7 @@ class RBM(object):
             monitoring_cost = self.get_reconstruction_cost(updates,
                                                            pre_sigmoid_nvs[-1])
 
-        return monitoring_cost, updates
+        return monitoring_cost, current_free_energy, T.mean(gparam), updates
 
     def get_pseudo_likelihood_cost(self, updates):
         """Stochastic approximation to the pseudo-likelihood"""
@@ -154,3 +154,12 @@ class RBM(object):
                       axis=1))
         return cross_entropy
 
+
+class RBMBinLine(RBM):
+    def prop_up(self, vis):
+        hid = T.dot(vis, self.W) - self.hbias            
+        return hid
+    def sample_h_given_v(self, v_sample):
+        h_val = self.prop_up(v_sample)
+        return [None, None, h_val]
+       
