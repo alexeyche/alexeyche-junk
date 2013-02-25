@@ -8,7 +8,9 @@ require(tsne)
 
 set.seed(1)
 
-data <- read.csv('/home/alexeyche/my/dbn/kaggle_sentiment/training_feat_proc.csv',sep=',',header=FALSE)
+#data <- read.csv('/home/alexeyche/my/dbn/kaggle_sentiment/training_feat_proc.csv',sep=',',header=FALSE)
+data <- read.csv('/home/alexeyche/prog/alexeyche-junk/ml/dbn/sentiment/training_feat_proc.csv',sep=',',header=FALSE)
+
 data <- as.matrix(data)
 num.dims.raw <- ncol(data)
 

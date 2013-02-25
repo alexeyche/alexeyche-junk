@@ -1,2 +1,3 @@
 #!/usr/bin/env bash
+cat $1
 python -i $1

@@ -1,4 +1,13 @@
 #!/usr/bin/env bash
-export R_CUSTOM=$* 
-/usr/bin/R -q --no-save
-
+export R_CUSTOM=$1 
+shift 1
+args=
+for var in "$@"; do
+    args=$args" "$var    
+done
+echo "The accumulated length of all arguments is: $args"
+if [ -z $args]; then
+    /usr/bin/R -q --no-save
+else    
+    /usr/bin/R -q --no-save --args $args
+fi

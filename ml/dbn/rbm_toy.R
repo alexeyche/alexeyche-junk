@@ -42,7 +42,7 @@ num.batches <- dim(data.b)[3]
 
 train.params = list(e.w = 0.01, e.v = 0.001, e.h = 0.001, w_cost = 0.0002, 
                     init.moment = 0.5, fin.moment = 0.9, 
-                    epochs = 100, cd.iter = 10, persistent = TRUE)  
+                    epochs = 100, cd.iter = 1, persistent = TRUE)  
 
 model <- train_rbm(data.b, train.params, num.hid)
 batched.hid_probs <- collect_hidden_statistics(model, data.b)
