@@ -161,5 +161,37 @@ class RBMBinLine(RBM):
         return hid
     def sample_h_given_v(self, v_sample):
         h_val = self.prop_up(v_sample)
-        return [None, None, h_val]
+        return h_val
+    def free_energy(self):
+        return None
+    def get_pseudo_likelihood_cost(self):
+        return None
+    def gibbs_hvh(self, h0_sample):
+        pre_sigmoid_v1, v1_mean, v1_sample = self.sample_v_given_h(h0_sample)
+        h1_val = self.sample_h_given_v(v1_sample)
+        return [pre_sigmoid_v1, v1_mean, v1_sample, h1_val]
+    def get_cost_updates(self, lr=0.1, weight_cost = 0.0002, num_cases = 7000, momentum = 0.5, persistent=None, k=1):
+        h_val = self.sample_h_given_v(self.input)
+
+        [pre_sigmoid_nvs, nv_means, nv_samples, nh_vals], updates = \
+            theano.scan(self.gibbs_hvh,
+                    outputs_info=[None, None, None, h_val],
+                    n_steps=k)
+
+        vis_sample_fantasy = nv_samples[-1]
+        hid_val_fantasy = nh_vals[-1]
+        self.W_inc = (T.dot(self.input.T, h_val) - T.dot(vis_sample_fantasy.T, hid_val_fantasy))/num_cases - self.W * weight_cost
+        self.hbias_inc = (T.sum(h_val) - T.sum(nh_vals))/num_cases
+        self.vbias_inc = (T.sum(self.input) - T.sum(nv_samples))/num_cases
+        
+        updates[self.W] = self.W + self.W_inc * momentum + self.W_inc * T.cast(lr, dtype=theano.config.floatX)
+        updates[self.hbias] = self.hbias + self.hbias_inc * momentum + self.hbias_inc * T.cast(lr, dtype=theano.config.floatX)
+        updates[self.vbias] = self.vbias + self.vbias_inc * momentum + self.vbias_inc * T.cast(lr, dtype=theano.config.floatX)
        
+        monitoring_cost = self.get_reconstruction_cost(updates, pre_sigmoid_nvs[-1])
+
+        return monitoring_cost, updates
+
+
+def collect_hid_stat(rbm, data):
+    pass
