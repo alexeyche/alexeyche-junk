@@ -13,8 +13,8 @@ from rbm_util import daydream
 from rbm import RBM, RBMBinLine, train_rbm
 from fine_tune import get_error, fine_tune
 
-#csvfile = '/home/alexeyche/my/dbn/kaggle_sentiment/training_feat_proc.csv'
-csvfile = '/home/alexeyche/prog/alexeyche-junk/ml/dbn/sentiment/training_feat_proc.csv'
+csvfile = '/home/alexeyche/my/dbn/kaggle_sentiment/training_feat_proc.csv'
+#csvfile = '/home/alexeyche/prog/alexeyche-junk/ml/dbn/sentiment/training_feat_proc.csv'
 data = genfromtxt(csvfile, delimiter=',')
 ncol = data.shape[1]
 data_target = data[...,0]
@@ -35,8 +35,9 @@ rbm = RBM(num_vis = num_dims, num_hid = 500)
 rbm_line = RBMBinLine(num_vis = 500, num_hid = 2)
 
 # hyper parameters
-train_params = { 'batch_size' : 100, 'learning_rate' : 0.1, 'cd_steps' : 1, 'max_epoch' : 50, 'persistent' : False}
-train_rbm(rbm, data_sh, train_params, True, True)
+train_params = { 'batch_size' : 100, 'learning_rate' : 0.1, 'cd_steps' : 2, 'max_epoch' : 25, 'persistent' : False}
+
+train_rbm(rbm, data_sh, train_params, False, False)
 fine_tune(rbm, data_sh, epochs = 10, batch_size=100)
 
 # collect statistics
@@ -45,9 +46,9 @@ hid_stat_sh = theano.shared(np.asarray(hid_stat, dtype=theano.config.floatX), bo
 
 # hyper parameters
 train_params = { 'batch_size' : 100, 'learning_rate' : 0.05, 'cd_steps' : 1, 'max_epoch' : 20, 'persistent' : False }
-train_rbm(rbm_line, hid_stat_sh, train_params, True, True)
+train_rbm(rbm_line, hid_stat_sh, train_params, False, False)
 
-hid_stat = theano.function([], rbm_line.prop_up(hid_stat_sh))()
+hid_stat = theano.function([], rbm.prop_up(hid_stat_sh))()
 x = hid_stat[0:1000,0].tolist()
 y = hid_stat[0:1000,1].tolist()
 import rpy2.robjects as ro

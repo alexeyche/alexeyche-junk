@@ -41,6 +41,7 @@ class RBM(object):
         self.vbias = vbias
         self.theano_rng = theano_rng
         self.params = [self.W, self.hbias, self.vbias]
+        _, self.output = self.prop_up(self.input)
 
     def prop_up(self, vis):
         pre_sigmoid_activation = T.dot(vis, self.W) + self.hbias
@@ -148,6 +149,25 @@ class RBM(object):
 
 class RBMBinLine(RBM):
     def __init__(self, input=None, num_vis = 50, num_hid = 10, W=None, hbias=None, vbias=None, numpy_rng = None, theano_rng = None):
+        if numpy_rng is None:
+            numpy_rng = np.random.RandomState(1)
+        if theano_rng is None:
+            theano_rng = RandomStreams(numpy_rng.randint(2 ** 30))
+    
+        if W is None:
+            initial_W = np.asarray(0.01 * numpy_rng.randn(num_vis, num_hid), dtype=theano.config.floatX)
+            W = theano.shared(value=initial_W, name='W', borrow=True)
+
+        if hbias is None:
+            # create shared variable for hidden units bias
+            hbias = theano.shared(value=np.zeros(num_hid,
+                                                    dtype=theano.config.floatX),
+                                  name='hbias', borrow=True)
+        if vbias is None:
+            # create shared variable for visible units bias
+            vbias = theano.shared(value=np.zeros(num_vis,
+                                                    dtype=theano.config.floatX),
+                                  name='vbias', borrow=True)
         self.W_inc = theano.shared(value=np.zeros((num_vis, num_hid),
                                                     dtype=theano.config.floatX),
                                   name='W_inc', borrow=True)
@@ -157,8 +177,20 @@ class RBMBinLine(RBM):
         self.vbias_inc = theano.shared(value=np.zeros(num_vis,
                                                     dtype=theano.config.floatX),
                                   name='vbias_inc', borrow=True)
-        super(RBMBinLine,self).__init__(input, num_vis, num_hid, W, hbias, vbias, numpy_rng, theano_rng)
+        # initialize input layer for standalone RBM or layer0 of DBN
+        self.input = input
+        if input is None:
+            self.input = T.matrix('input')
 
+        self.num_vis = num_vis 
+        self.num_hid = num_hid
+        self.W = W
+        self.hbias = hbias
+        self.vbias = vbias
+        self.theano_rng = theano_rng
+        self.params = [self.W, self.hbias, self.vbias]        
+        self.output = self.prop_up(self.input) 
+    
     def prop_up(self, vis):
         hid = T.dot(vis, self.W) - self.hbias            
         return hid
@@ -195,8 +227,9 @@ class RBMBinLine(RBM):
         W_inc = (T.dot(self.input.T, h_val) - T.dot(vis_sample_fantasy.T, hid_val_fantasy))/num_cases_c - self.W * weight_cost_c
         hbias_inc = (T.sum(h_val, axis=0) - T.sum(hid_val_fantasy,axis=0))/num_cases_c
         vbias_inc = (T.sum(self.input,axis=0) - T.sum(vis_sample_fantasy,axis=0))/num_cases_c
-        
-        updates[self.W] = self.W + W_inc * momentum_c + self.W_inc * lr_c 
+        W_inc_rate =  W_inc * momentum_c + self.W_inc * lr_c
+
+        updates[self.W] = self.W +  W_inc_rate
         updates[self.hbias] = self.hbias + self.hbias_inc * momentum_c + hbias_inc * lr_c
         updates[self.vbias] = self.vbias + self.vbias_inc * momentum_c + vbias_inc * lr_c
         updates[self.W_inc] = W_inc
@@ -210,7 +243,7 @@ class RBMBinLine(RBM):
         # so we can measure cost only with reconstruction:
         monitoring_cost = self.get_reconstruction_cost(updates, pre_sigmoid_nvs[-1])
 
-        return monitoring_cost, updates
+        return monitoring_cost, T.as_tensor_variable(0), T.mean(W_inc_rate), updates
 
 
 

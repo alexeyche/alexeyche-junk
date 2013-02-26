@@ -5,9 +5,9 @@ args=
 for var in "$@"; do
     args=$args" "$var    
 done
-echo "The accumulated length of all arguments is: $args"
-if [ -z $args]; then
+if [ -z $args ]; then
     /usr/bin/R -q --no-save
 else    
-    /usr/bin/R -q --no-save --args $args
+    R_CUSTOM=
+    /usr/bin/R -q --no-save -f $1 --args $args
 fi
