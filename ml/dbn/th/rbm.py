@@ -9,40 +9,37 @@ from theano.tensor.shared_randomstreams import RandomStreams
 import cPickle
 
 class RBM(object):
-    def __init__(self, input=None, num_vis = 50, num_hid = 10, W=None, hbias=None, vbias=None, numpy_rng = None, theano_rng = None):
-        if numpy_rng is None:
-            numpy_rng = np.random.RandomState(1)
-        if theano_rng is None:
-            theano_rng = RandomStreams(numpy_rng.randint(2 ** 30))
-    
-        if W is None:
-            initial_W = np.asarray(0.01 * numpy_rng.randn(num_vis, num_hid), dtype=theano.config.floatX)
-            W = theano.shared(value=initial_W, name='W', borrow=True)
+    def __init__(self, input=None, num_vis = 50, num_hid = 10):
+        self.numpy_rng = np.random.RandomState(1)
+        self.theano_rng = RandomStreams(self.numpy_rng.randint(2 ** 30))
+        self.num_vis = num_vis 
+        self.num_hid = num_hid
 
-        if hbias is None:
-            # create shared variable for hidden units bias
-            hbias = theano.shared(value=np.zeros(num_hid,
-                                                    dtype=theano.config.floatX),
-                                  name='hbias', borrow=True)
-        if vbias is None:
-            # create shared variable for visible units bias
-            vbias = theano.shared(value=np.zeros(num_vis,
-                                                    dtype=theano.config.floatX),
-                                  name='vbias', borrow=True)
+        self.init_params()
         # initialize input layer for standalone RBM or layer0 of DBN
         self.input = input
         if input is None:
             self.input = T.matrix('input')
 
-        self.num_vis = num_vis 
-        self.num_hid = num_hid
-        self.W = W
-        self.hbias = hbias
-        self.vbias = vbias
-        self.theano_rng = theano_rng
         self.params = [self.W, self.hbias, self.vbias]
         _, self.output = self.prop_up(self.input)
-
+    def init_W(self):
+        initial_W = np.asarray(0.01 * self.numpy_rng.randn(self.num_vis, self.num_hid), dtype=theano.config.floatX)
+        self.W = theano.shared(value=initial_W, name='W', borrow=True)
+    def init_hbias(self):
+        self.hbias = theano.shared(value=np.zeros(self.num_hid, dtype=theano.config.floatX), name='hbias', borrow=True)
+    def init_vbias(self):      
+        self.vbias = theano.shared(value=np.zeros(self.num_vis, dtype=theano.config.floatX), name='vbias', borrow=True)
+    def init_params(self):
+        self.init_W()
+        self.init_vbias()
+        self.init_hbias()
+    def reset_params(self):
+        initial_W = np.asarray(0.01 * self.numpy_rng.randn(self.num_vis, self.num_hid), dtype=theano.config.floatX)
+        self.W.set_value(initial_W, borrow=True)
+        self.hbias.set_value(np.zeros(self.num_hid, dtype=theano.config.floatX), borrow=True)
+        self.vbias.set_value(np.zeros(self.num_vis, dtype=theano.config.floatX), borrow=True)
+   
     def prop_up(self, vis):
         pre_sigmoid_activation = T.dot(vis, self.W) + self.hbias
         return [pre_sigmoid_activation, T.nnet.sigmoid(pre_sigmoid_activation)]
@@ -148,49 +145,34 @@ class RBM(object):
 
 
 class RBMBinLine(RBM):
-    def __init__(self, input=None, num_vis = 50, num_hid = 10, W=None, hbias=None, vbias=None, numpy_rng = None, theano_rng = None):
-        if numpy_rng is None:
-            numpy_rng = np.random.RandomState(1)
-        if theano_rng is None:
-            theano_rng = RandomStreams(numpy_rng.randint(2 ** 30))
-    
-        if W is None:
-            initial_W = np.asarray(0.01 * numpy_rng.randn(num_vis, num_hid), dtype=theano.config.floatX)
-            W = theano.shared(value=initial_W, name='W', borrow=True)
+    def __init__(self, input=None, num_vis = 50, num_hid = 10):
+        self.numpy_rng = np.random.RandomState(1)
+        self.theano_rng = RandomStreams(self.numpy_rng.randint(2 ** 30))
+        self.num_vis = num_vis 
+        self.num_hid = num_hid
 
-        if hbias is None:
-            # create shared variable for hidden units bias
-            hbias = theano.shared(value=np.zeros(num_hid,
-                                                    dtype=theano.config.floatX),
-                                  name='hbias', borrow=True)
-        if vbias is None:
-            # create shared variable for visible units bias
-            vbias = theano.shared(value=np.zeros(num_vis,
-                                                    dtype=theano.config.floatX),
-                                  name='vbias', borrow=True)
-        self.W_inc = theano.shared(value=np.zeros((num_vis, num_hid),
-                                                    dtype=theano.config.floatX),
-                                  name='W_inc', borrow=True)
-        self.hbias_inc = theano.shared(value=np.zeros(num_hid,
-                                                    dtype=theano.config.floatX),
-                                  name='hbias_inc', borrow=True)
-        self.vbias_inc = theano.shared(value=np.zeros(num_vis,
-                                                    dtype=theano.config.floatX),
-                                  name='vbias_inc', borrow=True)
+        self.init_params()
         # initialize input layer for standalone RBM or layer0 of DBN
         self.input = input
         if input is None:
             self.input = T.matrix('input')
 
-        self.num_vis = num_vis 
-        self.num_hid = num_hid
-        self.W = W
-        self.hbias = hbias
-        self.vbias = vbias
-        self.theano_rng = theano_rng
         self.params = [self.W, self.hbias, self.vbias]        
         self.output = self.prop_up(self.input) 
-    
+    def init_W(self):
+        initial_W = np.asarray(0.01 * self.numpy_rng.randn(self.num_vis, self.num_hid), dtype=theano.config.floatX)
+        self.W = theano.shared(value=initial_W, name='W', borrow=True)
+        self.W_inc = theano.shared(value=np.zeros((self.num_vis, self.num_hid), dtype=theano.config.floatX), name='W_inc', borrow=True)
+    def init_hbias(self):
+        self.hbias = theano.shared(value=np.zeros(self.num_hid, dtype=theano.config.floatX), name='hbias', borrow=True)
+        self.hbias_inc = theano.shared(value=np.zeros(self.num_hid, dtype=theano.config.floatX), name='hbias_inc', borrow=True)
+    def init_vbias(self):      
+        self.vbias = theano.shared(value=np.zeros(self.num_vis, dtype=theano.config.floatX), name='vbias', borrow=True)
+        self.vbias_inc = theano.shared(value=np.zeros(self.num_vis, dtype=theano.config.floatX), name='vbias_inc', borrow=True)    
+    def init_params(self):
+        self.init_W()
+        self.init_vbias()
+        self.init_hbias()
     def prop_up(self, vis):
         hid = T.dot(vis, self.W) - self.hbias            
         return hid
