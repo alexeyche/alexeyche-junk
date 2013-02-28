@@ -11,6 +11,7 @@ import cPickle
 
 from ae import AutoEncoder, save_to_file, load_from_file, print_top_to_file
 from rbm import RBMBinLine
+from rbm_stack import RBMStack
 
 csvfile = '/home/alexeyche/my/dbn/kaggle_sentiment/training_feat_proc.csv'
 #csvfile = '/home/alexeyche/prog/alexeyche-junk/ml/dbn/sentiment/training_feat_proc.csv'
@@ -29,12 +30,13 @@ data_target = data_target[perm]
 data_sh = theano.shared(np.asarray(data, dtype=theano.config.floatX), borrow=True)
 data_target_sh = theano.shared(np.asarray(data_target, dtype=theano.config.floatX), borrow=True)
 
-batch_size = 100
+batch_size = 70
 num_batches = num_cases/batch_size
-max_epoch = 10
-train_params = {'batch_size' : batch_size, 'learning_rate' : 0.05, 'cd_steps' : 1, 'max_epoch' : max_epoch, 'persistent' : False, 'learning_rate_line' : 0.001, 'finetune_learning_rate' : 0.1 }
+max_epoch = 30
+train_params = {'batch_size' : batch_size, 'learning_rate' : 0.01, 'cd_steps' : 5, 'max_epoch' : max_epoch, 'persistent' : True, 'learning_rate_line' : 0.001, 'finetune_learning_rate' : 0.1 }
 
-sent_ae = AutoEncoder(num_vis = num_vis, hid_layers_size = [500, 500, 2], linear_top=True)
+stack_rbm = RBMStack(num_vis = num_vis, hid_layers_size = [500])
+sent_ae = AutoEncoder(stack_rbm)
 val = sent_ae.finetune_cost()
 
 index = T.lscalar('index')  # index to a minibatch
@@ -43,7 +45,7 @@ cost_before = []
 for b in xrange(0, num_batches):
     cost_before.append(fun_cost(b))
 
-need_train = False
+need_train = True
 if need_train:
     fn = sent_ae.pretrain_fun(data_sh, train_params)
     for f in fn:
@@ -69,10 +71,10 @@ else:
     #        cost, cur_free_en, cur_gparam = fn[2](b)
     #        print "Epoch # %d:%d cost: %f free energy: %f grad: %f" % (ep, b, cost, cur_free_en, cur_gparam)
 
-need_finetune=False
+need_finetune=True
 if need_finetune:
     fine_tune = sent_ae.finetune_fun(data_sh, train_params)
-    for ep in xrange(0, 20):
+    for ep in xrange(0, max_epoch):
         for b in xrange(0, num_batches):
             cost = fine_tune(b)
             print "Epoch # %d:%d cost: %f" % (ep, b, cost)

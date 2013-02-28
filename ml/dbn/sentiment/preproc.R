@@ -1,6 +1,6 @@
 #!/usr/bin/RScript
 
-data <- read.csv('training_feat.csv',sep=',',header=FALSE)
+data <- read.csv('/home/alexeyche/my/dbn/kaggle_sentiment/training_feat.csv',sep=',',header=FALSE)
 data <- as.matrix(data)
 n <- ncol(data)
 sd_d <- apply(data,2,sd)
