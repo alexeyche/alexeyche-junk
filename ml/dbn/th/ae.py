@@ -12,6 +12,7 @@ import rpy2.robjects as ro
 from rpy2.robjects.packages import importr
 
 from rbm import RBM, RBMBinLine
+from rbm_util import gen_name
 
     
 class AutoEncoder(object):
@@ -20,7 +21,6 @@ class AutoEncoder(object):
         self.output = T.ivector('output')
         
         self.stack = rbms 
-        self.num_layers = rbms.num_layers
         self.num_vis = rbms[0].num_vis
         
         top_rbm = RBMBinLine(input = self.stack[-1].output, num_vis = self.stack[-1].num_hid, num_hid = num_out)  
@@ -30,13 +30,24 @@ class AutoEncoder(object):
         for rbm in rbms:
             self.params.extend(rbm.params)
     
+        self.num_layers = self.stack.num_layers
+
     def pretrain_fun(self, data_sh, train_params):
-        funcs = self.stack.pretrain_fun(data_sh, train_params)
+        funcs = []
+        if not self.stack.isTrained:
+            funcs = self.stack.pretrain_fun(data_sh, train_params)
         learning_rate_line = train_params['learning_rate_line'] 
+        persistent = train_params['persistent']
+        cd_steps = train_params['cd_steps_line']
+        batch_size = train_params['batch_size']
         num_cases = data_sh.get_value(borrow=True).shape[0]
-        
+
+        #if persistent:
+        #    persistent_chain = theano.shared(np.zeros((batch_size, self.stack[-1].num_hid), dtype=theano.config.floatX), borrow=True)
+        #else:
+        persistent_chain = None            
         index = T.lscalar('index')  # index to a minibatch
-        cost, free_en, gparam, updates = rbm.get_cost_updates(lr=learning_rate_line, num_cases=num_cases, persistent=persistent_chain, k=cd_steps)
+        cost, free_en, gparam, updates = self.stack[-1].get_cost_updates(lr=learning_rate_line, num_cases=num_cases, persistent=persistent_chain, k=cd_steps)
 
         train_rbm_f = theano.function([index], [cost, free_en, gparam],
                updates=updates,
@@ -69,30 +80,33 @@ class AutoEncoder(object):
                                   givens=[ (self.input, data_sh[index * batch_size: (index + 1) * batch_size])])
 
         return train_fn
+    def pretrain(self, data_sh, train_params):
+        max_epoch = train_params['max_epoch']
+        num_batches = data_sh.get_value(borrow=True).shape[0]/train_params['batch_size']
+        fn = self.pretrain_fun(data_sh, train_params)
+        for i in xrange(0,len(fn)):
+            f = fn[i]
+            if (i == len(fn)-1):
+                max_epoch = int(round(max_epoch/2))
+            for ep in xrange(0, max_epoch):
+                for b in xrange(0, num_batches):
+                    cost, cur_free_en, cur_gparam = f(b)
+                    print "pretrain, layer %s, epoch # %d:%d cost: %f free energy: %f grad: %f" % (i, ep, b, cost, cur_free_en, cur_gparam)
 
-def gen_name(ae):
-    name = "ae"
-    for rbm in ae.stack:
-        name += "_%d" % (rbm.num_hid) 
-    return name        
+    def finetune(self, data_sh, train_params):
+        max_epoch = train_params['max_epoch']
+        num_batches = data_sh.get_value(borrow=True).shape[0]/train_params['batch_size']
+        fine_tune = self.finetune_fun(data_sh, train_params)
+        for ep in xrange(0, max_epoch):
+            for b in xrange(0, num_batches):
+                cost = fine_tune(b)
+                print "Finetune, epoch # %d:%d cost: %f" % (ep, b, cost)
 
-def save_to_file(ae):
-    fileName_p = open(gen_name(ae), 'wb')
-    for rbm in ae.stack:
-        cPickle.dump(rbm.W.get_value(borrow=True), fileName_p, -1)  # the -1 is for HIGHEST_PROTOCOL
-        cPickle.dump(rbm.vbias.get_value(borrow=True), fileName_p, -1)  # .. and it triggers much more efficient
-        cPickle.dump(rbm.hbias.get_value(borrow=True), fileName_p, -1)  # .. storage than numpy's default
 
-def load_from_file(ae):
-    fileName_p = open(gen_name(ae), 'r')
-    for rbm in ae.stack:    
-        rbm.W.set_value(cPickle.load(fileName_p), borrow=True)
-        rbm.vbias.set_value(cPickle.load(fileName_p), borrow=True)
-        rbm.hbias.set_value(cPickle.load(fileName_p), borrow=True)
-
-def print_top_to_file(ae, name, data_sh, data_target, cases):
-    ae_name = gen_name(ae)
-    fileName = ae_name + "_" + name + ".png"
+path="/mnt/yandex.disk/models"
+def print_top_to_file(ae, train_params, name, data_sh, data_target, cases):
+    ae_name = gen_name(ae, train_params)
+    fileName = path + "/" + ae_name + "_" + name + ".png"
 
     out_line = ae.stack[-1].output
     f = theano.function([], out_line, givens=[(ae.input, data_sh[cases])])
@@ -100,7 +114,7 @@ def print_top_to_file(ae, name, data_sh, data_target, cases):
     x = hid_stat[...,0].tolist()
     y = hid_stat[...,1].tolist()
     grdevices = importr('grDevices')
-    grdevices.png(file=fileName, width=512, height=512)
+    grdevices.png(file=fileName, width=1024, height=1024)
     lab = ro.IntVector(data_target[cases].tolist())
     lab_col = ro.StrVector(map(lambda p: p == 0 and 'blue' or 'red', lab))
     lab_col.names = lab

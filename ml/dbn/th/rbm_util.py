@@ -27,4 +27,10 @@ def daydream(rbm):
     v = f()
     gray_plot(v.tolist())
 
-    
+def gen_name(rbms,params):
+    name = "rbms"
+    for rbm in rbms.stack:
+        name += "_%d" % (rbm.num_hid) 
+    name += "_%s_%s_%s" % (params['learning_rate'], params['cd_steps'], params['persistent'])
+    return name        
+   

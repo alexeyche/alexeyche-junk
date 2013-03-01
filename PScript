@@ -1,3 +1,5 @@
 #!/usr/bin/env bash
-cat $1
-python -i $1
+file=$1
+shift 1
+cat $file
+python -i $file $@

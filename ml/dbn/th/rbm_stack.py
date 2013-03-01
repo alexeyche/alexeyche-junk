@@ -8,7 +8,7 @@ import os
 from theano.tensor.shared_randomstreams import RandomStreams
 import cPickle
 from rbm import RBM
-
+from rbm_util import gen_name
 
 class RBMStack():
     def __init__(self, num_vis, hid_layers_size):
@@ -19,6 +19,7 @@ class RBMStack():
         self.stack = []
         num_vis_cur = self.num_vis
         input_cur = self.input
+        self.isTrained = False
         for l in xrange(0, self.num_layers):
             num_hid_cur = hid_layers_size[l]
              
@@ -34,6 +35,7 @@ class RBMStack():
         return self.stack[index]
     def append(self,rbm):
         self.stack.append(rbm)
+        self.num_layers = len(self.stack)
     
     def pretrain_fun(self, data_sh, train_params):
         batch_size = train_params['batch_size']
@@ -58,4 +60,41 @@ class RBMStack():
             
             pretrain_fns.append(train_rbm_f)
         return pretrain_fns            
+
+    def pretrain(self, data_sh, train_params):
+        max_epoch = train_params['max_epoch']
+        num_batches = data_sh.get_value(borrow=True).shape[0]/train_params['batch_size']
+        fn = self.pretrain_fun(data_sh, train_params)
+        for i in xrange(0,len(fn)):
+            f = fn[i]
+            for ep in xrange(0, max_epoch):
+                for b in xrange(0, num_batches):
+                    cost, cur_free_en, cur_gparam = f(b)
+                    print "pretrain, layer %s, epoch # %d:%d cost: %f free energy: %f grad: %f" % (i, ep, b, cost, cur_free_en, cur_gparam)
+        self.isTrained = True
+      
+
+path="/mnt/yandex.disk/models"
+def save_to_file(rbms,params):
+    name = path+"/"+gen_name(rbms,params)
+    fileName_p = open(name, 'wb')
+    for rbm in rbms.stack:
+        cPickle.dump(rbm.W.get_value(borrow=True), fileName_p, -1)  # the -1 is for HIGHEST_PROTOCOL
+        cPickle.dump(rbm.vbias.get_value(borrow=True), fileName_p, -1)  # .. and it triggers much more efficient
+        cPickle.dump(rbm.hbias.get_value(borrow=True), fileName_p, -1)  # .. storage than numpy's default
+    print "rbm_stack saved %s" % name
+
+def load_from_file(rbms, params):
+    name = path+"/"+gen_name(rbms,params)
+    if os.path.isfile(name):
+        fileName_p = open(name, 'r')
+        for rbm in rbms.stack:    
+            rbm.W.set_value(cPickle.load(fileName_p), borrow=True)
+            rbm.vbias.set_value(cPickle.load(fileName_p), borrow=True)
+            rbm.hbias.set_value(cPickle.load(fileName_p), borrow=True)
+        rbms.isTrained = True
+        print "rbm_stack opened %s" % name
+        return True
+    else:
+        return False
 
