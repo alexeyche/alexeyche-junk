@@ -8,6 +8,7 @@ options(prompt="R> ")
   library(graphics)
   library(stats)
   library(datasets)
+  library(grDevices)
   for ( filename in strsplit(Sys.getenv("R_CUSTOM")," ")[[1]] )   {
    source( filename, echo = T )
   }

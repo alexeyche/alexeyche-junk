@@ -95,8 +95,8 @@ while(<TRAIN>) {
         undef($click_pos);
     }
     if ($sess_type eq "S") {
-#        $switch_detected = 1;
-#        push @pattern, "S";
+        $switch_detected = 1;
+        push @pattern, "S";
     }
     undef($sess_id);
     undef($line);

@@ -74,27 +74,4 @@ class RBMStack():
         self.isTrained = True
       
 
-path="/mnt/yandex.disk/models"
-def save_to_file(rbms,params):
-    name = path+"/"+gen_name(rbms,params)
-    fileName_p = open(name, 'wb')
-    for rbm in rbms.stack:
-        cPickle.dump(rbm.W.get_value(borrow=True), fileName_p, -1)  # the -1 is for HIGHEST_PROTOCOL
-        cPickle.dump(rbm.vbias.get_value(borrow=True), fileName_p, -1)  # .. and it triggers much more efficient
-        cPickle.dump(rbm.hbias.get_value(borrow=True), fileName_p, -1)  # .. storage than numpy's default
-    print "rbm_stack saved %s" % name
-
-def load_from_file(rbms, params):
-    name = path+"/"+gen_name(rbms,params)
-    if os.path.isfile(name):
-        fileName_p = open(name, 'r')
-        for rbm in rbms.stack:    
-            rbm.W.set_value(cPickle.load(fileName_p), borrow=True)
-            rbm.vbias.set_value(cPickle.load(fileName_p), borrow=True)
-            rbm.hbias.set_value(cPickle.load(fileName_p), borrow=True)
-        rbms.isTrained = True
-        print "rbm_stack opened %s" % name
-        return True
-    else:
-        return False
 

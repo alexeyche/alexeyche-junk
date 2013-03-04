@@ -1,9 +1,10 @@
-#!/usr/bin/env python
+#!/usr/bin/PScript
 
 TRAIN_FILE="training.txt"
 FEAT_FILE="training_feat.csv"
 WORD_COUNT=2287
 word_corpus = {}
+word_id_to_count = {}
 
 f = open(TRAIN_FILE, 'r')
 ff = open(FEAT_FILE,'w')
@@ -13,7 +14,7 @@ for line in f:
     l_num+=1
     spl = line.split('\t')
     words = spl[1].split(' ')
-    feats = [spl[0]] + ['0']*WORD_COUNT
+    feats = [int(spl[0])] + [0]*WORD_COUNT
     for w in words:
 #'\xe2\x80\x98': 2, '\xe2\x80\x9d': 5, '\xe2\x80\x9c': 3,
         if (w == '\xe2\x80\x99') or (w == '\xe2\x80\x98'):
@@ -29,10 +30,12 @@ for line in f:
         if w1 not in word_corpus:
             word_corpus[w1] = word_id
             word_id+=1
-        feats[word_corpus[w1]]='1'
-    str = ','.join(feats)
-    str += '\n'
-    ff.write(str)
+            word_id_to_count[word_corpus[w1]] = 1
+        word_id_to_count[word_corpus[w1]] +=1
+        feats[word_corpus[w1]] += 1
+    string = ','.join(map(str,feats))
+    string += '\n'
+    ff.write(string)
 
 
 
