@@ -23,6 +23,9 @@ class RBM(object):
 
         self.params = [self.W, self.hbias, self.vbias]
         _, self.output = self.prop_up(self.input)
+    
+    def set_input(self, input):
+        self.input = input
     def init_W(self):
         initial_W = np.asarray(0.01 * self.numpy_rng.randn(self.num_vis, self.num_hid), dtype=theano.config.floatX)
         self.W = theano.shared(value=initial_W, name='W', borrow=True)
@@ -159,6 +162,9 @@ class RBMBinLine(RBM):
 
         self.params = [self.W, self.hbias, self.vbias]        
         self.output = self.prop_up(self.input) 
+    
+    def set_input(self, input):
+        self.input = input
     def init_W(self):
         initial_W = np.asarray(0.01 * self.numpy_rng.randn(self.num_vis, self.num_hid), dtype=theano.config.floatX)
         self.W = theano.shared(value=initial_W, name='W', borrow=True)
@@ -229,9 +235,20 @@ class RBMBinLine(RBM):
 
 
 class RBMReplSoftmax(RBM):
+    def __init__(self, input=None, num_vis = 5, num_hid = 10):
+        if input is None:
+            self.input = T.matrix('input')
+        else:
+            self.input = input
+        self.D = T.sum(self.input, axis=1)
+        super(RBMReplSoftmax, self).__init__(self.input, num_vis, num_hid)        
+    
+    def set_input(self, input):
+        self.input = input
+        self.D = T.sum(self.input, axis=1)
+    
     def prop_up(self, vis):
-        D = T.sum(vis, axis=1)
-        pre_sigmoid_activation = T.dot(vis, self.W) + T.outer(D,self.hbias)
+        pre_sigmoid_activation = T.dot(vis, self.W) + T.outer(self.D,self.hbias)
         return [pre_sigmoid_activation, T.nnet.sigmoid(pre_sigmoid_activation)]
 
     def prop_down(self, hid):
@@ -246,9 +263,9 @@ class RBMReplSoftmax(RBM):
         return -hidden_term - vbias_term
 
     def sample_v_given_h(self, h_sample):
-        pre_sigmoid_v, v_mean = self.prop_down(h_sample)
-        v_sample = self.theano_rng.multinomial(size=v_mean.shape, n=1, pvals=v_mean, dtype=theano.config.floatX)
-        return [pre_sigmoid_v, v_mean, v_sample]
+        pre_softmax_v, v_mean = self.prop_down(h_sample)
+        v_sample = self.theano_rng.multinomial(n=self.D, pvals=v_mean, dtype=theano.config.floatX)
+        return [pre_softmax_v, v_mean, v_sample]
 
     def sample_h_given_v(self, v_sample):
         pre_sigmoid_h, h_mean = self.prop_up(v_sample)
@@ -256,83 +273,83 @@ class RBMReplSoftmax(RBM):
         return [pre_sigmoid_h, h_mean, h_sample]
 
     def gibbs_hvh(self, h0_sample):
-        pre_sigmoid_v1, v1_mean, v1_sample = self.sample_v_given_h(h0_sample)
+        pre_softmax_v1, v1_mean, v1_sample = self.sample_v_given_h(h0_sample)
         pre_sigmoid_h1, h1_mean, h1_sample = self.sample_h_given_v(v1_sample)
-        return [pre_sigmoid_v1, v1_mean, v1_sample,
+        return [pre_softmax_v1, v1_mean, v1_sample,
                 pre_sigmoid_h1, h1_mean, h1_sample]
 
     def gibbs_vhv(self, v0_sample):
         pre_sigmoid_h1, h1_mean, h1_sample = self.sample_h_given_v(v0_sample)
-        pre_sigmoid_v1, v1_mean, v1_sample = self.sample_v_given_h(h1_sample)
+        pre_softmax_v1, v1_mean, v1_sample = self.sample_v_given_h(h1_sample)
         return [pre_sigmoid_h1, h1_mean, h1_sample,
-                pre_sigmoid_v1, v1_mean, v1_sample]
+                pre_softmax_v1, v1_mean, v1_sample]
 
-#    def get_cost_updates(self, lr=0.1, persistent=None, k=1):
-#        # compute positive phase
-#        pre_sigmoid_ph, ph_mean, ph_sample = self.sample_h_given_v(self.input)
-#
-#        if persistent is None:
-#            chain_start = ph_sample
-#        else:
-#            chain_start = persistent
-#
-#        [pre_sigmoid_nvs, nv_means, nv_samples,
-#         pre_sigmoid_nhs, nh_means, nh_samples], updates = \
-#            theano.scan(self.gibbs_hvh,
-#                    outputs_info=[None,  None,  None, None, None, chain_start],
-#                    n_steps=k)
-#
-#        # determine gradients on RBM parameters
-#        # not that we only need the sample at the end of the chain
-#        chain_end = nv_samples[-1]
-#        current_free_energy = T.mean(self.free_energy(self.input))
-#        cost = current_free_energy - T.mean(
-#            self.free_energy(chain_end))
-#        # We must not compute the gradient through the gibbs sampling
-#        gparams = T.grad(cost, self.params, consider_constant=[chain_end])
-#
-#        # constructs the update dictionary
-#        for gparam, param in zip(gparams, self.params):
-#            # make sure that the learning rate is of the right dtype
-#            updates[param] = param - gparam * T.cast(lr,
-#                                                    dtype=theano.config.floatX)
-#        if persistent:
-#            # Note that this works only if persistent is a shared variable
-#            updates[persistent] = nh_samples[-1]
-#            # pseudo-likelihood is a better proxy for PCD
-#            monitoring_cost = self.get_pseudo_likelihood_cost(updates)
-#        else:
-#            # reconstruction cross-entropy is a better proxy for CD
-#            monitoring_cost = self.get_reconstruction_cost(updates,
-#                                                           pre_sigmoid_nvs[-1])
-#
-#        return monitoring_cost, current_free_energy, T.mean(gparam), updates
-#
-#    def get_pseudo_likelihood_cost(self, updates):
-#        """Stochastic approximation to the pseudo-likelihood"""
-#
-#        bit_i_idx = theano.shared(value=0, name='bit_i_idx')
-#
-#        xi = T.round(self.input)
-#
-#        fe_xi = self.free_energy(xi)
-#        xi_flip = T.set_subtensor(xi[:, bit_i_idx], 1 - xi[:, bit_i_idx])
-#
-#        fe_xi_flip = self.free_energy(xi_flip)
-#
-#        cost = T.mean(self.num_vis * T.log(T.nnet.sigmoid(fe_xi_flip -
-#                                                            fe_xi)))
-#
-#        updates[bit_i_idx] = (bit_i_idx + 1) % self.num_vis
-#
-#        return cost
-#
-#    def get_reconstruction_cost(self, updates, pre_sigmoid_nv):
-#        cross_entropy = T.mean(
-#                T.sum(self.input * T.log(T.nnet.sigmoid(pre_sigmoid_nv)) +
-#                (1 - self.input) * T.log(1 - T.nnet.sigmoid(pre_sigmoid_nv)),
-#                      axis=1))
-#        return cross_entropy
+    def get_cost_updates(self, lr=0.1, persistent=None, k=1):
+        # compute positive phase
+        pre_sigmoid_ph, ph_mean, ph_sample = self.sample_h_given_v(self.input)
+
+        if persistent is None:
+            chain_start = ph_sample
+        else:
+            chain_start = persistent
+
+        [pre_softmax_nvs, nv_means, nv_samples,
+         pre_sigmoid_nhs, nh_means, nh_samples], updates = \
+            theano.scan(self.gibbs_hvh,
+                    outputs_info=[None,  None,  None, None, None, chain_start],
+                    n_steps=k)
+
+        # determine gradients on RBM parameters
+        # not that we only need the sample at the end of the chain
+        chain_end = nv_samples[-1]
+        current_free_energy = T.mean(self.free_energy(self.input))
+        cost = current_free_energy - T.mean(
+            self.free_energy(chain_end))
+        # We must not compute the gradient through the gibbs sampling
+        gparams = T.grad(cost, self.params, consider_constant=[chain_end])
+
+        # constructs the update dictionary
+        for gparam, param in zip(gparams, self.params):
+            # make sure that the learning rate is of the right dtype
+            updates[param] = param - gparam * T.cast(lr,
+                                                    dtype=theano.config.floatX)
+        if persistent:
+            # Note that this works only if persistent is a shared variable
+            updates[persistent] = nh_samples[-1]
+            # pseudo-likelihood is a better proxy for PCD
+            monitoring_cost = self.get_pseudo_likelihood_cost(updates)
+        else:
+            # reconstruction cross-entropy is a better proxy for CD
+            monitoring_cost = self.get_reconstruction_cost(updates,
+                                                           pre_softmax_nvs[-1])
+
+        return monitoring_cost, current_free_energy, T.mean(gparam), updates
+
+    def get_pseudo_likelihood_cost(self, updates):
+        """Stochastic approximation to the pseudo-likelihood"""
+
+        bit_i_idx = theano.shared(value=0, name='bit_i_idx')
+
+        xi = T.round(self.input)
+
+        fe_xi = self.free_energy(xi)
+        xi_flip = T.set_subtensor(xi[:, bit_i_idx], 1 - xi[:, bit_i_idx])
+
+        fe_xi_flip = self.free_energy(xi_flip)
+
+        cost = T.mean(self.num_vis * T.log(T.nnet.sigmoid(fe_xi_flip -
+                                                            fe_xi)))
+
+        updates[bit_i_idx] = (bit_i_idx + 1) % self.num_vis
+
+        return cost
+
+    def get_reconstruction_cost(self, updates, pre_softmax_nv):
+        cross_entropy = T.mean(
+                T.sum(self.input * T.log(T.nnet.sigmoid(pre_softmax_nv)) +
+                (1 - self.input) * T.log(1 - T.nnet.sigmoid(pre_softmax_nv)),
+                      axis=1))
+        return cross_entropy
 
 def train_rbm(rbm, data_sh, train_params, saveFile = True, findFile = True):
     num_hid = rbm.num_hid
@@ -355,7 +372,7 @@ def train_rbm(rbm, data_sh, train_params, saveFile = True, findFile = True):
     num_batches = num_cases/batch_size
 
     x = T.matrix('x') 
-    rbm.input = x
+    rbm.set_input(x)
     index = T.lscalar()    # index to a [mini]batch
     if persistent:
         persistent_chain = theano.shared(np.zeros((batch_size, num_hid), dtype=theano.config.floatX), borrow=True)
@@ -374,7 +391,7 @@ def train_rbm(rbm, data_sh, train_params, saveFile = True, findFile = True):
                 cost = train_rbm_f(i)
                 print "Epoch # %d:%d cost: %f" % (ep, i, cost)
 
-    if type(rbm) is RBM:
+    if type(rbm) is RBM or type(rbm) is RBMReplSoftmax:
         cost, free_en, gparam, updates = rbm.get_cost_updates(lr=lr_giv, persistent=persistent_chain, k=k_giv)
 
         train_rbm_f = theano.function([index], [cost, free_en, gparam],

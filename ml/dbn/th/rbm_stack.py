@@ -7,11 +7,11 @@ from numpy import genfromtxt
 import os
 from theano.tensor.shared_randomstreams import RandomStreams
 import cPickle
-from rbm import RBM
+from rbm import RBM, RBMReplSoftmax
 from rbm_util import gen_name
 
 class RBMStack():
-    def __init__(self, num_vis, hid_layers_size):
+    def __init__(self, num_vis, hid_layers_size, repl_softmax = False):
         self.input = T.matrix('input') 
         self.params = []
         self.num_layers = len(hid_layers_size)
@@ -26,8 +26,11 @@ class RBMStack():
             if l > 0:
                 input_cur = self.stack[-1].output
                 num_vis_cur = self.stack[-1].num_hid
-
-            rbm = RBM(input = input_cur, num_vis = num_vis_cur, num_hid = num_hid_cur)
+            
+            if repl_softmax and l == 0:  # replicated softmax layer only for first one
+                rbm = RBMReplSoftmax(input = input_cur, num_vis = num_vis_cur, num_hid = num_hid_cur)
+            else:    
+                rbm = RBM(input = input_cur, num_vis = num_vis_cur, num_hid = num_hid_cur)
              
             self.stack.append(rbm)
 

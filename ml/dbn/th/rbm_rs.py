@@ -9,19 +9,28 @@ from theano.tensor.shared_randomstreams import RandomStreams
 from theano import ProfileMode
 import cPickle
 
-from rbm import RBMReplSoftmax
+from rbm import RBMReplSoftmax, train_rbm
+from rbm_stack import RBMStack
 
-x = [[0,1,1,20,3],[1,1,2,0,1],[0,1,1,1,1]]
-#x_np = np.asarray(x, dtype=theano.config.floatX)
-x_sh = theano.shared(np.asarray(x, dtype=theano.config.floatX), borrow=True) 
+csvfile = '/home/alexeyche/my/git/alexeyche-junk/ml/dbn/sentiment/training_feat.csv'
 
-rbm = RBMReplSoftmax(num_vis = 5, num_hid = 10)
+data = genfromtxt(csvfile, delimiter=',')
+ncol = data.shape[1]
+data_target = data[...,0]
+data_target_0 = data_target
+data = data[...,1:ncol]
+num_cases = data.shape[0]
+num_dims = data.shape[1]
+num_vis = num_dims
 
-pre_val, val = rbm.prop_up(rbm.input)
-pre_val2, val2 = rbm.prop_down(val)
-#size = [D1,D2,D3] for each case
-#pvals = [0.2,0.2,0.2,0.2,0.2]  for each visible unit
+data_wo_p = data[:7000]
+data_target_wo_p = data_target
 
-v_sample = rbm.theano_rng.multinomial(size=val2.shape, n=1, pvals=val2, dtype=theano.config.floatX)
+perm = np.random.permutation(num_cases)
+data = data[perm]
+data_target = data_target[perm]
+data_sh = theano.shared(np.asarray(data, dtype=theano.config.floatX), borrow=True)
 
-f = theano.function([], [pre_val2, val2], givens=[(rbm.input, x_sh)])
+#rbm_rs = RBMStack(num_vis = num_vis, hid_layers_size = [1000,500], repl_softmax = True)
+
+train_params = {'batch_size' : 100, 'learning_rate' : 0.1, 'cd_steps' : 2, 'max_epoch' : 20, 'persistent' : True }

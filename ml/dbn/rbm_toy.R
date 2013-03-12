@@ -7,11 +7,9 @@ source('makebatches.R')
 source('dbn_util.R')
 
 set.seed(2)
-num.vis <- 50
+num.vis <- 10
 num.hid <- 10
 num.dims <- num.vis
-
-
 
 train.params = list(e.w = 0.1, e.v = 0.1, e.h = 0.1, w_cost = 0.0002, 
                     init.moment = 0.5, fin.moment = 0.9, 
@@ -26,8 +24,8 @@ batch.size <- 10
 data.all <- NULL
 for(c in 1:num.cases) {
     m <- matrix(0, ncol = num.dims)
-    rb <- rbinom(50,50,0.9)
-    rb2 <- rbinom(50,50,0.1)
+    rb <- rbinom(10,10,0.9)
+    rb2 <- rbinom(10,10,0.1)
     for(i in 1:length(rb)) {
         m[rb[i]] = m[rb[i]]+1
         m[rb2[i]] = m[rb2[i]]+1          
@@ -45,11 +43,10 @@ train.params = list(e.w = 0.01, e.v = 0.001, e.h = 0.001, w_cost = 0.0002,
                     epochs = 100, cd.iter = 1, persistent = TRUE)  
 
 model <- train_rbm(data.b, train.params, num.hid)
-batched.hid_probs <- collect_hidden_statistics(model, data.b)
+test <- matrix(0, ncol = num.vis, nrow=100)
+hid_probs <- prop_up(test, model)
 
-vis_data <- unbatch_data(data.b) # data.all not ok< cuz make batches mixing data
-hid_probs <- unbatch_data(batched.hid_probs)
-plot(energy_all(vis_data,hid_probs,model), type = 'l')
+plot(energy_all(test,hid_probs,model), type = 'l')
 
 #model <- list(W = array(0.1*rnorm(num.vis*num.hid,mean=0.5,sd=0.3),dim=c(num.vis,num.hid)), # visible units for row, hidden units for col
 #              vis_bias = array(0,dim = c(1,num.vis)), 
