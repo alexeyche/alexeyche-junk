@@ -52,6 +52,7 @@ bias_cond <- function(u,model) {
 
 
 
+
 num_vis <- 10
 num_hid <- 12 
 
@@ -65,20 +66,18 @@ for(j in 1:(num_cases/10)) {
   }
   data_all <- rbind(data_all, data)
 }
-n_delay <- 4
-#c(data_b, data_b_t) := makebatches(data = data_all, target.data = data_all, batch.size = 10, normalize=FALSE, permutate=FALSE)
-#num_batches <- dim(data_b)[3]
-batch_start <- sample(seq(from=1,to=num_cases,by=n_delay))
+
+
 # init model
 
 train.params = list(e.w = 0.1, e.v = 0.001, e.h = 0.001, w_cost = 0.0002, 
                     init.moment = 0.5, fin.moment = 0.9, 
-                    epochs = 10000, cd.iter = 10, persistent = TRUE)  
+                    epochs = 10, cd.iter = 10, persistent = TRUE)  
 
 # Energy:
 # E(v,h) = -b_v*v' -b_h*h' - v*W*h'
 
-
+n_delay <- 3
 model <- list(W = array(0.01*rnorm(num_vis*num_hid),dim=c(num_vis,num_hid)), # visible units for row, hidden units for col
               W_uv = array(0.01*rnorm(num_vis*num_vis*n_delay),dim=c(num_vis,num_vis,n_delay)),
               W_uh = array(0.01*rnorm(num_vis*n_delay*num_hid),dim=c(num_vis,num_hid,n_delay)),
@@ -86,44 +85,96 @@ model <- list(W = array(0.01*rnorm(num_vis*num_hid),dim=c(num_vis,num_hid)), # v
               hid_bias = array(0,dim = c(1,num_hid)),
               num_cases = num_cases)
 
-train.params = list(e.w = 0.1, e.v = 0.1, e.h = 0.1, w_cost = 0.0002, 
+train.params = list(e.w = 0.1, e.v = 0.1, e.h = 0.1, w_decay = 0.0002, e.w_uv = 0.1, e.w_uh = 0.1,
                     init.moment = 0.5, fin.moment = 0.9, 
-                    epochs = 50, cd.iter = 1)
+                    epochs = 500, cd.iter = 1)
 for (v in 1:length(train.params)) assign(names(train.params)[v], train.params[[v]])
 
+batch_start <- sample((n_delay+1):num_cases)
+batch_size <- 100
+num_batches <- nrow(data_all)/batch_size
 
-W.inc <- hid_bias.inc <- vis_bias.inc <- 0
+W_inc <- hid_bias_inc <- vis_bias_inc <- 0
+W_uv_inc <- array(0,dim=c(num_vis,num_vis,n_delay))
+W_uh_inc <- array(0,dim=c(num_vis,num_hid,n_delay))
 
-b <- 1
+num_cases <- batch_size
 
-
-#for(i in 1:nrow(data)) {
-  
-  b_s <- batch_start[b]
-  data <- data_all[b_s:(b_s+n_delay),]
-  u <- data[1:n_delay,]
-  v <- matrix(data[n_delay+1,], nrow =1)
-  
-#  hid_probs <- prop_up(v,u,model)
-#  c(vis_sample.fantasy, vis_probs.fantasy, hid_probs.fantasy) := contrastive_divergence(hid_probs,u,model,5)
-#  cost <- cross_entropy_cost(v,vis_probs.fantasy)
-#  
-#  c(b_v, b_h) := bias_cond(u, model)
-#  
-#  momentum <- 0.8
-#  W.inc <- momentum*W.inc + e.w*( ( t(v) %*% hid_probs - t(vis_sample.fantasy) %*% hid_probs.fantasy)/num_cases - w_cost*model$W)
-#  # d_log_p(v) / d_hid_bias_j
-#  hid_bias.inc <- momentum*hid_bias.inc + e.h*(sum.row(hid_probs) - sum.row(hid_probs.fantasy))/num_cases
-#  # d_log_p(v) / d_vis_bias_i
-#  vis_bias.inc <- momentum*vis_bias.inc + e.v*(sum.row(v) - sum.row(vis_sample.fantasy) - b_v)/num_cases
-#  
-#  
-#  model$W <- model$W + W.inc
-#  model$hid_bias <- model$hid_bias + hid_bias.inc
-#  model$vis_bias <- model$vis_bias + vis_bias.inc        
-#  uv_grad <- matrix(0, nrow=1, ncol=n_delay) 
-#  for(t in 1:n_delay) {
-#    uv_grad[,t] <- v - model$vis_vias - b_v
-#  }
-#}
+for(epoch in 1:epochs) {
+    for(b in 1:num_batches) {
+        if (((b-1)*batch_size+batch_size) > length(batch_start)) {
+            break
+        } else {
+            b_s <- batch_start[((b-1)*batch_size+1):((b-1)*batch_size+batch_size)]
+        }
+        num_cases <- length(b_s)
+        data <- array(dim=c(num_cases, num_vis,n_delay+1))
+        data[,,1] <- data_all[b_s,]
+        for(t in 1:n_delay) {
+            data[,,t+1] <- data_all[b_s-t,]
+        }
+        
+        # calc bias conditional contributions
+        bistar <- array(0, dim=c(num_cases,num_vis))   
+        bjstar <- array(0, dim=c(num_cases,num_hid))     
+        for (t in 1:n_delay) {
+            bistar = bistar + data[,,t+1] %*% model$W_uv[,,t]
+            bjstar = bjstar + data[,,t+1] %*% model$W_uh[,,t]
+        }
+        # prop up   
+        v <- data[,,1]
+        hid_probs <- sigmoid( v %*% model$W + rep.row(model$hid_bias, nrow(v)) + bjstar)  
+        hid_state <- sample_bernoulli(hid_probs)
+        
+        # calc positive grads
+        pos_W_grad <- t(v) %*% hid_state
+        pos_vis_bias_grad <- sum.row(v-rep.row(model$vis_bias,num_cases)-bistar)
+        pos_hid_bias_grad <- sum.row(hid_state)
+        pos_W_uv_grad <- array(0, dim=c(num_vis,num_vis,n_delay))
+        pos_W_uh_grad <- array(0, dim=c(num_vis,num_hid,n_delay))
+        for (t in 1:n_delay) {
+            pos_W_uv_grad[,,t] <- t(data[,,1] - rep.row(model$vis_bias, num_cases) - bistar) %*% data[,,t+1]
+            pos_W_uh_grad[,,t] <- t(hid_state) %*% data[,,t+1]
+        }
+        # prop down
+        h <- hid_state
+        vis_probs <- sigmoid( h %*% t(model$W) + rep.row(model$vis_bias, nrow(h)) + bistar)  
+        # and up again
+        hid_probs <- sigmoid( vis_probs %*% model$W + rep.row(model$hid_bias, nrow(vis_probs)) + bjstar)  
+        
+        # calc negative grads
+        neg_W_grad <- t(vis_probs) %*% hid_probs
+        neg_vis_bias_grad <- sum.row(vis_probs-rep.row(model$vis_bias, num_cases)-bistar)
+        neg_hid_bias_grad <- sum.row(hid_probs)
+        neg_W_uv_grad <- array(0, dim=c(num_vis,num_vis,n_delay))
+        neg_W_uh_grad <- array(0, dim=c(num_vis,num_hid,n_delay))
+        for (t in 1:n_delay) {
+            neg_W_uv_grad[,,t] <- t(vis_probs - rep.row(model$vis_bias, num_cases) - bistar) %*% data[,,t+1]
+            neg_W_uh_grad[,,t] <- t(hid_probs) %*% data[,,t+1] 
+        }
+        # calc recontruction error
+        cost <- sum((v -vis_probs)^2)
+        cat("Epoch #",epoch, ", cost: ", cost,"\n")
+        # momentum
+        momentum <- 0.9
+        if(epoch<=5) {
+            momentum <- 0
+        }
+        # calc increments
+        W_inc <- momentum * W_inc + e.w * ((pos_W_grad - neg_W_grad)/num_cases - w_decay*model$W)
+        vis_bias_inc <- momentum * vis_bias_inc + e.h * ((pos_vis_bias_grad - neg_vis_bias_grad)/num_cases)    
+        hid_bias_inc <- momentum * hid_bias_inc + e.h * ((pos_hid_bias_grad - neg_hid_bias_grad)/num_cases)
+        for(t in 1:n_delay) {
+            W_uv_inc[,,t] <- momentum * W_uv_inc[,,t] + e.w_uv * ((pos_W_uv_grad[,,t]-neg_W_uv_grad[,,t])/num_cases - w_decay*model$W_uv[,,t])
+            W_uh_inc[,,t] <- momentum * W_uh_inc[,,t] + e.w_uh * ((pos_W_uh_grad[,,t]-neg_W_uh_grad[,,t])/num_cases - w_decay*model$W_uh[,,t])
+        }
+        model$W <- model$W + W_inc
+        model$vis_bias <- model$vis_bias + vis_bias_inc
+        model$hid_bias <- model$hid_bias + hid_bias_inc
+        for(t in 1:n_delay){
+            model$W_uv[,,t] <- model$W_uv[,,t] + W_uv_inc[,,t]
+            model$W_uh[,,t] <- model$W_uh[,,t] + W_uh_inc[,,t]
+        }
+    }
+}
 
