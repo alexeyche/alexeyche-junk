@@ -24,13 +24,15 @@ prediction <- function(data, model, m = 50) {
         for(it in 1:100) {
             hid_probs <- sigmoid( v %*% model$W + rep.row(model$hid_bias, nrow(v))+bjstar)  
             hid_states <- sample_bernoulli(hid_probs)
-            vis_probs <- sigmoid( hid_states %*% t(model$W) + rep.row(model$vis_bias, nrow(hid_probs))+bistar)  
+            vis_probs <- softmax( hid_states %*% t(model$W) + rep.row(model$vis_bias, nrow(hid_probs))+bistar)  
             v <- vis_probs            
         }
-        for(del in model$n_delay:2) {
-            d[,,del+1] <- d[,,del]           
+        if(model$n_delay>1) {
+            for(del in model$n_delay:2) {
+                d[,,del+1] <- d[,,del]           
+            }
         }
-        d[,,2] <- sample_bernoulli(v)
+        d[,,2] <- round(v)
         printf("%d ",d[,,2])
         cat("\n")
     }
@@ -38,26 +40,22 @@ prediction <- function(data, model, m = 50) {
 
 gen_data <- function(n, model) {
     data_all <- NULL
-    for(j in 1:(n/6)) { 
-      data <- matrix(0, nrow = 6, ncol=model$num_vis)  
-      for(i in 1:(model$num_vis-4)) {
+    for(j in 1:(n/10)) { 
+      data <- matrix(0, nrow = 10, ncol=model$num_vis)  
+      for(i in 1:10) {
         data[i,i] <- 1  
-        data[i,(i+2)] <- 1  
-        data[i,(i+4)] <- 1  
       }
       data_all <- rbind(data_all, data)
     }
-    x <- 6
-    tt <- (model$n_delay - model$n_delay %% 6)/6 
+    x <- 10
+    tt <- (model$n_delay - model$n_delay %% 10)/10 
     for(t in 1:(tt+1)) {
-        if(t == (tt+1)) {
-            x <- model$n_delay %% 6
+        if(t == (tt+1) & ((model$n_delay %% 10) > 0)) {
+            x <- model$n_delay %% 10
         }        
         data <- matrix(0, nrow = x, ncol=model$num_vis)  
         for(i in 1:x) {
             data[i,i] <- 1  
-            data[i,(i+2)] <- 1  
-            data[i,(i+4)] <- 1  
         }
         data_all <- rbind(data_all, data)
     }
@@ -69,15 +67,19 @@ sigmoid <- function(x) {
     1/(1+exp(-x))
 }
 
+softmax <- function(m) {
+    exp(m)/rowSums(exp(m))
+}
+
 prop_up <- function(v, bjstar, model) {
     sigmoid( v %*% model$W + rep.row(model$hid_bias, nrow(v)) + bjstar )
 }
 
 prop_down <- function(h, bistar, model) {
-    sigmoid( h %*% t(model$W) + rep.row(model$vis_bias, nrow(h)) + bistar )
+    softmax( h %*% t(model$W) + rep.row(model$vis_bias, nrow(h)) + bistar )
 }
 
-n_delay <- 10
+n_delay <- 1
 num_vis <- 10
 num_hid <- 15
 num_cases <- 1200
