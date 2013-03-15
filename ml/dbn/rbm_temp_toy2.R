@@ -77,7 +77,7 @@ prop_down <- function(h, bistar, model) {
     sigmoid( h %*% t(model$W) + rep.row(model$vis_bias, nrow(h)) + bistar )
 }
 
-n_delay <- 10
+n_delay <- 3
 num_vis <- 10
 num_hid <- 15
 num_cases <- 1200
