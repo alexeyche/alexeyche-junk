@@ -136,7 +136,7 @@ for(epoch in 1:epochs) {
         hid_probs <- prop_up(v, bjstar, model)
         hid_states <- sample_bernoulli(hid_probs)
         
-        pos_W_grad <- t(v) %*% hid_probs
+        pos_W_grad <- t(v) %*% hid_states
         pos_vb_grad <- sum.row(v - rep.row(model$vis_bias, batch_size) - bistar)
         pos_hb_grad <- sum.row(hid_states)
         for(t in 1:model$n_delay) {
