@@ -43,7 +43,9 @@ class CRBM(object):
         self.hbias_inc = theano.shared(value=np.zeros(self.num_hid, dtype=theano.config.floatX), name='vbias_inc', borrow=True)
         self.W_uv_inc = theano.shared(value=np.zeros((self.n_delay, self.num_vis,self.num_vis), dtype=theano.config.floatX), name='W_uh_inc', borrow=True)
         self.W_uh_inc = theano.shared(value=np.zeros((self.n_delay, self.num_vis,self.num_hid), dtype=theano.config.floatX), name='W_uv_inc', borrow=True)
-
+        
+        self.epoch_ratio = theano.shared(np.zeros((1), dtype=theano.config.floatX), borrow=True)
+        
     def save_model(self):
         fileName = "crbm_%s_%s_%s.model" % (self.num_vis, self.num_hid, self.n_delay)
         fileName = os.path.join(CACHE_PATH, fileName)
@@ -126,7 +128,7 @@ class CRBM(object):
     def get_reconstruction_cost(self, updates, vis_probs):
         return T.sum(T.sum(T.sqr(self.input - vis_probs), axis=1))
             
-    def get_cost_updates(self, train_params, index):
+    def get_cost_updates(self, train_params):
         l_rate = T.cast(train_params['learning_rate'], dtype=theano.config.floatX)
         weight_decay = T.cast(train_params['weight_decay'], dtype=theano.config.floatX)
         momentum = T.cast(train_params['momentum'], dtype=theano.config.floatX)
@@ -134,7 +136,7 @@ class CRBM(object):
         moment_start = train_params['moment_start']
         batch_size = T.cast(train_params['batch_size'], dtype=theano.config.floatX)
         cd_steps =  train_params['cd_steps']
-
+        
         # compute positive phase
         pre_sigmoid_ph, ph_mean, ph_sample = self.sample_h_given_v(self.input)
 
@@ -146,13 +148,12 @@ class CRBM(object):
                     outputs_info=[None,  None,  None, None, None, hid_states],
                     n_steps=cd_steps)
 
-        vis_probs_fant = nv_samples[-1]
-        hid_probs_fant = nh_samples[-1]
+        vis_probs_fant = nv_means[-1]
+        hid_probs_fant = nh_means[-1]
 
         # updates
-        cur_momentum = momentum
-        if T.lt(index, 5):
-            cur_momentum = init_momentum
+        cur_momentum = T.switch(T.lt(self.epoch_ratio[0], moment_start), init_momentum, momentum)
+        
         W_inc = cur_momentum * self.W_inc + l_rate*((T.dot(self.input.T, hid_states) - T.dot(vis_probs_fant.T, hid_probs_fant))/batch_size - self.W * weight_decay)
         vbias_inc = cur_momentum * self.vbias_inc + l_rate*((T.sum( self.input - self.vbias - self.vbias_c ,axis=0) -
                                                                   T.sum( vis_probs_fant - self.vbias - self.vbias_c, axis=0))/batch_size)
@@ -188,11 +189,20 @@ class CRBM(object):
         energy_cost = current_free_energy - T.mean(self.free_energy(vis_probs_fant))
 
         recon_cost = self.get_reconstruction_cost(updates, vis_probs_fant)
-
+        
         return recon_cost, current_free_energy, energy_cost, updates
                
 
-def daydream(crbm, history, sample_n = 100, gibbs_steps = 30):
+class CRBMSoftmax(CRBM):
+    def prop_down(self, hid):
+        pre_softmax_activation = T.dot(hid, self.W.T) + self.vbias + self.vbias_c
+        return [pre_softmax_activation, T.nnet.softmax(pre_softmax_activation)]
+
+
+def generate(crbm, history, sample_n = 100, gibbs_steps = 30):
+    samples = list()
+    samples_prob = list()
+
     numpy_rng = np.random.RandomState(1)
     vis = theano.shared(np.asarray(np.abs(0.01 * numpy_rng.randn(1, crbm.num_vis)), dtype=theano.config.floatX))
     history_sh = theano.shared(np.asarray(history, dtype=theano.config.floatX))
@@ -201,14 +211,12 @@ def daydream(crbm, history, sample_n = 100, gibbs_steps = 30):
                                 outputs_info = [None,None,None,None,None,vis], 
                                 n_steps=gibbs_steps)
 
-#    v = v1_sample[-1]
-#    h = history_sh[:-1,:,:]
-#    c = T.concatenate( (v,h), axis=0)
-#    test_f = theano.function([], [v, h, c], updates = updates, givens = [(crbm.input, vis),(crbm.history, history_sh)])            
-#    return test_f()
     updates.update( [( vis , v1_sample[-1]) , (history_sh, T.concatenate( (v1_sample[-1].dimshuffle('x',0,1), history_sh[:-1,:,:]))) ] )
     dream = theano.function([], [v1_mean[-1], v1_sample[-1]], updates = updates, givens = [(crbm.input, vis),(crbm.history, history_sh)])            
 
     for s in xrange(0, sample_n):
         vis, vis_s = dream()
-        print vis_s
+        samples.append(vis_s[0])
+        samples_prob.append(vis[0])
+    return samples, samples_prob
+

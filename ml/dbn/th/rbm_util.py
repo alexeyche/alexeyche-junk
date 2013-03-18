@@ -15,7 +15,7 @@ def gray_plot(data, min=0, max=1):
     gg = ggplot2.ggplot(reshape.melt(data,id_var=['x','y']))
     pg = gg + ggplot2.aes_string(x='L1',y='L2')+ \
          ggplot2.geom_tile(ggplot2.aes_string(fill='value'))+ \
-         ggplot2.scale_fill_gradient(low="black", high="white",limits=IntVector((min,max)))+ \
+         ggplot2.scale_fill_gradient(low="black", high="white",limits=FloatVector((min,max)))+ \
          ggplot2.coord_equal()
     pg.plot() 
 

@@ -30,7 +30,7 @@ my $lines_num = 0;
 my @pattern; 
 my $curr_serp;
 my %serp;
-my $switch_detected=1;
+my $switch_detected=0;
 while(<TRAIN>) {
     chomp($_);
     my $line = $_;
@@ -51,6 +51,7 @@ while(<TRAIN>) {
             if ($switch_detected) {  
                 print join(',', @pattern) . "\n";
             }    
+            $switch_detected=0;
             undef(@pattern);
             foreach my $k (keys %serp) {
                 undef($serp{$k});
