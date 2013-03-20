@@ -2,6 +2,7 @@
 
 source('sys.R')
 source('rbm.R')
+require(R.utils)
 
 prediction <- function(data, model, m = 50) {    
     start <- (model$n_delay+1)
@@ -63,6 +64,85 @@ gen_data <- function(n, model) {
     return(data_all)
 }
 
+get_contributions <- function(data,model) {
+    # calc bias conditional contributions
+    batch_size  <- dim(data)[1]
+    bistar <- array(0, dim=c(batch_size, model$num_vis))
+    bjstar <- array(0, dim=c(batch_size, model$num_hid))
+    for (t in 1:model$n_delay) {
+        bistar = bistar + data[,,t+1] %*% model$W_uv[,,t]
+        bjstar = bjstar + data[,,t+1] %*% model$W_uh[,,t]
+    }
+    return(list(bistar, bjstar))
+}
+
+get_contributions_vec <- function(data,model) {
+    # calc bias conditional contributions    
+    bistar <- array(0, dim=c(1, model$num_vis))
+    bjstar <- array(0, dim=c(1, model$num_hid))
+    for (t in 1:model$n_delay) {
+        bistar = bistar + data[,t+1] %*% model$W_uv[,,t]
+        bjstar = bjstar + data[,t+1] %*% model$W_uh[,,t]
+    }
+    return(list(bistar, bjstar))
+}
+
+energy_vector <- function(v,h,model) {
+    - v %*% t(model$vis_bias) - h %*% t(model$hid_bias) - v %*% model$W %*% t(h) 
+}
+
+energy_all <- function(v,h,model) {
+    E <- NULL
+    for(case in 1:nrow(v)) {        
+        E <- rbind(E, energy_vector(t(v[case,]), t(h[case,]),model))
+    }
+    return(E)
+}
+
+
+
+free_energy <- function(data,model) {    
+    v <- data[,,1]
+    m <- nrow(v)
+    bistar <- array(0, dim=c(m,model$num_vis))   
+    bjstar <- array(0, dim=c(m,model$num_hid))     
+    for (t in 1:model$n_delay) {            
+        bistar = bistar + data[,,t+1] %*% model$W_uv[,,t]
+        bjstar = bjstar + data[,,t+1] %*% model$W_uh[,,t]
+    }     
+    - (v+bistar) %*% t(model$vis_bias) - sum.col(log(1+exp(v %*% model$W + rep.row(model$hid_bias,m) + bjstar )) )
+}
+
+
+
+
+partition_function <- function(model) {
+    v_data <- array(dim=c(model$num_vis, model$num_vis,model$n_delay+1))
+    for(t in 0:model$n_delay) {
+        data <- array(0,dim=c(model$num_vis, model$num_vis))
+        for(i in 1:model$num_vis) {        
+            j <- i+t
+            if(j>model$num_vis) {
+                j <- j - model$num_vis 
+            }
+            data[i,j] <- 1    
+        }
+        v_data[,,t+1] <- data
+    }
+    sum(free_energy(v_data, model))
+}
+
+likelyhood <- function(model) {
+    batch_size <- 100
+    data <- array(dim=c(batch_size, model$num_vis,model$n_delay+1))
+    b_s <- seq(model$n_delay+1, model$n_delay+100)
+    data[,,1] <- data_all[b_s,]
+    for(t in 1:model$n_delay) {
+        data[,,t+1] <- data_all[b_s-t,]
+    }    
+    free_energy(data,model)/partition_function(model)
+}
+
 sigmoid <- function(x) {
     1/(1+exp(-x))
 }
@@ -79,7 +159,7 @@ prop_down <- function(h, bistar, model) {
     softmax( h %*% t(model$W) + rep.row(model$vis_bias, nrow(h)) + bistar )
 }
 
-n_delay <- 1
+n_delay <- 5
 num_vis <- 10
 num_hid <- 15
 num_cases <- 1200
@@ -127,12 +207,7 @@ for(epoch in 1:epochs) {
         }
         
         # calc bias conditional contributions
-        bistar <- array(0, dim=c(batch_size, model$num_vis))
-        bjstar <- array(0, dim=c(batch_size, model$num_hid))
-        for (t in 1:model$n_delay) {
-            bistar = bistar + data[,,t+1] %*% model$W_uv[,,t]
-            bjstar = bjstar + data[,,t+1] %*% model$W_uh[,,t]
-        }
+        bistar, bjstar := get_contributions(data,model)
         
         v <- data[,,1]
         hid_probs <- prop_up(v, bjstar, model)

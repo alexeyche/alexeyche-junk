@@ -4,7 +4,7 @@ symb = ["Q", "Qbad1", "Qbad2", "Qbad3", "C0", "C1", "Cb0", "Cb1", "S"]
 
 train_file = "/home/alexeyche/my/prog/ya_sw_det/patterns_switch"
 
-rec = len(symb) * ["0"]
+rec = (len(symb)+1) * ["0"]
 
 for line in open(train_file,"r"):
     line = line.rstrip()
@@ -19,5 +19,8 @@ for line in open(train_file,"r"):
             print "%s not found" % sym
             quit(1)
     r = list(rec)
+    r[-1] = "1"
     print ",".join(r)
+#    r = list(rec)
+#    print ",".join(r)
 
