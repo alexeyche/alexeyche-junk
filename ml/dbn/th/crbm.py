@@ -197,6 +197,11 @@ class CRBMSoftmax(CRBM):
     def prop_down(self, hid):
         pre_softmax_activation = T.dot(hid, self.W.T) + self.vbias + self.vbias_c
         return [pre_softmax_activation, T.nnet.softmax(pre_softmax_activation)]
+    
+    def sample_v_given_h(self, h_sample):
+        pre_sigmoid_v, v_mean = self.prop_down(h_sample)
+        v_sample = T.round(v_mean)
+        return [pre_sigmoid_v, v_mean, v_sample]
 
 
 def generate(crbm, history, sample_n = 100, gibbs_steps = 30):
@@ -226,8 +231,8 @@ def generate_case(crbm, gibbs_steps = 30):
 
     numpy_rng = np.random.RandomState(1)
     vis = theano.shared(np.asarray(np.abs(0.01 * numpy_rng.randn(1, crbm.num_vis)), dtype=theano.config.floatX))
-    history = np.zeros(crbm.n_delay, 1, crbm.num_vis)
-    history_sh = theano.shared(np.asarray(history, dtype=theano.config.floatX))
+    history = np.zeros((crbm.n_delay, 1, crbm.num_vis), dtype=theano.config.floatX)
+    history_sh = theano.shared(history)
     [pre_sigmoid_h1, h1_mean, h1_sample,
                 pre_sigmoid_v1, v1_mean, v1_sample], updates = theano.scan(crbm.gibbs_vhv, 
                                 outputs_info = [None,None,None,None,None,vis], 
@@ -236,13 +241,15 @@ def generate_case(crbm, gibbs_steps = 30):
     updates.update( [( vis , v1_sample[-1]) , (history_sh, T.concatenate( (v1_sample[-1].dimshuffle('x',0,1), history_sh[:-1,:,:]))) ] )
     dream = theano.function([], [v1_mean[-1], v1_sample[-1]], updates = updates, givens = [(crbm.input, vis),(crbm.history, history_sh)])            
     
-    stop_case = np.zeros((1,ncol), dtype=theano.config.floatX)
-    stop_case[0,ncol-1] = 1
+    stop_case = np.zeros((crbm.num_vis), dtype=theano.config.floatX)
+    stop_case[crbm.num_vis-1] = 1
 
     for s in xrange(0, 100):
         vis, vis_s = dream()
         samples.append(vis_s[0])
         samples_prob.append(vis[0])
-        if vis_s == stop 
+        print vis_s[0]
+        if not (vis_s[0]-stop_case).any():
+            break
     return samples, samples_prob
 

@@ -8,7 +8,7 @@ from numpy import genfromtxt
 
 from rbm_util import gray_plot
 from crbm import CRBMSoftmax
-from crbm import generate
+from crbm import generate_case
 
 from rpy2.robjects.packages import importr
 
@@ -25,7 +25,7 @@ num_cases_fake = 1000000
 
 data_sh = theano.shared(np.asarray(data, dtype=theano.config.floatX), borrow=True) 
 
-n_delay = 10 
+n_delay = 2
 num_hid = 100
 crbm = CRBMSoftmax(num_vis = num_dims, num_hid = num_hid, n_delay = n_delay)
 
@@ -62,11 +62,11 @@ get_hist = theano.function([index], history)
 
 
 
-max_epoch = 100
+max_epoch = 5
 num_batches = len(batches)/batch_size
 ep_inc = np.float32(1.0/(num_batches*max_epoch))
 
-train_params = {'learning_rate' : 0.01, 'cd_steps' : 5, 'n_delay' : n_delay , 'batch_size' : batch_size, 'weight_decay' : 0.0002, 
+train_params = {'learning_rate' : 0.1, 'cd_steps' : 3, 'n_delay' : n_delay , 'batch_size' : batch_size, 'weight_decay' : 0.0002, 
                 'momentum' : 0.9, 'init_momentum' : 0, 'moment_start' : 0.01 } 
 
 
@@ -81,5 +81,10 @@ if crbm.need_train:
             print "Epoch(%d),Batch(%d) Rec.cost: %.4f Free energy: %.4f Energy cost: %.4f" % (epoch, b, rcost, fe, en_cost)
     crbm.save_model()            
 
+#preh, h  = crbm.prop_up(crbm.input)
 
+#pre_sigm, v_mean, v_act = crbm.sample_v_given_h(h)
+#f = theano.function([index],[v_mean, v_act], givens = [(crbm.input, data_sh[index]), (crbm.history, history)] )
+
+s = generate_case(crbm)
 
