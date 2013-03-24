@@ -351,6 +351,7 @@ class RBMReplSoftmax(RBM):
                       axis=1))
         return cross_entropy
 
+
 def train_rbm(rbm, data_sh, train_params, saveFile = True, findFile = True):
     num_hid = rbm.num_hid
     if findFile or saveFile:

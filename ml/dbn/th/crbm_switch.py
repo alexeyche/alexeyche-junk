@@ -8,7 +8,7 @@ from numpy import genfromtxt
 
 from rbm_util import gray_plot
 from crbm import CRBMSoftmax
-from crbm import generate_case
+from crbm import generate_case, get_error
 
 from rpy2.robjects.packages import importr
 
@@ -25,7 +25,7 @@ num_cases_fake = 1000000
 
 data_sh = theano.shared(np.asarray(data, dtype=theano.config.floatX), borrow=True) 
 
-n_delay = 2
+n_delay = 5
 num_hid = 100
 crbm = CRBMSoftmax(num_vis = num_dims, num_hid = num_hid, n_delay = n_delay)
 
@@ -86,5 +86,10 @@ if crbm.need_train:
 #pre_sigm, v_mean, v_act = crbm.sample_v_given_h(h)
 #f = theano.function([index],[v_mean, v_act], givens = [(crbm.input, data_sh[index]), (crbm.history, history)] )
 
-s = generate_case(crbm)
+err = get_error(crbm, data[:1000])
+
+
+
+
+
 

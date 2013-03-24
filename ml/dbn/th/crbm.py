@@ -253,3 +253,46 @@ def generate_case(crbm, gibbs_steps = 30):
             break
     return samples, samples_prob
 
+
+def get_error(crbm, data, last_case = 2, it = 10, gibbs_steps = 30):
+    num_cases = 100
+    
+    stop_case = np.zeros((crbm.num_vis), dtype=theano.config.floatX)
+    stop_case[crbm.num_vis-1] = 1
+   
+    history = np.zeros((crbm.n_delay, num_cases, crbm.num_vis), dtype=theano.config.floatX)
+    targets = np.zeros((last_case, num_cases, crbm.num_vis))
+    hist = []
+    i = 0
+    j = 0
+    for case in data:
+        j+=1
+        if (case - stop_case).any() == 0:
+            hist_arr = np.asarray(hist)
+            history[:,i,:] = hist_arr[-last_case-crbm.n_delay:-last_case]
+            targets[:,i,:] = hist_arr[-last_case:]
+            i+=1
+            del hist[:]
+            if i == num_cases:
+                break
+        else:
+            hist.append(case)
+    
+    numpy_rng = np.random.RandomState(1)
+    vis = theano.shared(np.asarray(np.abs(0.01 * numpy_rng.randn(num_cases, crbm.num_vis)), dtype=theano.config.floatX))
+    history_sh = theano.shared(history)
+    [pre_sigmoid_h1, h1_mean, h1_sample,
+                pre_sigmoid_v1, v1_mean, v1_sample], updates = theano.scan(crbm.gibbs_vhv, 
+                                outputs_info = [None,None,None,None,None,vis], 
+                                n_steps=gibbs_steps)
+    dream = theano.function([], [v1_mean[-1], v1_sample[-1]], updates = updates, givens = [(crbm.input, vis),(crbm.history, history_sh)])            
+    
+    iter_err = np.zeros((it, num_cases, 1))
+    for i in xrange(0,it):
+        v_mean, v_sample = dream() 
+        iter_err[i,:,0] = np.sum(np.abs(targets[0,:,:] - v_sample), axis = 1)
+        
+    err_iter_mean = iter_err.mean(axis=0)
+    err_sum = err_iter_mean.sum(axis=0)
+    return err_sum
+

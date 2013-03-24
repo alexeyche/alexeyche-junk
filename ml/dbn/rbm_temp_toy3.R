@@ -117,7 +117,7 @@ free_energy <- function(data,model) {
 
 
 partition_function <- function(model) {
-    v_data <- array(dim=c(model$num_vis, model$num_vis,model$n_delay+1))
+    v_data <- array(dim=c(model$num_vis, modebl$num_vis,model$n_delay+1))
     for(t in 0:model$n_delay) {
         data <- array(0,dim=c(model$num_vis, model$num_vis))
         for(i in 1:model$num_vis) {        
