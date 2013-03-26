@@ -20,6 +20,7 @@ class RBM(object):
         self.input = input
         if input is None:
             self.input = T.matrix('input')
+        
 
         self.params = [self.W, self.hbias, self.vbias]
         _, self.output = self.prop_up(self.input)

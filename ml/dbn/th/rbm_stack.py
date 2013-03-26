@@ -8,10 +8,12 @@ import os
 from theano.tensor.shared_randomstreams import RandomStreams
 import cPickle
 from rbm import RBM, RBMReplSoftmax
+from rbm_mult_softmax import RBMMultSoftmax
 from rbm_util import gen_name
 
+
 class RBMStack():
-    def __init__(self, num_vis, hid_layers_size, repl_softmax = False):
+    def __init__(self, num_vis = None, hid_layers_size = [], bottomRBMtype = None, add_opts = {}):
         self.input = T.matrix('input') 
         self.params = []
         self.num_layers = len(hid_layers_size)
@@ -27,8 +29,12 @@ class RBMStack():
                 input_cur = self.stack[-1].output
                 num_vis_cur = self.stack[-1].num_hid
             
-            if repl_softmax and l == 0:  # replicated softmax layer only for first one
-                rbm = RBMReplSoftmax(input = input_cur, num_vis = num_vis_cur, num_hid = num_hid_cur)
+            if bottomRBMtype and l == 0:  # replicated softmax layer only for first one
+                if bottomRBMtype == RBMReplSoftmax:
+                    rbm = RBMReplSoftmax(input = input_cur, num_vis = num_vis_cur, num_hid = num_hid_cur)
+                if bottomRBMtype == RBMMultSoftmax:
+                    rbm = RBMMultSoftmax(input = input_cur, num_hid = num_hid_cur, unit_size = add_opts['unit_size'], num_units = add_opts['num_units'])
+                    self.num_vis = add_opts['unit_size']*add_opts['num_units']
             else:    
                 rbm = RBM(input = input_cur, num_vis = num_vis_cur, num_hid = num_hid_cur)
              
@@ -36,6 +42,7 @@ class RBMStack():
 
     def __getitem__(self, index):
         return self.stack[index]
+
     def append(self,rbm):
         self.stack.append(rbm)
         self.num_layers = len(self.stack)
@@ -50,6 +57,8 @@ class RBMStack():
         index = T.lscalar('index')  # index to a minibatch
         for l in xrange(0, self.num_layers):
             rbm = self.stack[l]
+            if rbm.need_train == False:
+                continue
             if persistent:
                 persistent_chain = theano.shared(np.zeros((batch_size, rbm.num_hid), dtype=theano.config.floatX), borrow=True)
             else:
