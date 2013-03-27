@@ -8,8 +8,10 @@ import os
 from theano.tensor.shared_randomstreams import RandomStreams
 import cPickle
 
+CACHE_PATH="/mnt/yandex.disk/models"
+
 class RBM(object):
-    def __init__(self, input=None, num_vis = 50, num_hid = 10):
+    def __init__(self, input=None, num_vis = 50, num_hid = 10, from_cache = True):
         self.numpy_rng = np.random.RandomState(1)
         self.theano_rng = RandomStreams(self.numpy_rng.randint(2 ** 30))
         self.num_vis = num_vis 
@@ -22,9 +24,36 @@ class RBM(object):
             self.input = T.matrix('input')
         
 
+        self.epoch_ratio = theano.shared(np.zeros((1), dtype=theano.config.floatX), borrow=True)
+        self.need_train=True
+        if from_cache:
+            self.restore_from_cache()
+
         self.params = [self.W, self.hbias, self.vbias]
         _, self.output = self.prop_up(self.input)
-    
+
+    def save_model(self, path = CACHE_PATH):
+        fileName = "rbm_%s_%s.model" % (self.num_vis, self.num_hid)
+        fileName = os.path.join(path, fileName)
+        save_file = open(fileName, 'wb')  # this will overwrite current contents
+        cPickle.dump(self.W.get_value(borrow=True), save_file, -1)  
+        cPickle.dump(self.vbias.get_value(borrow=True), save_file, -1)
+        cPickle.dump(self.hbias.get_value(borrow=True), save_file, -1)
+        save_file.close()
+
+    def restore_from_cache(self, path=CACHE_PATH):
+        fileName = "rbm_%s_%s.model" % (self.num_vis, self.num_hid)
+        fileName = os.path.join(path, fileName)
+        if os.path.isfile(fileName):
+            fileName_p = open(fileName, 'r')
+            self.W.set_value(cPickle.load(fileName_p), borrow=True)
+            self.vbias.set_value(cPickle.load(fileName_p), borrow=True)
+            self.hbias.set_value(cPickle.load(fileName_p), borrow=True)
+            fileName_p.close()
+            self.need_train = False
+        else:
+            print "Model file was not found. Need to call RBM.save_model()"
+ 
     def set_input(self, input):
         self.input = input
     def init_W(self):
@@ -89,26 +118,6 @@ class RBM(object):
         else:
             chain_start = persistent
 
-        [pre_sigmoid_nvs, nv_means, nv_samples,
-         pre_sigmoid_nhs, nh_means, nh_samples], updates = \
-            theano.scan(self.gibbs_hvh,
-                    outputs_info=[None,  None,  None, None, None, chain_start],
-                    n_steps=k)
-
-        # determine gradients on RBM parameters
-        # not that we only need the sample at the end of the chain
-        chain_end = nv_samples[-1]
-        current_free_energy = T.mean(self.free_energy(self.input))
-        cost = current_free_energy - T.mean(
-            self.free_energy(chain_end))
-        # We must not compute the gradient through the gibbs sampling
-        gparams = T.grad(cost, self.params, consider_constant=[chain_end])
-
-        # constructs the update dictionary
-        for gparam, param in zip(gparams, self.params):
-            # make sure that the learning rate is of the right dtype
-            updates[param] = param - gparam * T.cast(lr,
-                                                    dtype=theano.config.floatX)
         if persistent:
             # Note that this works only if persistent is a shared variable
             updates[persistent] = nh_samples[-1]
