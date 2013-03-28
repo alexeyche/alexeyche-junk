@@ -136,20 +136,20 @@ class RBMReplSoftmax(RBM):
                     outputs_info=[None,  None,  None, None, None, chain_start],
                     n_steps=cd_steps)
 
-        vis_probs_fant = nv_samples[-1]
+        vis_samp_fant = nv_samples[-1]
         hid_probs_fant = nh_means[-1]
         
         cur_momentum = T.switch(T.lt(self.epoch_ratio[0], moment_start), init_momentum, momentum)
         # updates
         
-        W_inc = ( T.dot(self.input.T, ph_mean) - T.dot(vis_probs_fant.T, hid_probs_fant) )/batch_size - self.W * weight_decay
+        W_inc = ( T.dot(self.input.T, ph_mean) - T.dot(vis_samp_fant.T, hid_probs_fant) )/batch_size - self.W * weight_decay
         hbias_inc = (T.sum(ph_mean, axis=0) - T.sum(hid_probs_fant,axis=0))/batch_size
-        vbias_inc = (T.sum(self.input,axis=0) - T.sum(vis_probs_fant,axis=0))/batch_size
+        vbias_inc = (T.sum(self.input,axis=0) - T.sum(vis_samp_fant,axis=0))/batch_size
         
         W_inc_rate = (self.W_inc * cur_momentum + W_inc) * l_rate
         updates[self.W] = self.W + W_inc_rate
         updates[self.hbias] = self.hbias + (self.hbias_inc * cur_momentum + hbias_inc) * l_rate
-        updates[self.vbias] = self.vbias + (self.vbias_inc * cur_momentum + vbias_inc) * l_rate/self.D
+        updates[self.vbias] = self.vbias + (self.vbias_inc * cur_momentum + vbias_inc) * l_rate #/self.D
         updates[self.W_inc] = W_inc
         updates[self.hbias_inc] = hbias_inc
         updates[self.vbias_inc] = vbias_inc
@@ -164,8 +164,7 @@ class RBMReplSoftmax(RBM):
             monitoring_cost = self.get_pseudo_likelihood_cost(updates)
         else:
             # reconstruction cross-entropy is a better proxy for CD
-            monitoring_cost = self.get_reconstruction_cost(updates,
-                                                           pre_softmax_nvs[-1])
+            monitoring_cost = self.get_reconstruction_cost(vis_samp_fant)
 
         return monitoring_cost, current_free_energy, T.mean(W_inc_rate), updates
 
@@ -189,5 +188,5 @@ class RBMReplSoftmax(RBM):
         return cost
 
     def get_reconstruction_cost(self, vis_sample):
-        return T.sum(T.sum(T.sqr(self.input - vis_sample), axis=1))/self.D
+        return T.sum((T.sum(T.sqr(self.input - vis_sample), axis=1))/self.D)
 
