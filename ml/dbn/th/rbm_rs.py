@@ -19,8 +19,20 @@ class RBMReplSoftmax(RBM):
         else:
             self.input = input
 
+        self.numpy_rng = np.random.RandomState(1)
+        self.theano_rng = RandomStreams(self.numpy_rng.randint(2 ** 30))
+        self.num_vis = num_vis 
+        self.num_hid = num_hid
+
+        self.init_params()
+        # initialize input layer for standalone RBM or layer0 of DBN
+
+        self.epoch_ratio = theano.shared(np.zeros((1), dtype=theano.config.floatX), borrow=True)
+        self.need_train=True
         self.D = T.sum(self.input, axis=1)
-        super(RBMReplSoftmax, self).__init__(self.input, num_vis, num_hid, False)        
+        self.params = [self.W, self.hbias, self.vbias]
+        _, self.output = self.prop_up(self.input)
+        
         if from_cache:
             self.restore_from_cache()
 
@@ -47,7 +59,7 @@ class RBMReplSoftmax(RBM):
             print "Model file was not found. Need to call RBM.save_model()"
     
     def init_W(self):
-        initial_W = np.asarray(0.01 * self.numpy_rng.randn(self.num_vis, self.num_hid), dtype=theano.config.floatX)
+        initial_W = np.asarray(0.0001 * self.numpy_rng.randn(self.num_vis, self.num_hid), dtype=theano.config.floatX)
         self.W = theano.shared(value=initial_W, name='W', borrow=True)
         self.W_inc = theano.shared(value=np.zeros((self.num_vis, self.num_hid), dtype=theano.config.floatX), name='W_inc', borrow=True)
     def init_hbias(self):
@@ -124,7 +136,7 @@ class RBMReplSoftmax(RBM):
                     outputs_info=[None,  None,  None, None, None, chain_start],
                     n_steps=cd_steps)
 
-        vis_probs_fant = nv_means[-1]
+        vis_probs_fant = nv_samples[-1]
         hid_probs_fant = nh_means[-1]
         
         cur_momentum = T.switch(T.lt(self.epoch_ratio[0], moment_start), init_momentum, momentum)
@@ -134,10 +146,10 @@ class RBMReplSoftmax(RBM):
         hbias_inc = (T.sum(ph_mean, axis=0) - T.sum(hid_probs_fant,axis=0))/batch_size
         vbias_inc = (T.sum(self.input,axis=0) - T.sum(vis_probs_fant,axis=0))/batch_size
         
-        W_inc_rate = self.W_inc * cur_momentum + W_inc * l_rate
+        W_inc_rate = (self.W_inc * cur_momentum + W_inc) * l_rate
         updates[self.W] = self.W + W_inc_rate
-        updates[self.hbias] = self.hbias + self.hbias_inc * cur_momentum + hbias_inc * l_rate
-        updates[self.vbias] = self.vbias + self.vbias_inc * cur_momentum + vbias_inc * l_rate
+        updates[self.hbias] = self.hbias + (self.hbias_inc * cur_momentum + hbias_inc) * l_rate
+        updates[self.vbias] = self.vbias + (self.vbias_inc * cur_momentum + vbias_inc) * l_rate/self.D
         updates[self.W_inc] = W_inc
         updates[self.hbias_inc] = hbias_inc
         updates[self.vbias_inc] = vbias_inc
@@ -176,10 +188,6 @@ class RBMReplSoftmax(RBM):
 
         return cost
 
-    def get_reconstruction_cost(self, updates, pre_softmax_nv):
-        cross_entropy = T.mean(
-                T.sum(self.input * T.log(T.nnet.sigmoid(pre_softmax_nv)) +
-                (1 - self.input) * T.log(1 - T.nnet.sigmoid(pre_softmax_nv)),
-                      axis=1))
-        return cross_entropy
+    def get_reconstruction_cost(self, vis_sample):
+        return T.sum(T.sum(T.sqr(self.input - vis_sample), axis=1))/self.D
 
