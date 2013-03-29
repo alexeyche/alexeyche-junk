@@ -11,8 +11,8 @@ import cPickle
 
 from rbm_rs import RBMReplSoftmax
 from rbm_stack import RBMStack
-from rbm_util import gray_plot
-from rpy2.robjects.packages import importr
+from rbm_util import gray_plot, print_top_to_file
+from ae import AutoEncoder
 
 def getch():
     import sys, tty, termios
@@ -24,7 +24,8 @@ def getch():
     finally:
         termios.tcsetattr(fd, termios.TCSADRAIN, old)
 
-csvfile = "/home/alexeyche/prog/topic/nips_feats.csv"
+#csvfile = "/home/alexeyche/prog/topic/nips_feats.csv"
+csvfile = "/home/alexeyche/my/dbn/topic_mod/scripts/nips_feats.csv"
 #csvfile = "/home/alexeyche/my/git/alexeyche-junk/ml/dbn/sentiment/training_feat.csv"
 data = np.asarray(genfromtxt(csvfile, delimiter=','), dtype=theano.config.floatX)
 data = np.round(np.log(data[:,0:2000]+1))
@@ -53,29 +54,29 @@ if persistent:
     train_params['persistent'] = theano.shared(np.zeros((batch_size, rbm.num_hid), dtype=theano.config.floatX), borrow=True)
 else:
     train_params['persistent'] = None
-cost, free_en, gparam, updates, w = rbm.get_cost_updates(train_params)
+cost, free_en, gparam, updates = rbm.get_cost_updates(train_params)
 updates.update([(rbm.epoch_ratio, rbm.epoch_ratio + ep_inc)])
 
-f = theano.function([index], [cost, free_en, gparam] + w,
+f = theano.function([index], [cost, free_en, gparam],
        updates=updates,
        givens=[(rbm.input, data_sh[index * batch_size: (index + 1) * batch_size])])
+
+get_watches = theano.function([index], rbm.watches, updates=updates,givens=[(rbm.input, data_sh[index * batch_size: (index + 1) * batch_size])])
+
 i=0
+
 def print_watches(w):
     global i
-    print "pos hid_m %s" % w[0][0:3,0:12]
-    grdevices = importr('grDevices')
-    grdevices.png(file="/home/alexeyche/tmp/hids%d.png" % i, width=1024, height=1024)
+    for k, v in w:
+        if len(v.shape) == 1:
+            print "%s:\n%s" % (k, v[0:10])
+        if len(v.shape) == 2:
+            if v.shape[0] > 500:
+                v = v[0:200]
+            if v.shape[1] > 500:
+                v = v[:, 0:200]
+            print "%s:\n%s" % (k, v[0:3,0:10])
     i+=1
-    gray_plot(w[0].tolist(), w[0].max(), w[0].min())
-    grdevices.dev_off()
-    print "pos hid_s %s" % w[1][0:3,0:12]
-    print "neg vis_m %s" % w[2][0:3,0:12]
-    print "neg vis_s %s" % w[3][0:3,0:12]
-    print "neg hid_m %s" % w[4][0:3,0:12]
-    print "W_inc %s" % w[5][0:3,0:12]
-    print "hbias_inc %s" % w[6][0:12]
-    print "vbias_inc %s" % w[7][0:12]
-    print "free en %s" % w[8][0:12]
 #    import pdb; pdb.set_trace()
 
 def train_rs(rbm, train_params):
@@ -86,10 +87,8 @@ def train_rs(rbm, train_params):
     mean_cost_last = 0
     for ep in xrange(0, max_epoch):
         for b in xrange(0, num_batches):
-            out = f(b)
-            cost, cur_free_en, cur_gparam = out[0:3]
-            w = out[3:]
-            
+            cost, cur_free_en, cur_gparam = f(b)            
+            w = zip(rbm.watches_label, get_watches(b)) # map to dict from labels-values lists
             mean_cost.append(cost)
             epoch_ratio = rbm.epoch_ratio.get_value(borrow=True)
             print "pretrain(%3.1f), layer %s, epoch # %d:%d last mean cost %2.2f (cost: %f) free energy: %f grad: %f" % (epoch_ratio*100,0, ep, b, mean_cost_last, cost, cur_free_en, cur_gparam)
@@ -100,7 +99,6 @@ def train_rs(rbm, train_params):
 
 if rbm.need_train:
     train_params = {'batch_size' : 87, 'learning_rate' : 0.01, 'cd_steps' : 1, 'max_epoch' : 200, 'persistent_on' : False, 'init_momentum' : 0.5, 'momentum' : 0.9, 'moment_start' : 0.01, 'weight_decay' : 0.0001 }
-
 
     train_rs(rbm, train_params)
 
@@ -113,7 +111,12 @@ if rbm.need_train:
     train_rs(rbm, train_params)
     rbm.save_model()
 
-preh,h = rbm.prop_up(data[0:2])
-prev,v, vs = rbm.sample_v_given_h(h)
-
-f = theano.function([], [v, vs], givens=[(rbm.input,data[0:2])])
+rbm_st = RBMStack(rbms = [rbm])
+ae = AutoEncoder(rbm_st)
+train_params['learning_rate_line'] = 0.001
+train_params['max_epoch'] = 50
+ae.pretrain(data_sh, train_params)
+train_params['finetune_learning_rate'] = 0.1
+train_params['max_epoch'] = 100
+ae.finetune(data_sh, train_params)
+print_top_to_file(ae, train_params, "rs", data_sh, range(0,1000))

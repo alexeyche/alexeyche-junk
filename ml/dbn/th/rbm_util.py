@@ -10,14 +10,14 @@ from rpy2.robjects.vectors import IntVector, FloatVector
 import os
 import cPickle
 
-def gray_plot(data, min=0, max=1):
+def gray_plot(data, min=0, max=1, name=""):
     reshape = importr('reshape')
     gg = ggplot2.ggplot(reshape.melt(data,id_var=['x','y']))
     pg = gg + ggplot2.aes_string(x='L1',y='L2')+ \
          ggplot2.geom_tile(ggplot2.aes_string(fill='value'))+ \
          ggplot2.scale_fill_gradient(low="black", high="white",limits=FloatVector((min,max)))+ \
-         ggplot2.coord_equal()
-    pg.plot() 
+         ggplot2.coord_equal() + ggplot2.scale_x_continuous(name)
+    return pg
 
 
 
@@ -62,7 +62,7 @@ def load_from_file(rbms, params):
     else:
         return False
   
-def print_top_to_file(ae, train_params, name, data_sh, data_target, cases):
+def print_top_to_file(ae, train_params, name, data_sh, cases, data_target=None):
     ae_name = gen_name(ae, train_params)
     fileName = path + "/" + ae_name + "_" + name + ".png"
 
@@ -73,10 +73,13 @@ def print_top_to_file(ae, train_params, name, data_sh, data_target, cases):
     y = hid_stat[...,1].tolist()
     grdevices = importr('grDevices')
     grdevices.png(file=fileName, width=1024, height=1024)
-    lab = ro.IntVector(data_target[cases].tolist())
-    lab_col = ro.StrVector(map(lambda p: p == 0 and 'blue' or 'red', lab))
-    lab_col.names = lab
-    ro.r.plot(x,y, xlab = "x", ylab="y", type="n")
-    ro.r.text(x,y,labels=lab, col = lab_col)
+    if data_target:
+        lab = ro.IntVector(data_target[cases].tolist())
+        lab_col = ro.StrVector(map(lambda p: p == 0 and 'blue' or 'red', lab))
+        lab_col.names = lab
+        ro.r.plot(x,y, xlab = "x", ylab="y", type="n")
+        ro.r.text(x,y,labels=lab, col = lab_col)
+    else:
+        ro.r.plot(x,y, xlab = "x", ylab="y", type="p")
     grdevices.dev_off()
 

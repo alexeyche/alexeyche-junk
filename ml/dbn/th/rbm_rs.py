@@ -35,8 +35,8 @@ class RBMReplSoftmax(RBM):
         
         if from_cache:
             self.restore_from_cache()
-        self.point_error = T.cast(0.00015, dtype=theano.config.floatX)
         self.watches=[]
+        self.watches_label=[]
 
     def save_model(self, path = CACHE_PATH):
         fileName = "rbm_rs_%s_%s.model" % (self.num_vis, self.num_hid)
@@ -92,7 +92,6 @@ class RBMReplSoftmax(RBM):
 
     def sample_v_given_h(self, h_sample):
         pre_softmax_v, v_mean = self.prop_down(h_sample)
-        #v_mean2 = T.nnet.softmax(v_mean) #v_mean - self.point_error
         v_sample = self.theano_rng.multinomial(n=self.D, pvals=v_mean, dtype=theano.config.floatX)
         return [pre_softmax_v, v_mean, v_sample]
 
@@ -113,15 +112,9 @@ class RBMReplSoftmax(RBM):
         return [pre_sigmoid_h1, h1_mean, h1_sample,
                 pre_softmax_v1, v1_mean, v1_sample]
 
-    def get_watches(self, data_sh):
-        out = []
-        for name in self.watches:
-            f = theano.function([],self.watches[name], givens=[(self.input, data_sh)])
-            out.append(f())
-        return out
-
     def add_watch(self,w,name):
         self.watches.append(w)
+        self.watches_label.append(name)
 
     def get_cost_updates(self, train_params):
         l_rate = T.cast(train_params['learning_rate'], dtype=theano.config.floatX)
@@ -192,7 +185,7 @@ class RBMReplSoftmax(RBM):
             # reconstruction cross-entropy is a better proxy for CD
             monitoring_cost = self.get_reconstruction_cost(vis_samp_fant)
 
-        return monitoring_cost, current_free_energy, T.mean(W_inc_rate), updates, self.watches
+        return monitoring_cost, current_free_energy, T.mean(W_inc_rate), updates
 
     def get_pseudo_likelihood_cost(self, updates):
         """Stochastic approximation to the pseudo-likelihood"""

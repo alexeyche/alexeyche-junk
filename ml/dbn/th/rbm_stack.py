@@ -14,33 +14,43 @@ from rbm_util import gen_name
 CACHE_PATH="/mnt/yandex.disk/models/rs"
 
 class RBMStack():
-    def __init__(self, num_vis = None, hid_layers_size = [], bottomRBMtype = None, add_opts = {}):
-        self.input = T.matrix('input') 
+    def __init__(self, rbms = [], num_vis = None, hid_layers_size = [], bottomRBMtype = None, add_opts = {}):
         self.params = []
-        self.num_layers = len(hid_layers_size)
-        self.num_vis = num_vis
-        self.stack = []
-        num_vis_cur = self.num_vis
-        input_cur = self.input
-        self.isTrained = False
-        for l in xrange(0, self.num_layers):
-            num_hid_cur = hid_layers_size[l]
-             
-            if l > 0:
-                input_cur = self.stack[-1].output
-                num_vis_cur = self.stack[-1].num_hid
+        if not rbms:
+            self.input = T.matrix('input') 
+            self.num_layers = len(hid_layers_size)
+            self.num_vis = num_vis
+            self.stack = []
+            num_vis_cur = self.num_vis
+            input_cur = self.input
+            self.isTrained = False
+            for l in xrange(0, self.num_layers):
+                num_hid_cur = hid_layers_size[l]
+                 
+                if l > 0:
+                    input_cur = self.stack[-1].output
+                    num_vis_cur = self.stack[-1].num_hid
 
-            rbm = None 
-            if l == 0:  # replicated softmax layer only for first one
-                if bottomRBMtype == None or bottomRBMtype == RBM:
+                rbm = None 
+                if l == 0:  # replicated softmax layer only for first one
+                    if bottomRBMtype == None or bottomRBMtype == RBM:
+                        rbm = RBM(input = input_cur, num_vis = num_vis_cur, num_hid = num_hid_cur)
+                    if bottomRBMtype == RBMReplSoftmax:
+                        rbm = RBMReplSoftmax(input = input_cur, num_vis = num_vis_cur, num_hid = num_hid_cur)
+                else:
                     rbm = RBM(input = input_cur, num_vis = num_vis_cur, num_hid = num_hid_cur)
-                if bottomRBMtype == RBMReplSoftmax:
-                    rbm = RBMReplSoftmax(input = input_cur, num_vis = num_vis_cur, num_hid = num_hid_cur)
-            else:
-                rbm = RBM(input = input_cur, num_vis = num_vis_cur, num_hid = num_hid_cur)
 
-            assert(rbm)
-            self.stack.append(rbm)
+                assert(rbm)
+                self.stack.append(rbm)
+        else:
+            self.stack = rbms                
+            self.num_vis = self.stack[0].num_vis
+            self.num_layers = len(self.stack)
+            self.isTrained = True
+            self.input = rbms[0].input
+            for l in xrange(1, self.num_layers):
+                self.stack[l].input = self.stack[l-1].output
+
 
     def __getitem__(self, index):
         return self.stack[index]

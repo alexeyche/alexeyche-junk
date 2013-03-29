@@ -37,23 +37,26 @@ class AutoEncoder(object):
         funcs = []
         if not self.stack.isTrained:
             funcs = self.stack.pretrain_fun(data_sh, train_params)
-        learning_rate_line = train_params['learning_rate_line'] 
-        learning_rate = train_params['learning_rate'] 
-        persistent = train_params['persistent']
-        cd_steps = train_params['cd_steps_line']
+        
+        ep_inc = train_params['ep_inc']
+        persistent = train_params['persistent_on']
         batch_size = train_params['batch_size']
-        num_cases = data_sh.get_value(borrow=True).shape[0]
+        max_epoch = train_params['max_epoch']
+        num_batches = data_sh.get_value(borrow=True).shape[0]/train_params['batch_size']
+        train_params['ep_inc'] = np.float32(1.0/(num_batches*max_epoch))
 
         if persistent and type(self.stack[-1]) is RBM:
-            persistent_chain = theano.shared(np.zeros((batch_size, self.stack[-1].num_hid), dtype=theano.config.floatX), borrow=True)
+            train_params['persistent'] = theano.shared(np.zeros((batch_size, self.stack[-1].num_hid), dtype=theano.config.floatX), borrow=True)
         else:
-            persistent_chain = None            
+            train_params['persistent'] = None            
+
         index = T.lscalar('index')  # index to a minibatch
-        if type(self.stack[-1]) is RBMBinLine:
-            cost, free_en, gparam, updates = self.stack[-1].get_cost_updates(lr=learning_rate_line, num_cases=num_cases, persistent=persistent_chain, k=cd_steps)
-        if type(self.stack[-1]) is RBMBinLine:
-            cost, free_en, gparam, updates = self.stack[-1].get_cost_updates(lr=learning_rate, persistent=persistent_chain, k=cd_steps)
+#        if type(self.stack[-1]) is RBMBinLine:
+        cost, free_en, gparam, updates = self.stack[-1].get_cost_updates(train_params)
+#        if type(self.stack[-1]) is RBM:
+#            cost, free_en, gparam, updates = self.stack[-1].get_cost_updates(lr=learning_rate, persistent=persistent_chain, k=cd_steps)
   
+        updates.update([(self.stack[-1].epoch_ratio, self.stack[-1].epoch_ratio + ep_inc)])
         train_rbm_f = theano.function([index], [cost, free_en, gparam],
                updates=updates,
                givens=[(self.input, data_sh[index * batch_size: (index + 1) * batch_size])])

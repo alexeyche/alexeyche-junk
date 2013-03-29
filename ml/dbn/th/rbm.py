@@ -169,6 +169,7 @@ class RBMBinLine(RBM):
         self.input = input
         if input is None:
             self.input = T.matrix('input')
+        self.epoch_ratio = theano.shared(np.zeros((1), dtype=theano.config.floatX), borrow=True)
 
         self.params = [self.W, self.hbias, self.vbias]        
         self.output = self.prop_up(self.input) 
@@ -203,7 +204,17 @@ class RBMBinLine(RBM):
         pre_sigmoid_v1, v1_mean, v1_sample = self.sample_v_given_h(h0_sample)
         h1_val = self.sample_h_given_v(v1_sample)
         return [pre_sigmoid_v1, v1_mean, v1_sample, h1_val]
-    def get_cost_updates(self, lr=0.1, weight_cost = 0.0002, num_cases = 7000, momentum = 0.8, persistent=None, k=1):
+    def get_cost_updates(self, train_params):
+        l_rate = T.cast(train_params['learning_rate'], dtype=theano.config.floatX)
+        weight_decay = T.cast(train_params['weight_decay'], dtype=theano.config.floatX)
+        momentum = T.cast(train_params['momentum'], dtype=theano.config.floatX)
+        init_momentum = T.cast(train_params['init_momentum'], dtype=theano.config.floatX)
+        moment_start = train_params['moment_start']
+        
+        batch_size = T.cast(train_params['batch_size'], dtype=theano.config.floatX)
+        cd_steps = train_params['cd_steps']
+        persistent = train_params['persistent']
+       
         h_val = self.sample_h_given_v(self.input)
         if persistent:
             chain_start = persistent
@@ -213,23 +224,21 @@ class RBMBinLine(RBM):
         [pre_sigmoid_nvs, nv_means, nv_samples, nh_vals], updates = \
             theano.scan(self.gibbs_hvh,
                     outputs_info=[None, None, None, chain_start],
-                    n_steps=k)
+                    n_steps=cd_steps)
 
         vis_sample_fantasy = nv_samples[-1]
         hid_val_fantasy = nh_vals[-1]
-        momentum_c = T.cast(momentum, dtype=theano.config.floatX)
-        num_cases_c = T.cast(num_cases, dtype=theano.config.floatX)
-        weight_cost_c = T.cast(weight_cost, dtype=theano.config.floatX)
-        lr_c = T.cast(lr, dtype=theano.config.floatX)       
+        
+        cur_momentum = T.switch(T.lt(self.epoch_ratio[0], moment_start), init_momentum, momentum)
 
-        W_inc = (T.dot(self.input.T, h_val) - T.dot(vis_sample_fantasy.T, hid_val_fantasy))/num_cases_c - self.W * weight_cost_c
-        hbias_inc = (T.sum(h_val, axis=0) - T.sum(hid_val_fantasy,axis=0))/num_cases_c
-        vbias_inc = (T.sum(self.input,axis=0) - T.sum(vis_sample_fantasy,axis=0))/num_cases_c
-        W_inc_rate =  W_inc * momentum_c + self.W_inc * lr_c
+        W_inc = (T.dot(self.input.T, h_val) - T.dot(vis_sample_fantasy.T, hid_val_fantasy))/batch_size - self.W * weight_decay
+        hbias_inc = (T.sum(h_val, axis=0) - T.sum(hid_val_fantasy,axis=0))/batch_size
+        vbias_inc = (T.sum(self.input,axis=0) - T.sum(vis_sample_fantasy,axis=0))/batch_size
+        W_inc_rate =  (W_inc * cur_momentum + self.W_inc) * l_rate
 
         updates[self.W] = self.W +  W_inc_rate
-        updates[self.hbias] = self.hbias + self.hbias_inc * momentum_c + hbias_inc * lr_c
-        updates[self.vbias] = self.vbias + self.vbias_inc * momentum_c + vbias_inc * lr_c
+        updates[self.hbias] = self.hbias + (self.hbias_inc * cur_momentum + hbias_inc) * l_rate
+        updates[self.vbias] = self.vbias + (self.vbias_inc * cur_momentum + vbias_inc) * l_rate
         updates[self.W_inc] = W_inc
         updates[self.hbias_inc] = hbias_inc
         updates[self.vbias_inc] = vbias_inc
