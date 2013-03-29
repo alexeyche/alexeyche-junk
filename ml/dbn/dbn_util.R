@@ -4,7 +4,7 @@
 gray_plot <- function(data, lims = c(min(data),max(data)) ) {
     require(ggplot2)
     require(reshape)
-    gg <- ggplot(melt(data),aes(Var1,Var2))+
+    gg <- ggplot(melt(data),aes(X1,X2))+
         geom_tile(aes(fill=value))+
         scale_fill_gradient(low="black",high="white",limits=lims)+
         coord_equal()

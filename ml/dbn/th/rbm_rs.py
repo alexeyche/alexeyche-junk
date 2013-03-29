@@ -146,7 +146,7 @@ class RBMReplSoftmax(RBM):
 
         vis_samp_fant = nv_samples[-1]
         hid_probs_fant = nh_means[-1]
-        self.add_watch(nv_means[-1], "nig_vis_m")
+        self.add_watch(nv_means[-1], "neg_vis_m")
         self.add_watch(vis_samp_fant, "neg_vis_s")
         self.add_watch(hid_probs_fant, "neg_hid_m")
 
@@ -172,6 +172,8 @@ class RBMReplSoftmax(RBM):
         updates[self.W_inc] = W_inc
         updates[self.hbias_inc] = hbias_inc
         updates[self.vbias_inc] = vbias_inc
+        
+        self.add_watch(T.as_tensor_variable(self.W), "W")
 
         current_free_energy = T.mean(self.free_energy(self.input))
         self.add_watch(self.free_energy(self.input),'free_en') 
