@@ -2,10 +2,11 @@
 
 require(R.matlab)
 
-bag <- readMat('/home/alexeyche/my/dbn/topic_mod/topictoolbox/bagofwords_nips.mat') 
-words <- readMat('/home/alexeyche/my/dbn/topic_mod/topictoolbox/words_nips.mat')
-titles <- readMat('/home/alexeyche/my/dbn/topic_mod/topictoolbox/titles_nips.mat')
-authors <- readMat('/home/alexeyche/my/dbn/topic_mod/topictoolbox/authors_nips.mat')
+topic_toolbox <-"/home/alexeyche/prog/topictoolbox/"
+bag <- readMat(paste(topic_toolbox , 'bagofwords_nips.mat', sep="") )
+words <- readMat(paste(topic_toolbox , 'words_nips.mat', sep=""))
+titles <- readMat(paste(topic_toolbox , 'titles_nips.mat', sep=""))
+authors <- readMat(paste(topic_toolbox ,'authors_nips.mat', sep=""))
 
 # $ WS: num [1, 1:2301375] 1 1 1 1 1 1 1 1 1 1 ...
 # $ DS: num [1, 1:2301375] 1 1 1 1 1 1 1 1 1 1 ...
@@ -24,4 +25,4 @@ for(i in 1:length(bag$DS)) {
     docs[cur_doc, cur_word] <- docs[cur_doc, cur_word] + 1
 }
 
-write.table(docs, "nips_feats.csv", sep=",", row.names=FALSE, col.names=FALSE)
+#write.table(docs, "nips_feats.csv", sep=",", row.names=FALSE, col.names=FALSE)

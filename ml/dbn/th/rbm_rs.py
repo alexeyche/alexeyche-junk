@@ -35,6 +35,8 @@ class RBMReplSoftmax(RBM):
         
         if from_cache:
             self.restore_from_cache()
+        self.point_error = T.cast(0.00015, dtype=theano.config.floatX)
+        self.watches=[]
 
     def save_model(self, path = CACHE_PATH):
         fileName = "rbm_rs_%s_%s.model" % (self.num_vis, self.num_hid)
@@ -90,6 +92,7 @@ class RBMReplSoftmax(RBM):
 
     def sample_v_given_h(self, h_sample):
         pre_softmax_v, v_mean = self.prop_down(h_sample)
+        #v_mean2 = T.nnet.softmax(v_mean) #v_mean - self.point_error
         v_sample = self.theano_rng.multinomial(n=self.D, pvals=v_mean, dtype=theano.config.floatX)
         return [pre_softmax_v, v_mean, v_sample]
 
@@ -110,6 +113,16 @@ class RBMReplSoftmax(RBM):
         return [pre_sigmoid_h1, h1_mean, h1_sample,
                 pre_softmax_v1, v1_mean, v1_sample]
 
+    def get_watches(self, data_sh):
+        out = []
+        for name in self.watches:
+            f = theano.function([],self.watches[name], givens=[(self.input, data_sh)])
+            out.append(f())
+        return out
+
+    def add_watch(self,w,name):
+        self.watches.append(w)
+
     def get_cost_updates(self, train_params):
         l_rate = T.cast(train_params['learning_rate'], dtype=theano.config.floatX)
         weight_decay = T.cast(train_params['weight_decay'], dtype=theano.config.floatX)
@@ -124,6 +137,8 @@ class RBMReplSoftmax(RBM):
 
         # compute positive phase
         pre_sigmoid_ph, ph_mean, ph_sample = self.sample_h_given_v(self.input)
+        self.add_watch(ph_mean, "hid_m")
+        self.add_watch(ph_sample, "hid_s")
 
         if persistent is None:
             chain_start = ph_sample
@@ -138,24 +153,35 @@ class RBMReplSoftmax(RBM):
 
         vis_samp_fant = nv_samples[-1]
         hid_probs_fant = nh_means[-1]
-        
+        self.add_watch(nv_means[-1], "nig_vis_m")
+        self.add_watch(vis_samp_fant, "neg_vis_s")
+        self.add_watch(hid_probs_fant, "neg_hid_m")
+
         cur_momentum = T.switch(T.lt(self.epoch_ratio[0], moment_start), init_momentum, momentum)
         # updates
         
         W_inc = ( T.dot(self.input.T, ph_mean) - T.dot(vis_samp_fant.T, hid_probs_fant) )/batch_size - self.W * weight_decay
         hbias_inc = (T.sum(ph_mean, axis=0) - T.sum(hid_probs_fant,axis=0))/batch_size
         vbias_inc = (T.sum(self.input,axis=0) - T.sum(vis_samp_fant,axis=0))/batch_size
+
         
         W_inc_rate = (self.W_inc * cur_momentum + W_inc) * l_rate
+        hbias_inc_rate = (self.hbias_inc * cur_momentum + hbias_inc) * l_rate
+        vbias_inc_rate = (self.vbias_inc * cur_momentum + vbias_inc) * l_rate / 10
+        
+        self.add_watch(W_inc_rate, "W_inc")
+        self.add_watch(hbias_inc_rate, "hbias_inc")
+        self.add_watch(vbias_inc_rate, "vbias_inc")
+
         updates[self.W] = self.W + W_inc_rate
-        updates[self.hbias] = self.hbias + (self.hbias_inc * cur_momentum + hbias_inc) * l_rate
-        updates[self.vbias] = self.vbias + (self.vbias_inc * cur_momentum + vbias_inc) * l_rate #/self.D
+        updates[self.hbias] = self.hbias + hbias_inc_rate
+        updates[self.vbias] = self.vbias + vbias_inc_rate
         updates[self.W_inc] = W_inc
         updates[self.hbias_inc] = hbias_inc
         updates[self.vbias_inc] = vbias_inc
 
         current_free_energy = T.mean(self.free_energy(self.input))
-        
+        self.add_watch(self.free_energy(self.input),'free_en') 
         
         if persistent:
             # Note that this works only if persistent is a shared variable
@@ -166,7 +192,7 @@ class RBMReplSoftmax(RBM):
             # reconstruction cross-entropy is a better proxy for CD
             monitoring_cost = self.get_reconstruction_cost(vis_samp_fant)
 
-        return monitoring_cost, current_free_energy, T.mean(W_inc_rate), updates
+        return monitoring_cost, current_free_energy, T.mean(W_inc_rate), updates, self.watches
 
     def get_pseudo_likelihood_cost(self, updates):
         """Stochastic approximation to the pseudo-likelihood"""

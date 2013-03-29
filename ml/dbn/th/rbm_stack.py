@@ -8,7 +8,6 @@ import os
 from theano.tensor.shared_randomstreams import RandomStreams
 import cPickle
 from rbm import RBM
-from rbm_mult_softmax import RBMMultSoftmax
 from rbm_rs import RBMReplSoftmax
 from rbm_util import gen_name
 
@@ -37,9 +36,6 @@ class RBMStack():
                     rbm = RBM(input = input_cur, num_vis = num_vis_cur, num_hid = num_hid_cur)
                 if bottomRBMtype == RBMReplSoftmax:
                     rbm = RBMReplSoftmax(input = input_cur, num_vis = num_vis_cur, num_hid = num_hid_cur)
-                if bottomRBMtype == RBMMultSoftmax:
-                    rbm = RBMMultSoftmax(input = input_cur, num_hid = num_hid_cur, unit_size = add_opts['unit_size'], num_units = add_opts['num_units'])
-                    self.num_vis = add_opts['unit_size']*add_opts['num_units']
             else:
                 rbm = RBM(input = input_cur, num_vis = num_vis_cur, num_hid = num_hid_cur)
 
@@ -73,7 +69,7 @@ class RBMStack():
 
             train_rbm_f = theano.function([index], [cost, free_en, gparam],
                    updates=updates,
-                   givens=[(self.input, data_sh[index * batch_size: (index + 1) * batch_size])])
+                   givens=[(rbm.input, data_sh[index * batch_size: (index + 1) * batch_size])])
             
             pretrain_fns.append(train_rbm_f)
         return pretrain_fns            
@@ -82,15 +78,21 @@ class RBMStack():
         max_epoch = train_params['max_epoch']
         num_batches = data_sh.get_value(borrow=True).shape[0]/train_params['batch_size']
         train_params['ep_inc'] = np.float32(1.0/(num_batches*max_epoch))
-
+        
         fn = self.pretrain_fun(data_sh, train_params)
         for i in xrange(0,len(fn)):
             f = fn[i]
+            mean_cost = []
+            mean_cost_last = 0
             for ep in xrange(0, max_epoch):
                 for b in xrange(0, num_batches):
                     cost, cur_free_en, cur_gparam = f(b)
+                    mean_cost.append(cost)
                     epoch_ratio = self.stack[i].epoch_ratio.get_value(borrow=True)
-                    print "pretrain(%3.1f), layer %s, epoch # %d:%d cost: %f free energy: %f grad: %f" % (epoch_ratio*100,i, ep, b, cost, cur_free_en, cur_gparam)
+                    print "pretrain(%3.1f), layer %s, epoch # %d:%d last mean cost %2.2f (cost: %f) free energy: %f grad: %f" % (epoch_ratio*100,0, ep, b, mean_cost_last, cost, cur_free_en, cur_gparam)
+                mean_cost_last = np.mean(mean_cost)
+                mean_cost = []
+
             self.stack[i].save_model(CACHE_PATH)
         self.isTrained = True
       
