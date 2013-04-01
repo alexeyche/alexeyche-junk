@@ -85,14 +85,19 @@ class RBMReplSoftmax(RBM):
         return [pre_softmax_activation, T.nnet.softmax(pre_softmax_activation)]
 
     def free_energy(self, v_sample):
-        wx_b = T.dot(v_sample, self.W) + T.outer(self.D, self.hbias)
+        D = T.sum(v_sample, axis=1)
+        wx_b = T.dot(v_sample, self.W) +self.hbias + T.outer(D, self.hbias)
         vbias_term = T.dot(v_sample, self.vbias)
         hidden_term = T.sum(T.log(1 + T.exp(wx_b)), axis=1)
         return -hidden_term - vbias_term
 
-    def sample_v_given_h(self, h_sample):
+    def sample_v_given_h(self, h_sample,D=None):
         pre_softmax_v, v_mean = self.prop_down(h_sample)
-        v_sample = self.theano_rng.multinomial(n=self.D, pvals=v_mean, dtype=theano.config.floatX)
+        if not D:
+            D = self.D
+        v_samples, updates = theano.scan(fn=self.multinom_sampler,non_sequences=[v_mean, D], n_steps=50)        
+        v_sample = T.mean(v_samples, axis=0)
+        self.updates = updates
         return [pre_softmax_v, v_mean, v_sample]
 
     def sample_h_given_v(self, v_sample):
@@ -106,11 +111,15 @@ class RBMReplSoftmax(RBM):
         return [pre_softmax_v1, v1_mean, v1_sample,
                 pre_sigmoid_h1, h1_mean, h1_sample]
 
-    def gibbs_vhv(self, v0_sample):
+    def gibbs_vhv(self, v0_sample, D=None):
         pre_sigmoid_h1, h1_mean, h1_sample = self.sample_h_given_v(v0_sample)
-        pre_softmax_v1, v1_mean, v1_sample = self.sample_v_given_h(h1_sample)
+        pre_softmax_v1, v1_mean, v1_sample = self.sample_v_given_h(h1_sample,D)
         return [pre_sigmoid_h1, h1_mean, h1_sample,
                 pre_softmax_v1, v1_mean, v1_sample]
+
+    def multinom_sampler(self, probs, D):
+        v_sample = self.theano_rng.multinomial(n=D, pvals=probs, dtype=theano.config.floatX)
+        return v_sample
 
     def add_watch(self,w,name):
         self.watches.append(w)
@@ -126,6 +135,7 @@ class RBMReplSoftmax(RBM):
         batch_size = T.cast(train_params['batch_size'], dtype=theano.config.floatX)
         cd_steps = train_params['cd_steps']
         persistent = train_params['persistent']
+        persistent_on = train_params['persistent_on']
         batch_size = T.cast(train_params['batch_size'], dtype=theano.config.floatX)
 
         # compute positive phase
@@ -133,10 +143,13 @@ class RBMReplSoftmax(RBM):
         self.add_watch(ph_mean, "hid_m")
         self.add_watch(ph_sample, "hid_s")
 
-        if persistent is None:
-            chain_start = ph_sample
+        if persistent_on:
+            if T.eq(T.sum(T.sum(persistent,axis=1)),0): 
+                chain_start = ph_sample
+            else:
+                chain_start = persistent
         else:
-            chain_start = persistent
+            chain_start = ph_sample
         
         [pre_softmax_nvs, nv_means, nv_samples,
          pre_sigmoid_nhs, nh_means, nh_samples], updates = \
@@ -144,8 +157,11 @@ class RBMReplSoftmax(RBM):
                     outputs_info=[None,  None,  None, None, None, chain_start],
                     n_steps=cd_steps)
 
+        #import pdb; pdb.set_trace()
+        #updates.update(self.updates)
         vis_samp_fant = nv_samples[-1]
         hid_probs_fant = nh_means[-1]
+
         self.add_watch(nv_means[-1], "neg_vis_m")
         self.add_watch(vis_samp_fant, "neg_vis_s")
         self.add_watch(hid_probs_fant, "neg_hid_m")
@@ -153,14 +169,21 @@ class RBMReplSoftmax(RBM):
         cur_momentum = T.switch(T.lt(self.epoch_ratio[0], moment_start), init_momentum, momentum)
         # updates
         
-        W_inc = ( T.dot(self.input.T, ph_mean) - T.dot(vis_samp_fant.T, hid_probs_fant) )/batch_size - self.W * weight_decay
+        #W_inc = ( T.dot(self.input.T, ph_mean) - T.dot(vis_samp_fant.T, hid_probs_fant) )/batch_size - self.W * weight_decay
+        #hbias_inc = (T.sum(ph_mean, axis=0) - T.sum(hid_probs_fant,axis=0))/batch_size
+        #vbias_inc = (T.sum(self.input,axis=0) - T.sum(vis_samp_fant,axis=0))/batch_size
+        
+        W_inc = ( T.dot(self.input.T, ph_mean) - T.dot(vis_samp_fant.T, hid_probs_fant) )/batch_size
         hbias_inc = (T.sum(ph_mean, axis=0) - T.sum(hid_probs_fant,axis=0))/batch_size
         vbias_inc = (T.sum(self.input,axis=0) - T.sum(vis_samp_fant,axis=0))/batch_size
 
-        
-        W_inc_rate = (self.W_inc * cur_momentum + W_inc) * l_rate
-        hbias_inc_rate = (self.hbias_inc * cur_momentum + hbias_inc) * l_rate
-        vbias_inc_rate = (self.vbias_inc * cur_momentum + vbias_inc) * l_rate / 10
+        #W_inc_rate = (self.W_inc * cur_momentum + W_inc) * l_rate
+        #hbias_inc_rate = (self.hbias_inc * cur_momentum + hbias_inc) * l_rate
+        #vbias_inc_rate = (self.vbias_inc * cur_momentum + vbias_inc) * l_rate / 10
+
+        W_inc_rate = self.W_inc * l_rate
+        hbias_inc_rate = self.hbias_inc * l_rate
+        vbias_inc_rate = self.vbias_inc * l_rate
         
         self.add_watch(W_inc_rate, "W_inc")
         self.add_watch(hbias_inc_rate, "hbias_inc")
@@ -178,7 +201,7 @@ class RBMReplSoftmax(RBM):
         current_free_energy = T.mean(self.free_energy(self.input))
         self.add_watch(self.free_energy(self.input),'free_en') 
         
-        if persistent:
+        if persistent_on:
             # Note that this works only if persistent is a shared variable
             updates[persistent] = nh_samples[-1]
             # pseudo-likelihood is a better proxy for PCD
@@ -208,6 +231,8 @@ class RBMReplSoftmax(RBM):
 
         return cost
 
-    def get_reconstruction_cost(self, vis_sample):
-        return T.sum((T.sum(T.sqr(self.input - vis_sample), axis=1))/self.D)
+    def get_reconstruction_cost(self, vis_sample, vis_source=None, D=None):
+        if not vis_source:
+            return T.sum((T.sum(T.sqr(self.input - vis_sample), axis=1))/self.D)
+        return T.sum((T.sum(T.sqr(vis_source - vis_sample), axis=1))/D)
 
