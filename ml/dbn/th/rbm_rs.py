@@ -61,7 +61,7 @@ class RBMReplSoftmax(RBM):
             print "Model file was not found. Need to call RBM.save_model()"
     
     def init_W(self):
-        initial_W = np.asarray(0.0001 * self.numpy_rng.randn(self.num_vis, self.num_hid), dtype=theano.config.floatX)
+        initial_W = np.asarray(0.01 * self.numpy_rng.randn(self.num_vis, self.num_hid), dtype=theano.config.floatX)
         self.W = theano.shared(value=initial_W, name='W', borrow=True)
         self.W_inc = theano.shared(value=np.zeros((self.num_vis, self.num_hid), dtype=theano.config.floatX), name='W_inc', borrow=True)
     def init_hbias(self):
@@ -169,21 +169,21 @@ class RBMReplSoftmax(RBM):
         cur_momentum = T.switch(T.lt(self.epoch_ratio[0], moment_start), init_momentum, momentum)
         # updates
         
-        #W_inc = ( T.dot(self.input.T, ph_mean) - T.dot(vis_samp_fant.T, hid_probs_fant) )/batch_size - self.W * weight_decay
-        #hbias_inc = (T.sum(ph_mean, axis=0) - T.sum(hid_probs_fant,axis=0))/batch_size
-        #vbias_inc = (T.sum(self.input,axis=0) - T.sum(vis_samp_fant,axis=0))/batch_size
-        
-        W_inc = ( T.dot(self.input.T, ph_mean) - T.dot(vis_samp_fant.T, hid_probs_fant) )/batch_size
+        W_inc = ( T.dot(self.input.T, ph_mean) - T.dot(vis_samp_fant.T, hid_probs_fant) )/batch_size - self.W * weight_decay
         hbias_inc = (T.sum(ph_mean, axis=0) - T.sum(hid_probs_fant,axis=0))/batch_size
         vbias_inc = (T.sum(self.input,axis=0) - T.sum(vis_samp_fant,axis=0))/batch_size
+        
+#        W_inc = ( T.dot(self.input.T, ph_mean) - T.dot(vis_samp_fant.T, hid_probs_fant) )/batch_size
+#        hbias_inc = (T.sum(ph_mean, axis=0) - T.sum(hid_probs_fant,axis=0))/batch_size
+#        vbias_inc = (T.sum(self.input,axis=0) - T.sum(vis_samp_fant,axis=0))/batch_size
 
-        #W_inc_rate = (self.W_inc * cur_momentum + W_inc) * l_rate
-        #hbias_inc_rate = (self.hbias_inc * cur_momentum + hbias_inc) * l_rate
-        #vbias_inc_rate = (self.vbias_inc * cur_momentum + vbias_inc) * l_rate / 10
+        W_inc_rate = (self.W_inc * cur_momentum + W_inc) * l_rate
+        hbias_inc_rate = (self.hbias_inc * cur_momentum + hbias_inc) * l_rate
+        vbias_inc_rate = (self.vbias_inc * cur_momentum + vbias_inc) * l_rate
 
-        W_inc_rate = self.W_inc * l_rate
-        hbias_inc_rate = self.hbias_inc * l_rate
-        vbias_inc_rate = self.vbias_inc * l_rate
+#        W_inc_rate = self.W_inc * l_rate
+#        hbias_inc_rate = self.hbias_inc * l_rate
+#        vbias_inc_rate = self.vbias_inc * l_rate
         
         self.add_watch(W_inc_rate, "W_inc")
         self.add_watch(hbias_inc_rate, "hbias_inc")

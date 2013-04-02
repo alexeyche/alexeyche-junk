@@ -17,7 +17,8 @@ import db_redis as rd
 
 #csvfile = "/home/alexeyche/prog/topic/nips_feats.csv"
 #csvfile = "/home/alexeyche/my/dbn/topic_mod/scripts/nips_feats.csv"
-csvfile = "/home/alexeyche/prog/alexeyche-junk/ml/dbn/test_data_rs.csv"
+#csvfile = "/home/alexeyche/prog/alexeyche-junk/ml/dbn/test_data_rs.csv"
+csvfile = "/home/alexeyche/my/git/alexeyche-junk/ml/dbn/test_data_rs.csv"
 data = np.asarray(genfromtxt(csvfile, delimiter=','), dtype=theano.config.floatX)
 #data = np.round(np.log(data[:,0:2000]+1))
 #data = data[:,0:2000]
@@ -40,7 +41,7 @@ num_vis = num_dims
 data_sh = theano.shared(np.asarray(data, dtype=theano.config.floatX), borrow=True)
 data_valid_sh = theano.shared(np.asarray(data_valid, dtype=theano.config.floatX), borrow=True)
 
-train_params = {'batch_size' : 50, 'learning_rate' : 0.01, 'cd_steps' : 1, 'max_epoch' : 501, 'persistent_on' : False, 'init_momentum' : 0.5, 'momentum' : 0.9, 'moment_start' : 0.01, 'weight_decay' : 0, 'introspect_freq' : 10 } 
+train_params = {'batch_size' : 50, 'learning_rate' : 0.005, 'cd_steps' : 1, 'max_epoch' : 91, 'persistent_on' : False, 'init_momentum' : 0.5, 'momentum' : 0.9, 'moment_start' : 0.01, 'weight_decay' : 0.0002, 'introspect_freq' : 10 } 
 
 rbm = RBMReplSoftmax(num_vis = num_vis, num_hid = 75, from_cache = True)
 
@@ -159,23 +160,23 @@ if rbm.need_train:
     train_rs(rbm, train_params)
 
 #data_nop_sh = theano.shared(data_nop, borrow=True)
-#preh, h, hs = rbm.sample_h_given_v(data_nop_sh[0:2])
+#preh, h, hs = rbm.sample_h_given_v(data_nop_sh[-50:])
 #prev, v, vs = rbm.sample_v_given_h(hs)
-
-#f = theano.function([], v, updates = rbm.updates, givens = [(rbm.input, data_nop_sh[0:2])])
-
 #
-#    train_params = {'batch_size' : 87, 'learning_rate' : 0.01, 'cd_steps' : 5, 'max_epoch' : 400, 'persistent_on' : False, 'init_momentum' : 0.5, 'momentum' : 0.9, 'moment_start' : 0.01, 'weight_decay' : 0.0001 }
+#test = theano.function([], vs, updates = rbm.updates, givens = [(rbm.input, data_nop_sh[-50:])])
+#before = test()
+#train_params['max_epoch'] = 30
+#train_params['cd_steps'] = 5
 #
-#    train_rs(rbm, train_params)
-#    rbm.save_model()
-
-#rbm_st = RBMStack(rbms = [rbm])
-#ae = AutoEncoder(rbm_st)
-#train_params['learning_rate_line'] = 0.001
-#train_params['max_epoch'] = 50
-#ae.pretrain(data_sh, train_params)
-#train_params['finetune_learning_rate'] = 0.1
-#train_params['max_epoch'] = 100
-#ae.finetune(data_sh, train_params)
-#print_top_to_file(ae, train_params, "rs", data_sh, range(0,1000))
+#train_rs(rbm, train_params)
+#after = test()
+rbm_st = RBMStack(rbms = [rbm])
+ae = AutoEncoder(rbm_st)
+train_params['learning_rate_line'] = 0.00005
+train_params['max_epoch'] = 30
+ae.pretrain(data_sh, train_params)
+train_params['finetune_learning_rate'] = 0.001
+train_params['max_epoch'] = 75
+ae.finetune(data_sh, train_params)
+data_nop_sh = theano.shared(data_nop, borrow=True)
+print_top_to_file(ae, train_params, "rs", data_nop_sh, range(700,1050))
