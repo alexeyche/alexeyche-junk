@@ -27,7 +27,7 @@ data_nop = data
 perm = np.random.permutation(data.shape[0])
 data = data[perm]
 
-valid_num = 50
+valid_num = 25
 data_valid = data[-valid_num:]
 data = data[:-valid_num]
 
@@ -41,9 +41,9 @@ num_vis = num_dims
 data_sh = theano.shared(np.asarray(data, dtype=theano.config.floatX), borrow=True)
 data_valid_sh = theano.shared(np.asarray(data_valid, dtype=theano.config.floatX), borrow=True)
 
-train_params = {'batch_size' : 50, 'learning_rate' : 0.005, 'cd_steps' : 1, 'max_epoch' : 91, 'persistent_on' : False, 'init_momentum' : 0.5, 'momentum' : 0.9, 'moment_start' : 0.01, 'weight_decay' : 0.0002, 'introspect_freq' : 10 } 
+train_params = {'batch_size' : 25, 'learning_rate' : 0.005, 'cd_steps' : 1, 'max_epoch' : 151, 'persistent_on' : False, 'init_momentum' : 0.5, 'momentum' : 0.9, 'moment_start' : 0.01, 'weight_decay' : 0.0002, 'introspect_freq' : 10 } 
 
-rbm = RBMReplSoftmax(num_vis = num_vis, num_hid = 75, from_cache = True)
+rbm = RBMReplSoftmax(num_vis = num_vis, num_hid = 75, from_cache = False)
 
 num_batches = data_sh.get_value(borrow=True).shape[0]/train_params['batch_size']
 max_epoch = train_params['max_epoch']
@@ -72,7 +72,7 @@ Dv = T.sum(valid_set, axis=1)
                     outputs_info=[None,  None,  None, None, None, valid_set],
                     non_sequences = Dv,
                     n_steps=1)
-rbm.add_watch(rbm.get_reconstruction_cost(vs, valid_set, Dv), "cost_valid")
+#rbm.add_watch(rbm.get_reconstruction_cost(vs, valid_set, Dv), "cost_valid")
 get_watches = theano.function([index], rbm.watches, updates=updates,givens=[(rbm.input, data_sh[index * batch_size: (index + 1) * batch_size]),
                                                                             (valid_set, data_valid_sh)])
 
@@ -123,8 +123,8 @@ def train_rs(rbm, train_params):
             w = zip(rbm.watches_label, get_watches(b)) # map to list of tuples from labels-values lists
             free_en_v_ind = rbm.watches_label.index("free_en_valid")
             free_en_valid.append(w[free_en_v_ind][1]) 
-            mean_cost_v_ind = rbm.watches_label.index("cost_valid")
-            mean_cost_valid.append(w[mean_cost_v_ind][1])
+            #mean_cost_v_ind = rbm.watches_label.index("cost_valid")
+            #mean_cost_valid.append(w[mean_cost_v_ind][1])
 
             epoch_ratio = rbm.epoch_ratio.get_value(borrow=True)
             print "pretrain(%3.1f), layer %s, epoch # %d:%d last mean cost %2.2f (cost: %f) free energy: %f grad: %f" % (epoch_ratio*100,0, ep, b, mean_cost_last, cost, cur_free_en, cur_gparam)
@@ -158,25 +158,27 @@ if rbm.need_train:
     rd.r0.flushdb()
     
     train_rs(rbm, train_params)
-
+    rbm.save_model()
 #data_nop_sh = theano.shared(data_nop, borrow=True)
-#preh, h, hs = rbm.sample_h_given_v(data_nop_sh[-50:])
+#preh, h = rbm.prop_up(data_nop_sh[-100:])
 #prev, v, vs = rbm.sample_v_given_h(hs)
 #
-#test = theano.function([], vs, updates = rbm.updates, givens = [(rbm.input, data_nop_sh[-50:])])
+#test = theano.function([], h, givens = [(rbm.input, data_nop_sh[-100:])])
 #before = test()
 #train_params['max_epoch'] = 30
 #train_params['cd_steps'] = 5
 #
 #train_rs(rbm, train_params)
 #after = test()
-rbm_st = RBMStack(rbms = [rbm])
-ae = AutoEncoder(rbm_st)
-train_params['learning_rate_line'] = 0.00005
-train_params['max_epoch'] = 30
-ae.pretrain(data_sh, train_params)
-train_params['finetune_learning_rate'] = 0.001
-train_params['max_epoch'] = 75
-ae.finetune(data_sh, train_params)
-data_nop_sh = theano.shared(data_nop, borrow=True)
-print_top_to_file(ae, train_params, "rs", data_nop_sh, range(700,1050))
+#rbm_st = RBMStack(rbms = [rbm])
+#ae = AutoEncoder(rbm_st)
+#train_params['learning_rate_line'] = 0.1
+#train_params['max_epoch'] = 100
+#train_params['cd_steps'] = 10
+#train_params['persistent_on'] = True
+#ae.pretrain(data_sh, train_params)
+#train_params['finetune_learning_rate'] = 0.05
+#train_params['max_epoch'] = 10
+#ae.finetune(data_sh, train_params)
+#data_nop_sh = theano.shared(data_nop, borrow=True)
+#print_top_to_file(ae, train_params, "rs", data_nop_sh, range(700,1050))

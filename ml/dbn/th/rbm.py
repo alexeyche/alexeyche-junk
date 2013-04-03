@@ -226,7 +226,7 @@ class RBMBinLine(RBM):
                     outputs_info=[None, None, None, chain_start],
                     n_steps=cd_steps)
 
-        vis_sample_fantasy = nv_samples[-1]
+        vis_sample_fantasy = nv_means[-1]
         hid_val_fantasy = nh_vals[-1]
         
         cur_momentum = T.switch(T.lt(self.epoch_ratio[0], moment_start), init_momentum, momentum)

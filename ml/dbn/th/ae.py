@@ -45,7 +45,7 @@ class AutoEncoder(object):
         num_batches = data_sh.get_value(borrow=True).shape[0]/train_params['batch_size']
         train_params['ep_inc'] = np.float32(1.0/(num_batches*max_epoch))
 
-        if persistent and type(self.stack[-1]) is RBM:
+        if persistent: #and type(self.stack[-1]) is RBM:
             train_params['persistent'] = theano.shared(np.zeros((batch_size, self.stack[-1].num_hid), dtype=theano.config.floatX), borrow=True)
         else:
             train_params['persistent'] = None            
