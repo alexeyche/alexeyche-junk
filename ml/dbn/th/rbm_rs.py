@@ -80,9 +80,13 @@ class RBMReplSoftmax(RBM):
         pre_sigmoid_activation = T.dot(vis, self.W) + T.outer(self.D,self.hbias)
         return [pre_sigmoid_activation, T.nnet.sigmoid(pre_sigmoid_activation)]
 
-    def prop_down(self, hid):
+    def prop_down(self, hid, D=None):
         pre_softmax_activation = T.dot(hid, self.W.T) + self.vbias
-        return [pre_softmax_activation, T.nnet.softmax(pre_softmax_activation)]
+        if not D:
+            return [pre_softmax_activation, T.nnet.softmax(pre_softmax_activation)]
+        else:
+            val = D.T*T.nnet.softmax(pre_softmax_activation).T           
+            return [pre_softmax_activation, val.T]
 
     def free_energy(self, v_sample):
         D = T.sum(v_sample, axis=1)
@@ -92,12 +96,14 @@ class RBMReplSoftmax(RBM):
         return -hidden_term - vbias_term
 
     def sample_v_given_h(self, h_sample,D=None):
-        pre_softmax_v, v_mean = self.prop_down(h_sample)
         if not D:
-            D = self.D
-        v_samples, updates = theano.scan(fn=self.multinom_sampler,non_sequences=[v_mean, D], n_steps=50)        
-        v_sample = T.mean(v_samples, axis=0)
-        self.updates = updates
+            D = self.D       
+        pre_softmax_v, v_mean = self.prop_down(h_sample, self.D)
+
+        #v_samples, updates = theano.scan(fn=self.multinom_sampler,non_sequences=[v_mean, D], n_steps=10)        
+        #v_sample = T.mean(v_samples, axis=0)
+        #self.updates = updates
+        v_sample = v_mean
         return [pre_softmax_v, v_mean, v_sample]
 
     def sample_h_given_v(self, v_sample):

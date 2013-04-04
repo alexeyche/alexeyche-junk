@@ -27,7 +27,7 @@ data_nop = data
 perm = np.random.permutation(data.shape[0])
 data = data[perm]
 
-valid_num = 25
+valid_num = 50
 data_valid = data[-valid_num:]
 data = data[:-valid_num]
 
@@ -41,9 +41,12 @@ num_vis = num_dims
 data_sh = theano.shared(np.asarray(data, dtype=theano.config.floatX), borrow=True)
 data_valid_sh = theano.shared(np.asarray(data_valid, dtype=theano.config.floatX), borrow=True)
 
-train_params = {'batch_size' : 25, 'learning_rate' : 0.005, 'cd_steps' : 1, 'max_epoch' : 151, 'persistent_on' : False, 'init_momentum' : 0.5, 'momentum' : 0.9, 'moment_start' : 0.01, 'weight_decay' : 0.0002, 'introspect_freq' : 10 } 
+train_params = {'batch_size' : 42, 'learning_rate' : 0.005, 'cd_steps' : 1, 'max_epoch' : 50, 'persistent_on' : True, 'init_momentum' : 0.5, 'momentum' : 0.9, 'moment_start' : 0.01, 'weight_decay' : 0.0002, 'introspect_freq' : 10 } 
+num_hid = 60
+if len(sys.argv)>1:
+    num_hid = int(sys.argv[1])
 
-rbm = RBMReplSoftmax(num_vis = num_vis, num_hid = 75, from_cache = False)
+rbm = RBMReplSoftmax(num_vis = num_vis, num_hid = num_hid, from_cache = False)
 
 num_batches = data_sh.get_value(borrow=True).shape[0]/train_params['batch_size']
 max_epoch = train_params['max_epoch']
@@ -73,8 +76,8 @@ Dv = T.sum(valid_set, axis=1)
                     non_sequences = Dv,
                     n_steps=1)
 #rbm.add_watch(rbm.get_reconstruction_cost(vs, valid_set, Dv), "cost_valid")
-get_watches = theano.function([index], rbm.watches, updates=updates,givens=[(rbm.input, data_sh[index * batch_size: (index + 1) * batch_size]),
-                                                                            (valid_set, data_valid_sh)])
+#get_watches = theano.function([index], rbm.watches, updates=updates,givens=[(rbm.input, data_sh[index * batch_size: (index + 1) * batch_size]),
+#                                                                            (valid_set, data_valid_sh)])
 
 it=0
 
@@ -120,9 +123,9 @@ def train_rs(rbm, train_params):
             mean_cost.append(cost)
             free_en.append(cur_free_en)
 
-            w = zip(rbm.watches_label, get_watches(b)) # map to list of tuples from labels-values lists
-            free_en_v_ind = rbm.watches_label.index("free_en_valid")
-            free_en_valid.append(w[free_en_v_ind][1]) 
+            #w = zip(rbm.watches_label, get_watches(b)) # map to list of tuples from labels-values lists
+            #free_en_v_ind = rbm.watches_label.index("free_en_valid")
+            #free_en_valid.append(w[free_en_v_ind][1]) 
             #mean_cost_v_ind = rbm.watches_label.index("cost_valid")
             #mean_cost_valid.append(w[mean_cost_v_ind][1])
 
@@ -141,29 +144,37 @@ def train_rs(rbm, train_params):
         free_en_valid_acc.append(free_en_valid_last)
         mean_cost_valid_acc.append(mean_cost_valid_last)
         if ep % introspect_freq == 0:
-            w = zip(rbm.watches_label, get_watches(b-intro_b)) # map to list of tuples from labels-values lists
-            intro_b += 1
-            if intro_b > 10:
-                intro_b = 0
-            w.append( ("cost_acc", np.asarray(mean_cost_acc)) )
-            w.append( ("free_en_valid_delta", np.asarray(free_en_acc) - np.asarray(free_en_valid_acc)) )
-            w.append( ("free_en_acc", np.asarray(free_en_acc)) )
-            w.append( ("free_en_valid_acc", np.asarray(free_en_valid_acc)) )
-            w.append( ("max_epoch", np.asarray(max_epoch)) )
-            w.append( ("cost_valid_acc", np.asarray(mean_cost_valid_acc)) ) 
-            w.append( ("cost_delta", np.asarray(mean_cost_valid_acc) - np.asarray(mean_cost_acc)) )
-            load_watches(w)
+            pass
+            #w = zip(rbm.watches_label, get_watches(b-intro_b)) # map to list of tuples from labels-values lists
+            #intro_b += 1
+            #if intro_b > 10:
+            #    intro_b = 0
+            #w.append( ("cost_acc", np.asarray(mean_cost_acc)) )
+            #w.append( ("free_en_valid_delta", np.asarray(free_en_acc) - np.asarray(free_en_valid_acc)) )
+            #w.append( ("free_en_acc", np.asarray(free_en_acc)) )
+            #w.append( ("free_en_valid_acc", np.asarray(free_en_valid_acc)) )
+            #w.append( ("max_epoch", np.asarray(max_epoch)) )
+            #w.append( ("cost_valid_acc", np.asarray(mean_cost_valid_acc)) ) 
+            #w.append( ("cost_delta", np.asarray(mean_cost_valid_acc) - np.asarray(mean_cost_acc)) )
+            #load_watches(w)
 
 if rbm.need_train:
     rd.r0.flushdb()
     
     train_rs(rbm, train_params)
     rbm.save_model()
-#data_nop_sh = theano.shared(data_nop, borrow=True)
-#preh, h = rbm.prop_up(data_nop_sh[-100:])
-#prev, v, vs = rbm.sample_v_given_h(hs)
-#
-#test = theano.function([], h, givens = [(rbm.input, data_nop_sh[-100:])])
+    train_params['max_epoch'] = 150
+    train_params['cd_steps'] = 3
+    train_params['learning_rate'] = 0.001
+    train_rs(rbm, train_params)
+    train_params['max_epoch'] = 150
+    train_params['cd_steps'] = 5
+    train_params['learning_rate'] = 0.0005
+    train_rs(rbm, train_params)
+
+
+
+
 #before = test()
 #train_params['max_epoch'] = 30
 #train_params['cd_steps'] = 5
