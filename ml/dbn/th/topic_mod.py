@@ -41,7 +41,7 @@ num_vis = num_dims
 data_sh = theano.shared(np.asarray(data, dtype=theano.config.floatX), borrow=True)
 data_valid_sh = theano.shared(np.asarray(data_valid, dtype=theano.config.floatX), borrow=True)
 
-train_params = {'batch_size' : 42, 'learning_rate' : 0.005, 'cd_steps' : 1, 'max_epoch' : 50, 'persistent_on' : True, 'init_momentum' : 0.5, 'momentum' : 0.9, 'moment_start' : 0.01, 'weight_decay' : 0.0002, 'introspect_freq' : 10 } 
+train_params = {'batch_size' : 42, 'learning_rate' : 0.005, 'cd_steps' : 5, 'max_epoch' : 50, 'persistent_on' : True, 'init_momentum' : 0.5, 'momentum' : 0.9, 'moment_start' : 0.01, 'weight_decay' : 0.0002, 'introspect_freq' : 10 } 
 num_hid = 60
 if len(sys.argv)>1:
     num_hid = int(sys.argv[1])

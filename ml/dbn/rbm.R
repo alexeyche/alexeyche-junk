@@ -37,75 +37,32 @@ free_energy <- function(v,model) {
 }
 
 prop_up <- function(given_v, model) {    
-    if(model$type == 'BB') {
-        out <- sigmoid( given_v %*% model$W + rep.row(model$hid_bias, nrow(given_v)) )
-    } else
-    if(model$type == 'BG') {
-        out <- given_v %*% model$W + rep.row(model$hid_bias, nrow(given_v))
-    } else 
-    if(model$type == 'GB') {
-        out <- sigmoid( (given_v %*% model$W)/model$sigma + rep.row(model$hid_bias, nrow(given_v)) )
-    } else {
-        cat("Unknown model type")
-    }
-    return(out)
+    sigmoid( given_v %*% model$W + rep.row(model$hid_bias, nrow(given_v)) )
 }
 
 prop_down <- function(given_h, model) {
-    if(model$type == 'BB') {
-        out <- sigmoid( given_h %*% t(model$W) + rep.row(model$vis_bias, nrow(given_h)) )    
-    } else
-    if(model$type == 'BG') {
-        out <- sigmoid( given_h %*% t(model$W) + rep.row(model$vis_bias, nrow(given_h)) )    
-    } else 
-    if(model$type == 'GB') {
-        out <- model$sigma * given_h %*% t(model$W) + rep.row(model$vis_bias, nrow(given_h))
-    } else {
-        cat("Unknown model type")
-    }
-    return(out)
+    sigmoid( given_h %*% t(model$W) + rep.row(model$vis_bias, nrow(given_h)) )        
 }
 
 gibbs_hvh <- function(hid_probs,model) {    
-    if ((model$type == 'GB' ) | (model$type == 'BB')) {
-        hid_states <- sample_bernoulli(hid_probs)
-    } else 
-    if (model$type == 'BG') {
-        hid_states <- hid_probs
-    }
+    hid_states <- sample_bernoulli(hid_probs)
     # p(v_model|h) calculate visible state with given hidden units state from positive phase    
     vis_probs <- prop_down(hid_states, model)
-    
-    if ((model$type == 'BG' ) | (model$type == 'BB')) {
-        vis_states <- sample_bernoulli(vis_probs)
-    } else 
-    if (model$type == 'GB') {
-        vis_states <- vis_probs
-    }
+        
+    vis_states <- sample_bernoulli(vis_probs)
     # p(h|v_model) calculate hidden state with given state of visible units    
     hid_probs <- prop_up(vis_states, model)
     
     list(vis_states = vis_states, vis_probs = vis_probs, hid_probs = hid_probs)
 }
 gibbs_vhv <- function(vis_probs,model) {    
-    if ((model$type == 'BG' ) | (model$type == 'BB')) {
-        vis_states <- sample_bernoulli(vis_probs)
-    } else 
-    if (model$type == 'GB') {
-        vis_states <- vis_probs
-    }
+    vis_states <- sample_bernoulli(vis_probs)
     # p(h|v_model) calculate hidden state with given state of visible units    
     hid_probs <- prop_up(vis_states, model)
     
-    if ((model$type == 'GB' ) | (model$type == 'BB')) {
-        hid_states <- sample_bernoulli(hid_probs)
-    } else 
-    if (model$type == 'BG') {
-        hid_states <- hid_probs
-    }
+    hid_states <- sample_bernoulli(hid_probs)
     # p(v_model|h) calculate visible state with given hidden units state from positive phase    
-    vis_probs <- prop_down(hid_states, model)
-    
+    vis_probs <- prop_down(hid_states, model)    
     return(vis_probs)
 }
 
@@ -171,18 +128,7 @@ train_rbm <- function(batched.data, params, num.hid, type = 'BB', sigma = 1, mod
             # positive part, given data                                
             data <- batched.data[,,batch]
             hid_probs <- prop_up(data,model) # v*W + bias_h    
-            if((epoch/epochs > 0.5)&(cd.upd == 0)) {
-                cd.iter <- cd.iter + 1
-                cd.upd <- cd.upd + 1
-            }
-            if((epoch/epochs > 0.75)&(cd.upd == 1)) {
-                cd.iter <- cd.iter + 1
-                cd.upd <- cd.upd + 1
-            }
-            if((epoch/epochs > 0.85)&(cd.upd == 2)) {
-                cd.iter <- cd.iter + 3
-                cd.upd <- cd.upd + 1
-            }
+
             # collecting negative samples
             if(persistent) {
                 c(vis_sample.fantasy, vis_probs.fantasy, hid_probs.fantasy) := contrastive_divergence(persist.hid_probs, model, cd.iter)
