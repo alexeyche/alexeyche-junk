@@ -8,7 +8,7 @@ source('dbn_util.R')
 
 set.seed(2)
 num.vis <- 10
-num.hid <- 7
+num.hid <- 15
 num.dims <- num.vis
 
 num.cases <- 500
@@ -64,7 +64,7 @@ sparsetarget <- .2
 hidmeans <- matrix(sparsetarget, nrow=1, ncol=num.hid)
 #model$hid_bias <- #log(sparsetarget/(1-sparsetarget)) * matrix(1, nrow=1, ncol=num.hid)
 #sparsecost <- .001
-sparsecost <- 0.1
+sparsecost <- 0.001
 sparsedamping <- .9
 
 
