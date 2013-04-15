@@ -2,10 +2,10 @@
 
 source('sys.R')
 source('rbm.R')
-source('dbn_util.R')
+source('ais_tools.R')
 
-betas <- c(seq(0,0.5,by=1e-03), seq(0.5,0.9,by=1e-04), seq(0.9,1,by=1e-04))
-numruns <- 100
+betas <- c(seq(0,0.5,by=1e-03), seq(0.5,0.9,by=1e-04), seq(0.9,1,by=1e-05))
+numruns <- 1000
 c(num.vis, num.hid) := dim(model$W)
 
 log_base_rate <- log(colMeans(data.all)) - log(1-colMeans(data.all))
@@ -50,7 +50,7 @@ for( bb_i in seq(2, length(betas)-1) ) {
     i <- i+1
     logw <- logw + log_p_k(v, bb, base_model,model)
     if(i %% 500 == 0) {        
-        cat("var log_w: ", mean(logw), " (", i/length(betas),")\n")
+        cat("var log_w: ", var(logw), " (", i/length(betas),")\n")
     }
     h.m <- prop_up.t(v, bb, model)
     h <- sample_bernoulli(h.m)

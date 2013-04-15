@@ -8,7 +8,7 @@ source('dbn_util.R')
 
 set.seed(2)
 num.vis <- 10
-num.hid <- 5
+num.hid <- 15
 num.dims <- num.vis
 
 num.cases <- 500

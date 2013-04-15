@@ -61,12 +61,3 @@ int_to_bin <- function(x) {
 }
 
 
-logsum <- function(x) {
-    alpha <- max(x) - log(.Machine$double.xmax)/2
-    alpha + log(sum(exp(x-alpha)))
-}
-
-logdiff <- function(x) {
-    alpha <- max(x) - log(.Machine$double.xmax)/2
-    alpha + log(diff(exp(x-alpha)))
-}
