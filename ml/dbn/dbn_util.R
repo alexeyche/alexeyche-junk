@@ -46,6 +46,27 @@ unbatch_data <- function(batched.data, start.batch = 1) {
     return(whole)
 }
 
-plot_energy_all <- function(data,model) {
-    
+int_to_bin <- function(x) {
+    p <- x
+    n <- ceiling(log2(max(x)))
+    v <- array(0, dim=c(length(x),n))
+    for(i in n:1) {
+        p <- p/2    
+        rest <- p %% 1
+        v[,i] <- rest != 0
+        p <- p - rest    
+    }
+    v[x == 0, ] <- 0
+    return(v)
+}
+
+
+logsum <- function(x) {
+    alpha <- max(x) - log(.Machine$double.xmax)/2
+    alpha + log(sum(exp(x-alpha)))
+}
+
+logdiff <- function(x) {
+    alpha <- max(x) - log(.Machine$double.xmax)/2
+    alpha + log(diff(exp(x-alpha)))
 }

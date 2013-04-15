@@ -2,8 +2,9 @@
 
 source('sys.R')
 source('rbm.R')
+source('dbn_util.R')
 
-betas <- c(seq(0,0.5,by=1e-03), seq(0.5,0.9,by=1e-04), seq(0.9,1,by=1e-05))
+betas <- c(seq(0,0.5,by=1e-03), seq(0.5,0.9,by=1e-04), seq(0.9,1,by=1e-04))
 numruns <- 100
 c(num.vis, num.hid) := dim(model$W)
 
@@ -16,10 +17,6 @@ base_model <- list(W = array(0,dim=c(num.vis,num.hid)), # visible units for row,
               num.cases = numruns)
 
 
-logsum <- function(x) {
-    alpha <- max(x) - log(.Machine$double.xmax)/2
-    alpha + log(sum(exp(x-alpha)))
-}
 
 prop_up.t <- function(v,bb,model) {
     sigmoid( bb * (v %*% model$W + rep.row(model$hid_bias,nrow(v)) ) ) 
@@ -46,14 +43,14 @@ bb <- betas[1]
 i <- 1
 v.m <- rep.row(sigmoid(base_model$vis_bias), numruns)
 v <- sample_bernoulli(v.m)
-logw <- log_p_k(v, bb, base_model,model)
+logw <- -log_p_k(v, bb, base_model,model)
 
 for( bb_i in seq(2, length(betas)-1) ) {
     bb <- betas[bb_i]
     i <- i+1
     logw <- logw + log_p_k(v, bb, base_model,model)
-    if(i %% 500 == 0) {
-        cat("var log_w: ", var(logw), " (", i/length(betas),")\n")
+    if(i %% 500 == 0) {        
+        cat("var log_w: ", mean(logw), " (", i/length(betas),")\n")
     }
     h.m <- prop_up.t(v, bb, model)
     h <- sample_bernoulli(h.m)
