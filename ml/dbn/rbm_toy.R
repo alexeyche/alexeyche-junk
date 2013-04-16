@@ -44,12 +44,14 @@ train.params = list(e.w = 0.1, e.v = 0.1, e.h = 0.1, w_cost = 0.0002,
 
 #plot(energy_all(test,hid_probs,model), type = 'l')
 
+
 model <- list(W = array(0.1*rnorm(num.vis*num.hid,mean=0.5,sd=0.3),dim=c(num.vis,num.hid)), # visible units for row, hidden units for col
              vis_bias = array(0,dim = c(1,num.vis)), 
              hid_bias = array(0,dim = c(1,num.hid)),
              num.cases = num.cases, batch.size = batch.size)
-
-
+model$W <- as.matrix(read.table("/home/alexeyche/tmp/W_vals", sep=","))
+model$vis_bias <- t(read.table("/home/alexeyche/tmp/vis_bias_vals", sep=","))
+model$hid_bias <- t(read.table("/home/alexeyche/tmp/hid_bias_vals", sep=","))
 for (v in 1:length(train.params)) assign(names(train.params)[v], train.params[[v]])
 W.inc <- hid_bias.inc <- vis_bias.inc <- 0
 
@@ -64,7 +66,7 @@ sparsetarget <- .2
 hidmeans <- matrix(sparsetarget, nrow=1, ncol=num.hid)
 #model$hid_bias <- #log(sparsetarget/(1-sparsetarget)) * matrix(1, nrow=1, ncol=num.hid)
 #sparsecost <- .001
-sparsecost <- 0.001
+sparsecost <- 0.01
 sparsedamping <- .9
 
 

@@ -46,7 +46,7 @@ class RBMStack():
             self.stack = rbms                
             self.num_vis = self.stack[0].num_vis
             self.num_layers = len(self.stack)
-            self.isTrained = True
+            self.isTrained = False
             self.input = rbms[0].input
             for l in xrange(1, self.num_layers):
                 self.stack[l].input = self.stack[l-1].output
