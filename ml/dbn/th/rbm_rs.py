@@ -29,7 +29,7 @@ class RBMReplSoftmax(RBM):
 
         self.epoch_ratio = theano.shared(np.zeros((1), dtype=theano.config.floatX), borrow=True)
         self.need_train=True
-        self.D = T.sum(self.input, axis=1)
+        self.D = T.sum(self.input, axis=1).dimshuffle(0,'x')
         self.params = [self.W, self.hbias, self.vbias]
         _, self.output = self.prop_up(self.input)
         
@@ -85,8 +85,8 @@ class RBMReplSoftmax(RBM):
         if not D:
             return [pre_softmax_activation, T.nnet.softmax(pre_softmax_activation)]
         else:
-            val = D.T*T.nnet.softmax(pre_softmax_activation).T           
-            return [pre_softmax_activation, val.T]
+            val = D*T.nnet.softmax(pre_softmax_activation)           
+            return [pre_softmax_activation, val]
 
     def free_energy(self, v_sample):
         D = T.sum(v_sample, axis=1)
