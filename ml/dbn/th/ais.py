@@ -3,8 +3,13 @@
 import theano
 import theano.tensor as T
 import numpy as np
-import os
+import os, sys
 from theano.tensor.shared_randomstreams import RandomStreams
+
+
+def logsum(x):
+    alpha = T.max(x) - T.log(np.finfo(theano.config.floatX).max)/2
+    return alpha + T.log(T.sum(T.exp(x-alpha))) 
 
 
 class AIS(object):
@@ -57,16 +62,56 @@ class AIS(object):
         logw -= self.log_p_k(v_next, beta)
         return logw, v_next
     
-    def perform(self):
+    def est_log_part_fun(self):
         # init first visible data 
         v_mean = T.nnet.sigmoid(self.base_vbias) 
         v_mean_rep = T.tile(v_mean, (self.numruns,)).reshape((self.numruns, self.model.num_vis))
         v = self.theano_rng.binomial(size=v_mean_rep.shape, n=1, p=v_mean_rep, dtype=theano.config.floatX)
         # init logw with beta = 0
-        logw = - self.log_p_k(v, 0)
-
-        [logw_list, vs], updates = theano.scan(self.ais_step, sequences = [self.betas[1:]], outputs_info = [logw, v])
-        logw = logw_list[-1]
-        logw += self.log_p_k(v, 1)            
+        logw = - self.log_p_k(v, 0.) 
         
-        return theano.function([], logw, updates=updates)
+        [logw_list, vs], updates = theano.scan(self.ais_step, sequences = self.betas[1:], outputs_info = [logw, v])
+        
+        logw = logw_list[-1]
+        v = vs[-1]
+        
+        logw += self.log_p_k(v, 1)            
+        r = logsum(logw) - T.log(self.numruns) 
+
+        log_z_base = T.sum(T.log(1+T.exp(self.base_vbias))) + (self.model.num_hid)*T.log(2)
+        log_z_est = r + log_z_base
+        
+        perform_fun = theano.function([], log_z_est, updates=updates)
+
+        return perform_fun()
+
+def log_prob_data(model, log_z, data):
+    return model.free_energy(data) - log_z
+
+
+class AIS_RS(AIS):
+    def sample_h_given_v(self, v, beta, D):
+        pre_sigmoid_activation = beta * (T.dot(v, self.model.W) + T.outer(D, self.model.hbias))
+        h_mean = T.nnet.sigmoid(pre_sigmoid_activation)
+        h_sample = self.theano_rng.binomial(size=h_mean.shape, n=1, p=h_mean, dtype=theano.config.floatX)
+        return h_sample
+
+    def sample_v_given_h(self, h, beta, D):
+        pre_softmax_activation = (1-beta) * T.outer(D, self.base_vbias) + beta * D * (T.dot(h, self.model.W.T) + self.model.vbias)
+        v_mean = T.nnet.softmax(pre_sigmoid_activation)
+#        v_sample = self.theano_rng.binomial(size=v_mean.shape, n=1, p=v_mean, dtype=theano.config.floatX)
+        return v_mean
+
+    def free_energy_base(self, v, beta):
+        return -beta * T.dot(v, self.base_vbias.T)
+
+    def free_energy(self, v, beta):
+        return -beta * T.dot(v, self.model.vbias.T) - T.sum(T.log(1+T.exp( beta * (T.dot(v,self.model.W) + T.outer(T.sum(v, axis=1),self.model.hbias)) )),axis=1)
+    
+    def ais_step(self, beta, logw, v):
+        logw += self.log_p_k(v, beta)
+        h = self.sample_h_given_v(v, beta)
+        v_next = self.sample_v_given_h(h, beta)
+        logw -= self.log_p_k(v_next, beta)
+        return logw, v_next
+

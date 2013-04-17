@@ -4,8 +4,8 @@ source('sys.R')
 source('rbm.R')
 source('ais_tools.R')
 
-#betas <- c(seq(0,0.5,by=1e-03), seq(0.5,0.9,by=1e-04), seq(0.9,1,by=1e-04))
-betas <- seq(0,1,by=0.01)
+betas <- c(seq(0,0.5,by=1e-03), seq(0.5,0.9,by=1e-04), seq(0.9,1,by=1e-04))
+#betas <- c(0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9, 1)#seq(0,1,by=0.01)
 numruns <- 100
 c(num.vis, num.hid) := dim(model$W)
 
@@ -44,6 +44,7 @@ bb <- betas[1]
 i <- 1
 v.m <- rep.row(sigmoid(base_model$vis_bias), numruns)
 v <- sample_bernoulli(v.m)
+
 logw <- -log_p_k(v, bb, base_model,model)
 
 for( bb_i in seq(2, length(betas)-1) ) {
@@ -51,13 +52,13 @@ for( bb_i in seq(2, length(betas)-1) ) {
     i <- i+1
     logw <- logw + log_p_k(v, bb, base_model,model)
     if(i %% 1 == 500) {        
-        cat("mean log_w: ", mean(logw), " (", i/length(betas),")\n")
+        cat("var log_w: ", var(logw), " (", i/length(betas),")\n")
     }
     h.m <- prop_up.t(v, bb, model)
     h <- sample_bernoulli(h.m)
     v.m <- prop_down.t(h, bb, base_model, model)
     v <- sample_bernoulli(v.m)
-    logw <- logw - log_p_k(v, bb, base_model, model)    
+    logw <- logw - log_p_k(v, bb, base_model, model)     
 }
 logw <- logw + log_p_k(v, 1, base_model,model)
 
