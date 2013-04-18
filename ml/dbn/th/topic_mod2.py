@@ -42,29 +42,39 @@ data_valid_sh = theano.shared(np.asarray(data_valid, dtype=theano.config.floatX)
 train_params = {  'batch_size' : 42, 
                   'learning_rate' : 0.05, 
                   'cd_steps' : 5, 
-                  'max_epoch' : 100, 
+                  'max_epoch' : 200, 
                   'persistent_on' : True, 
                   'init_momentum' : 0.5, 
                   'momentum' : 0.9, 
                   'moment_start' : 0.01, 
                   'weight_decay' : 0.0002, 
+                  'mean_field' : True,
                   'introspect_freq' : 10,
               } 
 num_hid = 60
 
-rbm = RBMReplSoftmax(num_vis = num_vis, num_hid = num_hid, from_cache = True)
+rbm = RBMReplSoftmax(num_vis = num_vis, num_hid = num_hid, from_cache = False)
 
-from rbm_util import *
+#from rbm_util import *
+#
+#steps = 100
+#numpy_rng = np.random.RandomState(1)
+#init_vis = theano.shared(data_nop[0:5])
+#preh, h, hs = rbm.sample_h_given_v(init_vis)
+#prev, v, vs = rbm.sample_v_given_h(hs, 1)
+#f = theano.function([], vs, givens=[(rbm.input, init_vis)])
+#v = f()
 
-steps = 100
-numpy_rng = np.random.RandomState(1)
-#init_vis = theano.shared(np.asarray(3*np.abs(numpy_rng.randn(10, rbm.num_vis)), dtype=theano.config.floatX))
-init_vis = theano.shared(data_nop[-100:])
-[pre_sigmoid_h1, h1_mean, h1_sample,
-            pre_sigmoid_v1, v1_mean, v1_sample], updates = theano.scan(rbm.gibbs_vhv, outputs_info = [None,None,None,None,None,init_vis], n_steps=steps)
-f = theano.function([], v1_mean[-1], givens=[(rbm.input, init_vis)], updates = updates)            
-v = f()
+rbms = RBMStack(rbms=[rbm])
+rbms.pretrain(data_sh, train_params)
+rbm.save_model()
 
-#rbms = RBMStack(rbms=[rbm])
-#rbms.pretrain(data_sh, train_params)
-#rbm.save_model()
+#ais = AIS_RS(rbm, betas = np.asarray(np.concatenate([np.arange(0,0.5,1e-03), np.arange(0.5,0.9,1e-03),np.arange(0.9,1,1e-03)]), dtype=theano.config.floatX), data = data, mean_field=False)
+#v_samples, logw_list, vs, logz = ais.est_log_part_fun()
+#log_z_est  = ais.est_log_part_fun()
+#log_probs = log_prob_data(rbm, log_z_est, data_sh)
+#v = data_sh[0:2]
+#D = T.sum(v, axis=1)
+#h = ais.sample_h_given_v(v, 0.5, D)
+#v = ais.sample_v_given_h(h, 0.5, D, 0)
+#f = theano.function([],[v,D,h])

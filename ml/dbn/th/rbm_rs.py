@@ -29,7 +29,7 @@ class RBMReplSoftmax(RBM):
 
         self.epoch_ratio = theano.shared(np.zeros((1), dtype=theano.config.floatX), borrow=True)
         self.need_train=True
-        self.D = T.sum(self.input, axis=1).dimshuffle(0,'x')
+        self.D = T.sum(self.input, axis=1) #.dimshuffle(0,'x')
         self.params = [self.W, self.hbias, self.vbias]
         _, self.output = self.prop_up(self.input)
         
@@ -61,7 +61,7 @@ class RBMReplSoftmax(RBM):
             print "Model file was not found. Need to call RBM.save_model()"
     
     def init_W(self):
-        initial_W = np.asarray(0.01 * self.numpy_rng.randn(self.num_vis, self.num_hid), dtype=theano.config.floatX)
+        initial_W = np.asarray(0.001 * self.numpy_rng.randn(self.num_vis, self.num_hid), dtype=theano.config.floatX)
         self.W = theano.shared(value=initial_W, name='W', borrow=True)
         self.W_inc = theano.shared(value=np.zeros((self.num_vis, self.num_hid), dtype=theano.config.floatX), name='W_inc', borrow=True)
     def init_hbias(self):
@@ -80,13 +80,13 @@ class RBMReplSoftmax(RBM):
         pre_sigmoid_activation = T.dot(vis, self.W) + T.outer(self.D,self.hbias)
         return [pre_sigmoid_activation, T.nnet.sigmoid(pre_sigmoid_activation)]
 
-    def prop_down(self, hid, D=None):
+    def prop_down(self, hid): #, D=None):
         pre_softmax_activation = T.dot(hid, self.W.T) + self.vbias
-        if not D:
-            return [pre_softmax_activation, T.nnet.softmax(pre_softmax_activation)]
-        else:
-            val = D*T.nnet.softmax(pre_softmax_activation)           
-            return [pre_softmax_activation, val]
+        return [pre_softmax_activation, T.nnet.softmax(pre_softmax_activation)]
+        
+#        else:
+#            val = D*T.nnet.softmax(pre_softmax_activation)           
+#            return [pre_softmax_activation, val]
 
     def free_energy(self, v_sample):
         D = T.sum(v_sample, axis=1)
@@ -95,15 +95,13 @@ class RBMReplSoftmax(RBM):
         hidden_term = T.sum(T.log(1 + T.exp(wx_b)), axis=1)
         return -hidden_term - vbias_term
 
-    def sample_v_given_h(self, h_sample,D=None):
-        if not D:
-            D = self.D       
-        pre_softmax_v, v_mean = self.prop_down(h_sample, self.D)
-
-        #v_samples, updates = theano.scan(fn=self.multinom_sampler,non_sequences=[v_mean, D], n_steps=10)        
-        #v_sample = T.mean(v_samples, axis=0)
-        #self.updates = updates
-        v_sample = v_mean
+    def sample_v_given_h(self, h_sample, mean_field=0):
+        pre_softmax_v, v_mean = self.prop_down(h_sample)
+        
+        #v_sample = self.D.dimshuffle(0,'x') * v_mean        
+        v_samples, updates = theano.scan(fn=self.multinom_sampler,non_sequences=[v_mean, self.D], n_steps=5)        
+        self.updates = updates
+        v_sample = v_samples[-1]
         return [pre_softmax_v, v_mean, v_sample]
 
     def sample_h_given_v(self, v_sample):
@@ -111,8 +109,8 @@ class RBMReplSoftmax(RBM):
         h_sample = self.theano_rng.binomial(size=h_mean.shape, n=1, p=h_mean, dtype=theano.config.floatX)
         return [pre_sigmoid_h, h_mean, h_sample]
 
-    def gibbs_hvh(self, h0_sample):
-        pre_softmax_v1, v1_mean, v1_sample = self.sample_v_given_h(h0_sample)
+    def gibbs_hvh(self, h0_sample, mean_field):
+        pre_softmax_v1, v1_mean, v1_sample = self.sample_v_given_h(h0_sample, mean_field)
         pre_sigmoid_h1, h1_mean, h1_sample = self.sample_h_given_v(v1_sample)
         return [pre_softmax_v1, v1_mean, v1_sample,
                 pre_sigmoid_h1, h1_mean, h1_sample]
@@ -143,7 +141,9 @@ class RBMReplSoftmax(RBM):
         persistent = train_params['persistent']
         persistent_on = train_params['persistent_on']
         batch_size = T.cast(train_params['batch_size'], dtype=theano.config.floatX)
-
+        mean_field=0
+        if train_params['mean_field']:
+            mean_field = 1
         # compute positive phase
         pre_sigmoid_ph, ph_mean, ph_sample = self.sample_h_given_v(self.input)
         self.add_watch(ph_mean, "hid_m")
@@ -161,6 +161,7 @@ class RBMReplSoftmax(RBM):
          pre_sigmoid_nhs, nh_means, nh_samples], updates = \
             theano.scan(self.gibbs_hvh,
                     outputs_info=[None,  None,  None, None, None, chain_start],
+                    non_sequences=mean_field,
                     n_steps=cd_steps)
 
         #import pdb; pdb.set_trace()
