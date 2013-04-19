@@ -13,11 +13,8 @@ from rbm import RBM
 CACHE_PATH="/mnt/yandex.disk/models/rs"
 
 class RBMReplSoftmax(RBM):
-    def __init__(self, input=None, num_vis = 5, num_hid = 10, from_cache=True):
-        if input is None:
-            self.input = T.matrix('input')
-        else:
-            self.input = input
+    def __init__(self, num_vis, num_hid, train_params, from_cache=True):
+        self.input = T.matrix('input')
 
         self.numpy_rng = np.random.RandomState(1)
         self.theano_rng = RandomStreams(self.numpy_rng.randint(2 ** 30))
@@ -33,13 +30,15 @@ class RBMReplSoftmax(RBM):
         self.params = [self.W, self.hbias, self.vbias]
         _, self.output = self.prop_up(self.input)
         
+        self.hid_means = theano.shared(np.tile(np.asarray(train_params['sparse_target'], dtype=theano.config.floatX), self.num_hid), borrow=True)
+
         if from_cache:
-            self.restore_from_cache()
+            self.restore_from_cache(train_params)
         self.watches=[]
         self.watches_label=[]
 
-    def save_model(self, path = CACHE_PATH):
-        fileName = "rbm_rs_%s_%s.model" % (self.num_vis, self.num_hid)
+    def save_model(self, train_params, path = CACHE_PATH):
+        fileName = "rbm_rs_%s_%s_ep%s_sp%s.model" % (self.num_vis, self.num_hid, train_params['max_epoch'], train_params['sparse_target'])
         fileName = os.path.join(path, fileName)
         save_file = open(fileName, 'wb')  # this will overwrite current contents
         cPickle.dump(self.W.get_value(borrow=True), save_file, -1)  
@@ -47,8 +46,8 @@ class RBMReplSoftmax(RBM):
         cPickle.dump(self.hbias.get_value(borrow=True), save_file, -1)
         save_file.close()
 
-    def restore_from_cache(self, path=CACHE_PATH):
-        fileName = "rbm_rs_%s_%s.model" % (self.num_vis, self.num_hid)
+    def restore_from_cache(self, train_params, path=CACHE_PATH):
+        fileName = "rbm_rs_%s_%s_ep%s_sp%s.model" % (self.num_vis, self.num_hid, train_params['max_epoch'], train_params['sparse_target'])
         fileName = os.path.join(path, fileName)
         if os.path.isfile(fileName):
             fileName_p = open(fileName, 'r')
@@ -80,13 +79,9 @@ class RBMReplSoftmax(RBM):
         pre_sigmoid_activation = T.dot(vis, self.W) + T.outer(self.D,self.hbias)
         return [pre_sigmoid_activation, T.nnet.sigmoid(pre_sigmoid_activation)]
 
-    def prop_down(self, hid): #, D=None):
+    def prop_down(self, hid): 
         pre_softmax_activation = T.dot(hid, self.W.T) + self.vbias
         return [pre_softmax_activation, T.nnet.softmax(pre_softmax_activation)]
-        
-#        else:
-#            val = D*T.nnet.softmax(pre_softmax_activation)           
-#            return [pre_softmax_activation, val]
 
     def free_energy(self, v_sample):
         D = T.sum(v_sample, axis=1)
@@ -95,13 +90,17 @@ class RBMReplSoftmax(RBM):
         hidden_term = T.sum(T.log(1 + T.exp(wx_b)), axis=1)
         return -hidden_term - vbias_term
 
-    def sample_v_given_h(self, h_sample, mean_field=0):
+    def sample_v_given_h(self, h_sample):
         pre_softmax_v, v_mean = self.prop_down(h_sample)
         
-        #v_sample = self.D.dimshuffle(0,'x') * v_mean        
         v_samples, updates = theano.scan(fn=self.multinom_sampler,non_sequences=[v_mean, self.D], n_steps=5)        
         self.updates = updates
         v_sample = v_samples[-1]
+        return [pre_softmax_v, v_mean, v_sample]
+
+    def sample_v_given_h_mf(self, h_sample):
+        pre_softmax_v, v_mean = self.prop_down(h_sample)
+        v_sample = self.D.dimshuffle(0,'x') * v_mean        
         return [pre_softmax_v, v_mean, v_sample]
 
     def sample_h_given_v(self, v_sample):
@@ -109,8 +108,14 @@ class RBMReplSoftmax(RBM):
         h_sample = self.theano_rng.binomial(size=h_mean.shape, n=1, p=h_mean, dtype=theano.config.floatX)
         return [pre_sigmoid_h, h_mean, h_sample]
 
-    def gibbs_hvh(self, h0_sample, mean_field):
-        pre_softmax_v1, v1_mean, v1_sample = self.sample_v_given_h(h0_sample, mean_field)
+    def gibbs_hvh(self, h0_sample):
+        pre_softmax_v1, v1_mean, v1_sample = self.sample_v_given_h(h0_sample)
+        pre_sigmoid_h1, h1_mean, h1_sample = self.sample_h_given_v(v1_sample)
+        return [pre_softmax_v1, v1_mean, v1_sample,
+                pre_sigmoid_h1, h1_mean, h1_sample]
+    
+    def gibbs_hvh_mf(self, h0_sample):
+        pre_softmax_v1, v1_mean, v1_sample = self.sample_v_given_h_mf(h0_sample)
         pre_sigmoid_h1, h1_mean, h1_sample = self.sample_h_given_v(v1_sample)
         return [pre_softmax_v1, v1_mean, v1_sample,
                 pre_sigmoid_h1, h1_mean, h1_sample]
@@ -141,13 +146,13 @@ class RBMReplSoftmax(RBM):
         persistent = train_params['persistent']
         persistent_on = train_params['persistent_on']
         batch_size = T.cast(train_params['batch_size'], dtype=theano.config.floatX)
-        mean_field=0
-        if train_params['mean_field']:
-            mean_field = 1
+        sparse_damping = T.cast(train_params['sparse_damping'],dtype=theano.config.floatX)
+        sparse_cost = T.cast(train_params['sparse_cost'],dtype=theano.config.floatX)
+        sparse_target = T.cast(train_params['sparse_target'],dtype=theano.config.floatX)
+        
         # compute positive phase
         pre_sigmoid_ph, ph_mean, ph_sample = self.sample_h_given_v(self.input)
         self.add_watch(ph_mean, "hid_m")
-        self.add_watch(ph_sample, "hid_s")
 
         if persistent_on:
             if T.eq(T.sum(T.sum(persistent,axis=1)),0): 
@@ -157,15 +162,17 @@ class RBMReplSoftmax(RBM):
         else:
             chain_start = ph_sample
         
+        if train_params['mean_field']:
+            gibbs_hvh_fun = self.gibbs_hvh_mf        
+        else:
+            gibbs_hvh_fun = self.gibbs_hvh
+
         [pre_softmax_nvs, nv_means, nv_samples,
          pre_sigmoid_nhs, nh_means, nh_samples], updates = \
-            theano.scan(self.gibbs_hvh,
+            theano.scan(gibbs_hvh_fun,
                     outputs_info=[None,  None,  None, None, None, chain_start],
-                    non_sequences=mean_field,
                     n_steps=cd_steps)
 
-        #import pdb; pdb.set_trace()
-        #updates.update(self.updates)
         vis_samp_fant = nv_samples[-1]
         hid_probs_fant = nh_means[-1]
 
@@ -174,35 +181,30 @@ class RBMReplSoftmax(RBM):
         self.add_watch(hid_probs_fant, "neg_hid_m")
 
         cur_momentum = T.switch(T.lt(self.epoch_ratio[0], moment_start), init_momentum, momentum)
-        # updates
+        # sparsity stuff
+        hid_means = sparse_damping * self.hid_means + (1-sparse_damping) * T.sum(ph_mean, axis=0)/batch_size
+        sparse_grads = sparse_cost * ( T.tile(hid_means.dimshuffle('x',0), (train_params['batch_size'],1) ) - sparse_target )
         
-        W_inc = ( T.dot(self.input.T, ph_mean) - T.dot(vis_samp_fant.T, hid_probs_fant) )/batch_size - self.W * weight_decay
-        hbias_inc = (T.sum(ph_mean, axis=0) - T.sum(hid_probs_fant,axis=0))/batch_size
+        self.add_watch(hid_means, "hid_means")
+        self.add_watch(sparse_grads, "sparse_grads")
+        # updates
+        W_inc = ( T.dot(self.input.T, ph_mean) - T.dot(vis_samp_fant.T, hid_probs_fant) - T.dot(self.input.T, sparse_grads) )/batch_size - self.W * weight_decay
+        hbias_inc = (T.sum(ph_mean, axis=0) - T.sum(hid_probs_fant,axis=0) - T.sum(sparse_grads, axis=0))/batch_size
+        
         vbias_inc = (T.sum(self.input,axis=0) - T.sum(vis_samp_fant,axis=0))/batch_size
         
-#        W_inc = ( T.dot(self.input.T, ph_mean) - T.dot(vis_samp_fant.T, hid_probs_fant) )/batch_size
-#        hbias_inc = (T.sum(ph_mean, axis=0) - T.sum(hid_probs_fant,axis=0))/batch_size
-#        vbias_inc = (T.sum(self.input,axis=0) - T.sum(vis_samp_fant,axis=0))/batch_size
-
         W_inc_rate = (self.W_inc * cur_momentum + W_inc) * l_rate
         hbias_inc_rate = (self.hbias_inc * cur_momentum + hbias_inc) * l_rate
         vbias_inc_rate = (self.vbias_inc * cur_momentum + vbias_inc) * l_rate
-
-#        W_inc_rate = self.W_inc * l_rate
-#        hbias_inc_rate = self.hbias_inc * l_rate
-#        vbias_inc_rate = self.vbias_inc * l_rate
-        
-        self.add_watch(W_inc_rate, "W_inc")
-        self.add_watch(hbias_inc_rate, "hbias_inc")
-        self.add_watch(vbias_inc_rate, "vbias_inc")
-
+       
         updates[self.W] = self.W + W_inc_rate
         updates[self.hbias] = self.hbias + hbias_inc_rate
         updates[self.vbias] = self.vbias + vbias_inc_rate
         updates[self.W_inc] = W_inc
         updates[self.hbias_inc] = hbias_inc
         updates[self.vbias_inc] = vbias_inc
-        
+        updates[self.hid_means] = hid_means
+
         self.add_watch(T.as_tensor_variable(self.W), "W")
 
         current_free_energy = T.mean(self.free_energy(self.input))

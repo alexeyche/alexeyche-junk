@@ -205,7 +205,7 @@ class RBMBinLine(RBM):
         h1_val = self.sample_h_given_v(v1_sample)
         return [pre_sigmoid_v1, v1_mean, v1_sample, h1_val]
     def get_cost_updates(self, train_params):
-        l_rate = T.cast(train_params['learning_rate'], dtype=theano.config.floatX)
+        l_rate = T.cast(train_params['learning_rate_line'], dtype=theano.config.floatX)
         weight_decay = T.cast(train_params['weight_decay'], dtype=theano.config.floatX)
         momentum = T.cast(train_params['momentum'], dtype=theano.config.floatX)
         init_momentum = T.cast(train_params['init_momentum'], dtype=theano.config.floatX)
@@ -234,9 +234,9 @@ class RBMBinLine(RBM):
         W_inc = (T.dot(self.input.T, h_val) - T.dot(vis_sample_fantasy.T, hid_val_fantasy))/batch_size - self.W * weight_decay
         hbias_inc = (T.sum(h_val, axis=0) - T.sum(hid_val_fantasy,axis=0))/batch_size
         vbias_inc = (T.sum(self.input,axis=0) - T.sum(vis_sample_fantasy,axis=0))/batch_size
-        W_inc_rate =  (W_inc * cur_momentum + self.W_inc) * l_rate
+        W_inc_rate = (W_inc * cur_momentum + self.W_inc) * l_rate
 
-        updates[self.W] = self.W +  W_inc_rate
+        updates[self.W] = self.W + W_inc_rate
         updates[self.hbias] = self.hbias + (self.hbias_inc * cur_momentum + hbias_inc) * l_rate
         updates[self.vbias] = self.vbias + (self.vbias_inc * cur_momentum + vbias_inc) * l_rate
         updates[self.W_inc] = W_inc
