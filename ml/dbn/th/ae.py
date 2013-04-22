@@ -81,7 +81,7 @@ class AutoEncoder(object):
 
     def finetune_cost(self):
         output = self.get_output()
-        return -T.mean(T.sum(T.sqr(self.input - output), axis=1))
+        return T.mean(T.sum(T.sqr(self.input - output), axis=1))
     
     def finetune_fun(self, data_sh, train_params):
         batch_size = train_params['batch_size']

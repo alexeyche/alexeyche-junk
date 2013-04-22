@@ -93,7 +93,7 @@ class RBMReplSoftmax(RBM):
     def sample_v_given_h(self, h_sample):
         pre_softmax_v, v_mean = self.prop_down(h_sample)
         
-        v_samples, updates = theano.scan(fn=self.multinom_sampler,non_sequences=[v_mean, self.D], n_steps=5)        
+        v_samples, updates = theano.scan(fn=self.multinom_sampler,non_sequences=[v_mean, self.D], n_steps=1)        
         self.updates = updates
         v_sample = v_samples[-1]
         return [pre_softmax_v, v_mean, v_sample]

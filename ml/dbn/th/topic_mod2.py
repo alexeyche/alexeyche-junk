@@ -18,7 +18,8 @@ from ais import *
 
 from rbm_classic import RBM
 
-csvfile = "/home/alexeyche/my/git/alexeyche-junk/ml/dbn/test_data_rs.csv"
+#csvfile = "/home/alexeyche/my/git/alexeyche-junk/ml/dbn/test_data_rs.csv"
+csvfile = "/home/alexeyche/my/dbn/topic_mod/topictoolbox/nips_feats.csv"
 data = np.asarray(genfromtxt(csvfile, delimiter=','), dtype=theano.config.floatX)
 data_nop = data
 
@@ -49,27 +50,37 @@ train_params = {  'batch_size'             : 42,
                   'momentum'               : 0.9, 
                   'moment_start'           : 0.01, 
                   'weight_decay'           : 0.0002, 
-                  'mean_field'             : False,
+                  'mean_field'             : True,
                   'introspect_freq'        : 10,
                   'sparse_cost'            : 0.001,
                   'sparse_damping'         : 0.9,
                   'sparse_target'          : 0.2,
                   'learning_rate_line'     : 0.001, 
-                  'finetune_learning_rate' : 0.1,
+                  'finetune_learning_rate' : 0.0001,
               } 
 num_hid = 60
 
-rbm = RBMReplSoftmax(num_vis = num_vis, num_hid = num_hid, train_params = train_params, from_cache = True)
 
+rbm = RBMReplSoftmax(num_vis = num_vis, num_hid = num_hid, train_params = train_params, from_cache = False)
+
+train_params['max_epoch'] = 50
+train_params['cd_steps'] = 2
 rbms = RBMStack(rbms=[rbm])
 for watches in rbms.pretrain(data_sh, data_valid_sh, train_params):
     print watches
 
-ae = AutoEncoder(rbms)
-train_params['max_epoch'] = 400
-ae.pretrain(data_sh, data_valid_sh, train_params)
-ae.finetune(data_sh, train_params)
-print_top_to_file(ae, train_params, "_sp0.2", data_nop_sh, range(0,100)) 
+train_params['max_epoch'] = 200
+train_params['mean_field'] = False
+train_params['cd_steps'] = 5
+for watches in rbms.pretrain(data_sh, data_valid_sh, train_params):
+    print watches
+
+#ae = AutoEncoder(rbms)
+#train_params['max_epoch'] = 400
+#ae.pretrain(data_sh, data_valid_sh, train_params)
+#train_params['max_epoch'] = 50
+#ae.finetune(data_sh, train_params)
+#print_top_to_file(ae, train_params, "_sp0.2", data_nop_sh, range(0,100)) 
 #ais = AIS_RS(rbm, betas = np.asarray(np.concatenate([np.arange(0,0.5,1e-03), np.arange(0.5,0.9,1e-03),np.arange(0.9,1,1e-03)]), dtype=theano.config.floatX), data = data, mean_field=False)
 #v_samples, logw_list, vs, logz = ais.est_log_part_fun()
 #log_z_est  = ais.est_log_part_fun()

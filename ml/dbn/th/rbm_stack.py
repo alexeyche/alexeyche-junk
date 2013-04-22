@@ -23,7 +23,7 @@ class RBMStack():
             self.stack = []
             num_vis_cur = self.num_vis
             input_cur = self.input
-            self.need_train = False
+            self.need_train = True
             for l in xrange(0, self.num_layers):
                 num_hid_cur = hid_layers_size[l]
                  
