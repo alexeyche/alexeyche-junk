@@ -104,20 +104,15 @@ class RBMStack():
             f = fn[i]
             wf = wfn[i]
             rbm = self.stack[i]
-            mean_cost = []
-            mean_cost_last = 0
             for ep in xrange(0, max_epoch):
                 for b in xrange(0, num_batches):
                     cost, cur_free_en, cur_gparam = f(b)
-                    mean_cost.append(cost)
                     epoch_ratio = rbm.epoch_ratio.get_value(borrow=True)
                 
-                    print "pretrain(%3.1f), layer %s, epoch # %d:%d last mean cost %2.2f (cost: %f) free energy: %f grad: %f" % (epoch_ratio*100,0, ep, b, mean_cost_last, cost, cur_free_en, cur_gparam)
+                    print "pretrain(%3.1f), layer %s, epoch # %d:%d (cost: %f) free energy: %f grad: %f" % (epoch_ratio*100,0, ep, b, cost, cur_free_en, cur_gparam)
                 
                 if ep % introspect_freq == 0:
-                    yield zip(rbm.watches_label, wf(b))               
-                mean_cost_last = np.mean(mean_cost)
-                mean_cost = []
+                    yield dict(zip(rbm.watches_label, wf(b)))
 
             self.stack[i].save_model(train_params, CACHE_PATH)
         self.need_train = False

@@ -13,7 +13,8 @@ from rbm_rs import RBMReplSoftmax
 from rbm_stack import RBMStack
 from rbm_util import gray_plot, print_top_to_file
 from ae import AutoEncoder
-import db_redis as rd
+#import db_redis as rd
+from sqlite_load import load_np_array
 from ais import *
 
 from rbm_classic import RBM
@@ -63,11 +64,27 @@ num_hid = 60
 
 rbm = RBMReplSoftmax(num_vis = num_vis, num_hid = num_hid, train_params = train_params, from_cache = False)
 
+
+def load_watches(watches):
+    load_np_array(watches)
+    #for k in watches:
+        #v = watches[k]
+        #if len(v.shape) == 1:
+        #        i_0 = np.random.random_integers(0,v.shape[0], 1000)                
+        #        v = v[i_0]
+        #if len(v.shape) == 2:
+        #    if v.shape[0]*v.shape[1]>1000:
+        #        i_0 = np.random.random_integers(0,v.shape[0], 33)                
+        #        i_1 = np.random.random_integers(0,v.shape[1], 33)                
+        #        v = v[i_0,i_1]
+        #
+        #load(v)
+
 train_params['max_epoch'] = 50
 train_params['cd_steps'] = 2
 rbms = RBMStack(rbms=[rbm])
 for watches in rbms.pretrain(data_sh, data_valid_sh, train_params):
-    print watches
+    load_watches(watches)
 
 train_params['max_epoch'] = 200
 train_params['mean_field'] = False
