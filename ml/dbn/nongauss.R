@@ -15,5 +15,3 @@ excess_kurtosis <- function(x) {
     mean((x-mean(x))^4)/(var(x)^2) - 3
 }
 
-con <- dbConnect(dbDriver("SQLite"), "/home/alexeyche/ml.db")
-require(RSQLite)

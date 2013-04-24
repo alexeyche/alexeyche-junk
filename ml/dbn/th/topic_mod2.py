@@ -14,13 +14,13 @@ from rbm_stack import RBMStack
 from rbm_util import gray_plot, print_top_to_file
 from ae import AutoEncoder
 #import db_redis as rd
-from sqlite_load import load_np_array
+from sqlite_load import load_np_array, flush_db
 from ais import *
 
 from rbm_classic import RBM
 
-#csvfile = "/home/alexeyche/my/git/alexeyche-junk/ml/dbn/test_data_rs.csv"
-csvfile = "/home/alexeyche/my/dbn/topic_mod/topictoolbox/nips_feats.csv"
+csvfile = "/home/alexeyche/my/git/alexeyche-junk/ml/dbn/test_data_rs.csv"
+#csvfile = "/home/alexeyche/my/dbn/topic_mod/topictoolbox/nips_feats.csv"
 data = np.asarray(genfromtxt(csvfile, delimiter=','), dtype=theano.config.floatX)
 data_nop = data
 
@@ -61,24 +61,14 @@ train_params = {  'batch_size'             : 42,
               } 
 num_hid = 60
 
-
+flush_db()
 rbm = RBMReplSoftmax(num_vis = num_vis, num_hid = num_hid, train_params = train_params, from_cache = False)
 
-
+iter=0
 def load_watches(watches):
-    load_np_array(watches)
-    #for k in watches:
-        #v = watches[k]
-        #if len(v.shape) == 1:
-        #        i_0 = np.random.random_integers(0,v.shape[0], 1000)                
-        #        v = v[i_0]
-        #if len(v.shape) == 2:
-        #    if v.shape[0]*v.shape[1]>1000:
-        #        i_0 = np.random.random_integers(0,v.shape[0], 33)                
-        #        i_1 = np.random.random_integers(0,v.shape[1], 33)                
-        #        v = v[i_0,i_1]
-        #
-        #load(v)
+    global iter
+    load_np_array(watches, iter)
+    iter+=1
 
 train_params['max_epoch'] = 50
 train_params['cd_steps'] = 2
