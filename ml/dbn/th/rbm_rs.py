@@ -76,7 +76,7 @@ class RBMReplSoftmax(RBM):
         self.init_hbias()
 
     def prop_up(self, vis):
-        pre_sigmoid_activation = T.dot(vis, self.W) + T.outer(self.D,self.hbias)
+        pre_sigmoid_activation = T.dot(vis, self.W) + self.hbias #T.outer(self.D,self.hbias)
         return [pre_sigmoid_activation, T.nnet.sigmoid(pre_sigmoid_activation)]
 
     def prop_down(self, hid): 

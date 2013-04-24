@@ -19,8 +19,8 @@ from ais import *
 
 from rbm_classic import RBM
 
-csvfile = "/home/alexeyche/my/git/alexeyche-junk/ml/dbn/test_data_rs.csv"
-#csvfile = "/home/alexeyche/my/dbn/topic_mod/topictoolbox/nips_feats.csv"
+#csvfile = "/home/alexeyche/my/git/alexeyche-junk/ml/dbn/test_data_rs.csv"
+csvfile = "/home/alexeyche/my/dbn/topic_mod/topictoolbox/nips_feats.csv"
 data = np.asarray(genfromtxt(csvfile, delimiter=','), dtype=theano.config.floatX)
 data_nop = data
 
@@ -43,8 +43,8 @@ data_valid_sh = theano.shared(np.asarray(data_valid, dtype=theano.config.floatX)
 data_nop_sh = theano.shared(np.asarray(data_nop, dtype=theano.config.floatX), borrow=True)
 
 train_params = {  'batch_size'             : 42, 
-                  'learning_rate'          : 0.05, 
-                  'cd_steps'               : 5, 
+                  'learning_rate'          : 0.001, 
+                  'cd_steps'               : 1, 
                   'max_epoch'              : 100, 
                   'persistent_on'          : True, 
                   'init_momentum'          : 0.5, 
@@ -53,7 +53,7 @@ train_params = {  'batch_size'             : 42,
                   'weight_decay'           : 0.0002, 
                   'mean_field'             : True,
                   'introspect_freq'        : 10,
-                  'sparse_cost'            : 0.001,
+                  'sparse_cost'            : 0,
                   'sparse_damping'         : 0.9,
                   'sparse_target'          : 0.2,
                   'learning_rate_line'     : 0.001, 
@@ -61,9 +61,14 @@ train_params = {  'batch_size'             : 42,
               } 
 num_hid = 60
 
-flush_db()
 rbm = RBMReplSoftmax(num_vis = num_vis, num_hid = num_hid, train_params = train_params, from_cache = False)
 
+
+#preh, h = rbm.prop_up(data_sh[0:100])
+#f = theano.function([], [preh,h], givens=[(rbm.input, data_sh[0:100])] )
+
+
+flush_db()
 iter=0
 def load_watches(watches):
     global iter
