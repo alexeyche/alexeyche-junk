@@ -20,4 +20,6 @@ get_names <- function() {
 get_iters <- function() {
     dbGetQuery(con,"SELECT DISTINCT iter FROM matrices")$iter
 }
+
 last_iter <- max(get_iters())
+load_matrices(get_names(), last_iter)
