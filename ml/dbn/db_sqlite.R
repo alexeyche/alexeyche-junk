@@ -1,7 +1,9 @@
+#!/usr/bin/RScript
 
 require(RSQLite)
 
-con <- dbConnect(dbDriver("SQLite"), "/home/alexeyche/ml.db")
+db_name <- "/home/alexeyche/ml.db"
+
 
 load_matrices <- function(names, iter) {
     df_all <- dbGetQuery(con,paste("SELECT name, colNum, rowNum, value FROM matrices WHERE iter =",iter))
@@ -17,9 +19,16 @@ load_matrices <- function(names, iter) {
 get_names <- function() {
     dbGetQuery(con,"SELECT DISTINCT name FROM matrices")$name
 }
-get_iters <- function() {
-    dbGetQuery(con,"SELECT DISTINCT iter FROM matrices")$iter
+last_iter <- function() {
+    dbGetQuery(con,"SELECT max(iter) as iter FROM matrices")$iter
 }
-
-last_iter <- max(get_iters())
-load_matrices(get_names(), last_iter)
+while(TRUE) {
+    con <- dbConnect(SQLite(), dbname=db_name, flags=SQLITE_RO)
+    result <- try(load_matrices(get_names(), last_iter()), silent =TRUE)
+    if (class(result) != "try-error") {
+        hist(hid_m@x)
+        Sys.sleep(2)
+    }
+    Sys.sleep(0.5)
+}
+#load_matrices(get_names(),0)

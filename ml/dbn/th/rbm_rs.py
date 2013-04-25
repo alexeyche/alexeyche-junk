@@ -76,12 +76,12 @@ class RBMReplSoftmax(RBM):
         self.init_hbias()
 
     def prop_up(self, vis):
-        pre_sigmoid_activation = T.dot(vis, self.W) + self.hbias #T.outer(self.D,self.hbias)
+        pre_sigmoid_activation = T.dot(vis, self.W) + T.outer(self.D,self.hbias)
         return [pre_sigmoid_activation, T.nnet.sigmoid(pre_sigmoid_activation)]
 
     def prop_down(self, hid): 
         pre_softmax_activation = T.dot(hid, self.W.T) + self.vbias
-        return [pre_softmax_activation, T.nnet.softmax(pre_softmax_activation)]
+        return [pre_softmax_activation, T.nnet.softmax(T.nnet.softmax(pre_softmax_activation))]
 
     def free_energy(self, v_sample):
         D = T.sum(v_sample, axis=1)
@@ -93,7 +93,7 @@ class RBMReplSoftmax(RBM):
     def sample_v_given_h(self, h_sample):
         pre_softmax_v, v_mean = self.prop_down(h_sample)
         
-        v_samples, updates = theano.scan(fn=self.multinom_sampler,non_sequences=[v_mean, self.D], n_steps=1)        
+        v_samples, updates = theano.scan(fn=self.multinom_sampler,non_sequences=[v_mean, self.D], n_steps=3)        
         self.updates = updates
         v_sample = v_samples[-1]
         return [pre_softmax_v, v_mean, v_sample]
@@ -174,22 +174,23 @@ class RBMReplSoftmax(RBM):
                     n_steps=cd_steps)
 
         vis_samp_fant = nv_samples[-1]
-        hid_probs_fant = nh_means[-1]
+        hid_probs_fant = nh_samples[-1]
 
-        self.add_watch(nv_means[-1], "neg_vis_m")
         self.add_watch(vis_samp_fant, "neg_vis_s")
         self.add_watch(hid_probs_fant, "neg_hid_m")
 
         cur_momentum = T.switch(T.lt(self.epoch_ratio[0], moment_start), init_momentum, momentum)
         # sparsity stuff
-        hid_means = sparse_damping * self.hid_means + (1-sparse_damping) * T.sum(ph_mean, axis=0)/batch_size
-        sparse_grads = sparse_cost * ( T.tile(hid_means.dimshuffle('x',0), (train_params['batch_size'],1) ) - sparse_target )
+#        hid_means = sparse_damping * self.hid_means + (1-sparse_damping) * T.sum(ph_mean, axis=0)/batch_size
+#        sparse_grads = sparse_cost * ( T.tile(hid_means.dimshuffle('x',0), (train_params['batch_size'],1) ) - sparse_target )
         
-        self.add_watch(hid_means, "hid_means")
-        self.add_watch(sparse_grads, "sparse_grads")
+#        self.add_watch(hid_means, "hid_means")
+#        self.add_watch(sparse_grads, "sparse_grads")
         # updates
-        W_inc = ( T.dot(self.input.T, ph_mean) - T.dot(vis_samp_fant.T, hid_probs_fant) - T.dot(self.input.T, sparse_grads) )/batch_size - self.W * weight_decay
-        hbias_inc = (T.sum(ph_mean, axis=0) - T.sum(hid_probs_fant,axis=0) - T.sum(sparse_grads, axis=0))/batch_size
+#        W_inc = ( T.dot(self.input.T, ph_mean) - T.dot(vis_samp_fant.T, hid_probs_fant) - T.dot(self.input.T, sparse_grads) )/batch_size - self.W * weight_decay
+#        hbias_inc = (T.sum(ph_mean, axis=0) - T.sum(hid_probs_fant,axis=0) - T.sum(sparse_grads, axis=0))/batch_size
+        W_inc = ( T.dot(self.input.T, ph_sample) - T.dot(vis_samp_fant.T, hid_probs_fant) )/batch_size #- self.W * weight_decay
+        hbias_inc = (T.sum(ph_sample, axis=0) - T.sum(hid_probs_fant,axis=0) )/batch_size
         
         vbias_inc = (T.sum(self.input,axis=0) - T.sum(vis_samp_fant,axis=0))/batch_size
         
@@ -203,9 +204,14 @@ class RBMReplSoftmax(RBM):
         updates[self.W_inc] = W_inc
         updates[self.hbias_inc] = hbias_inc
         updates[self.vbias_inc] = vbias_inc
-        updates[self.hid_means] = hid_means
+#        updates[self.hid_means] = hid_means
 
-        self.add_watch(T.as_tensor_variable(self.W), "W")
+#        self.add_watch(T.as_tensor_variable(self.W), "W")
+#        self.add_watch(T.as_tensor_variable(self.hbias), "hbias")
+#        self.add_watch(T.as_tensor_variable(self.vbias), "vbias")
+        self.add_watch(W_inc_rate, "W_inc")
+#        self.add_watch(hbias_inc_rate, "hbias_inc")
+#        self.add_watch(vbias_inc_rate, "vbias_inc")
 
         current_free_energy = T.mean(self.free_energy(self.input))
         self.add_watch(self.free_energy(self.input),'free_en') 

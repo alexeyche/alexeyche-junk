@@ -27,9 +27,11 @@ data_nop = data
 perm = np.random.permutation(data.shape[0])
 data = data[perm]
 
-valid_num = 50
+valid_num = 40
 data_valid = data[-valid_num:]
 data = data[:-valid_num]
+
+data = data[:50]
 
 
 num_cases = data.shape[0]
@@ -42,18 +44,18 @@ data_sh = theano.shared(np.asarray(data, dtype=theano.config.floatX), borrow=Tru
 data_valid_sh = theano.shared(np.asarray(data_valid, dtype=theano.config.floatX), borrow=True)
 data_nop_sh = theano.shared(np.asarray(data_nop, dtype=theano.config.floatX), borrow=True)
 
-train_params = {  'batch_size'             : 42, 
-                  'learning_rate'          : 0.001, 
+train_params = {  'batch_size'             : 50, 
+                  'learning_rate'          : 1e-06, 
                   'cd_steps'               : 1, 
-                  'max_epoch'              : 100, 
+                  'max_epoch'              : 200, 
                   'persistent_on'          : True, 
-                  'init_momentum'          : 0.5, 
-                  'momentum'               : 0.9, 
+                  'init_momentum'          : 0, 
+                  'momentum'               : 0, 
                   'moment_start'           : 0.01, 
                   'weight_decay'           : 0.0002, 
-                  'mean_field'             : True,
-                  'introspect_freq'        : 10,
-                  'sparse_cost'            : 0,
+                  'mean_field'             : False,
+                  'introspect_freq'        : 20,
+                  'sparse_cost'            : 0.01,
                   'sparse_damping'         : 0.9,
                   'sparse_target'          : 0.2,
                   'learning_rate_line'     : 0.001, 
@@ -75,17 +77,17 @@ def load_watches(watches):
     load_np_array(watches, iter)
     iter+=1
 
-train_params['max_epoch'] = 50
-train_params['cd_steps'] = 2
 rbms = RBMStack(rbms=[rbm])
 for watches in rbms.pretrain(data_sh, data_valid_sh, train_params):
     load_watches(watches)
 
-train_params['max_epoch'] = 200
-train_params['mean_field'] = False
-train_params['cd_steps'] = 5
-for watches in rbms.pretrain(data_sh, data_valid_sh, train_params):
-    print watches
+#train_params['max_epoch'] = 200
+#train_params['mean_field'] = False
+#train_params['cd_steps'] = 5
+#train_params['learning_rate'] = 0.0005
+#rbms.stack[0].need_train = True
+#for watches in rbms.pretrain(data_sh, data_valid_sh, train_params):
+#    print watches
 
 #ae = AutoEncoder(rbms)
 #train_params['max_epoch'] = 400
