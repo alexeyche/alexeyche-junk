@@ -206,12 +206,12 @@ class RBMReplSoftmax(RBM):
         updates[self.vbias_inc] = vbias_inc
 #        updates[self.hid_means] = hid_means
 
-#        self.add_watch(T.as_tensor_variable(self.W), "W")
-#        self.add_watch(T.as_tensor_variable(self.hbias), "hbias")
-#        self.add_watch(T.as_tensor_variable(self.vbias), "vbias")
+        self.add_watch(T.as_tensor_variable(self.W), "W")
+        self.add_watch(T.as_tensor_variable(self.hbias), "hbias")
+        self.add_watch(T.as_tensor_variable(self.vbias), "vbias")
         self.add_watch(W_inc_rate, "W_inc")
-#        self.add_watch(hbias_inc_rate, "hbias_inc")
-#        self.add_watch(vbias_inc_rate, "vbias_inc")
+        self.add_watch(hbias_inc_rate, "hbias_inc")
+        self.add_watch(vbias_inc_rate, "vbias_inc")
 
         current_free_energy = T.mean(self.free_energy(self.input))
         self.add_watch(self.free_energy(self.input),'free_en') 

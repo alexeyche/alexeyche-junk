@@ -58,9 +58,9 @@ monit_plots <- function(d) {
   pl_w <- get_gray_plot(d$W, "W")
   pl_fen <- ggplot(melt(d$free_en),aes(X2,value)) + geom_point() + geom_line() + 
             ylim(min(d$free_en),0) + labs(title = "Free energy")
-  pl_h_m <- get_gray_plot(d$hid_m, "hid")
-  pl_neg_h_m <- get_gray_plot(d$neg_hid_m, "neg hid")
-  pl_neg_v_m <- get_gray_plot(d$neg_vis_m, "neg vis")  
+  pl_h_m <- get_gray_plot(d$hid_m, "hid_m")
+  pl_neg_h_m <- get_gray_plot(d$neg_hid_m, "neg_hid_m")
+  pl_neg_v_m <- get_gray_plot(d$neg_vis_m, "neg_vis_m")  
   pl_hist_W <- ggplot(melt(d$W), aes(x=value)) + geom_histogram(binwidth=.5, colour="black", fill="white") + labs(title = "W hist")
   #pl_free_en <- ggplot(melt(d$free_en_acc),aes(X2,value)) + geom_point() + geom_line() +
   #              xlim(0,d$max_epoch) + ylim(min(d$free_en_acc),0) + labs(title = "Free energy acc")
