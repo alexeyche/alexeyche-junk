@@ -104,12 +104,9 @@ class AIS_RS(AIS):
     def sample_v_given_h(self, h, beta, D):
         pre_softmax_activation = (1-beta) * self.base_vbias + beta * (T.dot(h, self.model.W.T) + self.model.vbias)
         v_mean = T.nnet.softmax(pre_softmax_activation)
-        
-        #v_sample = D.dimshuffle(0,'x') * v_mean
-        v_samples, updates = theano.scan(fn=self.multinom_sampler,non_sequences=[v_mean, D], n_steps=5)        
+        v_samples, updates = theano.scan(fn=self.multinom_sampler,non_sequences=[v_mean, D], n_steps=1)        
         self.updates = updates
         v_sample = v_samples[-1]
-        
         return v_sample
 
     def multinom_sampler(self, probs, D):
@@ -129,7 +126,7 @@ class AIS_RS(AIS):
         D = T.sum(v, axis=1)
         logw += self.log_p_k(v, beta, D)
         h = self.sample_h_given_v(v, beta, D)
-        v_next = self.sample_v_given_h(h, beta, D, self.mean_field)
+        v_next = self.sample_v_given_h(h, beta, D)
         logw -= self.log_p_k(v_next, beta, D)
         return logw, v_next, D
     

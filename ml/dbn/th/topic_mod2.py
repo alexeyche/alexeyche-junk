@@ -21,7 +21,9 @@ from ais import *
 from rbm_classic import RBM
 
 #csvfile = "/home/alexeyche/my/git/alexeyche-junk/ml/dbn/test_data_rs.csv"
-csvfile = "/home/alexeyche/my/dbn/topic_mod/topictoolbox/nips_feats.csv"
+#csvfile = "/home/alexeyche/prog/alexeyche-junk/ml/dbn/test_data_rs.csv"
+#csvfile = "/home/alexeyche/my/dbn/topic_mod/topictoolbox/nips_feats.csv"
+csvfile = "/home/alexeyche/prog/topic/nips_feats.csv"
 data = np.asarray(genfromtxt(csvfile, delimiter=','), dtype=theano.config.floatX)
 data_nop = data
 
@@ -45,16 +47,16 @@ data_sh = theano.shared(np.asarray(data, dtype=theano.config.floatX), borrow=Tru
 data_valid_sh = theano.shared(np.asarray(data_valid, dtype=theano.config.floatX), borrow=True)
 data_nop_sh = theano.shared(np.asarray(data_nop, dtype=theano.config.floatX), borrow=True)
 
-train_params = {  'batch_size'             : 50, 
-                  'learning_rate'          : 1e-05,
-                  'cd_steps'               : 1, 
-                  'max_epoch'              : 200, 
-                  'persistent_on'          : False, 
-                  'init_momentum'          : 0, 
-                  'momentum'               : 0, 
+train_params = {  'batch_size'             : 100, 
+                  'learning_rate'          : 0.005,
+                  'cd_steps'               : 2,
+                  'max_epoch'              : 500, 
+                  'persistent_on'          : True, 
+                  'init_momentum'          : 0.5, 
+                  'momentum'               : 0.9, 
                   'moment_start'           : 0.01, 
                   'weight_decay'           : 0.0002, 
-                  'mean_field'             : True,
+                  'mean_field'             : False,
                   'introspect_freq'        : 10,
                   'sparse_cost'            : 0.01,
                   'sparse_damping'         : 0.9,
@@ -62,9 +64,9 @@ train_params = {  'batch_size'             : 50,
                   'learning_rate_line'     : 0.001, 
                   'finetune_learning_rate' : 0.0001,
               } 
-num_hid = 500
+num_hid = 50
 
-rbm = RBMReplSoftmax(num_vis = num_vis, num_hid = num_hid, train_params = train_params, from_cache = False)
+rbm = RBMReplSoftmax(num_vis = num_vis, num_hid = num_hid, train_params = train_params, from_cache = True)
 
 
 #preh, h = rbm.prop_up(data_sh[0:100])
@@ -84,17 +86,43 @@ def load_watches(watches):
     end = time.time()
     print "Inserted in %s" % (end - start,)
 
+free_en_acc = []
+free_en_valid_acc = []
+cost_acc = []
+cost_valid_acc = []
+
+rbm.need_train = True
 rbms = RBMStack(rbms=[rbm])
-for watches in rbms.pretrain(data_sh, data_valid_sh, train_params):
-    load_watches(watches)
-    
-#train_params['max_epoch'] = 200
-#train_params['mean_field'] = False
-#train_params['cd_steps'] = 5
-#train_params['learning_rate'] = 0.0005
-#rbms.stack[0].need_train = True
-#for watches in rbms.pretrain(data_sh, data_valid_sh, train_params):
-#    print watches
+
+def train(rbms, data_sh, data_valid_sh, train_params):
+    for watches in rbms.pretrain(data_sh, data_valid_sh, train_params):
+        free_en_acc.append(watches['free_en'])
+        free_en_valid_acc.append(watches['free_en_valid'])
+        cost_acc.append(watches['cost'])
+        cost_valid_acc.append(watches['cost_valid'])
+
+        watches['free_en_acc'] = np.asarray(free_en_acc, dtype=theano.config.floatX)
+        watches['free_en_valid_acc'] = np.asarray(free_en_valid_acc, dtype=theano.config.floatX)
+        watches['cost_acc'] = np.asarray(cost_acc, dtype=theano.config.floatX)
+        watches['cost_valid_acc'] = np.asarray(cost_valid_acc, dtype=theano.config.floatX)
+
+        del watches['free_en'] 
+        del watches['free_en_valid']
+        del watches['cost']
+        del watches['cost_valid']
+
+        load_watches(watches)
+
+
+train(rbms, data_sh, data_valid_sh, train_params)
+
+train_params['max_epoch'] = 200
+train_params['mean_field'] = False
+train_params['cd_steps'] = 5
+train_params['learning_rate'] = 0.01
+rbms.stack[0].need_train = True
+
+train(rbms, data_sh, data_valid_sh, train_params)
 
 #ae = AutoEncoder(rbms)
 #train_params['max_epoch'] = 400

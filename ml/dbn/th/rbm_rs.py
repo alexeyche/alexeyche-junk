@@ -30,7 +30,7 @@ class RBMReplSoftmax(RBM):
         self.params = [self.W, self.hbias, self.vbias]
         _, self.output = self.prop_up(self.input)
         
-        self.hid_means = theano.shared(np.tile(np.asarray(train_params['sparse_target'], dtype=theano.config.floatX), self.num_hid), borrow=True)
+        #self.hid_means = theano.shared(np.tile(np.asarray(train_params['sparse_target'], dtype=theano.config.floatX), self.num_hid), borrow=True)
 
         if from_cache:
             self.restore_from_cache(train_params)
@@ -56,6 +56,7 @@ class RBMReplSoftmax(RBM):
             self.hbias.set_value(cPickle.load(fileName_p), borrow=True)
             fileName_p.close()
             self.need_train = False
+            print "Model file %s was found. rbm.need_train flag turned to False" % fileName
         else:
             print "Model file was not found. Need to call RBM.save_model()"
     
@@ -75,13 +76,15 @@ class RBMReplSoftmax(RBM):
         self.init_vbias()
         self.init_hbias()
 
-    def prop_up(self, vis):
-        pre_sigmoid_activation = T.dot(vis, self.W) + T.outer(self.D,self.hbias)
+    def prop_up(self, vis, D = None):
+        if D == None:
+            D = self.D
+        pre_sigmoid_activation = T.dot(vis, self.W) + T.outer(D,self.hbias)
         return [pre_sigmoid_activation, T.nnet.sigmoid(pre_sigmoid_activation)]
 
     def prop_down(self, hid): 
         pre_softmax_activation = T.dot(hid, self.W.T) + self.vbias
-        return [pre_softmax_activation, T.nnet.softmax(T.nnet.softmax(pre_softmax_activation))]
+        return [pre_softmax_activation, T.nnet.softmax(pre_softmax_activation)]
 
     def free_energy(self, v_sample):
         D = T.sum(v_sample, axis=1)
@@ -90,21 +93,32 @@ class RBMReplSoftmax(RBM):
         hidden_term = T.sum(T.log(1 + T.exp(wx_b)), axis=1)
         return -hidden_term - vbias_term
 
-    def sample_v_given_h(self, h_sample):
+    def sample_v_given_h(self, h_sample, D = None):
+        if D == None:
+            D = self.D
         pre_softmax_v, v_mean = self.prop_down(h_sample)
-        
-        v_samples, updates = theano.scan(fn=self.multinom_sampler,non_sequences=[v_mean, self.D], n_steps=3)        
+
+        v_mean = v_mean/T.sum(v_mean, axis=1).dimshuffle(0,'x')
+        v_samples, updates = theano.scan(fn=self.multinom_sampler,non_sequences=[v_mean, D], n_steps=1)        
         self.updates = updates
         v_sample = v_samples[-1]
         return [pre_softmax_v, v_mean, v_sample]
 
-    def sample_v_given_h_mf(self, h_sample):
+    def multinom_sampler(self, probs, D):
+        v_sample = self.theano_rng.multinomial(n=D, pvals=probs, dtype=theano.config.floatX)
+        return v_sample
+
+    def sample_v_given_h_mf(self, h_sample, D = None):
+        if D == None:
+            D = self.D
         pre_softmax_v, v_mean = self.prop_down(h_sample)
-        v_sample = self.D.dimshuffle(0,'x') * v_mean        
+        v_sample = D.dimshuffle(0,'x') * v_mean        
         return [pre_softmax_v, v_mean, v_sample]
 
-    def sample_h_given_v(self, v_sample):
-        pre_sigmoid_h, h_mean = self.prop_up(v_sample)
+    def sample_h_given_v(self, v_sample, D = None):
+        if D == None:
+            D = self.D
+        pre_sigmoid_h, h_mean = self.prop_up(v_sample, D)
         h_sample = self.theano_rng.binomial(size=h_mean.shape, n=1, p=h_mean, dtype=theano.config.floatX)
         return [pre_sigmoid_h, h_mean, h_sample]
 
@@ -120,19 +134,25 @@ class RBMReplSoftmax(RBM):
         return [pre_softmax_v1, v1_mean, v1_sample,
                 pre_sigmoid_h1, h1_mean, h1_sample]
 
-    def gibbs_vhv(self, v0_sample, D=None):
-        pre_sigmoid_h1, h1_mean, h1_sample = self.sample_h_given_v(v0_sample)
+    def gibbs_vhv(self, v0_sample, D):
+        pre_sigmoid_h1, h1_mean, h1_sample = self.sample_h_given_v(v0_sample,D)
         pre_softmax_v1, v1_mean, v1_sample = self.sample_v_given_h(h1_sample,D)
         return [pre_sigmoid_h1, h1_mean, h1_sample,
                 pre_softmax_v1, v1_mean, v1_sample]
 
-    def multinom_sampler(self, probs, D):
-        v_sample = self.theano_rng.multinomial(n=D, pvals=probs, dtype=theano.config.floatX)
-        return v_sample
+    def gibbs_vhv_mf(self, v0_sample, D):
+        pre_sigmoid_h1, h1_mean, h1_sample = self.sample_h_given_v(v0_sample,D)
+        pre_softmax_v1, v1_mean, v1_sample = self.sample_v_given_h_mf(h1_sample,D)
+        return [pre_sigmoid_h1, h1_mean, h1_sample,
+                pre_softmax_v1, v1_mean, v1_sample]
 
     def add_watch(self,w,name):
         self.watches.append(w)
         self.watches_label.append(name)
+
+    def clean_wacthes(self):
+        self.watches = []
+        self.watches_label = []
 
     def get_cost_updates(self, train_params):
         l_rate = T.cast(train_params['learning_rate'], dtype=theano.config.floatX)
@@ -146,12 +166,13 @@ class RBMReplSoftmax(RBM):
         persistent = train_params['persistent']
         persistent_on = train_params['persistent_on']
         batch_size = T.cast(train_params['batch_size'], dtype=theano.config.floatX)
-        sparse_damping = T.cast(train_params['sparse_damping'],dtype=theano.config.floatX)
-        sparse_cost = T.cast(train_params['sparse_cost'],dtype=theano.config.floatX)
-        sparse_target = T.cast(train_params['sparse_target'],dtype=theano.config.floatX)
+        #sparse_damping = T.cast(train_params['sparse_damping'],dtype=theano.config.floatX)
+        #sparse_cost = T.cast(train_params['sparse_cost'],dtype=theano.config.floatX)
+        #sparse_target = T.cast(train_params['sparse_target'],dtype=theano.config.floatX)
         
         # compute positive phase
         pre_sigmoid_ph, ph_mean, ph_sample = self.sample_h_given_v(self.input)
+        self.add_watch(self.input, "vis_s")
         self.add_watch(ph_mean, "hid_m")
 
         if persistent_on:
@@ -174,7 +195,7 @@ class RBMReplSoftmax(RBM):
                     n_steps=cd_steps)
 
         vis_samp_fant = nv_samples[-1]
-        hid_probs_fant = nh_samples[-1]
+        hid_probs_fant = nh_means[-1]
 
         self.add_watch(vis_samp_fant, "neg_vis_s")
         self.add_watch(hid_probs_fant, "neg_hid_m")
@@ -189,8 +210,8 @@ class RBMReplSoftmax(RBM):
         # updates
 #        W_inc = ( T.dot(self.input.T, ph_mean) - T.dot(vis_samp_fant.T, hid_probs_fant) - T.dot(self.input.T, sparse_grads) )/batch_size - self.W * weight_decay
 #        hbias_inc = (T.sum(ph_mean, axis=0) - T.sum(hid_probs_fant,axis=0) - T.sum(sparse_grads, axis=0))/batch_size
-        W_inc = ( T.dot(self.input.T, ph_sample) - T.dot(vis_samp_fant.T, hid_probs_fant) )/batch_size #- self.W * weight_decay
-        hbias_inc = (T.sum(ph_sample, axis=0) - T.sum(hid_probs_fant,axis=0) )/batch_size
+        W_inc = ( T.dot(self.input.T, ph_mean) - T.dot(vis_samp_fant.T, hid_probs_fant) )/batch_size - self.W * weight_decay
+        hbias_inc = (T.sum(ph_mean, axis=0) - T.sum(hid_probs_fant,axis=0) )/batch_size
         
         vbias_inc = (T.sum(self.input,axis=0) - T.sum(vis_samp_fant,axis=0))/batch_size
         
@@ -207,24 +228,23 @@ class RBMReplSoftmax(RBM):
 #        updates[self.hid_means] = hid_means
 
         self.add_watch(T.as_tensor_variable(self.W), "W")
-        self.add_watch(T.as_tensor_variable(self.hbias), "hbias")
-        self.add_watch(T.as_tensor_variable(self.vbias), "vbias")
+#        self.add_watch(T.as_tensor_variable(self.hbias), "hbias")
+#        self.add_watch(T.as_tensor_variable(self.vbias), "vbias")
         self.add_watch(W_inc_rate, "W_inc")
-        self.add_watch(hbias_inc_rate, "hbias_inc")
-        self.add_watch(vbias_inc_rate, "vbias_inc")
+#        self.add_watch(hbias_inc_rate, "hbias_inc")
+#        self.add_watch(vbias_inc_rate, "vbias_inc")
 
         current_free_energy = T.mean(self.free_energy(self.input))
-        self.add_watch(self.free_energy(self.input),'free_en') 
+        self.add_watch(T.mean(self.free_energy(self.input)),'free_en') 
         
         if persistent_on:
-            # Note that this works only if persistent is a shared variable
             updates[persistent] = nh_samples[-1]
-            # pseudo-likelihood is a better proxy for PCD
-            monitoring_cost = self.get_pseudo_likelihood_cost(updates)
+            monitoring_cost = self.get_reconstruction_cost(vis_samp_fant)
         else:
             # reconstruction cross-entropy is a better proxy for CD
             monitoring_cost = self.get_reconstruction_cost(vis_samp_fant)
 
+        self.add_watch(monitoring_cost, "cost")
         return monitoring_cost, current_free_energy, T.mean(W_inc_rate), updates
 
     def get_pseudo_likelihood_cost(self, updates):

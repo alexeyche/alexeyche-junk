@@ -71,23 +71,30 @@ class RBMStack():
             rbm = self.stack[l]
             if rbm.need_train == False:
                 continue
+            rbm.clean_wacthes()
             if persistent:
                 train_params['persistent'] = theano.shared(np.zeros((batch_size, rbm.num_hid), dtype=theano.config.floatX), borrow=True)
             else:
                 train_params['persistent'] = None
             cost, free_en, gparam, updates = rbm.get_cost_updates(train_params)
             updates.update([(rbm.epoch_ratio, rbm.epoch_ratio + ep_inc)])
-
+            
             train_rbm_f = theano.function([index], [cost, free_en, gparam],
                    updates=updates,
                    givens=[(self.input, data_sh[index * batch_size: (index + 1) * batch_size])])
             
             pretrain_fns.append(train_rbm_f)
-            # watches stuff
-            valid_set = T.matrix("valid_set")
-            rbm.add_watch(T.mean(rbm.free_energy(valid_set)), "free_en_valid")
 
-            get_watches = theano.function([index], rbm.watches, updates=updates,givens=[(rbm.input, data_sh[index * batch_size: (index + 1) * batch_size]),
+            # watches stuff
+            valid_set = T.matrix("valid_set0")
+            rbm.add_watch(T.mean(rbm.free_energy(valid_set)), "free_en_valid")
+            Dv = T.sum(valid_set, axis=1)
+            [preh, h, hs, prev, v, vs], updates_w = theano.scan(rbm.gibbs_vhv_mf, outputs_info = [None,  None,  None, None, None, valid_set],
+                    non_sequences = Dv,
+                    n_steps=5)
+            rbm.add_watch(rbm.get_reconstruction_cost(vs[-1], valid_set, Dv), "cost_valid")
+            updates.update(updates_w)
+            get_watches = theano.function([index], rbm.watches, updates = updates, givens=[(self.input, data_sh[index * batch_size: (index + 1) * batch_size]),
                                                                             (valid_set, data_valid_sh)])
             watches_fns.append(get_watches)
         
@@ -113,7 +120,6 @@ class RBMStack():
                 
                 if ep % introspect_freq == 0:
                     yield dict(zip(rbm.watches_label, wf(b)))
-
             self.stack[i].save_model(train_params, CACHE_PATH)
         self.need_train = False
       
