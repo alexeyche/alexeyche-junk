@@ -22,3 +22,32 @@ mean_field <- function(data, model, mf_runs = 20) {
     return(list(temp_h0, temp_h1))
 }
 
+daydream <- function(model) {
+    grid.newpage()  
+    pushViewport(viewport(layout = grid.layout(3, 1)))
+    
+    test.num <- 50
+    data <- round(array(runif(batch.size*num.vis), dim = c(batch.size,num.vis)))
+    hid0_probs <- sigmoid(data %*% (model$W0) + rep.row(model$hid_bias0,batch.size))
+    
+    for(i in 1:10) {
+        hid0_states <- sample_bernoulli(hid0_probs)
+        hid1_probs <- sigmoid(hid0_states %*% model$W1 + rep.row(model$hid_bias1,batch.size))
+        hid1_states <- sample_bernoulli(hid1_probs)
+        
+        data_probs <- sigmoid(hid0_states %*% t(model$W0) + rep.row(model$vis_bias,batch.size))
+        data_states <- sample_bernoulli(data_probs)
+        
+        cat("i=",i,"\n")
+        hid0_probs <- sigmoid(data_states %*% model$W0 + 
+                                  hid1_states %*% t(model$W1) + rep.row(model$hid_bias0,batch.size))
+        # plot
+        gg0 <- get_gray_plot(hid0_probs)
+        gg1 <- get_gray_plot(hid1_probs)
+        gg_data <- get_gray_plot(data_probs)
+        print(gg_data, vp = vplayout(1,1))
+        print(gg0, vp = vplayout(2,1))
+        print(gg1, vp = vplayout(3,1))        
+        Sys.sleep(1)        
+    }
+}

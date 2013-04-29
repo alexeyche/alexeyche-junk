@@ -46,7 +46,7 @@ model <- list(W0 = array(0.01*rnorm(num.vis*num.hid0),dim=c(num.vis,num.hid0)), 
 
 train.params = list(e.w = 0.001, e.v = 0.001, e.h = 0.001, w_cost = 0.0002, mf_runs = 10, 
                     init.moment = 0.5, fin.moment = 0.9, 
-                    epochs = 2000, cd.iter = 5)
+                    epochs = 100, cd.iter = 5)
 
 for (v in 1:length(train.params)) assign(names(train.params)[v], train.params[[v]])
 # some inits:
@@ -63,9 +63,9 @@ for(epoch in 1:epochs) {
     errsum <-0
     for(b in 1:num.batches) {
         data <- data.b[,,b]
-        e.w <- max(e.w/1.000015,0.00010)
-        e.v <- max(e.w/1.000015,0.00010)
-        e.h <- max(e.w/1.000015,0.00010)
+       # e.w <- max(e.w/1.000015,0.00010)
+      #  e.v <- max(e.w/1.000015,0.00010)
+       # e.h <- max(e.w/1.000015,0.00010)
         
         c(pos_hid0, pos_hid1) := mean_field(data, model)
         
@@ -104,21 +104,10 @@ for(epoch in 1:epochs) {
     }
 }
 
-test.num <- 50
-data <- round(array(runif(batch.size*num.vis), dim = c(batch.size,num.vis)))
-hid0_probs <- sigmoid(data %*% (2 * model$W0) + rep.row(model$hid_bias0,batch.size))
 
-for(i in 1:10) {
-    hid0_states <- sample_bernoulli(hid0_probs)
-    hid1_probs <- sigmoid(hid0_states %*% model$W1 + rep.row(model$hid_bias1,batch.size))
-    hid1_states <- sample_bernoulli(hid1_probs)
-    
-    data_probs <- sigmoid(hid0_states %*% t(model$W0) + rep.row(model$vis_bias,batch.size))
-    data_states <- sample_bernoulli(data_probs)
-    gray_plot(data_probs)
-    cat("i=",i,"\n")
-    Sys.sleep(1)
-    hid0_probs <- sigmoid(data_states %*% model$W0 + 
-                              hid1_states %*% t(model$W1) + rep.row(model$hid_bias0,batch.size))
-}
+
+
+
+
+
 
