@@ -10,7 +10,7 @@ d2 = theano.shared(np.asarray([[4,5,6]], dtype = theano.config.floatX), borrow=T
 #l = [d1, d2, d3]
 #ans = T.concatenate(l).reshape((3,2,3))
 #ans = T.stack(l)[0]
-ans = T.concatenate( (d2.reshape((1,1,3)), d1[0:2,:,:]))
+ans = T.concatenate( (d2.dimshuffle('x',0,1), d1))
 
 f = theano.function([], ans)
 

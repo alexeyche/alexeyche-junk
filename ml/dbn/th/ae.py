@@ -24,14 +24,26 @@ class AutoEncoder(object):
         self.num_vis = stack[0].num_vis
         if top_line: 
             top_rbm = RBMBinLine(input = self.stack[-1].output, num_vis = self.stack[-1].num_hid, num_hid = num_out)  
-        else:                 
-            top_rbm = RBM(input = self.stack[-1].output, num_vis = self.stack[-1].num_hid, num_hid = num_out)  
 
-        self.stack.append(top_rbm)
+            self.stack.append(top_rbm)
         self.params = []
+        
+        theta_len = 0
+        theta_init = None
         for rbm in stack:
-            self.params.extend(rbm.params)
-    
+            if theta_init == None:
+                theta_init = T.concatenate( ( rbm.W, rbm.vbias.dimshuffle(0,'x') ), axis=1 )
+                theta_init = T.concatenate( ( theta_init, rbm.hbias.dimshuffle(0,'x') ), axis=0)
+#            else:
+#                theta_init = T.concatenate( (theta_init, rbm.W, rbm.vbias.dimshuffle('x',0), rbm.hbias.dimshuffle('x',0)) )
+
+        f = theano.function([], theta_init)
+        self.theta = theano.shared(value=f(), name='theta', borrow=True)
+        # W is represented by the fisr n_in*n_out elements of theta
+#        self.W = self.theta[0:n_in * n_out].reshape((n_in, n_out))
+        # b is the rest (last n_out elements)
+#        self.b = self.theta[n_in * n_out:n_in * n_out + n_out]
+
         self.num_layers = self.stack.num_layers
 
     def pretrain_fun(self, data_sh, train_params):
@@ -81,7 +93,7 @@ class AutoEncoder(object):
 
     def finetune_cost(self):
         output = self.get_output()
-        return T.mean(T.sum(T.sqr(self.input - output), axis=1))
+        return -T.mean(T.sum(T.sqr(self.input - output), axis=1))
     
     def finetune_fun(self, data_sh, train_params):
         batch_size = train_params['batch_size']
@@ -107,5 +119,16 @@ class AutoEncoder(object):
                 cost = fine_tune(b)
                 print "Finetune, epoch # %d:%d cost: %f" % (ep, b, cost)
 
+
+
+
+
+
+
+def train_fn(theta_value):
+    classifier.theta.set_value(theta_value, borrow=True)
+    train_losses = [batch_cost(i * batch_size)
+                    for i in xrange(n_train_batches)]
+    return numpy.mean(train_losses)
 
 

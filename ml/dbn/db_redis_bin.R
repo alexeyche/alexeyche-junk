@@ -136,7 +136,7 @@ if(! is.null(to_plot)) {
     while(TRUE) {
         redisConnect()
         last_it_new <- redisGet("last_it")
-        Sys.sleep(0.5)
+        Sys.sleep(2)
         if (! is.null(last_it_new)) {
             if(last_it_new != last_it) {
                 last_it <- last_it_new
