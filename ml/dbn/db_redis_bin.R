@@ -4,8 +4,8 @@
 require(rredis)
 require(grid)
 require(ggplot2)
-require(reshape)
 require(Matrix)
+require(reshape)
 source('sys.R')
 
 
