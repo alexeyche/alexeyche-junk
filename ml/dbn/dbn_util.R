@@ -13,7 +13,7 @@ get_gray_plot <- function(data, lims = c(min(data),max(data))) {
 }
                           
 gray_plot <- function(data, lims = c(min(data),max(data)) ) {
-    get_gray_plot(data, lims)
+    gg <- get_gray_plot(data, lims)
     plot(gg)
 }
 
