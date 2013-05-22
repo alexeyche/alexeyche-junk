@@ -205,7 +205,7 @@ class RBMBinLine(RBM):
         h1_val = self.sample_h_given_v(v1_sample)
         return [pre_sigmoid_v1, v1_mean, v1_sample, h1_val]
     def get_cost_updates(self, train_params):
-        l_rate = T.cast(train_params['learning_rate_line'], dtype=theano.config.floatX)
+        l_rate = T.casrt(train_params['learning_rate_line'], dtype=theano.config.floatX)
         weight_decay = T.cast(train_params['weight_decay'], dtype=theano.config.floatX)
         momentum = T.cast(train_params['momentum'], dtype=theano.config.floatX)
         init_momentum = T.cast(train_params['init_momentum'], dtype=theano.config.floatX)
