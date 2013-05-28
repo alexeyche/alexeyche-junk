@@ -3,9 +3,14 @@
 #include "sim_client.c"
 
 int main(int argc, char **argv) {
-    float msg[] = { 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.1, 1001.1, 1 };
+    int n = 10000;
+    float msg[n];
+    for(int i=0; i<n; i++) {
+        msg[i]=0.001;
+    }
     int len = sizeof(msg);
+    char head[50] = "Var_name:1:10000@";
     printf("sizeof(msg): %i\n", len);
     init_socket();
-    send_message_f(msg, len);
+    send_message_f(head, 50, msg, len);
 }

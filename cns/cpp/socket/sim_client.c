@@ -31,17 +31,7 @@ void init_socket(int port = 7777) {
 }
 
 
-void send_message(char *msg) {
-    int len = strlen(msg);
-    int k = send(sock_desc, msg, len, 0);      
-    if (k == -1)
-    {
-        printf("cannot write to server!\n");
-    }
-}
-
-void send_message_f(float *msg, int len) {
-    printf("sending %i\n", len);
+void send_message(void *msg, int len) {
     int c_len=len;
     int k;
     while(c_len > 0) {
@@ -53,9 +43,15 @@ void send_message_f(float *msg, int len) {
         printf("send k: %i\n", k);
         msg += k;
         c_len -= k;
-    }
-    //char c = '\n';
-    //k = send(sock_desc, &c, 1, 0);      
+    }   
+}
+
+
+void send_message_f(char *head, float *msg, int head_len, int msg_len) {
+    printf("sending head: %i\n", head_len);
+    send_message(head, head_len);
+    printf("sending msg: %i\n", msg_len);
+    send_message(msg, msg_len);
     close(sock_desc);  
 }
 
