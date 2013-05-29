@@ -30,8 +30,8 @@ void init_socket(int port = 7777) {
     printf("Socket connection established\n");
 }
 
-
-void send_message(void *msg, int len) {
+template <typename T>
+void send_message(T *msg, int len) {
     int c_len=len;
     int k;
     while(c_len > 0) {
@@ -39,6 +39,7 @@ void send_message(void *msg, int len) {
         if (k == -1)
         {
             printf("cannot write to server!\n");
+            break;
         }
         printf("send k: %i\n", k);
         msg += k;
@@ -47,11 +48,11 @@ void send_message(void *msg, int len) {
 }
 
 
-void send_message_f(char *head, float *msg, int head_len, int msg_len) {
+void send_message_d(char *head, double *msg, int head_len, int msg_len) {
     printf("sending head: %i\n", head_len);
-    send_message(head, head_len);
+    send_message<char>(head, head_len);
     printf("sending msg: %i\n", msg_len);
-    send_message(msg, msg_len);
+    send_message<double>(msg, msg_len);
     close(sock_desc);  
 }
 
