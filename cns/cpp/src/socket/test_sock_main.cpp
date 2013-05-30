@@ -7,7 +7,8 @@
 int main(int argc, char **argv) {
     int n = 100;
     double msg[n];
-    for(int i=0; i<n; i++) {
+    msg[0] = -1;
+    for(int i=1; i<n; i++) {
         msg[i]=0.001;
     }
     int len = sizeof(msg);

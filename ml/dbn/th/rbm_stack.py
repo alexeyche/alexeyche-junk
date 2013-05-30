@@ -11,7 +11,8 @@ from rbm import RBM
 from rbm_rs import RBMReplSoftmax
 from rbm_util import gen_name
 
-CACHE_PATH="/mnt/yandex.disk/models/rs"
+#CACHE_PATH="/mnt/yandex.disk/models/rs"
+CACHE_PATH="/home/alexeyche/models"
 
 class RBMStack():
     def __init__(self, rbms = [], num_vis = None, hid_layers_size = [], bottomRBMtype = None, add_opts = {}):

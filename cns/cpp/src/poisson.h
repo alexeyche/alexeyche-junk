@@ -2,7 +2,6 @@
 #define POISSONELEM_H
 
 #include "basic_elements.h"
-#include "core.h"
 
 #define I_OUT 14 // pA
 #define LONG_MS 10

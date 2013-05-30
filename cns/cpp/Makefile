@@ -1,18 +1,37 @@
 CC=g++
-CFLAGS=-c -Wall -O1 -I/home/alexeyche/distr/credis-0.2.3
-LDFLAGS=-larmadillo -L/home/alexeyche/distr/credis-0.2.3 -lcredis
-SOURCES=main.cpp neurons.cpp simenv.cpp poisson.cpp connection.cpp
-OBJECTS=$(SOURCES:.cpp=.o)
-EXECUTABLE=sim
+LD=g++
+CFLAGS=-Wall -O1 
+LDFLAGS=-larmadillo 
 
-all: $(SOURCES) $(EXECUTABLE)
-    
-$(EXECUTABLE): $(OBJECTS) 
-	$(CC) $(OBJECTS) $(LDFLAGS) -o $@
+TARGET   = sim
 
+# change these to set the proper directories where each files shoould be
+SRCDIR   = src
+BINDIR   = build
+OBJDIR   = build
+
+SOURCES  := $(wildcard $(SRCDIR)/*.cpp)
+INCLUDES := $(wildcard $(SRCDIR)/*.h)
+OBJECTS  := $(SOURCES:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
+rm       = rm -f
+
+
+$(BINDIR)/$(TARGET): $(OBJECTS)
+	@$(LD) $(OBJECTS) $(LDFLAGS) -o $@ 
+	@echo "Linking complete!"
+
+$(OBJECTS): $(OBJDIR)/%.o : $(SRCDIR)/%.cpp
+	@$(CC) $(CFLAGS) -c $< -o $@
+	@echo "Compiled "$<" successfully!"
+
+
+
+.PHONEY: clean
 clean:
-	/bin/rm -r -f $(OBJECTS) sim *.o *~
+	@$(rm) $(OBJECTS)
+	@echo "Cleanup complete!"
 
-
-.cpp.o:
-	$(CC) $(CFLAGS) $< -o $@
+.PHONEY: remove
+remove: clean
+	@$(rm) $(BINDIR)/$(TARGET)
+	@echo "Executable removed!"

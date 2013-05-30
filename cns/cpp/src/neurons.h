@@ -2,7 +2,7 @@
 #ifndef NEURONS_H
 #define NEURONS_H
 
-#include "core.h"
+
 #include "basic_elements.h"
 
 class Neurons : public SimElem<vec, vec> {

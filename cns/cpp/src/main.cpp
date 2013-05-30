@@ -1,7 +1,8 @@
 
 #include "simenv.h"
-
-#include "credis.h"
+#include "core.h"
+//$(CC) $(CFLAGS) -c -o $@
+#include "socket/sim_socket_core.cpp"
 
 int main(int argc, char** argv) {
     SimEnv env(0.25);
@@ -17,6 +18,6 @@ int main(int argc, char** argv) {
     env.runSimulation(100);  
     
     for(size_t i=0; i< v->acc.size(); i++) {
-        v->acc[i].print();
+        send_arma_mat(v->acc[i], "V");
     }
 }

@@ -3,6 +3,7 @@
 
 #include <armadillo>
 #include <stdio.h>
+#include <string>
 
 using namespace arma;
 

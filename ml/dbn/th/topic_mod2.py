@@ -22,8 +22,8 @@ from rbm_classic import RBM
 
 #csvfile = "/home/alexeyche/my/git/alexeyche-junk/ml/dbn/test_data_rs.csv"
 #csvfile = "/home/alexeyche/prog/alexeyche-junk/ml/dbn/test_data_rs.csv"
-csvfile = "/home/alexeyche/my/dbn/topic_mod/topictoolbox/nips_feats.csv"
-#csvfile = "/home/alexeyche/prog/topic/nips_feats.csv"
+#csvfile = "/home/alexeyche/my/dbn/topic_mod/topictoolbox/nips_feats.csv"
+csvfile = "/home/alexeyche/prog/topic/nips_feats.csv"
 data = np.asarray(genfromtxt(csvfile, delimiter=','), dtype=theano.config.floatX)
 data_nop = data
 
@@ -47,16 +47,16 @@ data_sh = theano.shared(np.asarray(data, dtype=theano.config.floatX), borrow=Tru
 data_valid_sh = theano.shared(np.asarray(data_valid, dtype=theano.config.floatX), borrow=True)
 data_nop_sh = theano.shared(np.asarray(data_nop, dtype=theano.config.floatX), borrow=True)
 
-train_params = {  'batch_size'             : 100, 
+train_params = {  'batch_size'             : 50, 
                   'learning_rate'          : 0.005,
-                  'cd_steps'               : 1,
-                  'max_epoch'              : 500, 
+                  'cd_steps'               : 3,
+                  'max_epoch'              : 1000, 
                   'persistent_on'          : True, 
                   'init_momentum'          : 0.5, 
                   'momentum'               : 0.9, 
                   'moment_start'           : 0.01, 
                   'weight_decay'           : 0.0002, 
-                  'mean_field'             : True,
+                  'mean_field'             : False,
                   'introspect_freq'        : 10,
                   'sparse_cost'            : 0.01,
                   'sparse_damping'         : 0.9,
@@ -64,9 +64,9 @@ train_params = {  'batch_size'             : 100,
                   'learning_rate_line'     : 0.001, 
                   'finetune_learning_rate' : 0.0001,
               } 
-num_hid = 50
+num_hid = 75
 
-rbm = RBMReplSoftmax(num_vis = num_vis, num_hid = num_hid, train_params = train_params, from_cache = False)
+rbm = RBMReplSoftmax(num_vis = num_vis, num_hid = num_hid, train_params = train_params, from_cache = True)
 
 
 #preh, h = rbm.prop_up(data_sh[0:100])
@@ -113,19 +113,18 @@ def train(rbms, data_sh, data_valid_sh, train_params):
 
         load_watches(watches)
 
+train(rbms, data_sh, data_valid_sh, train_params)
 
-#train(rbms, data_sh, data_valid_sh, train_params)
+
+valid_set = T.matrix("valid_set0")
+Dv = T.sum(valid_set, axis=1)
+[preh, h, hs, prev, v, vs], updates = theano.scan(rbm.gibbs_vhv_mf, outputs_info = [None,  None,  None, None, None, valid_set],
+        non_sequences = Dv,
+        n_steps=5)
 
 
-#valid_set = T.matrix("valid_set0")
-#Dv = T.sum(valid_set, axis=1)
-#[preh, h, hs, prev, v, vs], updates = theano.scan(rbm.gibbs_vhv_mf, outputs_info = [None,  None,  None, None, None, valid_set],
-#        non_sequences = Dv,
-#        n_steps=5)
-#
-#
-#cost = rbm.get_reconstruction_cost(vs[-1], valid_set, Dv)
-#get_cost = theano.function([], [cost, vs], updates = updates, givens=[(valid_set, data_valid_sh)])
+cost = rbm.get_reconstruction_cost(vs[-1], valid_set, Dv)
+get_cost = theano.function([], [cost, vs], updates = updates, givens=[(valid_set, data_valid_sh)])
 
 #train_params['max_epoch'] = 200
 #train_params['mean_field'] = False
@@ -135,7 +134,6 @@ def train(rbms, data_sh, data_valid_sh, train_params):
 #
 #train(rbms, data_sh, data_valid_sh, train_params)
 
-ae = AutoEncoder(rbms)
 #train_params['max_epoch'] = 400
 #ae.pretrain(data_sh, data_valid_sh, train_params)
 #train_params['max_epoch'] = 50
