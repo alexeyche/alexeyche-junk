@@ -16,8 +16,7 @@ int main(int argc, char** argv) {
     Connection *c = env.connect(p1,n1);    
     
     VoltMeter *v = env.addVoltMeter(n1);
-    env.runSimulation(SimOptions(0.25, 100));
+    env.runSimulation(SimOptions(0.25, 100)); // tau(ms), simulation time (ms)
     
-    send_arma_mat(v->acc, "V",NULL, true);
-    
+    send_arma_mat(v->acc, "V");    
 }

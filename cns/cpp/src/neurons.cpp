@@ -18,10 +18,10 @@ Neurons::Neurons(int n, double a_v, double b_v, double c_v, double d_v, double V
 }
 
 void Neurons::computeMe(double dt) {        
-    if(need_reset.n_elem>0) {
+    //if(need_reset.n_elem>0) {
         V(need_reset).fill(c);
         u(need_reset) = u(need_reset)+d;        
-    }    
+    //}    
     V = V + dt * (0.04*square(V) + 5*V - V_rest*2 - u + Isyn);
     u = u + dt * a * (b*V - u);
     need_reset = find(V>treshold);
