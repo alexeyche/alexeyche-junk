@@ -93,7 +93,12 @@ MessageCont *MessageContCreate() {
     return mc;
 }
 void MessageCont_add(MessageCont *mc, DoubleMessage *m) { 
-    mc->cont = (DoubleMessage**)realloc(mc->cont, (mc->num+1) * sizeof(DoubleMessage*));
+    void *tmp = realloc(mc->cont, (mc->num+1) * sizeof(DoubleMessage*));
+    if(!tmp) {
+        printf("Can't allocate memory\n");        
+        return;
+    }
+    mc->cont = (DoubleMessage**) tmp;
     mc->cont[mc->num] = m; 
     mc->num+=1; 
 }
@@ -103,7 +108,12 @@ typedef struct {
     MessageCont *mc;
 } args_s;
 
+//#define DEBUG
+
 void* get_message(void *args_p) {
+    #ifdef DEBUG
+        printf("Starting thread\n");
+    #endif 
     args_s *args = (args_s*) args_p;
     MessageCont *mes_cont = args->mc;
     int port = args->port;
@@ -134,6 +144,9 @@ void* get_message(void *args_p) {
     struct sockaddr_in client;  
     memset(&client, 0, sizeof(client));  
     socklen_t len = sizeof(client); 
+    #ifdef DEBUG
+        printf("Go accepting\n");
+    #endif 
     for(;;) {
         int temp_sock_desc = accept(sock_desc, (struct sockaddr*)&client, &len);  
         if (temp_sock_desc == -1)
@@ -143,14 +156,21 @@ void* get_message(void *args_p) {
             return NULL;
         }   
         HeadMessage m = read_head(temp_sock_desc);
-        
+        #ifdef DEBUG
+            printf("Got message: %s %d:%d\n", m.var_name, m.nrow, m.ncol);            
+        #endif
         double *out = (double*) malloc(sizeof(double)*m.nrow*m.ncol);
-        double buf[1000];  
+        int buf_size=1000;
+        if(m.nrow*m.ncol<buf_size) {
+            buf_size = m.nrow*m.ncol;
+        }
+        int need_download = m.nrow*m.ncol;
+        double buf[buf_size];
         int k;  
         int k_all = 0;
-        while(1) 
-        {      
-            k = recv(temp_sock_desc, buf, 1000*sizeof(double), 0);      
+        while(1)
+        {     
+            k = recv(temp_sock_desc, buf, buf_size*sizeof(double), 0);      
             if (k == -1)
             {
                 printf("\ncannot read from client!\n");
@@ -159,6 +179,17 @@ void* get_message(void *args_p) {
             if(k > 0) {
                 memcpy(out+k_all, buf, k);
                 k_all += k/sizeof(double);
+                #ifdef DEBUG                    
+                    printf("--| read %d bytes (k_all: %d)\n", k,k_all);
+                    printf("--| head of out: %f %f %f\n", out[0],out[1],out[2]);
+                #endif
+                need_download -= k/sizeof(double);
+                if(need_download<=0) {
+                    #ifdef DEBUG
+                        printf("--| we've downloaded all arrray\n");
+                    #endif
+                    break;
+                }
             }
             if(k == 0) {
                 break;
@@ -172,7 +203,9 @@ void* get_message(void *args_p) {
         fm->name = m.var_name;
         fm->nrow = m.nrow;
         fm->ncol = m.ncol;
-//        printf("downloaded(%d) vector, name: %s (%d:%d)\n",k_all, fm->name, fm->nrow, fm->ncol);
+        #ifdef DEBUG
+            printf("downloaded(%d) vector, name: %s (%d:%d)\n",k_all, fm->name, fm->nrow, fm->ncol);
+        #endif            
         MessageCont_add(mes_cont, fm);
     }
     printf("exit!\n");

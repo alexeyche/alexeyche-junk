@@ -39,7 +39,6 @@ SEXP r_run_server(SEXP port) {
     MessageCont *mc = MessageContCreate();
     args.mc = mc;
     args.port = port_i;
-    Rprintf("here\n");
     pthread_create( &t, NULL, get_message, (void*)&args);
     sleep(1);
 //    pthread_attr_destroy(&attr);

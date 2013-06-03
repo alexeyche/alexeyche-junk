@@ -20,14 +20,23 @@ Poisson* SimEnv::addPoissonGroup(int n, double mHerz) {
     return elems;
 }
 
+void SimEnv::prepareSimulation(SimOptions so) {
+    for(size_t i=0; i<elements.size(); i++) {
+            elements[i]->prepareMe(so);        
+    }
+    for(size_t i=0; i<connections.size(); i++) {
+            connections[i]->prepareMe(so);        
+    }
+}
 
-void SimEnv::runSimulation(double time_ms) {
-    for(double t; t < time_ms; t+=tau) {
+void SimEnv::runSimulation(SimOptions so) {
+    this->prepareSimulation(so);
+    for(double t=0; t < so.time_ms; t+=so.tau_ms) {
         for(size_t i=0; i<elements.size(); i++) {
-            elements[i]->computeMe(tau);        
+            elements[i]->computeMe(so.tau_ms);        
         }
         for(size_t i=0; i<connections.size(); i++) {
-            connections[i]->computeMe(tau);        
+            connections[i]->computeMe(so.tau_ms);        
         }
     }
 }

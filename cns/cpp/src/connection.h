@@ -4,11 +4,11 @@
 
 #include "basic_elements.h"
 
-class Connection {
+class Connection : public SimBasic {
 public:		
 	Connection(SimElemCommon* pre, SimElemCommon* post);
-	void computeMe(double dt);
-
+	void computeMe(double dt);	
+	
 	SimElemCommon *pre;
 	SimElemCommon *post;
 	mat connMat;

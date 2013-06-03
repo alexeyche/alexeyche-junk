@@ -12,7 +12,7 @@ void Poisson::computeMe(double dt) {
             acc=0;
             return;
         } 
-        Iout=I_OUT;
+        Iout=I_OUT;        
     }                
     acc+=dt;
 }
@@ -23,6 +23,6 @@ void Poisson::setInput(vec in) {
 
 vec Poisson::getOutput() {	
     vec out(1);
-	out.fill(Iout);
+	out.fill(Iout);    
 	return out;
 }

@@ -10,6 +10,7 @@ class Poisson : public SimElem<vec, vec> {
 public:
     Poisson(double mHerz_v);
     void computeMe(double dt);
+    
     void setInput(vec in);
     vec getOutput();
     

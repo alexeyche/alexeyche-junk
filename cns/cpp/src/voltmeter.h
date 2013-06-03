@@ -6,13 +6,20 @@
 
 class VoltMeter : public SimBasic {
 public:	
-	VoltMeter(Neurons* el) : el(el) {}
+	VoltMeter(Neurons* el) : el(el), iter(0) {}
 	void computeMe(double dt) {
-		acc.push_back(el->V);
+		acc.col(iter) = el->V;
+		iter++;
 	}
+	void prepareMe(SimOptions so) {
+		acc = zeros(el->n, so.iterations);
+	}	
+
 
 	Neurons* el;
-	std::vector<vec> acc;	
+	mat acc;	
+private:
+	int iter;
 };
 
 

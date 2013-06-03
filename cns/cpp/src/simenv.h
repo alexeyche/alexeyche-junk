@@ -8,20 +8,21 @@
 #include "connection.h"
 #include "voltmeter.h"
 
+
+
 class SimEnv {
     public: 
-        SimEnv(double tau_v = 0.25) : tau(tau_v) { }
+        SimEnv() {}
         
         Neurons* addNeuronGroup(int n);
         VoltMeter* addVoltMeter(Neurons *el);
         Poisson* addPoissonGroup(int n, double mHerz);
         Connection* connect(SimElemCommon* pre, SimElemCommon* post);
-        void runSimulation(double time_s); 
-        
+        void runSimulation(SimOptions so); 
+        void prepareSimulation(SimOptions so);
         
         std::vector<SimBasic*> elements;
-        std::vector<Connection*> connections;
-        double tau;
+        std::vector<Connection*> connections;        
 };
 
 #endif

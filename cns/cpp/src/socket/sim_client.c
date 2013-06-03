@@ -6,7 +6,9 @@
 #include <arpa/inet.h> 
 #include <unistd.h> 
 
-int sock_desc;
+int sock_desc = -1;
+
+//#define DEBUG
 
 void init_socket(int port = 7777) {
     sock_desc = socket(AF_INET, SOCK_STREAM, 0); 
@@ -27,7 +29,9 @@ void init_socket(int port = 7777) {
         close(sock_desc);
         return;
     }
-    printf("Socket connection established\n");
+    #ifdef DEBUG
+        printf("Socket connection established\n");
+    #endif        
 }
 
 template <typename T>
@@ -41,7 +45,9 @@ void send_message(T *msg, int len) {
             printf("cannot write to server!\n");
             break;
         }
-        printf("send k: %i\n", k);
+        #ifdef DEBUG
+            printf("send k: %i\n", k);
+        #endif            
         msg += k;
         c_len -= k;
     }   
