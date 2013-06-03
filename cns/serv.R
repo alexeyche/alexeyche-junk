@@ -2,7 +2,7 @@
 
 require(Matrix)
 
-dyn.load("/home/alexeyche/my/git/alexeyche-junk/cns/cpp/src/socket/sim_socket_r.so")
+dyn.load("/home/alexeyche/my/git/alexeyche-junk/cns/socket_test/sim_socket_r.so")
 
 run_server <- function(port = 7778) {
     .Call("r_run_server", as.integer(port))    
