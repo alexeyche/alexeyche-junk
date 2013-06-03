@@ -16,7 +16,7 @@ class SimEnv {
         
         Neurons* addNeuronGroup(int n);
         VoltMeter* addVoltMeter(Neurons *el);
-        Poisson* addPoissonGroup(int n, double mHerz);
+        Poisson* addPoissonElem(double mHerz, double long_ms, double Iout_value);
         Connection* connect(SimElemCommon* pre, SimElemCommon* post);
         void runSimulation(SimOptions so); 
         void prepareSimulation(SimOptions so);

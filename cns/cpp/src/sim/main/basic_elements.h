@@ -1,7 +1,7 @@
 #ifndef BASIC_ELEMENTS_H
 #define BASIC_ELEMENTS_H
 
-#include "core.h"
+#include <sim/core.h>
 
 struct SimOptions {
     SimOptions(double tau_ms, double time_ms) : tau_ms(tau_ms), time_ms(time_ms), iterations(time_ms/tau_ms) {}

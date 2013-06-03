@@ -1,3 +1,7 @@
+#ifndef SIM_CLIENT
+#define SIM_CLIENT
+
+
 #include <sys/socket.h>  
 #include <netinet/in.h>  
 #include <stdio.h>  
@@ -63,3 +67,5 @@ void send_message_d(char *head, double *msg, int head_len, int msg_len) {
     close(sock_desc);  
 }
 
+
+#endif

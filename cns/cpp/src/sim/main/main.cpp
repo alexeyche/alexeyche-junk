@@ -1,17 +1,17 @@
 
 #include "simenv.h"
-#include "core.h"
-//$(CC) $(CFLAGS) -c -o $@
-#include "socket/sim_socket_core.cpp"
+
+#include <sim/core.h>
+#include <sim/socket/sim_socket_core.cpp>
 
 int main(int argc, char** argv) {
 
     SimEnv env;
 
-    Poisson *p1 = env.addPoissonGroup(1, 10);
-    //std::cout << (SimElemCommon*)p1->size.n_out << " - p1 n_out" << std::endl;    
+    Poisson *p1 = env.addPoissonElem(10, 50, 10); // 10 mHerz - freq, 50 ms - long, 10 mA - out value
+    
     Neurons *n1 = env.addNeuronGroup(10);
-    //std::cout << (SimElemCommon*)n1->size.n_in << " - n1 n_in" << std::endl;
+    
     
     Connection *c = env.connect(p1,n1);    
     

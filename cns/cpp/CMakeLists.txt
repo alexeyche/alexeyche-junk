@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.5)
-project(sim C CXX)
+project(sim_prj C CXX)
 
 # First, define all the compilation options.
 # We default to debugging mode for developers.
@@ -45,6 +45,13 @@ endif(ARMA_EXTRA_DEBUG)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMake")
 
 find_package(Armadillo 2.4.0 REQUIRED)
+find_package(Boost
+    COMPONENTS
+      program_options
+    REQUIRED
+)
+include_directories(${Boost_INCLUDE_DIRS})
+set(Boost_BACKUP_LIBRARIES ${Boost_LIBRARIES})
 
 include_directories(${ARMADILLO_INCLUDE_DIRS})
 
@@ -67,4 +74,4 @@ else (WIN32)
   set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/)
 endif (WIN32)
 
-add_subdirectory(src)
+add_subdirectory(src/sim)

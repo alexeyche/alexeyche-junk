@@ -7,4 +7,7 @@
 
 using namespace arma;
 
+#include "util/log.hpp"
+#include "util/cli.hpp"
+
 #endif

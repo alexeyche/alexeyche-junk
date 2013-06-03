@@ -4,11 +4,11 @@
 #include "basic_elements.h"
 
 #define I_OUT 14 // pA
-#define LONG_MS 10
+#define LONG_MS 100
 
 class Poisson : public SimElem<vec, vec> {
 public:
-    Poisson(double mHerz_v);
+    Poisson(double mHerz, double long_ms, double Iout_value);
     void computeMe(double dt);
     
     void setInput(vec in);
@@ -16,6 +16,8 @@ public:
     
     double mHerz;
     double Iout;
+    double Iout_value;
+    double long_ms;
     
 private:
     double acc;    

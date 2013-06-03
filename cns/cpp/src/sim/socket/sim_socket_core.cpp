@@ -1,6 +1,9 @@
 
-#include "sim_client.c"
+#include "sim_client.h"
+
 #include <string.h>
+
+#include <sim/core.h>
 
 #define HEAD_LEN 100
 #define PORT 7778

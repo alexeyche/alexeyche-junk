@@ -14,8 +14,8 @@ VoltMeter* SimEnv::addVoltMeter(Neurons *el) {
     return elems;
 }
 
-Poisson* SimEnv::addPoissonGroup(int n, double mHerz) { 
-    Poisson *elems = new Poisson(mHerz);
+Poisson* SimEnv::addPoissonElem(double mHerz, double long_ms, double Iout_value) { 
+    Poisson *elems = new Poisson(mHerz,long_ms,Iout_value);
     elements.push_back((SimBasic*)elems);
     return elems;
 }
