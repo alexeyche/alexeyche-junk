@@ -2,8 +2,8 @@
 #include "simenv.h"
 
 
-Neurons* SimEnv::addNeuronGroup(int n) { 
-    Neurons *elems = new Neurons(n);
+Neurons* SimEnv::addNeuronGroup(NeuronGroupOptions opts) { 
+    Neurons *elems = new Neurons(opts);
     elements.push_back((SimBasic*)elems);
     return elems;
 }

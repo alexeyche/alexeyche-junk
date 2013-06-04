@@ -678,8 +678,7 @@ void CLI::PrintHelp(const std::string& param)
   // Helpful information at the bottom of the help output, to point the user to
   // citations and better documentation (if necessary).  See ticket #201.
   std::cout << HyphenateString("For further information, including relevant "
-      "papers, citations, and theory, consult the documentation found at "
-      "http://www.sim.org or included with your distribution of SIM.", 0)
+      "papers, citations, and theory, consult alexey.chernushev@gmail.com", 0)
       << std::endl;
 }
 

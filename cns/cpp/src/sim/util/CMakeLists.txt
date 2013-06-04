@@ -15,9 +15,7 @@ set(SOURCES
   prefixedoutstream.hpp
   prefixedoutstream.cpp
   prefixedoutstream_impl.hpp
-#  save_restore_utility.hpp
-#  save_restore_utility.cpp
-#  save_restore_utility_impl.hpp
+  rand_funcs.hpp
   timers.hpp
   timers.cpp
 )

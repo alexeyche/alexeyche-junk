@@ -14,7 +14,7 @@ class SimEnv {
     public: 
         SimEnv() {}
         
-        Neurons* addNeuronGroup(int n);
+        Neurons* addNeuronGroup(NeuronGroupOptions opts);
         VoltMeter* addVoltMeter(Neurons *el);
         Poisson* addPoissonElem(double mHerz, double long_ms, double Iout_value);
         Connection* connect(SimElemCommon* pre, SimElemCommon* post);
