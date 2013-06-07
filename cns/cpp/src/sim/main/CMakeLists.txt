@@ -14,6 +14,7 @@ set(SOURCES
         simenv.cpp
         simenv.h
         voltmeter.h
+        axon.h
 )
 
 # add directory name to sources

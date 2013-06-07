@@ -1,6 +1,6 @@
 
 #include "simenv.h"
-
+#include "axon.h"
 
 Neurons* SimEnv::addNeuronGroup(NeuronGroupOptions opts) { 
     Neurons *elems = new Neurons(opts);

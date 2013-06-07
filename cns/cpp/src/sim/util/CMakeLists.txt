@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 2.8)
 
+set(DIRS
+  rand
+)
+
 set(SOURCES
   cli.hpp
   cli.cpp
@@ -14,8 +18,7 @@ set(SOURCES
   option_impl.hpp
   prefixedoutstream.hpp
   prefixedoutstream.cpp
-  prefixedoutstream_impl.hpp
-  rand_funcs.hpp
+  prefixedoutstream_impl.hpp  
   timers.hpp
   timers.cpp
 )

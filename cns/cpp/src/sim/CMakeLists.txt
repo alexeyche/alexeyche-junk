@@ -9,6 +9,7 @@ set(DIRS
     socket
     util
     main
+    tests
     )
 
 foreach(dir ${DIRS})
@@ -56,4 +57,11 @@ install(TARGETS sim_prj
   RUNTIME DESTINATION bin
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib)
+
+# For 'make test'. 
+add_custom_target(test 
+  ${CMAKE_BINARY_DIR}/bin/sim_test
+  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/ # This is where test files are put. 
+  COMMENT "Running SIM test" 
+  DEPENDS sim_test)
 

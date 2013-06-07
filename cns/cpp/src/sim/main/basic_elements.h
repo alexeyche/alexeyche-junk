@@ -17,7 +17,7 @@ struct SimElemSize {
 };
 
 class SimBasic {
-public:		
+public:
 	virtual void computeMe(double dt) = 0;	
     virtual void prepareMe(SimOptions so) {}
 };

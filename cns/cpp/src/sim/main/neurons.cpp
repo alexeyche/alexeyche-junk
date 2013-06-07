@@ -1,27 +1,31 @@
 
 #include "neurons.h"
 
-#include <sim/util/rand_funcs.hpp>
+#include <sim/util/rand/rand_funcs.h>
 
-Neurons::Neurons(NeuronGroupOptions opts) 
+Neurons::Neurons(NeuronGroupOptions opts) : SimElem(n,n)
 {
-    for(size_t i=0; i<opts.size(); i++) {
-        n += opts[i].num;
-        vec a_cur(opts[i].num);
-        vec b_cur(opts[i].num);
-        vec c_cur(opts[i].num);
-        vec d_cur(opts[i].num);
-        vec V_rest_cur(opts[i].num);
-        a_cur.fill(opts[i].a);
-        b_cur.fill(opts[i].b);
-        c_cur.fill(opts[i].c);
-        d_cur.fill(opts[i].d);
-        V_rest_cur.fill(opts[i].V_rest);
+    n = opts.neurons_num;    
+    axon = new AxonDelay(n);
+    
+    for(size_t i=0; i<opts.group_size(); i++) {        
+        vec a_cur(opts[i]->num);
+        vec b_cur(opts[i]->num);
+        vec c_cur(opts[i]->num);
+        vec d_cur(opts[i]->num);
+        vec V_rest_cur(opts[i]->num);
+        a_cur.fill(opts[i]->a);
+        b_cur.fill(opts[i]->b);
+        c_cur.fill(opts[i]->c);
+        d_cur.fill(opts[i]->d);
+        V_rest_cur.fill(opts[i]->V_rest);
         a = join_cols(a, a_cur);                    
         b = join_cols(b, b_cur);
         c = join_cols(c, c_cur);
         d = join_cols(d, d_cur);
         V_rest = join_cols(V_rest, V_rest_cur);
+        axon->prepareMe(&opts[i]->axonOpts);    
+
     }
     V = V_rest;
     u = V_rest % b;
