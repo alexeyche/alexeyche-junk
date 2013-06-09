@@ -3,7 +3,7 @@
 #define NEURONS_H
 
 #include <sim/core.h>
-
+#include <map>
 
 using namespace sim;
 
@@ -11,9 +11,10 @@ using namespace sim;
 #include "axon.h"
 
 struct NeuronOptions {
-    NeuronOptions(int num, double a = 0.02, double b = 0.2, double c = -65, double d = 6, double V_rest = -70, double treshold = 30) : 
-                  num(num), a(a), b(b), c(c), d(d), treshold(treshold), V_rest(V_rest), axonOpts(num) { }
+    NeuronOptions(int num, const std::string &name, double a = 0.02, double b = 0.2, double c = -65, double d = 6, double V_rest = -70, double treshold = 30) : 
+                  num(num), name(name), a(a), b(b), c(c), d(d), treshold(treshold), V_rest(V_rest), axonOpts(num) { }
     int num;
+    const std::string name;
     double a;
     double b;
     double c;
@@ -57,9 +58,15 @@ class Neurons : public SimElem<vec, vec> {
         Neurons(NeuronGroupOptions opts);
         void computeMe(double dt);  
         
-        void setInput(vec I);
-        vec getOutput();
+        vec& getInput();
+        vec& getOutput();
 
+        uvec getIndSubgroup(const std::string &name) {
+            return ind_distr[name];
+        }
+        uvec getIndAll() {
+            return linspace<uvec>(0, n-1, n);
+        }
         int n;
 
         vec a;
@@ -71,10 +78,15 @@ class Neurons : public SimElem<vec, vec> {
         vec u;
         vec Isyn;
         vec V;
-        vec Vout;
+        vec V_out;
+        
         AxonDelay* axon;
+
     private:
-        uvec need_reset;        
+        uvec fired;
+        std::map<const std::string, uvec> ind_distr; 
+        //system inf
+               
 };
 
 #endif

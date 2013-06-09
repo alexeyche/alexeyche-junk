@@ -3,11 +3,11 @@
 
 #include <sim/util/rand/rand_funcs.h>
 
-Neurons::Neurons(NeuronGroupOptions opts) : SimElem(n,n)
+Neurons::Neurons(NeuronGroupOptions opts) : SimElem(opts.neurons_num, opts.neurons_num), n(opts.neurons_num), V_out(n)
 {
-    n = opts.neurons_num;    
-    axon = new AxonDelay(n);
-    
+    V_out.fill(0);
+    axon = new AxonDelay(n, V_out);
+
     for(size_t i=0; i<opts.group_size(); i++) {        
         vec a_cur(opts[i]->num);
         vec b_cur(opts[i]->num);
@@ -25,38 +25,41 @@ Neurons::Neurons(NeuronGroupOptions opts) : SimElem(n,n)
         d = join_cols(d, d_cur);
         V_rest = join_cols(V_rest, V_rest_cur);
         axon->prepareMe(&opts[i]->axonOpts);    
-
+        treshold = opts[i]->treshold;
+        ind_distr[opts[i]->name] = linspace<uvec>(a.n_elem-opts[i]->num, a.n_elem-1, opts[i]->num);
     }
     V = V_rest;
     u = V_rest % b;
-    Isyn.zeros();  
-    need_reset.zeros();
+    Isyn.zeros(n);  
+    fired.zeros();
 
     //permutate 
-    uvec indices = get_shuffled_indices(n);
-    a = a(indices);
-    b = b(indices);
-    c = c(indices);
-    d = d(indices);
-    V = V(indices);
-    u = u(indices);
+    // uvec indices = get_shuffled_indices(n);
+    // a = a(indices);
+    // b = b(indices);
+    // c = c(indices);
+    // d = d(indices);
+    // V = V(indices);
+    // u = u(indices);
 }
 
 void Neurons::computeMe(double dt) {        
-    // reset, if need_reset.n_elem == 0, it just ignores
-    V(need_reset) = c(need_reset);
-    u(need_reset) = u(need_reset)+d(need_reset);        
-
+    // reset, if fired.n_elem == 0, it just ignores
+    
+    V(fired) = c(fired);    
+    u(fired) = u(fired)+d(fired);            
     V = V + dt * (0.04*square(V) + 5*V - V_rest*2 - u + Isyn);
+    
     u = u + dt * a * (b*V - u);
-    need_reset = find(V>treshold);
-    V(need_reset).fill(treshold);
+    fired = find(V>treshold);
+    V(fired).fill(treshold);
+    V_out(fired).fill(treshold);
 }
 
-void Neurons::setInput(vec I) {    
-    Isyn = I;
+vec& Neurons::getInput() {
+    return Isyn;
 }
 
-vec Neurons::getOutput() {    
-    return V;
+vec& Neurons::getOutput() {  
+    return axon->getOutput();
 }

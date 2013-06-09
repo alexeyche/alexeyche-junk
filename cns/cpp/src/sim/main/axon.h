@@ -30,23 +30,39 @@ private:
 	RandGen* generator;		
 };
 
-class AxonDelay {
+
+class AxonDelay : public SimBasic {
 public:	
-	AxonDelay(int n) : n(n), I_in(n), I_out(n), delays(n), filled(0), delays_cur(n) {
+	AxonDelay(int n, vec &in) : V_in(in), n(n), V_out(n), delays(n), filled(0), delays_cur(n), V_in_cur(n) {
+		V_out.fill(0);
 		delays.fill(0);
-	}
-	void setInput(vec in) {
+		delays_cur.fill(0);
+		V_in_cur.fill(0);	
+		cur_active_axons.fill(0);
 
 	}
-	vec getOutput() {
-
+	vec& getOutput() {
+		return V_out;
 	}
-	void computeMe(double dt) {
-		uvec active_axons = find(I_in > 0);		
-		delays_cur(active_axons) += dt;		
+	vec& getInput() {
+		return V_in;
+	}
+	void computeMe(double dt) {		
+		// get potentials
+		uvec active_axons = find(V_in);
+		 
+		V_in_cur(active_axons) = V_in(active_axons);		
+		V_in(active_axons).fill(0);
+
+		// increment delays
+		cur_active_axons = find(V_in_cur);		
+		delays_cur(cur_active_axons) += dt;		
+		// find finished axons
 		uvec transmited_ind = find(delays_cur-delays >= 0);
+		// transmit current
 		if(transmited_ind.n_elem > 0) {
-			I_out(transmited_ind) = I_in(transmited_ind);
+			V_out(transmited_ind) = V_in_cur(transmited_ind);
+			V_in_cur(transmited_ind).fill(0);
 			delays_cur(transmited_ind).fill(0);
 		}
 	}
@@ -55,14 +71,18 @@ public:
 		filled += ado->n;		
 	}
 
-	vec I_in;
-	vec I_out;
-	vec delays;
 	int n;
+	vec &V_in;
+	vec V_out;
+	vec delays;	
+	vec V_in_cur; // potentials need to deliver
+	vec delays_cur;
 private:
 	int filled;
-	vec delays_cur;
 	
+	
+	//uvec active_axons;
+	uvec cur_active_axons;	
 };
 
 #endif

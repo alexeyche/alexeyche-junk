@@ -1,11 +1,11 @@
 #include "connection.h"
 
-Connection::Connection(SimElemCommon* pre, SimElemCommon* post) : pre(pre), post(post), connMat(pre->size.n_out, post->size.n_in) {//
-	connMat.ones();
+
+Connection::Connection(SimElemCommon* pre, SimElemCommon* post) : connMat(pre->size.n_out, post->size.n_in), in(pre->getOutput()), out(post->getInput()) {
+	connMat.ones();	
 }
 
 void Connection::computeMe(double dt) {
-	vec out_pre = pre->getOutput();	
-	mat in_post = out_pre * connMat;
-	post->setInput(in_post.t());
+	mat in_post = in * connMat;
+	out = in_post.row(0);	
 }

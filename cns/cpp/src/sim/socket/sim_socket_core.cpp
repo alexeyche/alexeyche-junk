@@ -15,7 +15,7 @@ void send_arma_mat(mat m, std::string name, long unsigned int* iter=NULL, bool v
 	if(iter == NULL) {
 		snprintf(head_m, 100, "%s:%d:%d@",name_c, m.n_rows, m.n_cols);
 	} else 	{
-		snprintf(head_m, 100, "%s%d:%d:%d@",name_c,*iter, m.n_rows, m.n_cols);
+		snprintf(head_m, 100, "%s%d:%d:%d@",name_c,(int)*iter, m.n_rows, m.n_cols);
 	}
 	
 	init_socket(PORT);	

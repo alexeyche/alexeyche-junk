@@ -35,14 +35,13 @@ public:
 		probs = probs(ind);
 		samples = samples(ind);
 	}
-	SampleRandGen(int min, int max) : probs(max-min+1), samples(max-min+1) {
+	SampleRandGen(int min, int max) : samples(max-min+1), probs(max-min+1) {
 		int ind = 0;
-		for(int i=min; i<max; i++) {
-			probs(i) = 1.0/(max-min);
-			samples(ind++) = i; 
-		}
-		probs.print();
-		samples.print();
+		for(int i=min; i<=max; i++) {
+			probs(ind) = 1.0/(max-min);
+			samples(ind) = i; 
+			ind++;
+		}		
 	}
 	vec gen(int n) {
 		std::srand(time(NULL));

@@ -11,11 +11,11 @@ public:
     Poisson(double mHerz, double long_ms, double Iout_value);
     void computeMe(double dt);
     
-    void setInput(vec in);
-    vec getOutput();
+    vec& getInput();
+    vec& getOutput();
     
     double mHerz;
-    double Iout;
+    vec Iout;
     double Iout_value;
     double long_ms;
     

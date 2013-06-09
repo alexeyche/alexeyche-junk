@@ -7,7 +7,11 @@
 
 using namespace arma;
 
-#include "util/log.hpp"
-#include "util/cli.hpp"
+
+#include <sim/util/log.hpp>
+#include <sim/util/cli.hpp>
+#include <sim/util/timers.hpp>
+
+using namespace sim;
 
 #endif

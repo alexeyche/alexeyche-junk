@@ -5,11 +5,18 @@
 Neurons* SimEnv::addNeuronGroup(NeuronGroupOptions opts) { 
     Neurons *elems = new Neurons(opts);
     elements.push_back((SimBasic*)elems);
+    elements.push_back((SimBasic*)elems->axon);
     return elems;
 }
 
-VoltMeter* SimEnv::addVoltMeter(Neurons *el) { 
-    VoltMeter *elems = new VoltMeter(el);
+Synapse* SimEnv::addSynapse(Neurons *pre, Neurons *post,  SynapticGroupOptions &sgo) { 
+    Synapse *elems = new Synapse(pre, post, sgo);
+    elements.push_back((SimBasic*)elems);
+    return elems;
+}
+
+StatCollector* SimEnv::addStatCollector(vec &v) { 
+    StatCollector *elems = new StatCollector(v);
     elements.push_back((SimBasic*)elems);
     return elems;
 }
@@ -31,18 +38,28 @@ void SimEnv::prepareSimulation(SimOptions so) {
 
 void SimEnv::runSimulation(SimOptions so) {
     this->prepareSimulation(so);
-    for(double t=0; t < so.time_ms; t+=so.tau_ms) {
-        for(size_t i=0; i<elements.size(); i++) {
-            elements[i]->computeMe(so.tau_ms);        
+    Timer::Start("Iterations");
+    for(double t=0; t < so.time_ms; t+=so.tau_ms) {        
+        Log::Info << "1) Calculating elements (t:" << t << ")" << std::endl;
+        for(size_t i=0; i<elements.size(); i++) {            
+            Timer::Start("Element");
+            Log::Info << "===| Calculating element #" << i << std::endl;
+            elements[i]->computeMe(so.tau_ms);
+            Timer::Stop("Element");        
         }
-        for(size_t i=0; i<connections.size(); i++) {
+        Log::Info << "2) Calculating connections (t:" << t << ")" << std::endl;
+        for(size_t i=0; i<connections.size(); i++) {            
+            Timer::Start("Connection");
+            Log::Info << "===| Calculating connection #" << i << std::endl;
             connections[i]->computeMe(so.tau_ms);        
+            Timer::Stop("Connection");
         }
     }
+    Timer::Start("Iterations");
 }
 
-Connection* SimEnv::connect(SimElemCommon* pre, SimElemCommon* post) {
-	Connection* c = new Connection(pre, post);
-	connections.push_back(c);
-    return c;	
-}
+//Synapse* SimEnv::connect(SimElemCommon* pre, SimElemCommon* post) {
+//    Synapse* c = new Synapse(pre, post);
+//    connections.push_back(c);
+//    return c;   
+//}

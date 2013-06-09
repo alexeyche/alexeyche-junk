@@ -1,22 +1,22 @@
-#ifndef VOLTMETER_H
-#define VOLTMETER_H
+#ifndef STAT_COLLECTOR_H
+#define STAT_COLLECTOR_H
 
 
 #include "neurons.h"
 
-class VoltMeter : public SimBasic {
+class StatCollector : public SimBasic {
 public:	
-	VoltMeter(Neurons* el) : el(el), iter(0) {}
+	StatCollector(vec& val) : iter(0) { v = &val; } 
 	void computeMe(double dt) {
-		acc.col(iter) = el->V;
+		acc.col(iter) = *v;
 		iter++;
 	}
 	void prepareMe(SimOptions so) {
-		acc = zeros(el->n, so.iterations);
+		acc = zeros(v->n_elem, so.iterations);
 	}	
 
 
-	Neurons* el;
+	vec *v;
 	mat acc;	
 private:
 	int iter;

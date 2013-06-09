@@ -26,8 +26,8 @@ template <typename T_IN, typename T_OUT>
 class SimElem : public SimBasic {
     public:            
         SimElem(int n_in = 0, int n_out = 0) : size(n_in, n_out) {}        
-        virtual void setInput(T_IN in) = 0;
-        virtual T_OUT getOutput() = 0;
+        virtual T_OUT& getOutput() = 0;
+        virtual T_OUT& getInput() = 0;
 
         SimElemSize size;
 };
