@@ -14,8 +14,8 @@ option(ARMA_EXTRA_DEBUG "Compile with extra Armadillo debugging symbols." OFF)
 # Only GCC-like compilers support -Wextra, and other compilers give tons of
 # output for -Wall, so only -Wall and -Wextra on GCC.
 if(CMAKE_COMPILER_IS_GNUCC)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ")
 endif(CMAKE_COMPILER_IS_GNUCC)
 
 # Debugging CFLAGS.  Turn optimizations off; turn debugging symbols on.
