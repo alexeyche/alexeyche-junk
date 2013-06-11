@@ -1,3 +1,5 @@
+#ifndef RAND_FUNCS_H
+#define RAND_FUNCS_H
 
 #include <vector>
 #include <algorithm>
@@ -19,3 +21,5 @@ uvec get_shuffled_indices(int n_elem) {
  	uvec ids_v(&ids[0], n_elem);    
  	return ids_v;
 }
+
+#endif

@@ -10,12 +10,11 @@ void axon_test() {
 	AxonDelay ax(1000, V_in_vec);
 	
 	AxonDelayOptions ado(1000);
-	ado.setGenerator(new UnifRandGen(1,20));
+	ado.setGenerator(new UnifRandGen<vec>(1,20));
 	ax.prepareMe(&ado);
 	
-	SampleRandGen sr(1,400);
-	vec v = sr.gen(400);
-	uvec ind = conv_to<uvec>::from(v);
+	SampleRandGen<uvec> sr(1,400);
+	uvec ind = sr.gen(400);
 	V_in_vec(ind).fill(30);
 
 	Timer::Start("Axon compute");

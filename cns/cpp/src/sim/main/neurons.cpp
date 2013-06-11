@@ -1,7 +1,7 @@
 
 #include "neurons.h"
 
-#include <sim/util/rand/rand_funcs.h>
+//#include <sim/util/rand/rand_funcs.h>
 
 Neurons::Neurons(NeuronGroupOptions opts) : SimElem(opts.neurons_num, opts.neurons_num), n(opts.neurons_num), V_out(n)
 {

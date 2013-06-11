@@ -6,6 +6,8 @@ Connection::Connection(SimElemCommon* pre, SimElemCommon* post) : connMat(pre->s
 }
 
 void Connection::computeMe(double dt) {
-	mat in_post = in * connMat;
-	out = in_post.row(0);	
+	uvec fired = find(in);
+	if(fired.n_elem>0) {		
+		out = in.t() * connMat;		
+	}		
 }

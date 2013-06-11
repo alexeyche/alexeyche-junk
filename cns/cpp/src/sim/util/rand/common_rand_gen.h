@@ -5,17 +5,19 @@
 #include <sim/core.h>
 
 
+template <typename TSample>
 class RandGen {
 public:
-	virtual vec gen(int n) = 0;
+	virtual TSample gen(int n) = 0;
 };
 
-class UnifRandGen : public RandGen {
+template <typename TSample>
+class UnifRandGen : public RandGen<TSample> {
 public:	
 	UnifRandGen(double min, double max) : min(min), max(max) {}
-	vec gen(int n) {
+	TSample gen(int n) {
 		std::srand(time(NULL));
-		vec out;
+		TSample out;
 		out.randu(n);
 		out = min + max * out;
 		return out;
@@ -24,9 +26,10 @@ public:
 	double max;
 };
 
-class SampleRandGen : public RandGen {
+template <typename TSample>
+class SampleRandGen : public RandGen<TSample> {
 public:
-	SampleRandGen(vec samples_c, vec probs_c) : samples(samples_c), probs(probs_c) { 
+	SampleRandGen(TSample samples_c, vec probs_c) : samples(samples_c), probs(probs_c) { 
 		if(samples.n_elem != probs.n_elem) {
 			throw std::logic_error("Length of probs and samples must be equal"); 
 		}
@@ -35,29 +38,35 @@ public:
 		probs = probs(ind);
 		samples = samples(ind);
 	}
+	SampleRandGen(TSample samples_c) : samples(samples_c), probs(samples_c.n_elem) { 		
+		probs.fill(1.0/samples_c.n_elem);		
+	}
 	SampleRandGen(int min, int max) : samples(max-min+1), probs(max-min+1) {
 		int ind = 0;
 		for(int i=min; i<=max; i++) {
 			probs(ind) = 1.0/(max-min);
-			samples(ind) = i; 
+			samples(ind) = i;
 			ind++;
 		}		
 	}
-	vec gen(int n) {
+
+	TSample gen(int n) {
+		TSample out;
 		std::srand(time(NULL));
-		vec r, cum_p, out;
-		r.randu(n);		
+		vec r, cum_p;
+		
+		r.randu(n);
 		cum_p.zeros(n);
 		out.zeros(n);
 		for(size_t i=0; i<samples.n_elem; i++) {			
 			cum_p += probs(i);			
-			uvec fired_ind = find( (cum_p-r)>0 );			
+			uvec fired_ind = find( (cum_p-r)>0 );					
 			out(fired_ind).fill(samples(i));
 			cum_p(fired_ind).fill(-1);
 		}		
 		return out;
 	}
-	vec samples;
+	TSample samples;
 	vec probs;
 };
 

@@ -12,22 +12,22 @@ using namespace sim;
 #define DEFAULT_MAX_D 20
 
 struct AxonDelayOptions {
-	AxonDelayOptions(int n, RandGen* generator_c = NULL): n(n), generator(generator_c) {
+	AxonDelayOptions(int n, RandGen<vec>* generator_c = NULL): n(n), generator(generator_c) {
 		if(!generator) {
-			generator = new UnifRandGen(1,DEFAULT_MAX_D);
+			generator = new UnifRandGen<vec>(1,DEFAULT_MAX_D);
 		}			
 	}
 	~AxonDelayOptions() { delete generator; }
-	RandGen* setGenerator(RandGen* gen) {
+	RandGen<vec>* setGenerator(RandGen<vec>* gen) {
 		delete generator;
 		generator = gen;
 	}
-	RandGen* getGenerator() {
+	RandGen<vec>* getGenerator() {
 		return generator;
 	}
 	int n;
 private:	
-	RandGen* generator;		
+	RandGen<vec>* generator;		
 };
 
 

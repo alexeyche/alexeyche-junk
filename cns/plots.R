@@ -1,4 +1,4 @@
-
+#!/usr/bin/RScript
 
 plot_act <- function(x, treshold=30) {
   V_gr <- NULL

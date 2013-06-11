@@ -2,6 +2,7 @@
 #define SYNAPSE_H
 
 #include <sim/main/connection.h>
+#include <sim/util/rand/rand_funcs.h>
 
 class SynapticOptions {
 public:	
@@ -28,6 +29,7 @@ public:
 		syn_opts.push_back(so);
 	}
 	int group_size() { return syn_opts.size(); }   
+	SynapticOptions* operator [] (int i) { return syn_opts[i]; }
 	double tau_ltp;
 	double tau_ltd;
 	double syn_max;
@@ -46,32 +48,42 @@ public:
 		ltp.fill(0);
 		ltd.fill(0);
 		sd.fill(0);
-		for(size_t i=0; i<sgo.group_size(); i++) {
-			// need random filling
-			//s(sgo.syn_opts[i].indices_in).fill(sgo.syn_opts[i].syn_strength);
+		for(size_t i=0; i<sgo.group_size(); i++) {			
+			for(size_t j=0; j< sgo[i]->indices_in.n_elem; j++) {
+				uvec ind = get_shuffled_indices(sgo[i]->indices_out.n_elem);			
+				ind = ind(span(0, sgo[i]->syn_num));				
+				uvec ind_row(1);
+				ind_row.fill(sgo[i]->indices_in(j));			
+				s(ind_row,ind).fill(sgo[i]->syn_strength);
+			}			
 		}
+		tau_ltp = sgo.tau_ltp;
+		tau_ltd = sgo.tau_ltd;
+		syn_max = sgo.syn_max;
 	}
 
 	void computeMe(double dt) {		
 		uvec fired = find(in);
-		// if(fired.n_elem>0) {
-		// 	std::cin.ignore();
-		// 	mat post = s.rows(fired);
-		// 	uvec post_fired = find(post != 0);
-			
-		// 	fired.print();
-		// 	post.print();
-		// 	post_fired.print();
-		// 	ltp *= (1-1/tau_ltp);
-		// 	ltd *= (1-1/tau_ltd);
-		// }
+		if(fired.n_elem>0) {
+			vec out_m = in.t() * s;
+			out_m.print();
+			std::cin.ignore();
+		}
+		g_ampa -= g_ampa/tau_ampa;
+		ltp *= (1-1/tau_ltp);
+		ltd *= (1-1/tau_ltd);
 	}
 
 private:
 	vec ltp; // stdp
 	vec ltd; 	
-	mat s;
+	mat s;	
 	mat sd;
+	double tau_ltp;
+	double tau_ltd;
+	double syn_max;
+	mat g_ampa;
+	mat g_nmda;
 };
 
 

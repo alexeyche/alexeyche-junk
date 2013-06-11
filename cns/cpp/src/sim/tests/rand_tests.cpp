@@ -3,7 +3,7 @@
 
 
 void test_sample_rand_gen() {	
-	SampleRandGen s("1 2 3 4 5", "0.1 0.2 0.3 0.4 0.2");
+	SampleRandGen<vec> s("1 2 3 4 5", "0.1 0.2 0.3 0.4 0.2");
 	vec out = s.gen(100);
 	uvec counts;
 	counts.zeros(5);
