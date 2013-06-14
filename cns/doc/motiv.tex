@@ -6,51 +6,136 @@
 \usepackage[english,russian]{babel}
 \usepackage{amsmath}
 \usepackage{color,graphicx}
+
 \title{Заголовок}
 \author{Автор}
+
 \begin{document}
+
+
+\begin{center}
+\thispagestyle{empty}
+\centering
+\ \\
+\ \\
+\ \\
+\ \\
+\ \\
+\ \\
+\ \\
+\ \\
+\ \\
+\textsc{\Large Мотивационное письмо}\\[1cm]
+\ \\
+\ \\
+\ \\
+\ \\
+\ \\
+\ \\
+\ \\
+\ \\
+\ \\
+\ \\
+\ \\
+\ \\
+\ \\
+\ \\
+\ \\
+\ \\
+\ \\
+\ \\
+\ \\
+\ \\
+\ \\
+\ \\
+\ \\
+\ \\
+\ \\
+\ \\
+\ \\
+\ \\
+\ \\
+\ \\
+\ \\
+\end{center}
+Чернышев Алексей, 2013
+
+\newpage
+\tableofcontents
+\newpage
 \setlength{\parindent}{10pt}
-\section*{Вводные слова}
+
+\section{Вводные слова}
 Основная задача будущего исследования - создать унифицированный подход в использовании возможностей сложных динамических нейроннных систем в проблемах обработки больших объемов данных и осуществления при помощи них классических задач машинного обучения таких как кластеризация, регрессия, классификация.\\
 \indent Динамические системы вдохновленные структурой коры головного мозга давно являются, как минимум, любопытным феноменом для учёных. Мозг является сложным многосистемным вычислительным устройством, который поражает своими вычислительными способностями и подчерпнуть хоть немного из его строения, научиться это использовать, является большим вызовом.
-\paragraph*{Нейронные сети.} Первое поколение Искусственных Нейронных Сетей (ИНС) взяло только основные принципы работы биологических нейросетей. В них нейрон формализован как сумматор принимающий на вход сигналы от других нейронов и на основе искусственно введенной нелинейности решает передавать сигнал дальше или нет.\\
-\indent Вторым поколением ИНС можно назвать модели школы Хинтона\cite{hinton2006}. Эти модели имеют стохастическую природу - нейрон передает или не передает сигнал в зависимости от вероятности выражаемой через коэффициенты модели, которые обучаются на данных без учителя.\\ 
-\indent Обучение без учителя является ключевым показателем интеллектуальности алгоритма. Интеллект сам по себе, как свойство живых организмов, представляет собой следствие самоорганизации природы в определенных условиях\cite{evolut}. Руководствуясь подобными предпосылками, на базе школы Хинтона выросло направление в \textit{Machine Learning - Representation Learning}\cite{yoshua}.\\
-\indent \textit{Representation Learning} собрал для себя следующие принципы, которые, по большей части, взяты именно из особенностей работы мозга: 
+
+\section{Машинное обучение, основные проблемы}
+\label{sec:ml}
+Одной из классических задач машинного обучения является найти зависимость между скрытыми переменными (причиной) и следствием (данными). С такой задачей машинное обучение уже давно с успехом справляется. Можно взять в качестве примера наивный байесовский классификатор, в котором делается предположение о независимости признаков друг от друга (то есть скрытые переменные не взавимосвязаны причинно-следственной связью) и в итоге получить классификатор, который будет классифицировать объекты с той или иной погрешностью.\\
+\indent Основная проблема подобного подхода в том, что в реальных сложных задачах мы почти никогда не встретим случая, когда данные порождены абсолютно независимыми причинами.\\
+\indent Существуют графические вероятностные модели \cite{prob_graph} в которых подобные зависимости вводятся в виде графа факторов. Также существует много способов обучать такие модели, но так или иначе, все они сталкиваются с невозможностью описать зависимость всех факторов друг от друга. Если, например, рассмотреть в качестве данных картинку 32x32, в которой каждый пискель принимает значение $\{0,1\}$, то, чтобы описать зависимость всех факторов друг от друга, необходимо ввести $2^{1024}$ дополнительных факторов, не говоря о том, как сложно их обучить.\\
+\indent В 2003 году, B. Taskar предложил графическую модель которая может учитывать попарно связанные факторы \cite{taskar}, но тем не менее задача как рассматривать более высокоранговые связи внутри данных всё также остра.
+\section{Reservoir computing}
+\label{sec:res_comp_sec}
+Почти одновременно и с большой помпой вышли две работы H. Jaeger \cite{esn} и W. Maass \cite{lsm} в 2004 г., описывающие модели \textit{Echo State Networks} и \textit{Liquid State Machine} соотв., которые положили начало новому взгляду на использования рекуррентных сетей . Рекуррентные сети не без успеха использовались и до выхода работ, но рекуррентность в сетях порождают труднопреодолимые проблемы, как нестабильность и проблема обучения таких сетей \cite{rnn_prob}.\\
+\indent Успех вышеназванных работ заключатся в уникальном по простоте подходу к динамическим системам (см. рис~\ref{res_comp}).
+\begin{figure}[ht]
+\centering
+\includegraphics[width=1\linewidth]{res_comp}
+\caption{схема Reservoir Computing}
+\label{res_comp}
+\end{figure} \\
+\indent Основной принцип работы модели в том, что вычислительный резервуар, который представляет собой динамическую рекуррентную нейронную сеть, принимает уникальное состояние для каждого элемента данных, выходные же элементы по средством настраиваемых весов, обучаются на состояниях резервуара.\\
+\indent Методы обучения считывающих (\textit{readout}) элементов на состояниях резервуара могут быть самыми примитивными - используя только решение системы нормальных уравнений для регрессии методом наименьших квадратов, уже можно добиться хороших предсказательных способностей \cite{esn_site}.\\
+\indent Примечателен тот факт, что веса связей между элементами резервуара во время обучения остаются постоянными.
+\section{Нейронные сети, тренд развития}
+Первое поколение Искусственных Нейронных Сетей (ИНС) взяло только основные принципы работы биологических нейросетей. В них нейрон формализован как сумматор принимающий на вход сигналы от других нейронов и на основе искусственно введенной нелинейности решает передавать сигнал дальше или нет.\\
+\indent Вторым поколением ИНС можно назвать модели школы \textit{Deep Learning}, которую основал J. Hinton с выходом работы \cite{hinton2006}. Эти модели имеют стохастическую природу - нейрон передает или не передает сигнал в зависимости от вероятности выражаемой через коэффициенты модели, которые обучаются на данных без учителя.\\ 
+\indent Обучение без учителя является ключевым показателем интеллектуальности алгоритма. Интеллект сам по себе, как свойство живых организмов, представляет собой следствие самоорганизации природы в определенных условиях \cite{evolut}. Руководствуясь подобными предпосылками, на базе школы \textit{Deep Learning} выросло направление в \textit{Machine Learning - Representation Learning} \cite{yoshua}.\\
+\indent \textit{Representation Learning} собрал для себя следующие принципы, которые, по большей части, взяты именно из особенностей работы мозга:
 \begin{itemize}
 \item распределенность хранения (distributed representation);
 \item разреженность представления (sparse code);
 \item генеративные модели (generative models);
-\end{itemize}
-Общий тренд развития интеллектуальных алгоритмов стремительно идёт по направлению к биоподобным моделям.
-\paragraph*{Паралелли с Neuroscience.} Neuroscience, как наука, за последние 50 лет накопила множество опыта в исследовании особенностей функционирования мозга. Computational Neuroscience серьезно продвинулся в моделировании биологических процессов, начиная со знаменитой работы Hodkin и Huxley\cite{hodhux} в моделировании нейрона кальмара, заканчивая масштабными симуляциями нейронной активности\cite{izh_large} (порядка $10^4$ нейронов).\\
-\indent В отличии от Neuroscience данная работа не ставит целью воспроизвести биологические процессы, но создать подход в применении таких моделей для конкретных задач.
-\section*{Предпосылки и мотивация применения биологических принципов}
-В данном разделе рассмотрены наиболее перспективные направления развития интеллектуальных алгоритмов и систем по пути биологического моделирования. В статье Randal O'Reilly \cite{randall98} описываются принципы построения когнитивных моделей, которые ещё не получили широкого распространения.
-\begin{enumerate}
-\item \textit{Биологический реализм.} \\
-Повторение биологических принципов и применение их в моделях поможет лучше понять и использовать когнитивные способности организмов. Важным является не полагаться полностью на них, ввиду большой сложности биохимических реакций, но уметь выставить баланс между реализмом и функциональной пользой этого реализма. \\
-\indent \\
-\textbf{Архитектурные принципы.}
-\item \textit{Распределенное представление.} \\
-Биологические нейронные системы широко используют понятие распределенного разреженного представления информации. Каждый нейрон является вычислительным элементом активность которого представляет собой микропризнак (\textit{microfeature}). Различные сочетания нейронной активности представляют ряд выделенных признаков которыми кодируется информация. Функциональная польза такого подхода заключается в большой эффективности, робастности, точности представления и возможности создавать связи подобия \cite{hinton86}. Принцип подобия исходит из наличия общих элементов представляющих признаки какой либо информации. \\ 
-В качестве простого примера распределенности можно рассмотреть алфавит. Каждая буква алфавита является признаком, различные небольшие сочетания признаков (слова) могут закодировать огромное количество информации.
-\item \textit{Конкуренция тормозящих связей.}\\
-Конкуренция тормозящих связей создаёт селективность когнитивной модели в выборе репрезентаций и как следствие формирует фундамент для обучения модели. Конкуренция заключается в погашении слабой активности, так, что только небольшой процент самых активных нейронов остается представлять данный квант информации.\\
-Большинство обучающих механизмов построено по подобным принципам --  конкуренция элементов представлять информацию с течением времени приводит к тому, что наиболее важная информация <<схватывается>>   элементами.
-\item \textit{Рекуррентные потоки активности.}\\
-Рекуррентный обмен активностью внутри модели контрастирует на фоне классических сетей прямого распространения и являет собой важный механизм итеративного процесса представления информации определенным паттерном по достижению системы состояния эквилибриума (баланса).\\
-Важность интерактивности для понимания когнитивных процессов была показана в работе McClelland и Rumelhart\cite{mcclel_rumer}. В этой работе было показано, что интерактивность может объяснить влияние высокоуровневого слоя обработки слов на низкоуровневые слои обработки букв.  \\
-\indent \\
-\item \textit{Обучение.}
-\section*{Наиболее перспективные направления моделирования нейронных сетей.}
-Здесь будет dendritic computation, reservoir computing и/или polychronius groups, time encoding, inh synaptic plasctisity 
+\end{itemize} 
+\indent \indent Стоит заметить, что \textit{Deep Learning} привнес новый взгляд на пробему решения вопроса обучения больших полносвязанных графических моделей. В своих работах Hinton применяет современные методы цепей Монте-Карло, направляя сэмплированные частицы (\textit{particles}), по направлению градиента поверхности правдоподобия модели. К сожалению его метод обучения ограничен только определенным классом моделей.\\
+\indent Как итог небольшого экскурса в историю ИНС невооруженным вглядом можно заметить, что общий тренд их развития стремительно идёт по направлению к биоподобным моделям.
+\section{Новости с фронтов Neuroscience}
+Начиная с создания динамической модели аксона кальмара в работе Hodkin и Huxley \cite{hodhux}, в 50-ых сформировалась научная область изучающая поведение динамических систем и приведение их в соответствие с наблюдаемыми данными - \textit{Computational Neuroscience}. Развитие компьютеров позволяют всё больше и больше понять тонкости взаимосвязи химических реакций в мозгу.\\ 
+\paragraph*{Neural Coding.} До 90-ых в сообществе учёных была твёрдая уверенность, что информация в нейронах кодируется при помощи спайковой интенсивности (\textit{rate coding}). В работе D. Warland \cite{time_cricket} измерили временные статистики спайковой активности сверчка, на усы которого воздействали слабым потоком воздуха, выяснилось, что нейронная активность наиболее всего коррелирует с временем между спайками. Также, работе J. Gautrais \cite{time_code} показал, что потенциальное количество информации закодированной нейросетью растет экспоненциально с ростом количества нейронов, если информация кодируется при помощи временной разницы между спайками.\\
+\paragraph*{Dendritic Computation.}
+Роль дендритов много времени не была ясна и им не уделяли много внимания: многие симуляции организовывали вовсе без дендритов - синаптические связи подключали напрямую к клетке. В 2003 году появилась работа \cite{dendr0}, где показывается нелинейность поведения дендритов и феномена появиления, так называемого, кластера синапсов. Здесь \cite{dendr1} рассказывается, что используя только сеть дендритов и один нейрон была создана сеть распознающую лица.
+\paragraph*{Synaptic Plasticity.}
+Пластичность синапсов, как ключ к обучаемости и интеллекту всегда был интересен ученым в Neuroscience и не только. Начиная с 1998 года появилась, уже классическая, модель пластичности синаптических связей \cite{syn0} \textit{Spike Timing Dependence Plasticity} (\textit{STDP}). Она во многом солидарна со правилом Хэбба \cite{hebb}, предсказанным им ещё в 1949 году - связи между нейронами, которые активны большую часть времени, усиливаются, только правило не учитывает момент ослабления синаптических связей. Современное правило пластичности синапсов, биологически верное, построено на разнице во времени спайков pre-нейрона и post-нейрона. Если pre-нейрон произвел спайк, а потом произвел спайк post-нейрон, то синаптическая связь между pre-нейроном и post-нейроном усиливается. Если же post-нейрон произвел спайк раньше, чем pre-нейрон, то связь ослабляется. Модель, наиболее натурально описывающая этот феномен -- экспоненциальная.\\
+\indent Существует множество работ \cite{syn1}\cite{syn2}\cite{syn3}, доказывающих, что рекуррентные сети, обущающиеся на таком правиле, способны к самоорганизации и кластеризации.
 
-\section*{Конкретная модель}
-\end{enumerate}
+\paragraph*{Polychronious Groups.}
+Как гипотеза в работе Eugene Izhikevich \cite{izh_groups}, была предложена идея работы мозга на основе полихронов -- особых груп нейронов, которые имеют место формироваться в больших симуляциях нейронных сетей (около $10^5$ нейронов). Полихронные группы формируются в больших количествах и в разных качествах, есть группы временные, которые умирают сразу, есть постоянные, но также есть определенные виды групп которые соответствуют определенному входному паттерну \cite{patt_groups}.
+
+\section{Основная гипотеза}
+Вместо того, чтобы порождать огромное множество различных алгоритмов машинного обучения для каждого конкретного случая зависимости факторов (секция \ref{sec:ml}), предпологается создать на базе \textit{Reservoir Computing} (секция \ref{sec:res_comp_sec}) один специальный сложный алгоритм, который обучается на корелляционных атрибутах нейронной активности.\\
+\indent Гипотеза подразумевает существование единого принципа работы когнитивных функций мозга и возможности в большей или меньшей  степени приблизить принцип работы резервуара с динамической нейронной сетью к этому единому природному принципу.\\
+
+\section{Конкретная задача и модель для проверки гипотезы}
+
+
 
 \newpage
+\addcontentsline{toc}{section}{Список литературы}
 \begin{thebibliography}{9}
+\bibitem{prob_graph}
+D. Koller and N. Friedman, Probabilistic Graphical Models: Principles and Techniques,2009, MIT Press
+\bibitem{taskar}
+Max-Margin Markov Networks,  B. Taskar, C. Guestrin and D. Koller. Neural Information Processing Systems Conference (NIPS03), Vancouver, Canada, December 2003
+\bibitem{esn}
+Herbert Jaeger, Harald Haas; Harnessing Nonlinearity: Predicting Chaotic Systems and Saving Energy in Wireless Communication; 
+Science 2 April 2004: Vol. 304 no. 5667 pp. 78-80 
+\bibitem{lsm}
+Maass, Wolfgang; Natschläger, Thomas; Markram, Henry (November 2002), "Real-time computing without stable states: a new framework for neural computation based on perturbations", Neural Comput 14 (11): 2531–60
+\bibitem{rnn_prob}
+Sepp Hochreiter; The Vanishing Gradient Problem during Learning; INTERNATIONAL JOURNAL OF UNCERTAINTY, FUZZINESS AND KNOWLEDGE-BASED SYSTEMS
+\bibitem{esn_site}
+http://minds.jacobs-university.de/mantas/code
 \bibitem{hinton2006}
 Hinton, G. E., Osindero, S. and Teh, Y. (2006)
 A fast learning algorithm for deep belief nets.
@@ -61,16 +146,42 @@ Christoph Adami, Charles Ofria, and Travis C. Collier, Evolution of biological c
 Yoshua Bengio, Aaron Courville, Pascal Vincent (2012), Representation Learning: A Review and New Perspectives, CoRR abs/1206.5538 
 \bibitem{hodhux}
 A. L. Hodgkin. A. F. Huxley. Chance and design in electrophysiology: an informal account of certain experiments on nerve carried out between 1934 and 1952. J Physiol, 263(1):1-21, Dec 1976.
-\bibitem{izh_large}
-E. M. Izhikevich and G. M. Edelman. The Neurosciences Institute,10640 John Jay Hopkins Drive, San Diego, CA, 92121.
-\bibitem{randall98}
-Randall C. O'Reilly, Six Principles for Biologically-Based Computational Models of Cortical Cognition, TRENDS IN COGNITIVE SCIENCES, 1998, 455--462
-\bibitem{hinton86}
-Hinton, G. E., McClelland, J. L., and Rumelhart, D. E. (1986)
-Distributed representations. 
-In Rumelhart, D. E. and McClelland, J. L., editors, Parallel Distributed Processing: Explorations in the Microstructure of Cognition. Volume 1: Foundations, MIT Press, Cambridge, MA.
-\bibitem{mcclel_rumer}
-McClelland, J. L., and Rumelhart, D. E. (1981). An interactive activation model of context effects in letter perception: Part 1. An account of basic findings. Psychological Review, 88, 375-407.
+\bibitem{time_cricket}
+David Warland, Michael Landolfa, John P. Miller, William Bialek; Reading Between the Spikes in the Cereal Filiform Hair Receptors of the Cricket; Analysis and Modeling of Neural Systems; 1992, pp 327-333
+\bibitem{time_code}
+Jacques Gautrais, Simon Thorpe; Rate coding versus temporal order coding: a theoretical approach; 1998; Centre de Recherche Cerveau et Cognition UMR 5549, 133 route de Narbonne, 31062 Toulouse, France
+\bibitem{time_ts1}
+Sinchan Roychowdhury and G. Kumar Venayagamoorthy; Spiking Neural Networks Encoding \& Decoding Algorithms for Time Series; 2012
+\bibitem{time_image}
+Miss.Chinki Chandhok, Mrs.Soni Chaturvedi; Adaptation of Spiking Neural Networks for Image Clustering; International Journal of Video \& Image Processing and Network Security IJVIPNS-IJENS Vol: 12 No: 03
+\bibitem{dendr0}
+Michael Hausser and Bartlett Mel.; Dendrites: bug or feature? Current Opinion in Neurobiology 2003, 13:372–383
+\bibitem{dendr1}
+https://class.coursera.org/bluebrain-001/class/index
+\bibitem{syn0}
+Guo-qiang Bi and Mu-ming Poo; Synaptic Modifications in Cultured Hippocampal Neurons: Dependence on Spike Timing, Synaptic Strength, and Postsynaptic Cell Type; The Journal of Neuroscience, 15 December 1998, 18(24): 10464-10472;
+\bibitem{syn1}
+Xiaoli Tao, Howard E. Michel. Data Clustering Via Spiking Neural Networks through Spike Timing-Dependent Plasticity. In Hamid R. Arabnia, editor, Proceedings of the International Conference on Artificial Intelligence, IC-AI 04, June 21-24, 2004, Las Vegas, Nevada, USA, Volume 1. pages 168-173, CSREA Press, 2004.
+\bibitem{syn2}
+Belatreche, Ammar and Paul, Rakesh (2012) Dynamic cluster formation using populations of spiking neurons. In: The 2012 IEEE International Joint Conference on Neural Networks (IJCNN), , Brisbane, Australia. IEEE. 6 pp.
+\bibitem{syn3}
+Bernhard Nessler, Michael Pfeiffer and Wolfgang Maass; STDP enables spiking neurons to detect hidden causes of their inputs; Computational, Information-Theoretic Learning with Statistics, Learning/Statistics \& Optimisation, Theory \& Algorithms; 2009
+\bibitem{hebb}
+Hebb, D. O. (1949). The Organization of Behavior: A Neuropsychological Theory. ISBN 978-0805843002.
+\bibitem{izh_groups}
+Eugene M. Izhikevich, Joe A. Gally, Gerald M. Edelman; Spike-Timing Dynamics of Neuronal Groups; (2004) Cerebral Cortex, 14:933-944
+\bibitem{patt_groups}
+Joseph Chrol-Cannon, Andre Gruning and Yaochu Jin; The Emergence of Polychronous Groups under Varying Input Patterns, Plasticity Rules and Network Connectivities; IJCNN The 2012 International Joint Conference on Neural Networks, 2012-06-10 - 2012-06-15, Brisbane, QLD
+%\bibitem{izh_large}
+%E. M. Izhikevich and G. M. Edelman. The Neurosciences %Institute,10640 John Jay Hopkins Drive, San Diego, CA, 92121.
+%\bibitem{randall98}
+%Randall C. O'Reilly, Six Principles for Biologically-Based Computational Models of Cortical Cognition, TRENDS IN COGNITIVE SCIENCES, 1998, 455--462
+%\bibitem{hinton86}
+%Hinton, G. E., McClelland, J. L., and Rumelhart, D. E. (1986)
+%Distributed representations. 
+%In Rumelhart, D. E. and McClelland, J. L., editors, Parallel Distributed Processing: Explorations in the Microstructure of Cognition. Volume 1: Foundations, MIT Press, Cambridge, MA.
+%\bibitem{mcclel_rumer}
+%McClelland, J. L., and Rumelhart, D. E. (1981). An interactive activation model of context effects in letter perception: Part 1. An account of basic findings. Psychological Review, 88, 375-407.
 \end{thebibliography}
 
 \end{document}
