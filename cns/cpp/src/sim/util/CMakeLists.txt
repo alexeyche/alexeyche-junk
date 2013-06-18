@@ -21,6 +21,7 @@ set(SOURCES
   prefixedoutstream_impl.hpp  
   timers.hpp
   timers.cpp
+  debug_funcs.h
 )
 
 # add directory name to sources

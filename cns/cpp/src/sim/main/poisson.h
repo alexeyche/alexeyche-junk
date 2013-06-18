@@ -4,7 +4,7 @@
 #include "basic_elements.h"
 
 #define I_OUT 14 // pA
-#define LONG_MS 100
+#define LONG_MS 5
 
 class Poisson : public SimElem<vec, vec> {
 public:

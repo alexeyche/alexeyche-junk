@@ -11,7 +11,7 @@ Neurons* SimEnv::addNeuronGroup(NeuronGroupOptions opts) {
 
 Synapse* SimEnv::addSynapse(Neurons *pre, Neurons *post,  SynapticGroupOptions &sgo) { 
     Synapse *elems = new Synapse(pre, post, sgo);
-    elements.push_back((SimBasic*)elems);
+    connections.push_back((Connection*)elems);
     return elems;
 }
 
