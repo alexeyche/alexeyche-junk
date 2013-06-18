@@ -7,7 +7,7 @@
 using namespace sim;
 
 PROGRAM_INFO("SIM", "spiking neural network simulation framework"); 
-PARAM_DOUBLE("neurons", "scale of network", "n", 100);
+PARAM_DOUBLE("neurons", "scale of network", "n", 50);
 
 int main(int argc, char** argv) {	
     CLI::ParseCommandLine(argc, argv);
@@ -18,14 +18,14 @@ int main(int argc, char** argv) {
     Poisson *p1 = env.addPoissonElem(10, 50, 10); // 10 mHerz - freq, 50 ms - long, 10 mA - out value
 	
     double exc_ratio = 0.8;
-    NeuronOptions n_exc(80,"excitatory");
+    NeuronOptions n_exc(40,"excitatory");
     
     n_exc.axonOpts.setGenerator(new UnifRandGen<vec>(1,20));
     
     n_exc.a = 0.02;
     n_exc.d = 8;
     
-    NeuronOptions n_inh(30, "inhibitory");    
+    NeuronOptions n_inh(10, "inhibitory");    
     n_inh.axonOpts.setGenerator(new SampleRandGen<vec>("1","1"));    
     n_inh.a = 0.1;
     n_inh.d = 2;
@@ -37,14 +37,14 @@ int main(int argc, char** argv) {
 
     Connection *c = env.connect<Connection>(p1, n1);    
 
-    int synapse_num = 30;
-    // synaptic connection between excitatory and all other neurons
+    int synapse_num = 20;
+    // synaptic connection between excitatory and all other neurons    
     
-    SynapticOptions syn_exc_all(n1->getIndSubgroup("excitatory"), n1->getIndAll(), 6, synapse_num);  
+    SynapticOptions syn_exc_all(n1->getIndSubgroup("excitatory"), n1->getIndAll(), 0.1, synapse_num, AMPA);  
     
     
     // synaptic connection between inhibitory and excitatory
-    SynapticOptions syn_inh_exc(n1->getIndSubgroup("inhibitory"), n1->getIndSubgroup("excitatory"), -5, synapse_num);
+    SynapticOptions syn_inh_exc(n1->getIndSubgroup("inhibitory"), n1->getIndSubgroup("excitatory"), 0.1, synapse_num, AMPA_A);
     SynapticGroupOptions syn_opt;
     syn_opt.add(&syn_exc_all);
     syn_opt.add(&syn_inh_exc);
