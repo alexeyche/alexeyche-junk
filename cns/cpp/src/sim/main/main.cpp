@@ -2,7 +2,7 @@
 #include "simenv.h"
 
 #include <sim/core.h>
-#include <sim/socket/sim_socket_core.cpp>
+#include <sim/socket/sim_socket_core.h>
 
 using namespace sim;
 
@@ -40,8 +40,8 @@ int main(int argc, char** argv) {
     int synapse_num = 500;
     // synaptic connection between excitatory and all other neurons    
     
-    SynapticOptions syn_exc_all0(n1->getIndSubgroup("excitatory"), n1->getIndAll(), 0.1, synapse_num/2, AMPA, 5);  
-    SynapticOptions syn_exc_all1(n1->getIndSubgroup("excitatory"), n1->getIndAll(), 0.1, synapse_num/2, NMDA, 150);
+    SynapticOptions syn_exc_all0(n1->getIndSubgroup("excitatory"), n1->getIndAll(), 0.8, synapse_num/2, AMPA, 6);  
+    SynapticOptions syn_exc_all1(n1->getIndSubgroup("excitatory"), n1->getIndAll(), 0.8, synapse_num/2, NMDA, 150);
     
     
     // synaptic connection between inhibitory and excitatory
@@ -61,12 +61,12 @@ int main(int argc, char** argv) {
     StatCollector *axon_cur = env.addStatCollector(n1->axon->V_in_cur);
     StatCollector *axon_d_cur = env.addStatCollector(n1->axon->delays_cur);
     StatCollector *syn_out = env.addStatCollector(syn->out);
-    env.runSimulation(SimOptions(0.25, 500)); // tau(ms), simulation time (ms)
+    env.runSimulation(SimOptions(0.25, 100)); // tau(ms), simulation time (ms)
     
     send_arma_mat(v_n->acc, "V");  
     send_arma_mat(v_isyn->acc, "Isyn");
     send_arma_mat(axon_cur->acc, "axon_cur");
     send_arma_mat(axon_d_cur->acc, "axon_d_cur");
-    send_arma_mat(syn_out->acc, "syn_out");
+    send_arma_mat(syn_out->acc, "syn_out", NULL, true);
     
 }

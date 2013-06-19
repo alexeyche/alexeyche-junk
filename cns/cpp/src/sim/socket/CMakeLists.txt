@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 
-set(SOURCES sim_socket_core.cpp sim_client.h)
+set(SOURCES sim_socket_core.h sim_client.h)
 
 # add directory name to sources
 set(DIR_SRCS)

@@ -14,7 +14,7 @@ void Connection::computeMe(double dt) {
 		out(out_i) = out_to_all(out_i);
 		out(out_i+1) = out_to_all(out_i+1);
 		out(out_i+2) = out_to_all(out_i+2);
-		//out(out_i+3) = out_to_all(out_i+3);
-		//out(out_i+4) = out_to_all(out_i+4);
+		out(out_i+3) = out_to_all(out_i+3);
+		out(out_i+4) = out_to_all(out_i+4);
 	}		
 }
