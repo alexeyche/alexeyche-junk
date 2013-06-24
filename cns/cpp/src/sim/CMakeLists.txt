@@ -10,6 +10,7 @@ set(DIRS
     util
     main
     tests
+    lookup
     )
 
 foreach(dir ${DIRS})
