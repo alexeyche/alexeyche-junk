@@ -24,8 +24,8 @@ public:
         dims[name] = d;
         whole_dim *= d.dim_size;
     }    
-    double *v;
-    double *u_fin;
+    float *v;
+    float *u_fin;
     size_t whole_dim;
     std::map<std::string, dim> dims;
 };
@@ -40,7 +40,7 @@ public:
 	}
 	~LookupTableIzh() { delete table; }
 	
-	double getValue(double V, double u, double t) {
+	float getValue(double V, double u, double t) {
 		size_t vi = getIndex("V", V);
 		size_t ui = getIndex("u", u);
 		size_t ti = getIndex("t", t);
@@ -54,7 +54,7 @@ public:
 		return table->v[vi_it+ui_it+ti];
 	}
 
-	double getLastU(double V, double u) {
+	float getLastU(double V, double u) {
 		size_t vi = getIndex("V", V);
 		size_t ui = getIndex("u", u);
 		size_t vi_it = vi * table->dims["u"].dim_size;
@@ -65,19 +65,19 @@ public:
         
         table = new TableIzh();
         table->addDim("V", 100, -100.0, 30.0); // V dim
-        table->addDim("u", 50, -20.0, 10.0); // u dim
-        table->addDim("t", 70, 0.0, 50.0); // t dim
+        table->addDim("u", 100, -20.0, 10.0); // u dim
+        table->addDim("t", 100, 0.0, 50.0); // t dim
 
         Log::Info << "Generating table with " << table->whole_dim << " elements ... ";
-        table->v = (double*)malloc(sizeof(double)*table->whole_dim);
-        table->u_fin = (double*)malloc(sizeof(double) * table->dims["V"].dim_size * table->dims["u"].dim_size);
+        table->v = (float*)malloc(sizeof(float)*table->whole_dim);
+        table->u_fin = (float*)malloc(sizeof(float) * table->dims["V"].dim_size * table->dims["u"].dim_size);
         
         vec V_space = linspace<vec>(table->dims["V"].min, table->dims["V"].max, table->dims["V"].dim_size);
         vec t_space = linspace<vec>(table->dims["t"].min, table->dims["t"].max, table->dims["t"].dim_size);
         vec u_space = linspace<vec>(table->dims["u"].min, table->dims["u"].max, table->dims["u"].dim_size);
 
         for(size_t vi=0; vi<V_space.n_elem; vi++) {
-    		size_t vi_it = vi * table->dims["t"].dim_size * table->dims["u"].dim_size;
+    		size_t vi_it = vi * table->dims["u"].dim_size * table->dims["t"].dim_size;
             
             for(size_t ui=0; ui<u_space.n_elem; ui++) {
             	

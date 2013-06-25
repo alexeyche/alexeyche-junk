@@ -35,9 +35,9 @@ int main(int argc, char** argv)
             lut.getValue(Vs, us, t);
         }
         double u = lut.getLastU(Vs, us);
-        std::cout << "last u: " << u << "\n";
+        //std::cout << "last u: " << u << "\n";
         double V = lut.getValue(Vs, us, 49.0);
-        std::cout << "last V: " << V << "\n";
+        //std::cout << "last V: " << V << "\n";
         Vs=V;
         us=u;
     }
