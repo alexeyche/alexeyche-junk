@@ -3,8 +3,8 @@
 #include <boost/numeric/odeint.hpp>
 
 
-#include "neuron_models.h"
 
+#include "lookup_table.h"
 
 
 
@@ -24,9 +24,22 @@ struct push_back_state_and_time
 };
 
 
-int main(int /* argc */ , char** /* argv */ )
+int main(int argc, char** argv)
 {
-    neuron_izh n;
-    n.calc();        
+    CLI::ParseCommandLine(argc, argv);
+    LookupTableIzh lut;
+    double Vs = -70.0;
+    double us = -14.0;
+    for(size_t icyc=0; icyc<10; icyc++) {
+        for(double t=0; t<50; t+=1) {
+            lut.getValue(Vs, us, t);
+        }
+        double u = lut.getLastU(Vs, us);
+        std::cout << "last u: " << u << "\n";
+        double V = lut.getValue(Vs, us, 49.0);
+        std::cout << "last V: " << V << "\n";
+        Vs=V;
+        us=u;
+    }
     return 0;
 }

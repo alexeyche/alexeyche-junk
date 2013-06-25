@@ -1,8 +1,9 @@
 cmake_minimum_required(VERSION 2.8)
 
-#set(SOURCES
-#	generate_table.cpp
-#)
+set(SOURCES
+	neuron_models.h
+	lookup_table.h
+)
 
 add_executable(gen_table
     generate_table.cpp    
