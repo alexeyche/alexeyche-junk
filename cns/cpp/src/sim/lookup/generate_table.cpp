@@ -30,15 +30,16 @@ int main(int argc, char** argv)
     LookupTableIzh lut;
     double Vs = -70.0;
     double us = -14.0;
-    NeuronIzh n;
-    lut.check_bounds(&n);
+    double Is = 5;
+    //NeuronIzh n;
+    //lut.check_bounds(&n);
     // for(size_t icyc=0; icyc<10; icyc++) {
     //     for(double t=0; t<50; t+=1) {
-    //         lut.getValue(Vs, us, t);
+    //         lut.getValue(Vs, us, Is, t);
     //     }
-    //     double u = lut.getLastU(Vs, us);
+    //     double u = lut.getLastU(Vs, us, Is);
     //     //std::cout << "last u: " << u << "\n";
-    //     double V = lut.getValue(Vs, us, 49.0);
+    //     double V = lut.getValue(Vs, us, Is, 49.0);
     //     //std::cout << "last V: " << V << "\n";
     //     Vs=V;
     //     us=u;
