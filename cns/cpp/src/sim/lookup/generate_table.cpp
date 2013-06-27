@@ -31,8 +31,7 @@ int main(int argc, char** argv)
     double Vs = -70.0;
     double us = -14.0;
     double Is = 5;
-    //NeuronIzh n;
-    //lut.check_bounds(&n);
+    NeuronIzh n;
     // for(size_t icyc=0; icyc<10; icyc++) {
     //     for(double t=0; t<50; t+=1) {
     //         lut.getValue(Vs, us, Is, t);
