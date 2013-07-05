@@ -14,24 +14,6 @@ struct dim {
     size_t it_size_no_t;
     std::string name;
     
-    void writeToFile(std::ofstream &fs) {
-        fs.write(reinterpret_cast<const char*>(&dim_size), sizeof(dim_size));
-        fs.write(reinterpret_cast<const char*>(&min), sizeof(min));
-        fs.write(reinterpret_cast<const char*>(&max), sizeof(max));
-        fs.write(reinterpret_cast<const char*>(&dx), sizeof(dx));
-        fs.write(reinterpret_cast<const char*>(&it_size), sizeof(it_size));
-        fs.write(reinterpret_cast<const char*>(&it_size_no_t), sizeof(it_size_no_t));
-        fs.write(reinterpret_cast<const char*>(&name), sizeof(name));
-    }
-    void readFromFile(std::ifstream &fs) {
-        fs.read(reinterpret_cast<char*>(&dim_size), sizeof(dim_size));
-        fs.read(reinterpret_cast<char*>(&min), sizeof(min));
-        fs.read(reinterpret_cast<char*>(&max), sizeof(max));
-        fs.read(reinterpret_cast<char*>(&dx), sizeof(dx));
-        fs.read(reinterpret_cast<char*>(&it_size), sizeof(it_size));
-        fs.read(reinterpret_cast<char*>(&it_size_no_t), sizeof(it_size_no_t));
-        fs.read(reinterpret_cast<char*>(&name), sizeof(name));
-    }
     bool equals(const dim &other_dim) {
         if(dim_size != other_dim.dim_size) { return false; }
         if(min != other_dim.min) { return false; }
@@ -39,7 +21,8 @@ struct dim {
         if(dx != other_dim.dx) { return false; }
         if(it_size != other_dim.it_size) { return false; }
         if(it_size_no_t != other_dim.it_size_no_t) { return false; }
-        if(name != other_dim.name) { return false; }
+        //if(name != other_dim.name) { return false; }
+
         return true;
     }
 };
@@ -51,25 +34,22 @@ struct pointIzh {
     size_t ti;
 };
 struct fileHead {
-        unsigned int dims_size;
+        unsigned int dims_num;
         dim *dims; 
         
-        void writeToFile(std::ofstream &fs) {
-            fs.write(reinterpret_cast<const char*>(&dims_size), sizeof(dims_size));
-            for(size_t i=0; i<dims_size; i++) {
-                dims[i].writeToFile(fs);
-            }
+        void writeToFile(FILE *fp) {
+            fwrite(&dims_num, sizeof(dims_num), 1, fp);
+            fwrite(dims, sizeof(dim), dims_num, fp);
         }
-        void readFromFile(std::ifstream &fs) {
-            fs.read(reinterpret_cast<char*>(&dims_size), sizeof(dims_size));
-            dims = new dim[dims_size];
-            for(size_t i=0; i<dims_size; i++) {
-                dims[i].readFromFile(fs);
-            }
+        void readFromFile(FILE *fp) {
+            size_t rb = fread(&dims_num, sizeof(dims_num), 1, fp);
+            dims = new dim[dims_num];
+            rb = fread(dims, sizeof(dim), dims_num, fp);            
         }
         bool equals(const fileHead &other_fileHead) {
-            if (other_fileHead.dims_size != dims_size) { return false; }
-            for(size_t i=0; i<dims_size; i++) {
+            if (other_fileHead.dims_num != dims_num) { return false; }
+            
+            for(size_t i=0; i<dims_num; i++) {
                 if(!dims[i].equals(other_fileHead.dims[i])) {
                     return false;
                 }
@@ -131,16 +111,18 @@ public:
         }            
     }
     void allocMemory() {
+        Log::Info << "Allocating " << sizeof(float) * dims_size << " bytes" << std::endl;
         v = (float*)malloc(sizeof(float) * dims_size);
+        Log::Info << "Allocating " << sizeof(float) * dims_size_no_t << " bytes" << std::endl;
         u_fin = (float*)malloc(sizeof(float) * dims_size_no_t);
     }
     fileHead* generateFileHeader() {
         fileHead* fh = new fileHead();
-        fh->dims_size = dims_size;
-        fh->dims = new dim[dims_size];
-        for(size_t i=0; i>dims_ins_order.size(); i++) {
+        fh->dims_num = dims_ins_order.size();
+        fh->dims = new dim[fh->dims_num];
+        for(size_t i=0; i<dims_ins_order.size(); i++) {
             const std::string cur_name = dims_ins_order[i];     
-            fh->dims[i] = dims[cur_name];
+            memcpy((void*)&fh->dims[i], (void*)&dims[cur_name], sizeof(dim));
         }
         return fh;
     }
@@ -156,7 +138,7 @@ public:
 };
 
 
-#define BUFF_LEN 1000
+#define BUFF_LEN 10000
 #define FILENAME "NeuronIzhData.bin"
 
 class LookupTableIzh {
@@ -199,22 +181,20 @@ public:
 	void generate_table(Model *m) {    	
         table = new TableIzh();
         
-        // table->addDim("V", 100, -105.0, 30.0); // V dim
-        // table->addDim("u", 50, -15.5, 36.5); // u dim
-        // table->addDim("I", 100, -70, 70); // I dim
-        // table->addDim("t", 100, 0.0, 50.0); // t dim
-        
         table->addDim("V", 100, -105.0, 30.0); // V dim
         table->addDim("u", 100, -15.5, 36.5); // u dim
         table->addDim("I", 50, -70, 70); // I dim
         table->addDim("t", 100, 0.0, 50.0); // t dim
         
-        Log::Info << "Generating table with " << table->dims_size << " elements ... ";        
+        Log::Info << "Generating table with " << table->dims_size << " elements ... " << std::endl;        
         table->allocMemory(); // allocate mem
            
+        
         if(readFromFile()) {
-            return;
+           return;
         }
+
+//        return;
         
         Timer::Start("Table generation");
         
@@ -281,7 +261,7 @@ public:
         std::cout << "V_min: " << V_min << " V_max: " << V_max << " u_min: " << u_min << " u_max: " << u_max << std::endl;        
     }
     void saveToFile() {
-         std::ofstream bin_data(FILENAME, std::ios::out | std::ios::binary);
+         FILE *bin_data = fopen(FILENAME,"wb");
          fileHead * fh = table->generateFileHeader();
          fh->writeToFile(bin_data);
          // writing table         
@@ -295,8 +275,9 @@ public:
             if(count<0) {
                 download_b = BUFF_LEN + count;
             }
-            memcpy(buff, &table->v[p], sizeof(float)*download_b);
-            bin_data.write(reinterpret_cast<const char*>(buff),sizeof(float)*download_b);
+            memcpy(buff, table->v+p, sizeof(float)*download_b);
+            fwrite((void*)buff, sizeof(float), download_b, bin_data);
+            
             if(count<0) break;
             
             p += download_b;
@@ -310,18 +291,19 @@ public:
             if(count<0) {
                 download_b = BUFF_LEN + count;
             }
-            memcpy(buff, &table->u_fin[p], sizeof(float)*download_b);
-            bin_data.write(reinterpret_cast<const char*>(buff),sizeof(float)*download_b);
+            memcpy(buff, table->u_fin+p, sizeof(float)*download_b);
+            
+            fwrite((void*)buff, sizeof(float), download_b, bin_data);
             if(count<0) break;
 
             p += download_b;
          }
-         bin_data.close();
+         fclose(bin_data);
     }
     bool readFromFile() {
-         std::ifstream bin_data(FILENAME, std::ios::in | std::ios::binary);
+         FILE* bin_data;
          Log::Info << "Checking file " << FILENAME;
-         if(bin_data.good()) {
+         if(bin_data = fopen(FILENAME,"rb")) {
              Log::Info << "... file found. Reading data ... " << std::endl;
 
              fileHead * fh_file = new fileHead();
@@ -329,6 +311,7 @@ public:
              fileHead * fh_cur = table->generateFileHeader();
              if(fh_cur->equals(*fh_file)) {
                 Log::Info << "Head file is proper. Loading table ... ";
+                Timer::Start("Table read");
                 float *buff = new float[BUFF_LEN];
                 
                 float *dest = table->v;
@@ -341,8 +324,8 @@ public:
                     if(count<0) {
                         download_b = BUFF_LEN + count;                        
                     }
-                    bin_data.read(reinterpret_cast<char*>(buff), sizeof(float)*download_b);
-                    memcpy(&table->v[p], buff, sizeof(float)*download_b);   
+                    size_t rb = fread((void*)buff, sizeof(float), download_b, bin_data);
+                    memcpy(table->v+p, buff, sizeof(float)*download_b);   
                     if(count<0) break;
                     
                     p += download_b;
@@ -355,13 +338,15 @@ public:
                     if(count<0) {
                         download_b = BUFF_LEN + count;                        
                     }
-                    bin_data.read(reinterpret_cast<char*>(buff), sizeof(float)*download_b);
-                    memcpy(&table->u_fin[p], buff, sizeof(float)*download_b);   
+                    size_t rb = fread((void*)buff, sizeof(float), download_b, bin_data);
+                    memcpy(table->u_fin+p, buff, sizeof(float)*download_b);   
                     if(count<0) break;
                                  
                     p += download_b;
                 }
-                Log::Info << "done" << std::endl;       
+                fclose(bin_data);
+                Timer::Stop("Table read");
+                Log::Info << "done" << std::endl;      
                 return true;
              } else {
                 Log::Info << "Head of file " << FILENAME << " don't proper for current configs. File will be overwritten with new version" << std::endl;
