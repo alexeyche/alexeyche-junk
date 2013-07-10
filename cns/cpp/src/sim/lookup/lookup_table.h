@@ -149,6 +149,10 @@ struct LinealInterpIndex {
     int low;
     int high;
 };
+struct LinealInterpGrid {
+    float low;
+    float high;
+};
 public:
 	LookupTableIzh() : curr_time(0)  {		
         NeuronIzh n;
@@ -165,12 +169,14 @@ public:
 		return table->v[vi_it+ui_it+ii_it+ti];
     }
     float bilineal_interpolation(double V, double u, double I, double t) {
-        LinealInterpIndex vi = getIndex("V", V);
-        LinealInterpIndex ui = getIndex("u", u);
-        LinealInterpIndex ii = getIndex("I", I);
-        LinealInterpIndex ti = getIndex("t", t);
-
+        LinealInterpGrid vg = getGridValue("V", V);
+        LinealInterpGrid ug = getGridValue("u", u);
+        LinealInterpGrid ig = getGridValue("I", I);
+        LinealInterpGrid tg = getGridValue("t", t);
+        float denom = (vg.high-vg.low)*(ug.high-ug.low)*(ig.high-ig.low)*(tg.high-tg.low);
+        Log::Info << "Denominator: " << denom << std::endl;
     }
+
     LinealInterpIndex getIndex(const std::string &axis_name, double value) {       
         LinealInterpIndex ind;
         ind.low = floor((value - table->dims[axis_name].min)/table->dims[axis_name].dx);  // -100 -70
@@ -181,6 +187,14 @@ public:
         //}
         return ind;
     }   
+    LinealInterpGrid getGridValue(const std::string &axis_name, double value) {
+        LinealInterpIndex ind = getIndex(axis_name, value);
+        vec space = table->getSpaceVec(axis_name);
+        LinealInterpGrid gr;
+        gr.low = space(ind.low);
+        gr.high = space(ind.high);
+        return gr;
+     }
 
 	// float getLastU(double V, double u, double I) {
 	// 	size_t vi = getIndex("V", V);
