@@ -74,7 +74,13 @@ public:
         d.max = max;
         d.dx = (max-min)/dim_size;
         d.name = name.c_str();
-        d.space = linspace<vec>(d.min, d.max, d.dim_size);
+        vec space(d.dim_size);
+        double val=d.min;
+        for(size_t i=0; i<d.dim_size; i++) {
+            space(i) = val;
+            val += d.dx;
+        }
+        d.space = space;
         dims[name] = d;       
         dims_size *= d.dim_size;
 
@@ -145,13 +151,12 @@ public:
 #define FILENAME "NeuronIzhData.bin"
 
 class LookupTableIzh {
-struct LinealInterpIndex {
-    int low;
-    int high;
-};
+
 struct LinealInterpGrid {
     float low;
     float high;
+    int low_i;
+    int high_i;
 };
 public:
 	LookupTableIzh() : curr_time(0)  {		
@@ -168,31 +173,55 @@ public:
 
 		return table->v[vi_it+ui_it+ii_it+ti];
     }
-    float bilineal_interpolation(double V, double u, double I, double t) {
-        LinealInterpGrid vg = getGridValue("V", V);
-        LinealInterpGrid ug = getGridValue("u", u);
-        LinealInterpGrid ig = getGridValue("I", I);
-        LinealInterpGrid tg = getGridValue("t", t);
-        float denom = (vg.high-vg.low)*(ug.high-ug.low)*(ig.high-ig.low)*(tg.high-tg.low);
-        Log::Info << "Denominator: " << denom << std::endl;
+    float bilineal_interpolation(std::vector<double> vals) {
+        vec& t_space = table->getSpaceVec("t");
+        t_space.print();
+        std::vector<LinealInterpGrid> grid_values;
+        for(size_t i=0; i<table->dims_ins_order.size(); i++) {
+            grid_values.push_back(getGridValue(table->dims_ins_order[i],vals[i]));        
+        }
+
+        float denom = 1.0;
+        for(size_t ax=0; ax<grid_values.size(); ax++) {
+            denom *= grid_values[ax].high - grid_values[ax].low;
+        }
+        
+        int calc_len = pow(2,grid_values.size());
+        char digits[4] = {8, 4, 2, 1};
+        float final_val = 0;
+        for(size_t i=0; i<calc_len; i++) {            
+            size_t work_ind[4];
+            double deltas = 1.0;
+            for(size_t j=0; j<4; j++) {
+                if(i & digits[j]) {
+                    work_ind[j] = grid_values[j].high_i;
+                    Log::Info << "i:" << i << " " << "j:" << j  << " - " << vals[j] << ", " << grid_values[j].low << " = " << vals[j] - grid_values[j].low << std::endl;
+                    deltas *= vals[j] - grid_values[j].low;
+                } else {
+                    work_ind[j] = grid_values[j].low_i;
+                    Log::Info << "i:" << i << " " << "j:" << j  << " - " << grid_values[j].high << ", " << vals[j] << " = " << grid_values[j].high - vals[j] << std::endl;
+                    deltas *=  grid_values[j].high - vals[j];
+                }
+            }       
+            float val = getValue(work_ind[0],  work_ind[1],  work_ind[2],  work_ind[3]);
+            final_val += (val/denom)*deltas;
+            Log::Info <<  work_ind[0] << ":" << work_ind[1] << ":" << work_ind[2] << ":" << work_ind[3] << " " << val << "    | deltas: " << deltas << std::endl;
+        }
+        
+        Log::Info << "Final value: " << final_val << std::endl;
     }
 
-    LinealInterpIndex getIndex(const std::string &axis_name, double value) {       
-        LinealInterpIndex ind;
-        ind.low = floor((value - table->dims[axis_name].min)/table->dims[axis_name].dx);  // -100 -70
-        //if(ind.low < table->dims[axis_name].dim_size) {
-        ind.high = ind.low+1;
-        //} else {
-        //    ind.high = ind.low;
-        //}
-        return ind;
-    }   
     LinealInterpGrid getGridValue(const std::string &axis_name, double value) {
-        LinealInterpIndex ind = getIndex(axis_name, value);
         vec space = table->getSpaceVec(axis_name);
         LinealInterpGrid gr;
-        gr.low = space(ind.low);
-        gr.high = space(ind.high);
+        gr.low_i = floor((value - table->dims[axis_name].min)/table->dims[axis_name].dx);  // -100 -70
+        gr.high_i = gr.low_i +1;
+        gr.low = space(gr.low_i);
+        gr.high = space(gr.high_i);
+        Log::Info << axis_name << ": " << table->dims[axis_name].dx << std::endl;
+        Log::Info << axis_name << ": " << (value - table->dims[axis_name].min)/table->dims[axis_name].dx << std::endl;
+        Log::Info << axis_name << ": " << "low_i: " << gr.low_i << " high_i: " << gr.high_i << " low_v: " << gr.low << " high_v: " << gr.high << std::endl; 
+         
         return gr;
      }
 

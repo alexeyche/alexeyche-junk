@@ -1,0 +1,10 @@
+ x = y = z = -1:1;
+ f = @(x,y,z) x.^2 - y - z.^2;
+ [xx, yy, zz] = meshgrid (x, y, z);
+ v = f (xx,yy,zz);
+ xi = yi = zi = -1:0.1:1;
+ [xxi, yyi, zzi] = meshgrid (xi, yi, zi);
+ vi = interp3(x, y, z, v, xxi, yyi, zzi, 'spline');
+% [xxi, yyi, zzi] = ndgrid (xi, yi, zi);
+% vi2 = interpn(x, y, z, v, xxi, yyi, zzi, 'spline');
+% mesh (zi, yi, squeeze (vi2(1,:,:)));
