@@ -209,6 +209,7 @@ public:
         }
         
         Log::Info << "Final value: " << final_val << std::endl;
+        return final_val;
     }
 
     LinealInterpGrid getGridValue(const std::string &axis_name, double value) {

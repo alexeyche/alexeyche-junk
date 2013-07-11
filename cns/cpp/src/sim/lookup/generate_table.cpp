@@ -28,13 +28,14 @@ int main(int argc, char** argv)
 {
     CLI::ParseCommandLine(argc, argv);
     LookupTableIzh lut;
-    double Vs = -101.0;
-    double us = -11.0;
-    double Is = 12;
+    double Vs = -105.0;
+    double us = -15.5;
+    double Is = -72;
     NeuronIzh n;
     std::vector<double> vals;
-    vals.push_back(Vs); vals.push_back(us); vals.push_back(Is); vals.push_back(2.5);
-    lut.bilineal_interpolation(vals);
+    vals.push_back(Vs); vals.push_back(us); vals.push_back(Is); vals.push_back(0.5);
+    float int_val = lut.bilineal_interpolation(vals);
+    Log::Info << "interp: " << int_val << " real: " << lut.getValue(0,0,0,1) << std::endl;
     // for(size_t icyc=0; icyc<50; icyc++) {
     //     for(double t=0; t<50; t+=1) {
     //         lut.getValue(Vs, us, Is, t);
