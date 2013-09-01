@@ -10,11 +10,13 @@ Apos <- 1
 Aneg <- -1
 t_pos_ <- t_syn*t_pos/(t_syn+t_pos)
 t_neg_ <- t_syn*t_neg/(t_syn+t_neg)
-N <- 100
 
-epsp <- function(s) {
+T <- 1000
+
+epsp <- Vectorize(function(s) {
+  if(s<0) { return(0)}
   (s/(t0^2)) * exp(-s/t0)
-}
+})
 #s<-seq(0,100, length.out=1000); s<-plot(s,epsp(s), type="l")
 #  integrate(epsp, 0,1000)
 
@@ -32,19 +34,38 @@ W <- function(s) {
 }
 #s <- seq(-40,60,length.out=1000); plot(s, W(s), type="l")
 
+aver <- function(f) {
+  function(t) {
+    integrate(f, t,t+T)$value
+  }
+}
+
 # J parameters:
 
 v0 <- 0
+N <- 100
+M1 <- N/2
+M2 <- N/2
 w_in <- nu
 w_out <- -1.0475*nu
-J <- abs(rnorm(N, sd=0.3))
+J <- abs(rnorm(N, sd=0.01))
 
-t_fin <- 10000 # ms = 10 sec
-t <- seq(0, t_fin)
+lambda_in_i <- Vectorize(function(t) 10)
 
+lambda_in <- list()
+for(i in 1:N) { lambda_in[[i]] <- lambda_in_i }
 
+lambda_in.big <- function(i,t) { 
+  integrate(function(s) { epsp(s)*lambda_in[[i]](t-s) },0, Inf)$value
+}
 
+S_out_av <- function(t) { 
+  v0 + sum_over(function(i) J[i]*lambda_in.big(i,t), N)
+}
 
+corr_av_i <- function(i,t,s) {
+  lambda_in[[i]](t+s)*(v0 + J[i]*epsp(-s)+sum_over(function(j) J[j]*lambda_in.big(i,t), N) )
+}
 
 
 
