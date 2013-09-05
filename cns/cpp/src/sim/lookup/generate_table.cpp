@@ -4,7 +4,7 @@
 
 
 
-#include "lookup_table.h"
+#include "neuron_models.h"
 
 
 
@@ -27,26 +27,17 @@ struct push_back_state_and_time
 int main(int argc, char** argv)
 {
     CLI::ParseCommandLine(argc, argv);
-    LookupTableIzh lut;
-    double Vs = -105.0;
-    double us = -15.5;
-    double Is = -72;
-    NeuronIzh n;
-    std::vector<double> vals;
-    vals.push_back(Vs); vals.push_back(us); vals.push_back(Is); vals.push_back(0.5);
-    float int_val = lut.bilineal_interpolation(vals);
-    Log::Info << "interp: " << int_val << " real: " << lut.getValue(0,0,0,1) << std::endl;
-    // for(size_t icyc=0; icyc<50; icyc++) {
-    //     for(double t=0; t<50; t+=1) {
-    //         lut.getValue(Vs, us, Is, t);
-    //     }
-    //     double u = lut.getLastU(Vs, us, Is);
-    //     //std::cout << "last u: " << u << "\n";
-    //     double V = lut.getValue(Vs, us, Is, 49.0);
-    //     //std::cout << "last V: " << V << "\n";
-    //     Vs=V;
-    //     us=u;
-    // }
-
+    NeuronLIF *nlif = new NeuronLIF();
+    state_type x(2);
+    x[0] = -70;
+    x[1] = 10;
+    for(double t=0; t<1000; t++) {
+        nlif->do_step(x,t);
+        printf("t:%f\tv:%f\n",t,x[0]);
+        if(t>500) {
+           x[1] = 0;
+        }
+    }
+    delete nlif;
     return 0;
 }
