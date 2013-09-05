@@ -1,4 +1,9 @@
+#!/usr/bin/RScript
+
 # epsp parameters:
+
+source('sys.R')
+
 t0 <- 10 # ms
 
 # W parameters:
@@ -50,13 +55,10 @@ w_in <- nu
 w_out <- -1.0475*nu
 J <- abs(rnorm(N, sd=0.01))
 
-lambda_in_i <- Vectorize(function(t) 10)
-
-lambda_in <- list()
-for(i in 1:N) { lambda_in[[i]] <- lambda_in_i }
+lambda_in <- function(i, t) 10
 
 lambda_in.big <- function(i,t) { 
-  integrate(function(s) { epsp(s)*lambda_in[[i]](t-s) },0, Inf)$value
+  integrate(function(s) { epsp(s)*lambda_in(i,t-s) },0, Inf)$value
 }
 
 S_out_av <- function(t) { 
@@ -64,7 +66,7 @@ S_out_av <- function(t) {
 }
 
 corr_av_i <- function(i,t,s) {
-  lambda_in[[i]](t+s)*(v0 + J[i]*epsp(-s)+sum_over(function(j) J[j]*lambda_in.big(i,t), N) )
+  lambda_in(i,t+s)*(v0 + J[i]*epsp(-s)+sum_over(function(j) J[j]*lambda_in.big(i,t), N) )
 }
 
 
