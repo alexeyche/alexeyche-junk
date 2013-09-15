@@ -1,0 +1,11 @@
+t_syn = 5;
+t_pos = 1;
+t_neg = 10;
+Apos = 1;
+Aneg = -1;
+t_pos_ = t_syn*t_pos/(t_syn+t_pos);
+t_neg_ = t_syn*t_neg/(t_syn+t_neg);
+
+W_ltp(t) := exp(t/t_syn)*(Apos*(1-t/t_pos_) + Aneg*(1-t/t_neg_));
+W_ltd(t) := Apos*exp(-t/t_pos) + Aneg*exp(-t/t_neg);
+W(t) := if t<=0 then W_ltp(t) else W_ldt(t);
