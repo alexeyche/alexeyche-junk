@@ -12,7 +12,7 @@ M1 <- N/2
 M2 <- N/2
 w_in <- nu
 w_out <- -1.0475*nu
-J <- abs(rnorm(N, sd=0.01))
+Jstart <- abs(rnorm(N, sd=0.001))
 T <- 100
 dt <- 0.1
 t <- seq(0,T, by = dt)
@@ -42,4 +42,23 @@ diag(c_m) <- c_koeff
 
 e <- matrix(rep(1,N),ncol=N, nrow=1)
 b <- matrix(rep(b_koeff,N),ncol=1, nrow=N)
+
+a <- matrix(rep(a_koeff,N), ncol=1, nrow=N)
+
+require(deSolve)
+emerge_weights <- function (time, J, pars) {
+    with(as.list(c(pars)), {
+        dJ <- a + (b %*% e + c_m + Q) %*% J
+        return(list(c(dJ)))
+    })        
+}
+
+pars = c(a = a, b = b, e = e, c_m = c_m, Q = Q)
+
+tStart <- 0
+tEnd <- 500
+dt <- 10
+
+#out <- ode(func=emerge_weights, y=Jstart, parms=pars, times = seq(tStart, tEnd, by = dt))
+
 
