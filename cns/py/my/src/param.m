@@ -1,7 +1,7 @@
 global PARAM
 
 PARAM.randState = 0; % Random generator seed. 
-PARAM.T = 1000; % Total duration (s)
+PARAM.T = 20; % Total duration (s)
 PARAM.patternDuration = 50e-3; % Patter duration L (s)
 PARAM.meanFreq = 20; % Mean firing rate r_0 (Hz)
 PARAM.nAfferent = 1000; % Number of afferents N
