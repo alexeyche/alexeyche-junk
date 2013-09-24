@@ -36,17 +36,11 @@ get_default_clock().set_dt(.1*ms) # set time step
 
 # random state
 randState = 0 # use this to specify it
-# # use this for batches:
-#rl = glob.glob('../data/rand*.mat')
-#if len(rl)==0:
-#    randState = 0
-#else:
-#    randState = int(rl[-1][12:15])+1
-#savemat('../data/rand'+'%03d' % (randState)+'.mat',{'tmp':[]})
+
 seed(randState)
 
 imposedEnd = Inf*second # imposed end time
-N = 1000 # number of presynaptic neurons
+N = 2 # number of presynaptic neurons
 nG = 1 # number of gmax values
 nR = 1 # number of ratio LTD/LTP
 M = nG*nR # number of postsynaptic neurons, numbered like that [ (r_0,g_0)...(r_0,g_nG),(r_1,g_0)...(r_1,g_nG),...,(r_nR,g_0)...(r_nR,g_nG)]
@@ -62,17 +56,10 @@ monitorPot = True # monitor potential in output layer
 monitorCurrent = True # monitor potential in output layer
 monitorRate = True # monitor rates in output layer
 isMonitoring = False # flag saying if currently monitoring
-#monitorTime = 990*second # start monitoring only at that time (to save memory)
 monitorTime = 10*second
 analyzePeriod = 40 # periodically dump weights
 
-# load pattern values (the values are only useful for plotting), but the length of the vector is used to scale gmax
-if os.path.exists(os.path.join('..','data','realValuedPattern.'+'%03d' % (randState)+'.mat')):
-    realValuedPattern=loadmat(os.path.join('..','data','realValuedPattern.'+'%03d' % (randState)+'.mat'),squeeze_me=True)
-    realValuedPattern=realValuedPattern['realValuedPattern']
-else:
-    realValuedPattern=zeros(round(0.5*N))
-    
+   
 #**************************
 # NEURON MODEL PARAMETERS *
 #**************************
@@ -136,10 +123,15 @@ w_out = - 1.0 * eta # homeostatic rate-based terms (LTD)
 w_in=zeros(M) # array of w_in/w_out ratios
 for i in range(nR):
     w_in[i*nG:(i+1)*nG] = -w_out*.5*exp(0*(i-nR/2)*.5*log(2))
+print 'w_in:', w_in
+print 'w_out:', w_out
 
 a_post=zeros(M) # array of LTD/LTP ratios
 for i in range(nR):
     a_post[i*nG:(i+1)*nG] = -a_pre*1.05**-4*exp((i-nR/2)*2*log(1.05)) #
+
+print 'a_pre:', a_pre
+print 'a_post:', a_post
 print 'normalized a_post/a_pre ratios' + str(a_post/a_pre)
     
 

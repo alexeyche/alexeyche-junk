@@ -190,6 +190,7 @@ if imposedEnd-timeOffset>20: # don't dump short simulations, probably done for d
     
 if monitorPot:
 	execfile('savePot.py')
+
 if monitorCurrent:
 	execfile('saveCurrent.py')
 
