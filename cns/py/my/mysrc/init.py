@@ -8,6 +8,7 @@ print '********'
 import os
 isunix = lambda: os.name == 'posix'
 import matplotlib   
+import re
 
 #if isunix():
 #    matplotlib.use('Agg') # no graphic link with Unix cluster for me
@@ -147,15 +148,11 @@ def printtime(mess):
 
 def listMatFile(directory,randState):                                        
     "get list of spike lists" 
-    fileList = os.listdir(directory)
-    fileList.sort()
-    fileList = [f 
-               for f in fileList
-                # e.g. spikeList.200.010.mat
-                #      01234567890123456789
-                if f[0:9] in ['spikeList'] and f[10:13] in ['%03d' % (randState)] and f[-4:] in ['.mat'] ]
+    fileList = re.findall('[ ]+(spikeList\.[0-9]+\.{:03d}.mat)[ ]+'.format(randState), ' '.join(sorted(os.listdir(directory))))
     return fileList
 
+print 'Found spikeLists for rand state %s:' % randState
+print listMatFile('/home/alexeyche/my/git/alexeyche-junk/cns/py/my/data', 001)
 
 # Called whenever output neurons fire. Resets the potential and trigger STDP updates.
 # Includes C code, will be compiled the first time it is called
