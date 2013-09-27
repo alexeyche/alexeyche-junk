@@ -38,10 +38,10 @@ else:
 neurons_cr = CustomRefractoriness(neurons_reset,period=refractoryPeriod,state='v')
 
 if poissonOutput: # stochastic spike generation
-    neurons=NeuronGroup(M,model=eqs_neurons,threshold=PoissonThreshold(),reset=neurons_cr)
+    neurons=NeuronGroup(M,model=eqs_neurons,threshold=PoissonThreshold(), reset=neurons_cr)
 else: # deterministic spike generation
-    raise Exception("Not implemented yet")
-    #neurons=NeuronGroup(M,model=eqs_neurons,threshold=vt,reset=neurons_cr)    
+    #raise Exception("Not implemented yet")
+    neurons=NeuronGroup(M,model=eqs_neurons,threshold=vt, reset=neurons_cr)    
 
 #connections
 synapses=Connection(mirror,neurons,'ge',structure='dense')
@@ -58,8 +58,8 @@ if useSavedWeight and os.path.exists(os.path.join('..','data','weight.'+'%03d' %
 else: # start from random synaptic weights
     initialWeight = zeros([N,M])
     for i in range(N):
-#            initialWeight[i,:] = initialWeight_min + rand(1)*(initialWeight_max-initialWeight_min)
-        initialWeight[i,:] = initialWeight_min + rand(M)*(initialWeight_max-initialWeight_min)
+        initialWeight[i,:] = 0.2*volt
+        #initialWeight[i,:] = initialWeight_min + rand(M)*(initialWeight_max-initialWeight_min)
     if initialWeight.max() > min(gmax):
         print '***********************************************************'
         print '* WARNING: Initial weight > gmax. This should not happen. *'
@@ -82,8 +82,87 @@ startTime = timeOffset;
     
 printtime('Starting (use saved spike list)')
 
-# look for spike list files
-fileList = listMatFile('../data/',randState)
-print str(len(fileList)) + ' spike list files found'
+# patterns
+from genPattern import spikeAvalanche, spikeAvalancheBack
+
+aval = []
+aval.append(spikeAvalanche(nAffer = N, dt = 0.05, T=50))
+#aval.append(spikeAvalancheBack(nAffer = N, dt = 0.05, T=5))
+#aval.append(spikeAvalanche(nAffer = N, dt = 0.05, T=5))
+#aval.append(spikeAvalanche(nAffer = N, dt = 0.05, T = 10))
+
+t_aval = 0
+for i in range(0, len(aval)):
+    aval[i][:,1] += t_aval    
+    t_aval = aval[i][-1,1]
+
+#aval = [numpy.asarray([[0,3],[1,5]])]
+
+for sl in aval:
+    localStartTime = time()*second
+   
+    sl=sl[sl[:,1]>=timeOffset,:] # otherwise Brian sends the old spikes
+    if jitter>0:
+        sl[:,1] += jitter*randn(size(sl,0))
+        sl=sl[sl[:,1].argsort(),]
+    print str(size(sl,0)) + ' spikes read (in ' + str(time()*second-localStartTime) + ')'
 
 
+    endTime = sl[-1][1]       
+    input = SpikeGeneratorGroup(N, sl) # special Brian NeuronGroup that fire at specified dates
+    if endTime>=monitorTime and not isMonitoring:
+   
+        print '********************'            
+        print '* Start monitoring *'            
+        print '********************'            
+        isMonitoring = True
+        if monitorInput:
+            inputSpike = SpikeMonitor(input,True)
+        if monitorOutput:
+            outputSpike = SpikeMonitor(neurons,True)
+        if monitorPot:
+            if poissonOutput:
+                pot = StateMonitor(neurons,'v',record=True,timestep=10)
+            else:
+                pot = StateMonitor(neurons,'v',record=True,timestep=10)
+        if monitorCurrent:
+            current = StateMonitor(neurons,'ge',record=True,timestep=1)
+        if monitorRate:
+            rate = []
+            for i in range(M):
+                rate.append(PopulationRateMonitor(neurons[i],bin=2000*ms))
+     # imposed end time
+    endTime = min(imposedEnd,endTime)
+    C_input_mirror = IdentityConnection(input, mirror)
+
+
+    # run
+    print 'Running from t=' + str(startTime) + ' to t=' + str(endTime)
+    defaultclock.reinit(startTime) # make sure end time is exactly the one we want, to avoid drifting
+    run(endTime-startTime) # run Brian simulator until endTime
+    startTime = endTime
+    print _synW
+#    finalWeight = zeros([N,M])
+#    for i in range(N):
+#        for j in range(M):
+#            finalWeight[i,j] = _synW[i,j]/gmax[j]
+
+               
+print 'Total computation time: ' + str(time()*second-globalStartTime)
+
+figure(1)
+if monitorPot:
+    subplot(311)
+    plot(pot[0])
+
+if monitorOutput:
+    subplot(312)
+    raster_plot(outputSpike)
+
+if monitorCurrent:
+    subplot(313)
+    plot(current[0])
+
+
+
+show()

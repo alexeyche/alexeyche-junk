@@ -22,7 +22,7 @@ from time import localtime
 from customrefractoriness import *
 import pickle
 import glob
-
+import numpy
 
 set_global_preferences(useweave=True) # to compile C code
 
@@ -41,14 +41,14 @@ randState = 0 # use this to specify it
 seed(randState)
 
 imposedEnd = Inf*second # imposed end time
-N = 2 # number of presynaptic neurons
+N = 100 # number of presynaptic neurons
 nG = 1 # number of gmax values
 nR = 1 # number of ratio LTD/LTP
 M = nG*nR # number of postsynaptic neurons, numbered like that [ (r_0,g_0)...(r_0,g_nG),(r_1,g_0)...(r_1,g_nG),...,(r_nR,g_0)...(r_nR,g_nG)]
 
-useSavedWeight = True # load previously dumped weights in ../data/weight.###.mat (if False, or if file not found then random initial weights will be used)
+useSavedWeight = False # load previously dumped weights in ../data/weight.###.mat (if False, or if file not found then random initial weights will be used)
 timeOffset = 0*second # simulation starts at t=timeOffset
-jitter = 0e-3*second # add jitter to the input spike trains
+jitter = 0*second #0e-3*second # add jitter to the input spike trains
 
 graph = True # graph output
 monitorInput = True # monitor input spikes
@@ -57,7 +57,7 @@ monitorPot = True # monitor potential in output layer
 monitorCurrent = True # monitor potential in output layer
 monitorRate = True # monitor rates in output layer
 isMonitoring = False # flag saying if currently monitoring
-monitorTime = 10*second
+monitorTime = 0*second
 analyzePeriod = 40 # periodically dump weights
 
    
@@ -67,7 +67,7 @@ analyzePeriod = 40 # periodically dump weights
 
 # Types of output neurons
 conductanceOutput = False # conductance-base output neurons (as opposed to LIF)
-poissonOutput = True # stochastic (Poisson) output neurons (as opposed to deterministic). Note that their differential equations are the same as the LIF, but firing is stochastic.
+poissonOutput = False # stochastic (Poisson) output neurons (as opposed to deterministic). Note that their differential equations are the same as the LIF, but firing is stochastic.
 
 #neurons (Dayan&Abbott 2001)
 refractoryPeriod = 1*ms
@@ -75,7 +75,8 @@ R=10*Mohm
 if poissonOutput:
     vt=400 # not used (just for graph scaling)
     vr=-450 # not used
-    El=-200 # resting 
+    #El=-200 # resting 
+    El = 0
 else:
     vt=-54*mV # threshold
     vr=-60*mV # reset
@@ -92,6 +93,7 @@ if poissonOutput:
     gmax=0.1125/taue*exp(2*log(1.05)*(array(nR*range(nG))-nG/2)) # taue is in factor because the kernel in the paper is normalized
 else: # LIF or gIF    
     gmax = 0.028*(vt-El)/unitaryEffect*exp(2*log(1.05)*(array(nR*range(nG))-nG/2)) # 1/0.028 is the number of synchronous input spikes arriving through maximally potentiated synapses needed to reach the threshold from the resting state
+    gmax=[2.]
 
 if conductanceOutput:
     gmax /= (Ee-vt)
@@ -103,11 +105,13 @@ print 'gmax=' + str(gmax)
 #********************
 # initial synaptic weight are randomly picked (uniformly) between those two bounds
 if poissonOutput: #
-    initialWeight_min = 0*7000.0/N # 0
-    initialWeight_max = 2*7000.0/N
+    initialWeight_min = 0 #0*7000.0/N # 0
+    initialWeight_max = 3 #2*7000.0/N
 else:
     initialWeight_min = 0*volt
-    initialWeight_max = 2000.0/N*35e-5*volt
+#    initialWeight_max = 2000.0/N*35e-5*volt
+    initialWeight_max = 45
+
 burstingCriterion = .8 # unplug neurons whose mean normalized synaptic weight is above this value. This allows to save memory by not computing neurons whose normalized synaptic weights all go to 1.
 
 #******************
@@ -145,14 +149,6 @@ mu = 0 # to interpolate between additive and multiplicative STDP (see Gutig et a
 def printtime(mess):
     t = localtime()
     print  '%02d' % t[3] + ':' + '%02d' % t[4] + ' ' + mess
-
-def listMatFile(directory,randState):                                        
-    "get list of spike lists" 
-    fileList = re.findall('[ ]+(spikeList\.[0-9]+\.{:03d}.mat)[ ]+'.format(randState), ' '.join(sorted(os.listdir(directory))))
-    return fileList
-
-print 'Found spikeLists for rand state %s:' % randState
-print listMatFile('/home/alexeyche/my/git/alexeyche-junk/cns/py/my/data', 001)
 
 # Called whenever output neurons fire. Resets the potential and trigger STDP updates.
 # Includes C code, will be compiled the first time it is called
