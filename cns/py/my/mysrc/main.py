@@ -11,8 +11,17 @@ printtime('************************')
 # count is the current period number
 count = 0
 
+if nearestSpike: # flags useful for nearest spike mode
+    alreadyDepressed = zeros([N,M],dtype=int)
+    alreadyPotentiated = zeros([N,M],dtype=int)
+
+
     
 _gmax = asarray(gmax) # faster implementation (does not verify dimensions)
+
+if nearestSpike: # flags useful for nearest spike mode
+    _alreadyPotentiated = asarray(alreadyPotentiated)
+    _alreadyDepressed = asarray(alreadyDepressed)
 
 # mirrors
 mirror_eqs=''' 
@@ -45,6 +54,8 @@ else: # deterministic spike generation
 
 #connections
 synapses=Connection(mirror,neurons,'ge',structure='dense')
+synapses_h=Connection(mirror_h, neurons,'ge',structure='dense')
+
 seed(randState)
 
 if useSavedWeight and os.path.exists(os.path.join('..','data','weight.'+'%03d' % (randState)+'.mat')):
@@ -86,7 +97,7 @@ printtime('Starting (use saved spike list)')
 from genPattern import spikeAvalanche, spikeAvalancheBack
 
 aval = []
-aval.append(spikeAvalanche(nAffer = N, dt = 0.05, T=50))
+aval.append(spikeAvalanche(nAffer = N, dt = 0.005, T=100))
 #aval.append(spikeAvalancheBack(nAffer = N, dt = 0.05, T=5))
 #aval.append(spikeAvalanche(nAffer = N, dt = 0.05, T=5))
 #aval.append(spikeAvalanche(nAffer = N, dt = 0.05, T = 10))
