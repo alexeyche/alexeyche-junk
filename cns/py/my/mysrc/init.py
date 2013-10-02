@@ -42,7 +42,7 @@ seed(randState)
 
 imposedEnd = Inf*second # imposed end time
 N = 100 # number of presynaptic neurons
-nG = 1 # number of gmax values
+nG = 2 # number of gmax values
 nR = 1 # number of ratio LTD/LTP
 M = nG*nR # number of postsynaptic neurons, numbered like that [ (r_0,g_0)...(r_0,g_nG),(r_1,g_0)...(r_1,g_nG),...,(r_nR,g_0)...(r_nR,g_nG)]
 
@@ -117,7 +117,7 @@ burstingCriterion = .8 # unplug neurons whose mean normalized synaptic weight is
 #******************
 # STDP PARAMETERS *
 #******************    
-nearestSpike = False # Implement "nearest spike" mode for STDP
+nearestSpike = True # Implement "nearest spike" mode for STDP
 tau_post=34.0*ms #(source: Bi & Poo 2001)
 tau_pre=17.0*ms #(source: Bi & Poo 2001)
 eta = 1e-3# learning rate

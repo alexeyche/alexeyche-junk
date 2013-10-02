@@ -1,4 +1,4 @@
-
+#!/usr/bin/RScript
 
 # epsp parameters:
 
@@ -30,7 +30,7 @@ W <- function(s) {
   if(length(pos_ind>0)) {
     s[pos_ind] <- Apos*exp(-s[pos_ind]/t_pos) + Aneg*exp(-s[pos_ind]/t_neg)  
   }
-  return(nu*s)
+  return(s)
 }
 #s <- seq(-40,60,length.out=1000); plot(s, W(s), type="l")
 

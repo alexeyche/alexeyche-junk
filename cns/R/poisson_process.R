@@ -1,4 +1,4 @@
-
+#!/usr/bin/env RScript
 
 # getN = function(x,tt=1) {
 #   if(sum(x)<tt)
