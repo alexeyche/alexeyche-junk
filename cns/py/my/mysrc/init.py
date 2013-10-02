@@ -67,7 +67,7 @@ analyzePeriod = 40 # periodically dump weights
 
 # Types of output neurons
 conductanceOutput = False # conductance-base output neurons (as opposed to LIF)
-poissonOutput = False # stochastic (Poisson) output neurons (as opposed to deterministic). Note that their differential equations are the same as the LIF, but firing is stochastic.
+poissonOutput = True # stochastic (Poisson) output neurons (as opposed to deterministic). Note that their differential equations are the same as the LIF, but firing is stochastic.
 
 #neurons (Dayan&Abbott 2001)
 refractoryPeriod = 1*ms
@@ -93,10 +93,10 @@ if poissonOutput:
     gmax=0.1125/taue*exp(2*log(1.05)*(array(nR*range(nG))-nG/2)) # taue is in factor because the kernel in the paper is normalized
 else: # LIF or gIF    
     gmax = 0.028*(vt-El)/unitaryEffect*exp(2*log(1.05)*(array(nR*range(nG))-nG/2)) # 1/0.028 is the number of synchronous input spikes arriving through maximally potentiated synapses needed to reach the threshold from the resting state
-    gmax=[2.]
+    gmax=[6.]
 
-if conductanceOutput:
-    gmax /= (Ee-vt)
+#if conductanceOutput:
+#    gmax /= (Ee-vt)
 
 print 'gmax=' + str(gmax)
 

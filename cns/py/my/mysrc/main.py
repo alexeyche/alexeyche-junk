@@ -58,7 +58,7 @@ if useSavedWeight and os.path.exists(os.path.join('..','data','weight.'+'%03d' %
 else: # start from random synaptic weights
     initialWeight = zeros([N,M])
     for i in range(N):
-        initialWeight[i,:] = 0.2*volt
+        initialWeight[i,:] = 0.35*volt
         #initialWeight[i,:] = initialWeight_min + rand(M)*(initialWeight_max-initialWeight_min)
     if initialWeight.max() > min(gmax):
         print '***********************************************************'
@@ -86,10 +86,7 @@ printtime('Starting (use saved spike list)')
 from genPattern import spikeAvalanche, spikeAvalancheBack
 
 aval = []
-aval.append(spikeAvalanche(nAffer = N, dt = 0.05, T=50))
-#aval.append(spikeAvalancheBack(nAffer = N, dt = 0.05, T=5))
-#aval.append(spikeAvalanche(nAffer = N, dt = 0.05, T=5))
-#aval.append(spikeAvalanche(nAffer = N, dt = 0.05, T = 10))
+aval.append(spikeAvalanche(nAffer = N, dt = 0.005, T=300))
 
 t_aval = 0
 for i in range(0, len(aval)):
