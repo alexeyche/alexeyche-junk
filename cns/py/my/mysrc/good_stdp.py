@@ -70,7 +70,7 @@ def pre_reset(P, spikes):
                     if(u == 0) {
                         continue;
                     }
-                    printf("i=%d,u=%3.3f,psi=%d,t=%3.3f\\n",i, u, post_spike, t);
+                    printf("i=%d,u=%1.6f,psi=%d,t=%1.6f\\n",i, u, post_spike, t);
                     if ((u>0)&&(u<W_len/2)) {
                         _synW(i,j) += -A_neg*exp(u/t_neg);
                     } else {
@@ -106,7 +106,7 @@ def post_reset(P, spikes):
                     if(u == 0) {
                         continue;
                     }
-                    printf("                                   i=%d,u=%3.3f,psi=%d,t=%3.3f\\n",i, u, pre_spike, t);
+                    printf("                                                     i=%d,u=%1.6f,psi=%d,t=%3.6f\\n",i, u, pre_spike, t);
                     if ((u>0)&&(u<W_len/2)) {
                         _synW(i,j) += A_pos*exp(-u/t_pos);
                     } else {
@@ -118,6 +118,7 @@ def post_reset(P, spikes):
                 int pi = post_activity_n(i);
                 post_activity(i, pi) = t;
                 post_activity_n(i) += 1;
+                    printf("                                      just spike:    i=%d,t=%1.6f,n_act=%d\\n",i, t, pi+1);
             }
         }
         '''
