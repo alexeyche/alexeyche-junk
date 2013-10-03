@@ -47,11 +47,11 @@ seed(randState)
 
 
 
-max_sp_w = 100 # max spikes in window
+max_sp_w = 1000 # max spikes in window
 post_activity = zeros([M, max_sp_w])
-post_activity_n = zeros(M, dtype=numpy.int8)
+post_activity_n = zeros(M, dtype=numpy.int16)
 pre_activity = zeros([N, max_sp_w])
-pre_activity_n = zeros(N, dtype=numpy.int8)
+pre_activity_n = zeros(N, dtype=numpy.int16)
 
 
 def pre_reset(P, spikes):
@@ -82,6 +82,7 @@ def pre_reset(P, spikes):
                 int pi = pre_activity_n(i);
                 pre_activity(i, pi) = t;
                 pre_activity_n(i) += 1;
+                printf("just spike:    i=%d,t=%1.6f,n_act=%d\\n",i, t, pi+1);
             }                
         }
         '''

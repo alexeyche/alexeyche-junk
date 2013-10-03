@@ -12,17 +12,17 @@ pre = NeuronGroup(N, model="v:1", threshold=0.5, reset=pre_reset)
 synapses=Connection(pre,post,'ge',structure='dense')
 initialWeight = zeros([N,M])
 for i in range(N):
-    initialWeight[i,:] = 0.35*volt
+    initialWeight[i,:] = 0.05*volt
  
 synapses.connect(pre,post,initialWeight)
 synapses.compress() 
 _synW = asarray(synapses.W)
 
 # affect initial values
-post.v_ = 0#vr+rand(1)*ones(len(neurons))*(vt-vr)
+post.v_ = vr
 post.ge_=0*volt
 #imposedEnd = Inf*second
-imposedEnd = 0.2
+imposedEnd = 5*second
 timeOffset=0
 startTime = timeOffset
 
@@ -31,7 +31,7 @@ startTime = timeOffset
 from genPattern import spikeAvalanche, spikeAvalancheBack
 
 aval = []
-aval.append(spikeAvalanche(nAffer = N, dt = 0.005, T=1))
+aval.append(spikeAvalanche(nAffer = N, dt = 0.007, T=10))
 
 t_aval = 0
 for i in range(0, len(aval)):
@@ -50,6 +50,8 @@ endTime = sl[-1][1]
 input = SpikeGeneratorGroup(N, sl) # special Brian NeuronGroup that fire at specified dates
 endTime = min(imposedEnd,endTime)
 
+pot = StateMonitor(post,'v',record=True,timestep=1)
+
 C_input_mirror = IdentityConnection(input, pre)
 
 # run
@@ -59,3 +61,6 @@ run(endTime-startTime) # run Brian simulator until endTime
 startTime = endTime
 print _synW
 
+
+plot(pot[0])
+show()
