@@ -3,18 +3,18 @@
 
 # M - pre, N - post
 
-def stdp_call_post(spikes, N_in, N_out, _alreadyPotentiated, _synW, _gmax, A_pre, mu, w_out):
+def stdp_call_post(spikes, N, _alreadyPotentiated, _synW, _gmax, A_pre, mu, w_out, neighbor):
     nspikes = size(spikes)
     code = '''
     for(int si=0;si<nspikes;si++)
     {
         int i = spikes(si);
-        for(int j=0;j<N_in;j++)
+        for(int j=0;j<N;j++)
         {
             double wnew;
             wnew = _synW(j,i)+_gmax(i)*w_out;
             if(wnew<0) wnew = 0.0;
-            if(!_alreadyPotentiated(j,i))
+            if(!_alreadyPotentiated(j,i)
             {
                 if(mu==0) { /* additive. requires hard bound */
                     wnew += _gmax(i)*A_pre(j);
@@ -23,7 +23,7 @@ def stdp_call_post(spikes, N_in, N_out, _alreadyPotentiated, _synW, _gmax, A_pre
                 else { /* soft bound */
                     wnew += _gmax(i)*A_pre(j)*exp(mu*log(1-wnew/_gmax(i)));
                 }
-                _alreadyPotentiated(j,i) = true;
+                if (neighbor) _alreadyPotentiated(j,i) = true;
             }
             _synW(j,i) = wnew;
         }

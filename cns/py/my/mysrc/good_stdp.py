@@ -15,7 +15,7 @@ A_pos = 1 * eta
 A_neg = -1 * eta
 t_neg=34.0 * 10**-3
 t_pos=17.0 * 10**-3
-W_len = 0.4 # seconds
+W_len = 0.2  # seconds
 
 vt=-54*mV # threshold
 vr=-60*mV # reset
@@ -26,7 +26,7 @@ taue=taum/4 # synapse time constant
 sigma = 0*0.015*(vt-vr) # white Gaussian noise. Applies to input and output neurons
 
 poissonOutput = False
-conductanceOutput = False
+conductanceOutput = True
 #STDP neuron(s)
 if conductanceOutput:
     eqs_neurons='''
@@ -72,7 +72,7 @@ def pre_reset(P, spikes):
                     }
                     printf("i=%d,u=%1.6f,psi=%d,t=%1.6f\\n",i, u, post_spike, t);
                     if ((u>0)&&(u<W_len/2)) {
-                        _synW(i,j) += -A_neg*exp(u/t_neg);
+                        _synW(i,j) += A_neg*exp(u/t_neg);
                     } else {
                         post_activity_n(j) -= 1;
                     }
