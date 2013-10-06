@@ -12,7 +12,7 @@ pre = NeuronGroup(N, model="v:1", threshold=0.5, reset=pre_reset)
 synapses=Connection(pre,post,'ge',structure='dense')
 initialWeight = zeros([N,M])
 for i in range(N):
-    initialWeight[i,:] = 1*volt
+    initialWeight[i,:] = 0.6*volt
  
 synapses.connect(pre,post,initialWeight)
 synapses.compress() 
@@ -22,7 +22,7 @@ _synW = asarray(synapses.W)
 post.v_ = vr
 post.ge_=0*volt
 #imposedEnd = Inf*second
-imposedEnd = 0.2*second
+imposedEnd = 100*second
 timeOffset=0
 startTime = timeOffset
 
@@ -31,7 +31,7 @@ startTime = timeOffset
 from genPattern import spikeAvalanche, spikeAvalancheBack
 
 aval = []
-aval.append(spikeAvalanche(nAffer = N, dt = 0.005, T=100))
+aval.append(spikeAvalanche(nAffer = N, dt = 0.005, T=200))
 
 t_aval = 0
 for i in range(0, len(aval)):
@@ -52,7 +52,7 @@ endTime = min(imposedEnd,endTime)
 
 pot = StateMonitor(post,'v',record=True,timestep=1)
 epsp_mon = StateMonitor(post,'ge',record=True,timestep=1)
-
+post_spikes = SpikeMonitor(post, True)
 
 C_input_mirror = IdentityConnection(input, pre)
 
@@ -63,7 +63,7 @@ run(endTime-startTime) # run Brian simulator until endTime
 startTime = endTime
 print _synW
 
-
-plot(pot[0])
-#plot(epsp_mon[0])
+t_ax = linspace(0, imposedEnd*10**(3), len(pot[0]))
+plot(t_ax, pot[0])
+raster_plot(post_spikes)
 show()

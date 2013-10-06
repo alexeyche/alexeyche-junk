@@ -15,7 +15,7 @@ A_pos = 1 * eta
 A_neg = -1 * eta
 t_neg=34.0 * 10**-3
 t_pos=17.0 * 10**-3
-W_len = 0.2  # seconds
+W_len = 0.24  # seconds
 
 vt=-54*mV # threshold
 vr=-60*mV # reset
@@ -70,9 +70,9 @@ def pre_reset(P, spikes):
                     if(u == 0) {
                         continue;
                     }
-                    printf("i=%d,u=%1.6f,psi=%d,t=%1.6f\\n",i, u, post_spike, t);
+//                    printf("i=%d,u=%1.6f,psi=%d,t=%1.6f,dw=%3.6f\\n",i, u, post_spike, t, A_neg*exp(-u/t_neg));
                     if ((u>0)&&(u<W_len/2)) {
-                        _synW(i,j) += A_neg*exp(u/t_neg);
+                        _synW(i,j) += A_neg*exp(-u/t_neg);
                     } else {
                         post_activity_n(j) -= 1;
                     }
@@ -82,7 +82,7 @@ def pre_reset(P, spikes):
                 int pi = pre_activity_n(i);
                 pre_activity(i, pi) = t;
                 pre_activity_n(i) += 1;
-                printf("just spike:    i=%d,t=%1.6f,n_act=%d\\n",i, t, pi+1);
+//                printf("just spike:    i=%d,t=%1.6f,n_act=%d\\n",i, t, pi+1);
             }                
         }
         '''
@@ -107,7 +107,7 @@ def post_reset(P, spikes):
                     if(u == 0) {
                         continue;
                     }
-                    printf("                                                     i=%d,u=%1.6f,psi=%d,t=%3.6f\\n",i, u, pre_spike, t);
+//                    printf("                                                     i=%d,u=%1.6f,psi=%d,t=%3.6f,dw=%3.6f\\n",i, u, pre_spike, t, A_pos*exp(-u/t_pos));
                     if ((u>0)&&(u<W_len/2)) {
                         _synW(i,j) += A_pos*exp(-u/t_pos);
                     } else {
@@ -119,7 +119,7 @@ def post_reset(P, spikes):
                 int pi = post_activity_n(i);
                 post_activity(i, pi) = t;
                 post_activity_n(i) += 1;
-                    printf("                                      just spike:    i=%d,t=%1.6f,n_act=%d\\n",i, t, pi+1);
+//                    printf("                                      just spike:    i=%d,t=%1.6f,n_act=%d\\n",i, t, pi+1);
             }
         }
         '''
