@@ -3,8 +3,9 @@
 execfile('good_stdp.py') # sets the parameters
 
 # neurons:
+post_reset_refr= CustomRefractoriness(post_reset, period=refractoryPeriod,state='v')
 
-post = NeuronGroup(M, model=eqs_neurons, threshold=vt, reset=post_reset)    
+post = NeuronGroup(M, model=eqs_neurons, threshold=vt, reset=post_reset_refr)    
 pre = NeuronGroup(N, model="v:1", threshold=0.5, reset=pre_reset)
 
 # synapses
@@ -12,7 +13,7 @@ pre = NeuronGroup(N, model="v:1", threshold=0.5, reset=pre_reset)
 synapses=Connection(pre,post,'ge',structure='dense')
 initialWeight = zeros([N,M])
 for i in range(N):
-    initialWeight[i,:] = 0.6*volt
+    initialWeight[i,:] = 1*volt
  
 synapses.connect(pre,post,initialWeight)
 synapses.compress() 
@@ -22,7 +23,7 @@ _synW = asarray(synapses.W)
 post.v_ = vr
 post.ge_=0*volt
 #imposedEnd = Inf*second
-imposedEnd = 100*second
+imposedEnd = 10*second
 timeOffset=0
 startTime = timeOffset
 
@@ -64,6 +65,6 @@ startTime = endTime
 print _synW
 
 t_ax = linspace(0, imposedEnd*10**(3), len(pot[0]))
-plot(t_ax, pot[0])
-raster_plot(post_spikes)
+plot(t_ax, epsp_mon[0])
+#raster_plot(post_spikes)
 show()

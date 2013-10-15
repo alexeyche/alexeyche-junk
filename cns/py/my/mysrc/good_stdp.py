@@ -5,6 +5,7 @@ from scipy import weave
 from time import time
 from time import localtime
 import numpy
+from customrefractoriness import *
 
 N = 100
 M = 1
@@ -24,6 +25,7 @@ Ee=0*mV # for excitatory conductance
 taum = 10*ms # membrane time constant
 taue=taum/4 # synapse time constant
 sigma = 0*0.015*(vt-vr) # white Gaussian noise. Applies to input and output neurons
+refractoryPeriod = 10*ms
 
 poissonOutput = False
 conductanceOutput = True

@@ -1,3 +1,5 @@
+#!/usr/bin/env python 
+
 from brian import *
 
 __all__ = ['CustomRefractoriness']
@@ -72,8 +74,8 @@ class CustomRefractoriness(Refractoriness):
 
 if __name__=='__main__':
     def f(P, spikes):
-        P.V[spikes] = rand(len(spikes))*0.5
-    R = CustomRefractoriness(f)
+        P.V[spikes] = 0.5#rand(len(spikes))*0.5
+    R = CustomRefractoriness(f, 0*ms)
     G = NeuronGroup(5,
             model='''
             dV/dt = -(V-1.1)/(15*ms) : 1
