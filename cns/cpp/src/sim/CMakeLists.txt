@@ -8,9 +8,10 @@ set(${SIM_SRCS} ${SIM_SRCS} "core.h")
 set(DIRS
     socket
     util
-    main
+    oldsim
     tests
     lookup
+    srm
     )
 
 foreach(dir ${DIRS})
