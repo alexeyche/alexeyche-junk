@@ -11,14 +11,25 @@ void epsp_test() {
     double fi = 10.0;
     double fj = 5.0; 
     for(size_t ti=0; ti<t.n_elem; ti++) {
-        std::cout << srm::epsp(t[ti], fj, fi) << " ";
+        std::cout << srm::epsp(t[ti], fj, fi) << ",";
     }
     std::cout << "\n";
 }
 
 int main(int argc, char** argv) {
     CLI::ParseCommandLine(argc, argv);
-    epsp_test();
+    std::string test_name("all");
+	if(argc>1) {
+        test_name = std::string(argv[1]);
+        Log::Info << "Tests name was found: " << test_name << "\n";
+    }   
+    Log::Info << "Tests started" << std::endl;
+    if((test_name == "all") || (test_name == "epsp")) {
+        Log::Info << "epsp test: " << std::endl;
+        Log::Info << "===============================================================" << std::endl;
+        epsp_test();
+        Log::Info << "===============================================================" << std::endl;
+    }        
     return 0;
 }
 
