@@ -1,19 +1,24 @@
 
 
 #include <sim/core.h>
+#include <sim/socket/sim_socket_core.h>
+
 #include "srm.h"
+
 
 void epsp_test() {
     double Tmax = 100;
     double dt = 0.1;
-    uvec t = linspace<uvec>(0.0, Tmax, (int)Tmax/dt);
+    vec t = linspace<vec>(0.0, Tmax, (int)Tmax/dt);
     
     double fi = 10.0;
     double fj = 5.0; 
+    mat epsp(t.n_elem, 2);
     for(size_t ti=0; ti<t.n_elem; ti++) {
-        std::cout << srm::epsp(t[ti], fj, fi) << ",";
+        epsp[ti, 0] = t[ti];
+        epsp[ti, 1] = srm::epsp(t[ti], fj, fi);
     }
-    std::cout << "\n";
+    send_arma_mat(epsp, "epsp");
 }
 
 int main(int argc, char** argv) {
