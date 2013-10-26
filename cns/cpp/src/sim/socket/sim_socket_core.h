@@ -22,7 +22,6 @@ void send_arma_mat(mat m, std::string name, long unsigned int* iter=NULL, bool v
 	
 	init_socket(PORT);	
 	send_message<char>(head_m, HEAD_LEN);	
-	std::cout << "sending head: " << m[0,0] << " " << m[0,1] << "\n";
     send_message<double>(p, sizeof(double)*m.n_rows*m.n_cols);
 	if(verbose) {
 		std::cout << "sending: " << head_m << std::endl;
