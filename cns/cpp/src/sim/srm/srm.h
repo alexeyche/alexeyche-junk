@@ -1,6 +1,10 @@
+#ifndef SRM_H
+#define SRM_H
 
 
 namespace srm {
+    const double sec = 0.001;
+
     const double ts = 3; // ms
     const double tm = 10; // ms
     
@@ -23,11 +27,50 @@ namespace srm {
         return u_abs*exp(-(t-fi+dr)/trf)+u_r*exp(-(t-fi)/trs);
     }
 
-    const double u_rest = -70; //mV
-    class SrmNeuron {
-
+    class Neuron {
+        unsigned int genid() { static unsigned int ID = 0; return ID++; }
     public:
-        typedef std::vector<SrmNeuron*> TInput;
+        typedef std::vector<Neuron*> TInput;
+        Neuron() : id_num(genid()) { }
+        virtual ~Neuron() {} 
+        unsigned int id() { return id_num; } 
+        
+        void add_input(Neuron *n, double w_n) {
+           in.push_back(n);
+           w.set_size(w.n_elem+1);
+           w(w.n_elem-1) = w_n;
+        }
+        
+        vec w;
+        TInput in; 
+        vec y;
+    private:                
+        unsigned int id_num;
+    };
+
+    class StochasticNeuron : public Neuron {
+    public:
+        virtual double p (double t) = 0;
+    };
+
+    class PoissonNeuron : public StochasticNeuron {
+    public:
+        PoissonNeuron(double rate) : rate(rate) {}
+
+        double p(double t) {
+            return rate;
+        }
+
+        double rate;        
+    };
+
+    class SrmNeuron : public StochasticNeuron {
+    public:
+        static const double u_rest = -70; //mV
+        static const double alpha = 1;
+        static const double beta = 1;
+        static const double tresh = -50; //mV
+
         SrmNeuron() {
         }
 
@@ -35,14 +78,10 @@ namespace srm {
             double epsp_pot = 0;
             double nu_pot = 0;
             for(size_t i=0; i<in.size(); i++) {
-                Log::Info << "i:" << i << " ";
                 for(size_t j=0; j< in[i]->y.n_elem; j++) {
-                    if(y.n_elem>0) {
-                        epsp_pot += w(i)*srm::epsp(t, in[i]->y(j), y.max());
-                    } else {
-                        epsp_pot += w(i)*srm::epsp(t, in[i]->y(j), -datum::inf);
-                    }
-                    Log::Info << "epsp_pot: " << epsp_pot << "\n";
+                    epsp_pot += w(i)*srm::epsp(t, in[i]->y(j), y.max());
+//                    Log::Info << "epsp_pot: " << epsp_pot; 
+//                    Log::Info << " w:" << w[i] << " t:"  << t << " in.y(j):" << in[i]->y(j) << " y:"  << y.max() << "\n";
                 }
             }
             for(size_t i=0; i<y.n_elem; i++) {
@@ -50,20 +89,19 @@ namespace srm {
             }
             return u_rest + epsp_pot + nu_pot;
         }
+        
+        double p(double t) {
+            double uc = u(t);
+            return (beta/alpha)*(log(1+exp(alpha*(tresh-uc))) - alpha*(tresh-uc));
+        }
 
         vec* get_y() {
             return &y;
         }
-        void add_input(SrmNeuron *n, double w_n) {
-           in.push_back(n);
-           w << w_n;
-        }
-        vec w;
-        vec y;
-        TInput in;
+        
     };
 
 };
 
 
-
+#endif

@@ -54,20 +54,24 @@ void srm_test() {
     srm::SrmNeuron n;
     for(size_t i=0; i<10; i++) {
         srm::SrmNeuron* inp_n = new srm::SrmNeuron();
-        n.add_input(inp_n, 10);
+        n.add_input(inp_n, 4);
     }
     n.in[5]->y << 15 << 16 << 17 << endr;
-    n.in[6]->y << 15.5 << 16.5 << 17.5 << endr;
+    n.in[6]->y << 16 << 18 << 20 << endr;
+    n.in[7]->y << 25 << 28 << 30 << endr;
+
 
     double Tmax = 100;
     double dt = 0.1;
     vec t = linspace<vec>(0.0, Tmax, (int)Tmax/dt);
-    mat pot(t.n_elem, 2);
+    mat pot(t.n_elem, 3);
     for(size_t ti=0; ti<t.n_elem; ti++) {
         pot(ti, 0) = t[ti];
         pot(ti, 1) = n.u(t[ti]);     
+        pot(ti, 2) = n.p(pot(ti,1));
+
     }
-    pot.print();
+    send_arma_mat(pot, "pot");
 }
 
 PROGRAM_INFO("SIM TEST", "sim tests"); 
