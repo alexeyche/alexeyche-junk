@@ -10,7 +10,7 @@
 #define HEAD_LEN 100
 #define PORT 7778
 
-void send_arma_mat(mat m, std::string name, long unsigned int* iter=NULL, bool verbose=false) {
+void send_arma_mat(mat m, std::string name, const unsigned int* iter=NULL, bool verbose=false) {
 	double *p = m.memptr();
 	const char *name_c = name.c_str()	;
 	char head_m[HEAD_LEN];
