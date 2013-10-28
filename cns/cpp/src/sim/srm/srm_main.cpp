@@ -32,7 +32,7 @@ int main(int argc, char** argv)
     n->add_input(new DetermenisticNeuron("9 14 35 45"), w_start);
 
 
-    s.addRecNeuron(n);
+    s.addRecNeuron(n, TStatGrabber::Prob);
     s.run(0.1*sec);
     for(size_t ni=0; ni<s.stoch_elem.size(); ni++) {
         Log::Info << "id: " << s.stoch_elem[ni]->id() << "\n";

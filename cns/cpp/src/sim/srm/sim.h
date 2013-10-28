@@ -11,11 +11,43 @@ namespace srm {
     class TStatGrabber {
     public: 
         enum TStatType { None, Spike, Prob };
+        typedef std::pair<std::vector<double>*, TStatType> TStatBox;
+        typedef std::map<const unsigned int, TStatBox> TStat;
         
-        typedef std::vector<std::vector<double> > TStat;
+        ~TStatGrabber() {
+            for(TStat::iterator it = ids.begin(); it != ids.end(); it++) {
+                delete it->second.first;
+            }
+        }
+
+        void addStatProvider(StochasticNeuron *n, TStatType st) {
+            TStatBox b;
+            b.first = new std::vector<double>();
+            b.second = st;
+            ids[n->id()] = b;
+        }
         
-        std::map<const unsigned int, TStatType> ids;
-        TStat s;
+        void addStat(StochasticNeuron *n, double s) {
+            TStat::iterator it = ids.find(n->id());
+            it->second.first->push_back(s);
+        }
+        
+        TStatType getStatType(StochasticNeuron *n) {
+            TStat::iterator it = ids.find(n->id());
+            if(it != ids.end()) {
+                return it->second.second;
+            } else {
+                TStatType s = None;
+                return s;
+            }
+        }
+        void sendStat() {
+            for(TStat::iterator it = ids.begin(); it != ids.end(); it++) {
+                vec s(*(it->second.first));            
+                send_arma_mat(s, "neuron", &it->first); 
+            }
+        }
+        TStat ids;
     };
 
     class Sim {
@@ -37,41 +69,47 @@ namespace srm {
             for(size_t ti=0; ti<t.n_elem; ti++) {
                 for(size_t ni=0; ni<stoch_elem.size(); ni++) {
                     double pi = stoch_elem[ni]->p(t(ti));
+                    TStatType nti = sg.getStatType(stoch_elem[ni]);
+                    
                     if(pi*dt > unif(ti, ni)) {
                         TTime &yn = stoch_elem[ni]->y;
                         Log::Info << "spike of " << ni << " at " << t(ti) << "\n";
                         // spike!
                         yn.push_back(t(ti));
+                        if(nti == TStatGrabber::Spike) {
+                            sg.addStat(stoch_elem[ni], t(ti));
+                        }
                     }
-                    if(t[ti] % 1 == 0) {
-                        
-                    }
+                   if(nti == TStatGrabber::Prob) {
+                        sg.addStat(stoch_elem[ni], pi);
+                   }
                 }
             }
-            send_arma_mat(stoch_stat, "stoch_stat");
+            sg.sendStat();
         }
 
-        void addNeuron(Neuron *n, TStatType gt = TStatType.None) {
+        void addNeuron(Neuron *n, TStatType gt = TStatGrabber::None) {
             if(dynamic_cast<StochasticNeuron*>(n)) {
                 stoch_elem.push_back(dynamic_cast<StochasticNeuron*>(n));            
+                if(gt != TStatGrabber::None) {
+                    sg.addStatProvider(stoch_elem.back(), gt);
+                }               
             }
-            if(gt != TStatType.None) {
-                sg.addStatProvider(n);
-            }
+            
         }
-        void addRecNeuron(Neuron *n) {
+        void addRecNeuron(Neuron *n, TStatType gt = TStatGrabber::None) {
             std::set<unsigned int> hist;
-            addRecNeuronFn(n, hist);
+            addRecNeuronFn(n, gt, hist);
         }
 
         std::vector<StochasticNeuron*> stoch_elem;
     private:        
-        void addRecNeuronFn(Neuron *n, std::set<unsigned int> &hist) {
-            addNeuron(n);
+        void addRecNeuronFn(Neuron *n, TStatType gt, std::set<unsigned int> &hist) {
+            addNeuron(n, gt);
             hist.insert(n->id());
             for(size_t ni=0; ni<n->in.size(); ni++) {
                 if(hist.find(n->in[ni]->id()) == hist.end()) { 
-                    addRecNeuronFn(n->in[ni], hist);
+                    addRecNeuronFn(n->in[ni], gt, hist);
                 }
             }
         }

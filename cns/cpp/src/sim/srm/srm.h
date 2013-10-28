@@ -108,14 +108,14 @@ namespace srm {
 
     class StochasticNeuron : public Neuron {
     public:
-        virtual double p (double t) = 0;
+        virtual double p (const double &t) = 0;
     };
 
     class PoissonNeuron : public StochasticNeuron {
     public:
         PoissonNeuron(double rate) : rate(rate) {}
 
-        double p(double t) {
+        double p(const double &t) {
             return rate;
         }
 
