@@ -49,6 +49,13 @@ void nu_test(bool just_print = false) {
     }        
 }
 
+void ttime_test() {
+    TTime in;
+    in.push_back(10);
+    in.push_back(20);
+    in.push_back(30);
+}
+
 
 void srm_test() {
     srm::SrmNeuron n;
