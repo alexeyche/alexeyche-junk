@@ -12,5 +12,9 @@ set(CMAKE_CXX_FLAGS_PROFILE "-O2 -pg -finline-limit=12 -DPROFILE -DNDEBUG")
 set(CMAKE_CXX_FLAGS_SMALL "-Os -DNDEBUG")
 set(CMAKE_CXX_FLAGS_TRACE "-g -DNDEBUG")
 
+set(CMAKE_C_COMPILER "/usr/bin/gcc")
+set(CMAKE_CXX_COMPILER "/usr/bin/g++")
+
+
 add_definitions( -DDISABLE_DISK_MATRIX )
 
