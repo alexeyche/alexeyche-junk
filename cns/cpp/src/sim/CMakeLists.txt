@@ -12,6 +12,7 @@ set(DIRS
     tests
     lookup
     srm
+    int
     )
 
 foreach(dir ${DIRS})

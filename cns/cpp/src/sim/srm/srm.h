@@ -28,7 +28,7 @@ namespace srm {
     }
 
     class TTime : public std::vector<double> {
-    static const double TIME_OF_FORGET = 200;
+    static constexpr double TIME_OF_FORGET = 200;
     public:
         TTime() : std::vector<double>(), inf_elem(-datum::inf), n_elem_real(0), forgotten_elems(0) { }
         double& operator() (const size_t i) {
@@ -124,10 +124,10 @@ namespace srm {
 
     class SrmNeuron : public StochasticNeuron {
     public:
-        static const double u_rest = -70; //mV
-        static const double alpha = 1;
-        static const double beta = 1;
-        static const double tresh = -50; //mV
+        static constexpr double u_rest = -70; //mV
+        static constexpr double alpha = 1;
+        static constexpr double beta = 1;
+        static constexpr double tresh = -50; //mV
 
         SrmNeuron() {
         }
