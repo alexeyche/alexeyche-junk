@@ -4,7 +4,7 @@
 #include <sim/socket/sim_socket_core.h>
 
 #include "srm.h"
-
+#include "srm_neurons.h"
 
 namespace srm {
     

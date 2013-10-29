@@ -37,9 +37,11 @@ int main(int argc, char** argv)
     s.addStatListener(n, TStatListener::Prob);
 
     s.run(0.1*sec);
-    for(size_t ni=0; ni<s.stoch_elem.size(); ni++) {
-        Log::Info << "id: " << s.stoch_elem[ni]->id() << "\n";
-        s.stoch_elem[ni]->y.print();
-    }
+    prob(n);    
+
+//    for(size_t ni=0; ni<s.stoch_elem.size(); ni++) {
+//        Log::Info << "id: " << s.stoch_elem[ni]->id() << "\n";
+//        s.stoch_elem[ni]->y.print();
+//    }
 }
 
