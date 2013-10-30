@@ -4,7 +4,7 @@
 #include <sim/socket/sim_socket_core.h>
 
 #include "srm.h"
-
+#include "srm_neurons.h"
 
 void epsp_test(bool just_print = false) {
     double Tmax = 100;
@@ -50,10 +50,42 @@ void nu_test(bool just_print = false) {
 }
 
 void ttime_test() {
-    TTime in;
-    in.push_back(10);
-    in.push_back(20);
-    in.push_back(30);
+    srm::TTime in;
+    std::srand(time(NULL));
+    vec  q       = randu<vec>(20);
+//    vec  q("1 2 3 4 5 6 7");
+    uvec indices = sort_index(q);
+    for(size_t iq=0; iq<indices.n_elem; iq++) {
+        in.push_back(q(indices(iq)));
+    }
+    Log::Info << "TTime: \n";
+    for(size_t ind=0; ind<in.size(); ind++) {
+        Log::Info << "i:" << ind << " v: " << in[ind] << "\n";
+    }
+    vec bs = randu<vec>(1);
+//    vec bs("3.5");
+    size_t i = in.binary_search(bs(0));
+    Log::Info << "binary search " << bs(0) << " : " << i << "\n";
+    size_t test_i;
+    if(in[0] > bs(0)) { 
+        test_i = 0;
+    } else {
+        for(test_i=0; test_i<in.size(); test_i++) {
+            if(in[test_i] > bs(0)) {
+                test_i--;
+                break;
+            }
+        }
+        if(test_i == in.size()) {
+            test_i--;
+        }
+    }
+    Log::Info << "binary search (test) " << bs(0) << " : " << test_i << "\n";
+    if(test_i == i) {
+        Log::Info << "test passed\n";
+    } else {
+        Log::Info << "test failed\n";
+    }
 }
 
 
@@ -61,24 +93,37 @@ void srm_test() {
     srm::SrmNeuron n;
     for(size_t i=0; i<10; i++) {
         srm::SrmNeuron* inp_n = new srm::SrmNeuron();
-        n.add_input(inp_n, 4);
+        n.add_input(inp_n, 30);
     }
-    n.in[5]->y << 15 << 16 << 17 << endr;
-    n.in[6]->y << 16 << 18 << 20 << endr;
-    n.in[7]->y << 25 << 28 << 30 << endr;
-
+    n.in[5]->y.push_back(15);
+    n.in[5]->y.push_back(16);
+    n.in[5]->y.push_back(17);
+    n.in[6]->y.push_back(16);
+    n.in[6]->y.push_back(17);
+    n.in[6]->y.push_back(18);
+    n.in[7]->y.push_back(17);
+    n.in[7]->y.push_back(18);
+    n.in[7]->y.push_back(19);
 
     double Tmax = 100;
     double dt = 0.1;
     vec t = linspace<vec>(0.0, Tmax, (int)Tmax/dt);
-    mat pot(t.n_elem, 3);
+    mat unif(t.n_elem, 1, fill::randu);
+    mat stat(t.n_elem, 4);
     for(size_t ti=0; ti<t.n_elem; ti++) {
-        pot(ti, 0) = t[ti];
-        pot(ti, 1) = n.u(t[ti]);     
-        pot(ti, 2) = n.p(pot(ti,1));
-
+        stat(ti, 0) = t(ti);
+        stat(ti, 1) = n.u(t(ti));     
+        stat(ti, 2) = n.p(stat(ti,1));
+        if(stat(ti, 2)*dt > unif(ti, 0)) {
+            n.y.push_back(t(ti));
+            Log::Info << "We had a spike at " << t(ti) << "(" << stat(ti, 2)*dt  << "<" << unif(ti,0)  << ")\n";
+        } 
+        stat(ti, 3) = n.y.last(t(ti));
     }
-    send_arma_mat(pot, "pot");
+    send_arma_mat(stat, "stat");
+    for(size_t ni=0; ni<n.in.size(); ni++) {
+        delete n.in[ni];
+    }
 }
 
 PROGRAM_INFO("SIM TEST", "sim tests"); 
@@ -106,6 +151,12 @@ int main(int argc, char** argv) {
         Log::Info << "srm test: " << std::endl;
         Log::Info << "===============================================================" << std::endl;
         srm_test();
+        Log::Info << "===============================================================" << std::endl;
+    }        
+    if((test_name == "all") || (test_name == "ttime")) {
+        Log::Info << "ttime test: " << std::endl;
+        Log::Info << "===============================================================" << std::endl;
+        ttime_test();
         Log::Info << "===============================================================" << std::endl;
     }        
     return 0;

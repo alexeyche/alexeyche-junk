@@ -53,10 +53,10 @@ namespace srm {
                     vec s(*(it_s->second));
                     std::string stat_name;
                     if(it_s->first == Spike) {
-                        stat_name = "neuron_spike";
+                        stat_name = "n_spike";
                     }
                     if(it_s->first == Prob) {
-                        stat_name = "neuron_prob";
+                        stat_name = "n_prob";
                     }
                     send_arma_mat(s, stat_name, &it->first); 
                 }

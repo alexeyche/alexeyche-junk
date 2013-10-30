@@ -1,8 +1,17 @@
 #ifndef SRM_NEURONS_H
 #define SRM_NEURONS_H
 
+#include <cmath>
 
 namespace srm {
+    struct SrmException : public std::exception
+    {
+       std::string s;
+       SrmException(std::string ss) : s(ss) {}
+       ~SrmException() throw () {} // Updated
+       const char* what() const throw() { return s.c_str(); }
+    };    
+    
     class TTime : public std::vector<double> {
     static constexpr double TIME_OF_FORGET = 200;
     public:
@@ -14,6 +23,28 @@ namespace srm {
             std::vector<double>::push_back(v);
             n_elem_real++;
         }
+
+        size_t binary_search(const double &t) {
+            const size_t &s = std::vector<double>::size();
+            if(s == 0) { throw SrmException("Binary search on empty TTime\n"); }
+            if (std::vector<double>::operator[] (0) >= t) { return 0;}
+            if (std::vector<double>::operator[] (s-1) <= t) { return s-1;}
+            size_t first = 0;
+            size_t last= s;
+            size_t mid = first + (last-first)/2;
+            //Log::Info << "first: " << first << " last: " << last << " mid: "  << mid << "\n";
+            while(first < last) {
+                if(t <= std::vector<double>::operator[] (mid)) {
+                    last = mid;
+                } else {
+                    first = mid+1;
+                }
+            //    Log::Info << "first: " << first << " last: " << last << " mid: "  << mid << "\n";
+                mid = first + (last - first) / 2;
+            }
+            last--;
+            return last;
+        }
         double& first() {
             if(n_elem_real>0) {
                 return std::vector<double>::operator[] (forgotten_elems);
@@ -21,9 +52,9 @@ namespace srm {
                 return inf_elem;
             }
         }        
-        double& last(size_t shift=0) {
+        double& last(const double &t = datum::inf) {
             if(n_elem_real>0) {
-                return std::vector<double>::operator[] (n_elem_real-1-shift);
+                return std::vector<double>::operator[] (binary_search(t));
             } else {
                 return inf_elem;
             }
@@ -33,19 +64,13 @@ namespace srm {
             time_vec.print();
         }
         size_t n_elem(const double &t) {
-            if(n_elem_real-forgotten_elems == 0) { return 0; }
-            while((t-first()>TIME_OF_FORGET)&&( (n_elem_real-forgotten_elems) > 0)) {
-                forgotten_elems++;
+            if(n_elem_real>0) {
+                return(binary_search(t)+1);
+            } else {
+                return 0;
             }
-            size_t shift = 0;
-            while(t<last(shift)&&( (n_elem_real-forgotten_elems) > shift)) {
-                shift++;
-            }
-            Log::Info << "for t=" << t << " last - " << last(shift) << "\n";
-            return n_elem_real - forgotten_elems - shift;
         }
 
-        
     private:
         size_t n_elem_real;
         double inf_elem;
