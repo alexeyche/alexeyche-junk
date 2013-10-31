@@ -54,8 +54,8 @@ void nu_test(bool just_print = false) {
 void ttime_test() {
     srm::TTime in;
     std::srand(time(NULL));
-    vec  q       = randu<vec>(20);
-//    vec  q("1 2 3 4 5 6 7");
+//    vec  q       = randu<vec>(20);
+    vec  q("1 2 3 4 5 6 7");
     uvec indices = sort_index(q);
     for(size_t iq=0; iq<indices.n_elem; iq++) {
         in.push_back(q(indices(iq)));
@@ -64,8 +64,8 @@ void ttime_test() {
     for(size_t ind=0; ind<in.size(); ind++) {
         Log::Info << "i:" << ind << " v: " << in[ind] << "\n";
     }
-    vec bs = randu<vec>(1);
-//    vec bs("3.5");
+//    vec bs = randu<vec>(1);
+    vec bs("3.1");
     size_t i = in.binary_search(bs(0));
     Log::Info << "binary search " << bs(0) << " : " << i << "\n";
     size_t test_i;

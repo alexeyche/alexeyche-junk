@@ -34,15 +34,16 @@ namespace srm {
             size_t mid = first + (last-first)/2;
             //Log::Info << "first: " << first << " last: " << last << " mid: "  << mid << "\n";
             while(first < last) {
-                if(t <= std::vector<double>::operator[] (mid)) {
+                if(t < std::vector<double>::operator[] (mid)) {
                     last = mid;
                 } else {
                     first = mid+1;
                 }
-            //    Log::Info << "first: " << first << " last: " << last << " mid: "  << mid << "\n";
                 mid = first + (last - first) / 2;
+                Log::Info << "first: " << first << " last: " << last << " mid: "  << mid << "\n";
             }
-            last--;
+
+               last--;
             return last;
         }
         double& first() {
