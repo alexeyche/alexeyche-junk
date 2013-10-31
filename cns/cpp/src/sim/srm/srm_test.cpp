@@ -128,51 +128,65 @@ void srm_test() {
     }
 }
 
+double prob(const double &t, srm::SrmNeuron *n) {
+   return n->p(t);
+}
+
+
+
+
 void srm_lh_test() {
     srm::SrmNeuron n;
     for(size_t i=0; i<2; i++) {
         srm::SrmNeuron* inp_n = new srm::SrmNeuron();
-        n.add_input(inp_n, 30);
+        n.add_input(inp_n, 70);
     }
     n.in[0]->y.push_back(15);
     n.in[0]->y.push_back(16);
     n.in[0]->y.push_back(17);
-    n.in[1]->y.push_back(16);
-    n.in[1]->y.push_back(17);
-    n.in[1]->y.push_back(18);
-    
-    n.y.push_back(19);
+    n.in[1]->y.push_back(19);
+    n.in[1]->y.push_back(20);
+    n.in[1]->y.push_back(21);
+    double spike_time = 0;
+    n.y.push_back(spike_time);
+    Log::Info << prob(spike_time, &n) << "\n";
     double dt=0.1;
-    vec w1 = linspace<vec>(20, 40, (int)5/dt);
-    vec w2 = linspace<vec>(20, 40, (int)5/dt);
+    vec w1 = linspace<vec>(-10, 500, (int)5/dt);
+    vec w2 = linspace<vec>(-10, 500, (int)5/dt);
     n.w(0) = w1(0);
     n.w(1) = w2(0);
     n.w.print();
     
-    double Tmax=50;
+    double Tmax=100;
     mat w_de(w1.n_elem, w2.n_elem);
     mat w_trap(w1.n_elem, w2.n_elem);
     mat w_brute(w1.n_elem, w2.n_elem);
     int s_eval;
     double s_err;
-    for(size_t wi1=0; wi1<w1.n_elem; wi1++) {
-        for(size_t wi2=0; wi2<w2.n_elem; wi2++) {
-            int eval;
-            double err;           
-            n.w(0) = wi1;
-            n.w(1) = wi2;
-            w_de(wi1, wi2) = DEIntegrator<double>::Integrate(n, &srm::SrmNeuron::p, 0, Tmax, 1e-02, eval, err);
-            w_trap(wi1, wi2) = int_trapezium(0, Tmax, 300, n, &srm::SrmNeuron::p);
-            w_brute(wi1, wi2) = int_brute(0, Tmax, 0.01, n, &srm::SrmNeuron::p);
-            s_eval += eval;
-            s_err += err;
-        }
-    }        
+    for(spike_time=0; spike_time<100; spike_time++) {
+        for(size_t wi1=0; wi1<w1.n_elem; wi1++) {
+            for(size_t wi2=0; wi2<w2.n_elem; wi2++) {
+                int eval;
+                double err;           
+                n.w(0) = wi1;
+                n.w(1) = wi2;
+                w_de(wi1, wi2) = DEIntegrator<double>::Integrate(&n, &prob, 0, Tmax, 1e-02, eval, err);
+    //            w_trap(wi1, wi2) = int_trapezium(0, Tmax, 300, n, &srm::SrmNeuron::p);
+    //            w_brute(wi1, wi2) = int_brute(0, Tmax, 0.005, n, &srm::SrmNeuron::p);
+                w_de(wi1, wi2) = n.p(spike_time)*exp(-w_de(wi1,wi2));
+                s_eval += eval;
+                s_err += err;
+            }
+        }        
+        const unsigned int spike_time_int = spike_time;
+        send_arma_mat(w_de, "wz_de", &spike_time_int);
+    }
     Log::Info << "int eval(med.) " << s_eval/(w1.n_elem*w2.n_elem) << "\n";
     Log::Info << "int err(med.) " << s_err/(w1.n_elem*w2.n_elem) << "\n";
-    send_arma_mat(w_de, "wz_de");
-    send_arma_mat(w_trap, "wz_trap");
-    send_arma_mat(w_brute, "wz_brute");
+    send_arma_mat(w1, "w1");
+    send_arma_mat(w2, "w2");
+//    send_arma_mat(w_trap, "wz_trap");
+//    send_arma_mat(w_brute, "wz_brute");
 }
 
 

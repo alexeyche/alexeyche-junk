@@ -27,8 +27,8 @@ namespace srm {
         size_t binary_search(const double &t) {
             const size_t &s = std::vector<double>::size();
             if(s == 0) { throw SrmException("Binary search on empty TTime\n"); }
-            if (std::vector<double>::operator[] (0) >= t) { return 0;}
-            if (std::vector<double>::operator[] (s-1) <= t) { return s-1;}
+            if (std::vector<double>::operator[] (0) > t) { return 0;}
+            if (std::vector<double>::operator[] (s-1) < t) { return s-1;}
             size_t first = 0;
             size_t last= s;
             size_t mid = first + (last-first)/2;

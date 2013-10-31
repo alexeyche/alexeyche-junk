@@ -14,8 +14,8 @@ public:
     /*! Integrate an analytic function over a finite interval. @return The value of the integral. */
     static double Integrate
     (
-        srm::SrmNeuron &n,
-        TType (srm::SrmNeuron::*f)(const TType&),       //!< [in] integrand
+        srm::SrmNeuron *n,
+        TType (*f)(const TType&, srm::SrmNeuron*),       //!< [in] integrand
         double a,                       //!< [in] left limit of integration
         double b,                       //!< [in] right limit of integration
         double targetAbsoluteError,     //!< [in] desired bound on error
@@ -51,8 +51,8 @@ public:
     */
     static double Integrate
     (
-        srm::SrmNeuron &n,
-        TType (srm::SrmNeuron::*f)(const TType&),       //!< [in] integrand
+        srm::SrmNeuron *n,
+        TType (*f)(const TType&, srm::SrmNeuron*),       //!< [in] integrand
         double a,                       //!< [in] left limit of integration
         double b,                       //!< [in] right limit of integration
         double targetAbsoluteError      //!< [in] desired bound on error
@@ -78,8 +78,8 @@ private:
     // Integrate f(cx + d) with the given integration constants
     static double IntegrateCore
     (
-        srm::SrmNeuron &n,
-        TType (srm::SrmNeuron::*f)(const TType&),       //!< [in] integrand
+        srm::SrmNeuron *n,
+        TType (*f)(const TType&, srm::SrmNeuron*),       //!< [in] integrand
         double c,   // slope of change of variables
         double d,   // intercept of change of variables
         double targetAbsoluteError,
@@ -102,17 +102,17 @@ private:
         double h = 1.0;
         double previousDelta, currentDelta = DBL_MAX;
 
-        integral = (n.*f)(c*abcissas[0] + d) * weights[0];
+        integral = f(c*abcissas[0] + d, n) * weights[0];
         int i;
         for (i = offsets[0]; i != offsets[1]; ++i)
-            integral += weights[i]*((n.*f)(c*abcissas[i] + d) + (n.*f)(-c*abcissas[i] + d));
+            integral += weights[i]*(f(c*abcissas[i] + d, n) + f(-c*abcissas[i] + d, n));
 
         for (int level = 1; level != numLevels; ++level)
         {
             h *= 0.5;
             newContribution = 0.0;
             for (i = offsets[level]; i != offsets[level+1]; ++i)
-                newContribution += weights[i]*( (n.*f)(c*abcissas[i] + d) + (n.*f)(-c*abcissas[i] + d));
+                newContribution += weights[i]*( f(c*abcissas[i] + d, n) + f(-c*abcissas[i] + d, n));
             newContribution *= h;
 
             // difference in consecutive integral estimates

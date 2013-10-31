@@ -27,12 +27,8 @@ namespace srm {
         return (beta/alpha)*(log(1+exp(alpha*(tresh-uc))) - alpha*(tresh-uc));
     }
 
-    double prob(SrmNeuron *n) {
-        Log::Info << "Probabilites: \n";
-        for(size_t yi=0; yi<n->y.size(); yi++) {
-            Log::Info << " at " << n->y(yi) << " : ";
-            Log::Info << n->p(n->y(yi)) << "\n";
-        }
+    double prob(const double &t, SrmNeuron *n) {
+       return n->p(t);
     }  
 
 };        
