@@ -2,9 +2,11 @@
 #define DEINTEGRATOR_H
 
 #include "DEIntegrationConstants.h"
+#include <sim/srm/srm_neurons.h>
 #include <float.h>
 
 /*! Numerical integration in one dimension using the double expontial method of M. Mori. */
+
 template<class TType>
 class DEIntegrator
 {
@@ -12,7 +14,8 @@ public:
     /*! Integrate an analytic function over a finite interval. @return The value of the integral. */
     static double Integrate
     (
-        TType (*f)(TType),       //!< [in] integrand
+        srm::SrmNeuron &n,
+        TType (srm::SrmNeuron::*f)(const TType&),       //!< [in] integrand
         double a,                       //!< [in] left limit of integration
         double b,                       //!< [in] right limit of integration
         double targetAbsoluteError,     //!< [in] desired bound on error
@@ -29,6 +32,7 @@ public:
 
         return IntegrateCore
         (
+            n,
             f, 
             c, 
             d, 
@@ -47,7 +51,8 @@ public:
     */
     static double Integrate
     (
-        TType (*f)(TType),        //!< [in] integrand
+        srm::SrmNeuron &n,
+        TType (srm::SrmNeuron::*f)(const TType&),       //!< [in] integrand
         double a,                       //!< [in] left limit of integration
         double b,                       //!< [in] right limit of integration
         double targetAbsoluteError      //!< [in] desired bound on error
@@ -57,6 +62,7 @@ public:
         double errorEstimate;
         return Integrate
         (
+            n,
             f,
             a,
             b,
@@ -72,7 +78,8 @@ private:
     // Integrate f(cx + d) with the given integration constants
     static double IntegrateCore
     (
-        TType (*f)(TType),
+        srm::SrmNeuron &n,
+        TType (srm::SrmNeuron::*f)(const TType&),       //!< [in] integrand
         double c,   // slope of change of variables
         double d,   // intercept of change of variables
         double targetAbsoluteError,
@@ -95,17 +102,17 @@ private:
         double h = 1.0;
         double previousDelta, currentDelta = DBL_MAX;
 
-        integral = f(c*abcissas[0] + d) * weights[0];
+        integral = (n.*f)(c*abcissas[0] + d) * weights[0];
         int i;
         for (i = offsets[0]; i != offsets[1]; ++i)
-            integral += weights[i]*(f(c*abcissas[i] + d) + f(-c*abcissas[i] + d));
+            integral += weights[i]*((n.*f)(c*abcissas[i] + d) + (n.*f)(-c*abcissas[i] + d));
 
         for (int level = 1; level != numLevels; ++level)
         {
             h *= 0.5;
             newContribution = 0.0;
             for (i = offsets[level]; i != offsets[level+1]; ++i)
-                newContribution += weights[i]*(f(c*abcissas[i] + d) + f(-c*abcissas[i] + d));
+                newContribution += weights[i]*( (n.*f)(c*abcissas[i] + d) + (n.*f)(-c*abcissas[i] + d));
             newContribution *= h;
 
             // difference in consecutive integral estimates
