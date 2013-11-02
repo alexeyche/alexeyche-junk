@@ -2,6 +2,8 @@
 #define SRM_NEURONS_H
 
 #include <cmath>
+#include <sim/data/load.h>
+#include <sim/socket/sim_socket_core.h>
 
 namespace srm {
     struct SrmException : public std::exception
@@ -32,7 +34,6 @@ namespace srm {
             size_t first = 0;
             size_t last= s;
             size_t mid = first + (last-first)/2;
-            //Log::Info << "first: " << first << " last: " << last << " mid: "  << mid << "\n";
             while(first < last) {
                 if(t < std::vector<double>::operator[] (mid)) {
                     last = mid;
@@ -40,10 +41,9 @@ namespace srm {
                     first = mid+1;
                 }
                 mid = first + (last - first) / 2;
-                Log::Info << "first: " << first << " last: " << last << " mid: "  << mid << "\n";
             }
 
-               last--;
+            last--;
             return last;
         }
         double& first() {
@@ -105,6 +105,7 @@ namespace srm {
     
     class DetermenisticNeuron: public Neuron {
     public:
+        DetermenisticNeuron() {}
         DetermenisticNeuron(TTime yv) { Neuron::y = yv; }
         DetermenisticNeuron(std::string s) { 
             vec y_arm(s);    
@@ -112,6 +113,40 @@ namespace srm {
                 Neuron::y.push_back(y_arm(i));
             }
         }
+    };
+    class TimeSeriesGroup {
+    public:    
+        struct TPattern {
+            TPattern(size_t group_n, size_t n, double prob) : pattern(group_n, n), pattProb(prob) {}
+            mat pattern;
+            double pattProb;
+        };
+        TimeSeriesGroup(size_t n) { 
+            for(size_t gi=0; gi<n; gi++) {
+                group.push_back(DetermenisticNeuron());
+            }
+        }
+        void loadPatternFromFile(std::string csv_file, double pattDur, double pattProb) {
+            mat ts;
+            data::Load(csv_file, ts, true, false); 
+            for(size_t ci=0; ci<ts.n_cols; ci++) {
+                TPattern p(group.size(), ts.n_rows, pattProb);
+                double patt_dt = 0;
+                double lb = min(ts.col(ci));
+                double hb = max(ts.col(ci));
+                double dt = (hb-lb)/(group.size()-1);
+                for(size_t ri=0; ri<ts.col(ci).n_rows; ri++) {
+                    double val = ts(ri, ci);                
+                    int ind_n = (val-lb)/dt;
+                    patt_dt += pattDur/ts.col(ci).n_rows;
+                    p.pattern(ind_n, ri) = patt_dt;
+                }
+                patterns.push_back(p);
+            }
+        }
+        
+        std::vector<DetermenisticNeuron> group;
+        std::vector<TPattern> patterns;
     };
 
     class StochasticNeuron : public Neuron {

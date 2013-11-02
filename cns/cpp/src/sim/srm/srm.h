@@ -4,7 +4,8 @@
 namespace srm {
 
     const double sec = 1000; //ms
-
+    const double ms = sec/1000; // ms
+    
     double epsp(double t, double fj, double fi);
     double nu(double t, double fi);
 };

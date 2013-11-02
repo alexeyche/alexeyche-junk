@@ -2,7 +2,10 @@
 
 
 #include <sim/core.h>
+#include <sim/socket/sim_socket_core.h>
+
 #include "sim.h"
+
 
 using namespace srm;
 
@@ -17,7 +20,7 @@ int main(int argc, char** argv)
     std::srand(seed);
     Sim s;
     SrmNeuron* n = new SrmNeuron();
-    double w_start = 5;
+    double w_start = 10;
 //    n->add_input(new PoissonNeuron(100/sec), w_start);
 //    n->add_input(new PoissonNeuron(100/sec), w_start);
 //    n->add_input(new PoissonNeuron(100/sec), w_start);
@@ -25,19 +28,17 @@ int main(int argc, char** argv)
 //    n->add_input(new PoissonNeuron(10/sec), w_start);
 //    n->add_input(new PoissonNeuron(10/sec), w_start);
 
-    n->add_input(new DetermenisticNeuron("5 10 31 41"), w_start);
-    n->add_input(new DetermenisticNeuron("6 11 32 42"), w_start);
-    n->add_input(new DetermenisticNeuron("7 12 33 43"), w_start);
-    n->add_input(new DetermenisticNeuron("8 13 34 44"), w_start);
-    n->add_input(new DetermenisticNeuron("9 14 35 45"), w_start);
-
-
+    TimeSeriesGroup g(100);
+    g.loadPatternFromFile("/var/tmp/d1.csv", 100*ms, 0.5);
+    send_arma_mat(g.patterns[0].pattern, "d1_stat");
+    g.loadPatternFromFile("/var/tmp/d2.csv", 100*ms, 0.5);
+    send_arma_mat(g.patterns[1].pattern, "d2_stat");
+  
     s.addRecNeuron(n);
     s.addStatListener(n, TStatListener::Spike);
     s.addStatListener(n, TStatListener::Prob);
 
     s.run(0.1*sec);
-    prob(n);    
 
 //    for(size_t ni=0; ni<s.stoch_elem.size(); ni++) {
 //        Log::Info << "id: " << s.stoch_elem[ni]->id() << "\n";

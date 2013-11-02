@@ -51,6 +51,20 @@ void nu_test(bool just_print = false) {
     }        
 }
 
+void pfun_test() {
+    vec u = linspace<vec>(-75, 0, 500);
+    double beta = 1;
+    double alpha = 1; 
+    double tresh = -50;
+    mat pfun(500,2);
+    for(size_t ui=0; ui<u.n_elem; ui++) {
+        pfun(ui,0) = u(ui);
+        pfun(ui,1) = (beta/alpha)*(log(1+exp(alpha*(tresh-u(ui)))) - alpha*(tresh-u(ui)));
+    }
+    send_arma_mat(pfun, "pfun");
+}
+
+
 void ttime_test() {
     srm::TTime in;
     std::srand(time(NULL));
@@ -65,7 +79,7 @@ void ttime_test() {
         Log::Info << "i:" << ind << " v: " << in[ind] << "\n";
     }
 //    vec bs = randu<vec>(1);
-    vec bs("3.1");
+    vec bs("3");
     size_t i = in.binary_search(bs(0));
     Log::Info << "binary search " << bs(0) << " : " << i << "\n";
     size_t test_i;
@@ -95,7 +109,7 @@ void srm_test() {
     srm::SrmNeuron n;
     for(size_t i=0; i<10; i++) {
         srm::SrmNeuron* inp_n = new srm::SrmNeuron();
-        n.add_input(inp_n, 30);
+        n.add_input(inp_n, 2);
     }
     n.in[5]->y.push_back(15);
     n.in[5]->y.push_back(16);
@@ -115,11 +129,11 @@ void srm_test() {
     for(size_t ti=0; ti<t.n_elem; ti++) {
         stat(ti, 0) = t(ti);
         stat(ti, 1) = n.u(t(ti));     
-        stat(ti, 2) = n.p(stat(ti,1));
-        if(stat(ti, 2)*dt > unif(ti, 0)) {
-            n.y.push_back(t(ti));
-            Log::Info << "We had a spike at " << t(ti) << "(" << stat(ti, 2)*dt  << "<" << unif(ti,0)  << ")\n";
-        } 
+        stat(ti, 2) = n.p(t(ti));
+        //if(stat(ti, 2)*dt > unif(ti, 0)) {
+        //    n.y.push_back(t(ti));
+        //    Log::Info << "We had a spike at " << t(ti) << "(" << stat(ti, 2)*dt  << "<" << unif(ti,0)  << ")\n";
+        //} 
         stat(ti, 3) = n.y.last(t(ti));
     }
     send_arma_mat(stat, "stat");
@@ -133,26 +147,19 @@ double prob(const double &t, srm::SrmNeuron *n) {
 }
 
 
-
-
 void srm_lh_test() {
     srm::SrmNeuron n;
     for(size_t i=0; i<2; i++) {
         srm::SrmNeuron* inp_n = new srm::SrmNeuron();
         n.add_input(inp_n, 70);
     }
-    n.in[0]->y.push_back(15);
-    n.in[0]->y.push_back(16);
-    n.in[0]->y.push_back(17);
-    n.in[1]->y.push_back(19);
-    n.in[1]->y.push_back(20);
-    n.in[1]->y.push_back(21);
-    double spike_time = 0;
-    n.y.push_back(spike_time);
-    Log::Info << prob(spike_time, &n) << "\n";
+    n.in[0]->y.push_back(6);
+    n.in[1]->y.push_back(15);
+    n.in[1]->y.push_back(38);
+
     double dt=0.1;
-    vec w1 = linspace<vec>(-10, 500, (int)5/dt);
-    vec w2 = linspace<vec>(-10, 500, (int)5/dt);
+    vec w1 = linspace<vec>(0, 500, (int)5/dt);
+    vec w2 = linspace<vec>(0, 500, (int)5/dt);
     n.w(0) = w1(0);
     n.w(1) = w2(0);
     n.w.print();
@@ -163,32 +170,66 @@ void srm_lh_test() {
     mat w_brute(w1.n_elem, w2.n_elem);
     int s_eval;
     double s_err;
-    for(spike_time=0; spike_time<100; spike_time++) {
+    size_t wmax1i=0;
+    size_t wmax2i=0;
+    double wmax=0;
+    mat w_de_stat1(w1.n_elem, w2.n_elem);
+    mat w_de_stat2(w1.n_elem, w2.n_elem);
+    mat w_de_stat3(w1.n_elem, w2.n_elem);
+    for(double spike_time=0; spike_time<100; spike_time++) {
         for(size_t wi1=0; wi1<w1.n_elem; wi1++) {
             for(size_t wi2=0; wi2<w2.n_elem; wi2++) {
                 int eval;
                 double err;           
                 n.w(0) = wi1;
                 n.w(1) = wi2;
-                w_de(wi1, wi2) = DEIntegrator<double>::Integrate(&n, &prob, 0, Tmax, 1e-02, eval, err);
-    //            w_trap(wi1, wi2) = int_trapezium(0, Tmax, 300, n, &srm::SrmNeuron::p);
-    //            w_brute(wi1, wi2) = int_brute(0, Tmax, 0.005, n, &srm::SrmNeuron::p);
-                w_de(wi1, wi2) = n.p(spike_time)*exp(-w_de(wi1,wi2));
+                w_de_stat1(wi1, wi2) = DEIntegrator<double>::Integrate(&n, &prob, 0, Tmax, 1e-02, eval, err);
+                w_de_stat2(wi1, wi2) = n.p(spike_time)*n.p(spike_time+25);
+                w_de_stat3(wi1, wi2) = exp(-w_de_stat1(wi1,wi2));
+                w_de(wi1, wi2) = w_de_stat2(wi1, wi2) * w_de_stat3(wi1, wi2);
+                if(w_de(wi1, wi2)>wmax) {
+                    Log::Info << wmax << "\n";
+                    wmax = w_de(wi1, wi2);
+                    wmax1i = wi1;
+                    wmax2i = wi2;
+                }
                 s_eval += eval;
                 s_err += err;
             }
         }        
         const unsigned int spike_time_int = spike_time;
         send_arma_mat(w_de, "wz_de", &spike_time_int);
+        send_arma_mat(w_de_stat1, "wz_de_stat1", &spike_time_int);
+        send_arma_mat(w_de_stat2, "wz_de_stat2", &spike_time_int);
+        send_arma_mat(w_de_stat3, "wz_de_stat3", &spike_time_int);
     }
     Log::Info << "int eval(med.) " << s_eval/(w1.n_elem*w2.n_elem) << "\n";
     Log::Info << "int err(med.) " << s_err/(w1.n_elem*w2.n_elem) << "\n";
+    Log::Info << "max p value " << wmax << " for weights " << w1(wmax1i) << ", " << w2(wmax2i) << " (ind: " << wmax1i << ", " << wmax2i << ")\n";
     send_arma_mat(w1, "w1");
     send_arma_mat(w2, "w2");
 //    send_arma_mat(w_trap, "wz_trap");
 //    send_arma_mat(w_brute, "wz_brute");
 }
 
+void testf1() {
+    srm::SrmNeuron n;
+    for(size_t i=0; i<2; i++) {
+        srm::SrmNeuron* inp_n = new srm::SrmNeuron();
+        n.add_input(inp_n, 70);
+    }
+    n.in[0]->y.push_back(6);
+    n.in[1]->y.push_back(15);
+    double Tmax = 100;
+    int eval;
+    double err;
+    double pint = DEIntegrator<double>::Integrate(&n, &prob, 0, Tmax, 1e-02, eval, err);
+    Log::Info << "pint: " << pint << "\n";
+
+    for(size_t ni=0; ni<n.in.size(); ni++) {
+        delete n.in[ni];
+    }
+}
 
 PROGRAM_INFO("SIM TEST", "sim tests"); 
 PARAM_STRING("test", "name for test. default \"all\"", "t", "all");
@@ -227,6 +268,18 @@ int main(int argc, char** argv) {
         Log::Info << "srm likelyhood test: " << std::endl;
         Log::Info << "===============================================================" << std::endl;
         srm_lh_test();
+        Log::Info << "===============================================================" << std::endl;
+    }
+    if((test_name == "all") || (test_name == "pfun")) {
+        Log::Info << "pfun test: " << std::endl;
+        Log::Info << "===============================================================" << std::endl;
+        pfun_test();
+        Log::Info << "===============================================================" << std::endl;
+    }
+    if((test_name == "all") || (test_name == "testf1")) {
+        Log::Info << "testf1: " << std::endl;
+        Log::Info << "===============================================================" << std::endl;
+        testf1();
         Log::Info << "===============================================================" << std::endl;
     }
     return 0;

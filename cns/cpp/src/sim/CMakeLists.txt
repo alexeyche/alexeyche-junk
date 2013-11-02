@@ -6,6 +6,7 @@ cmake_minimum_required(VERSION 2.6)
 set(${SIM_SRCS} ${SIM_SRCS} "core.h")
 
 set(DIRS
+    data
     socket
     util
     oldsim

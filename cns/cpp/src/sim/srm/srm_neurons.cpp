@@ -16,7 +16,7 @@ namespace srm {
                 epsp_pot += w(i)*srm::epsp(t, in[i]->y(j), y.last(t));
             }
         }
-        for(size_t i=0; i<y.n_elem(t-0.001); i++) {
+        for(size_t i=0; i<y.n_elem(t); i++) {
             nu_pot += srm::nu(t, y(i));
         }
         return u_rest + epsp_pot + nu_pot;
