@@ -6,7 +6,6 @@
 
 #include "sim.h"
 
-
 using namespace srm;
 
 PROGRAM_INFO("SRM SIM", "Spike Resoponce Model simulator"); 
@@ -28,12 +27,13 @@ int main(int argc, char** argv)
 //    n->add_input(new PoissonNeuron(10/sec), w_start);
 //    n->add_input(new PoissonNeuron(10/sec), w_start);
 
-    TimeSeriesGroup g(100);
+    TimeSeriesGroup g(10, 50*ms); 
     g.loadPatternFromFile("/var/tmp/d1.csv", 100*ms, 0.5);
     send_arma_mat(g.patterns[0].pattern, "d1_stat");
     g.loadPatternFromFile("/var/tmp/d2.csv", 100*ms, 0.5);
     send_arma_mat(g.patterns[1].pattern, "d2_stat");
-  
+    s.addNeuronGroup(&g);
+
     s.addRecNeuron(n);
     s.addStatListener(n, TStatListener::Spike);
     s.addStatListener(n, TStatListener::Prob);

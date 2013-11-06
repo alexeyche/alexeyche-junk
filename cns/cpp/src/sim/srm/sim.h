@@ -4,7 +4,8 @@
 #include <sim/socket/sim_socket_core.h>
 
 #include "srm.h"
-#include "srm_neurons.h"
+#include "neurons.h"
+#include "groups.h"
 
 namespace srm {
     
@@ -76,6 +77,14 @@ namespace srm {
             Log::Info << "Cleaning Sim\n"; 
         }            
         void run(double Tmax, double dt=0.1) {
+            Log::Info << "Finding elements to precalculate\n";
+            for(size_t el_i=0; el_i<sim_elem.size(); el_i++) { 
+                if(sim_elem[el_i]->isNeedPreCalc()) {
+                    sim_elem[el_i]->preCalculate(Tmax, dt);
+                }
+            }
+
+
             vec t = linspace<vec>(0.0, Tmax, (int)Tmax/dt);
                             
             mat unif(t.n_elem, stoch_elem.size(), fill::randu);
@@ -100,7 +109,13 @@ namespace srm {
             if(dynamic_cast<StochasticNeuron*>(n)) {
                 stoch_elem.push_back(dynamic_cast<StochasticNeuron*>(n));            
             }
-            
+                
+        }
+
+        void addNeuronGroup(NeuronGroup *gr) {
+            if(dynamic_cast<SimElement*>(gr)) {
+                sim_elem.push_back(dynamic_cast<SimElement*>(gr));
+            }
         }
         void addRecNeuron(Neuron *n) {
             std::set<unsigned int> hist;
@@ -112,6 +127,7 @@ namespace srm {
         }
 
         std::vector<StochasticNeuron*> stoch_elem;
+        std::vector<SimElement*> sim_elem;
     private:        
         void addRecNeuronFn(Neuron *n, std::set<unsigned int> &hist) {
             addNeuron(n);
