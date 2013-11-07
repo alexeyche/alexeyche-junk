@@ -24,7 +24,7 @@ char* spliceChar(char *array, int start, int end) {
     return splice_out;
 }
 
-
+#define DEBUG
 
 #define HEAD_LEN 100
 

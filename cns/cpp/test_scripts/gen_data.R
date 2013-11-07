@@ -27,13 +27,21 @@ plot_syn_stat <- function(stat, new_plot=TRUE, clr="blue") {
   if(!new_plot) { pf <- points }
   for(i in 1:nrow(stat)) {
     cl <- stat[i,stat[i,]>0]
-    pf(cl, rep(c(i),length(cl)), col=clr, xlim=c(1, nrow(stat)), ylim=c(0,max(stat)))
+    pf(cl, rep(c(i),length(cl)), col=clr, xlim=c(0, max(stat)), ylim=c(1,nrow(stat)))
     if(i == 1) { pf <- points }    
   }  
 }
-par(mfrow=c(1,2))
-plot_syn_stat(d1_stat,TRUE,clr="blue")
+#par(mfrow=c(1,2))
+#plot_syn_stat(d1_stat,TRUE,clr="blue")
 plot_syn_stat(d2_stat,TRUE,clr="red")
+require(stringr)
+l <- list()
+for(i in ls()) {
+    m <- str_match(i, "ystat([0-9]+)")
+    if(!is.na(m[2])) {
+        l[[m[1]]] <- get(m[1])        
+    }
+}
 
 
 

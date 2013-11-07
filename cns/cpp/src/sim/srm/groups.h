@@ -2,6 +2,8 @@
 #define GROUPS_H
 
 #include "neurons.h"
+#include <random>
+#include <sim/util/rand/common_rand_gen.h>
 
 namespace srm {
     class NeuronGroup : public SimElement { 
@@ -17,7 +19,7 @@ namespace srm {
             double pattProb;
             double pattDur;
         };
-        TimeSeriesGroup(size_t n, double refr) : NeuronGroup(true), refrTime(refr) { 
+        TimeSeriesGroup(size_t n, double refr, double pattProb) : NeuronGroup(true), refrTime(refr), pattProb(pattProb) { 
             for(size_t gi=0; gi<n; gi++) {
                 group.push_back(DetermenisticNeuron());
             }
@@ -46,16 +48,12 @@ namespace srm {
             vec mean_rate(group.size(), fill::zeros);
             for(size_t pi=0; pi<patterns.size(); pi++) {
                 mat &pattern = patterns[pi].pattern;
-                Log::Info << "======\n";
-                mean(pattern, 1).print();
-                Log::Info << "======\n";
                 mean_rate += mean(pattern, 1)/patterns.size();
             }
-            
-            mean_rate.print();
-
             vec t = linspace<vec>(0, Tmax, (int)Tmax/dt);
             vec unif(t.n_elem, fill::randu);
+            std::default_random_engine generator;
+            std::uniform_real_distribution<double> d(0.0, 1.0);
             double refrTime_cur = 0;
             int patt_id=-1; // pattern that we choosed
             size_t patt_ti=0;  // current pattern time id
@@ -63,33 +61,48 @@ namespace srm {
                 if (refrTime_cur > 0) { 
                     refrTime_cur -= dt;
                 } else if(patt_id<0) { // choosing pattern
-                    for(size_t pi=0; pi<patterns.size(); pi++) {
-                        if(patterns[pi].pattProb*dt>unif(ti)) {
-                            patt_id = pi;
+                    if(pattProb*dt>unif(ti)) {
+//                        Log::Info << "What time is it? Pattern time! ("  << t(ti) << ")\n";
+                        double cump=0;
+                        vec unif_patt(patterns.size(), fill::randu);
+                        for(size_t pi=0; pi<patterns.size(); pi++) {
+                            cump += patterns[pi].pattProb;
+                            if(cump>unif_patt(pi)) {
+                                patt_id = pi;
+                                Log::Info << "(" << t(ti) << ") pattern# " << patt_id << " cump: " << cump << "\n";
+                                break;
+                            }
                         }
-                    }
+                    }                        
                 } 
                 if(patt_id<0) {
                     // filling with poisson process
-                    
+                    vec unif_poiss(group.size(), fill::randu);                    
+                    uvec bl = (mean_rate*dt>unif_poiss);
+                    uvec fired = find(bl == 1);
+                    for(size_t fi=0; fi<fired.n_elem; fi++) {
+                        group[fired(fi)].y.push_back(t(ti));
+                    }
                 } else {
                     mat &pattern = patterns[patt_id].pattern;
-                    if(pattern.n_cols >= patt_ti) {  // pattern ended
+                    if(patt_ti >= pattern.n_cols) {  // pattern ended
                         patt_id = -1;
+                        patt_ti = 0;
                         refrTime_cur = refrTime;
                         continue;
                     }
                     uvec fired = find(pattern.col(patt_ti)>0);
                     for(size_t fi=0; fi<fired.n_elem; fi++) {
-                        group[fired(fi)].y.push_back(t[ti]);
+                        group[fired(fi)].y.push_back(t(ti));
                     }
-                    patt_ti += 1;
+                    patt_ti++;
                 }                    
             }
         }
         std::vector<DetermenisticNeuron> group;
         std::vector<TPattern> patterns;
         double refrTime;
+        double pattProb;
     };
 
 
