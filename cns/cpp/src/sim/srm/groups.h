@@ -12,7 +12,7 @@ namespace srm {
     class TimeSeriesGroup : public NeuronGroup {
     public:    
         struct TPattern {
-            TPattern(size_t group_n, size_t n, double prob, double dur) : pattern(group_n, n), pattProb(prob), pattDur(dur) {}
+            TPattern(size_t group_n, size_t n, double prob, double dur) : pattern(group_n, n, fill::zeros), pattProb(prob), pattDur(dur) {}
             mat pattern;
             double pattProb;
             double pattDur;
@@ -33,10 +33,10 @@ namespace srm {
             double lb = min(ts.col(ci));
             double hb = max(ts.col(ci));
             double dt = (hb-lb)/(group.size()-1);
-            for(size_t ri=0; ri<ts.col(ci).n_rows; ri++) {
+            for(size_t ri=0; ri<ts.n_rows; ri++) {
                 double val = ts(ri, ci);                
                 int ind_n = (val-lb)/dt;
-                patt_dt += pattDur/ts.col(ci).n_rows;
+                patt_dt += pattDur/ts.n_rows;
                 p.pattern(ind_n, ri) = patt_dt;
             }
             patterns.push_back(p);
