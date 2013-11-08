@@ -12,9 +12,9 @@ run_server <- function(port = 7778) {
 get_message <- function(mc_p) {
     x <- .Call("r_get_message",mc_p)
     if(! is.null(x)) {
-        i_index <- rep(seq(1:x$nrow), x$ncol)
-        j_index <- c(sapply(seq(1:x$ncol),function(j) { rep(j, x$nrow) }))
-        assign(x$name, sparseMatrix(i = i_index,j = j_index,x = x$x), envir = .GlobalEnv)
+        i_index <- rep(seq(1:x$nrow), x$ncol)        
+        j_index <- c(sapply(seq(1:x$ncol),function(j) { rep(j, x$nrow) }))        
+        assign(x$name, as.matrix(sparseMatrix(i = i_index,j = j_index,x = x$x)), envir = .GlobalEnv)
     } else {
         return(NULL)
     }

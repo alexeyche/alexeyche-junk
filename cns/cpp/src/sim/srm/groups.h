@@ -2,8 +2,6 @@
 #define GROUPS_H
 
 #include "neurons.h"
-#include <random>
-#include <sim/util/rand/common_rand_gen.h>
 
 namespace srm {
     class NeuronGroup : public SimElement { 
@@ -50,10 +48,9 @@ namespace srm {
                 mat &pattern = patterns[pi].pattern;
                 mean_rate += mean(pattern, 1)/patterns.size();
             }
+            //meta_rate = mean_rate/10;
             vec t = linspace<vec>(0, Tmax, (int)Tmax/dt);
             vec unif(t.n_elem, fill::randu);
-            std::default_random_engine generator;
-            std::uniform_real_distribution<double> d(0.0, 1.0);
             double refrTime_cur = 0;
             int patt_id=-1; // pattern that we choosed
             size_t patt_ti=0;  // current pattern time id

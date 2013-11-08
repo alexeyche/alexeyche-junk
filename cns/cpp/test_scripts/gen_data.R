@@ -11,8 +11,8 @@ ornstein_uhlenbeck <- function(T, n, nu,lambda,sigma,x0){
 }
 
 set.seed(6)
-d1 <- ornstein_uhlenbeck(10,1000, 0.2, 1, 0.007, 0.15)
-d2 <- ornstein_uhlenbeck(10,1000, 0.19, 0.5, 0.01, 0.15)
+d1 <- ornstein_uhlenbeck(10,999, 0.2, 1, 0.007, 0.15)
+d2 <- ornstein_uhlenbeck(10,999, 0.19, 0.5, 0.01, 0.15)
 write.table(d1, "/var/tmp/d1.csv", sep=",", col.names=F, row.names=F) 
 write.table(d2, "/var/tmp/d2.csv", sep=",", col.names=F, row.names=F)
   
@@ -30,6 +30,15 @@ plot_syn_stat <- function(stat, new_plot=TRUE, clr="blue") {
     pf(cl, rep(c(i),length(cl)), col=clr, xlim=c(0, max(stat)), ylim=c(1,nrow(stat)))
     if(i == 1) { pf <- points }    
   }  
+}
+plot_syn_stat_list <- function(stat_list, new_plot=TRUE, clr="blue") {
+    pf <- plot
+    if(!new_plot) { pf <- points }
+    for(i in 1:length(stat_list)) {
+        cl <- stat_list[[i]]
+        pf(cl, rep(c(i),length(cl)), col=clr, xlim=c(0, max(unlist(stat_list))), ylim=c(1,length(stat_list)))
+        if(i == 1) { pf <- points }    
+    }  
 }
 #par(mfrow=c(1,2))
 #plot_syn_stat(d1_stat,TRUE,clr="blue")
