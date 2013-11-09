@@ -3,7 +3,7 @@
 
 
 #include <sim/core.h>
-
+#include <sim/util/rand/common_rand_gen.h>
 
 template <typename TSample>
 class RandGen {

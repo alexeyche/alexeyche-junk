@@ -27,18 +27,25 @@ int main(int argc, char** argv)
 //    n->add_input(new PoissonNeuron(10/sec), w_start);
 //    n->add_input(new PoissonNeuron(10/sec), w_start);
 
-    TimeSeriesGroup g(10, 50*ms); 
-    g.loadPatternFromFile("/var/tmp/d1.csv", 100*ms, 0.5);
-    send_arma_mat(g.patterns[0].pattern, "d1_stat");
-    g.loadPatternFromFile("/var/tmp/d2.csv", 100*ms, 0.5);
-    send_arma_mat(g.patterns[1].pattern, "d2_stat");
+    TimeSeriesGroup g(10, 0*ms, 100); 
+    g.loadPatternFromFile("/var/tmp/d1.csv", 100*ms, 100);
+//    send_arma_mat(g.patterns[0].pattern, "d1_stat");
+//    g.loadPatternFromFile("/var/tmp/d2.csv", 100*ms, 0.5);
+//    send_arma_mat(g.patterns[1].pattern, "d2_stat");
     s.addNeuronGroup(&g);
+    Log::Info << "col: " << g.patterns[0].pattern.n_cols << "\n";
+    Log::Info << "row: " << g.patterns[0].pattern.n_rows << "\n";
+//    s.addRecNeuron(n);
+//    s.addStatListener(n, TStatListener::Spike);
+//    s.addStatListener(n, TStatListener::Prob);
 
-    s.addRecNeuron(n);
-    s.addStatListener(n, TStatListener::Spike);
-    s.addStatListener(n, TStatListener::Prob);
+    s.run(0.2*sec);
 
-    s.run(0.1*sec);
+    for(unsigned int gi=0; gi<g.group.size(); gi++) {
+        if (g.group[gi].y.size() > 0) {
+            send_arma_mat(g.group[gi].y, "ystat",&gi);
+        }
+    }        
 
 //    for(size_t ni=0; ni<s.stoch_elem.size(); ni++) {
 //        Log::Info << "id: " << s.stoch_elem[ni]->id() << "\n";
