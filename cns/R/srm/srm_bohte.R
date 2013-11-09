@@ -77,7 +77,9 @@ run_srm <- function(x,y, T=50, dt=0.1) {
   }
   plot(tsim, pall, type="l")
   plot(tsim, uall, type="l", ylim=c(-70,-45))  
+  return(y);
 }
+
 prob_of_spikes <- function(x,y) {
   y <- c(-Inf, y)
   p <- 1

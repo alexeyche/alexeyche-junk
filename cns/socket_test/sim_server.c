@@ -25,7 +25,6 @@ char* spliceChar(char *array, int start, int end) {
 }
 
 
-
 #define HEAD_LEN 100
 
 typedef struct {
@@ -182,6 +181,7 @@ void* get_message(void *args_p) {
                 #ifdef DEBUG                    
                     printf("--| read %d bytes (k_all: %d)\n", k,k_all);
                     printf("--| head of out: %f %f %f\n", out[0],out[1],out[2]);
+                    printf("--| head of buf: %f %f %f\n", buf[0],buf[1],buf[2]);
                 #endif
                 need_download -= k/sizeof(double);
                 if(need_download<=0) {
