@@ -1,11 +1,9 @@
 cmake_minimum_required(VERSION 2.8)
 
 set(SOURCES
-	srm.h
-	srm.cpp
     neurons.h
-    neurons.cpp
     groups.h
+    sim.h
 )
 
 # add directory name to sources

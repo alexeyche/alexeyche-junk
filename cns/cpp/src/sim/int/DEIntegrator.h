@@ -2,7 +2,7 @@
 #define DEINTEGRATOR_H
 
 #include "DEIntegrationConstants.h"
-#include <sim/srm/srm_neurons.h>
+#include <sim/srm/neurons.h>
 #include <float.h>
 
 /*! Numerical integration in one dimension using the double expontial method of M. Mori. */

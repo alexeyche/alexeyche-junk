@@ -7,6 +7,8 @@ namespace srm {
     class NeuronGroup : public SimElement { 
     public:
         NeuronGroup(bool preCalculate) : SimElement(preCalculate) {}
+
+        std::vector<Neuron*> group;
     };
 
     class TimeSeriesGroup : public NeuronGroup {
@@ -19,8 +21,14 @@ namespace srm {
         };
         TimeSeriesGroup(size_t n, double refr, double pattProb) : NeuronGroup(true), refrTime(refr), pattProb(pattProb) { 
             for(size_t gi=0; gi<n; gi++) {
-                group.push_back(DetermenisticNeuron());
+                group.push_back(new DetermenisticNeuron());
             }
+        }
+        ~TimeSeriesGroup() {
+            for(size_t gi=0; gi<group.size(); gi++) {
+                delete group[gi];
+            }
+            group.clear();
         }
         void loadPatternFromFile(std::string csv_file, double pattDur, double pattProb) {
             mat ts;
@@ -78,7 +86,7 @@ namespace srm {
                     uvec bl = (mean_rate*dt>unif_poiss);
                     uvec fired = find(bl == 1);
                     for(size_t fi=0; fi<fired.n_elem; fi++) {
-                        group[fired(fi)].y.push_back(t(ti));
+                        group[fired(fi)]->y.push_back(t(ti));
                     }
                 } else {
                     mat &pattern = patterns[patt_id].pattern;
@@ -90,13 +98,12 @@ namespace srm {
                     }
                     uvec fired = find(pattern.col(patt_ti)>0);
                     for(size_t fi=0; fi<fired.n_elem; fi++) {
-                        group[fired(fi)].y.push_back(t(ti));
+                        group[fired(fi)]->y.push_back(t(ti));
                     }
                     patt_ti++;
                 }                    
             }
         }
-        std::vector<DetermenisticNeuron> group;
         std::vector<TPattern> patterns;
         double refrTime;
         double pattProb;

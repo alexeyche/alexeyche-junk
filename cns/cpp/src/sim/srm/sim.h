@@ -3,12 +3,14 @@
 
 #include <sim/socket/sim_socket_core.h>
 
-#include "srm.h"
 #include "neurons.h"
 #include "groups.h"
 
 namespace srm {
+    const double sec = 1000; //ms
+    const double ms = sec/1000; // ms
     
+
     class TStatListener {
     public: 
         enum TStatType { None, Spike, Prob };
@@ -83,15 +85,13 @@ namespace srm {
                     sim_elem[el_i]->preCalculate(Tmax, dt);
                 }
             }
-
-
+            Log::Info << "Done\n"; 
             vec t = linspace<vec>(0.0, Tmax, (int)Tmax/dt);
                             
             mat unif(t.n_elem, stoch_elem.size(), fill::randu);
             for(size_t ti=0; ti<t.n_elem; ti++) {
                 for(size_t ni=0; ni<stoch_elem.size(); ni++) {
                     double pi = stoch_elem[ni]->p(t(ti));
-                    
                     if(pi*dt > unif(ti, ni)) {
                         TTime &yn = stoch_elem[ni]->y;
                         Log::Info << "spike of " << ni << " at " << t(ti) << "\n";
@@ -102,7 +102,9 @@ namespace srm {
                     sg.addStat(stoch_elem[ni], TStatListener::Prob, pi);
                 }
             }
+            Log::Info << "Sending statistics to 7778\n";
             sg.sendStat();
+            Log::Info << "Done\n";
         }
 
         void addNeuron(Neuron *n) {

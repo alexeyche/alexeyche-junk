@@ -42,7 +42,7 @@ plot_syn_stat_list <- function(stat_list, new_plot=TRUE, clr="blue") {
 }
 #par(mfrow=c(1,2))
 #plot_syn_stat(d1_stat,TRUE,clr="blue")
-plot_syn_stat(d2_stat,TRUE,clr="red")
+#plot_syn_stat(d2_stat,TRUE,clr="red")
 require(stringr)
 l <- list()
 for(i in ls()) {

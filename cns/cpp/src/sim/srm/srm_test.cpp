@@ -5,8 +5,7 @@
 #include <sim/int/DEIntegrator.h>
 #include <sim/int/simple_int.h>
 
-#include "srm.h"
-#include "srm_neurons.h"
+#include "neurons.h"
 
 void epsp_test(bool just_print = false) {
     double Tmax = 100;
@@ -21,7 +20,7 @@ void epsp_test(bool just_print = false) {
             fi = 15; 
         }
         epsp(ti, 0) = t[ti];
-        epsp(ti, 1) = srm::epsp(t[ti], fj, fi);
+        epsp(ti, 1) = srm::SrmNeuron::epsp(t[ti], fj, fi);
     }
     if(just_print) {
         epsp.print();
@@ -42,7 +41,7 @@ void nu_test(bool just_print = false) {
             fi = 15; 
         }
         nupot(ti, 0) = t[ti];
-        nupot(ti, 1) = srm::nu(t[ti], fi);
+        nupot(ti, 1) = srm::SrmNeuron::nu(t[ti], fi);
     }
     if(just_print) {
         nupot.print();
@@ -79,8 +78,8 @@ void ttime_test() {
         Log::Info << "i:" << ind << " v: " << in[ind] << "\n";
     }
 //    vec bs = randu<vec>(1);
-    vec bs("3");
-    size_t i = in.binary_search(bs(0));
+    vec bs("0.5");
+    int i = in.binary_search(bs(0));
     Log::Info << "binary search " << bs(0) << " : " << i << "\n";
     size_t test_i;
     if(in[0] > bs(0)) { 

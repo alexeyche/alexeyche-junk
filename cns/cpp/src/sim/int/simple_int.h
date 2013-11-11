@@ -1,7 +1,7 @@
 #ifndef SIMPLE_INT
 #define SIMPLE_INT
 
-#include <sim/srm/srm_neurons.h>
+#include <sim/srm/neurons.h>
 
 double int_trapezium(double from, double to, double n, srm::SrmNeuron &inst, double (srm::SrmNeuron::*f)(const double&))
 {
