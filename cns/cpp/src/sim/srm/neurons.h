@@ -73,7 +73,11 @@ namespace srm {
                 return 0;
             }
         }
-
+        void clean() {
+            std::vector<double>::clear();
+            n_elem_real = 0;
+            forgotten_elems = 0;
+        }
     private:
         size_t n_elem_real;
         double inf_elem;
@@ -168,13 +172,14 @@ namespace srm {
             if((t-fi)<dr) return u_abs;
             return u_abs*exp(-(t-fi+dr)/trf)+u_r*exp(-(t-fi)/trs);
         }
+        
+        
+        SrmNeuron() {}
+
         static constexpr double u_rest = -70; //mV
         static constexpr double alpha = 1;
         static constexpr double beta = 1;
         static constexpr double tresh = -50; //mV
-
-        SrmNeuron() {
-        }
 
         double u(const double &t) {
             double epsp_pot = 0;
@@ -191,13 +196,11 @@ namespace srm {
             }
             return u_rest + epsp_pot + nu_pot;
         }
+
         double p(const double &t) {
             double uc = u(t);
             return (beta/alpha)*(log(1+exp(alpha*(tresh-uc))) - alpha*(tresh-uc));
         }    
-    
-    
-    
     };
 
 }

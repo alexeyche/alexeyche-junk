@@ -21,7 +21,7 @@ int main(int argc, char** argv)
     std::srand(seed);
     Sim s;
     SrmNeuron* n = new SrmNeuron();
-    double w_start = 2;
+    double w_start = 3;
     n->add_input(new DetermenisticNeuron("3 4 5"), w_start);
     n->add_input(new DetermenisticNeuron("4 5 6"), w_start);
     n->add_input(new DetermenisticNeuron("5 6 7"), w_start);
@@ -38,14 +38,16 @@ int main(int argc, char** argv)
 //    s.addNeuronGroup(&g);
     s.addNeuron(n);
 
-    s.addStatListener(n, TStatListener::Spike);
-    s.addStatListener(n, TStatListener::Prob);
+//    s.addStatListener(n, TStatListener::Spike);
+//    s.addStatListener(n, TStatListener::Prob);
     vec pp(100);
     for(size_t num=0; num<100; num++) {        
         double t_run = 0.05*sec;
         s.run(t_run);
         pp(num) = survFunction(t_run, n);
+        n->y.clean();
     }        
+    send_arma_mat(pp, "pp");
 //    for(size_t ni=0; ni<s.stoch_elem.size(); ni++) {
 //        Log::Info << "id: " << s.stoch_elem[ni]->id() << "\n";
 //        s.stoch_elem[ni]->y.print();
