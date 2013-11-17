@@ -50,6 +50,13 @@ find_package(Boost
       program_options
     REQUIRED
 )
+find_library(CUBA_LIBRARY
+    NAMES cuba
+    PATHS "/usr/local/lib")
+if (NOT CUBA_LIBRARY) 
+    message(FATAL_ERROR, "Cannot find Cuba library in /usr/local/lib")
+endif (NOT CUBA_LIBRARY)    
+
 include_directories(${Boost_INCLUDE_DIRS})
 set(Boost_BACKUP_LIBRARIES ${Boost_LIBRARIES})
 

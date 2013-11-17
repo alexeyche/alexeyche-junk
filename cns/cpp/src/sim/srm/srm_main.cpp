@@ -8,6 +8,8 @@
 #include "connections.h"
 #include "research.h"
 
+#include "entropy.h"
+
 using namespace srm;
 
 PROGRAM_INFO("SRM SIM", "Spike Resoponce Model simulator"); 
@@ -37,17 +39,22 @@ int main(int argc, char** argv)
 //    srm::connectFeedForward(&g, n, 0.2);
 //    s.addNeuronGroup(&g);
     s.addNeuron(n);
+    s.run(100*ms);
 
+    EntropyCalc ec(n, 0, 100);
+    ec.run(0);
+    ec.run(1);
+    ec.run(2);
 //    s.addStatListener(n, TStatListener::Spike);
 //    s.addStatListener(n, TStatListener::Prob);
-    vec pp(100);
-    for(size_t num=0; num<100; num++) {        
-        double t_run = 0.05*sec;
-        s.run(t_run);
-        pp(num) = survFunction(t_run, n);
-        n->y.clean();
-    }        
-    send_arma_mat(pp, "pp");
+//    vec pp(100);
+//    for(size_t num=0; num<100; num++) {        
+//        double t_run = 0.05*sec;
+//        s.run(t_run);
+//        pp(num) = survFunction(t_run, n);
+//        n->y.clean();
+//    }        
+//    send_arma_mat(pp, "pp");
 //    for(size_t ni=0; ni<s.stoch_elem.size(); ni++) {
 //        Log::Info << "id: " << s.stoch_elem[ni]->id() << "\n";
 //        s.stoch_elem[ni]->y.print();

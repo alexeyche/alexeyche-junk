@@ -25,6 +25,7 @@ add_library(sim_prj SHARED ${SIM_SRCS})
 target_link_libraries(sim_prj
   ${ARMADILLO_LIBRARIES}
   ${Boost_LIBRARIES}
+  ${CUBA_LIBRARY}
 )
 
 set_target_properties(sim_prj

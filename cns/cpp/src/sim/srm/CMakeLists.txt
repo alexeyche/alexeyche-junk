@@ -4,6 +4,8 @@ set(SOURCES
     neurons.h
     groups.h
     sim.h
+    entropy.h
+    entropy.cpp
 )
 
 # add directory name to sources
