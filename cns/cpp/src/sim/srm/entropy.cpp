@@ -21,11 +21,7 @@ namespace srm {
         }
         double p = survFunction(ec->neuron, ec->T0, ec->Tmax);
 
-        if(p == 0) {
-            ff[0] = 0;
-        } else {
-            ff[0] = p*log(p);
-        }
+        ff[0] = p*log(p);
 
         if(ec->cuba_verbose>0) {
             printf("survFunction for y = [ ");
@@ -74,13 +70,12 @@ namespace srm {
         if(n_calc == 0) {
             n_calc = 1;
         }
-        Vegas(n_calc, 1, Integrand, this, 1e-3, 1e-12, 2, 0, 0, 30000, 1000, 500, 100, 0, NULL, &neval, &fail, &integral, &error, &prob);
-        printf("VEGAS RESULT:\tneval %d\tfail %d\n", neval, fail);
-        printf("VEGAS RESULT:\t%.8f +- %.8f\tp = %.3f\n", integral, error, prob);
-
-//        double Hn = -int_trapezium<EntropyCalc>(T0, Tmax, 100, this, &entropy_fn_int);
-//        double Hn = -DEIntegrator<double, EntropyCalc>::Integrate(this, &entrop
-
+        Vegas(n_calc, 1, Integrand, this, 1e-3, 1e-12, cuba_verbose, 0, 0, 30000, 1000, 500, 100, 0, NULL, &neval, &fail, &integral, &error, &prob);
+        if(cuba_verbose>0) {
+            printf("VEGAS RESULT:\tneval %d\tfail %d\n", neval, fail);
+            printf("VEGAS RESULT:\t%.8f +- %.8f\tp = %.3f\n", integral, error, prob);
+        }            
+        return integral;
     }
 };    
 

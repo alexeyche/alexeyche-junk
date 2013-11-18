@@ -28,6 +28,7 @@
 #include <iostream>
 #include <map>
 #include <string>
+#include <thread>
 
 #include <boost/any.hpp>
 #include <boost/program_options.hpp>
@@ -679,6 +680,7 @@ class CLI
   ~CLI();
 
  private:
+  static pid_t main_pid;
   //! The documentation and names of options.
   po::options_description desc;
 

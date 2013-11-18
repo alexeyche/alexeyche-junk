@@ -42,9 +42,10 @@ int main(int argc, char** argv)
     s.run(100*ms);
 
     EntropyCalc ec(n, 0, 100);
-    ec.run(0);
-    ec.run(1);
-    ec.run(2);
+    Log::Info << "H0 = " << ec.run(0) << "\n";
+    Log::Info << "H1 = " << ec.run(1) << "\n";
+    Log::Info << "H2 = " << ec.run(2) << "\n";
+    Log::Info << "H3 = " << ec.run(3) << "\n";
 //    s.addStatListener(n, TStatListener::Spike);
 //    s.addStatListener(n, TStatListener::Prob);
 //    vec pp(100);

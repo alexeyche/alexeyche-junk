@@ -83,33 +83,34 @@ CLI::CLI(const CLI& other) : desc(other.desc),
 
 CLI::~CLI()
 {
-  // Terminate the program timer.
-  Timer::Stop("total_time");
+  if(main_pid == getpid()) {
+      // Terminate the program timer.
+      Timer::Stop("total_time");
 
-  // Did the user ask for verbose output?  If so we need to print everything.
-  // But only if the user did not ask for help or info.
-  if (HasParam("verbose") && !HasParam("help") && !HasParam("info"))
-  {
-    Log::Info << std::endl << "Execution parameters:" << std::endl;
-    Print();
+      // Did the user ask for verbose output?  If so we need to print everything.
+      // But only if the user did not ask for help or info.
+      if (HasParam("verbose") && !HasParam("help") && !HasParam("info"))
+      {
+        Log::Info << std::endl << "Execution parameters:" << std::endl;
+        Print();
 
-    Log::Info << "Program timers:" << std::endl;
-    std::map<std::string, timeval>::iterator it;
-    for (it = timer.GetAllTimers().begin(); it != timer.GetAllTimers().end();
-        ++it)
-    {
-      std::string i = (*it).first;
-      Log::Info << "  " << i << ": ";
-      timer.PrintTimer((*it).first.c_str());
-    }
+        Log::Info << "Program timers:" << std::endl;
+        std::map<std::string, timeval>::iterator it;
+        for (it = timer.GetAllTimers().begin(); it != timer.GetAllTimers().end();
+            ++it)
+        {
+          std::string i = (*it).first;
+          Log::Info << "  " << i << ": ";
+          timer.PrintTimer((*it).first.c_str());
+        }
+      }
+
+      // Notify the user if we are debugging, but only if we actually parsed the
+      // options.  This way this output doesn't show up inexplicably for someone who
+      // may not have wanted it there (i.e. in Boost unit tests).
+      if (didParse)
+        Log::Debug << "Compiled with debugging symbols." << std::endl;
   }
-
-  // Notify the user if we are debugging, but only if we actually parsed the
-  // options.  This way this output doesn't show up inexplicably for someone who
-  // may not have wanted it there (i.e. in Boost unit tests).
-  if (didParse)
-    Log::Debug << "Compiled with debugging symbols." << std::endl;
-
   return;
 }
 
@@ -383,8 +384,12 @@ CLI& CLI::GetSingleton()
  * @param argc The number of arguments on the commandline.
  * @param argv The array of arguments as strings
  */
+
+pid_t CLI::main_pid = getpid();
+
 void CLI::ParseCommandLine(int argc, char** line)
 {
+  main_pid = getpid();
   Timer::Start("total_time");
 
   po::variables_map& vmap = GetSingleton().vmap;
