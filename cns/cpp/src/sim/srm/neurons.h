@@ -101,8 +101,10 @@ namespace srm {
         typedef std::vector<Neuron*> TInput;
 
         Neuron() : SimElement(false), id_num(genid()) { }
+        Neuron(Neuron *n) : SimElement(false), id_num(genid()), w(n->w), in(n->in), y(n->y) {}
         virtual ~Neuron() {} 
         unsigned int id() { return id_num; } 
+        
         
         void add_input(Neuron *n, double w_n) {
            in.push_back(n);
@@ -134,6 +136,8 @@ namespace srm {
 
     class StochasticNeuron : public Neuron {
     public:
+        StochasticNeuron() {}
+        StochasticNeuron(StochasticNeuron *n) : Neuron(n) {}
         virtual double p (const double &t) = 0;
     };
 
@@ -175,6 +179,7 @@ namespace srm {
         
         
         SrmNeuron() {}
+        SrmNeuron(SrmNeuron *n) :  StochasticNeuron(n) {}
 
         static constexpr double u_rest = -70; //mV
         static constexpr double alpha = 1;

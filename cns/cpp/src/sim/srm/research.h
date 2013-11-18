@@ -39,6 +39,20 @@ namespace srm {
 //        Log::Info << "p = " << p << "\n";
         return p;
     }
+    void survFunctionSeq(SrmNeuron *n, double T0, double Tmax, double *out) {
+        double t_left=T0;
+        double p = 1;
+        out[0] = exp(-DEIntegrator<double>::Integrate(n, &prob, T0, Tmax, 1e-03));
+        for(size_t yi=0; yi<n->y.size(); yi++) {
+            double t_right = n->y[yi];
+            double no_spike = exp(-DEIntegrator<double>::Integrate(n, &prob, t_left, t_right-0.01, 1e-03));
+            double spike = 1-exp(-prob(t_right, n));
+            p = p*no_spike*spike;
+            t_left = t_right+0.01;
+            out[yi+1] = p*exp(-DEIntegrator<double>::Integrate(n, &prob, t_left, Tmax, 1e-03));
+        }
+        return;
+    }   
 };
 
 #endif
