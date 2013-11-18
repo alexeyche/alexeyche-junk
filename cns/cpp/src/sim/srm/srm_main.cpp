@@ -23,13 +23,13 @@ int main(int argc, char** argv)
     std::srand(seed);
     Sim s;
     SrmNeuron* n = new SrmNeuron();
-    double w_start = 5;
-    n->add_input(new DetermenisticNeuron("3 4 5 10 11 12"), w_start);
-    n->add_input(new DetermenisticNeuron("4 5 6 15 16 17"), w_start);
-    n->add_input(new DetermenisticNeuron("5 6 7"), w_start);
-    n->add_input(new DetermenisticNeuron("6 7 8"), w_start);
-    n->add_input(new DetermenisticNeuron("7 8 9"), w_start);
-    n->add_input(new DetermenisticNeuron("8 9 10"), w_start);
+    double w_start = 3;
+    n->add_input(new DetermenisticNeuron("3  10 11 12"), w_start);
+    n->add_input(new DetermenisticNeuron("4  13 14 15"), w_start);
+    n->add_input(new DetermenisticNeuron("5  15 16 17"), w_start);
+    n->add_input(new DetermenisticNeuron("6 "), w_start);
+    n->add_input(new DetermenisticNeuron("7 "), w_start);
+    n->add_input(new DetermenisticNeuron("8 "), w_start);
 //    TimeSeriesGroup g(100, 0*ms, 100); 
 //    g.loadPatternFromFile("/var/tmp/d1.csv", 100*ms, 100);
 //    send_arma_mat(g.patterns[0].pattern, "pattern");
@@ -39,15 +39,15 @@ int main(int argc, char** argv)
 //    srm::connectFeedForward(&g, n, 0.2);
 //    s.addNeuronGroup(&g);
     s.addNeuron(n);
-//    s.run(100*ms);
+    s.addStatListener(n, TStatListener::Spike);
+    s.addStatListener(n, TStatListener::Prob);
+    s.run(100*ms);
 
     EntropyCalc ec(n, 0, 100);
     Timer::Start("perf");
     ec.IntPerfomance();
     Timer::Stop("perf");
     
-//    s.addStatListener(n, TStatListener::Spike);
-//    s.addStatListener(n, TStatListener::Prob);
 //    vec pp(100);
 //    for(size_t num=0; num<100; num++) {        
 //        double t_run = 0.05*sec;

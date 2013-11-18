@@ -3,13 +3,14 @@
 
 #include <sim/srm/neurons.h>
 
-double int_trapezium(double from, double to, double n, srm::SrmNeuron &inst, double (srm::SrmNeuron::*f)(const double&))
+template <typename T>
+double int_trapezium(double from, double to, double n, T *inst, double (*f)(const double&, T*))
 {
    double h = (to - from) / n;
-   double sum = (inst.*f)(from) + (inst.*f)(to);
+   double sum = (*f)(from, inst) + (*f)(to, inst);
    int i;
    for(i = 1;i < n;i++)
-       sum += 2.0*(inst.*f)(from + i * h);
+       sum += 2.0*(*f)(from + i * h, inst);
    return  h * sum / 2.0;
 }
 
