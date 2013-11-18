@@ -1,0 +1,19 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[T2A]{fontenc}
+\usepackage[utf8x]{inputenc}
+\usepackage{ucs}
+\usepackage{cmap}
+\usepackage[english,russian]{babel}
+\usepackage{amsmath}
+\usepackage{color,graphicx}
+\usepackage{indentfirst}
+
+\title{SRM методичка}
+\author{Чернышев Алексей}
+\setlength{\parindent}{1cm}
+
+\begin{document}
+\section*{Спайковые НС}
+\paragraph{Spike Responce Model.} Spike Responce Model (SRM) - наиболее популярная модель спайкового нейрона. SRM своей популярностью обязана простотой математической интерпретации - вся динамика нейрона описывается одним уравнением вида $u(t)$, которое описывает напряжение на мембране нейрона и, по сути, является решением дифференциального уравнения для моделей типа \textit{Integrate and fire}. Динамику моделей \textit{Integrate and fire} можно описать так: нейрон суммирует входные сигналы и по достижению определенного порога, производит спайк, после чего нейрон переходит в состояние рефракторности, находясь в котором, вероятность нового спайка крайне мала.\\
+\indent Поведение описанное выше можно поэтапно собрать в одну формулу. Для начала формализуем вид входного сигнала на синапсах нейрона.
+\end{document}
