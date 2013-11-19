@@ -52,7 +52,7 @@ namespace srm {
         }                       
         double p = survFunction(ec->neuron, ec->T0, ec->Tmax);
         if(p == 0) { ff[0] = 0; return 0; } 
-        ff[0] = p*log(p)*(ec->Tmax - ec->T0);
+        ff[0] = p*log(p);
          
         if(ec->cs.VerboseInt) {
             printf("survFunction for y = [ ");
@@ -61,11 +61,14 @@ namespace srm {
             }
             printf("] = %f \n", ff[0]); 
         }
+        ff[0] = ff[0]*(ec->Tmax - ec->T0);
         return 0;
     }
     double EntropyCalc::entropy_fn_int(const double &fn, EntropyCalc *ec) {
-        if(ec->n_cur < ec->n-1) {
-            ec->neuron->y[ec->n_cur] = fn;
+        if(ec->n_cur < ec->n) {
+            if(ec->n_cur > 0) {
+                ec->neuron->y[ec->n_cur-1] = fn;
+            }                
             ec->n_cur += 1;
             Log::Info << "We going to integrate entr [" << fn << "," << ec->Tmax << "]\n";
             double H = int_trapezium<EntropyCalc>(fn, ec->Tmax, 1000, ec, &entropy_fn_int);
@@ -141,7 +144,7 @@ namespace srm {
             }
             if(cs.method == "trapezium") {
                 n_cur = 0;
-                n = n_calc_cur;
+                n = n_calc;
                 integral[0] = int_trapezium<EntropyCalc>(T0, Tmax, cs.NumEval, this, &entropy_fn_int);
             }   
             if(cs.FullInt) {
