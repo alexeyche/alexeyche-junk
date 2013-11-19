@@ -15,6 +15,7 @@ namespace srm {
                      Key(0), // Cuhre default
                      NumEval(100) // trapezium default
                      {} 
+
         std::string method;
         int    MinEval;
         int    MaxEval;
@@ -23,24 +24,24 @@ namespace srm {
         bool FullInt;
         bool VerboseInt;
 
-        int NStart; // Vegas
-        int NIncrease; // Vegas
-        int NBatch; // Vegas
-        int GridNo; // Vegas
+        int            NStart;          //Vegas
+        int            NIncrease;       //Vegas
+        int            NBatch;          //Vegas
+        int            GridNo;          //Vegas
 
-        int NNew;        //Suave
-        double Flatness; //Suave
+        int            NNew;            //Suave
+        double         Flatness;        //Suave
 
-        int    Key1; //Divonne
-        int    Key2; //Divonne
-        int    Key3; //Divonne
-        int    MaxPass; //Divonne
-        double Border; //Divonne
-        double MaxChiSq; //Divonne
-        double MinDeviation; //Divonne
-        int    NGiven; //Divonne
-        std::string LDXGiven; //Divonne
-        int    NExtra;  //Divonne
+        int            Key1;            //Divonne
+        int            Key2;            //Divonne
+        int            Key3;            //Divonne
+        int            MaxPass;         //Divonne
+        double         Border;          //Divonne
+        double         MaxChiSq;        //Divonne
+        double         MinDeviation;    //Divonne
+        int            NGiven;          //Divonne
+        std::string    LDXGiven;        //Divonne
+        int            NExtra;          //Divonne
         
         int Key; // Cuhre       
 

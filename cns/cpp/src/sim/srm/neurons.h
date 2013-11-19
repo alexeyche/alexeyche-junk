@@ -154,7 +154,7 @@ namespace srm {
 
     class SrmNeuron : public StochasticNeuron {
     public:
-        static constexpr double ts = 3; // ms
+        static constexpr double ts = 3;  // ms
         static constexpr double tm = 10; // ms
         
         static double epsp(double t, double fj, double fi) {
@@ -166,10 +166,10 @@ namespace srm {
 
 
         static constexpr double u_abs = -100; // mV
-        static constexpr double u_r = -50; // mV
-        static constexpr double trf = 0.25; // ms
-        static constexpr double trs = 3; // ms
-        static constexpr double dr = 1; // ms
+        static constexpr double u_r = -50;    // mV
+        static constexpr double trf = 0.25;   // ms
+        static constexpr double trs = 3;      // ms
+        static constexpr double dr = 1;       // ms
 
         static double nu(double t, double fi) {
             if((t-fi)<0) return 0;

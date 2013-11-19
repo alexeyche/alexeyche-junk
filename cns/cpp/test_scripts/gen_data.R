@@ -46,7 +46,7 @@ plot_syn_stat_list <- function(stat_list, new_plot=TRUE, clr="blue") {
 require(stringr)
 l <- list()
 for(i in ls()) {
-    m <- str_match(i, "ystat([0-9]+)")
+    m <- str_match(i, "d([0-9]+)_stat)")
     if(!is.na(m[2])) {
         l[[m[1]]] <- get(m[1])        
     }
