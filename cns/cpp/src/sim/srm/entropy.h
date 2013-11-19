@@ -120,10 +120,12 @@ namespace srm {
         }
 //        double run(size_t n_calc);
         double run();
-        void IntPerfomance();
+        double IntPerfomance();
         static int IntegrandFull(const int *ndim, const double xx[], const int *ncomp, double ff[], void *userdata);
         static int Integrand(const int *ndim, const double xx[], const int *ncomp, double ff[], void *userdata);
         static double entropy_fn_int(const double &fn, EntropyCalc *ec);
+        
+        CubaSett cs;
     private:        
         SrmNeuron* neuron;
         int n;
@@ -131,7 +133,6 @@ namespace srm {
         double T0;
         double Tmax;
         int cuba_verbose;
-        CubaSett cs;
     };
 
 };    

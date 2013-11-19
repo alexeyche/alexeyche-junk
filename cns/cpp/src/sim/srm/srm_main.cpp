@@ -24,31 +24,42 @@ int main(int argc, char** argv)
     Sim s;
     SrmNeuron* n = new SrmNeuron();
 
-//    double w_start = 3;
-//    n->add_input(new DetermenisticNeuron("3  10 11 12"), w_start);
-//    n->add_input(new DetermenisticNeuron("4  13 14 15"), w_start);
-//    n->add_input(new DetermenisticNeuron("5  15 16 17"), w_start);
-//    n->add_input(new DetermenisticNeuron("6 "), w_start);
-//    n->add_input(new DetermenisticNeuron("7 "), w_start);
-//    n->add_input(new DetermenisticNeuron("8 "), w_start);
+    double w_start = 3;
+    n->add_input(new DetermenisticNeuron("3  10 11 12"), w_start);
+    n->add_input(new DetermenisticNeuron("4  13 14 15"), w_start);
+    n->add_input(new DetermenisticNeuron("5  15 16 17"), w_start);
+    n->add_input(new DetermenisticNeuron("6 "), w_start);
+    n->add_input(new DetermenisticNeuron("7 "), w_start);
+    n->add_input(new DetermenisticNeuron("8 "), w_start);
     
-    TimeSeriesGroup g(100, 0*ms, 100); 
-    g.loadPatternFromFile("/var/tmp/d1.csv", 100*ms, 100);
-    send_arma_mat(g.patterns[0].pattern, "d1_stat");
+//    TimeSeriesGroup g(100, 0*ms, 100); 
+//    g.loadPatternFromFile("/var/tmp/d1.csv", 100*ms, 100);
+//    send_arma_mat(g.patterns[0].pattern, "d1_stat");
 //    g.loadPatternFromFile("/var/tmp/d2.csv", 100*ms, 0.5);
 //    send_arma_mat(g.patterns[1].pattern, "d2_stat");
-    srm::connectFeedForward(&g, n, 0.3);
+ //   srm::connectFeedForward(&g, n, 0.3);
     
-    s.addNeuronGroup(&g);
+//    s.addNeuronGroup(&g);
     s.addNeuron(n);
-    s.addStatListener(n, TStatListener::Spike);
+//    s.addStatListener(n, TStatListener::Spike);
     s.addStatListener(n, TStatListener::Prob);
     s.run(100*ms);
+    
+    EntropyCalc ec_full(n, 20, 40);
+//    ec_full.cs.NumEval = 1000;
+    double full_int = ec_full.IntPerfomance();
+    Log::Info << "full_int: " << full_int << "\n";               
 
-    EntropyCalc ec(n, 0, 50);
-    Timer::Start("perf");
-    ec.IntPerfomance();
-    Timer::Stop("perf");
+//    double part_int = 0;
+//    for(double tt = 0; tt<100; tt += 20) {
+//        Log::Info << "from " << tt << " to " << tt+20 << "\n"; 
+//        EntropyCalc ec(n, tt, tt+20);
+//        part_int += ec.IntPerfomance();
+//    }    
+//    Log::Info << "part_int: " << part_int << "\n";               
+//    Log::Info << "delta: " << full_int - part_int << "\n";        
+//    Timer::Start("perf");
+//    Timer::Stop("perf");
     
 //    vec pp(100);
 //    for(size_t num=0; num<100; num++) {        

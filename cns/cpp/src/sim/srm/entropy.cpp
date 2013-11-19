@@ -90,7 +90,7 @@ namespace srm {
         }            
     }
 
-    void EntropyCalc::IntPerfomance() {
+    double EntropyCalc::IntPerfomance() {
        
         if(cs.method == "Vegas") {
             printf("VEGAS PARAM: EpsRel %e, EpsAbs %e, MinEval %d, MaxEval %d, NStart %d, NIncrease %d, NBatch %d, GridNo %d\n", cs.EpsRel, cs.EpsAbs,cs.MinEval, cs.MaxEval, cs.NStart, cs.NIncrease, cs.NBatch, cs.GridNo);
@@ -171,6 +171,7 @@ namespace srm {
         }
         printf("final int: %f\n", sum_int);
         printf("final err: %f\n", sum_err);
+        return sum_int;
   }
 
 };    
