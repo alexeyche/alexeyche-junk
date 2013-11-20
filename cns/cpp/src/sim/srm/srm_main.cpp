@@ -43,21 +43,20 @@ int main(int argc, char** argv)
     s.addNeuron(n);
 //    s.addStatListener(n, TStatListener::Spike);
     s.addStatListener(n, TStatListener::Prob);
-    s.run(100*ms);
+//    s.run(40*ms);
     
-    EntropyCalc ec_full(n, 20, 40);
-//    ec_full.cs.NumEval = 1000;
+    EntropyCalc ec_full(n, 0, 100);
     double full_int = ec_full.IntPerfomance();
     Log::Info << "full_int: " << full_int << "\n";               
 
-//    double part_int = 0;
-//    for(double tt = 0; tt<100; tt += 20) {
-//        Log::Info << "from " << tt << " to " << tt+20 << "\n"; 
-//        EntropyCalc ec(n, tt, tt+20);
-//        part_int += ec.IntPerfomance();
-//    }    
-//    Log::Info << "part_int: " << part_int << "\n";               
-//    Log::Info << "delta: " << full_int - part_int << "\n";        
+    double part_int = 0;
+    for(double tt = 0; tt<100; tt += 20) {
+        Log::Info << "from " << tt << " to " << tt+20 << "\n"; 
+        EntropyCalc ec(n, tt, tt+20);
+        part_int += ec.IntPerfomance();
+    }    
+    Log::Info << "part_int: " << part_int << "\n";               
+    Log::Info << "delta: " << full_int - part_int << "\n";        
 //    Timer::Start("perf");
 //    Timer::Stop("perf");
     

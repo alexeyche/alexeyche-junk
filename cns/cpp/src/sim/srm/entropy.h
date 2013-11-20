@@ -1,7 +1,7 @@
 #ifndef ENTROPY_H
 #define ENTROPY_H
 
-#define DIM_MAX 3 
+#define DIM_MAX 2 
 #define NCOMP DIM_MAX+1
 
 namespace srm {
@@ -13,7 +13,7 @@ namespace srm {
                      NNew(1000), Flatness(25.),  // Suave default
                      Key1(47), Key2(1), Key3(1), MaxPass(5), MaxChiSq(10.), MinDeviation(.25), NGiven(0), LDXGiven("NDIM"), NExtra(0), // Divonne default
                      Key(0), // Cuhre default
-                     NumEval(100) // trapezium default
+                     Dt(0.1) // trapezium default
                      {} 
 
         std::string method;
@@ -45,7 +45,7 @@ namespace srm {
         
         int Key; // Cuhre       
 
-        int NumEval; // trapezium
+        double Dt; // brute
     };
     public:    
         EntropyCalc(SrmNeuron *neuron_v, double T0v, double Tmaxv) : neuron(neuron_v), T0(T0v), Tmax(Tmaxv), cuba_verbose(0) {
@@ -111,9 +111,9 @@ namespace srm {
                 const char *key = getenv("CUBA_KEY");
                 if(key) cs.Key = atoi(key);
             }
-            if(cs.method == "trapezium") {
-                const char *numeval = getenv("NUMEVAL");
-                if(numeval) cs.NumEval = atoi(numeval);
+            if(cs.method == "brute") {
+                const char *dt= getenv("DT");
+                if(dt) cs.Dt = atof(dt);
             }
         }
         ~EntropyCalc() { 

@@ -96,7 +96,7 @@ namespace srm {
                         TTime &yn = stoch_elem[ni]->y;
                         Log::Info << "spike of " << ni << " at " << t(ti) << "\n";
                         // spike!
-                        yn.push_back(t(ti));
+            //            yn.push_back(t(ti));
                         sg.addStat(stoch_elem[ni], TStatListener::Spike, t(ti));
                     }
                     sg.addStat(stoch_elem[ni], TStatListener::Prob, pi);
