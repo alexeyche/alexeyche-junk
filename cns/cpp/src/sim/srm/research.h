@@ -25,16 +25,16 @@ namespace srm {
         double p = 1;
 //        Log::Info << "Surv.function of " << n->id() << "\n";
 //        Log::Info << t_left << "|      ";
-      for(size_t yi=0; yi<n->y.size(); yi++) {
-          double t_right = n->y[yi];
-          double no_spike = exp(-DEIntegrator<double>::Integrate(n, &prob, t_left, t_right-0.01, 1e-03));
-          double spike = 1-exp(-prob(t_right, n));
+        for(size_t yi=0; yi<n->y.size(); yi++) {
+            double t_right = n->y[yi];
+            double no_spike = exp(-DEIntegrator<double>::Integrate(n, &prob, t_left, t_right-0.001, 1e-06));
+            double spike = 1-exp(-prob(t_right, n));
 //            Log::Info << "p:" << no_spike << "     |spike t:" << t_right << " p:" << spike << "|     ";
-          p = p*no_spike*spike;
-          t_left = t_right+0.01;
-      }
-      double no_spike = exp(-DEIntegrator<double>::Integrate(n, &prob, t_left, Tmax, 1e-03));
-      p = p*no_spike;
+            p = p*no_spike*spike;
+            t_left = t_right+0.001;
+        }
+        double no_spike = exp(-DEIntegrator<double>::Integrate(n, &prob, t_left, Tmax, 1e-06));
+        p = p*no_spike;
 //        Log::Info << no_spike << "|" << Tmax << "\n";
 //        Log::Info << "p = " << p << "\n";
         return p;

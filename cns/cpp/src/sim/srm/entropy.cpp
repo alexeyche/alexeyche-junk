@@ -92,7 +92,27 @@ namespace srm {
             return p*log(p);
         }            
     }
-
+    double EntropyCalc::run(int dim = DIM_MAX) {
+        double int_full = 0;
+        double p0 = survFunction(neuron, T0, Tmax);
+        int_full += p0*log(p0);
+        for(int n_calc= 1; n_calc<=dim; n_calc++) { 
+            neuron->y.clean();
+            for(size_t ni=0; ni<n_calc; ni++) {
+                neuron->y.push_back(T0);
+            }
+            int verbose, comp, nregions, neval, fail;
+            double integral, error, prob;
+            n = n_calc;
+            
+            cs.MaxEval = 3000; 
+            cs.EpsAbs = 1e-06;
+            Vegas(n_calc, 1, Integrand, this, cs.EpsRel, cs.EpsAbs, cuba_verbose, 0, cs.MinEval, cs.MaxEval, cs.NStart, cs.NIncrease, cs.NBatch, cs.GridNo, NULL, &neval, &fail, &integral, &error, &prob);           
+            int_full += integral;
+        } 
+        return int_full;
+    }
+    
     double EntropyCalc::IntPerfomance() {
        
         if(cs.method == "Vegas") {

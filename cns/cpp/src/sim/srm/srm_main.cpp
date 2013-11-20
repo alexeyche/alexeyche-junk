@@ -54,7 +54,7 @@ int main(int argc, char** argv)
         Log::Info << "from " << tt << " to " << tt+20 << "\n"; 
         EntropyCalc ec(n, tt, tt+20);
         part_int += ec.IntPerfomance();
-    }    
+    }
     Log::Info << "part_int: " << part_int << "\n";               
     Log::Info << "delta: " << full_int - part_int << "\n";        
 //    Timer::Start("perf");
