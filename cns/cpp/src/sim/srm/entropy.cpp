@@ -22,7 +22,7 @@ namespace srm {
         }                       
         survFunctionSeq(ec->neuron, ec->T0, ec->Tmax, pp);
         for(size_t ci=0; ci< *ncomp; ci++) {
-            ff[ci] = pp[ci]*log(pp[ci])*(ec->Tmax - ec->T0);           
+            ff[ci] = -pp[ci]*log(pp[ci])*(ec->Tmax - ec->T0);           
         }            
         
         if(ec->cs.VerboseInt) {
@@ -52,7 +52,7 @@ namespace srm {
         }                       
         double p = survFunction(ec->neuron, ec->T0, ec->Tmax);
         if(p == 0) { ff[0] = 0; return 0; } 
-        ff[0] = p*log(p);
+        ff[0] = -p*log(p);
          
         if(ec->cs.VerboseInt) {
             printf("survFunction for y = [ ");
@@ -89,13 +89,13 @@ namespace srm {
             if(p == 0) {
                 return 0;
             }
-            return p*log(p);
+            return -p*log(p);
         }            
     }
     double EntropyCalc::run(int dim = DIM_MAX) {
         double int_full = 0;
         double p0 = survFunction(neuron, T0, Tmax);
-        int_full += p0*log(p0);
+        int_full += -p0*log(p0);
         for(int n_calc= 1; n_calc<=dim; n_calc++) { 
             neuron->y.clean();
             for(size_t ni=0; ni<n_calc; ni++) {
@@ -105,8 +105,8 @@ namespace srm {
             double integral, error, prob;
             n = n_calc;
             
-            cs.MaxEval = 3000; 
-            cs.EpsAbs = 1e-06;
+            cs.MaxEval = 1000; 
+            cs.EpsAbs = 1e-03;
             Vegas(n_calc, 1, Integrand, this, cs.EpsRel, cs.EpsAbs, cuba_verbose, 0, cs.MinEval, cs.MaxEval, cs.NStart, cs.NIncrease, cs.NBatch, cs.GridNo, NULL, &neval, &fail, &integral, &error, &prob);           
             int_full += integral;
         } 

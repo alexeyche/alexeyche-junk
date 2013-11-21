@@ -5,6 +5,10 @@
 #include <sim/data/load.h>
 #include <sim/socket/sim_socket_core.h>
 
+
+#include <functional>
+#include "memoize.h"
+
 namespace srm {
     struct SrmException : public std::exception
     {
@@ -90,7 +94,7 @@ namespace srm {
         bool isNeedPreCalc() {
             return needPreCalc;
         }
-        virtual void preCalculate(double Tmax, double dt) {}
+        virtual void preCalculate(double T0, double Tmax, double dt) {}
     private:
         bool needPreCalc;
     };
@@ -108,14 +112,14 @@ namespace srm {
         
         void add_input(Neuron *n, double w_n) {
            in.push_back(n);
-           w.set_size(w.n_elem+1);
-           w(w.n_elem-1) = w_n;
+           w.push_back(w_n);
         }
+        
         TTime* get_y() {
             return &y;
         }
 
-        vec w;
+        std::vector<double> w;
         TInput in; 
         TTime y;
     private:                
@@ -138,6 +142,7 @@ namespace srm {
     public:
         StochasticNeuron() {}
         StochasticNeuron(StochasticNeuron *n) : Neuron(n) {}
+        virtual double u (const double &t) = 0;
         virtual double p (const double &t) = 0;
     };
 
@@ -150,9 +155,10 @@ namespace srm {
         }
         double rate;        
     };
-
+        
 
     class SrmNeuron : public StochasticNeuron {
+    #define WORK_WINDOW 40 
     public:
         static constexpr double ts = 3;  // ms
         static constexpr double tm = 10; // ms
@@ -178,9 +184,11 @@ namespace srm {
         }
         
         
-        SrmNeuron() {}
-        SrmNeuron(SrmNeuron *n) :  StochasticNeuron(n) {}
-
+        SrmNeuron() {
+        }
+        SrmNeuron(SrmNeuron *n) :  StochasticNeuron(n) {
+        }
+    
         static constexpr double u_rest = -70; //mV
         static constexpr double alpha = 1;
         static constexpr double beta = 1;
@@ -189,10 +197,14 @@ namespace srm {
         double u(const double &t) {
             double epsp_pot = 0;
             for(size_t i=0; i<in.size(); i++) {
-                for(size_t j=0; j< in[i]->y.n_elem(t); j++) {
-//                    Log::Info << "epsp_pot: " << epsp_pot; 
+                for(int j=(in[i]->y.n_elem(t)-1); j>=0; j--) {
+//                    Log::Info << "epsp_pot: " << epsp_pot;
 //                    Log::Info << " w:" << w[i] << " t:"  << t << " in.y(j):" << in[i]->y(j) << " y:"  << y.last() << "\n";
-                    epsp_pot += w(i)*epsp(t, in[i]->y(j), y.last(t-0.001));
+                    if( (t - in[i]->y(j)) > WORK_WINDOW) {
+//                        Log::Info << "ignoring: " << epsp(t, in[i]->y(j), y.last(t-0.001)) << "\n";   
+                        continue;
+                    }                        
+                    epsp_pot += w[i]*epsp(t, in[i]->y(j), y.last(t-0.001));
                 }
             }
             double nu_pot = 0;
@@ -206,6 +218,7 @@ namespace srm {
             double uc = u(t);
             return (beta/alpha)*(log(1+exp(alpha*(tresh-uc))) - alpha*(tresh-uc));
         }    
+        
     };
 
 }

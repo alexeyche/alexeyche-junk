@@ -25,52 +25,33 @@ int main(int argc, char** argv)
     SrmNeuron* n = new SrmNeuron();
 
     double w_start = 3;
-    n->add_input(new DetermenisticNeuron("3  10 11 12"), w_start);
-    n->add_input(new DetermenisticNeuron("4  13 14 15"), w_start);
-    n->add_input(new DetermenisticNeuron("5  15 16 17"), w_start);
-    n->add_input(new DetermenisticNeuron("6 "), w_start);
-    n->add_input(new DetermenisticNeuron("7 "), w_start);
-    n->add_input(new DetermenisticNeuron("8 "), w_start);
+//    n->add_input(new DetermenisticNeuron("3  10 11 12"), w_start);
+//    n->add_input(new DetermenisticNeuron("4  13 14 15"), w_start);
+//    n->add_input(new DetermenisticNeuron("5  15 16 17"), w_start);
+//    n->add_input(new DetermenisticNeuron("6 "), w_start);
+//    n->add_input(new DetermenisticNeuron("7 "), w_start);
+//    n->add_input(new DetermenisticNeuron("8 "), w_start);
     
-//    TimeSeriesGroup g(100, 0*ms, 100); 
-//    g.loadPatternFromFile("/var/tmp/d1.csv", 100*ms, 100);
-//    send_arma_mat(g.patterns[0].pattern, "d1_stat");
+    TimeSeriesGroup g(100, 0*ms, 100); 
+    g.loadPatternFromFile("/var/tmp/d1.csv", 500*ms, 100);
+    send_arma_mat(g.patterns[0].pattern, "d1_stat");
 //    g.loadPatternFromFile("/var/tmp/d2.csv", 100*ms, 0.5);
 //    send_arma_mat(g.patterns[1].pattern, "d2_stat");
- //   srm::connectFeedForward(&g, n, 0.3);
+    srm::connectFeedForward(&g, n, 1);
     
-//    s.addNeuronGroup(&g);
+    s.addNeuronGroup(&g);
     s.addNeuron(n);
-//    s.addStatListener(n, TStatListener::Spike);
-    s.addStatListener(n, TStatListener::Prob);
-//    s.run(40*ms);
-    
-    EntropyCalc ec_full(n, 0, 100);
-    double full_int = ec_full.IntPerfomance();
-    Log::Info << "full_int: " << full_int << "\n";               
 
-    double part_int = 0;
-    for(double tt = 0; tt<100; tt += 20) {
-        Log::Info << "from " << tt << " to " << tt+20 << "\n"; 
-        EntropyCalc ec(n, tt, tt+20);
-        part_int += ec.IntPerfomance();
+//    s.addStatListener(n, TStatListener::Spike);
+    s.addStatListener(n, TStatListener::Pot);
+    s.addStatListener(n, TStatListener::Prob);
+    s.run(100*ms, 0.5);
+    double Hall =0 ;
+    for(double T=0; T<80; T+=20) {
+        EntropyCalc ec(n,T, T+20);    
+        double H = ec.run(2);
+        Hall += H;
+        Log::Info <<  "H = " << H << "\n"; 
     }
-    Log::Info << "part_int: " << part_int << "\n";               
-    Log::Info << "delta: " << full_int - part_int << "\n";        
-//    Timer::Start("perf");
-//    Timer::Stop("perf");
-    
-//    vec pp(100);
-//    for(size_t num=0; num<100; num++) {        
-//        double t_run = 0.05*sec;
-//        s.run(t_run);
-//        pp(num) = survFunction(t_run, n);
-//        n->y.clean();
-//    }        
-//    send_arma_mat(pp, "pp");
-//    for(size_t ni=0; ni<s.stoch_elem.size(); ni++) {
-//        Log::Info << "id: " << s.stoch_elem[ni]->id() << "\n";
-//        s.stoch_elem[ni]->y.print();
-//    }
 }
 
