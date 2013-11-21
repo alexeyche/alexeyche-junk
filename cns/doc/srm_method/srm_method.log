@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2013.6.10)  20 NOV 2013 22:30
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2013.6.10)  21 NOV 2013 23:21
 entering extended mode
  %&-line parsing enabled.
 **srm_method.tex
@@ -174,7 +174,14 @@ Package graphics Info: Driver file: pdftex.def on input line 91.
 )
 (/usr/share/texmf-texlive/tex/latex/tools/indentfirst.sty
 Package: indentfirst 1995/11/23 v1.03 Indent first paragraph (DPC)
-) (./srm_method.aux)
+) (./srm_method.aux
+
+LaTeX Warning: Label `eq:p_y' multiply defined.
+
+
+LaTeX Warning: Label `eq:p_y' multiply defined.
+
+)
 \openout1 = `srm_method.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 15.
@@ -191,8 +198,7 @@ LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 15.
 LaTeX Font Info:    ... okay on input line 15.
 LaTeX Font Info:    Checking defaults for T2A/cmr/m/n on input line 15.
 LaTeX Font Info:    ... okay on input line 15.
-
-(/usr/share/texmf-texlive/tex/latex/ucs/ucsencs.def
+ (/usr/share/texmf-texlive/tex/latex/ucs/ucsencs.def
 File: ucsencs.def 2003/11/29 Fixes to fontencodings LGR, T3
 )
 (/usr/share/texmf-texlive/tex/context/base/supp-pdf.mkii
@@ -218,47 +224,59 @@ File: nu.png Graphic file (type png)
  <use nu.png> [1
 
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map} <./epsp.png (PNG copy)>]
-Underfull \hbox (badness 10000) in paragraph at lines 44--45
+Underfull \hbox (badness 10000) in paragraph at lines 45--46
 
  []
 
-LaTeX Font Info:    Try loading font information for OMS+cmr on input line 46.
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 47.
 (/usr/share/texmf-texlive/tex/latex/base/omscmr.fd
 File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 46.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 47.
 
-Underfull \hbox (badness 10000) in paragraph at lines 46--47
+Underfull \hbox (badness 10000) in paragraph at lines 47--48
 
  []
 
 [2 <./nu.png (PNG copy)>] <u_srm.png, id=28, 678.535pt x 628.3475pt>
 File: u_srm.png Graphic file (type png)
 
-<use u_srm.png> [3 <./u_srm.png (PNG copy)>] (./srm_method.aux) ) 
+<use u_srm.png> <p_srm.png, id=29, 678.535pt x 628.3475pt>
+File: p_srm.png Graphic file (type png)
+ <use p_srm.png>
+[3 <./u_srm.png (PNG copy)>]
+Underfull \hbox (badness 10000) in paragraph at lines 76--78
+
+ []
+
+[4 <./p_srm.png (PNG copy)>] [5] (./srm_method.aux)
+
+LaTeX Warning: There were multiply-defined labels.
+
+ ) 
 Here is how much of TeX's memory you used:
- 3466 strings out of 494818
- 42010 string characters out of 1178666
- 98753 words of memory out of 3000000
- 6602 multiletter control sequences out of 15000+50000
+ 3473 strings out of 494818
+ 42093 string characters out of 1178666
+ 98807 words of memory out of 3000000
+ 6608 multiletter control sequences out of 15000+50000
  8206 words of font info for 21 fonts, out of 3000000 for 9000
  212 hyphenation exceptions out of 8191
- 27i,7n,24p,1167b,619s stack positions out of 5000i,500n,10000p,200000b,50000s
- </home/alexey
-che/.texmf-var/fonts/pk/ljfour/lh/lh-t2a/lati1000.600pk> </home/alexeyche/.texm
-f-var/fonts/pk/ljfour/lh/lh-t2a/larm1000.600pk> </home/alexeyche/.texmf-var/fon
-ts/pk/ljfour/lh/lh-t2a/labx1000.600pk> </home/alexeyche/.texmf-var/fonts/pk/ljf
-our/lh/lh-t2a/labx1440.600pk></usr/share/texmf-texlive/fonts/type1/public/amsfo
-nts/cm/cmex10.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmmi
-10.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmmi5.pfb></usr
-/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/share/texmf
--texlive/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texmf-texlive/fon
-ts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texmf-texlive/fonts/type1/publ
-ic/amsfonts/cm/cmsy10.pfb>
-Output written on srm_method.pdf (3 pages, 151504 bytes).
+ 27i,7n,24p,1175b,619s stack positions out of 5000i,500n,10000p,200000b,50000s
+ </home/alexeyche/.texmf-var/fonts/pk/ljfour/lh/lh-t2a/lati1000.600pk> </home
+/alexeyche/.texmf-var/fonts/pk/ljfour/lh/lh-t2a/larm1000.600pk> </home/alexeych
+e/.texmf-var/fonts/pk/ljfour/lh/lh-t2a/labx1000.600pk> </home/alexeyche/.texmf-
+var/fonts/pk/ljfour/lh/lh-t2a/labx1440.600pk></usr/share/texmf-texlive/fonts/ty
+pe1/public/amsfonts/cm/cmex10.pfb></usr/share/texmf-texlive/fonts/type1/public/
+amsfonts/cm/cmmi10.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm
+/cmmi5.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmmi7.pfb><
+/usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/t
+exmf-texlive/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texmf-texlive/
+fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texmf-texlive/fonts/type1
+/public/amsfonts/cm/cmsy7.pfb>
+Output written on srm_method.pdf (5 pages, 187815 bytes).
 PDF statistics:
- 188 PDF objects out of 1000 (max. 8388607)
+ 240 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
- 36 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 41 words of extra memory for PDF output out of 10000 (max. 10000000)
 

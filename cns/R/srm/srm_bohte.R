@@ -8,11 +8,11 @@ epsp <-Vectorize(function(t, fj, fi) {
 }) # t - s = t-fj - t+fi; min(t-fi, t-fj)
 
 test_epsp <- function() {
-  t<-seq(10,30, length.out=500)
+  t<-seq(10,100, length.out=500)
   e <- c(); fi <- -Inf; fi_spike <- 19
   for(ti in t) {
-    if(ti >= fi_spike) { fi <- fi_spike }
-    e <- c(e, epsp(ti,18, fi))
+  #  if(ti >= fi_spike) { fi <- fi_spike }
+    e <- c(e, epsp(ti,18, -Inf))
   }
   plot(t,e, type="l")
 }  
