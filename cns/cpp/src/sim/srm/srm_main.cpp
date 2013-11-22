@@ -46,12 +46,12 @@ int main(int argc, char** argv)
     s.addStatListener(n, TStatListener::Pot);
     s.addStatListener(n, TStatListener::Prob);
     s.run(100*ms, 0.5);
-    double Hall =0 ;
-    for(double T=0; T<80; T+=20) {
-        EntropyCalc ec(n,T, T+20);    
-        double H = ec.run(2);
-        Hall += H;
-        Log::Info <<  "H = " << H << "\n"; 
-    }
+//    double Hall =0 ;
+//    for(double T=0; T<80; T+=20) {
+//        EntropyCalc ec(n,T, T+20);    
+//        double H = ec.run(2);
+//        Hall += H;
+//        Log::Info <<  "H = " << H << "\n"; 
+//    }
 }
 

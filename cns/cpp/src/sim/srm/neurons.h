@@ -158,7 +158,8 @@ namespace srm {
         
 
     class SrmNeuron : public StochasticNeuron {
-    #define WORK_WINDOW 40 
+    #define EPSP_WORK_WINDOW 40 
+    #define NU_WORK_WINDOW 40
     public:
         static constexpr double ts = 3;  // ms
         static constexpr double tm = 10; // ms
@@ -184,10 +185,8 @@ namespace srm {
         }
         
         
-        SrmNeuron() {
-        }
-        SrmNeuron(SrmNeuron *n) :  StochasticNeuron(n) {
-        }
+        SrmNeuron() { }
+        SrmNeuron(SrmNeuron *n) :  StochasticNeuron(n) { }
     
         static constexpr double u_rest = -70; //mV
         static constexpr double alpha = 1;
@@ -196,19 +195,25 @@ namespace srm {
 
         double u(const double &t) {
             double epsp_pot = 0;
+            
+            double &y_last = y.last(t-0.001);
             for(size_t i=0; i<in.size(); i++) {
                 for(int j=(in[i]->y.n_elem(t)-1); j>=0; j--) {
 //                    Log::Info << "epsp_pot: " << epsp_pot;
 //                    Log::Info << " w:" << w[i] << " t:"  << t << " in.y(j):" << in[i]->y(j) << " y:"  << y.last() << "\n";
-                    if( (t - in[i]->y(j)) > WORK_WINDOW) {
-//                        Log::Info << "ignoring: " << epsp(t, in[i]->y(j), y.last(t-0.001)) << "\n";   
+                    if( (t - in[i]->y(j)) > EPSP_WORK_WINDOW) {
+//                        Log::Info << "epsp ignoring: " << epsp(t, in[i]->y(j), y.last(t-0.001)) << "\n";   
                         continue;
                     }                        
-                    epsp_pot += w[i]*epsp(t, in[i]->y(j), y.last(t-0.001));
+                    epsp_pot += w[i]*epsp(t, in[i]->y(j), y_last);
                 }
             }
             double nu_pot = 0;
-            for(size_t i=0; i<y.n_elem(t-0.001); i++) {
+            for(int i = (y.n_elem(t-0.001)-1); i>=0; i--) {
+                if( (t-y(i)) > NU_WORK_WINDOW ) {
+//                    Log::Info << "nu ignoring(" << t << ": " << nu(t, y(i)) << "\n";
+                    break;
+                }                    
                 nu_pot += nu(t, y(i));
             }
             return u_rest + epsp_pot + nu_pot;
@@ -217,7 +222,7 @@ namespace srm {
         double p(const double &t) {
             double uc = u(t);
             return (beta/alpha)*(log(1+exp(alpha*(tresh-uc))) - alpha*(tresh-uc));
-        }    
+        }
         
     };
 
