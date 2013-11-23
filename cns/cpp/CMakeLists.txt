@@ -15,7 +15,7 @@ option(ARMA_EXTRA_DEBUG "Compile with extra Armadillo debugging symbols." OFF)
 # output for -Wall, so only -Wall and -Wextra on GCC.
 if(CMAKE_COMPILER_IS_GNUCC)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ")
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
 endif(CMAKE_COMPILER_IS_GNUCC)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")

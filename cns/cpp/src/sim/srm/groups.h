@@ -2,6 +2,7 @@
 #define GROUPS_H
 
 #include "neurons.h"
+#include <limits>
 
 namespace srm {
     class NeuronGroup : public SimElement { 
@@ -14,10 +15,11 @@ namespace srm {
     class TimeSeriesGroup : public NeuronGroup {
     public:    
         struct TPattern {
-            TPattern(size_t group_n, size_t n, double prob, double dur) : pattern(group_n, n, fill::zeros), pattProb(prob), pattDur(dur) {}
+            TPattern(size_t group_n, size_t n, double prob, double dur) : pattern(group_n, n, fill::zeros), pattProb(prob), pattDur(dur), dt(pattDur/n) {}
             mat pattern;
             double pattProb;
             double pattDur;
+            double dt;
         };
         TimeSeriesGroup(size_t n, double refr, double pattProb) : NeuronGroup(true), refrTime(refr), pattProb(pattProb) { 
             for(size_t gi=0; gi<n; gi++) {
@@ -49,7 +51,7 @@ namespace srm {
             }
             patterns.push_back(p);
         }
-        void preCalculate(double Tmax, double dt) {
+        void preCalculate(double T0, double Tmax, double dt) {
             Log::Info << "Precalculating TimeSeriesGroup\n"; 
             vec mean_rate(group.size(), fill::zeros);
             for(size_t pi=0; pi<patterns.size(); pi++) {
@@ -61,7 +63,7 @@ namespace srm {
             vec unif(t.n_elem, fill::randu);
             double refrTime_cur = 0;
             int patt_id=-1; // pattern that we choosed
-            size_t patt_ti=0;  // current pattern time id
+            double patt_ti=0;  // current pattern time id
             for(size_t ti=0; ti<t.n_elem; ti++) {
                 if (refrTime_cur > 0) { 
                     refrTime_cur -= dt;
@@ -96,11 +98,16 @@ namespace srm {
                         refrTime_cur = refrTime;
                         continue;
                     }
-                    uvec fired = find(pattern.col(patt_ti)>0);
-                    for(size_t fi=0; fi<fired.n_elem; fi++) {
-                        group[fired(fi)]->y.push_back(t(ti));
+                    
+                    double patt_index = patt_ti/patterns[patt_id].dt;
+                    int patt_index_int = floor(patt_index+0.001); 
+                    if( patt_index - patt_index_int < 1e-10) {  //machine precision stuff
+                        uvec fired = find(pattern.col(patt_index_int)>0);
+                        for(size_t fi=0; fi<fired.n_elem; fi++) {
+                            group[fired(fi)]->y.push_back(t(ti));
+                        }
                     }
-                    patt_ti++;
+                    patt_ti+=dt;
                 }                    
             }
         }

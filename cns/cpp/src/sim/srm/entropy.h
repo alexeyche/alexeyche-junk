@@ -57,7 +57,6 @@ namespace srm {
             const char *verb_int = getenv("VERBOSE_INT");
             if(verb_int) cs.VerboseInt = true;
 
-
             if( env_verb ) cuba_verbose = atoi(env_verb);
             const char *mineval = getenv("CUBA_MINEVAL");
             const char *maxeval = getenv("CUBA_MAXEVAL");
@@ -119,7 +118,7 @@ namespace srm {
         ~EntropyCalc() { 
         }
 //        double run(size_t n_calc);
-        double run();
+        double run(int dim);
         double IntPerfomance();
         static int IntegrandFull(const int *ndim, const double xx[], const int *ncomp, double ff[], void *userdata);
         static int Integrand(const int *ndim, const double xx[], const int *ncomp, double ff[], void *userdata);

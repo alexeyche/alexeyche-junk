@@ -14,6 +14,7 @@ set(DIRS
     lookup
     srm
     int
+    spike
     )
 
 foreach(dir ${DIRS})

@@ -5,7 +5,12 @@
 #include <sim/int/DEIntegrator.h>
 #include <sim/int/simple_int.h>
 
+#include "sim.h"
 #include "neurons.h"
+#include "research.h"
+#include "entropy.h"
+#include "groups.h"
+#include "connections.h"
 
 void epsp_test(bool just_print = false) {
     double Tmax = 100;
@@ -230,6 +235,68 @@ void testf1() {
     }
 }
 
+void test_integral_calc() {
+    srm::SrmNeuron n;
+
+    double w_start = 3;
+    n.add_input(new srm::DetermenisticNeuron("3  10 11 12"), w_start);
+    n.add_input(new srm::DetermenisticNeuron("4  13 14 15"), w_start);
+    n.add_input(new srm::DetermenisticNeuron("5  15 16 17"), w_start);
+    n.add_input(new srm::DetermenisticNeuron("6 "), w_start);
+    n.add_input(new srm::DetermenisticNeuron("7 "), w_start);
+    n.add_input(new srm::DetermenisticNeuron("8 "), w_start);
+    n.y.clean();
+
+    double pfull = survFunction(&n, 0 , 100);
+    Log::Info << "full: p[0,100] = " << pfull << "    H[0,100] = " << pfull*log(pfull) << "\n";
+    double ppart = 1;
+    for(double tr=0; tr<100; tr+=20) {
+        double p = survFunction(&n, tr, tr+20);
+        Log::Info << "p[" << tr << "," << tr+20 << "] = " << p << "    H[" << tr << "," << tr+20 << "] = " << p*log(p) << "\n";
+        ppart *= p;
+    }
+    Log::Info << "part: p[0,100] = " << ppart <<  "    Hpart[0,100] = " << ppart*log(ppart) <<"\n";
+    Log::Info << "delta: " << pfull - ppart << "\n";
+}
+
+void test_entropy_surface() {
+    srm::SrmNeuron n;
+    for(size_t i=0; i<2; i++) {
+        srm::SrmNeuron* inp_n = new srm::SrmNeuron();
+        n.add_input(inp_n, 70);
+    }
+//    srm::TimeSeriesGroup g(2, 0, 100); 
+//    g.loadPatternFromFile("/var/tmp/d1.csv", 100, 100);
+//    srm::connectFeedForward(&g, &n, 0.3);
+
+    n.in[0]->y.push_back(6);
+    n.in[1]->y.push_back(15);
+    n.in[1]->y.push_back(38);
+
+    double dt=1;
+    vec w1 = linspace<vec>(0, 30, (int)5/dt);
+    vec w2 = linspace<vec>(0, 30, (int)5/dt);
+   
+    double Tmax_all=50;
+    unsigned int i = 0;
+    for(double Tmax=10; Tmax<=Tmax_all; Tmax+=10) {
+        mat H_stat(w1.n_elem, w2.n_elem);
+        for(size_t wi1=0; wi1<w1.n_elem; wi1++) {
+           for(size_t wi2=0; wi2<w2.n_elem; wi2++) {
+                n.w(0) =  w1(wi1); 
+                n.w(1) =  w2(wi2); 
+                srm::EntropyCalc ec(&n, Tmax-10, Tmax);
+                double H = ec.run(4);
+                Log::Info << "w1: " << n.w(0) << " w2: " << n.w(1) << " H = " << H << "\n";
+                H_stat(wi1, wi2) = H;
+           }
+        }       
+        send_arma_mat(H_stat, "H_stat", &i);
+        i++;
+    }        
+}
+
+
 PROGRAM_INFO("SIM TEST", "sim tests"); 
 PARAM_STRING("test", "name for test. default \"all\"", "t", "all");
 PARAM_FLAG("nosend", "if it true. no sending to R", "n");
@@ -281,6 +348,19 @@ int main(int argc, char** argv) {
         testf1();
         Log::Info << "===============================================================" << std::endl;
     }
+    if((test_name == "all") || (test_name == "integral_calc")) {
+        Log::Info << "integral_calc: " << std::endl;
+        Log::Info << "===============================================================" << std::endl;
+        test_integral_calc();
+        Log::Info << "===============================================================" << std::endl;
+    }
+    if((test_name == "all") || (test_name == "entropy_surface")) {
+        Log::Info << "entropy_surface: " << std::endl;
+        Log::Info << "===============================================================" << std::endl;
+        test_entropy_surface();
+        Log::Info << "===============================================================" << std::endl;
+    }
+    
     return 0;
 }
 

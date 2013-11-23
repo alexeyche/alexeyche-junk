@@ -6,7 +6,7 @@ epsp <- Vectorize(function(s) {
   if(s<0) { return(0) }
   e0*(exp(-s/tm)-exp(-s/ts))
 })
-nu0 <- -5 # mV
+nu0 <- -150 # mV
 nu <- Vectorize(function(s) {
   if(s<0) { return(0)}
   nu0*exp(-s/tm)

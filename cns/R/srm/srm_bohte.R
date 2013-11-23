@@ -8,11 +8,11 @@ epsp <-Vectorize(function(t, fj, fi) {
 }) # t - s = t-fj - t+fi; min(t-fi, t-fj)
 
 test_epsp <- function() {
-  t<-seq(10,30, length.out=500)
-  e <- c(); fi <- -Inf; fi_spike <- 20
+  t<-seq(10,100, length.out=500)
+  e <- c(); fi <- -Inf; fi_spike <- 19
   for(ti in t) {
-    if(ti >= fi_spike) { fi <- fi_spike }
-    e <- c(e, epsp(ti,18, fi))
+  #  if(ti >= fi_spike) { fi <- fi_spike }
+    e <- c(e, epsp(ti,18, -Inf))
   }
   plot(t,e, type="l")
 }  
@@ -57,7 +57,22 @@ u_srm <- function(t, x, y) {
   }
   u_rest + e_syn + sum(nu(t-y))
 }
-
+plot_u_srm <- function() {
+    x <- list()
+    x[[1]] <- c(10,16)
+    x[[2]] <- c(15,20)
+    w <- matrix(30, ncol=2, nrow=1)
+    y <- c(-Inf)
+    uu <- c()
+    t <- seq(0,100, by=0.1)
+    for(i in t) {
+        if(i > 21) {
+            y <- c(-Inf, 21)
+        }
+        uu <- c(uu, u_srm(i,x,y))
+    }
+    plot(t, uu, type="l", ylim=c(-90,-20), xlab="t (мс)", ylab="u(t) (мВ)")
+}
 run_srm <- function(x,y, T=50, dt=0.1) {
   y <- c(-Inf)
   uall <- c()
