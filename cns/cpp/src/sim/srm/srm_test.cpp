@@ -398,6 +398,81 @@ void test_entropy_surface() {
     }        
 }
 
+double break_apart_int(srm::SrmNeuron *n, double T0, double Tmax, double dt) {
+    double t;
+    double integral = 0;
+    for(t=T0; t<Tmax; t+=dt) {
+        double t_right = t+dt;
+        double t_left = t;
+        if(t_right>Tmax) { t_right = Tmax; t=datum::inf; } 
+            
+//        double integral_cur = int_brute<srm::SrmNeuron>(t_left, t_right, 0.000001, n, &srm::prob);
+        double integral_cur = gauss_legendre(1024, integrand_gl, (void*)n, t_left, t_right);
+
+        Log::Info << "integral at " << t_left << ":" << t_right << " = " << integral_cur << "\n";
+        integral += integral_cur;
+    }
+    return integral;
+}
+
+
+double surv0(srm::SrmNeuron *n, double T0, double Tmax) {
+    double integral = 0;
+    double t_left = T0;
+    for(size_t yi=0; yi<n->y.size(); yi++) {
+        double t_right = n->y[yi];
+        double integral_cur = break_apart_int(n, t_left, t_right, 3); //int_brute<srm::SrmNeuron>(t_left, t_right, 0.00001, n, &srm::prob);
+//        Log::Info << "integral at " << t_left << ":" << t_right << " = " << integral_cur << "\n";
+        integral += integral_cur;
+        t_left = t_right;
+    }
+    double integral_cur = break_apart_int(n, t_left, Tmax, 3); //int_brute<srm::SrmNeuron>(t_left, Tmax, 0.00001, n, &srm::prob);
+    integral += integral_cur;
+//    Log::Info << "integral at " << t_left << ":" << Tmax << " = " << integral_cur << "\n";
+    Log::Info << "integral whole = " << integral << "\n";
+}
+
+double surv1(srm::SrmNeuron *n, double T0, double Tmax) {
+    double no_spike = break_apart_int(n, T0, Tmax, 2); //int_brute<srm::SrmNeuron>(T0, Tmax, 0.00001, n, &srm::prob);
+    Log::Info << "integral at whole = " << no_spike << "\n";
+//    for(size_t yi=0; yi<n->y.size(); yi++) {
+//        double t_right = n->y[yi];
+//        Log::Info << "integral at " << t_left << ":" << t_right << " = " << integral_cur << "\n";
+//        integral += integral_cur;
+//        t_left = t_right;
+//    }
+//    double integral_cur = int_brute<srm::SrmNeuron>(t_left, Tmax, 0.00001, n, &srm::prob);
+//    Log::Info << "integral at " << t_left << ":" << Tmax << " = " << integral_cur << "\n";
+//    Log::Info << "integral whole = " << integral << "\n";
+}
+void test_surv_func() {
+    std::srand(time(NULL));
+    srm::SrmNeuron n;
+    srm::Sim s;
+    double w_start = 4;
+    n.add_input(new srm::DetermenisticNeuron("3 4 10 11 12"), w_start);
+    n.add_input(new srm::DetermenisticNeuron("4 5 13 14 15"), w_start);
+    n.add_input(new srm::DetermenisticNeuron("5 6 15 16 17"), w_start);
+    n.add_input(new srm::DetermenisticNeuron("6 7 "), w_start);
+    n.add_input(new srm::DetermenisticNeuron("7 8"), w_start);
+    n.add_input(new srm::DetermenisticNeuron("8 9"), w_start);
+    
+    s.addNeuron(&n);
+    s.run(50*srm::ms, 0.1); 
+    vec n_prob(50/0.1);
+    size_t i=0;
+    for(double t=0; t<50; t+=0.1) {
+        n_prob(i) = n.p(t);
+        i++;
+    }
+    send_arma_mat(n_prob, "n_prob");
+    Log::Info << "///////////////////////////////////////////\n";
+    surv0(&n, 0, 50); 
+    Log::Info << "///////////////////////////////////////////\n";
+    surv1(&n, 0, 50); 
+    Log::Info << "///////////////////////////////////////////\n";
+
+}
 
 PROGRAM_INFO("SIM TEST", "sim tests"); 
 PARAM_STRING("test", "name for test. default \"all\"", "t", "all");
@@ -466,6 +541,12 @@ int main(int argc, char** argv) {
         Log::Info << "int_calc2:" << std::endl;
         Log::Info << "===============================================================" << std::endl;
         test_int_calc2();
+        Log::Info << "===============================================================" << std::endl;
+    }
+    if((test_name == "all") || (test_name == "surv_func")) {
+        Log::Info << "int_calc2:" << std::endl;
+        Log::Info << "===============================================================" << std::endl;
+        test_surv_func();
         Log::Info << "===============================================================" << std::endl;
     }
    
