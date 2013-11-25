@@ -4,6 +4,7 @@
 #include <sim/socket/sim_socket_core.h>
 #include <sim/int/DEIntegrator.h>
 #include <sim/int/simple_int.h>
+#include <sim/int/gauss_legendre.c>
 
 #include "sim.h"
 #include "neurons.h"
@@ -146,9 +147,9 @@ void srm_test() {
     }
 }
 
-double prob(const double &t, srm::SrmNeuron *n) {
-   return n->p(t);
-}
+//double prob(const double &t, srm::SrmNeuron *n) {
+//   return n->p(t);
+//}
 
 
 void srm_lh_test() {
@@ -164,9 +165,9 @@ void srm_lh_test() {
     double dt=0.1;
     vec w1 = linspace<vec>(0, 500, (int)5/dt);
     vec w2 = linspace<vec>(0, 500, (int)5/dt);
-    n.w(0) = w1(0);
-    n.w(1) = w2(0);
-    n.w.print();
+    n.w[0] = w1[0];
+    n.w[1] = w2[0];
+    //n.w.print();
     
     double Tmax=100;
     mat w_de(w1.n_elem, w2.n_elem);
@@ -185,9 +186,9 @@ void srm_lh_test() {
             for(size_t wi2=0; wi2<w2.n_elem; wi2++) {
                 int eval;
                 double err;           
-                n.w(0) = wi1;
-                n.w(1) = wi2;
-                w_de_stat1(wi1, wi2) = DEIntegrator<double>::Integrate(&n, &prob, 0, Tmax, 1e-02, eval, err);
+                n.w[0] = wi1;
+                n.w[1] = wi2;
+                w_de_stat1(wi1, wi2) = DEIntegrator<double,srm::SrmNeuron*>::Integrate(&n, &srm::prob, 0, Tmax, 1e-02, eval, err);
                 w_de_stat2(wi1, wi2) = n.p(spike_time)*n.p(spike_time+25);
                 w_de_stat3(wi1, wi2) = exp(-w_de_stat1(wi1,wi2));
                 w_de(wi1, wi2) = w_de_stat2(wi1, wi2) * w_de_stat3(wi1, wi2);
@@ -227,7 +228,7 @@ void testf1() {
     double Tmax = 100;
     int eval;
     double err;
-    double pint = DEIntegrator<double>::Integrate(&n, &prob, 0, Tmax, 1e-02, eval, err);
+    double pint = DEIntegrator<double, srm::SrmNeuron*>::Integrate(&n, &srm::prob, 0, Tmax, 1e-02, eval, err);
     Log::Info << "pint: " << pint << "\n";
 
     for(size_t ni=0; ni<n.in.size(); ni++) {
@@ -236,28 +237,129 @@ void testf1() {
 }
 
 void test_integral_calc() {
+    int seed = time(NULL);
+    seed = 1385387986; 
+    Log::Info << "seed: " << seed << "\n";
+    std::srand(seed);
     srm::SrmNeuron n;
-
+    srm::Sim s;
     double w_start = 3;
-    n.add_input(new srm::DetermenisticNeuron("3  10 11 12"), w_start);
-    n.add_input(new srm::DetermenisticNeuron("4  13 14 15"), w_start);
-    n.add_input(new srm::DetermenisticNeuron("5  15 16 17"), w_start);
-    n.add_input(new srm::DetermenisticNeuron("6 "), w_start);
-    n.add_input(new srm::DetermenisticNeuron("7 "), w_start);
-    n.add_input(new srm::DetermenisticNeuron("8 "), w_start);
-    n.y.clean();
-
-    double pfull = survFunction(&n, 0 , 100);
-    Log::Info << "full: p[0,100] = " << pfull << "    H[0,100] = " << pfull*log(pfull) << "\n";
-    double ppart = 1;
+    n.add_input(new srm::DetermenisticNeuron("3 4 10 11 12"), w_start);
+    n.add_input(new srm::DetermenisticNeuron("4 5 13 14 15"), w_start);
+    n.add_input(new srm::DetermenisticNeuron("5 6 15 16 17"), w_start);
+    n.add_input(new srm::DetermenisticNeuron("6 7 "), w_start);
+    n.add_input(new srm::DetermenisticNeuron("7 8"), w_start);
+    n.add_input(new srm::DetermenisticNeuron("8 9"), w_start);
+    
+    s.addNeuron(&n);
+    s.run(50*srm::ms, 0.1); 
+    
+    double pfull = srm::survFunction(&n, 0 , 20);
+    double pfull_test = srm::survFunction__test(&n, 0 , 20);
+    Log::Info << "full: p[0,20] = " << pfull << "    H[0,20] = " << pfull*log(pfull) << "\n";
+    Log::Info << "full test: p[0,20] = " << pfull_test << "    H[0,20] = " << pfull_test*log(pfull_test) << "\n";
+    return;
+    double ppart = 0;
+    double ppart_test = 0;
     for(double tr=0; tr<100; tr+=20) {
         double p = survFunction(&n, tr, tr+20);
+        double p_test = survFunction__test(&n, tr, tr+20);
         Log::Info << "p[" << tr << "," << tr+20 << "] = " << p << "    H[" << tr << "," << tr+20 << "] = " << p*log(p) << "\n";
-        ppart *= p;
+        Log::Info << "p_test[" << tr << "," << tr+20 << "] = " << p_test << "    H_test[" << tr << "," << tr+20 << "] = " << p_test*log(p_test) << "\n";
+        ppart += p;
+        ppart_test += p_test;
     }
     Log::Info << "part: p[0,100] = " << ppart <<  "    Hpart[0,100] = " << ppart*log(ppart) <<"\n";
+    Log::Info << "part_test: p[0,100] = " << ppart_test <<  "    Hpart_test[0,100] = " << ppart_test*log(ppart_test) <<"\n";
     Log::Info << "delta: " << pfull - ppart << "\n";
+    Log::Info << "delta_test: " << pfull_test - ppart_test << "\n";
+
 }
+
+double survFunction_brute(srm::SrmNeuron *n, double T0, double Tmax) {
+    double t_right=Tmax;
+    double p = 1;
+    Log::Info << "Surv.function of " << n->id() << " (from behind)\n";
+    Log::Info << t_right << "|      ";
+    for(int yi = n->y.n_elem(Tmax)-1; yi>=0; yi--) {
+        if(n->y[yi]<T0) { break; } 
+        double t_left = n->y[yi];
+        double no_spike = exp(-int_brute<srm::SrmNeuron>(t_left+1e-12, t_right, 0.0001, n, &srm::prob));
+        double spike = 1-exp(-srm::prob(t_left, n));
+        Log::Info << "p:" << no_spike << "     |spike t:" << t_left << " p:" << spike << "|     ";
+        p = p*no_spike*spike;
+        t_right = t_left-1e-12;
+    }
+    double no_spike = exp(-int_brute<srm::SrmNeuron>(T0, t_right, 0.0001, n, &srm::prob));
+    p = p*no_spike;
+    Log::Info << no_spike << "|" << T0 << "\n";
+    Log::Info << "p = " << p << "\n";
+    return p;
+}
+
+double integrand_gl(double x, void* data) {
+    srm::SrmNeuron *n = (srm::SrmNeuron*)data;
+    return n->p(x);
+}
+
+
+void test_int_calc2() {
+    std::srand(1);
+    srm::SrmNeuron n;
+    srm::Sim s;
+    double w_start = 4;
+    n.add_input(new srm::DetermenisticNeuron("3 4 10 11 12"), w_start);
+    n.add_input(new srm::DetermenisticNeuron("4 5 13 14 15"), w_start);
+    n.add_input(new srm::DetermenisticNeuron("5 6 15 16 17"), w_start);
+    n.add_input(new srm::DetermenisticNeuron("6 7 "), w_start);
+    n.add_input(new srm::DetermenisticNeuron("7 8"), w_start);
+    n.add_input(new srm::DetermenisticNeuron("8 9"), w_start);
+    
+    s.addNeuron(&n);
+    s.run(50*srm::ms, 0.1); 
+    
+    double p_br = int_brute<srm::SrmNeuron>(0, 50, 0.00001, &n, &srm::prob);
+    double p_de = DEIntegrator<double, srm::SrmNeuron*>::Integrate(&n, &srm::prob, 0, 50, 1e-12);
+    double p_gl = 0;
+    double delta_p_gl = datum::inf;
+    int delta_n = -1;
+    double p_gl_best;
+    for(size_t i=2; i<1024; i++) {
+        p_gl = gauss_legendre(i, integrand_gl, (void*)&n, 0, 50);
+        if(p_gl > 0) {
+            Log::Info << "p_gl (" << i << ") delta: " << fabs(p_gl - p_br) << " int: " << p_gl << "\n";
+            if( fabs(p_gl - p_br) < delta_p_gl) { delta_p_gl = fabs(p_gl-p_br); delta_n = i; p_gl_best = p_gl; }
+        }            
+    }        
+    Log::Info << "p_gl (" << delta_n << ") delta: " << delta_p_gl << " int: " <<  p_gl_best << "\n";
+    Log::Info << "p_br " << p_br << "\n";
+    Log::Info << "p_de " << p_de << "\n";
+    double p_br_p = 0;
+    double p_de_p = 0;
+    double p_gl_p = 0;
+    Log::Info << "brute part: \n";
+    for(double t=0; t<50; t+=5) {
+        double pp = int_brute<srm::SrmNeuron>(t, t+5, 0.0001, &n, &srm::prob);
+        p_br_p = p_br_p+pp;
+        Log::Info << t << ":" << t+5 << " = " << pp << "\n";
+    }        
+    Log::Info << "DE part: \n";
+    for(double t=0; t<50; t+=5) {
+        double pp = DEIntegrator<double, srm::SrmNeuron*>::Integrate(&n, &srm::prob, t, t+5, 1e-12);
+        p_de_p = p_de_p+pp;
+        Log::Info << t << ":" << t+5 << " = " << pp  << "\n";
+    }        
+    Log::Info << "GL part: \n";
+    for(double t=0; t<50; t+=5) {
+        double pp = gauss_legendre(delta_n, integrand_gl, (void*)&n, t, t+5);
+        p_gl_p = p_gl_p+pp;
+        Log::Info << t << ":" << t+5 << " = " << pp  << "\n";
+    }    
+    Log::Info << "DE delta = " << p_de_p - p_de << "\n"; 
+    Log::Info << "brute delta = " << p_br_p - p_br << "\n"; 
+    Log::Info << "GL delta = " << p_gl_p - p_gl << "\n"; 
+}
+
 
 void test_entropy_surface() {
     srm::SrmNeuron n;
@@ -283,11 +385,11 @@ void test_entropy_surface() {
         mat H_stat(w1.n_elem, w2.n_elem);
         for(size_t wi1=0; wi1<w1.n_elem; wi1++) {
            for(size_t wi2=0; wi2<w2.n_elem; wi2++) {
-                n.w(0) =  w1(wi1); 
-                n.w(1) =  w2(wi2); 
+                n.w[0] =  w1(wi1); 
+                n.w[1] =  w2(wi2); 
                 srm::EntropyCalc ec(&n, Tmax-10, Tmax);
                 double H = ec.run(4);
-                Log::Info << "w1: " << n.w(0) << " w2: " << n.w(1) << " H = " << H << "\n";
+                Log::Info << "w1: " << n.w[0] << " w2: " << n.w[1] << " H = " << H << "\n";
                 H_stat(wi1, wi2) = H;
            }
         }       
@@ -360,7 +462,13 @@ int main(int argc, char** argv) {
         test_entropy_surface();
         Log::Info << "===============================================================" << std::endl;
     }
-    
+    if((test_name == "all") || (test_name == "int_calc2")) {
+        Log::Info << "int_calc2:" << std::endl;
+        Log::Info << "===============================================================" << std::endl;
+        test_int_calc2();
+        Log::Info << "===============================================================" << std::endl;
+    }
+   
     return 0;
 }
 

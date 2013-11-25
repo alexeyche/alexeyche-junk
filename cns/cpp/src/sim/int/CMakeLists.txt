@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 2.8)
 set(SOURCES
 	DEIntegrationConstants.h  
     DEIntegrator.h  
+    gauss_legendre.c
+    gauss_legendre.h
 )
 
 add_executable(int_test

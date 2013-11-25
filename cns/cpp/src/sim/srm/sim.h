@@ -76,10 +76,10 @@ namespace srm {
     public:        
         Sim() : T0(0.0) {}
         ~Sim() { 
-            for(size_t ni=0; ni<stoch_elem.size(); ni++) { 
-                delete stoch_elem[ni]; 
-            }
-            stoch_elem.clear();
+//            for(size_t ni=0; ni<stoch_elem.size(); ni++) { 
+//                delete stoch_elem[ni]; 
+//            }
+//            stoch_elem.clear();
             Log::Info << "Cleaning Sim\n"; 
         }            
         void run(double Tdur, double dt) {

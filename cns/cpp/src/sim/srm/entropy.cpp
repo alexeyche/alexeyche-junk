@@ -7,37 +7,37 @@
 #include <cuba.h>
 
 namespace srm {
-    int EntropyCalc::IntegrandFull(const int *ndim, const double xx[], const int *ncomp, double ff[], void *userdata) {
-        EntropyCalc *ec = (EntropyCalc*)userdata;
-        double pp[*ncomp];
-        double t_cur= -datum::inf;
-        for(size_t nd = 0; nd< *ndim; nd++) {
-            ec->neuron->y[nd] = ec->T0 + (ec->Tmax - ec->T0)*xx[nd];
-            if(t_cur > ec->neuron->y[nd]) {
-                for(size_t nni=0; nni< *ncomp; nni++) // wrong order
-                    ff[nni] = 0;
-                return 0;
-            } 
-            t_cur = ec->neuron->y[nd];
-        }                       
-        survFunctionSeq(ec->neuron, ec->T0, ec->Tmax, pp);
-        for(size_t ci=0; ci< *ncomp; ci++) {
-            ff[ci] = -pp[ci]*log(pp[ci])*(ec->Tmax - ec->T0);           
-        }            
-        
-        if(ec->cs.VerboseInt) {
-            printf("survFunction for y = [ ");
-            for(size_t nd=0; nd< *ndim; nd++) {
-                printf("%f, ", ec->neuron->y[nd]);
-            }
-            printf("] = [ "); 
-            for(size_t nd=0; nd< *ncomp; nd++) {
-                printf(" %f, ", pp[nd]);
-            }                
-            printf(" ]\n");
-        }
-        return 0;
-    }
+//    int EntropyCalc::IntegrandFull(const int *ndim, const double xx[], const int *ncomp, double ff[], void *userdata) {
+//        EntropyCalc *ec = (EntropyCalc*)userdata;
+//        double pp[*ncomp];
+//        double t_cur= -datum::inf;
+//        for(size_t nd = 0; nd< *ndim; nd++) {
+//            ec->neuron->y[nd] = ec->T0 + (ec->Tmax - ec->T0)*xx[nd];
+//            if(t_cur > ec->neuron->y[nd]) {
+//                for(size_t nni=0; nni< *ncomp; nni++) // wrong order
+//                    ff[nni] = 0;
+//                return 0;
+//            } 
+//            t_cur = ec->neuron->y[nd];
+//        }                       
+//        survFunctionSeq(ec->neuron, ec->T0, ec->Tmax, pp);
+//        for(size_t ci=0; ci< *ncomp; ci++) {
+//            ff[ci] = -pp[ci]*log(pp[ci])*(ec->Tmax - ec->T0);           
+//        }            
+//        
+//        if(ec->cs.VerboseInt) {
+//            printf("survFunction for y = [ ");
+//            for(size_t nd=0; nd< *ndim; nd++) {
+//                printf("%f, ", ec->neuron->y[nd]);
+//            }
+//            printf("] = [ "); 
+//            for(size_t nd=0; nd< *ncomp; nd++) {
+//                printf(" %f, ", pp[nd]);
+//            }                
+//            printf(" ]\n");
+//        }
+//        return 0;
+//    }
 
     int EntropyCalc::Integrand(const int *ndim, const double xx[], const int *ncomp, double ff[], void *userdata) {
         EntropyCalc *ec = (EntropyCalc*)userdata;
@@ -141,7 +141,7 @@ namespace srm {
             }
             int n_comp = 1;
             auto inter = Integrand;
-            if(cs.FullInt) { inter = IntegrandFull; n_comp=DIM_MAX; }
+//            if(cs.FullInt) { inter = IntegrandFull; n_comp=DIM_MAX; }
             
             int verbose, comp, nregions, neval[n_comp], fail[n_comp];
             double integral[n_comp], error[n_comp], prob[n_comp];

@@ -22,33 +22,39 @@ int main(int argc, char** argv)
 	const int seed = CLI::GetParam<int>("seed");   
     std::srand(seed);
     Sim s;
-    SrmNeuron* n = new SrmNeuron();
+    SrmNeuron n;
 
     double w_start = 3;
-//    n->add_input(new DetermenisticNeuron("3  10 11 12"), w_start);
-//    n->add_input(new DetermenisticNeuron("4  13 14 15"), w_start);
-//    n->add_input(new DetermenisticNeuron("5  15 16 17"), w_start);
-//    n->add_input(new DetermenisticNeuron("6 "), w_start);
-//    n->add_input(new DetermenisticNeuron("7 "), w_start);
-//    n->add_input(new DetermenisticNeuron("8 "), w_start);
+//    n.add_input(new DetermenisticNeuron("3  10 11 12"), w_start);
+//    n.add_input(new DetermenisticNeuron("4  13 14 15"), w_start);
+//    n.add_input(new DetermenisticNeuron("5  15 16 17"), w_start);
+//    n.add_input(new DetermenisticNeuron("6 "), w_start);
+//    n.add_input(new DetermenisticNeuron("7 "), w_start);
+//    n.add_input(new DetermenisticNeuron("8 "), w_start);
     
     TimeSeriesGroup g(100, 0*ms, 100); 
     g.loadPatternFromFile("/var/tmp/d1.csv", 500*ms, 100);
     send_arma_mat(g.patterns[0].pattern, "d1_stat");
 //    g.loadPatternFromFile("/var/tmp/d2.csv", 100*ms, 0.5);
 //    send_arma_mat(g.patterns[1].pattern, "d2_stat");
-    srm::connectFeedForward(&g, n, 1);
+    srm::connectFeedForward(&g, &n, 1);
     
     s.addNeuronGroup(&g);
-    s.addNeuron(n);
+    s.addNeuron(&n);
 
 //    s.addStatListener(n, TStatListener::Spike);
-    s.addStatListener(n, TStatListener::Pot);
-    s.addStatListener(n, TStatListener::Prob);
+    s.addStatListener(&n, TStatListener::Pot);
+    s.addStatListener(&n, TStatListener::Prob);
     s.run(100*ms, 0.5);
-
-    TEntropyGrad eg(n);
-    eg.gradNoSpike();
+ 
+    vec t = linspace<vec>(0, 100, (int)100/0.5);
+    vec p((int)100/0.5);
+    for(size_t ti=0; ti<t.n_elem; ti++) {
+        p(ti) = n.p(t[ti]);    
+    }
+    send_arma_mat(p, "n_prob_after");
+//    TEntropyGrad eg(&n);
+//    eg.gradNoSpike();
 //    double Hall =0 ;
 //    for(double T=0; T<80; T+=20) {
 //        EntropyCalc ec(n,T, T+20);    
