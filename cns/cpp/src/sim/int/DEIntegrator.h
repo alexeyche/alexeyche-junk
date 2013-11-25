@@ -7,15 +7,15 @@
 
 /*! Numerical integration in one dimension using the double expontial method of M. Mori. */
 
-template<class TType>
+template<class TType, class TData>
 class DEIntegrator
 {
 public:
     /*! Integrate an analytic function over a finite interval. @return The value of the integral. */
     static double Integrate
     (
-        srm::SrmNeuron *n,
-        TType (*f)(const TType&, srm::SrmNeuron*),       //!< [in] integrand
+        TData n,
+        TType (*f)(const TType&, TData),       //!< [in] integrand
         double a,                       //!< [in] left limit of integration
         double b,                       //!< [in] right limit of integration
         double targetAbsoluteError,     //!< [in] desired bound on error
@@ -51,8 +51,8 @@ public:
     */
     static double Integrate
     (
-        srm::SrmNeuron *n,
-        TType (*f)(const TType&, srm::SrmNeuron*),       //!< [in] integrand
+        TData n,
+        TType (*f)(const TType&, TData),       //!< [in] integrand
         double a,                       //!< [in] left limit of integration
         double b,                       //!< [in] right limit of integration
         double targetAbsoluteError      //!< [in] desired bound on error
@@ -78,8 +78,8 @@ private:
     // Integrate f(cx + d) with the given integration constants
     static double IntegrateCore
     (
-        srm::SrmNeuron *n,
-        TType (*f)(const TType&, srm::SrmNeuron*),       //!< [in] integrand
+        TData n,
+        TType (*f)(const TType&, TData),       //!< [in] integrand
         double c,   // slope of change of variables
         double d,   // intercept of change of variables
         double targetAbsoluteError,
