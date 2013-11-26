@@ -49,9 +49,9 @@ int main(int argc, char** argv)
 
 //    TEntropyGrad eg(&n);
 //    eg.gradNoSpike();
-    TEntropyGrad eg(&n,0, 100);
-    double gns = eg.gradNoSpike();
-    Log::Info << "grad no spike: " << gns << "\n";
+    TEntropyGrad eg(&n,0, 30);
+    double gns = eg.grad();
+//    Log::Info << "grad 1 spike: " << gns << "\n";
 //    double Hall =0 ;
 //    for(double T=0; T<80; T+=20) {
 //        TEntropyGrad eg(&n,T, T+20);    
