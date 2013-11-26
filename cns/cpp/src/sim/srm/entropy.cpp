@@ -4,7 +4,6 @@
 #include "entropy.h"
 #include "research.h"
 
-#include <cuba.h>
 
 namespace srm {
 //    int EntropyCalc::IntegrandFull(const int *ndim, const double xx[], const int *ncomp, double ff[], void *userdata) {
@@ -94,6 +93,8 @@ namespace srm {
     }
     double EntropyCalc::run(int dim = DIM_MAX) {
         double int_full = 0;
+        
+        neuron->y.clean();
         double p0 = survFunction(neuron, T0, Tmax);
         int_full += -p0*log(p0);
         for(int n_calc= 1; n_calc<=dim; n_calc++) { 

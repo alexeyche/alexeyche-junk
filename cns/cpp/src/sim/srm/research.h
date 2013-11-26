@@ -2,40 +2,52 @@
 #define RESEARCH_H
 
 #include <sim/int/DEIntegrator.h>
-
+#include <sim/int/gauss_legendre.h>
+#include <sim/int/simple_int.h>
 
 #include "neurons.h"
 
 namespace srm {
-    class TEntropyGrad {
-    public:
-        TEntropyGrad(SrmNeuron *n_v) : n(n_v) {} 
-        double p_stroke(double &t) {
-            return SrmNeuron::beta/( 1 + exp(SrmNeuron::alpha*(SrmNeuron::tresh - n->u(t))) );
-        }
-//        static vec grab_epsp(const double &t, const int &index) {
-//            double &y_last = n->y.last(t-0.001);
-//            double epsp_pot = 0;
-//            for(int j=(n->in[index]->y.n_elem(t)-1); j>=0; j--) {
-//                if( (t - n->in[index]->y(j)) > EPSP_WORK_WINDOW) { continue; }
-//                epsp_pot += SrmNeuron::epsp(t, n->in[index]->y(j), y_last);
-//            }    
-//            return epsp_out;
-//        }
-//        double gradNoSpike() {
-//            vec grad_w(n->w.size());
-//            vec ep = grab_epsp(10, n); 
-//            double ep_int = DEIntegrator<double, const int&>::Integrate(0, &grab_epsp, 0, 20, 1e-03);
-//            Log::Info << ep_int << "\n";
-//        }
-        SrmNeuron *n;
-    };
 
     double prob(const double &t, SrmNeuron *n) {
        return n->p(t);
     }
     
+    double integrand_gl(double x, void* data) {
+        srm::SrmNeuron *n = (srm::SrmNeuron*)data;
+        return n->p(x);
+    }
+    
+    double break_apart_int(srm::SrmNeuron *n, double T0, double Tmax, double dt) {
+        double t;
+        double integral = 0;
+        for(t=T0; t<Tmax; t+=dt) {
+            double t_right = t+dt;
+            double t_left = t;
+            if(t_right>Tmax) { t_right = Tmax; t=datum::inf; } 
+                
+            double integral_cur = gauss_legendre(128, integrand_gl, (void*)n, t_left, t_right);
+//            double integral_cur = DEIntegrator<double, SrmNeuron*>::Integrate(n, &prob, t_left, t_right, 1e-04);
+//            Log::Info << "integral at " << t_left << ":" << t_right << " = " << integral_cur << "\n";
+            integral += integral_cur;
+        }
+//        Log::Info << "integral at whole " << T0 << ":" << Tmax<< " = " << integral << "\n";
+        return integral;
+    }   
+    
+    #define INT_NUM_BREAKS (Tmax-T0)/4.0
     double survFunction(SrmNeuron *n, double T0, double Tmax) {
+        double p = exp( - break_apart_int(n, T0, Tmax, (Tmax-T0)/1.0 ));  // prob of no spikes at whole region
+        for(int yi = n->y.n_elem(Tmax); yi>=0; yi--) {
+            double p_sp = n->p(n->y[yi]); // prob of spikes
+//            Log::Info << "p_sp("<< n->y[yi] <<") = " << p_sp << "\n";
+            p = p * p_sp;
+        }
+        return p;
+    }
+
+
+    double survFunction__old(SrmNeuron *n, double T0, double Tmax) {
         double t_right=Tmax;
         double p = 0;
         Log::Info << "Surv.function of " << n->id() << " (from behind)\n";

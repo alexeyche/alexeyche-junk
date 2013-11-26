@@ -6,6 +6,7 @@ set(SOURCES
     sim.h
     entropy.h
     entropy.cpp
+    entropy_grad.h
 )
 
 # add directory name to sources

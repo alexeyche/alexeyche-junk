@@ -4,6 +4,8 @@
 #define DIM_MAX 2 
 #define NCOMP DIM_MAX+1
 
+#include <cuba.h>
+
 namespace srm {
 
     class EntropyCalc {
@@ -125,7 +127,7 @@ namespace srm {
         static double entropy_fn_int(const double &fn, EntropyCalc *ec);
         
         CubaSett cs;
-    private:        
+    protected:        
         SrmNeuron* neuron;
         int n;
         int n_cur;

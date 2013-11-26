@@ -8,7 +8,7 @@
 #include "connections.h"
 #include "research.h"
 
-#include "entropy.h"
+#include "entropy_grad.h"
 
 using namespace srm;
 
@@ -46,18 +46,15 @@ int main(int argc, char** argv)
     s.addStatListener(&n, TStatListener::Pot);
     s.addStatListener(&n, TStatListener::Prob);
     s.run(100*ms, 0.5);
- 
-    vec t = linspace<vec>(0, 100, (int)100/0.5);
-    vec p((int)100/0.5);
-    for(size_t ti=0; ti<t.n_elem; ti++) {
-        p(ti) = n.p(t[ti]);    
-    }
-    send_arma_mat(p, "n_prob_after");
+
 //    TEntropyGrad eg(&n);
 //    eg.gradNoSpike();
+    TEntropyGrad eg(&n,0, 100);
+    double gns = eg.gradNoSpike();
+    Log::Info << "grad no spike: " << gns << "\n";
 //    double Hall =0 ;
 //    for(double T=0; T<80; T+=20) {
-//        EntropyCalc ec(n,T, T+20);    
+//        TEntropyGrad eg(&n,T, T+20);    
 //        double H = ec.run(2);
 //        Hall += H;
 //        Log::Info <<  "H = " << H << "\n"; 

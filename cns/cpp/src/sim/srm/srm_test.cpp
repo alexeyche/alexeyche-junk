@@ -398,7 +398,7 @@ void test_entropy_surface() {
     }        
 }
 
-double break_apart_int(srm::SrmNeuron *n, double T0, double Tmax, double dt) {
+double break_apart_int_test(srm::SrmNeuron *n, double T0, double Tmax, double dt) {
     double t;
     double integral = 0;
     for(t=T0; t<Tmax; t+=dt) {
@@ -421,19 +421,19 @@ double surv0(srm::SrmNeuron *n, double T0, double Tmax) {
     double t_left = T0;
     for(size_t yi=0; yi<n->y.size(); yi++) {
         double t_right = n->y[yi];
-        double integral_cur = break_apart_int(n, t_left, t_right, 3); //int_brute<srm::SrmNeuron>(t_left, t_right, 0.00001, n, &srm::prob);
+        double integral_cur = break_apart_int_test(n, t_left, t_right, 3.); //int_brute<srm::SrmNeuron>(t_left, t_right, 0.00001, n, &srm::prob);
 //        Log::Info << "integral at " << t_left << ":" << t_right << " = " << integral_cur << "\n";
         integral += integral_cur;
         t_left = t_right;
     }
-    double integral_cur = break_apart_int(n, t_left, Tmax, 3); //int_brute<srm::SrmNeuron>(t_left, Tmax, 0.00001, n, &srm::prob);
+    double integral_cur = break_apart_int_test(n, t_left, Tmax, 3.); //int_brute<srm::SrmNeuron>(t_left, Tmax, 0.00001, n, &srm::prob);
     integral += integral_cur;
 //    Log::Info << "integral at " << t_left << ":" << Tmax << " = " << integral_cur << "\n";
     Log::Info << "integral whole = " << integral << "\n";
 }
 
 double surv1(srm::SrmNeuron *n, double T0, double Tmax) {
-    double no_spike = break_apart_int(n, T0, Tmax, 2); //int_brute<srm::SrmNeuron>(T0, Tmax, 0.00001, n, &srm::prob);
+    double no_spike = break_apart_int_test(n, T0, Tmax, 50.0); //int_brute<srm::SrmNeuron>(T0, Tmax, 0.00001, n, &srm::prob);
     Log::Info << "integral at whole = " << no_spike << "\n";
 //    for(size_t yi=0; yi<n->y.size(); yi++) {
 //        double t_right = n->y[yi];
