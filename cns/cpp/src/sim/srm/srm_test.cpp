@@ -12,6 +12,7 @@
 #include "entropy.h"
 #include "groups.h"
 #include "connections.h"
+#include "entropy_grad.h"
 
 void epsp_test(bool just_print = false) {
     double Tmax = 100;
@@ -474,6 +475,28 @@ void test_surv_func() {
 
 }
 
+void test_p_stroke() {
+    std::srand(time(NULL));
+    srm::SrmNeuron n;
+    srm::Sim s;
+    double w_start = 4;
+    n.add_input(new srm::DetermenisticNeuron("3 4 10 11 12"), w_start);
+    n.add_input(new srm::DetermenisticNeuron("4 5 13 14 15"), w_start);
+    n.add_input(new srm::DetermenisticNeuron("5 6 15 16 17"), w_start);
+    n.add_input(new srm::DetermenisticNeuron("6 7 "), w_start);
+    n.add_input(new srm::DetermenisticNeuron("7 8"), w_start);
+    n.add_input(new srm::DetermenisticNeuron("8 9"), w_start);
+    s.addNeuron(&n);
+    s.run(50, 0.1);
+    srm::TEntropyGrad eg(n, 0, 25);
+    vec t = linspace<vec>(0, 50, 150);
+    vec ps(150, fill::zeros);
+    for(size_t ti=0; ti<t.n_elem; ti++) {
+        ps(ti) = eg.p_stroke(t(ti), &n);
+    }
+    send_arma_mat(ps, "ps");
+}
+
 PROGRAM_INFO("SIM TEST", "sim tests"); 
 PARAM_STRING("test", "name for test. default \"all\"", "t", "all");
 PARAM_FLAG("nosend", "if it true. no sending to R", "n");
@@ -547,6 +570,12 @@ int main(int argc, char** argv) {
         Log::Info << "int_calc2:" << std::endl;
         Log::Info << "===============================================================" << std::endl;
         test_surv_func();
+        Log::Info << "===============================================================" << std::endl;
+    }
+    if((test_name == "all") || (test_name == "p_stroke")) {
+        Log::Info << "p_stroke:" << std::endl;
+        Log::Info << "===============================================================" << std::endl;
+        test_p_stroke();
         Log::Info << "===============================================================" << std::endl;
     }
    

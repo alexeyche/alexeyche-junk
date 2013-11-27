@@ -8,13 +8,13 @@ namespace srm {
     class TEntropyGrad : public EntropyCalc {
     public:
         TEntropyGrad(const SrmNeuron &n_v, double T0_v, double Tmax_v) : EntropyCalc(n_v, T0_v, Tmax_v) {} 
-        static double p_stroke(double t, SrmNeuron *n) {
-            return SrmNeuron::beta/( 1 + exp(SrmNeuron::alpha*(SrmNeuron::tresh - n->u(t))) );
+        static double p_stroke(double t, ConstInputSrmNeuron *n) {
+            return SrmNeuron::beta/( 1 + exp(SrmNeuron::alpha*(SrmNeuron::tresh - SrmNeuron::u(t, n))) );
         }
         static double grab_epsp(const double &t, const int &j, ConstInputSrmNeuron *n) {
             double pot_j = 0;
             Neuron *n_j = n->in[j];
-            double &y_last = n->y.last(t);
+            double &y_last = n->y.last(t-0.01);
             for(int yi = n_j->y.n_elem(t)-1; yi>=0; yi--) {
                if( (t - n_j->y(yi)) > EPSP_WORK_WINDOW) { break; }
                pot_j += SrmNeuron::epsp(t, n_j->y(yi), y_last);
@@ -47,7 +47,11 @@ namespace srm {
                 double spike_part = 0;
                 for(size_t yi=0; yi<eg->neuron.y.size(); yi++) {
                     double &fi = eg->neuron.y[yi];
-                    spike_part += (p_stroke(fi, &eg->neuron)/eg->neuron.p(fi))*grab_epsp(fi, wi, &eg->neuron);
+                    Log::Info << "p' = " <<  p_stroke(fi, &eg->neuron)  << "\n";
+                    Log::Info << "p = " <<  eg->neuron.p(fi) << "\n";
+                    Log::Info << "u(t) = " << eg->neuron.u(fi) << "\n";
+                    Log::Info << "y[yi] = " << eg->neuron.y[yi] << "\n";
+                    spike_part += (p_stroke(fi, &eg->neuron)/SrmNeuron::p(fi, eg->neuron))*grab_epsp(fi, wi, &eg->neuron);
                     Log::Info << "spike_part " << yi << " = " << spike_part <<  "| fi = " << fi << " | wi = " << wi << "\n";
                 }
                 ff[wi] = p*(log(p)+1)*(int_part + spike_part);
@@ -76,7 +80,7 @@ namespace srm {
                 w_grad(wi) += p0*(log(p0)+1)*sec_part;
                 Log::Info << "Hgrad0[" << wi << "] = " << w_grad(wi) << "\n";
             }
-            for(int n_calc = 1; n_calc <= 2; n_calc++) {
+            for(int n_calc = 1; n_calc <= 1; n_calc++) {
                 int verbose, comp, nregions, neval, fail;
                 neuron.y.clean();
                 for(size_t ni=0; ni<n_calc; ni++) {

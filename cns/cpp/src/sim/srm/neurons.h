@@ -201,35 +201,46 @@ namespace srm {
         static constexpr double beta = 1;
         static constexpr double tresh = -50; //mV
 
-        double u(const double &t) {
+        static double u(const double &t, Neuron *n) {
             double epsp_pot = 0;
-            
-            double &y_last = y.last(t-0.001);
-            for(size_t i=0; i<in.size(); i++) {
-                for(int j=(in[i]->y.n_elem(t)-1); j>=0; j--) {
-//                    Log::Info << "epsp_pot: " << epsp_pot;
-//                    Log::Info << " w:" << w[i] << " t:"  << t << " in.y(j):" << in[i]->y(j) << " y:"  << y.last() << "\n";
-                    if( (t - in[i]->y(j)) > EPSP_WORK_WINDOW) {
-//                        Log::Info << "epsp ignoring: " << epsp(t, in[i]->y(j), y.last(t-0.001)) << "\n";   
+                        
+            double &y_last = n->y.last(t-0.001);
+            printf("============================================\n");  
+            printf("y_last: %f\n", y_last); 
+            printf("in.size(): %d\n", n->in.size());  
+            for(size_t i=0; i<n->in.size(); i++) {
+                for(int j=(n->in[i]->y.n_elem(t)-1); j>=0; j--) {
+                    printf("epsp_pot: %e\n", epsp_pot);
+                    printf(" w: %e t: %f in.y(j): %f y: %f\n", n->w[i], t, n->in[i]->y(j), n->y.last());
+                    if( (t - n->in[i]->y(j)) > EPSP_WORK_WINDOW) {
+                        printf("epsp ignoring: %e\n", epsp(t, n->in[i]->y(j), n->y.last(t-0.001)));
                         continue;
                     }                        
-                    epsp_pot += w[i]*epsp(t, in[i]->y(j), y_last);
+                    epsp_pot += n->w[i]*epsp(t, n->in[i]->y(j), y_last);
                 }
             }
             double nu_pot = 0;
-            for(int i = (y.n_elem(t-0.001)-1); i>=0; i--) {
-                if( (t-y(i)) > NU_WORK_WINDOW ) {
-//                    Log::Info << "nu ignoring(" << t << ": " << nu(t, y(i)) << "\n";
+            for(int i = (n->y.n_elem(t-0.001)-1); i>=0; i--) {
+                if( (t-n->y(i)) > NU_WORK_WINDOW ) {
+                    printf("nu ignoring(%f): %e\n", t, nu(t, n->y(i)));
                     break;
                 }                    
-                nu_pot += nu(t, y(i));
+                nu_pot += nu(t, n->y(i));
             }
-            return u_rest + epsp_pot + nu_pot;
+            return u_rest + epsp_pot + nu_pot;           
+        }
+
+        double u(const double &t) {
+            return u(t, this); 
+        }
+
+        static double p(const double &t, Neuron *n) {
+            double uc = u(t,n);
+            return (beta/alpha)*(log(1+exp(alpha*(tresh-uc))) - alpha*(tresh-uc));           
         }
 
         double p(const double &t) {
-            double uc = u(t);
-            return (beta/alpha)*(log(1+exp(alpha*(tresh-uc))) - alpha*(tresh-uc));
+            return p(t, this);
         }
         
     };
