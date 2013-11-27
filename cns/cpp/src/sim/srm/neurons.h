@@ -126,6 +126,14 @@ namespace srm {
         unsigned int id_num;
     };
     
+    class ConstInputNeuron : public Neuron {
+    public:        
+        ConstInputNeuron(const Neuron &n)  : w(n.w), in(n.in) {}
+        const std::vector<double> &w;
+        const TInput &in;
+        TTime y;
+    };
+
     class DetermenisticNeuron: public Neuron {
     public:
         DetermenisticNeuron() {}
@@ -226,5 +234,12 @@ namespace srm {
         
     };
 
+    class ConstInputSrmNeuron : public SrmNeuron {
+    public:        
+        ConstInputSrmNeuron(const SrmNeuron &n)  : w(n.w), in(n.in), y(n.y) {}
+        const std::vector<double> &w;
+        const TInput &in;
+        TTime y;       
+    };
 }
 #endif

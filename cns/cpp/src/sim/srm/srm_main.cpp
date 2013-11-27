@@ -4,6 +4,7 @@
 #include <sim/core.h>
 #include <sim/socket/sim_socket_core.h>
 
+#include "cfg.h"
 #include "sim.h"
 #include "connections.h"
 #include "research.h"
@@ -49,8 +50,8 @@ int main(int argc, char** argv)
 
 //    TEntropyGrad eg(&n);
 //    eg.gradNoSpike();
-    TEntropyGrad eg(&n,0, 30);
-    double gns = eg.grad();
+    TEntropyGrad eg(n, 0, 30);
+    vec dHdw = eg.grad();
 //    Log::Info << "grad 1 spike: " << gns << "\n";
 //    double Hall =0 ;
 //    for(double T=0; T<80; T+=20) {

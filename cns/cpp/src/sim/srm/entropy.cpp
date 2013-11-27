@@ -42,21 +42,21 @@ namespace srm {
         EntropyCalc *ec = (EntropyCalc*)userdata;
         double t_cur= -datum::inf;
         for(size_t nd = 0; nd<ec->n; nd++) {
-            ec->neuron->y[nd] = ec->T0 + (ec->Tmax - ec->T0)*xx[nd];
-            if(t_cur > ec->neuron->y[nd]) {
+            ec->neuron.y[nd] = ec->T0 + (ec->Tmax - ec->T0)*xx[nd];
+            if(t_cur > ec->neuron.y[nd]) {
                 ff[0] = 0;
                 return 0;
             } 
-            t_cur = ec->neuron->y[nd];
+            t_cur = ec->neuron.y[nd];
         }                       
-        double p = survFunction(ec->neuron, ec->T0, ec->Tmax);
+        double p = survFunction(&ec->neuron, ec->T0, ec->Tmax);
         if(p == 0) { ff[0] = 0; return 0; } 
         ff[0] = -p*log(p);
          
         if(ec->cs.VerboseInt) {
             printf("survFunction for y = [ ");
-            for(size_t nd=0; nd< ec->neuron->y.size(); nd++) {
-                printf("%f, ", ec->neuron->y[nd]);
+            for(size_t nd=0; nd< ec->neuron.y.size(); nd++) {
+                printf("%f, ", ec->neuron.y[nd]);
             }
             printf("] = %e  H = %e\n", p, ff[0]); 
         }
@@ -65,7 +65,7 @@ namespace srm {
     }
     double EntropyCalc::entropy_fn_int(const double &fn, EntropyCalc *ec) {
         if(ec->n_cur+1 < ec->n) {
-            ec->neuron->y[ec->n_cur] = fn;
+            ec->neuron.y[ec->n_cur] = fn;
             ec->n_cur += 1;
 //            Log::Info << "We going to integrate entr [" << fn << "," << ec->Tmax << "]\n";
             double H = int_brute<EntropyCalc>(fn, ec->Tmax, ec->cs.Dt, ec, &entropy_fn_int);
@@ -76,12 +76,12 @@ namespace srm {
 //            Log::Info << "We integrated H = " << H << "\n"; 
             return H;
         } else {
-            ec->neuron->y[ec->n_cur] = fn;
-            double p = survFunction(ec->neuron, ec->T0, ec->Tmax);
+            ec->neuron.y[ec->n_cur] = fn;
+            double p = survFunction(&ec->neuron, ec->T0, ec->Tmax);
             if(ec->cs.VerboseInt) {
                 printf("survFunction for y = [ ");
-                for(size_t ni=0; ni<ec->neuron->y.size(); ni++) {
-                    printf(" %f, ", ec->neuron->y[ni]);
+                for(size_t ni=0; ni<ec->neuron.y.size(); ni++) {
+                    printf(" %f, ", ec->neuron.y[ni]);
                 }
                 printf(" ] = %e H = %e\n", p, p*log(p));
             }
@@ -94,13 +94,13 @@ namespace srm {
     double EntropyCalc::run(int dim = DIM_MAX) {
         double int_full = 0;
         
-        neuron->y.clean();
-        double p0 = survFunction(neuron, T0, Tmax);
+        neuron.y.clean();
+        double p0 = survFunction(&neuron, T0, Tmax);
         int_full += -p0*log(p0);
         for(int n_calc= 1; n_calc<=dim; n_calc++) { 
-            neuron->y.clean();
+            neuron.y.clean();
             for(size_t ni=0; ni<n_calc; ni++) {
-                neuron->y.push_back(T0);
+                neuron.y.push_back(T0);
             }
             int verbose, comp, nregions, neval, fail;
             double integral, error, prob;
@@ -131,14 +131,14 @@ namespace srm {
         double integral_full[DIM_MAX+1], error_full[DIM_MAX+1], prob_full[DIM_MAX+1];
         int neval_full[DIM_MAX+1], fail_full[DIM_MAX+1];
         // in case with no spikes
-        double p0 = survFunction(neuron, T0, Tmax);
+        double p0 = survFunction(&neuron, T0, Tmax);
         integral_full[0] = p0 * log(p0);
         error_full[0] = 0; prob_full[0] = 0; neval_full[0] = 0; fail_full[0] = 0;
 
         for(int n_calc= cs.FullInt ? (DIM_MAX-1) : 1 ; n_calc<DIM_MAX+1; n_calc++) { 
-            neuron->y.clean();
+            neuron.y.clean();
             for(size_t ni=0; ni<n_calc; ni++) {
-                neuron->y.push_back(T0);
+                neuron.y.push_back(T0);
             }
             int n_comp = 1;
             auto inter = Integrand;

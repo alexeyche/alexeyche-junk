@@ -19,28 +19,36 @@ namespace srm {
     }
     
     double break_apart_int(srm::SrmNeuron *n, double T0, double Tmax, double dt) {
-        double t;
         double integral = 0;
-        for(t=T0; t<Tmax; t+=dt) {
-            double t_right = t+dt;
+        for(double t=T0; t<Tmax; t+=dt) {
             double t_left = t;
+            double t_right = t+dt;
             if(t_right>Tmax) { t_right = Tmax; t=datum::inf; } 
-                
+                                 
+        #if LOCAL_INT_METHOD==gauss
             double integral_cur = gauss_legendre(128, integrand_gl, (void*)n, t_left, t_right);
-//            double integral_cur = DEIntegrator<double, SrmNeuron*>::Integrate(n, &prob, t_left, t_right, 1e-04);
-//            Log::Info << "integral at " << t_left << ":" << t_right << " = " << integral_cur << "\n";
+        #elif LOCAL_INT_METHOD==de
+            double integral_cur = DEIntegrator<double, SrmNeuron*>::Integrate(n, &prob, t_left, t_right, 1e-04);
+        #endif
+        #if VERBOSE_SURV==1           
+            Log::Info << "integral at " << t_left << ":" << t_right << " = " << integral_cur << "\n";
+        #endif            
             integral += integral_cur;
         }
-//        Log::Info << "integral at whole " << T0 << ":" << Tmax<< " = " << integral << "\n";
+    #if VERBOSE_SURV==1           
+        Log::Info << "integral at whole " << T0 << ":" << Tmax<< " = " << integral << "\n";
+    #endif
         return integral;
     }   
     
-    #define INT_NUM_BREAKS (Tmax-T0)/4.0
+    #define INT_NUM_BREAKS (Tmax-T0)/1.0
     double survFunction(SrmNeuron *n, double T0, double Tmax) {
-        double p = exp( - break_apart_int(n, T0, Tmax, (Tmax-T0)/1.0 ));  // prob of no spikes at whole region
-        for(int yi = n->y.n_elem(Tmax); yi>=0; yi--) {
-            double p_sp = n->p(n->y[yi]); // prob of spikes
-//            Log::Info << "p_sp("<< n->y[yi] <<") = " << p_sp << "\n";
+        double p = exp( - break_apart_int(n, T0, Tmax, INT_NUM_BREAKS ));  // prob of no spikes at whole region
+        for(int yi = n->y.n_elem(Tmax)-1; yi>=0; yi--) {
+            double p_sp = n->p(n->y(yi)); // prob of spikes
+        #if VERBOSE_SURV==1           
+            Log::Info << "p_sp("<< n->y[yi] <<") = " << p_sp << "\n";
+        #endif            
             p = p * p_sp;
         }
         return p;

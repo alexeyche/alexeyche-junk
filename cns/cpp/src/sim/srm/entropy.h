@@ -50,7 +50,7 @@ namespace srm {
         double Dt; // brute
     };
     public:    
-        EntropyCalc(SrmNeuron *neuron_v, double T0v, double Tmaxv) : neuron(neuron_v), T0(T0v), Tmax(Tmaxv), cuba_verbose(0) {
+        EntropyCalc(const SrmNeuron &neuron_v, double T0v, double Tmaxv) : neuron(neuron_v), T0(T0v), Tmax(Tmaxv), cuba_verbose(0) {
             const char *env_verb = getenv("CUBAVERBOSE");
             const char *method_ch = getenv("CUBA_METHOD");
             if(method_ch) cs.method = std::string(method_ch);
@@ -128,7 +128,7 @@ namespace srm {
         
         CubaSett cs;
     protected:        
-        SrmNeuron* neuron;
+        ConstInputSrmNeuron neuron;
         int n;
         int n_cur;
         double T0;
