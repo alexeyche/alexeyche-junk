@@ -75,18 +75,18 @@ namespace srm {
                 w_grad(wi) += p0*(log(p0)+1)*sec_part;
                 Log::Info << "Hgrad0[" << wi << "] = " << w_grad(wi) << "\n";
             }
-            for(int n_calc = 1; n_calc <= 1; n_calc++) {
+            for(int n_calc = 1; n_calc <= 2; n_calc++) {
                 int verbose, comp, nregions, neval, fail;
                 double integral[neuron.w.size()], error[neuron.w.size()], prob[neuron.w.size()];           
                 for(size_t wi=0; wi<neuron.w.size(); wi++) { integral[wi] =0; error[wi] =0; prob[wi] =0; }
 
                 n = n_calc;
                 cs.MaxEval = 1000; 
-                cs.EpsAbs = 1e-03;
+                cs.EpsAbs = 1e-3;
     //            Vegas(n_calc, neuron.w.size(), integrand_grad_no_spike, this, cs.EpsRel, cs.EpsAbs, cuba_verbose, 0, cs.MinEval, cs.MaxEval, cs.NStart, cs.NIncrease, cs.NBatch, cs.GridNo, NULL, &neval, &fail, integral, error, prob);
                 Vegas(n_calc, neuron.w.size(), integrand_grad, this, cs.EpsRel, cs.EpsAbs, cuba_verbose, 0, cs.MinEval, cs.MaxEval, cs.NStart, cs.NIncrease, cs.NBatch, cs.GridNo, NULL, &neval, &fail, integral, error, prob);
                 for(size_t wi=0; wi<neuron.w.size(); wi++) {
-                    Log::Info << "Hgrad[" << wi << "] = " << integral[wi] << "\n";
+                    Log::Info << "Hgrad" << n_calc << "[" << wi << "] = " << integral[wi] << "\n";
                     w_grad(wi) += integral[wi];
                 }
             }

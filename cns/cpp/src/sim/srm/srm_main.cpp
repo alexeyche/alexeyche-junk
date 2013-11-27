@@ -25,7 +25,7 @@ int main(int argc, char** argv)
     Sim s;
     SrmNeuron n;
 
-    double w_start = 3;
+    double w_start = 5;
 //    n.add_input(new DetermenisticNeuron("3  10 11 12"), w_start);
 //    n.add_input(new DetermenisticNeuron("4  13 14 15"), w_start);
 //    n.add_input(new DetermenisticNeuron("5  15 16 17"), w_start);
@@ -50,8 +50,9 @@ int main(int argc, char** argv)
 
 //    TEntropyGrad eg(&n);
 //    eg.gradNoSpike();
-    TEntropyGrad eg(n, 0, 30);
+    TEntropyGrad eg(n, 0, 100);
     vec dHdw = eg.grad();
+    dHdw.print();
 //    Log::Info << "grad 1 spike: " << gns << "\n";
 //    double Hall =0 ;
 //    for(double T=0; T<80; T+=20) {
