@@ -48,6 +48,7 @@ namespace srm {
                 for(size_t yi=0; yi<eg->neuron.y.size(); yi++) {
                     double &fi = eg->neuron.y[yi];
                     spike_part += (p_stroke(fi, &eg->neuron)/eg->neuron.p(fi))*grab_epsp(fi, wi, &eg->neuron);
+                    Log::Info << "spike_part " << yi << " = " << spike_part <<  "| fi = " << fi << " | wi = " << wi << "\n";
                 }
                 ff[wi] = p*(log(p)+1)*(int_part + spike_part);
                 ff[wi] = ff[wi]*(eg->Tmax - eg->T0);
@@ -77,6 +78,10 @@ namespace srm {
             }
             for(int n_calc = 1; n_calc <= 2; n_calc++) {
                 int verbose, comp, nregions, neval, fail;
+                neuron.y.clean();
+                for(size_t ni=0; ni<n_calc; ni++) {
+                    neuron.y.push_back(T0);
+                }               
                 double integral[neuron.w.size()], error[neuron.w.size()], prob[neuron.w.size()];           
                 for(size_t wi=0; wi<neuron.w.size(); wi++) { integral[wi] =0; error[wi] =0; prob[wi] =0; }
 
