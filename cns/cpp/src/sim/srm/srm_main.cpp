@@ -13,14 +13,19 @@
 
 using namespace srm;
 
-PROGRAM_INFO("SRM SIM", "Spike Resoponce Model simulator"); 
+PROGRAM_INFO("SRM SIM", "Spike Responce Model simulator"); 
 PARAM_INT("seed", "seed", "s", time(NULL));
-PARAM
+PARAM_DOUBLE("rate", "learning rate", "r", 1);
+PARAM_STRING("mode", "modes for srm sim: \'run\', \'learn\'", "m", "run");
+PARAM_INT("epoch", "Num of epochs in learning mode", "e", 100);
 
 int main(int argc, char** argv)
 {
     CLI::ParseCommandLine(argc, argv);
 	const int seed = CLI::GetParam<int>("seed");   
+    const std::string mode = CLI::GetParam<std::string>("mode");
+    const double learning_rate = CLI::GetParam<double>("rate");
+    const int epoch = CLI::GetParam<int>("epoch");
     std::srand(seed);
     Sim s;
     SrmNeuron n;
@@ -46,29 +51,32 @@ int main(int argc, char** argv)
 //    s.addStatListener(n, TStatListener::Spike);
 //    s.addStatListener(&n, TStatListener::Pot);
 //    s.addStatListener(&n, TStatListener::Prob);
-    s.run(100*ms, 0.5);
-    Log::Info << "weights before:\n";
-    for(size_t wi=0; wi<n.w.size(); wi++) { Log::Info << n.w[wi] << ", "; } Log::Info << "\n";
+    if(mode == "run") {    
+        s.run(100*ms, 0.5);
+    } else 
+    if(mode == "learn") {
+        Log::Info << "weights before:\n";
+        for(size_t wi=0; wi<n.w.size(); wi++) { Log::Info << n.w[wi] << ", "; } Log::Info << "\n";
 
-    TEntropyGrad eg(&n, 0, 20);
-    TEntropyCalc ec(&n, 0, 20);
-    for(size_t i=0; i<300; i++) {
-        vec dHdw = eg.grad();
-        for(size_t wi=0; wi<n.w.size(); wi++) { n.w[wi] -= 1 * dHdw(wi); }
-        Log::Info << "Epoch(" << i << "): ";
-        Log::Info << "Grad: ";
-        for(size_t wi=0; wi<n.w.size(); wi++) { Log::Info << dHdw(wi) << ", "; }
-        if(i % 10 == 0) {
-            Log::Info << " H: ";
-            double H = ec.run(3);
-            Log::Info << H;
-        }            
-        Log::Info << "\n";
+        TEntropyGrad eg(&n, 0, 20);
+        TEntropyCalc ec(&n, 0, 20);
+        for(size_t i=0; i<epoch; i++) {
+            vec dHdw = eg.grad();
+            for(size_t wi=0; wi<n.w.size(); wi++) { n.w[wi] -= learning_rate * dHdw(wi); }
+            Log::Info << "Epoch(" << i << "): ";
+            Log::Info << "Grad: ";
+            for(size_t wi=0; wi<n.w.size(); wi++) { Log::Info << dHdw(wi) << ", "; }
+            if(i % 10 == 0) {
+                Log::Info << " H: ";
+                double H = ec.run(3);
+                Log::Info << H;
+            }            
+            Log::Info << "\n";
+        }        
+        s.run(100*ms, 0.5);
+        Log::Info << "weights after:\n";
+        for(size_t wi=0; wi<n.w.size(); wi++) { Log::Info << n.w[wi] << ", "; } Log::Info << "\n";
     }        
-    n.y.clean();
-    s.run(100*ms, 0.5);
-    Log::Info << "weights after:\n";
-    for(size_t wi=0; wi<n.w.size(); wi++) { Log::Info << n.w[wi] << ", "; } Log::Info << "\n";
 //    Log::Info << "grad 1 spike: " << gns << "\n";
 //    double Hall =0 ;
 //    for(double T=0; T<80; T+=20) {
