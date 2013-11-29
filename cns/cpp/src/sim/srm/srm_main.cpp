@@ -25,30 +25,30 @@ int main(int argc, char** argv)
     Sim s;
     SrmNeuron n;
 
-    double w_start = 3;
-//    n.add_input(new DetermenisticNeuron("3  10 11 12"), w_start);
-//    n.add_input(new DetermenisticNeuron("4  13 14 15"), w_start);
-//    n.add_input(new DetermenisticNeuron("5  15 16 17"), w_start);
+    double w_start = 6;
+    n.add_input(new DetermenisticNeuron("3 10 11 12"), w_start);
+    n.add_input(new DetermenisticNeuron("4 13 14 15"), w_start);
+//    n.add_input(new DetermenisticNeuron("5 15 16 17"), w_start);
 //    n.add_input(new DetermenisticNeuron("6 "), w_start);
 //    n.add_input(new DetermenisticNeuron("7 "), w_start);
 //    n.add_input(new DetermenisticNeuron("8 "), w_start);
     
-    TimeSeriesGroup g(100, 0*ms, 100); 
-    g.loadPatternFromFile("/var/tmp/d1.csv", 500*ms, 100);
-    send_arma_mat(g.patterns[0].pattern, "d1_stat");
+//    TimeSeriesGroup g(100, 0*ms, 100); 
+//    g.loadPatternFromFile("/var/tmp/d1.csv", 500*ms, 100);
+//    send_arma_mat(g.patterns[0].pattern, "d1_stat");
 //    g.loadPatternFromFile("/var/tmp/d2.csv", 100*ms, 0.5);
 //    send_arma_mat(g.patterns[1].pattern, "d2_stat");
-    srm::connectFeedForward(&g, &n, 1);
+//    srm::connectFeedForward(&g, &n, 1);
     
-    s.addNeuronGroup(&g);
-    s.addNeuron(&n);
+//    s.addNeuronGroup(&g);
+    s.addRecNeuron(&n);
 
 //    s.addStatListener(n, TStatListener::Spike);
-    s.addStatListener(&n, TStatListener::Pot);
-    s.addStatListener(&n, TStatListener::Prob);
+//    s.addStatListener(&n, TStatListener::Pot);
+//    s.addStatListener(&n, TStatListener::Prob);
     s.run(100*ms, 0.5);
 
-    TEntropyGrad eg(&n, 0, 25);
+    TEntropyGrad eg(&n, 0, 20);
     vec dHdw = eg.grad();
     dHdw.print();
 //    Log::Info << "grad 1 spike: " << gns << "\n";

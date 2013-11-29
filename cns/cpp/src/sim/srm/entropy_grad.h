@@ -35,7 +35,7 @@ namespace srm {
         }
         
         // for Monte Carlo integration 
-        static int integrand_grad(const int *ndim, const double xx[], const int *ncomp, double ff[], void *userdata) {
+        static int EntropyGradIntegrand(const int *ndim, const double xx[], const int *ncomp, double ff[], void *userdata) {
             TEntropyGrad *eg = (TEntropyGrad*)userdata;
             TTime y(*ndim);
             double t_cur= -datum::inf;
@@ -52,26 +52,22 @@ namespace srm {
                 TNeuronSynapseGivenY n_syn_y(wi, eg->neuron, y);           
                 double int_part = gauss_legendre(128, integrand_epsp_gl, (void*)&n_syn_y, eg->T0, eg->Tmax);
                 double spike_part = 0;
-                for(size_t yi=0; yi<eg->neuron->y.size(); yi++) {
-                    double &fi = eg->neuron->y[yi];
-//                    Log::Info << "p' = " <<  p_stroke(fi, eg->neuron, y)  << "\n";
-//                    Log::Info << "p = " <<  eg->neuron->p(fi, y) << "\n";
-//                    Log::Info << "u(t) = " << eg->neuron->u(fi, y) << "\n";
-//                    Log::Info << "y[yi] = " << y[yi] << "\n";
+                for(size_t yi=0; yi<y.size(); yi++) {
+                    double &fi = y[yi];
                     spike_part += (p_stroke(fi, eg->neuron, y)/eg->neuron->p(fi, y))*grab_epsp(fi, wi, eg->neuron, y);
-//                    Log::Info << "spike_part " << yi << " = " << spike_part <<  "| fi = " << fi << " | wi = " << wi << "\n";
+                    if(eg->cs.VerboseInt) {
+                        printf("yi: %zu\n", yi);
+                        printf("   | p' = %f\n", p_stroke(fi, eg->neuron, y));
+                        printf("   | p = %f\n", eg->neuron->p(fi, y));
+                        printf("   | u(t) = %f\n", eg->neuron->u(fi, y));
+                        printf("   | y[yi] = %f\n", y[yi]);
+                        printf("   | spike_part %f\n", spike_part);
+                    }                                           
                 }
                 ff[wi] = p*(log(p)+1)*(int_part + spike_part);
                 ff[wi] = ff[wi]*(eg->Tmax - eg->T0);
             }
-            //if(eg->cs.VerboseInt) {
-            //    printf("survFunction for y = [ ");
-            //    for(size_t nd=0; nd< eg->neuron->y.size(); nd++) {
-            //        printf("%f, ", eg->neuron->y[nd]);
-            //    }
-            //    printf("] = %e  H grad = %e\n", p0, ff[0]); 
-            //}           
-            
+             
             return 0;
         }
 
@@ -87,20 +83,12 @@ namespace srm {
                 w_grad(wi) += p0*(log(p0)+1)*sec_part;
                 Log::Info << "Hgrad0[" << wi << "] = " << w_grad(wi) << "\n";
             }
-            for(int n_calc = 1; n_calc <= 1; n_calc++) {
-                int verbose, comp, nregions, neval, fail;
+            for(int n_calc = 1; n_calc <= 3; n_calc++) {
                                
-                double integral[neuron->w.size()], error[neuron->w.size()], prob[neuron->w.size()];           
-                for(size_t wi=0; wi<neuron->w.size(); wi++) { integral[wi] =0; error[wi] =0; prob[wi] =0; }
-
-                n = n_calc;
-                cs.MaxEval = 1000; 
-                cs.EpsAbs = 1e-3;
-    //            Vegas(n_calc, neuron->w.size(), integrand_grad_no_spike, this, cs.EpsRel, cs.EpsAbs, cuba_verbose, 0, cs.MinEval, cs.MaxEval, cs.NStart, cs.NIncrease, cs.NBatch, cs.GridNo, NULL, &neval, &fail, integral, error, prob);
-                Vegas(n_calc, neuron->w.size(), integrand_grad, this, cs.EpsRel, cs.EpsAbs, cuba_verbose, 0, cs.MinEval, cs.MaxEval, cs.NStart, cs.NIncrease, cs.NBatch, cs.GridNo, NULL, &neval, &fail, integral, error, prob);
+                vec integral = integrate(n_calc, neuron->w.size(), EntropyGradIntegrand);
+                w_grad += integral;
                 for(size_t wi=0; wi<neuron->w.size(); wi++) {
                     Log::Info << "Hgrad" << n_calc << "[" << wi << "] = " << integral[wi] << "\n";
-                    w_grad(wi) += integral[wi];
                 }
             }
             return w_grad;
