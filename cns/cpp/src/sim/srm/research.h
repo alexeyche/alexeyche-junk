@@ -13,12 +13,13 @@ namespace srm {
        return n->p(t);
     }
     
+    typedef std::pair<SrmNeuron*, TTime&> TNeuronGivenY;
     double integrand_gl(double x, void* data) {
-        srm::SrmNeuron *n = (srm::SrmNeuron*)data;
-        return n->p(x);
+        TNeuronGivenY *ny = (TNeuronGivenY*)data;
+        return ny->first->p(x, ny->second);
     }
     
-    double break_apart_int(srm::SrmNeuron *n, double T0, double Tmax, double dt) {
+    double break_apart_int(srm::SrmNeuron *n, TTime &y, double T0, double Tmax, double dt) {
         double integral = 0;
         for(double t=T0; t<Tmax; t+=dt) {
             double t_left = t;
@@ -26,7 +27,8 @@ namespace srm {
             if(t_right>Tmax) { t_right = Tmax; t=datum::inf; } 
                                  
         #if LOCAL_INT_METHOD==gauss
-            double integral_cur = gauss_legendre(128, integrand_gl, (void*)n, t_left, t_right);
+            TNeuronGivenY ny(n,y);
+            double integral_cur = gauss_legendre(128, integrand_gl, (void*)&ny, t_left, t_right);
         #elif LOCAL_INT_METHOD==de
             double integral_cur = DEIntegrator<double, SrmNeuron*>::Integrate(n, &prob, t_left, t_right, 1e-04);
         #endif
@@ -42,18 +44,20 @@ namespace srm {
     }   
     
     #define INT_NUM_BREAKS (Tmax-T0)/1.0
-    double survFunction(SrmNeuron *n, double T0, double Tmax) {
-        double p = exp( - break_apart_int(n, T0, Tmax, INT_NUM_BREAKS ));  // prob of no spikes at whole region
-        for(int yi = n->y.n_elem(Tmax)-1; yi>=0; yi--) {
-            double p_sp = n->p(n->y(yi)); // prob of spikes
+    double survFunction(SrmNeuron *n, TTime &y, double T0, double Tmax) {
+        double p = exp( - break_apart_int(n, y, T0, Tmax, INT_NUM_BREAKS ));  // prob of no spikes at whole region
+        for(int yi = y.n_elem(Tmax)-1; yi>=0; yi--) {
+            double p_sp = n->p(y(yi), y); // prob of spikes
         #if VERBOSE_SURV==1           
-            Log::Info << "p_sp("<< n->y[yi] <<") = " << p_sp << "\n";
+            Log::Info << "p_sp("<< y[yi] <<") = " << p_sp << "\n";
         #endif            
             p = p * p_sp;
         }
         return p;
     }
-
+    double survFunction(SrmNeuron *n, double T0, double Tmax) {
+        return survFunction(n, n->y, T0, Tmax);
+    }
 
     double survFunction__old(SrmNeuron *n, double T0, double Tmax) {
         double t_right=Tmax;

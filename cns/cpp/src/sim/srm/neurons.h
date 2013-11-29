@@ -22,6 +22,8 @@ namespace srm {
     static constexpr double TIME_OF_FORGET = 200;
     public:
         TTime() : std::vector<double>(), inf_elem(-datum::inf), n_elem_real(0), forgotten_elems(0) { }
+        TTime(const int &n) : std::vector<double>(n), inf_elem(-datum::inf), n_elem_real(n), forgotten_elems(0) { }
+
         double& operator() (const size_t i) {
             return std::vector<double>::operator[] (i+forgotten_elems);
         }
@@ -201,56 +203,49 @@ namespace srm {
         static constexpr double beta = 1;
         static constexpr double tresh = -50; //mV
 
-        static double u(const double &t, Neuron *n) {
+        double u(const double &t, TTime &y_given) {
             double epsp_pot = 0;
                         
-            double &y_last = n->y.last(t-0.001);
-            printf("============================================\n");  
-            printf("y_last: %f\n", y_last); 
-            printf("in.size(): %d\n", n->in.size());  
-            for(size_t i=0; i<n->in.size(); i++) {
-                for(int j=(n->in[i]->y.n_elem(t)-1); j>=0; j--) {
-                    printf("epsp_pot: %e\n", epsp_pot);
-                    printf(" w: %e t: %f in.y(j): %f y: %f\n", n->w[i], t, n->in[i]->y(j), n->y.last());
-                    if( (t - n->in[i]->y(j)) > EPSP_WORK_WINDOW) {
-                        printf("epsp ignoring: %e\n", epsp(t, n->in[i]->y(j), n->y.last(t-0.001)));
+            double &y_last = y_given.last(t-0.001);
+//            printf("============================================\n");  
+//            printf("y_last: %f\n", y_last); 
+//            printf("in.size(): %d\n", n->in.size());  
+            for(size_t i=0; i<in.size(); i++) {
+                for(int j=(in[i]->y.n_elem(t)-1); j>=0; j--) {
+                    //printf("epsp_pot: %e\n", epsp_pot);
+                    //printf(" w: %e t: %f in.y(j): %f y: %f\n", w[i], t, in[i]->y(j), y_last);
+                    if( (t - in[i]->y(j)) > EPSP_WORK_WINDOW) {
+                        //printf("epsp ignoring: %e\n", epsp(t, in[i]->y(j), y_last));
                         continue;
                     }                        
-                    epsp_pot += n->w[i]*epsp(t, n->in[i]->y(j), y_last);
+                    epsp_pot += w[i]*epsp(t, in[i]->y(j), y_last);
                 }
             }
             double nu_pot = 0;
-            for(int i = (n->y.n_elem(t-0.001)-1); i>=0; i--) {
-                if( (t-n->y(i)) > NU_WORK_WINDOW ) {
-                    printf("nu ignoring(%f): %e\n", t, nu(t, n->y(i)));
+            for(int i = (y_given.n_elem(t-0.001)-1); i>=0; i--) {
+                if( (t-y_given(i)) > NU_WORK_WINDOW ) {
+                    //printf("nu ignoring(%f): %e\n", t, nu(t, y_given(i)));
                     break;
                 }                    
-                nu_pot += nu(t, n->y(i));
+                nu_pot += nu(t, y_given(i));
             }
             return u_rest + epsp_pot + nu_pot;           
         }
 
         double u(const double &t) {
-            return u(t, this); 
+            return u(t, y); 
         }
 
-        static double p(const double &t, Neuron *n) {
-            double uc = u(t,n);
+        double p(const double &t, TTime &y_given) {
+            double uc = u(t, y_given);
             return (beta/alpha)*(log(1+exp(alpha*(tresh-uc))) - alpha*(tresh-uc));           
         }
-
         double p(const double &t) {
-            return p(t, this);
+            return p(t, y);           
         }
         
     };
 
-    class ConstInputSrmNeuron : public SrmNeuron {
-    public:        
-        ConstInputSrmNeuron(const SrmNeuron &n)  : w(n.w), in(n.in), y(n.y) {}
-        const std::vector<double> &w;
-        const TInput &in;
-        TTime y;       
-    };
+
 }
 #endif

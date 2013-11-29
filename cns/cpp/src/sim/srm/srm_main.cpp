@@ -48,9 +48,7 @@ int main(int argc, char** argv)
     s.addStatListener(&n, TStatListener::Prob);
     s.run(100*ms, 0.5);
 
-//    TEntropyGrad eg(&n);
-//    eg.gradNoSpike();
-    TEntropyGrad eg(n, 0, 25);
+    TEntropyGrad eg(&n, 0, 25);
     vec dHdw = eg.grad();
     dHdw.print();
 //    Log::Info << "grad 1 spike: " << gns << "\n";
