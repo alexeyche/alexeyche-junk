@@ -50,7 +50,7 @@ namespace srm {
             double p = survFunction(eg->neuron, y, eg->T0, eg->Tmax);
             for(size_t wi=0; wi< *ncomp; wi++) {
                 TNeuronSynapseGivenY n_syn_y(wi, eg->neuron, y);           
-                double int_part = gauss_legendre(128, integrand_epsp_gl, (void*)&n_syn_y, eg->T0, eg->Tmax);
+                double int_part = gauss_legendre(cs.GaussQuad, integrand_epsp_gl, (void*)&n_syn_y, eg->T0, eg->Tmax);
                 double spike_part = 0;
                 for(size_t yi=0; yi<y.size(); yi++) {
                     double &fi = y[yi];
@@ -79,7 +79,7 @@ namespace srm {
             double p0 = survFunction(neuron, y_no_spikes, T0, Tmax);
             for(size_t wi=0; wi < neuron->w.size(); wi++) {
                 TNeuronSynapseGivenY p(wi, neuron, y_no_spikes);
-                double sec_part = gauss_legendre(128, integrand_epsp_gl, (void*)&p, T0, Tmax);
+                double sec_part = gauss_legendre(cd.GaussQuad, integrand_epsp_gl, (void*)&p, T0, Tmax);
                 w_grad(wi) += p0*(log(p0)+1)*sec_part;
                 Log::Info << "Hgrad0[" << wi << "] = " << w_grad(wi) << "\n";
             }

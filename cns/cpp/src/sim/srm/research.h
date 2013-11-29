@@ -28,7 +28,7 @@ namespace srm {
                                  
         #if LOCAL_INT_METHOD==gauss
             TNeuronGivenY ny(n,y);
-            double integral_cur = gauss_legendre(128, integrand_gl, (void*)&ny, t_left, t_right);
+            double integral_cur = gauss_legendre(GAUSS_QUAD, integrand_gl, (void*)&ny, t_left, t_right);
         #elif LOCAL_INT_METHOD==de
             double integral_cur = DEIntegrator<double, SrmNeuron*>::Integrate(n, &prob, t_left, t_right, 1e-04);
         #endif

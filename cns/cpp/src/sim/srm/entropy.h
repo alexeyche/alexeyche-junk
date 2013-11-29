@@ -15,7 +15,8 @@ namespace srm {
                      NNew(1000), Flatness(25.),  // Suave default
                      Key1(47), Key2(1), Key3(1), MaxPass(5), MaxChiSq(10.), MinDeviation(.25), NGiven(0), LDXGiven("NDIM"), NExtra(0), // Divonne default
                      Key(0), // Cuhre default
-                     Dt(0.1) // trapezium default
+                     Dt(0.1), // trapezium default
+                     GaussQuad(128)
                      {} 
 
         std::string method;
@@ -49,6 +50,8 @@ namespace srm {
         int Key; // Cuhre       
 
         double Dt; // brute
+
+        int GaussQuad; // Gauss Legendre
     };
     public:    
         EntropyCalc(SrmNeuron *neuron_v, double T0v, double Tmaxv) : neuron(neuron_v), T0(T0v), Tmax(Tmaxv) {
@@ -60,6 +63,9 @@ namespace srm {
             if(full_int) cs.FullInt = true;
             const char *verb_int = getenv("VERBOSE_INT");
             if(verb_int) cs.VerboseInt = true;
+            const char *gauss_quad = getenv("GAUSS_QUAD");
+            if(gauss_quad) cs.GaussQuad = atoi(gauss_quad);
+
 
             const char *mineval = getenv("CUBA_MINEVAL");
             const char *maxeval = getenv("CUBA_MAXEVAL");
