@@ -8,7 +8,7 @@
 
 namespace srm {
 
-    class EntropyCalc {
+    class TEntropyCalc {
     struct CubaSett {
         CubaSett() : method("Vegas"), MinEval(0), MaxEval(50000), EpsRel(1e-3), EpsAbs(1e-12), FullInt(false), VerboseInt(false), CubaVerbose(0),// all default
                      NStart(1000), NIncrease(500), NBatch(1000), GridNo(0),  // Vegas default
@@ -54,7 +54,7 @@ namespace srm {
         int GaussQuad; // Gauss Legendre
     };
     public:    
-        EntropyCalc(SrmNeuron *neuron_v, double T0v, double Tmaxv) : neuron(neuron_v), T0(T0v), Tmax(Tmaxv) {
+        TEntropyCalc(SrmNeuron *neuron_v, double T0v, double Tmaxv) : neuron(neuron_v), T0(T0v), Tmax(Tmaxv) {
             const char *env_verb = getenv("CUBA_VERBOSE");
             if( env_verb ) cs.CubaVerbose = atoi(env_verb);
             const char *method_ch = getenv("CUBA_METHOD");
@@ -124,13 +124,13 @@ namespace srm {
                 if(dt) cs.Dt = atof(dt);
             }
         }
-        ~EntropyCalc() { 
+        ~TEntropyCalc() { 
         }
 //        double run(size_t n_calc);
         double run(int dim);
         static int IntegrandFull(const int *ndim, const double xx[], const int *ncomp, double ff[], void *userdata);
         static int EntropyIntegrand(const int *ndim, const double xx[], const int *ncomp, double ff[], void *userdata);
-        static double entropy_fn_int(const double &fn, EntropyCalc *ec);
+        static double entropy_fn_int(const double &fn, TEntropyCalc *ec);
         
         void printIntConf();
         vec integrate(int ndim, int ncomp, int (*)(const int*, const double*, const int*, double*, void*) );

@@ -5,9 +5,9 @@
 #include "entropy.h"
 
 namespace srm {
-    class TEntropyGrad : public EntropyCalc {
+    class TEntropyGrad : public TEntropyCalc {
     public:
-        TEntropyGrad(SrmNeuron *n_v, double T0_v, double Tmax_v) : EntropyCalc(n_v, T0_v, Tmax_v) {} 
+        TEntropyGrad(SrmNeuron *n_v, double T0_v, double Tmax_v) : TEntropyCalc(n_v, T0_v, Tmax_v) {} 
         static double p_stroke(double t, SrmNeuron *n, TTime &y) {
             return SrmNeuron::beta/( 1 + exp(SrmNeuron::alpha*(SrmNeuron::tresh - n->u(t, y))) );
         }
@@ -50,7 +50,7 @@ namespace srm {
             double p = survFunction(eg->neuron, y, eg->T0, eg->Tmax);
             for(size_t wi=0; wi< *ncomp; wi++) {
                 TNeuronSynapseGivenY n_syn_y(wi, eg->neuron, y);           
-                double int_part = gauss_legendre(cs.GaussQuad, integrand_epsp_gl, (void*)&n_syn_y, eg->T0, eg->Tmax);
+                double int_part = gauss_legendre(eg->cs.GaussQuad, integrand_epsp_gl, (void*)&n_syn_y, eg->T0, eg->Tmax);
                 double spike_part = 0;
                 for(size_t yi=0; yi<y.size(); yi++) {
                     double &fi = y[yi];
@@ -64,7 +64,7 @@ namespace srm {
                         printf("   | spike_part %f\n", spike_part);
                     }                                           
                 }
-                ff[wi] = p*(log(p)+1)*(int_part + spike_part);
+                ff[wi] = -p*(log(p)+1)*(int_part + spike_part);
                 ff[wi] = ff[wi]*(eg->Tmax - eg->T0);
             }
              
@@ -72,24 +72,23 @@ namespace srm {
         }
 
         vec grad() {
-            Log::Info << neuron->w.size() << "\n";
             vec w_grad(neuron->w.size(), fill::zeros);
             // for no spikes:
             TTime y_no_spikes = TTime();
             double p0 = survFunction(neuron, y_no_spikes, T0, Tmax);
             for(size_t wi=0; wi < neuron->w.size(); wi++) {
                 TNeuronSynapseGivenY p(wi, neuron, y_no_spikes);
-                double sec_part = gauss_legendre(cd.GaussQuad, integrand_epsp_gl, (void*)&p, T0, Tmax);
-                w_grad(wi) += p0*(log(p0)+1)*sec_part;
-                Log::Info << "Hgrad0[" << wi << "] = " << w_grad(wi) << "\n";
+                double sec_part = gauss_legendre(cs.GaussQuad, integrand_epsp_gl, (void*)&p, T0, Tmax);
+                w_grad(wi) += -p0*(log(p0)+1)*sec_part;
+//                Log::Info << "Hgrad0[" << wi << "] = " << w_grad(wi) << "\n";
             }
             for(int n_calc = 1; n_calc <= 3; n_calc++) {
                                
                 vec integral = integrate(n_calc, neuron->w.size(), EntropyGradIntegrand);
                 w_grad += integral;
-                for(size_t wi=0; wi<neuron->w.size(); wi++) {
-                    Log::Info << "Hgrad" << n_calc << "[" << wi << "] = " << integral[wi] << "\n";
-                }
+//                for(size_t wi=0; wi<neuron->w.size(); wi++) {
+//                    Log::Info << "Hgrad" << n_calc << "[" << wi << "] = " << integral[wi] << "\n";
+//                }
             }
             return w_grad;
         }

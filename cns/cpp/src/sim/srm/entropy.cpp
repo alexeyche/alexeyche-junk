@@ -6,8 +6,8 @@
 
 
 namespace srm {
-//    int EntropyCalc::IntegrandFull(const int *ndim, const double xx[], const int *ncomp, double ff[], void *userdata) {
-//        EntropyCalc *ec = (EntropyCalc*)userdata;
+//    int TEntropyCalc::IntegrandFull(const int *ndim, const double xx[], const int *ncomp, double ff[], void *userdata) {
+//        TEntropyCalc *ec = (TEntropyCalc*)userdata;
 //        double pp[*ncomp];
 //        double t_cur= -datum::inf;
 //        for(size_t nd = 0; nd< *ndim; nd++) {
@@ -38,8 +38,8 @@ namespace srm {
 //        return 0;
 //    }
 
-    int EntropyCalc::EntropyIntegrand(const int *ndim, const double xx[], const int *ncomp, double ff[], void *userdata) {
-        EntropyCalc *ec = (EntropyCalc*)userdata;
+    int TEntropyCalc::EntropyIntegrand(const int *ndim, const double xx[], const int *ncomp, double ff[], void *userdata) {
+        TEntropyCalc *ec = (TEntropyCalc*)userdata;
         
         TTime y(*ndim);
         double t_cur= -datum::inf;
@@ -65,15 +65,15 @@ namespace srm {
         ff[0] = ff[0]*(ec->Tmax - ec->T0);
         return 0;
     }
-    double EntropyCalc::entropy_fn_int(const double &fn, EntropyCalc *ec) {
+    double TEntropyCalc::entropy_fn_int(const double &fn, TEntropyCalc *ec) {
         if(ec->n_cur+1 < ec->n) {
             ec->neuron->y[ec->n_cur] = fn;
             ec->n_cur += 1;
 //            Log::Info << "We going to integrate entr [" << fn << "," << ec->Tmax << "]\n";
-            double H = int_brute<EntropyCalc>(fn, ec->Tmax, ec->cs.Dt, ec, &entropy_fn_int);
-//            double H = int_trapezium<EntropyCalc>(fn, ec->Tmax, 1000, ec, &entropy_fn_int);
-//            double H = int_trapezium<EntropyCalc>(ec->T0, ec->Tmax, 10, ec, &entropy_fn_int);
-            //double H = DEIntegrator<double, EntropyCalc>::Integrate(ec, &entropy_fn_int, fn, ec->Tmax, 1e-06);
+            double H = int_brute<TEntropyCalc>(fn, ec->Tmax, ec->cs.Dt, ec, &entropy_fn_int);
+//            double H = int_trapezium<TEntropyCalc>(fn, ec->Tmax, 1000, ec, &entropy_fn_int);
+//            double H = int_trapezium<TEntropyCalc>(ec->T0, ec->Tmax, 10, ec, &entropy_fn_int);
+            //double H = DEIntegrator<double, TEntropyCalc>::Integrate(ec, &entropy_fn_int, fn, ec->Tmax, 1e-06);
             ec->n_cur = 0;
 //            Log::Info << "We integrated H = " << H << "\n"; 
             return H;
@@ -93,7 +93,7 @@ namespace srm {
             return -p*log(p);
         }            
     }
-    void EntropyCalc::printIntConf() {
+    void TEntropyCalc::printIntConf() {
         if(cs.method == "Vegas") {
             printf("VEGAS PARAM: EpsRel %e, EpsAbs %e, MinEval %d, MaxEval %d, NStart %d, NIncrease %d, NBatch %d, GridNo %d\n", cs.EpsRel, cs.EpsAbs,cs.MinEval, cs.MaxEval, cs.NStart, cs.NIncrease, cs.NBatch, cs.GridNo);
         } 
@@ -109,7 +109,7 @@ namespace srm {
     }    
 
     //const int *ndim, const double xx[], const int *ncomp, double ff[], void *userdata
-    vec EntropyCalc::integrate(int ndim, int ncomp, int (integrand)(const int*, const double*, const int*, double*, void*) ) {
+    vec TEntropyCalc::integrate(int ndim, int ncomp, int (integrand)(const int*, const double*, const int*, double*, void*) ) {
         int verbose, comp, nregions, neval, fail;
         double integral[ncomp], error[ncomp], prob[ncomp];       
         
@@ -134,7 +134,7 @@ namespace srm {
         return vec(integral, ncomp);
     }
 
-    double EntropyCalc::run(int dim = DIM_MAX) {
+    double TEntropyCalc::run(int dim = DIM_MAX) {
         double int_full = 0;
         TTime y0; 
         double p0 = survFunction(neuron, y0, T0, Tmax);

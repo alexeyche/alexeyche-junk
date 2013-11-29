@@ -6,6 +6,7 @@
 #include <sim/int/simple_int.h>
 
 #include "neurons.h"
+#include "cfg.h"
 
 namespace srm {
 
