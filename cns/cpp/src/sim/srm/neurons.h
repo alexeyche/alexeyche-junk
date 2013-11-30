@@ -128,14 +128,6 @@ namespace srm {
         unsigned int id_num;
     };
     
-    class ConstInputNeuron : public Neuron {
-    public:        
-        ConstInputNeuron(const Neuron &n)  : w(n.w), in(n.in) {}
-        const std::vector<double> &w;
-        const TInput &in;
-        TTime y;
-    };
-
     class DetermenisticNeuron: public Neuron {
     public:
         DetermenisticNeuron() {}
@@ -172,7 +164,7 @@ namespace srm {
     #define NU_WORK_WINDOW 40
     public:
         static constexpr double ts = 3;  // ms
-        static constexpr double tm = 10; // ms
+        static constexpr double tm = 10; //10; // ms
         
         static double epsp(double t, double fj, double fi) {
             if( ((t-fj)<0) ||  (fj<0) ) return 0.0;
@@ -199,8 +191,8 @@ namespace srm {
         SrmNeuron(SrmNeuron *n) :  StochasticNeuron(n) { }
     
         static constexpr double u_rest = -70; //mV
-        static constexpr double alpha = 1;
-        static constexpr double beta = 1;
+        static constexpr double alpha = 0.75;
+        static constexpr double beta = 0.25; //0.25;
         static constexpr double tresh = -50; //mV
 
         double u(const double &t, TTime &y_given) {

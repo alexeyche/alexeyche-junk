@@ -388,7 +388,7 @@ void test_entropy_surface() {
            for(size_t wi2=0; wi2<w2.n_elem; wi2++) {
                 n.w[0] =  w1(wi1); 
                 n.w[1] =  w2(wi2); 
-                srm::EntropyCalc ec(&n, Tmax-10, Tmax);
+                srm::TEntropyCalc ec(&n, Tmax-10, Tmax);
                 double H = ec.run(4);
                 Log::Info << "w1: " << n.w[0] << " w2: " << n.w[1] << " H = " << H << "\n";
                 H_stat(wi1, wi2) = H;
@@ -488,13 +488,89 @@ void test_p_stroke() {
     n.add_input(new srm::DetermenisticNeuron("8 9"), w_start);
     s.addNeuron(&n);
     s.run(50, 0.1);
-    srm::TEntropyGrad eg(n, 0, 25);
+    srm::TEntropyGrad eg(&n, 0, 25);
     vec t = linspace<vec>(0, 50, 150);
     vec ps(150, fill::zeros);
     for(size_t ti=0; ti<t.n_elem; ti++) {
-        ps(ti) = eg.p_stroke(t(ti), &n);
+  //      ps(ti) = eg.p_stroke(t(ti), &n);
     }
     send_arma_mat(ps, "ps");
+}
+
+mat H_surface(srm::SrmNeuron *n, double f1, double f2) {
+    n->in[0]->y[0] = f1;
+    n->in[1]->y[0] = f2;
+    double dw=5;
+    double wmin=0;
+    double wmax=50;
+    vec w1=linspace<vec>(wmin, wmax, (wmax-wmin)/dw);
+    vec w2=linspace<vec>(wmin, wmax, (wmax-wmin)/dw);
+    mat Hsurf(w1.n_elem, w2.n_elem);
+    srm::TEntropyCalc ec(n, 0, 50);
+    for(size_t wi1=0; wi1<w1.n_elem; wi1++) {
+        for(size_t wi2=0; wi2<w2.n_elem; wi2++) {
+            n->w[0] = w1(wi1);
+            n->w[1] = w2(wi2);
+            Hsurf(wi1, wi2) = ec.run(3);
+            Log::Info << "wi1: " << wi1 << " wi2: " << wi2 << " w1: " << w1(wi1) << " w2: " << w2(wi2)  << " H: " << Hsurf(wi1,wi2) << "\n"; 
+        }
+    }
+    return Hsurf;
+}
+
+void test_stdp() {
+    std::srand(time(NULL));
+    srm::Sim s;
+    srm::SrmNeuron n;
+
+    n.add_input(new srm::DetermenisticNeuron("25"), 50); 
+    n.add_input(new srm::DetermenisticNeuron("12"), 10);
+
+    s.addRecNeuron(&n);
+    for(size_t wi=0; wi<n.w.size(); wi++) { Log::Info << n.w[wi] << ", "; } Log::Info << "\n";
+    double t2_start = 0;
+    double t2_end = 50;
+    double dt = 1;
+    mat stdp1( (t2_end-t2_start)/dt+1, 2);
+    mat stdp2( (t2_end-t2_start)/dt+1, 2);
+    size_t ti = 0;
+    for(double t2=t2_start; t2<=t2_end; t2 += dt) { 
+        n.w[0] = 35; // 55, 5 - classic stdp, alpha=1 beta=1
+        n.w[1] = 1;  // 
+        n.in[1]->y[0] = t2;
+        n.y.clean();
+        while(n.y.size() == 0) {
+            s.run(50*srm::ms,0.5);
+        }
+        Log::Info << "=================================\n";
+        Log::Info << "delta t = " << n.y(0) - n.in[1]->y[0] << "\n";
+        srm::TEntropyGrad eg(&n, 0, 50);
+        srm::TEntropyCalc ec(&n, 0, 50);
+        vec dHdw_mean(n.w.size(), fill::zeros);
+        size_t epoch = 1;
+        for(size_t i=0; i<epoch; i++) {  // epoch
+            vec dHdw = eg.grad();
+            dHdw_mean += dHdw;
+            for(size_t wi=0; wi<n.w.size(); wi++) { n.w[wi] -= 3 * dHdw(wi); }
+            Log::Info << "Epoch(" << i << "): ";
+            Log::Info << "Grad: ";
+            for(size_t wi=0; wi<n.w.size(); wi++) { Log::Info << dHdw(wi) << ", "; }
+            if(i % 1 == 0) {
+                Log::Info << " H: ";
+                double H = ec.run(3);
+                Log::Info << H;
+            }            
+            Log::Info << "\n";
+        }
+        dHdw_mean = -dHdw_mean/epoch;
+        stdp1(ti,0) = n.y(0) - n.in[0]->y[0];
+        stdp1(ti,1) = dHdw_mean(0);
+        stdp2(ti,0) = n.y(0) - n.in[1]->y[0];
+        stdp2(ti,1) = dHdw_mean(1);
+        ti+=1;
+    }        
+    send_arma_mat(stdp1, "stdp1", NULL, true);
+    send_arma_mat(stdp2, "stdp2", NULL, true);
 }
 
 PROGRAM_INFO("SIM TEST", "sim tests"); 
@@ -576,6 +652,12 @@ int main(int argc, char** argv) {
         Log::Info << "p_stroke:" << std::endl;
         Log::Info << "===============================================================" << std::endl;
         test_p_stroke();
+        Log::Info << "===============================================================" << std::endl;
+    }
+    if((test_name == "all") || (test_name == "stdp")) {
+        Log::Info << "stdp:" << std::endl;
+        Log::Info << "===============================================================" << std::endl;
+        test_stdp();
         Log::Info << "===============================================================" << std::endl;
     }
    

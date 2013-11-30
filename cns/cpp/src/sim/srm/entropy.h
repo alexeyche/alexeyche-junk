@@ -16,7 +16,7 @@ namespace srm {
                      Key1(47), Key2(1), Key3(1), MaxPass(5), MaxChiSq(10.), MinDeviation(.25), NGiven(0), LDXGiven("NDIM"), NExtra(0), // Divonne default
                      Key(0), // Cuhre default
                      Dt(0.1), // trapezium default
-                     GaussQuad(128)
+                     GaussQuad(256)
                      {} 
 
         std::string method;

@@ -118,7 +118,7 @@ namespace srm {
             Log::Info << "Sending statistics to 7778\n";
             sg.sendStat();
             Log::Info << "Done\n";
-            T0 = Tmax;
+            //T0 = Tmax;
         }
 
         void addNeuron(Neuron *n) {
