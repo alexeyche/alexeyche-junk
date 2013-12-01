@@ -8,7 +8,13 @@ namespace srm {
     class NeuronGroup : public SimElement { 
     public:
         NeuronGroup(bool preCalculate) : SimElement(preCalculate) {}
-
+        Neuron* operator[](size_t ind) {
+            return group[ind];
+        }
+        size_t size() {
+            return group.size();
+        }
+        
         std::vector<Neuron*> group;
     };
 
@@ -117,6 +123,19 @@ namespace srm {
     };
 
 
+    class SrmNeuronGroup : public NeuronGroup {
+    public:
+        SrmNeuronGroup(size_t num) : NeuronGroup(false) {
+            for(size_t ni=0; ni<num; ni++) {
+                group.push_back(new SrmNeuron());
+            }
+        }
+        ~SrmNeuronGroup() {  
+            for(size_t ni=0; ni<group.size(); ni++) { 
+                delete group[ni];
+            }
+        }
+    };
 
 }
 

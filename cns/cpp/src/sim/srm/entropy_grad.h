@@ -33,7 +33,32 @@ namespace srm {
             TNeuronSynapseGivenY *p = (TNeuronSynapseGivenY*)data;
             return -p_stroke(t, p->n, p->y) * grab_epsp(t, p->ind_syn, p->n, p->y);
         }
-        
+        // one numerical evaluation of EntropyGrad
+        static vec EntropyGradGivenY(TEntropyGrad *eg, TTime &y) {
+            double p = survFunction(eg->neuron, y, eg->T0, eg->Tmax);
+            vec grad(eg->neuron->w.size());
+            for(size_t wi=0; wi< grad.n_elem; wi++) {
+                TNeuronSynapseGivenY n_syn_y(wi, eg->neuron, y);           
+                double int_part = gauss_legendre(eg->cs.GaussQuad, integrand_epsp_gl, (void*)&n_syn_y, eg->T0, eg->Tmax);
+                if(eg->cs.VerboseInt) printf("int_part wi(%zu) = %f", wi, int_part); 
+                double spike_part = 0;
+                for(size_t yi=0; yi<y.size(); yi++) {
+                    double &fi = y[yi];
+                    spike_part += (p_stroke(fi, eg->neuron, y)/eg->neuron->p(fi, y))*grab_epsp(fi, wi, eg->neuron, y);
+                    if(eg->cs.VerboseInt) {
+                        printf(" | yi: %zu ", yi);
+                    //    printf("   | p' = %f\n", p_stroke(fi, eg->neuron, y));
+                    //    printf("   | p = %f\n", eg->neuron->p(fi, y));
+                    //    printf("   | u(t) = %f\n", eg->neuron->u(fi, y));
+                    //    printf("   | y[yi] = %f\n", y[yi]);
+                        printf("   | spike_part %f\n", spike_part);
+                    }                                           
+                }
+                grad(wi) = -p*(log(p)+1)*(int_part + spike_part);
+            }
+            return grad;
+        }
+
         // for Monte Carlo integration 
         static int EntropyGradIntegrand(const int *ndim, const double xx[], const int *ncomp, double ff[], void *userdata) {
             TEntropyGrad *eg = (TEntropyGrad*)userdata;

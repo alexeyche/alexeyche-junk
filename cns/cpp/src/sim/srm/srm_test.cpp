@@ -521,15 +521,23 @@ mat H_surface(srm::SrmNeuron *n, double f1, double f2) {
 vec get_mean_firetimes(srm::SrmNeuron *n, srm::Sim *s, double simtime = 50, double ntrials = 20, int max_fires=10) {
     vec fmean(max_fires, fill::zeros);
     uvec fire_times(max_fires, fill::zeros);
-
+    vec dHdw_1eval_m(n->w.size(), fill::zeros);
     for(size_t tr_i=0; tr_i<ntrials; tr_i++) {
         n->y.clean();
         s->run(simtime*srm::ms,0.5, false);
+        srm::TEntropyGrad eg(n, 0, 50);
+        vec dHdw_1eval = eg.EntropyGradGivenY(&eg, n->y);
+
+        dHdw_1eval_m += dHdw_1eval;
         for(size_t yi=0; yi<std::min((double)max_fires,(double)n->y.size()); yi++) {
             fmean(yi) += n->y[yi];
             fire_times(yi) += 1; 
         }
     }
+    dHdw_1eval_m = dHdw_1eval_m/ntrials;
+    Log::Info << "Grad 1 eval: ";
+    for(size_t wi=0; wi<n->w.size(); wi++) { Log::Info << dHdw_1eval_m(wi) << ", "; }
+    Log::Info << "\n";
     return fmean/fire_times;
 }
 
@@ -552,8 +560,8 @@ void test_stdp() {
     mat probs((t2_end-t2_start)/dt+1, 50/0.5, fill::zeros);
     mat pots((t2_end-t2_start)/dt+1, 50/0.5, fill::zeros);
     for(double t2=t2_start; t2<=t2_end; t2 += dt) { 
-        n.w[0] = 25; // 55, 5 - classic stdp, alpha=1 beta=1 ; 25, 5, beta=0.25, alpha=0.35 - More ltd
-        n.w[1] = 7.5;  // 
+        n.w[0] = 30; // 55, 5 - classic stdp, alpha=1 beta=1 ; 25, 5, beta=0.25, alpha=0.35 - More ltd
+        n.w[1] = 5;  // 
         n.in[1]->y[0] = t2;
         vec fmeanv = get_mean_firetimes(&n, &s, 50, 20, 1);
         double fmean = fmeanv(0);
@@ -572,12 +580,8 @@ void test_stdp() {
             Log::Info << "Epoch(" << i << "): ";
             Log::Info << "Grad: ";
             for(size_t wi=0; wi<n.w.size(); wi++) { Log::Info << dHdw(wi) << ", "; }
-            if(i % 1 == 0) {
-                Log::Info << " H: ";
-                double H = ec.run(3);
-                Log::Info << H;
-            }            
             Log::Info << "\n";
+                       
         }
         dHdw_mean = -dHdw_mean/epoch;
         stdp1(ti,0) = fmean - n.in[0]->y[0];
@@ -597,11 +601,11 @@ void test_stdp_many() {
     srm::Sim s;
     srm::SrmNeuron n;
 
-    n.add_input(new srm::DetermenisticNeuron("1"), 7); 
-    n.add_input(new srm::DetermenisticNeuron("1"), 7);
-    n.add_input(new srm::DetermenisticNeuron("1"), 7); 
-    n.add_input(new srm::DetermenisticNeuron("1"), 7);
-    n.add_input(new srm::DetermenisticNeuron("1"), 7); 
+    n.add_input(new srm::DetermenisticNeuron("1"), 8); 
+    n.add_input(new srm::DetermenisticNeuron("1"), 8);
+    n.add_input(new srm::DetermenisticNeuron("1"), 8); 
+    n.add_input(new srm::DetermenisticNeuron("1"), 8);
+    n.add_input(new srm::DetermenisticNeuron("1"), 8); 
     n.add_input(new srm::DetermenisticNeuron("1"), 1);
     n.add_input(new srm::DetermenisticNeuron("1"), 1); 
     n.add_input(new srm::DetermenisticNeuron("1"), 1);
@@ -615,7 +619,7 @@ void test_stdp_many() {
 
     s.run(100*srm::ms, 0.5, true);
     double tstart=0;
-    double tend=8;
+    double tend=100;
     double dt=4;
     mat grads((tend-tstart)/dt, n.w.size());
     size_t gi=0;
@@ -636,9 +640,19 @@ void test_stdp_many() {
         Log::Info <<  "\n";
         vec dHdw(n.w.size(), fill::zeros);
         for(double tg=0; tg<100; tg+=10) {
-            srm::TEntropyGrad eg(&n, tg, tg+20);
-            dHdw += eg.grad();
+            srm::TEntropyGrad eg(&n, tg, tg+10);
+            vec dHdw_cur = eg.grad();
+            Log::Info << "dHdw(" << tg << ":"<< tg+10 << ")= ";
+            for(size_t wi=0; wi<n.w.size(); wi++) { Log::Info << dHdw_cur(wi) << ", "; } 
+            Log::Info << "\n";
+            dHdw += dHdw_cur;
         }            
+//        srm::TEntropyGrad eg(&n, 0, 100);
+//        vec dHdw_full = eg.grad();
+//        Log::Info << "dHdw_full(" << 0 << ":"<< 100 << ")= ";
+//        for(size_t wi=0; wi<n.w.size(); wi++) { Log::Info << dHdw_full(wi) << ", "; } 
+//        Log::Info << "\n";
+
         Log::Info << "Grad: ";
         for(size_t wi=0; wi<n.w.size(); wi++) { grads(gi,wi) = -dHdw(wi); Log::Info << dHdw(wi) << ", "; }
         gi++;
