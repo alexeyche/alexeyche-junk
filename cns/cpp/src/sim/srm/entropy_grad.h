@@ -48,19 +48,27 @@ namespace srm {
                 t_cur = y[nd];
             }
             double p = survFunction(eg->neuron, y, eg->T0, eg->Tmax);
+            if(eg->cs.VerboseInt) {
+                printf("survFunction for y = [ ");
+                for(size_t nd=0; nd< y.size(); nd++) {
+                    printf("%f, ", y[nd]);
+                }
+                printf("] = %e  \n", p);
+            }
             for(size_t wi=0; wi< *ncomp; wi++) {
                 TNeuronSynapseGivenY n_syn_y(wi, eg->neuron, y);           
                 double int_part = gauss_legendre(eg->cs.GaussQuad, integrand_epsp_gl, (void*)&n_syn_y, eg->T0, eg->Tmax);
+                if(eg->cs.VerboseInt) printf("int_part wi(%zu) = %f", wi, int_part); 
                 double spike_part = 0;
                 for(size_t yi=0; yi<y.size(); yi++) {
                     double &fi = y[yi];
                     spike_part += (p_stroke(fi, eg->neuron, y)/eg->neuron->p(fi, y))*grab_epsp(fi, wi, eg->neuron, y);
                     if(eg->cs.VerboseInt) {
-                        printf("yi: %zu\n", yi);
-                        printf("   | p' = %f\n", p_stroke(fi, eg->neuron, y));
-                        printf("   | p = %f\n", eg->neuron->p(fi, y));
-                        printf("   | u(t) = %f\n", eg->neuron->u(fi, y));
-                        printf("   | y[yi] = %f\n", y[yi]);
+                        printf(" | yi: %zu ", yi);
+                    //    printf("   | p' = %f\n", p_stroke(fi, eg->neuron, y));
+                    //    printf("   | p = %f\n", eg->neuron->p(fi, y));
+                    //    printf("   | u(t) = %f\n", eg->neuron->u(fi, y));
+                    //    printf("   | y[yi] = %f\n", y[yi]);
                         printf("   | spike_part %f\n", spike_part);
                     }                                           
                 }

@@ -518,13 +518,28 @@ mat H_surface(srm::SrmNeuron *n, double f1, double f2) {
     return Hsurf;
 }
 
+vec get_mean_firetimes(srm::SrmNeuron *n, srm::Sim *s, double simtime = 50, double ntrials = 20, int max_fires=10) {
+    vec fmean(max_fires, fill::zeros);
+    uvec fire_times(max_fires, fill::zeros);
+
+    for(size_t tr_i=0; tr_i<ntrials; tr_i++) {
+        n->y.clean();
+        s->run(simtime*srm::ms,0.5, false);
+        for(size_t yi=0; yi<std::min((double)max_fires,(double)n->y.size()); yi++) {
+            fmean(yi) += n->y[yi];
+            fire_times(yi) += 1; 
+        }
+    }
+    return fmean/fire_times;
+}
+
 void test_stdp() {
     std::srand(time(NULL));
     srm::Sim s;
     srm::SrmNeuron n;
 
     n.add_input(new srm::DetermenisticNeuron("25"), 50); 
-    n.add_input(new srm::DetermenisticNeuron("12"), 10);
+    n.add_input(new srm::DetermenisticNeuron("25"), 10);
 
     s.addRecNeuron(&n);
     for(size_t wi=0; wi<n.w.size(); wi++) { Log::Info << n.w[wi] << ", "; } Log::Info << "\n";
@@ -534,16 +549,18 @@ void test_stdp() {
     mat stdp1( (t2_end-t2_start)/dt+1, 2);
     mat stdp2( (t2_end-t2_start)/dt+1, 2);
     size_t ti = 0;
+    mat probs((t2_end-t2_start)/dt+1, 50/0.5, fill::zeros);
+    mat pots((t2_end-t2_start)/dt+1, 50/0.5, fill::zeros);
     for(double t2=t2_start; t2<=t2_end; t2 += dt) { 
-        n.w[0] = 35; // 55, 5 - classic stdp, alpha=1 beta=1
-        n.w[1] = 1;  // 
+        n.w[0] = 25; // 55, 5 - classic stdp, alpha=1 beta=1 ; 25, 5, beta=0.25, alpha=0.35 - More ltd
+        n.w[1] = 7.5;  // 
         n.in[1]->y[0] = t2;
-        n.y.clean();
-        while(n.y.size() == 0) {
-            s.run(50*srm::ms,0.5);
-        }
+        vec fmeanv = get_mean_firetimes(&n, &s, 50, 20, 1);
+        double fmean = fmeanv(0);
+        vec ttest = linspace<vec>(0,50, 50/0.5);
+        for(size_t tti=0; tti<ttest.n_elem; tti++) { srm::TTime ytest(1); ytest[0] = fmean; probs(ti, tti) = n.p(ttest(tti), ytest); pots(ti, tti) = n.u(ttest(tti), ytest);}
         Log::Info << "=================================\n";
-        Log::Info << "delta t = " << n.y(0) - n.in[1]->y[0] << "\n";
+        Log::Info << "delta t = " << fmean - n.in[1]->y[0] <<  "\n";
         srm::TEntropyGrad eg(&n, 0, 50);
         srm::TEntropyCalc ec(&n, 0, 50);
         vec dHdw_mean(n.w.size(), fill::zeros);
@@ -563,14 +580,72 @@ void test_stdp() {
             Log::Info << "\n";
         }
         dHdw_mean = -dHdw_mean/epoch;
-        stdp1(ti,0) = n.y(0) - n.in[0]->y[0];
+        stdp1(ti,0) = fmean - n.in[0]->y[0];
         stdp1(ti,1) = dHdw_mean(0);
-        stdp2(ti,0) = n.y(0) - n.in[1]->y[0];
+        stdp2(ti,0) = fmean - n.in[1]->y[0];
         stdp2(ti,1) = dHdw_mean(1);
         ti+=1;
     }        
     send_arma_mat(stdp1, "stdp1", NULL, true);
     send_arma_mat(stdp2, "stdp2", NULL, true);
+    send_arma_mat(probs, "probs");
+    send_arma_mat(pots, "pots");
+}
+
+void test_stdp_many() {
+    std::srand(time(NULL));
+    srm::Sim s;
+    srm::SrmNeuron n;
+
+    n.add_input(new srm::DetermenisticNeuron("1"), 7); 
+    n.add_input(new srm::DetermenisticNeuron("1"), 7);
+    n.add_input(new srm::DetermenisticNeuron("1"), 7); 
+    n.add_input(new srm::DetermenisticNeuron("1"), 7);
+    n.add_input(new srm::DetermenisticNeuron("1"), 7); 
+    n.add_input(new srm::DetermenisticNeuron("1"), 1);
+    n.add_input(new srm::DetermenisticNeuron("1"), 1); 
+    n.add_input(new srm::DetermenisticNeuron("1"), 1);
+    n.add_input(new srm::DetermenisticNeuron("1"), 1); 
+    n.add_input(new srm::DetermenisticNeuron("1"), 1);
+    s.addRecNeuron(&n);
+
+//    s.addStatListener(&n, srm::TStatListener::Spike);
+//    s.addStatListener(&n, srm::TStatListener::Pot);
+//    s.addStatListener(&n, srm::TStatListener::Prob);
+
+    s.run(100*srm::ms, 0.5, true);
+    double tstart=0;
+    double tend=8;
+    double dt=4;
+    mat grads((tend-tstart)/dt, n.w.size());
+    size_t gi=0;
+    for(double tshift=tstart; tshift<tend; tshift+=dt) {
+        Log::Info << "=================================\n";
+        Log::Info << "=================================\n";
+        double cur_tshift = tshift/5;
+        for(size_t ni=5; ni<n.w.size(); ni++) {
+          n.in[ni]->y[0] = 1+cur_tshift*(ni-4);
+          Log::Info << "ni("<< ni << "): " << n.in[ni]->y[0] << ", ";
+        }
+        Log::Info << "\n";
+        Log::Info << "=================================\n";
+        vec meanf = get_mean_firetimes(&n, &s, 100, 20, 5);
+        for(size_t mfi=0; mfi<meanf.n_elem; mfi++) { if(meanf[mfi]>0.001) { Log::Info << meanf[mfi] << ", "; } }
+        Log::Info << "\n";
+        for(size_t ni=5; ni<n.w.size(); ni++) { Log::Info << "dt = " << meanf[0]- n.in[ni]->y[0] << ", "; } 
+        Log::Info <<  "\n";
+        vec dHdw(n.w.size(), fill::zeros);
+        for(double tg=0; tg<100; tg+=10) {
+            srm::TEntropyGrad eg(&n, tg, tg+20);
+            dHdw += eg.grad();
+        }            
+        Log::Info << "Grad: ";
+        for(size_t wi=0; wi<n.w.size(); wi++) { grads(gi,wi) = -dHdw(wi); Log::Info << dHdw(wi) << ", "; }
+        gi++;
+        Log::Info << "\n";
+    }
+    send_arma_mat(grads,"grads",NULL, true);
+
 }
 
 PROGRAM_INFO("SIM TEST", "sim tests"); 
@@ -660,7 +735,13 @@ int main(int argc, char** argv) {
         test_stdp();
         Log::Info << "===============================================================" << std::endl;
     }
-   
+    if((test_name == "all") || (test_name == "stdp_many")) {
+        Log::Info << "stdp_many:" << std::endl;
+        Log::Info << "===============================================================" << std::endl;
+        test_stdp_many();
+        Log::Info << "===============================================================" << std::endl;
+    }
+  
     return 0;
 }
 
