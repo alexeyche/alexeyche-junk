@@ -26,7 +26,9 @@ int main(int argc, char** argv)
     const std::string mode = CLI::GetParam<std::string>("mode");
     const double learning_rate = CLI::GetParam<double>("rate");
     const int epoch = CLI::GetParam<int>("epoch");
+    
     std::srand(seed);
+    
     Sim s;
     SrmNeuron n;
 
