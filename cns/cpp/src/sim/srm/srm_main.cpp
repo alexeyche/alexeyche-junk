@@ -31,24 +31,29 @@ int main(int argc, char** argv)
     
     Sim s;
     SrmNeuronGroup g(10);
-    connect(&g, &g, TConnType::AllToAll, 0.1);
-    for(size_t ni=0; ni<g.size(); ni++) {
-        Log::Info << "neuron " << g.group[ni]->id() << " is connected to : ";    
-        for(size_t wi=0; wi<g.group[ni]->w.size(); wi++) {
-            Log::Info << g[ni]->in[wi]->id() << ";w=" << g.group[ni]->w[wi] << ", ";
-        }
-        Log::Info << "\n";
-    }
+    connect(&g, &g, TConnType::AllToAll, 0.6);
 
-//    TimeSeriesGroup g(100, 0*ms, 100); 
-//    g.loadPatternFromFile("/var/tmp/d1.csv", 500*ms, 100);
-//    send_arma_mat(g.patterns[0].pattern, "d1_stat");
+
+    TimeSeriesGroup tsg(10, 0*ms, 100); 
+    tsg.loadPatternFromFile("/var/tmp/d1.csv", 500*ms, 100);
+//    send_arma_mat(tsg.patterns[0].pattern, "d1_stat");
+//    return 0;
 //    g.loadPatternFromFile("/var/tmp/d2.csv", 100*ms, 0.5);
 //    send_arma_mat(g.patterns[1].pattern, "d2_stat");
-//    srm::connectFeedForward(&g, &n, 1);
+    connect(&tsg, &g, TConnType::FeedForward, 0.6);
     
+//    for(size_t ni=0; ni<g.size(); ni++) {
+//        Log::Info << "neuron " << g.group[ni]->id() << " is connected to : ";    
+//        for(size_t wi=0; wi<g.group[ni]->w.size(); wi++) {
+//            Log::Info << g[ni]->in[wi]->id() << ";w=" << g.group[ni]->w[wi] << ", ";
+//        }
+//        Log::Info << "\n";
+//    }   
+    s.addNeuronGroup(&tsg);
+    s.addNeuronGroup(&g);
+    s.addStatListener(&g);
     if(mode == "run") {    
-        s.run(100*ms, 0.5);
+        s.run(1800*ms, 0.5);
     } else 
     if(mode == "learn") {
         //Log::Info << "weights before:\n";

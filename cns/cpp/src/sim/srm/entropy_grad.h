@@ -103,7 +103,19 @@ namespace srm {
              
             return 0;
         }
-
+        vec grad_1eval() {
+            vec w_grad(neuron->w.size(), fill::zeros);
+            TTime y_no_spikes = TTime();
+            double p0 = survFunction(neuron, y_no_spikes, T0, Tmax);
+            for(size_t wi=0; wi < neuron->w.size(); wi++) {
+                TNeuronSynapseGivenY p(wi, neuron, y_no_spikes);
+                double sec_part = gauss_legendre(cs.GaussQuad, integrand_epsp_gl, (void*)&p, T0, Tmax);
+                w_grad(wi) += -p0*(log(p0)+1)*sec_part;
+//                Log::Info << "Hgrad0[" << wi << "] = " << w_grad(wi) << "\n";
+            }           
+            w_grad += EntropyGradGivenY(this, neuron->y);
+            return w_grad;
+        }
         vec grad() {
             vec w_grad(neuron->w.size(), fill::zeros);
             // for no spikes:
@@ -115,7 +127,7 @@ namespace srm {
                 w_grad(wi) += -p0*(log(p0)+1)*sec_part;
 //                Log::Info << "Hgrad0[" << wi << "] = " << w_grad(wi) << "\n";
             }
-            for(int n_calc = 1; n_calc <= 3; n_calc++) {
+            for(int n_calc = 1; n_calc <= 1; n_calc++) {
                                
                 vec integral = integrate(n_calc, neuron->w.size(), EntropyGradIntegrand);
                 w_grad += integral;

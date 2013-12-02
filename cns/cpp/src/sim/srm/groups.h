@@ -11,6 +11,9 @@ namespace srm {
         Neuron* operator[](size_t ind) {
             return group[ind];
         }
+        Neuron* at(size_t ind) {
+            return group[ind];
+        }
         size_t size() {
             return group.size();
         }
@@ -38,6 +41,7 @@ namespace srm {
             }
             group.clear();
         }
+
         void loadPatternFromFile(std::string csv_file, double pattDur, double pattProb) {
             mat ts;
             data::Load(csv_file, ts, true, false); 
@@ -65,7 +69,7 @@ namespace srm {
                 mean_rate += mean(pattern, 1)/patterns.size();
             }
             //meta_rate = mean_rate/10;
-            vec t = linspace<vec>(0, Tmax, (int)Tmax/dt);
+            vec t = linspace<vec>(T0, Tmax, (int)Tmax/dt);
             vec unif(t.n_elem, fill::randu);
             double refrTime_cur = 0;
             int patt_id=-1; // pattern that we choosed
@@ -73,9 +77,10 @@ namespace srm {
             for(size_t ti=0; ti<t.n_elem; ti++) {
                 if (refrTime_cur > 0) { 
                     refrTime_cur -= dt;
+                    Log::Info << "refrTime_cur " << refrTime_cur << "\n";
                 } else if(patt_id<0) { // choosing pattern
                     if(pattProb*dt>unif(ti)) {
-//                        Log::Info << "What time is it? Pattern time! ("  << t(ti) << ")\n";
+                        Log::Info << "What time is it? Pattern time! ("  << t(ti) << ")\n";
                         double cump=0;
                         vec unif_patt(patterns.size(), fill::randu);
                         for(size_t pi=0; pi<patterns.size(); pi++) {
@@ -88,6 +93,7 @@ namespace srm {
                         }
                     }                        
                 } 
+                Log::Info << "ti " << ti << "\n";
                 if(patt_id<0) {
                     // filling with poisson process
                     vec unif_poiss(group.size(), fill::randu);                    
@@ -104,9 +110,12 @@ namespace srm {
                         refrTime_cur = refrTime;
                         continue;
                     }
-                    
+                    Log::Info << "pattern.ncol " << pattern.n_cols << " pattern.nrow " << pattern.n_rows << "\n";
+                    Log::Info << "patt_id " << patt_id << " patt_ti " << patt_ti << " patt.dt " << patterns[patt_id].dt << "\n";    
                     double patt_index = patt_ti/patterns[patt_id].dt;
                     int patt_index_int = floor(patt_index+0.001); 
+                    Log::Info << "patt_index " <<  patt_index << "\n";
+                    Log::Info << "patt_index_int " <<  patt_index_int << "\n";
                     if( patt_index - patt_index_int < 1e-10) {  //machine precision stuff
                         uvec fired = find(pattern.col(patt_index_int)>0);
                         for(size_t fi=0; fi<fired.n_elem; fi++) {
