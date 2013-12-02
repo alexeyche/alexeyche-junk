@@ -388,7 +388,7 @@ void test_entropy_surface() {
            for(size_t wi2=0; wi2<w2.n_elem; wi2++) {
                 n.w[0] =  w1(wi1); 
                 n.w[1] =  w2(wi2); 
-                srm::EntropyCalc ec(&n, Tmax-10, Tmax);
+                srm::TEntropyCalc ec(&n, Tmax-10, Tmax);
                 double H = ec.run(4);
                 Log::Info << "w1: " << n.w[0] << " w2: " << n.w[1] << " H = " << H << "\n";
                 H_stat(wi1, wi2) = H;
@@ -488,13 +488,178 @@ void test_p_stroke() {
     n.add_input(new srm::DetermenisticNeuron("8 9"), w_start);
     s.addNeuron(&n);
     s.run(50, 0.1);
-    srm::TEntropyGrad eg(n, 0, 25);
+    srm::TEntropyGrad eg(&n, 0, 25);
     vec t = linspace<vec>(0, 50, 150);
     vec ps(150, fill::zeros);
     for(size_t ti=0; ti<t.n_elem; ti++) {
-        ps(ti) = eg.p_stroke(t(ti), &n);
+  //      ps(ti) = eg.p_stroke(t(ti), &n);
     }
     send_arma_mat(ps, "ps");
+}
+
+mat H_surface(srm::SrmNeuron *n, double f1, double f2) {
+    n->in[0]->y[0] = f1;
+    n->in[1]->y[0] = f2;
+    double dw=5;
+    double wmin=0;
+    double wmax=50;
+    vec w1=linspace<vec>(wmin, wmax, (wmax-wmin)/dw);
+    vec w2=linspace<vec>(wmin, wmax, (wmax-wmin)/dw);
+    mat Hsurf(w1.n_elem, w2.n_elem);
+    srm::TEntropyCalc ec(n, 0, 50);
+    for(size_t wi1=0; wi1<w1.n_elem; wi1++) {
+        for(size_t wi2=0; wi2<w2.n_elem; wi2++) {
+            n->w[0] = w1(wi1);
+            n->w[1] = w2(wi2);
+            Hsurf(wi1, wi2) = ec.run(3);
+            Log::Info << "wi1: " << wi1 << " wi2: " << wi2 << " w1: " << w1(wi1) << " w2: " << w2(wi2)  << " H: " << Hsurf(wi1,wi2) << "\n"; 
+        }
+    }
+    return Hsurf;
+}
+
+vec get_mean_firetimes(srm::SrmNeuron *n, srm::Sim *s, double simtime = 50, double ntrials = 20, int max_fires=10) {
+    vec fmean(max_fires, fill::zeros);
+    uvec fire_times(max_fires, fill::zeros);
+    vec dHdw_1eval_m(n->w.size(), fill::zeros);
+    for(size_t tr_i=0; tr_i<ntrials; tr_i++) {
+        n->y.clean();
+        s->run(simtime*srm::ms,0.5, false);
+        srm::TEntropyGrad eg(n, 0, 50);
+        vec dHdw_1eval = eg.EntropyGradGivenY(&eg, n->y);
+
+        dHdw_1eval_m += dHdw_1eval;
+        for(size_t yi=0; yi<std::min((double)max_fires,(double)n->y.size()); yi++) {
+            fmean(yi) += n->y[yi];
+            fire_times(yi) += 1; 
+        }
+    }
+    dHdw_1eval_m = dHdw_1eval_m/ntrials;
+    Log::Info << "Grad 1 eval: ";
+    for(size_t wi=0; wi<n->w.size(); wi++) { Log::Info << dHdw_1eval_m(wi) << ", "; }
+    Log::Info << "\n";
+    return fmean/fire_times;
+}
+
+void test_stdp() {
+    std::srand(time(NULL));
+    srm::Sim s;
+    srm::SrmNeuron n;
+
+    n.add_input(new srm::DetermenisticNeuron("25"), 50); 
+    n.add_input(new srm::DetermenisticNeuron("25"), 10);
+
+    s.addRecNeuron(&n);
+    for(size_t wi=0; wi<n.w.size(); wi++) { Log::Info << n.w[wi] << ", "; } Log::Info << "\n";
+    double t2_start = 0;
+    double t2_end = 50;
+    double dt = 1;
+    mat stdp1( (t2_end-t2_start)/dt+1, 2);
+    mat stdp2( (t2_end-t2_start)/dt+1, 2);
+    size_t ti = 0;
+    mat probs((t2_end-t2_start)/dt+1, 50/0.5, fill::zeros);
+    mat pots((t2_end-t2_start)/dt+1, 50/0.5, fill::zeros);
+    for(double t2=t2_start; t2<=t2_end; t2 += dt) { 
+        n.w[0] = 30; // 55, 5 - classic stdp, alpha=1 beta=1 ; 25, 5, beta=0.25, alpha=0.35 - More ltd
+        n.w[1] = 5;  // 
+        n.in[1]->y[0] = t2;
+        vec fmeanv = get_mean_firetimes(&n, &s, 50, 20, 1);
+        double fmean = fmeanv(0);
+        vec ttest = linspace<vec>(0,50, 50/0.5);
+        for(size_t tti=0; tti<ttest.n_elem; tti++) { srm::TTime ytest(1); ytest[0] = fmean; probs(ti, tti) = n.p(ttest(tti), ytest); pots(ti, tti) = n.u(ttest(tti), ytest);}
+        Log::Info << "=================================\n";
+        Log::Info << "delta t = " << fmean - n.in[1]->y[0] <<  "\n";
+        srm::TEntropyGrad eg(&n, 0, 50);
+        srm::TEntropyCalc ec(&n, 0, 50);
+        vec dHdw_mean(n.w.size(), fill::zeros);
+        size_t epoch = 1;
+        for(size_t i=0; i<epoch; i++) {  // epoch
+            vec dHdw = eg.grad();
+            dHdw_mean += dHdw;
+            for(size_t wi=0; wi<n.w.size(); wi++) { n.w[wi] -= 3 * dHdw(wi); }
+            Log::Info << "Epoch(" << i << "): ";
+            Log::Info << "Grad: ";
+            for(size_t wi=0; wi<n.w.size(); wi++) { Log::Info << dHdw(wi) << ", "; }
+            Log::Info << "\n";
+                       
+        }
+        dHdw_mean = -dHdw_mean/epoch;
+        stdp1(ti,0) = fmean - n.in[0]->y[0];
+        stdp1(ti,1) = dHdw_mean(0);
+        stdp2(ti,0) = fmean - n.in[1]->y[0];
+        stdp2(ti,1) = dHdw_mean(1);
+        ti+=1;
+    }        
+    send_arma_mat(stdp1, "stdp1", NULL, true);
+    send_arma_mat(stdp2, "stdp2", NULL, true);
+    send_arma_mat(probs, "probs");
+    send_arma_mat(pots, "pots");
+}
+
+void test_stdp_many() {
+    std::srand(time(NULL));
+    srm::Sim s;
+    srm::SrmNeuron n;
+
+    n.add_input(new srm::DetermenisticNeuron("1"), 8); 
+    n.add_input(new srm::DetermenisticNeuron("1"), 8);
+    n.add_input(new srm::DetermenisticNeuron("1"), 8); 
+    n.add_input(new srm::DetermenisticNeuron("1"), 8);
+    n.add_input(new srm::DetermenisticNeuron("1"), 8); 
+    n.add_input(new srm::DetermenisticNeuron("1"), 1);
+    n.add_input(new srm::DetermenisticNeuron("1"), 1); 
+    n.add_input(new srm::DetermenisticNeuron("1"), 1);
+    n.add_input(new srm::DetermenisticNeuron("1"), 1); 
+    n.add_input(new srm::DetermenisticNeuron("1"), 1);
+    s.addRecNeuron(&n);
+
+//    s.addStatListener(&n, srm::TStatListener::Spike);
+//    s.addStatListener(&n, srm::TStatListener::Pot);
+//    s.addStatListener(&n, srm::TStatListener::Prob);
+
+    s.run(100*srm::ms, 0.5, true);
+    double tstart=0;
+    double tend=100;
+    double dt=4;
+    mat grads((tend-tstart)/dt, n.w.size());
+    size_t gi=0;
+    for(double tshift=tstart; tshift<tend; tshift+=dt) {
+        Log::Info << "=================================\n";
+        Log::Info << "=================================\n";
+        double cur_tshift = tshift/5;
+        for(size_t ni=5; ni<n.w.size(); ni++) {
+          n.in[ni]->y[0] = 1+cur_tshift*(ni-4);
+          Log::Info << "ni("<< ni << "): " << n.in[ni]->y[0] << ", ";
+        }
+        Log::Info << "\n";
+        Log::Info << "=================================\n";
+        vec meanf = get_mean_firetimes(&n, &s, 100, 20, 5);
+        for(size_t mfi=0; mfi<meanf.n_elem; mfi++) { if(meanf[mfi]>0.001) { Log::Info << meanf[mfi] << ", "; } }
+        Log::Info << "\n";
+        for(size_t ni=5; ni<n.w.size(); ni++) { Log::Info << "dt = " << meanf[0]- n.in[ni]->y[0] << ", "; } 
+        Log::Info <<  "\n";
+        vec dHdw(n.w.size(), fill::zeros);
+        for(double tg=0; tg<100; tg+=10) {
+            srm::TEntropyGrad eg(&n, tg, tg+10);
+            vec dHdw_cur = eg.grad();
+            Log::Info << "dHdw(" << tg << ":"<< tg+10 << ")= ";
+            for(size_t wi=0; wi<n.w.size(); wi++) { Log::Info << dHdw_cur(wi) << ", "; } 
+            Log::Info << "\n";
+            dHdw += dHdw_cur;
+        }            
+//        srm::TEntropyGrad eg(&n, 0, 100);
+//        vec dHdw_full = eg.grad();
+//        Log::Info << "dHdw_full(" << 0 << ":"<< 100 << ")= ";
+//        for(size_t wi=0; wi<n.w.size(); wi++) { Log::Info << dHdw_full(wi) << ", "; } 
+//        Log::Info << "\n";
+
+        Log::Info << "Grad: ";
+        for(size_t wi=0; wi<n.w.size(); wi++) { grads(gi,wi) = -dHdw(wi); Log::Info << dHdw(wi) << ", "; }
+        gi++;
+        Log::Info << "\n";
+    }
+    send_arma_mat(grads,"grads",NULL, true);
+
 }
 
 PROGRAM_INFO("SIM TEST", "sim tests"); 
@@ -578,7 +743,19 @@ int main(int argc, char** argv) {
         test_p_stroke();
         Log::Info << "===============================================================" << std::endl;
     }
-   
+    if((test_name == "all") || (test_name == "stdp")) {
+        Log::Info << "stdp:" << std::endl;
+        Log::Info << "===============================================================" << std::endl;
+        test_stdp();
+        Log::Info << "===============================================================" << std::endl;
+    }
+    if((test_name == "all") || (test_name == "stdp_many")) {
+        Log::Info << "stdp_many:" << std::endl;
+        Log::Info << "===============================================================" << std::endl;
+        test_stdp_many();
+        Log::Info << "===============================================================" << std::endl;
+    }
+  
     return 0;
 }
 

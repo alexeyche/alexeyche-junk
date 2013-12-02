@@ -82,9 +82,11 @@ namespace srm {
 //            stoch_elem.clear();
             Log::Info << "Cleaning Sim\n"; 
         }            
-        void run(double Tdur, double dt) {
+        void run(double Tdur, double dt, bool verbose=true) {
             double Tmax = T0 + Tdur;
-            Log::Info << "Finding elements to precalculate\n";
+            if(verbose) {
+                Log::Info << "Finding elements to precalculate\n";
+            }                
             for(size_t el_i=0; el_i<sim_elem.size(); el_i++) { 
                 if(sim_elem[el_i]->isNeedPreCalc()) {
                     sim_elem[el_i]->preCalculate(T0, Tmax, dt);
@@ -97,7 +99,7 @@ namespace srm {
 //                    }
                 }
             }
-            Log::Info << "Done\n"; 
+            if(verbose) { Log::Info << "Done\n"; }
             vec t = linspace<vec>(T0, Tmax, (int)Tmax/dt);
                             
             mat unif(t.n_elem, stoch_elem.size(), fill::randu);
@@ -108,17 +110,17 @@ namespace srm {
                     sg.addStat(stoch_elem[ni], TStatListener::Prob, pi);
                     if(pi*dt > unif(ti, ni)) {
                         TTime &yn = stoch_elem[ni]->y;
-                        Log::Info << "spike of " << ni << " at " << t(ti) << "\n";
+                        if(verbose) { Log::Info << "spike of " << ni << " at " << t(ti) << "\n"; }
                         // spike!
                         yn.push_back(t(ti));
                         sg.addStat(stoch_elem[ni], TStatListener::Spike, t(ti));
                     }
                 }
             }
-            Log::Info << "Sending statistics to 7778\n";
+            if(verbose) { Log::Info << "Sending statistics to 7778\n"; }
             sg.sendStat();
-            Log::Info << "Done\n";
-            T0 = Tmax;
+            if(verbose) { Log::Info << "Done\n"; }
+            //T0 = Tmax;
         }
 
         void addNeuron(Neuron *n) {
