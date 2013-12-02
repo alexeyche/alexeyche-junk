@@ -10,14 +10,14 @@
 #define HEAD_LEN 100
 #define PORT 7778
 
-void send_arma_mat(mat m, std::string name, const unsigned int* iter=NULL, bool verbose=false) {
+void send_arma_mat(mat m, std::string name, int iter=-1, bool verbose=false) {
 	double *p = m.memptr();
 	const char *name_c = name.c_str()	;
 	char head_m[HEAD_LEN];
-	if(iter == NULL) {
+	if(iter < 0) {
 		snprintf(head_m, 100, "%s:%d:%d@",name_c, m.n_rows, m.n_cols);
 	} else 	{
-		snprintf(head_m, 100, "%s%d:%d:%d@",name_c,(int)*iter, m.n_rows, m.n_cols);
+		snprintf(head_m, 100, "%s%d:%d:%d@",name_c, iter, m.n_rows, m.n_cols);
 	}
 	
 	init_socket(PORT);	
