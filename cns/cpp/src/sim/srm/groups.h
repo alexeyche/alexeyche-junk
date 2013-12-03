@@ -93,7 +93,6 @@ namespace srm {
                         }
                     }                        
                 } 
-                Log::Info << "ti " << ti << "\n";
                 if(patt_id<0) {
                     // filling with poisson process
                     vec unif_poiss(group.size(), fill::randu);                    
@@ -104,18 +103,18 @@ namespace srm {
                     }
                 } else {
                     mat &pattern = patterns[patt_id].pattern;
-                    if(patt_ti >= pattern.n_cols) {  // pattern ended
+                    if(patt_ti >= patterns[patt_id].pattDur) {  // pattern ended
                         patt_id = -1;
                         patt_ti = 0;
                         refrTime_cur = refrTime;
                         continue;
                     }
-                    Log::Info << "pattern.ncol " << pattern.n_cols << " pattern.nrow " << pattern.n_rows << "\n";
-                    Log::Info << "patt_id " << patt_id << " patt_ti " << patt_ti << " patt.dt " << patterns[patt_id].dt << "\n";    
+                    //Log::Info << "pattern.ncol " << pattern.n_cols << " pattern.nrow " << pattern.n_rows << "\n";
+                    //Log::Info << "patt_id " << patt_id << " patt_ti " << patt_ti << " patt.dt " << patterns[patt_id].dt << "\n";    
                     double patt_index = patt_ti/patterns[patt_id].dt;
                     int patt_index_int = floor(patt_index+0.001); 
-                    Log::Info << "patt_index " <<  patt_index << "\n";
-                    Log::Info << "patt_index_int " <<  patt_index_int << "\n";
+                    //Log::Info << "patt_index " <<  patt_index << "\n";
+                    //Log::Info << "patt_index_int " <<  patt_index_int << "\n";
                     if( patt_index - patt_index_int < 1e-10) {  //machine precision stuff
                         uvec fired = find(pattern.col(patt_index_int)>0);
                         for(size_t fi=0; fi<fired.n_elem; fi++) {

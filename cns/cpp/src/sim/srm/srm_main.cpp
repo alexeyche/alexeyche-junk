@@ -34,13 +34,13 @@ int main(int argc, char** argv)
     connect(&g, &g, TConnType::AllToAll, 0.6);
 
 
-    TimeSeriesGroup tsg(10, 0*ms, 100); 
+    TimeSeriesGroup tsg(50, 0*ms, 100); 
     tsg.loadPatternFromFile("/var/tmp/d1.csv", 500*ms, 100);
 //    send_arma_mat(tsg.patterns[0].pattern, "d1_stat");
 //    return 0;
 //    g.loadPatternFromFile("/var/tmp/d2.csv", 100*ms, 0.5);
 //    send_arma_mat(g.patterns[1].pattern, "d2_stat");
-    connect(&tsg, &g, TConnType::FeedForward, 0.6);
+    connect(&tsg, &g, TConnType::FeedForward, 0.3);
     
 //    for(size_t ni=0; ni<g.size(); ni++) {
 //        Log::Info << "neuron " << g.group[ni]->id() << " is connected to : ";    

@@ -1,26 +1,31 @@
 #!/usr/bin/RScript
 
-dyn.load("/home/alexeyche/prog/alexeyche-junk/cns/cpp/socket/sim_socket_r.so")
+require(Matrix)
 
-create_server <- function(port = 7778) {
-    .Call("r_run_server", as.integer(port))
+
+#dyn.load("/home/alexeyche/my/git/alexeyche-junk/cns/socket_test/sim_socket_r.so")
+dyn.load("/home/alexeyche/prog/alexeyche-junk/cns/socket_test/sim_socket_r.so")
+
+run_server <- function(port = 7778) {
+  .Call("r_run_server", as.integer(port))    
 }
 
-read_message <- function(mc_p) {
-  x <- .Call("r_get_message", mc_p)  
+get_message <- function(mc_p) {
+  x <- .Call("r_get_message",mc_p)
   if(! is.null(x)) {
-    assign(x$name, x$x, envir = .GlobalEnv)
-    return(TRUE)
+    i_index <- rep(seq(1:x$nrow), x$ncol)
+    j_index <- c(sapply(seq(1:x$ncol),function(j) { rep(j, x$nrow) }))
+    assign(x$name, as.matrix(sparseMatrix(i = i_index,j = j_index,x = x$x)), envir = .GlobalEnv)
   } else {
     return(NULL)
-  }  
+  }
 }
-mc_p <- create_server()
+
+mc_p <- run_server()
 
 load <- function() {
-    x <- read_message(mc_p)
-    while(! is.null(x) ) {
-        x <- read_message(mc_p)    
-    }
+  x <- get_message(mc_p)
+  while(! is.null(x)) {
+    x <- get_message(mc_p)
+  }
 }
-

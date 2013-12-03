@@ -69,7 +69,6 @@ namespace srm {
 //                    send_arma_mat(gr->group[9]->y, "d_stat", 9);
                 }
             }
-            return;
             if(verbose) { Log::Info << "Done\n"; }
             vec t = linspace<vec>(T0, Tmax, (int)Tmax/dt);
            

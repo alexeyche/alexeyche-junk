@@ -204,10 +204,10 @@ void srm_lh_test() {
             }
         }        
         const unsigned int spike_time_int = spike_time;
-        send_arma_mat(w_de, "wz_de", &spike_time_int);
-        send_arma_mat(w_de_stat1, "wz_de_stat1", &spike_time_int);
-        send_arma_mat(w_de_stat2, "wz_de_stat2", &spike_time_int);
-        send_arma_mat(w_de_stat3, "wz_de_stat3", &spike_time_int);
+        send_arma_mat(w_de, "wz_de", spike_time_int);
+        send_arma_mat(w_de_stat1, "wz_de_stat1", spike_time_int);
+        send_arma_mat(w_de_stat2, "wz_de_stat2", spike_time_int);
+        send_arma_mat(w_de_stat3, "wz_de_stat3", spike_time_int);
     }
     Log::Info << "int eval(med.) " << s_eval/(w1.n_elem*w2.n_elem) << "\n";
     Log::Info << "int err(med.) " << s_err/(w1.n_elem*w2.n_elem) << "\n";
@@ -394,7 +394,7 @@ void test_entropy_surface() {
                 H_stat(wi1, wi2) = H;
            }
         }       
-        send_arma_mat(H_stat, "H_stat", &i);
+        send_arma_mat(H_stat, "H_stat", i);
         i++;
     }        
 }
@@ -590,8 +590,8 @@ void test_stdp() {
         stdp2(ti,1) = dHdw_mean(1);
         ti+=1;
     }        
-    send_arma_mat(stdp1, "stdp1", NULL, true);
-    send_arma_mat(stdp2, "stdp2", NULL, true);
+    send_arma_mat(stdp1, "stdp1", -1, true);
+    send_arma_mat(stdp2, "stdp2", -1, true);
     send_arma_mat(probs, "probs");
     send_arma_mat(pots, "pots");
 }
@@ -621,44 +621,64 @@ void test_stdp_many() {
     double tstart=0;
     double tend=100;
     double dt=4;
-    mat grads((tend-tstart)/dt, n.w.size());
+    mat grads((tend-tstart)/dt+1, n.w.size());
     size_t gi=0;
-    for(double tshift=tstart; tshift<tend; tshift+=dt) {
-        Log::Info << "=================================\n";
-        Log::Info << "=================================\n";
-        double cur_tshift = tshift/5;
-        for(size_t ni=5; ni<n.w.size(); ni++) {
-          n.in[ni]->y[0] = 1+cur_tshift*(ni-4);
-          Log::Info << "ni("<< ni << "): " << n.in[ni]->y[0] << ", ";
-        }
-        Log::Info << "\n";
-        Log::Info << "=================================\n";
-        vec meanf = get_mean_firetimes(&n, &s, 100, 20, 5);
-        for(size_t mfi=0; mfi<meanf.n_elem; mfi++) { if(meanf[mfi]>0.001) { Log::Info << meanf[mfi] << ", "; } }
-        Log::Info << "\n";
-        for(size_t ni=5; ni<n.w.size(); ni++) { Log::Info << "dt = " << meanf[0]- n.in[ni]->y[0] << ", "; } 
-        Log::Info <<  "\n";
-        vec dHdw(n.w.size(), fill::zeros);
-        for(double tg=0; tg<100; tg+=10) {
-            srm::TEntropyGrad eg(&n, tg, tg+10);
-            vec dHdw_cur = eg.grad();
-            Log::Info << "dHdw(" << tg << ":"<< tg+10 << ")= ";
-            for(size_t wi=0; wi<n.w.size(); wi++) { Log::Info << dHdw_cur(wi) << ", "; } 
+    for(size_t epoch=0; epoch<25; epoch++) {
+        for(double tshift=tstart; tshift<tend; tshift+=dt) {
+            Log::Info << "=================================\n";
+            Log::Info << "=================================\n";
+            double cur_tshift = tshift/5;
+            for(size_t ni=5; ni<n.w.size(); ni++) {
+              n.in[ni]->y[0] = 1+cur_tshift*(ni-4);
+              Log::Info << "ni("<< ni << "): " << n.in[ni]->y[0] << ", ";
+            }
             Log::Info << "\n";
-            dHdw += dHdw_cur;
-        }            
-//        srm::TEntropyGrad eg(&n, 0, 100);
-//        vec dHdw_full = eg.grad();
-//        Log::Info << "dHdw_full(" << 0 << ":"<< 100 << ")= ";
-//        for(size_t wi=0; wi<n.w.size(); wi++) { Log::Info << dHdw_full(wi) << ", "; } 
-//        Log::Info << "\n";
+            Log::Info << "=================================\n";
+//            vec meanf = get_mean_firetimes(&n, &s, 100, 20, 5);
+//            for(size_t mfi=0; mfi<meanf.n_elem; mfi++) { if(meanf[mfi]>0.001) { Log::Info << meanf[mfi] << ", "; } }
+//            Log::Info << "\n";
+//            for(size_t ni=5; ni<n.w.size(); ni++) { Log::Info << "dt = " << meanf[0]- n.in[ni]->y[0] << ", "; } 
+//            Log::Info <<  "\n";
+            vec dHdw(n.w.size(), fill::zeros);
+            for(double tg=0; tg<100; tg+=10) {
+                srm::TEntropyGrad eg(&n, tg, tg+10);
+//                vec dHdw_cur = eg.grad();
+                vec dHdw_cur = eg.grad_1eval()*1/25;
+                Log::Info << "dHdw(" << tg << ":"<< tg+10 << ")= ";
+                for(size_t wi=0; wi<n.w.size(); wi++) { Log::Info << dHdw_cur(wi) << ", "; } 
+                Log::Info << "\n";
+                dHdw += dHdw_cur;
+            }            
+            for(size_t wi=0; wi<n.w.size(); wi++) { Log::Info << dHdw(wi) << ", "; } 
+    //        srm::TEntropyGrad eg(&n, 0, 100);
+    //        vec dHdw_full = eg.grad();
+    //        Log::Info << "dHdw_full(" << 0 << ":"<< 100 << ")= ";
+    //        for(size_t wi=0; wi<n.w.size(); wi++) { Log::Info << dHdw_full(wi) << ", "; } 
+    //        Log::Info << "\n";
 
-        Log::Info << "Grad: ";
-        for(size_t wi=0; wi<n.w.size(); wi++) { grads(gi,wi) = -dHdw(wi); Log::Info << dHdw(wi) << ", "; }
-        gi++;
-        Log::Info << "\n";
+            //Log::Info << "Grad: ";
+            //for(size_t wi=0; wi<n.w.size(); wi++) { grads(gi,wi) = -dHdw(wi); Log::Info << dHdw(wi) << ", "; }
+            //gi++;
+            //Log::Info << "\n";
+        }
+        
+
     }
-    send_arma_mat(grads,"grads",NULL, true);
+
+    Log::Info << "\n";
+    vec dHdw(n.w.size(), fill::zeros);
+    for(double tg=0; tg<100; tg+=10) {
+        srm::TEntropyGrad eg(&n, tg, tg+10);
+        vec dHdw_cur = eg.grad();
+        Log::Info << "baseline dHdw(" << tg << ":"<< tg+10 << ")= ";
+        for(size_t wi=0; wi<n.w.size(); wi++) { Log::Info << dHdw_cur(wi) << ", "; } 
+        Log::Info << "\n";
+        dHdw += dHdw_cur;
+    }
+    Log::Info << "Baseline grad: ";
+    for(size_t wi=0; wi<n.w.size(); wi++) { grads(gi,wi) = -dHdw(wi); Log::Info << dHdw(wi) << ", "; }
+
+//    send_arma_mat(grads,"grads",-1, true);
 
 }
 
