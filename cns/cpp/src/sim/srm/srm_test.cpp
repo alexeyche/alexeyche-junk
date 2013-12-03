@@ -253,7 +253,7 @@ void test_integral_calc() {
     n.add_input(new srm::DetermenisticNeuron("8 9"), w_start);
     
     s.addNeuron(&n);
-    s.run(50*srm::ms, 0.1); 
+    s.run(50*srm::ms, 0.1, srm::TRunType::Run); 
     
     double pfull = srm::survFunction(&n, 0 , 20);
     double pfull_test = srm::survFunction__test(&n, 0 , 20);
@@ -317,7 +317,7 @@ void test_int_calc2() {
     n.add_input(new srm::DetermenisticNeuron("8 9"), w_start);
     
     s.addNeuron(&n);
-    s.run(50*srm::ms, 0.1); 
+    s.run(50*srm::ms, 0.1, srm::TRunType::Run); 
     
     double p_br = int_brute<srm::SrmNeuron>(0, 50, 0.00001, &n, &srm::prob);
     double p_de = DEIntegrator<double, srm::SrmNeuron*>::Integrate(&n, &srm::prob, 0, 50, 1e-12);
@@ -459,7 +459,7 @@ void test_surv_func() {
     n.add_input(new srm::DetermenisticNeuron("8 9"), w_start);
     
     s.addNeuron(&n);
-    s.run(50*srm::ms, 0.1); 
+    s.run(50*srm::ms, 0.1, srm::TRunType::Run); 
     vec n_prob(50/0.1);
     size_t i=0;
     for(double t=0; t<50; t+=0.1) {
@@ -487,7 +487,7 @@ void test_p_stroke() {
     n.add_input(new srm::DetermenisticNeuron("7 8"), w_start);
     n.add_input(new srm::DetermenisticNeuron("8 9"), w_start);
     s.addNeuron(&n);
-    s.run(50, 0.1);
+    s.run(50, 0.1, srm::TRunType::Run);
     srm::TEntropyGrad eg(&n, 0, 25);
     vec t = linspace<vec>(0, 50, 150);
     vec ps(150, fill::zeros);
@@ -521,23 +521,17 @@ mat H_surface(srm::SrmNeuron *n, double f1, double f2) {
 vec get_mean_firetimes(srm::SrmNeuron *n, srm::Sim *s, double simtime = 50, double ntrials = 20, int max_fires=10) {
     vec fmean(max_fires, fill::zeros);
     uvec fire_times(max_fires, fill::zeros);
-    vec dHdw_1eval_m(n->w.size(), fill::zeros);
     for(size_t tr_i=0; tr_i<ntrials; tr_i++) {
         n->y.clean();
-        s->run(simtime*srm::ms,0.5, false);
+        s->run(simtime*srm::ms,0.5, srm::TRunType::Run, false, false);
         srm::TEntropyGrad eg(n, 0, 50);
-        vec dHdw_1eval = eg.EntropyGradGivenY(&eg, n->y);
 
-        dHdw_1eval_m += dHdw_1eval;
         for(size_t yi=0; yi<std::min((double)max_fires,(double)n->y.size()); yi++) {
             fmean(yi) += n->y[yi];
             fire_times(yi) += 1; 
         }
     }
-    dHdw_1eval_m = dHdw_1eval_m/ntrials;
-    Log::Info << "Grad 1 eval: ";
-    for(size_t wi=0; wi<n->w.size(); wi++) { Log::Info << dHdw_1eval_m(wi) << ", "; }
-    Log::Info << "\n";
+
     return fmean/fire_times;
 }
 
@@ -617,14 +611,15 @@ void test_stdp_many() {
 //    s.addStatListener(&n, srm::TStatListener::Pot);
 //    s.addStatListener(&n, srm::TStatListener::Prob);
 
-    s.run(100*srm::ms, 0.5, true);
+    s.run(100*srm::ms, 0.5, srm::TRunType::Run, true, false);
     double tstart=0;
     double tend=100;
     double dt=4;
     mat grads((tend-tstart)/dt+1, n.w.size());
+    mat grads_1eval((tend-tstart)/dt+1, n.w.size());
     size_t gi=0;
-    for(size_t epoch=0; epoch<25; epoch++) {
-        for(double tshift=tstart; tshift<tend; tshift+=dt) {
+    for(double tshift=tstart; tshift<tend; tshift+=dt) {
+        for(size_t epoch=0; epoch<25; epoch++) {
             Log::Info << "=================================\n";
             Log::Info << "=================================\n";
             double cur_tshift = tshift/5;
@@ -633,52 +628,66 @@ void test_stdp_many() {
               Log::Info << "ni("<< ni << "): " << n.in[ni]->y[0] << ", ";
             }
             Log::Info << "\n";
-            Log::Info << "=================================\n";
-//            vec meanf = get_mean_firetimes(&n, &s, 100, 20, 5);
-//            for(size_t mfi=0; mfi<meanf.n_elem; mfi++) { if(meanf[mfi]>0.001) { Log::Info << meanf[mfi] << ", "; } }
-//            Log::Info << "\n";
-//            for(size_t ni=5; ni<n.w.size(); ni++) { Log::Info << "dt = " << meanf[0]- n.in[ni]->y[0] << ", "; } 
-//            Log::Info <<  "\n";
+            Log::Info << "=================================\n";           
+            
+            if(epoch == 0) {
+                vec meanf = get_mean_firetimes(&n, &s, 100, 20, 5);
+                for(size_t mfi=0; mfi<meanf.n_elem; mfi++) { if(meanf[mfi]>0.001) { Log::Info << meanf[mfi] << ", "; } }
+                Log::Info << "\n";
+                for(size_t ni=5; ni<n.w.size(); ni++) { Log::Info << "dt = " << meanf[0]- n.in[ni]->y[0] << ", "; } 
+                Log::Info <<  "\n";
+                vec dHdw(n.w.size(), fill::zeros);
+                for(double tg=0; tg<100; tg+=10) {
+                    srm::TEntropyGrad eg(&n, tg, tg+10);
+                    vec dHdw_cur = eg.grad();
+                    Log::Info << "dHdw(" << tg << ":"<< tg+10 << ")= ";
+                    for(size_t wi=0; wi<n.w.size(); wi++) { Log::Info << dHdw_cur(wi) << ", "; } 
+                    Log::Info << "\n";
+                    dHdw += dHdw_cur;
+                }            
+                for(size_t wi=0; wi<n.w.size(); wi++) { Log::Info << dHdw(wi) << ", "; } 
+
+                Log::Info << "dW: ";
+                for(size_t wi=0; wi<n.w.size(); wi++) { grads(gi,wi) = -dHdw(wi); Log::Info << dHdw(wi) << ", "; }
+                Log::Info << "\n";
+            }                
+            Log::Info << "epoch " << epoch << "\n";
+            n.y.clean();
+            s.run(100*srm::ms, 0.5, srm::TRunType::Run, false, false);
+            for(size_t fi=0; fi<n.y.size(); fi++) { Log::Info << n.y[fi] << ", "; }
+            Log::Info << "\n";
+            if(n.y.size()>0) {
+                for(size_t ni=5; ni<n.w.size(); ni++) { Log::Info << "dt = " << n.y[0]- n.in[ni]->y[0] << ", "; } 
+            } else {
+                Log::Info << "No spikes occured";
+            }
+            Log::Info <<  "\n";
+            
             vec dHdw(n.w.size(), fill::zeros);
             for(double tg=0; tg<100; tg+=10) {
                 srm::TEntropyGrad eg(&n, tg, tg+10);
-//                vec dHdw_cur = eg.grad();
-                vec dHdw_cur = eg.grad_1eval()*1/25;
-                Log::Info << "dHdw(" << tg << ":"<< tg+10 << ")= ";
+                vec dHdw_cur = eg.grad_1eval() * 1/25;
+                Log::Info << "dHdw_1eval(" << tg << ":"<< tg+10 << ")= ";
                 for(size_t wi=0; wi<n.w.size(); wi++) { Log::Info << dHdw_cur(wi) << ", "; } 
                 Log::Info << "\n";
                 dHdw += dHdw_cur;
             }            
-            for(size_t wi=0; wi<n.w.size(); wi++) { Log::Info << dHdw(wi) << ", "; } 
-    //        srm::TEntropyGrad eg(&n, 0, 100);
-    //        vec dHdw_full = eg.grad();
-    //        Log::Info << "dHdw_full(" << 0 << ":"<< 100 << ")= ";
-    //        for(size_t wi=0; wi<n.w.size(); wi++) { Log::Info << dHdw_full(wi) << ", "; } 
-    //        Log::Info << "\n";
-
-            //Log::Info << "Grad: ";
-            //for(size_t wi=0; wi<n.w.size(); wi++) { grads(gi,wi) = -dHdw(wi); Log::Info << dHdw(wi) << ", "; }
-            //gi++;
-            //Log::Info << "\n";
+            for(size_t wi=0; wi<n.w.size(); wi++) { Log::Info << dHdw(wi) << ", "; }
+            Log::Info << "dW 1eval: ";
+            for(size_t wi=0; wi<n.w.size(); wi++) { grads_1eval(gi,wi) += -dHdw(wi); Log::Info << dHdw(wi) << ", "; }
+            Log::Info << "\n";           
         }
+        Log::Info << "==============================================\n";
+        Log::Info << "delta full and 1 eval :";
+        vec delta = grads.row(gi) - grads_1eval.row(gi);
+        for(size_t wi=0; wi< delta.n_elem; wi++) { Log::Info << delta(wi) << ", "; }
+        Log::Info << "\n";
+        Log::Info << "==============================================\n";
+        gi++;
+    }
         
 
-    }
-
-    Log::Info << "\n";
-    vec dHdw(n.w.size(), fill::zeros);
-    for(double tg=0; tg<100; tg+=10) {
-        srm::TEntropyGrad eg(&n, tg, tg+10);
-        vec dHdw_cur = eg.grad();
-        Log::Info << "baseline dHdw(" << tg << ":"<< tg+10 << ")= ";
-        for(size_t wi=0; wi<n.w.size(); wi++) { Log::Info << dHdw_cur(wi) << ", "; } 
-        Log::Info << "\n";
-        dHdw += dHdw_cur;
-    }
-    Log::Info << "Baseline grad: ";
-    for(size_t wi=0; wi<n.w.size(); wi++) { grads(gi,wi) = -dHdw(wi); Log::Info << dHdw(wi) << ", "; }
-
-//    send_arma_mat(grads,"grads",-1, true);
+    send_arma_mat(grads,"grads",-1, true);
 
 }
 

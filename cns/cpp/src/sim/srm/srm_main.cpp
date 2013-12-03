@@ -53,7 +53,7 @@ int main(int argc, char** argv)
     s.addNeuronGroup(&g);
     s.addStatListener(&g);
     if(mode == "run") {    
-        s.run(1800*ms, 0.5);
+        s.run(1800*ms, 0.5, TRunType::Run);
     } else 
     if(mode == "learn") {
         //Log::Info << "weights before:\n";

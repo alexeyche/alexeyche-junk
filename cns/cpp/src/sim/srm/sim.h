@@ -39,10 +39,14 @@ namespace srm {
     };
     
     
-
+    class TRunType {
+    public:
+        enum ERunType { Run, RunAndLearn };
+    };
 
     class Sim {
     public:        
+        
         Sim() : T0(0.0) {}
         ~Sim() { 
 //            for(size_t ni=0; ni<stoch_elem.size(); ni++) { 
@@ -51,7 +55,7 @@ namespace srm {
 //            stoch_elem.clear();
             Log::Info << "Cleaning Sim\n"; 
         }            
-        void run(double Tdur, double dt, bool verbose=true) {
+        void run(double Tdur, double dt, TRunType::ERunType rt, bool verbose=true, bool send_data=true) {
             double Tmax = T0 + Tdur;
             if(verbose) {
                 Log::Info << "Finding elements to precalculate\n";
@@ -84,6 +88,7 @@ namespace srm {
             double learn_dt = 5;
             double learn_dti = 0;
             std::vector<SrmNeuron*> neuron_fired; // in window
+
             mat unif(t.n_elem, stoch_elem.size(), fill::randu);
             for(size_t ti=0; ti<t.n_elem; ti++) {
                 for(size_t ni=0; ni<stoch_elem.size(); ni++) {
@@ -108,31 +113,34 @@ namespace srm {
                     }
                                             
                 }
-                if(learn_dti>=learn_dt) {
-                    for(size_t ni=0; ni<neuron_fired.size(); ni++) { 
-                        TEntropyGrad eg(neuron_fired[ni], t(ti)-learn_dt, t(ti));
-                        vec dHdw = eg.grad_1eval();
-                        for(size_t wi=0; wi<dHdw.n_elem; wi++) { Log::Info << dHdw(wi) << ", "; neuron_fired[ni]->w[wi] -= 0.01 * dHdw(wi);  }
-                        Log::Info << "\n";                   
-                    }                    
-                    neuron_fired.clear();
-                    learn_dti = 0;
-                } else {                        
-                    learn_dti+=dt;
-                }               
+                if(rt == TRunType::RunAndLearn) {
+                    if(learn_dti>=learn_dt) {
+                        for(size_t ni=0; ni<neuron_fired.size(); ni++) { 
+                            TEntropyGrad eg(neuron_fired[ni], t(ti)-learn_dt, t(ti));
+                            vec dHdw = eg.grad_1eval();
+                            for(size_t wi=0; wi<dHdw.n_elem; wi++) { Log::Info << dHdw(wi) << ", "; neuron_fired[ni]->w[wi] -= 0.01 * dHdw(wi);  }
+                            Log::Info << "\n";                   
+                        }                    
+                        neuron_fired.clear();
+                        learn_dti = 0;
+                    } else {                        
+                        learn_dti+=dt;
+                    }               
+                }                    
             }
             if(verbose) { Log::Info << "Sending statistics to 7778\n"; }
             for(size_t i=0; i<stats.size(); i++) {
                 send_arma_mat(stats[i].stat, "gr_stat", i);
             }
-            
-            mat raster(stoch_elem.size(), max_spikes, fill::zeros);
-            for(size_t ni=0; ni<stoch_elem.size(); ni++) {
-                for(size_t yi=0; yi<stoch_elem[ni]->y.size(); yi++) {
-                    raster(ni, yi) = stoch_elem[ni]->y[yi];                
+            if (send_data) {
+                mat raster(stoch_elem.size(), max_spikes, fill::zeros);
+                for(size_t ni=0; ni<stoch_elem.size(); ni++) {
+                    for(size_t yi=0; yi<stoch_elem[ni]->y.size(); yi++) {
+                        raster(ni, yi) = stoch_elem[ni]->y[yi];                
+                    }
                 }
-            }
-            send_arma_mat(raster, "raster");
+                send_arma_mat(raster, "raster");
+            }                
             if(verbose) { Log::Info << "Done\n"; }
             //T0 = Tmax;
         }
