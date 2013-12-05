@@ -615,11 +615,11 @@ void test_stdp_many() {
     double tstart=0;
     double tend=100;
     double dt=4;
-    mat grads((tend-tstart)/dt+1, n.w.size());
-    mat grads_1eval((tend-tstart)/dt+1, n.w.size());
+    mat grads((tend-tstart)/dt, n.w.size());
+    mat grads_1eval((tend-tstart)/dt, n.w.size());
     size_t gi=0;
     for(double tshift=tstart; tshift<tend; tshift+=dt) {
-        for(size_t epoch=0; epoch<25; epoch++) {
+        for(size_t epoch=0; epoch<1; epoch++) {
             Log::Info << "=================================\n";
             Log::Info << "=================================\n";
             double cur_tshift = tshift/5;
@@ -651,6 +651,7 @@ void test_stdp_many() {
                 for(size_t wi=0; wi<n.w.size(); wi++) { grads(gi,wi) = -dHdw(wi); Log::Info << dHdw(wi) << ", "; }
                 Log::Info << "\n";
             }                
+            continue;
             Log::Info << "epoch " << epoch << "\n";
             n.y.clean();
             s.run(100*srm::ms, 0.5, srm::TRunType::Run, false, false);
@@ -666,7 +667,7 @@ void test_stdp_many() {
             vec dHdw(n.w.size(), fill::zeros);
             for(double tg=0; tg<100; tg+=10) {
                 srm::TEntropyGrad eg(&n, tg, tg+10);
-                vec dHdw_cur = eg.grad_1eval() * 1/25;
+                vec dHdw_cur = eg.grad_1eval();
                 Log::Info << "dHdw_1eval(" << tg << ":"<< tg+10 << ")= ";
                 for(size_t wi=0; wi<n.w.size(); wi++) { Log::Info << dHdw_cur(wi) << ", "; } 
                 Log::Info << "\n";
@@ -677,12 +678,17 @@ void test_stdp_many() {
             for(size_t wi=0; wi<n.w.size(); wi++) { grads_1eval(gi,wi) += -dHdw(wi); Log::Info << dHdw(wi) << ", "; }
             Log::Info << "\n";           
         }
-        Log::Info << "==============================================\n";
-        Log::Info << "delta full and 1 eval :";
-        vec delta = grads.row(gi) - grads_1eval.row(gi);
-        for(size_t wi=0; wi< delta.n_elem; wi++) { Log::Info << delta(wi) << ", "; }
-        Log::Info << "\n";
-        Log::Info << "==============================================\n";
+        //Log::Info << "==============================================\n";
+        //Log::Info << "full grad\n";
+        for(size_t wi=0; wi< grads.n_cols; wi++) { printf("%f, ", grads(gi,wi)); }
+        printf("\n");
+        //Log::Info << "\n";
+        //Log::Info << "==============================================\n";
+        //Log::Info << "==============================================\n";
+        //Log::Info << "grad 1 eval\n";
+        //for(size_t wi=0; wi< grads_1eval.n_cols; wi++) { Log::Info << grads_1eval(gi,wi) << ", "; }
+        //Log::Info << "\n";
+        //Log::Info << "==============================================\n";
         gi++;
     }
         
@@ -690,6 +696,9 @@ void test_stdp_many() {
     send_arma_mat(grads,"grads",-1, true);
 
 }
+
+
+
 
 PROGRAM_INFO("SIM TEST", "sim tests"); 
 PARAM_STRING("test", "name for test. default \"all\"", "t", "all");
