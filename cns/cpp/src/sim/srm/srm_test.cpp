@@ -692,9 +692,6 @@ void test_stdp_many() {
         gi++;
     }
         
-
-    send_arma_mat(grads,"grads",-1, true);
-
 }
 
 
