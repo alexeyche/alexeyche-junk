@@ -127,7 +127,7 @@ namespace srm {
                 w_grad(wi) += -p0*(log(p0)+1)*sec_part;
 //                Log::Info << "Hgrad0[" << wi << "] = " << w_grad(wi) << "\n";
             }
-            for(int n_calc = 1; n_calc <= 1; n_calc++) {
+            for(int n_calc = 1; n_calc <= 2; n_calc++) {
                                
                 vec integral = integrate(n_calc, neuron->w.size(), EntropyGradIntegrand);
                 w_grad += integral;

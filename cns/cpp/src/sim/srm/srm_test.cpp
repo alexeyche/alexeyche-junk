@@ -1,10 +1,12 @@
 
+#include <time.h>
 
 #include <sim/core.h>
 #include <sim/socket/sim_socket_core.h>
 #include <sim/int/DEIntegrator.h>
 #include <sim/int/simple_int.h>
 #include <sim/int/gauss_legendre.c>
+#include <sim/data/save.h>
 
 #include "sim.h"
 #include "neurons.h"
@@ -590,11 +592,13 @@ void test_stdp() {
     send_arma_mat(pots, "pots");
 }
 
-void test_stdp_many() {
+void test_stdp_many(const std::string output_filename = "") {
+    timeval t1, t2;
+    gettimeofday(&t1, NULL);
     std::srand(time(NULL));
     srm::Sim s;
     srm::SrmNeuron n;
-
+    
     n.add_input(new srm::DetermenisticNeuron("1"), 8); 
     n.add_input(new srm::DetermenisticNeuron("1"), 8);
     n.add_input(new srm::DetermenisticNeuron("1"), 8); 
@@ -680,8 +684,8 @@ void test_stdp_many() {
         }
         //Log::Info << "==============================================\n";
         //Log::Info << "full grad\n";
-        for(size_t wi=0; wi< grads.n_cols; wi++) { printf("%f, ", grads(gi,wi)); }
-        printf("\n");
+        for(size_t wi=0; wi< grads.n_cols; wi++) { Log::Info <<  grads(gi,wi); }
+        Log::Info << "\n";
         //Log::Info << "\n";
         //Log::Info << "==============================================\n";
         //Log::Info << "==============================================\n";
@@ -691,7 +695,16 @@ void test_stdp_many() {
         //Log::Info << "==============================================\n";
         gi++;
     }
+    
         
+    
+    if(output_filename != "") {
+        sim::data::Save(output_filename, grads, true, false);        
+        gettimeofday(&t2, NULL);
+        double elapsedTime = (t2.tv_sec - t1.tv_sec) * 1000.0;      // sec to ms
+        elapsedTime += (t2.tv_usec - t1.tv_usec) / 1000.0;   // us to ms
+        printf("%f\n", elapsedTime/1000.0);
+    }
 }
 
 
@@ -700,10 +713,14 @@ void test_stdp_many() {
 PROGRAM_INFO("SIM TEST", "sim tests"); 
 PARAM_STRING("test", "name for test. default \"all\"", "t", "all");
 PARAM_FLAG("nosend", "if it true. no sending to R", "n");
+PARAM_STRING("output", "output filename", "o","");
+
 
 int main(int argc, char** argv) {
     CLI::ParseCommandLine(argc, argv);
 	const std::string test_name = CLI::GetParam<std::string>("test");   
+	const std::string output_filename = CLI::GetParam<std::string>("output");   
+
     bool nosend = CLI::HasParam("nosend");
     Log::Info << "Tests started" << std::endl;
     if((test_name == "all") || (test_name == "epsp")) {
@@ -787,7 +804,11 @@ int main(int argc, char** argv) {
     if((test_name == "all") || (test_name == "stdp_many")) {
         Log::Info << "stdp_many:" << std::endl;
         Log::Info << "===============================================================" << std::endl;
-        test_stdp_many();
+        if(output_filename != "") {
+            test_stdp_many(output_filename);
+        } else {
+            test_stdp_many();
+        }
         Log::Info << "===============================================================" << std::endl;
     }
   

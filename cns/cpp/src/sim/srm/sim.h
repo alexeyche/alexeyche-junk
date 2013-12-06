@@ -107,19 +107,31 @@ namespace srm {
                         if(yn.size() > max_spikes) {
                             max_spikes = yn.size();
                         }
-                        if(SrmNeuron *n = dynamic_cast<SrmNeuron*>(stoch_elem[ni])) {
-                            neuron_fired.push_back(n);
-                        }                            
+                        
+                        //if(SrmNeuron *n = dynamic_cast<SrmNeuron*>(stoch_elem[ni])) {
+                        //    neuron_fired.push_back(n);
+                        //}                                                   
+                                                    
                     }
-                                            
+                                       
                 }
                 if(rt == TRunType::RunAndLearn) {
                     if(learn_dti>=learn_dt) {
-                        for(size_t ni=0; ni<neuron_fired.size(); ni++) { 
-                            TEntropyGrad eg(neuron_fired[ni], t(ti)-learn_dt, t(ti));
-                            vec dHdw = eg.grad_1eval();
-                            for(size_t wi=0; wi<dHdw.n_elem; wi++) { Log::Info << dHdw(wi) << ", "; neuron_fired[ni]->w[wi] -= 0.01 * dHdw(wi);  }
+                        for(size_t ni=0; ni<stoch_elem.size(); ni++) { 
+//                            vec dHdw(neuron_fired[ni]->w.size(), fill::zeros);
+                            //for(double tlow=t(ti)-2*learn_dt; tlow<t(ti)+0*learn_dt; tlow+=learn_dt) {
+                                SrmNeuron *n = dynamic_cast<SrmNeuron*>(stoch_elem[ni]);
+                                if(n) {
+                                TEntropyGrad eg(n, t(ti)-learn_dt, t(ti));
+                                vec dHdw = eg.grad();
+//                                Log::Info << "tlow: " << tlow << " thigh: " << tlow+learn_dt << "\n";
+//                                for(size_t wi=0; wi<dHdw_cur.n_elem; wi++) { Log::Info << dHdw_cur(wi) << ", "; }
+//                                Log::Info << "\n";
+//                                dHdw += dHdw_cur;
+                            //}
+                            for(size_t wi=0; wi<dHdw.n_elem; wi++) { Log::Info << dHdw(wi) << ", "; stoch_elem[ni]->w[wi] -= 0.6 * dHdw(wi);  }
                             Log::Info << "\n";                   
+                            }
                         }                    
                         neuron_fired.clear();
                         learn_dti = 0;

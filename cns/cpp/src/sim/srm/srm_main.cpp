@@ -31,16 +31,16 @@ int main(int argc, char** argv)
     
     Sim s;
     SrmNeuronGroup g(10);
-    connect(&g, &g, TConnType::AllToAll, 0.6);
+    connect(&g, &g, TConnType::AllToAll, 3);
 
 
     TimeSeriesGroup tsg(50, 0*ms, 100); 
-    tsg.loadPatternFromFile("/var/tmp/d1.csv", 500*ms, 100);
+    tsg.loadPatternFromFile("/var/tmp/d1.csv", 2000*ms, 100);
 //    send_arma_mat(tsg.patterns[0].pattern, "d1_stat");
 //    return 0;
 //    g.loadPatternFromFile("/var/tmp/d2.csv", 100*ms, 0.5);
 //    send_arma_mat(g.patterns[1].pattern, "d2_stat");
-    connect(&tsg, &g, TConnType::FeedForward, 0.3);
+    connect(&tsg, &g, TConnType::FeedForward, 3);
     
 //    for(size_t ni=0; ni<g.size(); ni++) {
 //        Log::Info << "neuron " << g.group[ni]->id() << " is connected to : ";    
@@ -52,31 +52,23 @@ int main(int argc, char** argv)
     s.addNeuronGroup(&tsg);
     s.addNeuronGroup(&g);
     s.addStatListener(&g);
+    TRunType::ERunType rt;   
     if(mode == "run") {    
-        s.run(1800*ms, 0.5, TRunType::Run);
-    } else 
-    if(mode == "learn") {
-        //Log::Info << "weights before:\n";
-        //for(size_t wi=0; wi<n.w.size(); wi++) { Log::Info << n.w[wi] << ", "; } Log::Info << "\n";
-
-        //TEntropyGrad eg(&n, 0, 40);
-        //TEntropyCalc ec(&n, 0, 40);
-        //for(size_t i=0; i<10; i++) {
-        //    vec dHdw = eg.grad();
-        //    for(size_t wi=0; wi<n.w.size(); wi++) { n.w[wi] -= learning_rate * dHdw(wi); }
-        //    Log::Info << "Epoch(" << i << "): ";
-        //    Log::Info << "Grad: ";
-        //    for(size_t wi=0; wi<n.w.size(); wi++) { Log::Info << dHdw(wi) << ", "; }
-        //    if(i % 10 == 0) {
-        //        Log::Info << " H: ";
-        //        double H = ec.run(2);
-        //        Log::Info << H;
-        //    }            
-        //    Log::Info << "\n";
-        //}        
-        //s.run(100*ms, 0.5);
-        //Log::Info << "weights after:\n";
-        //for(size_t wi=0; wi<n.w.size(); wi++) { Log::Info << n.w[wi] << ", "; } Log::Info << "\n";
+        rt = TRunType::Run;
+    } 
+    if(mode == "learn") {    
+        rt = TRunType::RunAndLearn;
+    } 
+    
+    s.run(300*ms, 0.5, rt);
+    Log::Info << "weight after:\n";
+    for(size_t ni=0; ni<g.group.size(); ni++) {
+        SrmNeuron *n =  dynamic_cast<SrmNeuron*>(g.group[ni]);
+        if(n) {
+            Log::Info << "neuron " << ni << "\n";
+            for(size_t wi=0; wi<n->w.size(); wi++) { Log::Info << n->w[wi] << ", "; }
+            Log::Info << "\n";
+        }            
     }        
 }
 
