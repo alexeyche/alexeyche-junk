@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+file=$1
+[ -z $file ] && exit 1
+shift 1
+args=
+for var in "$@"; do
+    args=$args" "$var
+done
+
+if [ ! -z "$args" ]; then
+    args="--args $args"
+fi
+/usr/local/bin/R --slave -f $file $args
