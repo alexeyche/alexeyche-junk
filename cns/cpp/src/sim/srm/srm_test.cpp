@@ -7,6 +7,7 @@
 #include <sim/int/simple_int.h>
 #include <sim/int/gauss_legendre.c>
 #include <sim/data/save.h>
+#include <sim/spike/lz78.h>
 
 #include "sim.h"
 #include "neurons.h"
@@ -649,7 +650,7 @@ void test_stdp_many(const std::string output_filename = "") {
                     Log::Info << "\n";
                     dHdw += dHdw_cur;
                 }            
-                for(size_t wi=0; wi<n.w.size(); wi++) { Log::Info << dHdw(wi) << ", "; } 
+                //for(size_t wi=0; wi<n.w.size(); wi++) { Log::Info << dHdw(wi) << ", "; } 
 
                 Log::Info << "dW: ";
                 for(size_t wi=0; wi<n.w.size(); wi++) { grads(gi,wi) = -dHdw(wi); Log::Info << dHdw(wi) << ", "; }
@@ -704,10 +705,48 @@ void test_stdp_many(const std::string output_filename = "") {
         double elapsedTime = (t2.tv_sec - t1.tv_sec) * 1000.0;      // sec to ms
         elapsedTime += (t2.tv_usec - t1.tv_usec) / 1000.0;   // us to ms
         printf("%f\n", elapsedTime/1000.0);
+    } else {
+        send_arma_mat(grads, "grads");
     }
 }
 
+void printLzDict(TDict &d) {
+    TDict::iterator it = d.begin();
+    while(it != d.end()) {
+        Log::Info << it->first << " -> " << it->second << "\n";
+        it++;
+    }
+}
 
+void test_lz() {
+    TSpikeTimes st;
+    st.push_back(2);
+    st.push_back(3);
+    st.push_back(3.3);
+    st.push_back(3.5);
+    st.push_back(4);
+    st.push_back(7);
+    TBitSpikes bs = spikeTimesToBits(st,0,10,0.2);
+    for(size_t bsi=0; bsi<bs.size(); bsi++) {
+        Log::Info << bs[bsi];
+    }
+    Log::Info << "\n";
+
+    TDict d = lz78Phrases(bs);
+    printLzDict(d); 
+    Log::Info << " ===== \n";
+    TBitSpikes bs2;
+    bs2.push_back(0);  bs2.push_back(0);
+    bs2.push_back(1);  bs2.push_back(1);
+    bs2.push_back(0);  bs2.push_back(0);
+    bs2.push_back(1);  bs2.push_back(0);
+    bs2.push_back(1);  bs2.push_back(0);
+    bs2.push_back(1);  bs2.push_back(0);
+    bs2.push_back(0);  bs2.push_back(1);
+    bs2.push_back(1);  bs2.push_back(1);
+    TDict d2 = lz78Phrases(bs2);
+    printLzDict(d2);
+}
 
 
 PROGRAM_INFO("SIM TEST", "sim tests"); 
@@ -811,7 +850,12 @@ int main(int argc, char** argv) {
         }
         Log::Info << "===============================================================" << std::endl;
     }
-  
+    if((test_name == "all") || (test_name == "lz")) {
+        Log::Info << "lz:" << std::endl;
+        Log::Info << "===============================================================" << std::endl;
+        test_lz();
+        Log::Info << "===============================================================" << std::endl;
+    } 
     return 0;
 }
 

@@ -13,12 +13,13 @@ ornstein_uhlenbeck <- function(T, n, nu,lambda,sigma,x0){
 set.seed(6)
 d1 <- ornstein_uhlenbeck(10,999, 0.2, 1, 0.007, 0.15)
 d2 <- ornstein_uhlenbeck(10,999, 0.19, 0.5, 0.01, 0.15)
+d3 <- ornstein_uhlenbeck(10,999, 0.15, 0.5, 0.01, 0.21)
 write.table(d1, "/var/tmp/d1.csv", sep=",", col.names=F, row.names=F) 
 write.table(d2, "/var/tmp/d2.csv", sep=",", col.names=F, row.names=F)
-  
-#plot(d1, type="l", col="blue")
-#lines(d2, col="red")
-
+write.table(d3, "/var/tmp/d3.csv", sep=",", col.names=F, row.names=F)  
+plot(d1, type="l", col="blue")
+lines(d2, col="red")
+lines(d3, col="green")
 #source("serv.R")
 load()
 

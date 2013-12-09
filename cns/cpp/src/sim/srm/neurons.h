@@ -174,9 +174,9 @@ namespace srm {
 
 
 
-        static constexpr double u_abs = -100; // mV
-        static constexpr double u_r = -50;    // mV
-        static constexpr double trf = 0.25;   // ms
+        static constexpr double u_abs = -300; // mV
+        static constexpr double u_r = -200;    // mV
+        static constexpr double trf = 5.25;   // ms
         static constexpr double trs = 3;      // ms
         static constexpr double dr = 1;       // ms
 
@@ -187,14 +187,20 @@ namespace srm {
         }
         
         
-        SrmNeuron() { }
+        SrmNeuron(bool sl=false) : stdp_learning(sl) { }
         SrmNeuron(SrmNeuron *n) :  StochasticNeuron(n) { }
     
         static constexpr double u_rest = -70; //mV
-        static constexpr double alpha = 0.45; //0.75;
-        static constexpr double beta = 0.25; //0.25;
+        static constexpr double alpha = 1;
+        static constexpr double beta = 1; //0.25;
         static constexpr double tresh = -50; //mV
 
+        #define APLUS 1.5
+        #define AMINUS 1.5
+        #define TPLUS 10
+        #define TMINUS 10
+        #define STDP_RATE 0.001
+        #define MU 0.7
         double u(const double &t, TTime &y_given) {
             double epsp_pot = 0;
                         
@@ -202,6 +208,7 @@ namespace srm {
 //            printf("============================================\n");  
 //            printf("y_last: %f\n", y_last); 
 //            printf("in.size(): %d\n", n->in.size());  
+//            Log::Info << "neuron " << id() << " in.size() == " << in.size() << "\n";
             for(size_t i=0; i<in.size(); i++) {
                 for(int j=(in[i]->y.n_elem(t)-1); j>=0; j--) {
                     //printf("epsp_pot: %e\n", epsp_pot);
@@ -211,6 +218,23 @@ namespace srm {
                         continue;
                     }                        
                     epsp_pot += w[i]*epsp(t, in[i]->y(j), y_last);
+                }
+                if(stdp_learning) {
+                    double dt = in[i]->y.last(t) - y_last;
+                    if(abs(dt) < 20) { 
+                       double dw=0;
+                       if(dt<=0) {
+                           if(w[i]<4)
+                           dw = pow(4-w[i], MU)*APLUS*exp(dt/TPLUS);
+                       } else {
+                           if(w[i]>-2)
+                           dw = -pow(2+w[i], MU)*AMINUS*exp(-dt/TMINUS);
+                       }
+                       //Log::Info << "syn " << i << " dt " << dt << "(" << in[i]->y.last(t) << ")" << " dw = " << dw << " w[i] " << w[i] << " \n"; 
+                       double mod_w = STDP_RATE*dw;
+                       //Log::Info << "syn " << i << " dt " << dt << "(" << in[i]->y.last(t) << ")" << " dw = " << dw << " \n"; 
+                       w[i] += mod_w;
+                    }
                 }
             }
             double nu_pot = 0;
@@ -236,6 +260,7 @@ namespace srm {
             return p(t, y);           
         }
         
+        bool stdp_learning;
     };
 
 

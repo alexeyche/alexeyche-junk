@@ -38,7 +38,8 @@ namespace srm {
         return false;
     }        
     
-    void connect(NeuronGroup *gr_left, NeuronGroup *gr_right, TConnType::EConnType ct, double start_weight) {
+    
+    void connect(NeuronGroup *gr_left, NeuronGroup *gr_right, TConnType::EConnType ct, mat start_weight) {
         std::map<int, std::set<int> > uniq_rels;
             
         for(size_t gli=0; gli<gr_left->size(); gli++) {
@@ -51,14 +52,14 @@ namespace srm {
                 if((ct == TConnType::FeedForward)||(ct == TConnType::AllToAll)) {
                     if(!check_relation(idl, idr, uniq_rels)) {
                         //Log::Info << idl << "->" << idr << "\n";
-                        gr_right->at(gri)->add_input( gr_left->at(gli) , start_weight);
+                        gr_right->at(gri)->add_input( gr_left->at(gli) , start_weight(gli,gri));
                         uniq_rels[idl].insert(idr);
                     }                        
                 }
                 if(ct == TConnType::AllToAll) {
                     if(!check_relation(idr, idl, uniq_rels)) {
                         //Log::Info << idr << "->" << idl << "\n";
-                        gr_left->at(gli)->add_input( gr_right->at(gri) , start_weight);
+                        gr_left->at(gli)->add_input( gr_right->at(gri) , start_weight(gli,gri));
                         uniq_rels[idr].insert(idl);
                     }
                 }       
@@ -67,6 +68,11 @@ namespace srm {
 
     }
 
+    void connect(NeuronGroup *gr_left, NeuronGroup *gr_right, TConnType::EConnType ct, double start_weight) {
+        mat w(gr_left->size(), gr_right->size());
+        w.fill(start_weight);
+        connect(gr_left, gr_right, ct, w);
+    }
 };
 
 

@@ -41,13 +41,13 @@ namespace srm {
     
     class TRunType {
     public:
-        enum ERunType { Run, RunAndLearn };
+        enum ERunType { Run, RunAndLearnEntropy, RunAndLearnSTDP };
     };
 
     class Sim {
     public:        
         
-        Sim() : T0(0.0) {}
+        Sim(double rate=0.1) : T0(0.0), learning_rate(rate) {}
         ~Sim() { 
 //            for(size_t ni=0; ni<stoch_elem.size(); ni++) { 
 //                delete stoch_elem[ni]; 
@@ -55,6 +55,9 @@ namespace srm {
 //            stoch_elem.clear();
             Log::Info << "Cleaning Sim\n"; 
         }            
+
+        typedef std::pair<NeuronGroupStat*,NeuronGroupStat*> pair_stat;
+
         void run(double Tdur, double dt, TRunType::ERunType rt, bool verbose=true, bool send_data=true) {
             double Tmax = T0 + Tdur;
             if(verbose) {
@@ -73,19 +76,30 @@ namespace srm {
 //                    send_arma_mat(gr->group[9]->y, "d_stat", 9);
                 }
             }
+            if(rt == TRunType::RunAndLearnSTDP) {
+                for(size_t ni=0; ni<stoch_elem.size(); ni++) {
+                    SrmNeuron *n = dynamic_cast<SrmNeuron*>(stoch_elem[ni]);
+                    if(n) {
+                        n->stdp_learning = true;
+                    }
+                }
+            }
             if(verbose) { Log::Info << "Done\n"; }
             vec t = linspace<vec>(T0, Tmax, (int)Tmax/dt);
            
             std::vector<NeuronGroupStat> stats;
-            std::map<unsigned int, NeuronGroupStat*> stat_map;
+
+            std::map<unsigned int, pair_stat> stat_map;
             for(size_t gi=0; gi< sg.group_to_listen.size(); gi++) {
                 stats.push_back( NeuronGroupStat(sg.group_to_listen[gi], t.n_elem) );
+                stats.push_back( NeuronGroupStat(sg.group_to_listen[gi], t.n_elem) );
                 for(size_t ni=0; ni < sg.group_to_listen[gi]->size(); ni++) {
-                    stat_map[sg.group_to_listen[gi]->at(ni)->id()] = &stats.back();
+                    stat_map[sg.group_to_listen[gi]->at(ni)->id()] = pair_stat(&stats[stats.size()-1], &stats[stats.size()-2]);
                 }
+                
             }
             int max_spikes = 0;
-            double learn_dt = 5;
+            double learn_dt = 1;
             double learn_dti = 0;
             std::vector<SrmNeuron*> neuron_fired; // in window
 
@@ -94,9 +108,10 @@ namespace srm {
                 for(size_t ni=0; ni<stoch_elem.size(); ni++) {
                     double pi = stoch_elem[ni]->p(t(ti));
                     
-                    std::map<unsigned int, NeuronGroupStat*>::iterator st_it = stat_map.find(stoch_elem[ni]->id());
+                    std::map<unsigned int, pair_stat>::iterator st_it = stat_map.find(stoch_elem[ni]->id());
                     if(st_it != stat_map.end()) {
-                        st_it->second->writeStat(stoch_elem[ni], pi, ti);
+                        st_it->second.first->writeStat(stoch_elem[ni], pi, ti);
+                        st_it->second.second->writeStat(stoch_elem[ni], stoch_elem[ni]->u(t(ti)),ti);
                     }                          
                     
                     if(pi*dt > unif(ti, ni)) {
@@ -115,8 +130,9 @@ namespace srm {
                     }
                                        
                 }
-                if(rt == TRunType::RunAndLearn) {
+                if(rt == TRunType::RunAndLearnEntropy) {
                     if(learn_dti>=learn_dt) {
+                        vec grads(stoch_elem.size(), stoch_elem[0]->w.size(), fill::zeros);
                         for(size_t ni=0; ni<stoch_elem.size(); ni++) { 
 //                            vec dHdw(neuron_fired[ni]->w.size(), fill::zeros);
                             //for(double tlow=t(ti)-2*learn_dt; tlow<t(ti)+0*learn_dt; tlow+=learn_dt) {
@@ -129,29 +145,41 @@ namespace srm {
 //                                Log::Info << "\n";
 //                                dHdw += dHdw_cur;
                             //}
-                            for(size_t wi=0; wi<dHdw.n_elem; wi++) { Log::Info << dHdw(wi) << ", "; stoch_elem[ni]->w[wi] -= 0.6 * dHdw(wi);  }
+                            for(size_t wi=0; wi<dHdw.n_elem; wi++) { 
+                                grads(ni,wi) = dHdw(wi);
+                                Log::Info << dHdw(wi) << ", "; 
+                                stoch_elem[ni]->w[wi] -= learning_rate * dHdw(wi);  
+                            }
+                            TEntropyCalc ec(n, t(ti)-learn_dt, t(ti));
+                            double H = ec.run(3);
+                            Log::Info << "    -> H = " << H;
                             Log::Info << "\n";                   
                             }
                         }                    
+                        //send_arma_mat(grads, "grads", t(ti)-learn_dt);
                         neuron_fired.clear();
                         learn_dti = 0;
                     } else {                        
                         learn_dti+=dt;
                     }               
-                }                    
+                }
             }
             if(verbose) { Log::Info << "Sending statistics to 7778\n"; }
-            for(size_t i=0; i<stats.size(); i++) {
-                send_arma_mat(stats[i].stat, "gr_stat", i);
-            }
+            
             if (send_data) {
-                mat raster(stoch_elem.size(), max_spikes, fill::zeros);
-                for(size_t ni=0; ni<stoch_elem.size(); ni++) {
-                    for(size_t yi=0; yi<stoch_elem[ni]->y.size(); yi++) {
-                        raster(ni, yi) = stoch_elem[ni]->y[yi];                
-                    }
+                for(size_t i=0; i<stats.size(); i+=2) {
+                    send_arma_mat(stats[i].stat, "gr_stat_prob", i, true);
+                    send_arma_mat(stats[i+1].stat, "gr_stat_pot", i, true);
                 }
-                send_arma_mat(raster, "raster");
+                if(max_spikes !=0) {
+                    mat raster(stoch_elem.size(), max_spikes, fill::zeros);
+                    for(size_t ni=0; ni<stoch_elem.size(); ni++) {
+                        for(size_t yi=0; yi<stoch_elem[ni]->y.size(); yi++) {
+                            raster(ni, yi) = stoch_elem[ni]->y[yi];                
+                        }
+                    }
+                    send_arma_mat(raster, "raster", time(NULL), true);
+                }                    
             }                
             if(verbose) { Log::Info << "Done\n"; }
             //T0 = Tmax;
@@ -202,6 +230,7 @@ namespace srm {
         }
         
         TStatListener sg;
+        double learning_rate;
     };
 
 }
