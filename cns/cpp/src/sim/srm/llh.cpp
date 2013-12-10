@@ -21,11 +21,9 @@ namespace srm {
         #if VERBOSE >= 3
             printf(" | syn # %zu    ----          spikes: [", wi);
 //            printf(" DEBUG %d %d %d %d ", n->in[wi]->y.binary_search(T0), n->in[wi]->y.binary_search(Tmax), n->in[wi]->y.n_elem(T0), n->in[wi]->y.n_elem(Tmax)); 
-            int starti = n->in[wi]->y.n_elem(T0);
-            if(starti>=0) {
-            for(; starti < n->in[wi]->y.n_elem(Tmax); starti++) {
+            
+            for(size_t starti=0; starti<n->in[wi]->y.size(); starti++) {
                 printf("%f, ", n->in[wi]->y[starti]);
-            }
             }
             printf("]\n");
             printf(" | int part :%f\n", int_part);

@@ -43,7 +43,7 @@ int main(int argc, char** argv)
     std::srand(seed);
     
     Sim s(learning_rate);
-    SrmNeuronGroup g(10);
+    SrmNeuronGroup g(1);
     mat start_w(g.size(),g.size(), fill::randn);
 //    start_w = 1.7 + start_w*0.2;
     start_w.fill(5);

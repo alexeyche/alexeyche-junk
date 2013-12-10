@@ -136,7 +136,7 @@ namespace srm {
                         for(size_t ni=0; ni<neuron_fired.size(); ni++) {
                             SrmNeuron *n = neuron_fired[ni];
                             vec dPdw(n->w.size(), fill::zeros);
-                            for(double t0=t(ti)-2*learn_dt; t0<=t(ti); t0+=learn_dt) {
+                            for(double t0=t(ti)-learn_dt; t0<t(ti); t0+=learn_dt) {
                                 TLogLikelyhood llh(n, t0, t0+learn_dt); //t(ti)-learn_dt, t(ti));     
                                 dPdw += llh.grad();
                             }
