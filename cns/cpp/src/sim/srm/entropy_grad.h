@@ -64,7 +64,7 @@ namespace srm {
                 double spike_part = 0;
                 for(size_t yi=0; yi<y.size(); yi++) {
                     double &fi = y[yi];
-                    spike_part += (p_stroke(fi, eg->neuron, y)/eg->neuron->p(fi, y))*grab_epsp(fi, wi, eg->neuron, y);
+                    spike_part += (p_stroke(fi, eg->neuron, y)/eg->neuron->p(fi, y))*grab_epsp_syn(fi, wi, eg->neuron, y);
                     if(eg->cs.VerboseInt) {
                         printf(" | yi: %zu ", yi);
                     //    printf("   | p' = %f\n", p_stroke(fi, eg->neuron, y));

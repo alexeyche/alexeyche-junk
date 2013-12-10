@@ -170,10 +170,10 @@ namespace srm {
 
         
         static constexpr double u_abs = -300; // mV
-        static constexpr double u_r = -200;    // mV
-        static constexpr double trf = 7.25;   // ms
-        static constexpr double trs = 4;      // ms
-        static constexpr double dr = 2;       // ms
+        static constexpr double u_r = -100;    // mV
+        static constexpr double trf = 2.25;   // ms
+        static constexpr double trs = 3;      // ms
+        static constexpr double dr = 1;       // ms
 
         static double nu(double t, double fi);
        
@@ -181,8 +181,8 @@ namespace srm {
         SrmNeuron(SrmNeuron *n) :  StochasticNeuron(n) { }
     
         static constexpr double u_rest = -70; //mV
-        static constexpr double alpha = 1;
-        static constexpr double beta = 1; //0.25;
+        static constexpr double alpha = 1;//0.35;
+        static constexpr double beta = 1;//0.15;
         static constexpr double tresh = -50; //mV
 
         double u(const double &t, TTime &y_given);

@@ -67,12 +67,12 @@ namespace srm {
             for(size_t el_i=0; el_i<sim_elem.size(); el_i++) { 
                 if(sim_elem[el_i]->isNeedPreCalc()) {
                     sim_elem[el_i]->preCalculate(T0, Tmax, dt);
-                    TimeSeriesGroup *gr = (TimeSeriesGroup*)sim_elem[el_i];
-                    for(unsigned int i=0; i<gr->group.size(); i++) {
-                        Log::Info << "n " << i << ":\n";
-                        Log::Info << gr->group[i]->y.size() << "\n";
-                        gr->group[i]->y.print();
-                    }
+//                    TimeSeriesGroup *gr = (TimeSeriesGroup*)sim_elem[el_i];
+//                    for(unsigned int i=0; i<gr->group.size(); i++) {
+//                        Log::Info << "n " << i << ":\n";
+//                        Log::Info << gr->group[i]->y.size() << "\n";
+//                        gr->group[i]->y.print();
+//                    }
 //                    send_arma_mat(gr->group[9]->y, "d_stat", 9);
                 }
             }
@@ -167,16 +167,18 @@ namespace srm {
                 for(size_t i=0; i<potstats.size(); i+=1) {
                     send_arma_mat(potstats[i]->stat, "gr_stat_pot", i, true);
                 }
-                if(max_spikes !=0) {
-                    mat raster(stoch_elem.size(), max_spikes, fill::zeros);
-                    for(size_t ni=0; ni<stoch_elem.size(); ni++) {
-                        for(size_t yi=0; yi<stoch_elem[ni]->y.size(); yi++) {
-                            raster(ni, yi) = stoch_elem[ni]->y[yi];                
-                        }
-                    }
-                    send_arma_mat(raster, "raster", time(NULL), true);
-                }                    
+
             }                
+            if(max_spikes !=0) {
+                mat rasterc(stoch_elem.size(), max_spikes, fill::zeros);
+                for(size_t ni=0; ni<stoch_elem.size(); ni++) {
+                    for(size_t yi=0; yi<stoch_elem[ni]->y.size(); yi++) {
+                        rasterc(ni, yi) = stoch_elem[ni]->y[yi];                
+                    }
+                }
+                if(send_data) send_arma_mat(rasterc, "raster", time(NULL), true);
+                raster = rasterc;
+            }                    
             if(verbose) { Log::Info << "Done\n"; }
             //T0 = Tmax;
             for(size_t gi=0; gi< sg.group_to_listen.size(); gi++) {
@@ -219,6 +221,7 @@ namespace srm {
         std::vector<SimElement*> sim_elem;
         
         double T0;
+        mat raster;
     private:        
         void addRecNeuronFn(Neuron *n, std::set<unsigned int> &hist) {
             addNeuron(n);

@@ -16,6 +16,7 @@
 #include "groups.h"
 #include "connections.h"
 #include "entropy_grad.h"
+#include "grad_funcs.h"
 
 void epsp_test(bool just_print = false) {
     double Tmax = 100;
@@ -391,10 +392,10 @@ void test_entropy_surface() {
            for(size_t wi2=0; wi2<w2.n_elem; wi2++) {
                 n.w[0] =  w1(wi1); 
                 n.w[1] =  w2(wi2); 
-                srm::TEntropyCalc ec(&n, Tmax-10, Tmax);
-                double H = ec.run(4);
-                Log::Info << "w1: " << n.w[0] << " w2: " << n.w[1] << " H = " << H << "\n";
-                H_stat(wi1, wi2) = H;
+//                srm::TEntropyCalc ec(&n, Tmax-10, Tmax);
+//                double H = ec.run(4);
+//                Log::Info << "w1: " << n.w[0] << " w2: " << n.w[1] << " H = " << H << "\n";
+//                H_stat(wi1, wi2) = H;
            }
         }       
         send_arma_mat(H_stat, "H_stat", i);
@@ -514,7 +515,7 @@ mat H_surface(srm::SrmNeuron *n, double f1, double f2) {
         for(size_t wi2=0; wi2<w2.n_elem; wi2++) {
             n->w[0] = w1(wi1);
             n->w[1] = w2(wi2);
-            Hsurf(wi1, wi2) = ec.run(3);
+    //        Hsurf(wi1, wi2) = ec.run(3);
             Log::Info << "wi1: " << wi1 << " wi2: " << wi2 << " w1: " << w1(wi1) << " w2: " << w2(wi2)  << " H: " << Hsurf(wi1,wi2) << "\n"; 
         }
     }
@@ -749,6 +750,89 @@ void test_lz() {
 }
 
 
+void test_dpdw() {
+    std::srand(time(NULL));
+
+    srm::Sim s;
+    srm::SrmNeuron n;
+    
+    n.add_input(new srm::DetermenisticNeuron("1"), 6); 
+    n.add_input(new srm::DetermenisticNeuron("1"), 6);
+    n.add_input(new srm::DetermenisticNeuron("1"), 6); 
+    n.add_input(new srm::DetermenisticNeuron("1"), 6);
+    n.add_input(new srm::DetermenisticNeuron("1"), 6); 
+    n.add_input(new srm::DetermenisticNeuron("1"), 6);
+    n.add_input(new srm::DetermenisticNeuron("1"), 6); 
+    n.add_input(new srm::DetermenisticNeuron("1"), 6);
+    n.add_input(new srm::DetermenisticNeuron("1"), 6); 
+    n.add_input(new srm::DetermenisticNeuron("1"), 6);
+    s.addRecNeuron(&n);
+    s.run(10*srm::ms, 0.5, srm::TRunType::Run, true, false);
+    n.y.clean();
+    double tstart=0;
+    double tend=10;
+    double dt=1;
+    mat grads((tend-tstart)/dt, n.w.size());
+    mat grads_1eval((tend-tstart)/dt, n.w.size());
+    size_t gi=0;
+    for(double tshift=tstart; tshift<tend; tshift+=dt) {
+        for(size_t epoch=0; epoch<1; epoch++) {
+            Log::Info << "=================================\n";
+            Log::Info << "=================================\n";
+            double cur_tshift = tshift/5;
+            for(size_t ni=5; ni<n.w.size(); ni++) {
+              n.in[ni]->y[0] = 1+cur_tshift*(ni-4);
+              Log::Info << "ni("<< ni << "): " << n.in[ni]->y[0] << ", ";
+            }
+            s.run(20*srm::ms, 0.5, srm::TRunType::Run, true, false);
+            n.y.print();
+
+            vec grad_val(n.w.size());
+
+            for(size_t wi=0; wi<grad_val.n_elem; wi++) {
+                printf(" | syn # %zu\n", wi);
+
+                srm::TNeuronSynapseGivenY n_syn_y(wi, &n, n.y);       
+                if((tshift == 7)&&(wi == 9)) { 
+                    mat ps_ep(1000,3);
+                    vec t = linspace<vec>(0,20, 1000);
+                    for(size_t ti=0; ti<t.n_elem; ti++) {
+                        ps_ep(ti,0) = t(ti);
+                        ps_ep(ti,1) = p_stroke(t(ti), &n, n.y);
+                        ps_ep(ti,2) = grab_epsp_syn(t(ti), wi, &n, n.y);
+                    }
+                    send_arma_mat(ps_ep,"ps_ep", -1, true);
+                    return;
+                }                    
+                double int_part = - gauss_legendre(GAUSS_QUAD, srm::integrand_epsp_gl, (void*)&n_syn_y, 0, 20);           
+                double spike_part = 0;
+//                double spike_part2 = 0;
+                for(size_t yi=0; yi<n.y.size(); yi++) {
+                    double &fi = n.y[yi];
+                    spike_part += (srm::p_stroke(fi, &n, n.y)/n.p(fi))*srm::grab_epsp_syn(fi, wi, &n, n.y);
+//                    spike_part2 += srm::p_stroke(fi, &n, n.y)*(exp(-n.p(fi))/(1-exp(-n.p(fi))))*srm::grab_epsp_syn(fi, wi, &n, n.y);
+                    printf(" | yi: %zu\n", yi);
+                    printf("   | p' = %f\n", p_stroke(fi, &n, n.y));
+//                    printf("   | p = %f\n", n.p(fi));
+//                    printf("   | u(t) = %f\n", n.u(fi));
+                    printf("   | epsp = %f\n", grab_epsp_syn(fi, wi, &n, n.y));
+//                    printf("   | y[yi] = %f\n", fi);
+//                    printf("   | spike_part %f\n", spike_part);
+//                    printf("   | spike_part2 %f\n", spike_part2);
+                    break; // one spike
+                }
+                Log::Info << "wi: " << wi  << " spike part : " << spike_part << " int part :" << int_part << " dPdw = " << spike_part+int_part <<  "\n";
+
+            } 
+            n.y.clean();
+            Log::Info << "\n";
+            Log::Info << "=================================\n";           
+        }
+    }        
+
+}
+
+
 PROGRAM_INFO("SIM TEST", "sim tests"); 
 PARAM_STRING("test", "name for test. default \"all\"", "t", "all");
 PARAM_FLAG("nosend", "if it true. no sending to R", "n");
@@ -856,6 +940,13 @@ int main(int argc, char** argv) {
         test_lz();
         Log::Info << "===============================================================" << std::endl;
     } 
+    if((test_name == "all") || (test_name == "dpdw")) {
+        Log::Info << "dpdw:" << std::endl;
+        Log::Info << "===============================================================" << std::endl;
+        test_dpdw();
+        Log::Info << "===============================================================" << std::endl;
+    } 
+
     return 0;
 }
 

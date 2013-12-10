@@ -17,6 +17,16 @@ d3 <- ornstein_uhlenbeck(10,999, 0.15, 0.5, 0.01, 0.21)
 write.table(d1, "/var/tmp/d1.csv", sep=",", col.names=F, row.names=F) 
 write.table(d2, "/var/tmp/d2.csv", sep=",", col.names=F, row.names=F)
 write.table(d3, "/var/tmp/d3.csv", sep=",", col.names=F, row.names=F)  
+for(i in 1:10) {
+  set.seed(i+10)
+  d1c <- ornstein_uhlenbeck(10,999, 0.2, 1, 0.007, 0.15)
+  d2c <- ornstein_uhlenbeck(10,999, 0.19, 0.5, 0.01, 0.15)
+  d3c <- ornstein_uhlenbeck(10,999, 0.15, 0.5, 0.01, 0.21)
+  write.table(d1c, paste("/var/tmp/d1_",i,".csv",sep=""), sep=",", col.names=F, row.names=F) 
+  write.table(d2c, paste("/var/tmp/d2_",i,".csv",sep=""), sep=",", col.names=F, row.names=F)
+  write.table(d3c, paste("/var/tmp/d3_",i,".csv",sep=""), sep=",", col.names=F, row.names=F) 
+}
+
 plot(d1, type="l", col="blue")
 lines(d2, col="red")
 lines(d3, col="green")

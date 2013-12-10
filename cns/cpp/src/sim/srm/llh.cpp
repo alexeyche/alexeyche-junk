@@ -34,7 +34,7 @@ namespace srm {
                 double &fi = n->y[yi];
                 spike_part += (p_stroke(fi, n, n->y)/n->p(fi))*grab_epsp_syn(fi, wi, n, n->y);
             #if VERBOSE >= 3
-                printf(" | yi: %zu\n", yi);
+                printf(" | yi: %d\n", yi);
                 printf("   | p' = %f\n", p_stroke(fi, n, n->y));
                 printf("   | p = %f\n", n->p(fi));
                 printf("   | u(t) = %f\n", n->u(fi));

@@ -28,6 +28,21 @@ bool fileExist( const std::string& name )
      return f.is_open();
 }
 
+std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems) {
+    std::stringstream ss(s);
+    std::string item;
+    while (std::getline(ss, item, delim)) {
+        elems.push_back(item);
+    }
+    return elems;
+}
+
+std::vector<std::string> split(const std::string &s, char delim) {
+    std::vector<std::string> elems;
+    split(s, delim, elems);
+    return elems;
+}
+
 int main(int argc, char** argv)
 {
     CLI::ParseCommandLine(argc, argv);
@@ -37,31 +52,32 @@ int main(int argc, char** argv)
     const double specpattdur = CLI::GetParam<double>("pattdur");
 
     const double learning_rate = CLI::GetParam<double>("rate");
-    const double simtime = CLI::GetParam<double>("simtime");
+    double simtime = CLI::GetParam<double>("simtime");
     const int epoch = CLI::GetParam<int>("epoch");
     
     std::srand(seed);
     
     Sim s(learning_rate);
-    SrmNeuronGroup g(1);
+    SrmNeuronGroup g(10);
     mat start_w(g.size(),g.size(), fill::randn);
 //    start_w = 1.7 + start_w*0.2;
-    start_w.fill(5);
+    start_w.fill(1);
     connect(&g, &g, TConnType::AllToAll, start_w);
 
 
-    TimeSeriesGroup tsg(10, 10*ms, 100); 
+    TimeSeriesGroup tsg(50, 10*ms, 100); 
     if(specpattern == "") {
-        tsg.loadPatternFromFile("/var/tmp/dtest.csv", 10*ms, 1);
-//        tsg.loadPatternFromFile("/var/tmp/d1.csv", 500*ms, 1);
-//        tsg.loadPatternFromFile("/var/tmp/d2.csv", 500*ms, 1);
-//        tsg.loadPatternFromFile("/var/tmp/d3.csv", 500*ms, 1);
+        //tsg.loadPatternFromFile("/var/tmp/dtest.csv", 10*ms, 1);
+        tsg.loadPatternFromFile("/var/tmp/d1.csv", 500*ms, 1);
+        tsg.loadPatternFromFile("/var/tmp/d2.csv", 500*ms, 1);
+        tsg.loadPatternFromFile("/var/tmp/d3.csv", 500*ms, 1);
+        simtime = (500+100)*3;
     } else {
         tsg.loadPatternFromFile(specpattern, specpattdur*ms, 1);
     }
 
     mat start_w_ff(tsg.size(),g.size(), fill::randn);
-    start_w_ff.fill(5);
+    start_w_ff.fill(1);
     connect(&tsg, &g, TConnType::FeedForward, start_w_ff);
                 
 //    for(size_t ni=0; ni<g.size(); ni++) {
@@ -114,6 +130,10 @@ int main(int argc, char** argv)
                 Log::Info << "\n";
             }            
         }        
+        if((rt == TRunType::Run)&&(specpattern != "")) { 
+            std::vector<std::string> filename_spl = split(specpattern, '.');
+            data::Save(filename_spl[filename_spl.size()-2]+std::string("_resp.csv"), s.raster);
+        }            
     }        
     if((rt == TRunType::RunAndLearnSTDP)||(rt == TRunType::RunAndLearnLogLikelyhood)) {
         data::Save("/var/tmp/weights.csv", weights);
