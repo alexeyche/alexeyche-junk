@@ -6,7 +6,8 @@
 
 #include "neurons.h"
 #include "groups.h"
-#include "entropy_grad.h"
+
+#include "llh.h"
 
 namespace srm {
     const double sec = 1000; //ms
@@ -21,7 +22,7 @@ namespace srm {
             }
         }
         void writeStat(Neuron *n, double stat_value, size_t stat_index) {
-            std::set<int>::const_iterator it = ids.find(n->id());
+            std::set<int>::iterator it = ids.find(n->id());
             if(it != ids.end()) {
                 size_t ind = std::distance(ids.begin(), it); 
                 stat(ind, stat_index) = stat_value; 
@@ -41,7 +42,7 @@ namespace srm {
     
     class TRunType {
     public:
-        enum ERunType { Run, RunAndLearnEntropy, RunAndLearnSTDP };
+        enum ERunType { Run, RunAndLearnEntropy, RunAndLearnSTDP, RunAndLearnLogLikelyhood };
     };
 
     class Sim {
@@ -66,13 +67,12 @@ namespace srm {
             for(size_t el_i=0; el_i<sim_elem.size(); el_i++) { 
                 if(sim_elem[el_i]->isNeedPreCalc()) {
                     sim_elem[el_i]->preCalculate(T0, Tmax, dt);
-//                    TimeSeriesGroup *gr = (TimeSeriesGroup*)sim_elem[el_i];
-//                    for(unsigned int i=0; i<gr->group.size(); i++) {
-//                        Log::Info << "n " << i << ":\n";
-//                        Log::Info << gr->group[i]->y.size() << "\n";
-//                        gr->group[i]->y.print();
-//                        //usleep(100000);
-//                    }
+                    TimeSeriesGroup *gr = (TimeSeriesGroup*)sim_elem[el_i];
+                    for(unsigned int i=0; i<gr->group.size(); i++) {
+                        Log::Info << "n " << i << ":\n";
+                        Log::Info << gr->group[i]->y.size() << "\n";
+                        gr->group[i]->y.print();
+                    }
 //                    send_arma_mat(gr->group[9]->y, "d_stat", 9);
                 }
             }
@@ -87,22 +87,23 @@ namespace srm {
             if(verbose) { Log::Info << "Done\n"; }
             vec t = linspace<vec>(T0, Tmax, (int)Tmax/dt);
            
-            std::vector<NeuronGroupStat> stats;
+            std::vector<NeuronGroupStat*> probstats;
+            std::vector<NeuronGroupStat*> potstats;
 
             std::map<unsigned int, pair_stat> stat_map;
             for(size_t gi=0; gi< sg.group_to_listen.size(); gi++) {
-                stats.push_back( NeuronGroupStat(sg.group_to_listen[gi], t.n_elem) );
-                stats.push_back( NeuronGroupStat(sg.group_to_listen[gi], t.n_elem) );
+                probstats.push_back(new NeuronGroupStat(sg.group_to_listen[gi], t.n_elem) );
+                potstats.push_back(new NeuronGroupStat(sg.group_to_listen[gi], t.n_elem) );
                 for(size_t ni=0; ni < sg.group_to_listen[gi]->size(); ni++) {
-                    stat_map[sg.group_to_listen[gi]->at(ni)->id()] = pair_stat(&stats[stats.size()-1], &stats[stats.size()-2]);
+                    stat_map[sg.group_to_listen[gi]->at(ni)->id()] = pair_stat(probstats.back(), potstats.back());
                 }
                 
             }
             int max_spikes = 0;
-            double learn_dt = 1;
+            double learn_dt = 5;
             double learn_dti = 0;
-            std::vector<SrmNeuron*> neuron_fired; // in window
 
+            std::vector<SrmNeuron*> neuron_fired; // in window
             mat unif(t.n_elem, stoch_elem.size(), fill::randu);
             for(size_t ti=0; ti<t.n_elem; ti++) {
                 for(size_t ni=0; ni<stoch_elem.size(); ni++) {
@@ -113,63 +114,58 @@ namespace srm {
                         st_it->second.first->writeStat(stoch_elem[ni], pi, ti);
                         st_it->second.second->writeStat(stoch_elem[ni], stoch_elem[ni]->u(t(ti)),ti);
                     }                          
-                    
                     if(pi*dt > unif(ti, ni)) {
                         TTime &yn = stoch_elem[ni]->y;
-                        if(verbose) { Log::Info << "spike of " << ni << " at " << t(ti) << "\n"; }
-                        // spike!
+                    #if VERBOSE >= 1
+                        printf("spike of %d at %f \n", stoch_elem[ni]->id(), t(ti));
+                    #endif
                         yn.push_back(t(ti));
                         if(yn.size() > max_spikes) {
                             max_spikes = yn.size();
                         }
                         
-                        //if(SrmNeuron *n = dynamic_cast<SrmNeuron*>(stoch_elem[ni])) {
-                        //    neuron_fired.push_back(n);
-                        //}                                                   
+                        if(SrmNeuron *n = dynamic_cast<SrmNeuron*>(stoch_elem[ni])) {
+                            neuron_fired.push_back(n);
+                        }                                                   
                                                     
                     }
                                        
                 }
-                if(rt == TRunType::RunAndLearnEntropy) {
+                if(rt == TRunType::RunAndLearnLogLikelyhood) {
                     if(learn_dti>=learn_dt) {
-                        vec grads(stoch_elem.size(), stoch_elem[0]->w.size(), fill::zeros);
-                        for(size_t ni=0; ni<stoch_elem.size(); ni++) { 
-//                            vec dHdw(neuron_fired[ni]->w.size(), fill::zeros);
-                            //for(double tlow=t(ti)-2*learn_dt; tlow<t(ti)+0*learn_dt; tlow+=learn_dt) {
-                                SrmNeuron *n = dynamic_cast<SrmNeuron*>(stoch_elem[ni]);
-                                if(n) {
-                                TEntropyGrad eg(n, t(ti)-learn_dt, t(ti));
-                                vec dHdw = eg.grad();
-//                                Log::Info << "tlow: " << tlow << " thigh: " << tlow+learn_dt << "\n";
-//                                for(size_t wi=0; wi<dHdw_cur.n_elem; wi++) { Log::Info << dHdw_cur(wi) << ", "; }
-//                                Log::Info << "\n";
-//                                dHdw += dHdw_cur;
-                            //}
-                            for(size_t wi=0; wi<dHdw.n_elem; wi++) { 
-                                grads(ni,wi) = dHdw(wi);
-                                Log::Info << dHdw(wi) << ", "; 
-                                stoch_elem[ni]->w[wi] -= learning_rate * dHdw(wi);  
+                        for(size_t ni=0; ni<neuron_fired.size(); ni++) {
+                            SrmNeuron *n = neuron_fired[ni];
+                            vec dPdw(n->w.size(), fill::zeros);
+                            for(double t0=t(ti)-2*learn_dt; t0<=t(ti); t0+=learn_dt) {
+                                TLogLikelyhood llh(n, t0, t0+learn_dt); //t(ti)-learn_dt, t(ti));     
+                                dPdw += llh.grad();
                             }
-                            TEntropyCalc ec(n, t(ti)-learn_dt, t(ti));
-                            double H = ec.run(3);
-                            Log::Info << "    -> H = " << H;
-                            Log::Info << "\n";                   
+                            for(size_t wi=0; wi<n->w.size(); wi++) {
+                                n->w[wi] += learning_rate * dPdw(wi);
+                            #if VERBOSE >= 1                                
+                                printf("syn:%zu = %f, ", wi, dPdw(wi));
+                            #endif                                
                             }
-                        }                    
-                        //send_arma_mat(grads, "grads", t(ti)-learn_dt);
-                        neuron_fired.clear();
+                        #if VERBOSE >= 1
+                            printf("\n");
+                        #endif 
+                        }
                         learn_dti = 0;
-                    } else {                        
-                        learn_dti+=dt;
-                    }               
+                        neuron_fired.clear();
+                    } else {
+                        learn_dti += dt;
+                    }
                 }
             }
+
             if(verbose) { Log::Info << "Sending statistics to 7778\n"; }
             
             if (send_data) {
-                for(size_t i=0; i<stats.size(); i+=2) {
-                    send_arma_mat(stats[i].stat, "gr_stat_prob", i, true);
-                    send_arma_mat(stats[i+1].stat, "gr_stat_pot", i, true);
+                for(size_t i=0; i<probstats.size(); i+=1) {
+                    send_arma_mat(probstats[i]->stat, "gr_stat_prob", i, true);
+                }
+                for(size_t i=0; i<potstats.size(); i+=1) {
+                    send_arma_mat(potstats[i]->stat, "gr_stat_pot", i, true);
                 }
                 if(max_spikes !=0) {
                     mat raster(stoch_elem.size(), max_spikes, fill::zeros);
@@ -183,6 +179,11 @@ namespace srm {
             }                
             if(verbose) { Log::Info << "Done\n"; }
             //T0 = Tmax;
+            for(size_t gi=0; gi< sg.group_to_listen.size(); gi++) {
+                delete probstats[gi];
+                delete potstats[gi];
+            }
+           
         }
 
         void addNeuron(Neuron *n) {

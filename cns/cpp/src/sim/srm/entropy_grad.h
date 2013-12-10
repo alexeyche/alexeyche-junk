@@ -3,36 +3,13 @@
 
 #include "research.h"
 #include "entropy.h"
+#include "grad_funcs.h"
 
 namespace srm {
     class TEntropyGrad : public TEntropyCalc {
     public:
         TEntropyGrad(SrmNeuron *n_v, double T0_v, double Tmax_v) : TEntropyCalc(n_v, T0_v, Tmax_v) {} 
-        static double p_stroke(double t, SrmNeuron *n, TTime &y) {
-            return SrmNeuron::beta/( 1 + exp(SrmNeuron::alpha*(SrmNeuron::tresh - n->u(t, y))) );
-        }
-        static double grab_epsp(const double &t, const int &j, SrmNeuron *n, TTime &y) {
-            double pot_j = 0;
-            Neuron *n_j = n->in[j];
-            double &y_last = y.last(t-0.01);
-            for(int yi = n_j->y.n_elem(t)-1; yi>=0; yi--) {
-               if( (t - n_j->y(yi)) > EPSP_WORK_WINDOW) { break; }
-               pot_j += SrmNeuron::epsp(t, n_j->y(yi), y_last);
-            }
-            return pot_j;
-        }
-        
-        // for [0, T] integration with Gauss Quadrature
-        struct TNeuronSynapseGivenY { 
-            TNeuronSynapseGivenY(size_t &ind_syn_v, SrmNeuron* n_v, TTime &y_v) : ind_syn(ind_syn_v), n(n_v), y(y_v) {}
-            size_t ind_syn;
-            SrmNeuron *n;
-            TTime &y;
-        };            
-        static double integrand_epsp_gl(double t, void* data) {
-            TNeuronSynapseGivenY *p = (TNeuronSynapseGivenY*)data;
-            return -p_stroke(t, p->n, p->y) * grab_epsp(t, p->ind_syn, p->n, p->y);
-        }
+
         // one numerical evaluation of EntropyGrad
         static vec EntropyGradGivenY(TEntropyGrad *eg, TTime &y) {
             double p = survFunction(eg->neuron, y, eg->T0, eg->Tmax);
@@ -44,7 +21,7 @@ namespace srm {
                 double spike_part = 0;
                 for(size_t yi=0; yi<y.size(); yi++) {
                     double &fi = y[yi];
-                    spike_part += (p_stroke(fi, eg->neuron, y)/eg->neuron->p(fi, y))*grab_epsp(fi, wi, eg->neuron, y);
+                    spike_part += (p_stroke(fi, eg->neuron, y)/eg->neuron->p(fi, y))*grab_epsp_syn(fi, wi, eg->neuron, y);
                     if(eg->cs.VerboseInt) {
                         printf(" | yi: %zu ", yi);
                     //    printf("   | p' = %f\n", p_stroke(fi, eg->neuron, y));
@@ -127,7 +104,7 @@ namespace srm {
                 w_grad(wi) += -p0*(log(p0)+1)*sec_part;
                 //Log::Info << "Hgrad0[" << wi << "] = " << w_grad(wi) << "\n";
             }
-            for(int n_calc = 1; n_calc <= 4; n_calc++) {
+            for(int n_calc = 1; n_calc <= 2; n_calc++) {
                                
                 vec integral = integrate(n_calc, neuron->w.size(), EntropyGradIntegrand);
                 w_grad += integral;

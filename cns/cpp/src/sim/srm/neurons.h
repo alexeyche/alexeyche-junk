@@ -3,7 +3,6 @@
 
 #include <cmath>
 #include <sim/data/load.h>
-#include <sim/socket/sim_socket_core.h>
 
 
 #include <functional>
@@ -34,9 +33,10 @@ namespace srm {
 
         int binary_search(const double &t) {
             const size_t &s = std::vector<double>::size();
+//            printf("DEBUG size : %zu\n", s);
             if(s == 0) { throw SrmException("Binary search on empty TTime\n"); }
             if (std::vector<double>::operator[] (0) > t) { return -1;}
-            if (std::vector<double>::operator[] (s-1) < t) { return s-1;}
+            if (std::vector<double>::operator[] (s-1) <= t) { return s-1;}
             size_t first = 0;
             size_t last= s;
             size_t mid = first + (last-first)/2;
@@ -166,27 +166,17 @@ namespace srm {
         static constexpr double ts = 3;  // ms
         static constexpr double tm = 10; //10; // ms
         
-        static double epsp(double t, double fj, double fi) {
-            if( ((t-fj)<0) ||  (fj<0) ) return 0.0;
-            if(fi>t) fi = -datum::inf;
-            return (exp( -std::max(fi-fj, 0.0)/ts )/(1-ts/tm)) * (exp(-std::min(t-fi,t-fj)/tm) - exp(-std::min(t-fi,t-fj)/ts));
-        }
+        static double epsp(double t, double fj, double fi);
 
-
-
+        
         static constexpr double u_abs = -300; // mV
         static constexpr double u_r = -200;    // mV
-        static constexpr double trf = 5.25;   // ms
-        static constexpr double trs = 3;      // ms
-        static constexpr double dr = 1;       // ms
+        static constexpr double trf = 7.25;   // ms
+        static constexpr double trs = 4;      // ms
+        static constexpr double dr = 2;       // ms
 
-        static double nu(double t, double fi) {
-            if((t-fi)<0) return 0;
-            if((t-fi)<dr) return u_abs;
-            return u_abs*exp(-(t-fi+dr)/trf)+u_r*exp(-(t-fi)/trs);
-        }
-        
-        
+        static double nu(double t, double fi);
+       
         SrmNeuron(bool sl=false) : stdp_learning(sl) { }
         SrmNeuron(SrmNeuron *n) :  StochasticNeuron(n) { }
     
@@ -195,71 +185,14 @@ namespace srm {
         static constexpr double beta = 1; //0.25;
         static constexpr double tresh = -50; //mV
 
-        #define APLUS 1.5
-        #define AMINUS 1.5
-        #define TPLUS 10
-        #define TMINUS 10
-        #define STDP_RATE 0.001
-        #define MU 0.7
-        double u(const double &t, TTime &y_given) {
-            double epsp_pot = 0;
-                        
-            double &y_last = y_given.last(t-0.001);
-//            printf("============================================\n");  
-//            printf("y_last: %f\n", y_last); 
-//            printf("in.size(): %d\n", n->in.size());  
-//            Log::Info << "neuron " << id() << " in.size() == " << in.size() << "\n";
-            for(size_t i=0; i<in.size(); i++) {
-                for(int j=(in[i]->y.n_elem(t)-1); j>=0; j--) {
-                    //printf("epsp_pot: %e\n", epsp_pot);
-                    //printf(" w: %e t: %f in.y(j): %f y: %f\n", w[i], t, in[i]->y(j), y_last);
-                    if( (t - in[i]->y(j)) > EPSP_WORK_WINDOW) {
-                        //printf("epsp ignoring: %e\n", epsp(t, in[i]->y(j), y_last));
-                        continue;
-                    }                        
-                    epsp_pot += w[i]*epsp(t, in[i]->y(j), y_last);
-                }
-                if(stdp_learning) {
-                    double dt = in[i]->y.last(t) - y_last;
-                    if(abs(dt) < 20) { 
-                       double dw=0;
-                       if(dt<=0) {
-                           if(w[i]<4)
-                           dw = pow(4-w[i], MU)*APLUS*exp(dt/TPLUS);
-                       } else {
-                           if(w[i]>-2)
-                           dw = -pow(2+w[i], MU)*AMINUS*exp(-dt/TMINUS);
-                       }
-                       //Log::Info << "syn " << i << " dt " << dt << "(" << in[i]->y.last(t) << ")" << " dw = " << dw << " w[i] " << w[i] << " \n"; 
-                       double mod_w = STDP_RATE*dw;
-                       //Log::Info << "syn " << i << " dt " << dt << "(" << in[i]->y.last(t) << ")" << " dw = " << dw << " \n"; 
-                       w[i] += mod_w;
-                    }
-                }
-            }
-            double nu_pot = 0;
-            for(int i = (y_given.n_elem(t-0.001)-1); i>=0; i--) {
-                if( (t-y_given(i)) > NU_WORK_WINDOW ) {
-                    //printf("nu ignoring(%f): %e\n", t, nu(t, y_given(i)));
-                    break;
-                }                    
-                nu_pot += nu(t, y_given(i));
-            }
-            return u_rest + epsp_pot + nu_pot;           
-        }
+        double u(const double &t, TTime &y_given);
 
-        double u(const double &t) {
-            return u(t, y); 
-        }
+        double u(const double &t);
 
-        double p(const double &t, TTime &y_given) {
-            double uc = u(t, y_given);
-            return (beta/alpha)*(log(1+exp(alpha*(tresh-uc))) - alpha*(tresh-uc));           
-        }
-        double p(const double &t) {
-            return p(t, y);           
-        }
-        
+        double p(const double &t, TTime &y_given);
+
+        double p(const double &t);       
+
         bool stdp_learning;
     };
 

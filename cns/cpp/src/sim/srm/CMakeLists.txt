@@ -1,12 +1,17 @@
 cmake_minimum_required(VERSION 2.8)
 
 set(SOURCES
-    neurons.h
+#    neurons.h
+    neurons.cpp
     groups.h
     sim.h
-    entropy.h
-    entropy.cpp
-    entropy_grad.h
+#    entropy.h
+#    entropy.cpp
+#    entropy_grad.h
+#    llh.h
+    llh.cpp
+#    grad_funcs.h
+    grad_funcs.cpp
 )
 
 # add directory name to sources

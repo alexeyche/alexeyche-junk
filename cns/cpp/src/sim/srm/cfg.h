@@ -5,5 +5,6 @@
 #define GAUSS_QUAD 128
 #define VERBOSE_SURV 0
 #define STDP_LEARNING 1
+#define VERBOSE 3
 
 #endif
