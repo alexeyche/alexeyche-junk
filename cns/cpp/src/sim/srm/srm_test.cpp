@@ -793,17 +793,17 @@ void test_dpdw() {
                 printf(" | syn # %zu\n", wi);
 
                 srm::TNeuronSynapseGivenY n_syn_y(wi, &n, n.y);       
-                if((tshift == 7)&&(wi == 9)) { 
-                    mat ps_ep(1000,3);
-                    vec t = linspace<vec>(0,20, 1000);
-                    for(size_t ti=0; ti<t.n_elem; ti++) {
-                        ps_ep(ti,0) = t(ti);
-                        ps_ep(ti,1) = p_stroke(t(ti), &n, n.y);
-                        ps_ep(ti,2) = grab_epsp_syn(t(ti), wi, &n, n.y);
-                    }
-                    send_arma_mat(ps_ep,"ps_ep", -1, true);
-                    return;
-                }                    
+//                if((tshift == 7)&&(wi == 9)) { 
+//                    mat ps_ep(1000,3);
+//                    vec t = linspace<vec>(0,20, 1000);
+//                    for(size_t ti=0; ti<t.n_elem; ti++) {
+//                        ps_ep(ti,0) = t(ti);
+//                        ps_ep(ti,1) = p_stroke(t(ti), &n, n.y);
+//                        ps_ep(ti,2) = grab_epsp_syn(t(ti), wi, &n, n.y);
+//                    }
+//                    send_arma_mat(ps_ep,"ps_ep", -1, true);
+//                    return;
+//                }                    
                 double int_part = - gauss_legendre(GAUSS_QUAD, srm::integrand_epsp_gl, (void*)&n_syn_y, 0, 20);           
                 double spike_part = 0;
 //                double spike_part2 = 0;

@@ -12,6 +12,8 @@ set(SOURCES
     llh.cpp
     grad_funcs.h
     grad_funcs.cpp
+    util.h
+    util.cpp
 )
 
 # add directory name to sources
