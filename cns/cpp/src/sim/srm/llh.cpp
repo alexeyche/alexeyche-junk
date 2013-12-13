@@ -55,7 +55,7 @@ namespace srm {
                 printf("   | y[yi] = %f\n", fi);
                 printf("   | spike_part %f\n", spike_part);
             #endif
-                break;
+//                break;
             }            
             grad_val(wi) = int_part + spike_part;
         }

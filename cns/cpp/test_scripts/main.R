@@ -14,7 +14,7 @@ sl <- sort(names(l))
 rast_bef_last <- get(l[[sl[length(sl)-1] ]])
 rast_last <- get(l[[sl[length(sl)] ]])
 
-plot_rast <- function(raster) {
+plot_rast <- function(raster, newplot=TRUE, c=1) {
   x <- c()
   y <- c()
   
@@ -23,7 +23,11 @@ plot_rast <- function(raster) {
     x <- c(x, raster[i,spikes])
     y <- c(y, rep(i, length(spikes)))
   }
- plot(x,y)
+ if(newplot) { 
+     plot(x,y,col=c)
+ } else {
+     points(x,y,col=c)
+ }     
 }  
 plot_rast(rast_bef_last)
 plot_rast(rast_last)

@@ -40,19 +40,19 @@ int main(int argc, char** argv)
     std::srand(seed);
     
     Sim s(learning_rate);
-    SrmNeuronGroup g(10);
+    SrmNeuronGroup g(100);
     mat start_w(g.size(),g.size(), fill::randn);
 //    start_w = 1.7 + start_w*0.2;
-    start_w.fill(1.5);
+    start_w.fill(1);
     connect(&g, &g, TConnType::AllToAll, start_w);
 
 
     TimeSeriesGroup tsg(50, 200*ms, 100); 
     if(specpattern == "") {
         //tsg.loadPatternFromFile("/var/tmp/dtest.csv", 10*ms, 1);
-        tsg.loadPatternFromFile("/var/tmp/d1.csv", 1000*ms, 1);
-        tsg.loadPatternFromFile("/var/tmp/d2.csv", 1000*ms, 1);
-        tsg.loadPatternFromFile("/var/tmp/d3.csv", 1000*ms, 1);
+        tsg.loadPatternFromFile("/var/tmp/d1.csv", 750*ms, 1);
+        tsg.loadPatternFromFile("/var/tmp/d2.csv", 750*ms, 1);
+        tsg.loadPatternFromFile("/var/tmp/d3.csv", 750*ms, 1);
         simtime = 0;
         for(size_t pi=0; pi<tsg.patterns.size(); pi++) {
             simtime += tsg.patterns[pi].pattDur + tsg.refrTime;
@@ -63,7 +63,7 @@ int main(int argc, char** argv)
     }
 
     mat start_w_ff(tsg.size(),g.size(), fill::randn);
-    start_w_ff.fill(1.5);
+    start_w_ff.fill(1);
     connect(&tsg, &g, TConnType::FeedForward, start_w_ff);
                 
 //    for(size_t ni=0; ni<g.size(); ni++) {
@@ -120,7 +120,8 @@ int main(int argc, char** argv)
             std::vector<std::string> filename_spl = split(specpattern, '/');
             std::string basename = filename_spl.back();
             std::vector<std::string> basename_spl = split(basename, '.');
-            data::Save(std::string("/var/tmp/")+basename_spl.front()+std::string("_resp.csv"), s.raster);
+            data::Save(std::string("/var/tmp/")+basename_spl.front()+std::string("_ep_")+std::to_string(ep)+std::string("_resp.csv"), s.raster);
+            std::srand(seed+ep);
         }            
     }        
     if((rt == TRunType::RunAndLearnSTDP)||(rt == TRunType::RunAndLearnLogLikelyhood)) {

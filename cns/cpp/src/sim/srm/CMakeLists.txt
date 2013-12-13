@@ -14,6 +14,7 @@ set(SOURCES
     grad_funcs.cpp
     util.h
     util.cpp
+    neurons_new.h
 )
 
 # add directory name to sources

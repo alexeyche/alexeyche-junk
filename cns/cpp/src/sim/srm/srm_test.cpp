@@ -17,6 +17,7 @@
 #include "connections.h"
 #include "entropy_grad.h"
 #include "grad_funcs.h"
+#include "neurons_new.h"
 
 void epsp_test(bool just_print = false) {
     double Tmax = 100;
@@ -832,6 +833,15 @@ void test_dpdw() {
 
 }
 
+void test_ttime2() {
+    srm::TTime2 t;
+    t.push_back(0.5);
+    t.push_back(2.5);
+    t.push_back(5);
+    t.push_back(6);
+    t.push_back(100);
+    t.push_back(101);
+}
 
 PROGRAM_INFO("SIM TEST", "sim tests"); 
 PARAM_STRING("test", "name for test. default \"all\"", "t", "all");
@@ -946,7 +956,12 @@ int main(int argc, char** argv) {
         test_dpdw();
         Log::Info << "===============================================================" << std::endl;
     } 
-
+    if((test_name == "all") || (test_name == "ttime2")) {
+        Log::Info << "ttime2" << std::endl;
+        Log::Info << "===============================================================" << std::endl;
+        test_ttime2();
+        Log::Info << "===============================================================" << std::endl;
+    }
     return 0;
 }
 

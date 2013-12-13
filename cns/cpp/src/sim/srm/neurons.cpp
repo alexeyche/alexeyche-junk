@@ -29,12 +29,11 @@ namespace srm {
         double &y_last = y_given.last(t-0.001);
 //            printf("============================================\n");  
 //            printf("y_last: %f\n", y_last); 
-//            printf("in.size(): %d\n", n->in.size());  
 //            Log::Info << "neuron " << id() << " in.size() == " << in.size() << "\n";
         for(size_t i=0; i<in.size(); i++) {
             for(int j=(in[i]->y.n_elem(t)-1); j>=0; j--) {
-                //printf("epsp_pot: %e\n", epsp_pot);
-                //printf(" w: %e t: %f in.y(j): %f y: %f\n", w[i], t, in[i]->y(j), y_last);
+//                printf("epsp_pot: %e\n", epsp_pot);
+//                printf(" w: %e t: %f in.y(j): %f y: %f\n", w[i], t, in[i]->y(j), y_last);
                 if( (t - in[i]->y(j)) > EPSP_WORK_WINDOW) {
                     //printf("epsp ignoring: %e\n", epsp(t, in[i]->y(j), y_last));
                     continue;

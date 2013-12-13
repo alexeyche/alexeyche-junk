@@ -63,6 +63,9 @@ namespace srm {
         }
         void preCalculate(double T0, double Tmax, double dt) {
             Log::Info << "Precalculating TimeSeriesGroup\n"; 
+            for(size_t ni=0; ni<group.size(); ni++) {
+                group[ni]->y.clean();
+            }
             vec mean_rate(group.size(), fill::zeros);
             for(size_t pi=0; pi<patterns.size(); pi++) {
                 mat &pattern = patterns[pi].pattern;
