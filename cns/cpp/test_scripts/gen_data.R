@@ -10,7 +10,7 @@ ornstein_uhlenbeck <- function(T, n, nu,lambda,sigma,x0){
   return(x);
 }
 
-set.seed(6)
+set.seed(8)
 d1 <- ornstein_uhlenbeck(10,999, 0.2, 1, 0.007, 0.15)
 d2 <- ornstein_uhlenbeck(10,999, 0.19, 0.5, 0.01, 0.15)
 d3 <- ornstein_uhlenbeck(10,999, 0.15, 0.5, 0.01, 0.21)
