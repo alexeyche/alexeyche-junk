@@ -30,13 +30,14 @@ namespace srm {
         #endif
 //            if(n->in[wi]->y.n_elem(Tmax) > 0) 
 //            if(n->y[0]< n->in[wi]->y[0]) { 
-//                mat ps_ep(1000,3);
+//                mat ps_ep(1000,4);
 //                vec t = linspace<vec>(T0,Tmax, 1000);
 //                TTime null;
 //                for(size_t ti=0; ti<t.n_elem; ti++) {
 //                    ps_ep(ti,0) = t(ti);
 //                    ps_ep(ti,1) = p_stroke(t(ti), n, null);
 //                    ps_ep(ti,2) = grab_epsp_syn(t(ti), wi, n, null);
+//                    ps_ep(ti,3) = n->u(t(ti),null);
 //                }
 //                Log::Info << "sending data for [" << T0 << "," << Tmax << "]\n";
 //                send_arma_mat(ps_ep,"ps_ep", -1, true);

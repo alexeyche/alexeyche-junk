@@ -117,7 +117,7 @@ namespace srm {
                     if(pi*dt > unif(ti, ni)) {
                         TTime &yn = stoch_elem[ni]->y;
                     #if VERBOSE >= 1
-                        printf("spike of %d at %f \n", stoch_elem[ni]->id(), t(ti));
+                        printf("spike of %d at %f (p == %f > U(x) == %f) \n", stoch_elem[ni]->id(), t(ti), pi*dt, unif(ti, ni));
                     #endif
                         yn.push_back(t(ti));
                         if(yn.size() > max_spikes) {
@@ -128,22 +128,21 @@ namespace srm {
                             neuron_fired.push_back(n);
                         }                                                   
                                                     
-                    }
+                    } 
                                        
                 }
                 if(rt == TRunType::RunAndLearnLogLikelyhood) {
                     if(learn_dti>=learn_dt) {
                         for(size_t ni=0; ni<neuron_fired.size(); ni++) {
                             SrmNeuron *n = neuron_fired[ni];
-                            vec dPdw(n->w.size(), fill::zeros);
-                            for(double t0=t(ti)-learn_dt; t0<t(ti); t0+=learn_dt) {
-                                TLogLikelyhood llh(n, t0, t0+learn_dt); //t(ti)-learn_dt, t(ti));     
-                                dPdw += llh.grad();
-                            }
+                            double &yl = n->y.last();
+                            TLogLikelyhood llh(n, yl-learn_dt, yl+learn_dt);
+                            vec dPdw = llh.grad();
                             for(size_t wi=0; wi<n->w.size(); wi++) {
                                 n->w[wi] += learning_rate * dPdw(wi);
                             #if VERBOSE >= 1                                
-                                printf("syn:%zu = %f, ", wi, dPdw(wi));
+                                if(dPdw(wi) != 0) 
+                                    printf("syn:%zu = %f, ", wi, dPdw(wi));
                             #endif                                
                             }
                         #if VERBOSE >= 1

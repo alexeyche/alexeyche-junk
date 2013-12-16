@@ -24,11 +24,13 @@ namespace srm {
     class TimeSeriesGroup : public NeuronGroup {
     public:    
         struct TPattern {
-            TPattern(size_t group_n, size_t n, double prob, double dur) : pattern(group_n, n, fill::zeros), pattProb(prob), pattDur(dur), dt(pattDur/n) {}
+            TPattern(size_t group_n, size_t n, double prob, double dur) : pattern(group_n, n, fill::zeros), pattProb(prob), 
+                                                                          pattDur(dur), dt(pattDur/n), dedicatedTime(-1,-1) { }
             mat pattern;
             double pattProb;
             double pattDur;
             double dt;
+            std::pair<double, double> dedicatedTime;
         };
         TimeSeriesGroup(size_t n, double refr, double pattProb) : NeuronGroup(true), refrTime(refr), pattProb(pattProb) { 
             for(size_t gi=0; gi<n; gi++) {
@@ -93,6 +95,7 @@ namespace srm {
                     }
                     Log::Info << "What time is it? Pattern time! ("  << t(ti) << ")\n";
                     Log::Info << "(" << t(ti) << ") pattern# " << patt_id << "\n";
+                    patterns[patt_id].dedicatedTime.first = t(ti);
                     //if(pattProb*dt>unif(ti)) {
                     //    Log::Info << "What time is it? Pattern time! ("  << t(ti) << ")\n";
                     //    double cump=0;
@@ -118,6 +121,7 @@ namespace srm {
                 } else {
                     mat &pattern = patterns[patt_id].pattern;
                     if(patt_ti >= patterns[patt_id].pattDur) {  // pattern ended
+                        patterns[patt_id].dedicatedTime.second = t(ti);
                         last_patt_id = patt_id;
                         patt_id = -1;
                         patt_ti = 0;

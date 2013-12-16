@@ -5,6 +5,7 @@ set(DIRS
 )
 
 set(SOURCES
+  confParser.h
   cli.hpp
   cli.cpp
   cli_deleter.hpp

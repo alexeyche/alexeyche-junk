@@ -9,13 +9,7 @@
 #include "memoize.h"
 
 namespace srm {
-    struct SrmException : public std::exception
-    {
-       std::string s;
-       SrmException(std::string ss) : s(ss) {}
-       ~SrmException() throw () {} // Updated
-       const char* what() const throw() { return s.c_str(); }
-    };    
+    
     
     class TTime : public std::vector<double> {
     static constexpr double TIME_OF_FORGET = 200;
@@ -182,7 +176,7 @@ namespace srm {
     
         static constexpr double u_rest = -70; //mV
         static constexpr double alpha = 0.65;
-        static constexpr double beta = 0.45;
+        static constexpr double beta = 0.65;
         static constexpr double tresh = -50; //mV
 
         double u(const double &t, TTime &y_given);

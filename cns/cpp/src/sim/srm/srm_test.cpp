@@ -748,6 +748,21 @@ void test_lz() {
     bs2.push_back(1);  bs2.push_back(1);
     TDict d2 = lz78Phrases(bs2);
     printLzDict(d2);
+    TSpikeTimes st2;
+    st2.push_back(2);
+    st2.push_back(3);
+    st2.push_back(4.3);
+    st2.push_back(5.5);
+    st2.push_back(7);
+    st2.push_back(8);
+    double dist1 = lz78Distance(st,st2, 0, 10, 0.1);
+    Log::Info << "Distance btw (dt=0.1) = " << dist1 << "\n";
+    double dist2 = lz78Distance(st,st2, 0, 10, 0.2);
+    Log::Info << "Distance btw (dt=0.2" << dist2 << "\n";
+    double dist3 = lz78Distance(st,st2, 0, 10, 1);
+    Log::Info << "Distance btw (dt=1) = " << dist3 << "\n";
+    double dist4 = lz78Distance(st,st2, 0, 10, 2);
+    Log::Info << "Distance btw (dt=2) = " << dist4 << "\n";
 }
 
 
