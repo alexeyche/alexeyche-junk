@@ -1,0 +1,863 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 9.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       157,          7]
+NotebookDataLength[     34823,        854]
+NotebookOptionsPosition[     33645,        816]
+NotebookOutlinePosition[     33983,        831]
+CellTagsIndexPosition[     33940,        828]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"f", "[", 
+    RowBox[{"s_", ",", "w_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{"g", "[", 
+     RowBox[{"s", ",", "w"}], "]"}], " ", 
+    RowBox[{"Log", "[", 
+     RowBox[{"g", "[", 
+      RowBox[{"s", ",", "w"}], "]"}], "]"}]}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"D", "[", 
+   RowBox[{
+    RowBox[{"f", "[", 
+     RowBox[{"s", ",", "w"}], "]"}], ",", "w"}], "]"}], ";"}]}], "Input",
+ CellChangeTimes->{{3.5948940757875013`*^9, 3.594894098634839*^9}, {
+   3.594894131082349*^9, 3.594894141848638*^9}, {3.594894216924869*^9, 
+   3.594894219086713*^9}, {3.594894298791276*^9, 3.594894405445457*^9}, {
+   3.594894675895875*^9, 3.5948947310634203`*^9}, {3.594894764393825*^9, 
+   3.594894771028968*^9}, {3.594894953355386*^9, 3.594894985124897*^9}, 
+   3.594895179486286*^9, 3.594896313122726*^9}],
+
+Cell[BoxData[
+ RowBox[{"\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"ts", ":=", "3"}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"tm", ":=", "10"}], ";"}]}]}]], "Input",
+ CellChangeTimes->{{3.594896634550337*^9, 3.594896644169718*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"epsp", "[", 
+     RowBox[{"t_", ",", "fj_", ",", "fi_"}], "]"}], " ", "=", " ", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"Exp", "[", 
+       RowBox[{
+        RowBox[{"-", 
+         RowBox[{"Max", "[", 
+          RowBox[{
+           RowBox[{"fi", "-", "fj"}], ",", "0"}], "]"}]}], "/", "ts"}], "]"}],
+       "/", 
+      RowBox[{"(", 
+       RowBox[{"1", "-", 
+        RowBox[{"ts", "/", "tm"}]}], ")"}]}], " ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"Exp", "[", 
+        RowBox[{
+         RowBox[{"-", 
+          RowBox[{"Min", "[", 
+           RowBox[{
+            RowBox[{"t", "-", "fi"}], ",", 
+            RowBox[{"t", "-", "fj"}]}], "]"}]}], "/", "tm"}], "]"}], "-", 
+       RowBox[{"Exp", "[", 
+        RowBox[{
+         RowBox[{"-", 
+          RowBox[{"Min", "[", 
+           RowBox[{
+            RowBox[{"t", "-", "fi"}], ",", 
+            RowBox[{"t", "-", "fj"}]}], "]"}]}], "/", "ts"}], "]"}]}], ")"}], 
+     " ", 
+     RowBox[{"HeavisideTheta", "[", "t", "]"}], 
+     RowBox[{"HeavisideTheta", "[", 
+      RowBox[{"t", "-", "fj"}], "]"}], 
+     RowBox[{"HeavisideTheta", "[", 
+      RowBox[{"t", "-", "fi"}], "]"}]}]}], ";"}], "\[IndentingNewLine]", 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"u", "[", 
+    RowBox[{"t_", ",", "w_", ",", "fjc_", ",", "fic_"}], "]"}], "=", 
+   RowBox[{"w", " ", 
+    RowBox[{"epsp", "[", 
+     RowBox[{"t", ",", "fjc", ",", "fic"}], "]"}]}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"beta", ":=", "0.25"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"alpha", ":=", "0.35"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"tr", ":=", "50"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"p", "[", "u_", "]"}], "=", 
+   RowBox[{
+    RowBox[{"(", 
+     RowBox[{"beta", "/", "alpha"}], ")"}], 
+    RowBox[{"(", 
+     RowBox[{
+      RowBox[{"Log", "[", 
+       RowBox[{"1", "+", 
+        RowBox[{"Exp", "[", 
+         RowBox[{"alpha", "*", 
+          RowBox[{"(", 
+           RowBox[{"tr", "-", "u"}], ")"}]}], "]"}]}], "]"}], "-", 
+      RowBox[{"alpha", 
+       RowBox[{"(", 
+        RowBox[{"tr", "-", "u"}], ")"}]}]}], ")"}]}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{"Integrate", "[", 
+  RowBox[{
+   RowBox[{"u", "[", 
+    RowBox[{"t", ",", "w", ",", "fic", ",", "fjc"}], "]"}], ",", "t"}], 
+  "]"}]}], "Input",
+ CellChangeTimes->{{3.594895751298154*^9, 3.5948957526653547`*^9}, {
+   3.594896319288047*^9, 3.59489632906639*^9}, {3.594896477211796*^9, 
+   3.594896565623021*^9}, {3.594896610946591*^9, 3.594896613444254*^9}, 
+   3.5948966577541656`*^9, {3.5948967438398113`*^9, 3.594896788296076*^9}, {
+   3.594896822307355*^9, 3.594896891588038*^9}, {3.594896975563209*^9, 
+   3.59489699991888*^9}, 3.5948971447913923`*^9, {3.594897259312388*^9, 
+   3.594897298201185*^9}, 3.594897330357685*^9, {3.594897369185817*^9, 
+   3.594897470112959*^9}, {3.594897524733251*^9, 3.594897524862031*^9}, {
+   3.594897616003359*^9, 3.5948976845037107`*^9}, {3.5948977456509533`*^9, 
+   3.594897799182137*^9}, {3.594897922607766*^9, 3.5948979306539516`*^9}, 
+   3.594897961483719*^9, {3.5948980098403597`*^9, 3.5948980271826153`*^9}}],
+
+Cell[BoxData[
+ TagBox[GridBox[{
+    {"\[Piecewise]", GridBox[{
+       {
+        RowBox[{
+         FractionBox["1", 
+          RowBox[{"tm", "-", "ts"}]], 
+         RowBox[{"tm", " ", "w", " ", 
+          RowBox[{"(", 
+           RowBox[{
+            RowBox[{
+             RowBox[{"HeavisideTheta", "[", "t", "]"}], " ", 
+             RowBox[{"(", 
+              RowBox[{
+               RowBox[{
+                RowBox[{"-", 
+                 RowBox[{"HeavisideTheta", "[", 
+                  RowBox[{"-", "fic"}], "]"}]}], " ", 
+                RowBox[{"(", 
+                 RowBox[{
+                  RowBox[{
+                   RowBox[{"(", 
+                    RowBox[{"tm", "-", 
+                    RowBox[{
+                    SuperscriptBox["\[ExponentialE]", 
+                    FractionBox[
+                    RowBox[{"fic", "-", "fjc"}], "tm"]], " ", "tm"}]}], ")"}],
+                    " ", 
+                   RowBox[{"HeavisideTheta", "[", 
+                    RowBox[{"fic", "-", "fjc"}], "]"}]}], "+", 
+                  RowBox[{
+                   SuperscriptBox["\[ExponentialE]", 
+                    RowBox[{"fic", "/", "tm"}]], " ", 
+                   RowBox[{"(", 
+                    RowBox[{
+                    RowBox[{"-", "1"}], "+", 
+                    SuperscriptBox["\[ExponentialE]", 
+                    RowBox[{"-", 
+                    FractionBox["fjc", "tm"]}]]}], ")"}], " ", "tm", " ", 
+                   RowBox[{"HeavisideTheta", "[", 
+                    RowBox[{"-", "fjc"}], "]"}]}]}], ")"}]}], "+", 
+               RowBox[{
+                RowBox[{"HeavisideTheta", "[", 
+                 RowBox[{
+                  RowBox[{"-", "fic"}], "+", "t"}], "]"}], " ", 
+                RowBox[{"(", 
+                 RowBox[{
+                  RowBox[{
+                   RowBox[{"(", 
+                    RowBox[{"tm", "-", 
+                    RowBox[{
+                    SuperscriptBox["\[ExponentialE]", 
+                    FractionBox[
+                    RowBox[{"fic", "-", "fjc"}], "tm"]], " ", "tm"}]}], ")"}],
+                    " ", 
+                   RowBox[{"HeavisideTheta", "[", 
+                    RowBox[{"fic", "-", "fjc"}], "]"}]}], "+", 
+                  RowBox[{
+                   SuperscriptBox["\[ExponentialE]", 
+                    RowBox[{"fic", "/", "tm"}]], " ", 
+                   RowBox[{"(", 
+                    RowBox[{
+                    SuperscriptBox["\[ExponentialE]", 
+                    RowBox[{"-", 
+                    FractionBox["fjc", "tm"]}]], "-", 
+                    SuperscriptBox["\[ExponentialE]", 
+                    RowBox[{"-", 
+                    FractionBox["t", "tm"]}]]}], ")"}], " ", "tm", " ", 
+                   RowBox[{"HeavisideTheta", "[", 
+                    RowBox[{
+                    RowBox[{"-", "fjc"}], "+", "t"}], "]"}]}]}], ")"}]}]}], 
+              ")"}]}], "-", 
+            RowBox[{
+             RowBox[{"HeavisideTheta", "[", "t", "]"}], " ", 
+             RowBox[{"(", 
+              RowBox[{
+               RowBox[{
+                RowBox[{"-", 
+                 RowBox[{"HeavisideTheta", "[", 
+                  RowBox[{"-", "fic"}], "]"}]}], " ", 
+                RowBox[{"(", 
+                 RowBox[{
+                  RowBox[{
+                   RowBox[{"(", 
+                    RowBox[{"ts", "-", 
+                    RowBox[{
+                    SuperscriptBox["\[ExponentialE]", 
+                    FractionBox[
+                    RowBox[{"fic", "-", "fjc"}], "ts"]], " ", "ts"}]}], ")"}],
+                    " ", 
+                   RowBox[{"HeavisideTheta", "[", 
+                    RowBox[{"fic", "-", "fjc"}], "]"}]}], "+", 
+                  RowBox[{
+                   SuperscriptBox["\[ExponentialE]", 
+                    RowBox[{"fic", "/", "ts"}]], " ", 
+                   RowBox[{"(", 
+                    RowBox[{
+                    RowBox[{"-", "1"}], "+", 
+                    SuperscriptBox["\[ExponentialE]", 
+                    RowBox[{"-", 
+                    FractionBox["fjc", "ts"]}]]}], ")"}], " ", "ts", " ", 
+                   RowBox[{"HeavisideTheta", "[", 
+                    RowBox[{"-", "fjc"}], "]"}]}]}], ")"}]}], "+", 
+               RowBox[{
+                RowBox[{"HeavisideTheta", "[", 
+                 RowBox[{
+                  RowBox[{"-", "fic"}], "+", "t"}], "]"}], " ", 
+                RowBox[{"(", 
+                 RowBox[{
+                  RowBox[{
+                   RowBox[{"(", 
+                    RowBox[{"ts", "-", 
+                    RowBox[{
+                    SuperscriptBox["\[ExponentialE]", 
+                    FractionBox[
+                    RowBox[{"fic", "-", "fjc"}], "ts"]], " ", "ts"}]}], ")"}],
+                    " ", 
+                   RowBox[{"HeavisideTheta", "[", 
+                    RowBox[{"fic", "-", "fjc"}], "]"}]}], "+", 
+                  RowBox[{
+                   SuperscriptBox["\[ExponentialE]", 
+                    RowBox[{"fic", "/", "ts"}]], " ", 
+                   RowBox[{"(", 
+                    RowBox[{
+                    SuperscriptBox["\[ExponentialE]", 
+                    RowBox[{"-", 
+                    FractionBox["fjc", "ts"]}]], "-", 
+                    SuperscriptBox["\[ExponentialE]", 
+                    RowBox[{"-", 
+                    FractionBox["t", "ts"]}]]}], ")"}], " ", "ts", " ", 
+                   RowBox[{"HeavisideTheta", "[", 
+                    RowBox[{
+                    RowBox[{"-", "fjc"}], "+", "t"}], "]"}]}]}], ")"}]}]}], 
+              ")"}]}]}], ")"}]}]}], 
+        RowBox[{
+         RowBox[{"fic", "-", "fjc"}], "\[GreaterEqual]", "0"}]},
+       {
+        RowBox[{"-", 
+         RowBox[{
+          FractionBox["1", 
+           RowBox[{"tm", "-", "ts"}]], 
+          RowBox[{"tm", " ", "w", " ", 
+           RowBox[{"(", 
+            RowBox[{
+             RowBox[{
+              RowBox[{"-", 
+               SuperscriptBox["\[ExponentialE]", 
+                RowBox[{"-", 
+                 FractionBox[
+                  RowBox[{
+                   RowBox[{"fjc", " ", "tm"}], "+", 
+                   RowBox[{"t", " ", "ts"}], "+", 
+                   RowBox[{"fic", " ", 
+                    RowBox[{"(", 
+                    RowBox[{
+                    RowBox[{"-", "tm"}], "+", "ts"}], ")"}]}]}], 
+                  RowBox[{"tm", " ", "ts"}]]}]]}], " ", "tm", " ", 
+              RowBox[{"HeavisideTheta", "[", "t", "]"}], " ", 
+              RowBox[{"(", 
+               RowBox[{
+                RowBox[{
+                 SuperscriptBox["\[ExponentialE]", 
+                  RowBox[{"t", "/", "tm"}]], " ", 
+                 RowBox[{"HeavisideTheta", "[", 
+                  RowBox[{"-", "fic"}], "]"}], " ", 
+                 RowBox[{"(", 
+                  RowBox[{
+                   RowBox[{
+                    RowBox[{"(", 
+                    RowBox[{
+                    SuperscriptBox["\[ExponentialE]", 
+                    RowBox[{"fic", "/", "tm"}]], "-", 
+                    SuperscriptBox["\[ExponentialE]", 
+                    RowBox[{"fjc", "/", "tm"}]]}], ")"}], " ", 
+                    RowBox[{"HeavisideTheta", "[", 
+                    RowBox[{"fic", "-", "fjc"}], "]"}]}], "+", 
+                   RowBox[{
+                    SuperscriptBox["\[ExponentialE]", 
+                    RowBox[{"fic", "/", "tm"}]], " ", 
+                    RowBox[{"(", 
+                    RowBox[{
+                    RowBox[{"-", "1"}], "+", 
+                    SuperscriptBox["\[ExponentialE]", 
+                    RowBox[{"fjc", "/", "tm"}]]}], ")"}], " ", 
+                    RowBox[{"HeavisideTheta", "[", 
+                    RowBox[{"-", "fjc"}], "]"}]}]}], ")"}]}], "-", 
+                RowBox[{
+                 RowBox[{"HeavisideTheta", "[", 
+                  RowBox[{
+                   RowBox[{"-", "fic"}], "+", "t"}], "]"}], " ", 
+                 RowBox[{"(", 
+                  RowBox[{
+                   RowBox[{
+                    SuperscriptBox["\[ExponentialE]", 
+                    RowBox[{"t", "/", "tm"}]], " ", 
+                    RowBox[{"(", 
+                    RowBox[{
+                    SuperscriptBox["\[ExponentialE]", 
+                    RowBox[{"fic", "/", "tm"}]], "-", 
+                    SuperscriptBox["\[ExponentialE]", 
+                    RowBox[{"fjc", "/", "tm"}]]}], ")"}], " ", 
+                    RowBox[{"HeavisideTheta", "[", 
+                    RowBox[{"fic", "-", "fjc"}], "]"}]}], "+", 
+                   RowBox[{
+                    SuperscriptBox["\[ExponentialE]", 
+                    RowBox[{"fic", "/", "tm"}]], " ", 
+                    RowBox[{"(", 
+                    RowBox[{
+                    SuperscriptBox["\[ExponentialE]", 
+                    RowBox[{"fjc", "/", "tm"}]], "-", 
+                    SuperscriptBox["\[ExponentialE]", 
+                    RowBox[{"t", "/", "tm"}]]}], ")"}], " ", 
+                    RowBox[{"HeavisideTheta", "[", 
+                    RowBox[{
+                    RowBox[{"-", "fjc"}], "+", "t"}], "]"}]}]}], ")"}]}]}], 
+               ")"}]}], "+", 
+             RowBox[{
+              RowBox[{"HeavisideTheta", "[", "t", "]"}], " ", 
+              RowBox[{"(", 
+               RowBox[{
+                RowBox[{
+                 RowBox[{"-", 
+                  RowBox[{"HeavisideTheta", "[", 
+                   RowBox[{"-", "fic"}], "]"}]}], " ", 
+                 RowBox[{"(", 
+                  RowBox[{
+                   RowBox[{
+                    RowBox[{"(", 
+                    RowBox[{"ts", "-", 
+                    RowBox[{
+                    SuperscriptBox["\[ExponentialE]", 
+                    FractionBox[
+                    RowBox[{"fic", "-", "fjc"}], "ts"]], " ", "ts"}]}], ")"}],
+                     " ", 
+                    RowBox[{"HeavisideTheta", "[", 
+                    RowBox[{"fic", "-", "fjc"}], "]"}]}], "+", 
+                   RowBox[{
+                    SuperscriptBox["\[ExponentialE]", 
+                    RowBox[{"fic", "/", "ts"}]], " ", 
+                    RowBox[{"(", 
+                    RowBox[{
+                    RowBox[{"-", "1"}], "+", 
+                    SuperscriptBox["\[ExponentialE]", 
+                    RowBox[{"-", 
+                    FractionBox["fjc", "ts"]}]]}], ")"}], " ", "ts", " ", 
+                    RowBox[{"HeavisideTheta", "[", 
+                    RowBox[{"-", "fjc"}], "]"}]}]}], ")"}]}], "+", 
+                RowBox[{
+                 RowBox[{"HeavisideTheta", "[", 
+                  RowBox[{
+                   RowBox[{"-", "fic"}], "+", "t"}], "]"}], " ", 
+                 RowBox[{"(", 
+                  RowBox[{
+                   RowBox[{
+                    RowBox[{"(", 
+                    RowBox[{"ts", "-", 
+                    RowBox[{
+                    SuperscriptBox["\[ExponentialE]", 
+                    FractionBox[
+                    RowBox[{"fic", "-", "fjc"}], "ts"]], " ", "ts"}]}], ")"}],
+                     " ", 
+                    RowBox[{"HeavisideTheta", "[", 
+                    RowBox[{"fic", "-", "fjc"}], "]"}]}], "+", 
+                   RowBox[{
+                    SuperscriptBox["\[ExponentialE]", 
+                    RowBox[{"fic", "/", "ts"}]], " ", 
+                    RowBox[{"(", 
+                    RowBox[{
+                    SuperscriptBox["\[ExponentialE]", 
+                    RowBox[{"-", 
+                    FractionBox["fjc", "ts"]}]], "-", 
+                    SuperscriptBox["\[ExponentialE]", 
+                    RowBox[{"-", 
+                    FractionBox["t", "ts"]}]]}], ")"}], " ", "ts", " ", 
+                    RowBox[{"HeavisideTheta", "[", 
+                    RowBox[{
+                    RowBox[{"-", "fjc"}], "+", "t"}], "]"}]}]}], ")"}]}]}], 
+               ")"}]}]}], ")"}]}]}]}], 
+        TagBox["True",
+         "PiecewiseDefault",
+         AutoDelete->True]}
+      },
+      AllowedDimensions->{2, Automatic},
+      Editable->True,
+      GridBoxAlignment->{
+       "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+        "RowsIndexed" -> {}},
+      GridBoxItemSize->{
+       "Columns" -> {{Automatic}}, "ColumnsIndexed" -> {}, "Rows" -> {{1.}}, 
+        "RowsIndexed" -> {}},
+      GridBoxSpacings->{"Columns" -> {
+          Offset[0.27999999999999997`], {
+           Offset[0.84]}, 
+          Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+          Offset[0.2], {
+           Offset[0.4]}, 
+          Offset[0.2]}, "RowsIndexed" -> {}},
+      Selectable->True]}
+   },
+   GridBoxAlignment->{
+    "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+     "RowsIndexed" -> {}},
+   GridBoxItemSize->{
+    "Columns" -> {{Automatic}}, "ColumnsIndexed" -> {}, "Rows" -> {{1.}}, 
+     "RowsIndexed" -> {}},
+   GridBoxSpacings->{"Columns" -> {
+       Offset[0.27999999999999997`], {
+        Offset[0.35]}, 
+       Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+       Offset[0.2], {
+        Offset[0.4]}, 
+       Offset[0.2]}, "RowsIndexed" -> {}}],
+  "Piecewise",
+  DeleteWithContents->True,
+  Editable->False,
+  SelectWithContents->True,
+  Selectable->False]], "Output",
+ CellChangeTimes->{
+  3.594897931385648*^9, {3.594897965578126*^9, 3.594898030264614*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Manipulate", "[", 
+  RowBox[{
+   RowBox[{"Plot", "[", 
+    RowBox[{"%14", ",", 
+     RowBox[{"{", 
+      RowBox[{"t", ",", 
+       RowBox[{"-", "8"}], ",", "8"}], "}"}]}], "]"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"fic", ",", 
+     RowBox[{"-", "8"}], ",", "8"}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"fjc", ",", 
+     RowBox[{"-", "2"}], ",", "2"}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"tm", ",", 
+     RowBox[{"-", "2"}], ",", "2"}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"ts", ",", 
+     RowBox[{"-", "2"}], ",", "2"}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"w", ",", 
+     RowBox[{"-", "2"}], ",", "2"}], "}"}]}], "]"}]], "Input",
+ NumberMarks->False],
+
+Cell[BoxData[
+ TagBox[
+  StyleBox[
+   DynamicModuleBox[{$CellContext`fic$$ = -0.13999999999999968`, \
+$CellContext`fjc$$ = -2, $CellContext`tm$$ = -2, $CellContext`ts$$ = -2, \
+$CellContext`w$$ = -2, Typeset`show$$ = True, Typeset`bookmarkList$$ = {}, 
+    Typeset`bookmarkMode$$ = "Menu", Typeset`animator$$, Typeset`animvar$$ = 
+    1, Typeset`name$$ = "\"untitled\"", Typeset`specs$$ = {{
+      Hold[$CellContext`fic$$], -8, 8}, {
+      Hold[$CellContext`fjc$$], -2, 2}, {
+      Hold[$CellContext`tm$$], -2, 2}, {
+      Hold[$CellContext`ts$$], -2, 2}, {
+      Hold[$CellContext`w$$], -2, 2}}, Typeset`size$$ = {360., {111., 117.}}, 
+    Typeset`update$$ = 0, Typeset`initDone$$, Typeset`skipInitDone$$ = 
+    True, $CellContext`fic$1969$$ = 0, $CellContext`fjc$1974$$ = 
+    0, $CellContext`tm$1975$$ = 0, $CellContext`ts$1976$$ = 
+    0, $CellContext`w$1977$$ = 0}, 
+    DynamicBox[Manipulate`ManipulateBoxes[
+     1, StandardForm, 
+      "Variables" :> {$CellContext`fic$$ = -8, $CellContext`fjc$$ = -2, \
+$CellContext`tm$$ = -2, $CellContext`ts$$ = -2, $CellContext`w$$ = -2}, 
+      "ControllerVariables" :> {
+        Hold[$CellContext`fic$$, $CellContext`fic$1969$$, 0], 
+        Hold[$CellContext`fjc$$, $CellContext`fjc$1974$$, 0], 
+        Hold[$CellContext`tm$$, $CellContext`tm$1975$$, 0], 
+        Hold[$CellContext`ts$$, $CellContext`ts$1976$$, 0], 
+        Hold[$CellContext`w$$, $CellContext`w$1977$$, 0]}, 
+      "OtherVariables" :> {
+       Typeset`show$$, Typeset`bookmarkList$$, Typeset`bookmarkMode$$, 
+        Typeset`animator$$, Typeset`animvar$$, Typeset`name$$, 
+        Typeset`specs$$, Typeset`size$$, Typeset`update$$, Typeset`initDone$$,
+         Typeset`skipInitDone$$}, "Body" :> Plot[
+        Piecewise[{{$CellContext`tm$$ ($CellContext`tm$$ - \
+$CellContext`ts$$)^(-1) $CellContext`w$$ (
+            HeavisideTheta[$CellContext`t] (-
+               HeavisideTheta[-$CellContext`fic$$] (($CellContext`tm$$ - 
+                  E^(($CellContext`fic$$ - \
+$CellContext`fjc$$)/$CellContext`tm$$) $CellContext`tm$$) 
+                 HeavisideTheta[$CellContext`fic$$ - $CellContext`fjc$$] + 
+                E^($CellContext`fic$$/$CellContext`tm$$) (-1 + 
+                  E^(-$CellContext`fjc$$/$CellContext`tm$$)) \
+$CellContext`tm$$ HeavisideTheta[-$CellContext`fjc$$]) + 
+              HeavisideTheta[-$CellContext`fic$$ + $CellContext`t] \
+(($CellContext`tm$$ - 
+                  E^(($CellContext`fic$$ - \
+$CellContext`fjc$$)/$CellContext`tm$$) $CellContext`tm$$) 
+                 HeavisideTheta[$CellContext`fic$$ - $CellContext`fjc$$] + 
+                E^($CellContext`fic$$/$CellContext`tm$$) (
+                  E^(-$CellContext`fjc$$/$CellContext`tm$$) - 
+                  E^(-$CellContext`t/$CellContext`tm$$)) $CellContext`tm$$ 
+                 HeavisideTheta[-$CellContext`fjc$$ + $CellContext`t])) - 
+            HeavisideTheta[$CellContext`t] (-
+              HeavisideTheta[-$CellContext`fic$$] (($CellContext`ts$$ - 
+                 E^(($CellContext`fic$$ - \
+$CellContext`fjc$$)/$CellContext`ts$$) $CellContext`ts$$) 
+                HeavisideTheta[$CellContext`fic$$ - $CellContext`fjc$$] + 
+               E^($CellContext`fic$$/$CellContext`ts$$) (-1 + 
+                 E^(-$CellContext`fjc$$/$CellContext`ts$$)) $CellContext`ts$$ 
+                HeavisideTheta[-$CellContext`fjc$$]) + 
+             HeavisideTheta[-$CellContext`fic$$ + $CellContext`t] \
+(($CellContext`ts$$ - 
+                 E^(($CellContext`fic$$ - \
+$CellContext`fjc$$)/$CellContext`ts$$) $CellContext`ts$$) 
+                HeavisideTheta[$CellContext`fic$$ - $CellContext`fjc$$] + 
+               E^($CellContext`fic$$/$CellContext`ts$$) (
+                 E^(-$CellContext`fjc$$/$CellContext`ts$$) - 
+                 E^(-$CellContext`t/$CellContext`ts$$)) $CellContext`ts$$ 
+                HeavisideTheta[-$CellContext`fjc$$ + $CellContext`t]))), \
+$CellContext`fic$$ - $CellContext`fjc$$ >= 
+           0}}, -$CellContext`tm$$ ($CellContext`tm$$ - \
+$CellContext`ts$$)^(-1) $CellContext`w$$ (-
+           E^(-$CellContext`tm$$^(-1) $CellContext`ts$$^(-1) \
+($CellContext`fjc$$ $CellContext`tm$$ + $CellContext`t $CellContext`ts$$ + \
+$CellContext`fic$$ (-$CellContext`tm$$ + $CellContext`ts$$))) \
+$CellContext`tm$$ 
+           HeavisideTheta[$CellContext`t] (
+            E^($CellContext`t/$CellContext`tm$$) 
+             HeavisideTheta[-$CellContext`fic$$] ((
+                E^($CellContext`fic$$/$CellContext`tm$$) - 
+                E^($CellContext`fjc$$/$CellContext`tm$$)) 
+               HeavisideTheta[$CellContext`fic$$ - $CellContext`fjc$$] + 
+              E^($CellContext`fic$$/$CellContext`tm$$) (-1 + 
+                E^($CellContext`fjc$$/$CellContext`tm$$)) 
+               HeavisideTheta[-$CellContext`fjc$$]) - 
+            HeavisideTheta[-$CellContext`fic$$ + $CellContext`t] (
+             E^($CellContext`t/$CellContext`tm$$) (
+               E^($CellContext`fic$$/$CellContext`tm$$) - 
+               E^($CellContext`fjc$$/$CellContext`tm$$)) 
+              HeavisideTheta[$CellContext`fic$$ - $CellContext`fjc$$] + 
+             E^($CellContext`fic$$/$CellContext`tm$$) (
+               E^($CellContext`fjc$$/$CellContext`tm$$) - 
+               E^($CellContext`t/$CellContext`tm$$)) 
+              HeavisideTheta[-$CellContext`fjc$$ + $CellContext`t])) + 
+          HeavisideTheta[$CellContext`t] (-
+             HeavisideTheta[-$CellContext`fic$$] (($CellContext`ts$$ - 
+                E^(($CellContext`fic$$ - \
+$CellContext`fjc$$)/$CellContext`ts$$) $CellContext`ts$$) 
+               HeavisideTheta[$CellContext`fic$$ - $CellContext`fjc$$] + 
+              E^($CellContext`fic$$/$CellContext`ts$$) (-1 + 
+                E^(-$CellContext`fjc$$/$CellContext`ts$$)) $CellContext`ts$$ 
+               HeavisideTheta[-$CellContext`fjc$$]) + 
+            HeavisideTheta[-$CellContext`fic$$ + $CellContext`t] \
+(($CellContext`ts$$ - 
+                E^(($CellContext`fic$$ - \
+$CellContext`fjc$$)/$CellContext`ts$$) $CellContext`ts$$) 
+               HeavisideTheta[$CellContext`fic$$ - $CellContext`fjc$$] + 
+              E^($CellContext`fic$$/$CellContext`ts$$) (
+                E^(-$CellContext`fjc$$/$CellContext`ts$$) - 
+                E^(-$CellContext`t/$CellContext`ts$$)) $CellContext`ts$$ 
+               HeavisideTheta[-$CellContext`fjc$$ + $CellContext`t])))], \
+{$CellContext`t, -8, 8}], 
+      "Specifications" :> {{$CellContext`fic$$, -8, 
+         8}, {$CellContext`fjc$$, -2, 2}, {$CellContext`tm$$, -2, 
+         2}, {$CellContext`ts$$, -2, 2}, {$CellContext`w$$, -2, 2}}, 
+      "Options" :> {}, "DefaultOptions" :> {}],
+     ImageSizeCache->{407., {205., 212.}},
+     SingleEvaluation->True],
+    Deinitialization:>None,
+    DynamicModuleValues:>{},
+    SynchronousInitialization->True,
+    UnsavedVariables:>{Typeset`initDone$$},
+    UntrackedVariables:>{Typeset`size$$}], "Manipulate",
+   Deployed->True,
+   StripOnInput->False],
+  Manipulate`InterpretManipulate[1]]], "Output",
+ CellChangeTimes->{3.594898047811961*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"Power", "::", "infy"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"Infinite expression \[NoBreak]\\!\\(1\\/0\\)\[NoBreak] \
+encountered. \\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", \
+ButtonStyle->\\\"Link\\\", ButtonFrame->None, \
+ButtonData:>\\\"paclet:ref/message/General/infy\\\", ButtonNote -> \
+\\\"Power::infy\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.594898047914917*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"Infinity", "::", "indet"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"Indeterminate expression \[NoBreak]\\!\\(0.`\\\\ \
+ComplexInfinity\\)\[NoBreak] encountered. \\!\\(\\*ButtonBox[\\\"\
+\[RightSkeleton]\\\", ButtonStyle->\\\"Link\\\", ButtonFrame->None, \
+ButtonData:>\\\"paclet:ref/message/General/indet\\\", ButtonNote -> \
+\\\"Infinity::indet\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.594898048111889*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"Power", "::", "infy"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"Infinite expression \[NoBreak]\\!\\(1\\/0\\)\[NoBreak] \
+encountered. \\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", \
+ButtonStyle->\\\"Link\\\", ButtonFrame->None, \
+ButtonData:>\\\"paclet:ref/message/General/infy\\\", ButtonNote -> \
+\\\"Power::infy\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.594898048113673*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"Infinity", "::", "indet"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"Indeterminate expression \[NoBreak]\\!\\(0.`\\\\ \
+ComplexInfinity\\)\[NoBreak] encountered. \\!\\(\\*ButtonBox[\\\"\
+\[RightSkeleton]\\\", ButtonStyle->\\\"Link\\\", ButtonFrame->None, \
+ButtonData:>\\\"paclet:ref/message/General/indet\\\", ButtonNote -> \
+\\\"Infinity::indet\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.594898048115147*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"Power", "::", "infy"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"Infinite expression \[NoBreak]\\!\\(1\\/0\\)\[NoBreak] \
+encountered. \\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", \
+ButtonStyle->\\\"Link\\\", ButtonFrame->None, \
+ButtonData:>\\\"paclet:ref/message/General/infy\\\", ButtonNote -> \
+\\\"Power::infy\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.594898048116168*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"General", "::", "stop"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"Further output of \[NoBreak]\\!\\(\\*StyleBox[\\(Power :: \
+infy\\), \\\"MessageName\\\"]\\)\[NoBreak] will be suppressed during this \
+calculation. \\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", \
+ButtonStyle->\\\"Link\\\", ButtonFrame->None, \
+ButtonData:>\\\"paclet:ref/message/General/stop\\\", ButtonNote -> \
+\\\"General::stop\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.594898048117206*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"Infinity", "::", "indet"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"Indeterminate expression \[NoBreak]\\!\\(0.`\\\\ \
+ComplexInfinity\\)\[NoBreak] encountered. \\!\\(\\*ButtonBox[\\\"\
+\[RightSkeleton]\\\", ButtonStyle->\\\"Link\\\", ButtonFrame->None, \
+ButtonData:>\\\"paclet:ref/message/General/indet\\\", ButtonNote -> \
+\\\"Infinity::indet\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.594898048118636*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"General", "::", "stop"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"Further output of \[NoBreak]\\!\\(\\*StyleBox[\\(Infinity \
+:: indet\\), \\\"MessageName\\\"]\\)\[NoBreak] will be suppressed during this \
+calculation. \\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", \
+ButtonStyle->\\\"Link\\\", ButtonFrame->None, \
+ButtonData:>\\\"paclet:ref/message/General/stop\\\", ButtonNote -> \
+\\\"General::stop\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.594898048119762*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"Power", "::", "infy"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"Infinite expression \[NoBreak]\\!\\(1\\/0\\)\[NoBreak] \
+encountered. \\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", \
+ButtonStyle->\\\"Link\\\", ButtonFrame->None, \
+ButtonData:>\\\"paclet:ref/message/General/infy\\\", ButtonNote -> \
+\\\"Power::infy\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.594898055425205*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"Infinity", "::", "indet"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"Indeterminate expression \[NoBreak]\\!\\(0.`\\\\ \
+ComplexInfinity\\)\[NoBreak] encountered. \\!\\(\\*ButtonBox[\\\"\
+\[RightSkeleton]\\\", ButtonStyle->\\\"Link\\\", ButtonFrame->None, \
+ButtonData:>\\\"paclet:ref/message/General/indet\\\", ButtonNote -> \
+\\\"Infinity::indet\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.5948980554591513`*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"Power", "::", "infy"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"Infinite expression \[NoBreak]\\!\\(1\\/0\\)\[NoBreak] \
+encountered. \\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", \
+ButtonStyle->\\\"Link\\\", ButtonFrame->None, \
+ButtonData:>\\\"paclet:ref/message/General/infy\\\", ButtonNote -> \
+\\\"Power::infy\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.5948980554898453`*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"Infinity", "::", "indet"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"Indeterminate expression \[NoBreak]\\!\\(0.`\\\\ \
+ComplexInfinity\\)\[NoBreak] encountered. \\!\\(\\*ButtonBox[\\\"\
+\[RightSkeleton]\\\", ButtonStyle->\\\"Link\\\", ButtonFrame->None, \
+ButtonData:>\\\"paclet:ref/message/General/indet\\\", ButtonNote -> \
+\\\"Infinity::indet\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.594898055525115*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"Power", "::", "infy"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"Infinite expression \[NoBreak]\\!\\(1\\/0\\)\[NoBreak] \
+encountered. \\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", \
+ButtonStyle->\\\"Link\\\", ButtonFrame->None, \
+ButtonData:>\\\"paclet:ref/message/General/infy\\\", ButtonNote -> \
+\\\"Power::infy\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.594898055554771*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"General", "::", "stop"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"Further output of \[NoBreak]\\!\\(\\*StyleBox[\\(Power :: \
+infy\\), \\\"MessageName\\\"]\\)\[NoBreak] will be suppressed during this \
+calculation. \\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", \
+ButtonStyle->\\\"Link\\\", ButtonFrame->None, \
+ButtonData:>\\\"paclet:ref/message/General/stop\\\", ButtonNote -> \
+\\\"General::stop\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.594898055571154*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"Infinity", "::", "indet"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"Indeterminate expression \[NoBreak]\\!\\(0.`\\\\ \
+ComplexInfinity\\)\[NoBreak] encountered. \\!\\(\\*ButtonBox[\\\"\
+\[RightSkeleton]\\\", ButtonStyle->\\\"Link\\\", ButtonFrame->None, \
+ButtonData:>\\\"paclet:ref/message/General/indet\\\", ButtonNote -> \
+\\\"Infinity::indet\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.594898055601131*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"General", "::", "stop"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"Further output of \[NoBreak]\\!\\(\\*StyleBox[\\(Infinity \
+:: indet\\), \\\"MessageName\\\"]\\)\[NoBreak] will be suppressed during this \
+calculation. \\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", \
+ButtonStyle->\\\"Link\\\", ButtonFrame->None, \
+ButtonData:>\\\"paclet:ref/message/General/stop\\\", ButtonNote -> \
+\\\"General::stop\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.5948980556172943`*^9}]
+}, Open  ]]
+},
+WindowSize->{740, 731},
+WindowMargins->{{Automatic, 366}, {-7, Automatic}},
+FrontEndVersion->"9.0 for Linux x86 (64-bit) (November 20, 2012)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[557, 20, 858, 21, 55, "Input"],
+Cell[1418, 43, 262, 7, 77, "Input"],
+Cell[CellGroupData[{
+Cell[1705, 54, 3228, 88, 275, "Input"],
+Cell[4936, 144, 13241, 318, 938, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[18214, 467, 698, 23, 55, "Input"],
+Cell[18915, 492, 7008, 125, 434, "Output"],
+Cell[25926, 619, 445, 10, 43, "Message"],
+Cell[26374, 631, 477, 10, 24, "Message"],
+Cell[26854, 643, 445, 10, 43, "Message"],
+Cell[27302, 655, 477, 10, 24, "Message"],
+Cell[27782, 667, 445, 10, 43, "Message"],
+Cell[28230, 679, 528, 11, 24, "Message"],
+Cell[28761, 692, 477, 10, 24, "Message"],
+Cell[29241, 704, 532, 11, 24, "Message"],
+Cell[29776, 717, 445, 10, 43, "Message"],
+Cell[30224, 729, 479, 10, 24, "Message"],
+Cell[30706, 741, 447, 10, 43, "Message"],
+Cell[31156, 753, 477, 10, 24, "Message"],
+Cell[31636, 765, 445, 10, 43, "Message"],
+Cell[32084, 777, 528, 11, 24, "Message"],
+Cell[32615, 790, 477, 10, 24, "Message"],
+Cell[33095, 802, 534, 11, 24, "Message"]
+}, Open  ]]
+}
+]
+*)
+
+(* End of internal cache information *)

@@ -33,8 +33,8 @@ t <- seq(0, 50, by=0.1)
 plot(t, nu(t-25), type="l")
 
 # stochastic threshold g(u):
-beta <- 0.25
-alpha <- 0.35
+beta <- 2
+alpha <- 2
 tr <- -50 # mV
 g <- Vectorize(function(u) {
   (beta/alpha)*(log(1+exp(alpha*(tr-u))) -alpha*(tr-u)) 
