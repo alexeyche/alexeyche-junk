@@ -6,6 +6,7 @@ project(sim_prj C CXX)
 option(DEBUG "Compile with debugging information" OFF)
 option(PROFILE "Compile with profiling information" OFF)
 option(ARMA_EXTRA_DEBUG "Compile with extra Armadillo debugging symbols." OFF)
+set(CMAKE_USE_RELATIVE_PATHS OFF)
 
 # This is as of yet unused.
 #option(PGO "Use profile-guided optimization if not a debug build" ON)
@@ -23,8 +24,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 # Debugging CFLAGS.  Turn optimizations off; turn debugging symbols on.
 if(DEBUG)
   add_definitions(-DDEBUG)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -g -O0")
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c++0x -g -O0")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -g -O1")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c++0x -g -O1")
 else()
   add_definitions(-DARMA_NO_DEBUG)
   add_definitions(-DNDEBUG)
