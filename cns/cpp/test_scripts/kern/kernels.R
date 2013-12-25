@@ -23,13 +23,28 @@ binSpikeTrains <- function(st, T, binSize) {
     return(x)
 }
 binnedKernel <- function(st1, st2, T, ksize) {
-    x1 <- binSpikeTrains( list(st1), T, ksize)
-    x2 <- binSpikeTrains( list(st2), T, ksize)
-    v <- t(x1) %*% x2
+    x <- binSpikeTrains( list(st1, st2), T, ksize)
+    v <- x[,1] %*% t(x[,2])
     return(v)
 }
 
+pairwiseL1 <- function(x, y) {
+   xm <- matrix(x, nrow=length(x),ncol=length(y))
+   abs(sweep(xm, 2, y))
+}
 
-st1 <- list(rnorm(100,mean=10, sd=1), rnorm(100, mean=9, sd=0.5))
-st2 <- list(rnorm(100,mean=10, sd=1), rnorm(100, mean=9, sd=0.5))
+mci <- function(st1, st2, ksize) {
+    inside = pairwiseL1(st1,st2)
+    sum(exp(-c(inside)/ksize))
+}
+dmci <- function(st1, st2, ksize) {
+    inside = pairwiseL1(st1,st2)
+    sum(c(inside) * exp(c(-inside)/ksize))/ksize^2
+}   
+
+nci <- function(st1, st2, 
+
+
+st1 <- rnorm(100,mean=10, sd=1)
+st2 <- rnorm(100, mean=9, sd=0.5)
 binnedKernel(st1,st2, 20, 2)
