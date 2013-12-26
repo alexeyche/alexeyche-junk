@@ -849,13 +849,28 @@ void test_dpdw() {
 }
 
 void test_ttime2() {
-    srm::TTime2 t;
-    t.push_back(0.5);
-    t.push_back(2.5);
-    t.push_back(5);
-    t.push_back(6);
-    t.push_back(100);
-    t.push_back(101);
+//    srm::TTime2 t;
+//    t.push_back(0.5);
+//    t.push_back(2.5);
+//    t.push_back(5);
+//    t.push_back(6);
+//    t.push_back(100);
+//    t.push_back(101);
+}
+
+void test_srmneuron2() {
+    srm::SrmNeuron2 n;
+    n.add_input(new srm::DetermenisticNeuron("1 2 3 4"), 6); 
+    n.add_input(new srm::DetermenisticNeuron("1 2 3"), 6);
+    n.add_input(new srm::DetermenisticNeuron("1 4 5"), 6); 
+    n.add_input(new srm::DetermenisticNeuron("1 2 3"), 6);
+    n.add_input(new srm::DetermenisticNeuron("1"), 6); 
+    vec t = linspace<vec>(0, 10, 100);
+    for(size_t ti=0; ti<t.n_elem; ti++) {
+        Log::Info << n.u(t(ti)) << ", ";
+    }
+    Log::Info << "\n";
+
 }
 
 PROGRAM_INFO("SIM TEST", "sim tests"); 
@@ -975,6 +990,12 @@ int main(int argc, char** argv) {
         Log::Info << "ttime2" << std::endl;
         Log::Info << "===============================================================" << std::endl;
         test_ttime2();
+        Log::Info << "===============================================================" << std::endl;
+    }
+    if((test_name == "all") || (test_name == "srmneuron2")) {
+        Log::Info << "srmneuron2" << std::endl;
+        Log::Info << "===============================================================" << std::endl;
+        test_srmneuron2();
         Log::Info << "===============================================================" << std::endl;
     }
     return 0;
