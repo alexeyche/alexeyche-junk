@@ -161,7 +161,7 @@ int main(int argc, char** argv)
             std::vector<std::string> filename_spl = split(specpattern, '/');
             std::string basename = filename_spl.back();
             std::vector<std::string> basename_spl = split(basename, '.');
-            data::Save(c.responces_dir+"/"+basename_spl.front()+std::string("_ep_")+std::to_string(ep)+std::string("_resp.csv"), s.raster);
+            data::Save(c.responces_dir+"/"+basename_spl.front()+std::string("_ep_")+std::to_string(ep)+std::string("_resp.csv"), s.raster, false, false);
             std::srand(seed+ep);
         }            
 //        std::vector<mat> responces;
