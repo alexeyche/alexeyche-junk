@@ -16,7 +16,7 @@ test_epsp <- function() {
   }
   plot(t,e, type="l")
 }  
-test_epsp()
+#test_epsp()
 # absolute(-100 mV) refractoriness with exponential restore
 u_abs <- -30 #-70 # mV
 u_r <- -10#-50 # mV
@@ -29,8 +29,8 @@ nu <- Vectorize(function(s) {
  u_abs*exp(-(s+dr)/trf)+u_r*exp(-s/trs)
 })
 
-t <- seq(0, 50, by=0.1)
-plot(t, nu(t-25), type="l")
+#t <- seq(0, 50, by=0.1)
+#plot(t, nu(t-25), type="l")
 
 # stochastic threshold g(u):
 beta <- 2
@@ -40,8 +40,8 @@ g <- Vectorize(function(u) {
   (beta/alpha)*(log(1+exp(alpha*(tr-u))) -alpha*(tr-u)) 
 })
 
-us<-seq(-70, -25, by=0.1)
-plot(us, g(us),type="l")
+#us<-seq(-70, -25, by=0.1)
+#plot(us, g(us),type="l")
 
 N <- 10
 M <- 1
@@ -63,6 +63,7 @@ u_srm <- function(t, x, y) {
   }
   u_rest + e_syn + sum(nu(t-y))
 }
+
 plot_u_srm <- function() {
     x <- list()
     x[[1]] <- c(10,16)
