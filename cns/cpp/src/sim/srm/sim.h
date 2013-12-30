@@ -141,7 +141,7 @@ namespace srm {
                             //    yl = t(ti)-learn_dt;
                             //    Log::Info << "Spike wasn't found. Taking " << t(ti)-learn_dt << "\n";
                             //}
-                            for(size_t it=0; it<100; it++) {
+                            for(size_t it=0; it<10; it++) {
                                 TLogLikelyhood llh(n, yl-learn_dt, yl+learn_dt);
                                 vec dPdw = llh.grad();
                                 printf("iter %zu  -- ", it);

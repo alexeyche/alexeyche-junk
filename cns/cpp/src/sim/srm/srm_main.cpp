@@ -156,7 +156,7 @@ int main(int argc, char** argv)
         }
         s.run(simtime*ms, 0.5, rt_cur, true, send);
             
-        if( (rt_cur == TRunType::RunAndLearnStabilize) || (rt_cur == TRunType::RunAndLearnLogLikelyhood)) {
+        if( (rt_cur == TRunType::RunAndLearnStabilize) || (rt_cur == TRunType::RunAndLearnLogLikelyhood) || (rt_cur == TRunType::RunAndLearnSTDP)) {
             Log::Info << "weight after:\n";
             for(size_t ni=0; ni<g.group.size(); ni++) {
                 SrmNeuron *n =  dynamic_cast<SrmNeuron*>(g.group[ni]);
