@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 2.8)
 set(SOURCES
     lzw.c
     lzw.cpp
+    dist.h
 )
 
 # add directory name to sources

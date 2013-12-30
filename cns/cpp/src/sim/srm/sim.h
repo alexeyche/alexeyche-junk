@@ -42,7 +42,7 @@ namespace srm {
     
     class TRunType {
     public:
-        enum ERunType { Run, RunAndLearnEntropy, RunAndLearnSTDP, RunAndLearnLogLikelyhood };
+        enum ERunType { Run, RunAndLearnEntropy, RunAndLearnSTDP, RunAndLearnLogLikelyhood, RunAndLearnStabilize };
     };
 
     class Sim {
@@ -70,7 +70,7 @@ namespace srm {
 //                    TimeSeriesGroup *gr = (TimeSeriesGroup*)sim_elem[el_i];
 //                    for(unsigned int i=0; i<gr->group.size(); i++) {
 //                        Log::Info << "n " << i << ":\n";
-//                        Log::Info << gr->group[i]->y.size() << "\n";
+//                        Log::Info << "size of y: " << gr->group[i]->y.size() << "; y:\n";
 //                        gr->group[i]->y.print();
 //                    }
 //                    send_arma_mat(gr->group[9]->y, "d_stat", 9);
@@ -131,23 +131,31 @@ namespace srm {
                     } 
                                        
                 }
-                if(rt == TRunType::RunAndLearnLogLikelyhood) {
+                if((rt == TRunType::RunAndLearnLogLikelyhood)||(rt == TRunType::RunAndLearnStabilize)) {
                     if(learn_dti>=learn_dt) {
                         for(size_t ni=0; ni<neuron_fired.size(); ni++) {
                             SrmNeuron *n = neuron_fired[ni];
-                            double &yl = n->y.last();
-                            TLogLikelyhood llh(n, yl-learn_dt, yl+learn_dt);
-                            vec dPdw = llh.grad();
-                            for(size_t wi=0; wi<n->w.size(); wi++) {
-                                n->w[wi] += learning_rate * dPdw(wi);
-                            #if VERBOSE >= 1                                
-                                if(dPdw(wi) != 0) 
-                                    printf("syn:%zu = %f, ", wi, dPdw(wi));
-                            #endif                                
+                            //SrmNeuron *n = dynamic_cast<SrmNeuron*>(stoch_elem[ni]);
+                            double yl = n->y.last();
+                            //if(yl<t(ti)-2*learn_dt) {
+                            //    yl = t(ti)-learn_dt;
+                            //    Log::Info << "Spike wasn't found. Taking " << t(ti)-learn_dt << "\n";
+                            //}
+                            for(size_t it=0; it<100; it++) {
+                                TLogLikelyhood llh(n, yl-learn_dt, yl+learn_dt);
+                                vec dPdw = llh.grad();
+                                printf("iter %zu  -- ", it);
+                                for(size_t wi=0; wi<n->w.size(); wi++) {
+                                    n->w[wi] += learning_rate * dPdw(wi);
+                                #if VERBOSE >= 1                                
+                                    if(dPdw(wi) != 0) 
+                                        printf("syn:%zu = %f, ", wi, dPdw(wi));
+                                #endif                                
+                                }
+                            #if VERBOSE >= 1
+                                printf("\n");
+                            #endif 
                             }
-                        #if VERBOSE >= 1
-                            printf("\n");
-                        #endif 
                         }
                         learn_dti = 0;
                         neuron_fired.clear();
@@ -169,7 +177,8 @@ namespace srm {
 
             }                
             if(max_spikes !=0) {
-                mat rasterc(stoch_elem.size(), max_spikes, fill::zeros);
+                mat rasterc(stoch_elem.size(), max_spikes);
+                rasterc.fill(-1);
                 for(size_t ni=0; ni<stoch_elem.size(); ni++) {
                     for(size_t yi=0; yi<stoch_elem[ni]->y.size(); yi++) {
                         rasterc(ni, yi) = stoch_elem[ni]->y[yi];                

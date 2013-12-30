@@ -1,5 +1,4 @@
 
-
 ornstein_uhlenbeck <- function(T, n, nu,lambda,sigma,x0){
   dt  <- T/n
   dw  <- rnorm(n, 0, sqrt(dt))
@@ -10,28 +9,38 @@ ornstein_uhlenbeck <- function(T, n, nu,lambda,sigma,x0){
   return(x);
 }
 
-set.seed(8)
-d1 <- ornstein_uhlenbeck(10,999, 0.2, 1, 0.007, 0.15)
-d2 <- ornstein_uhlenbeck(10,999, 0.19, 0.5, 0.01, 0.15)
-d3 <- ornstein_uhlenbeck(10,999, 0.15, 0.5, 0.01, 0.21)
-write.table(d1, "/var/tmp/d1.csv", sep=",", col.names=F, row.names=F) 
-write.table(d2, "/var/tmp/d2.csv", sep=",", col.names=F, row.names=F)
-write.table(d3, "/var/tmp/d3.csv", sep=",", col.names=F, row.names=F)  
-for(i in 1:10) {
-  set.seed(i+10)
-  d1c <- ornstein_uhlenbeck(10,999, 0.2, 1, 0.007, 0.15)
-  d2c <- ornstein_uhlenbeck(10,999, 0.19, 0.5, 0.01, 0.15)
-  d3c <- ornstein_uhlenbeck(10,999, 0.15, 0.5, 0.01, 0.21)
-  write.table(d1c, paste("/var/tmp/d1_",i,".csv",sep=""), sep=",", col.names=F, row.names=F) 
-  write.table(d2c, paste("/var/tmp/d2_",i,".csv",sep=""), sep=",", col.names=F, row.names=F)
-  write.table(d3c, paste("/var/tmp/d3_",i,".csv",sep=""), sep=",", col.names=F, row.names=F) 
+gen_ou <- function() {
+    set.seed(8)
+    d1 <- ornstein_uhlenbeck(10,999, 0.2, 1, 0.007, 0.15)
+    d2 <- ornstein_uhlenbeck(10,999, 0.19, 0.5, 0.01, 0.15)
+    d3 <- ornstein_uhlenbeck(10,999, 0.15, 0.5, 0.01, 0.21)
+    write.table(d1, "/home/alexeyche/my/sim/stimuli/d1.csv", sep=",", col.names=F, row.names=F) 
+    write.table(d2, "/home/alexeyche/my/sim/stimuli/d2.csv", sep=",", col.names=F, row.names=F)
+    write.table(d3, "/home/alexeyche/my/sim/stimuli/d3.csv", sep=",", col.names=F, row.names=F)  
+    for(i in 1:10) {
+        set.seed(i+10)
+        d1c <- ornstein_uhlenbeck(10,999, 0.2, 1, 0.007, 0.15)
+        d2c <- ornstein_uhlenbeck(10,999, 0.19, 0.5, 0.01, 0.15)
+        d3c <- ornstein_uhlenbeck(10,999, 0.15, 0.5, 0.01, 0.21)
+        write.table(d1c, paste("/home/alexeyche/my/sim/stimuli/d1_",i,".csv",sep=""), sep=",", col.names=F, row.names=F) 
+        write.table(d2c, paste("/home/alexeyche/my/sim/stimuli/d2_",i,".csv",sep=""), sep=",", col.names=F, row.names=F)
+        write.table(d3c, paste("/home/alexeyche/my/sim/stimuli/d3_",i,".csv",sep=""), sep=",", col.names=F, row.names=F) 
+    }
+    
+    plot(d1, type="l", col="blue")
+    lines(d2, col="red")
+    lines(d3, col="green")
 }
+gen_sd <- function() {
+    sd1 <- seq(1, 10)
+    sd2 <- seq(10, 1)
+    write.table(sd1, "/home/alexeyche/my/sim/stimuli/sd1.csv", sep=",", col.names=F, row.names=F)
+    write.table(sd2, "/home/alexeyche/my/sim/stimuli/sd2.csv", sep=",", col.names=F, row.names=F)
+}    
 
-plot(d1, type="l", col="blue")
-lines(d2, col="red")
-lines(d3, col="green")
+
 #source("serv.R")
-load()
+#load()
 
 plot_syn_stat <- function(stat, new_plot=TRUE, clr="blue") {
   pf <- plot

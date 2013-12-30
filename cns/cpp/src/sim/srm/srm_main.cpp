@@ -5,6 +5,7 @@
 #include <sim/data/save.h>
 #include <sim/data/load.h>
 #include <sim/util/confParser.h>
+#include <sim/spike/dist.h>
 
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -22,14 +23,12 @@ PROGRAM_INFO("SRM SIM", "Spike Responce Model simulator");
 PARAM_INT("seed", "seed", "", time(NULL));
 PARAM_DOUBLE("rate", "learning rate", "r", 1);
 PARAM_DOUBLE("simtime", "time to simulate(ms)", "t", 1100);
-PARAM_STRING("mode", "modes for srm sim: \'run\', \'train\', \'stdp\'", "m", "run");
+PARAM_STRING("mode", "modes for srm sim: \'run\', \'train\', \'stdp\',\'stabilize\'", "m", "run");
 PARAM_INT("epoch", "Num of epochs in learning mode", "e", 1);
 PARAM_STRING("stimuli-set", "Set of stimuli from config file", "s","train_set");
 PARAM_STRING("pattern", "specific pattern", "p", "");
 PARAM_DOUBLE("pattdur", "specific pattern duration", "d", 500);
 
-PARAM_STRING("stimuli-dir", "directory with input patterns", "i", "stimuli");
-PARAM_STRING("responces-dir", "directory with output patterns", "o", "responces");
 PARAM_STRING("config-file", "config file", "c", "config.cfg");
 
 int main(int argc, char** argv)
@@ -42,7 +41,7 @@ int main(int argc, char** argv)
 
     const double learning_rate = CLI::GetParam<double>("rate");
     double simtime = CLI::GetParam<double>("simtime");
-    const int epoch = CLI::GetParam<int>("epoch");
+    int epoch = CLI::GetParam<int>("epoch");
     const std::string stimset =  CLI::GetParam<std::string>("stimuli-set");  
     const std::string cfgFile =  CLI::GetParam<std::string>("config-file");  
     if(!fileExist(cfgFile)) {
@@ -113,7 +112,7 @@ int main(int argc, char** argv)
 //    return 0;
     s.addNeuronGroup(&tsg);
     s.addNeuronGroup(&g);
-//    s.addStatListener(&g);
+    s.addStatListener(&g);
     TRunType::ERunType rt;   
     if(mode == "run") {    
         rt = TRunType::Run;
@@ -129,8 +128,7 @@ int main(int argc, char** argv)
                 }            
             }
         } else {
-            Log::Fatal << "Model file " << modelFName << " doesn't exists\n";
-            throw SrmException("");
+            Log::Warn << "Model file " << modelFName << " doesn't exists\n";
         }
 
     } 
@@ -140,23 +138,35 @@ int main(int argc, char** argv)
     if(mode == "train") {    
         rt = TRunType::RunAndLearnLogLikelyhood;
     }        
+    if(mode == "stabilize") {
+        rt = TRunType::RunAndLearnStabilize;
+        epoch = epoch*5;
+    }
+    std::vector<mat> rasters;
     vec weights(g.group.size(), g.group[0]->w.size(), fill::zeros);
     for(size_t ep=0; ep<epoch; ep++) {
         for(size_t ni=0; ni<g.group.size(); ni++) { g.group[ni]->y.clean(); }
         bool send=false;
+        TRunType::ERunType rt_cur = rt; 
         if((ep == epoch-1)||(ep == 0)) {
             send=true;
         }
-        s.run(simtime*ms, 0.5, rt, true, send);
-        Log::Info << "weight after:\n";
-        for(size_t ni=0; ni<g.group.size(); ni++) {
-            SrmNeuron *n =  dynamic_cast<SrmNeuron*>(g.group[ni]);
-            if(n) {
-                Log::Info << "neuron " << ni << "\n";
-                for(size_t wi=0; wi<n->w.size(); wi++) { Log::Info << n->w[wi] << ", "; weights(ni,wi) = n->w[wi]; }
-                Log::Info << "\n";
-            }            
-        }        
+        if((rt == TRunType::RunAndLearnStabilize) && ((ep % 5 != 0)||(ep == 0))) {
+            rt_cur = TRunType::Run;
+        }
+        s.run(simtime*ms, 0.5, rt_cur, true, send);
+            
+        if( (rt_cur == TRunType::RunAndLearnStabilize) || (rt_cur == TRunType::RunAndLearnLogLikelyhood)) {
+            Log::Info << "weight after:\n";
+            for(size_t ni=0; ni<g.group.size(); ni++) {
+                SrmNeuron *n =  dynamic_cast<SrmNeuron*>(g.group[ni]);
+                if(n) {
+                    Log::Info << "neuron " << ni << "\n";
+                    for(size_t wi=0; wi<n->w.size(); wi++) { Log::Info << n->w[wi] << ", "; weights(ni,wi) = n->w[wi]; }
+                    Log::Info << "\n";
+                }            
+            }        
+        }            
         if((rt == TRunType::Run)&&(specpattern != "")) { 
             std::vector<std::string> filename_spl = split(specpattern, '/');
             std::string basename = filename_spl.back();
@@ -164,6 +174,14 @@ int main(int argc, char** argv)
             data::Save(c.responces_dir+"/"+basename_spl.front()+std::string("_ep_")+std::to_string(ep)+std::string("_resp.csv"), s.raster, false, false);
             std::srand(seed+ep);
         }            
+        if(rt == TRunType::RunAndLearnStabilize) {
+            rasters.push_back(s.raster);
+            Log::Info << "Epoch # " << ep << "\n";
+            if (rasters.size() > 1) {
+                double d = dist(rasters[rasters.size()-1], rasters[rasters.size()-2], 20);
+                Log::Info << "Delta between answers = " << d << "\n";
+            }       
+        }
 //        std::vector<mat> responces;
 //        for(size_t ti=0; ti<s.raster.n_cols; ti++) {
 //            for(size_t pi=0; pi<tsg.patterns.size(); pi++) {
