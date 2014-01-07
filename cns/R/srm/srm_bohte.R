@@ -33,8 +33,8 @@ nu <- Vectorize(function(s) {
 #plot(t, nu(t-25), type="l")
 
 # stochastic threshold g(u):
-beta <- 2
-alpha <- 2
+beta <- 1
+alpha <- 1
 tr <- -50 # mV
 g <- Vectorize(function(u) {
   (beta/alpha)*(log(1+exp(alpha*(tr-u))) -alpha*(tr-u)) 
@@ -80,6 +80,7 @@ plot_u_srm <- function() {
     }
     plot(t, uu, type="l", ylim=c(-90,-20), xlab="t (мс)", ylab="u(t) (мВ)")
 }
+
 run_srm <- function(x,y, T=50, dt=0.1) {
   y <- c(-Inf)
   uall <- c()
