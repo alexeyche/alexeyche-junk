@@ -1,0 +1,16 @@
+{
+    "contents" : "#include <Rcpp.h>\n#include \"gauss_legendre.h\"\n#include \"base.h\"\n#include \"neuron.h\"\n#include \"grad_funcs.h\"\n\nusing namespace Rcpp;\n\ndouble integrand(double t, void* data) {\n  const SSynInput &ssyn = *(SSynInput*)data;\n  return p_stroke(t, ssyn.si) * grab_epsp(t, ssyn);\n}\n\n#define GAUSS_QUAD 256\n// [[Rcpp::export]]\nSEXP integrateSRM(const List constants, const List int_options, const IntegerVector neuron_id, \n                  const IntegerVector neuron_id_conn, const NumericVector neuron_w, const List net) {\n    \n    const double &T0 = int_options[\"T0\"];\n    const double &Tmax = int_options[\"Tmax\"];\n    SInput si(constants, neuron_id, neuron_id_conn, neuron_w, net);\n    IntegerVector t = seq_len(Tmax);\n#ifdef DEBUG    \n    NumericMatrix out_ps(si.id_conn.size(), t.size());\n    NumericMatrix out_epsp(si.id_conn.size(), t.size());\n#endif    \n    NumericVector int_values(si.id_conn.size());\n    for(size_t syn_id=0; syn_id<si.id_conn.size(); syn_id++) {\n      SSynInput ssyn(si.id_conn[syn_id], si);\n      int_values[syn_id] = - gauss_legendre(GAUSS_QUAD, integrand, (void*)&ssyn, T0, Tmax);\n#ifdef DEBUG          \n      for(size_t ti=0; ti<t.size(); ti++) {\n        out_ps(syn_id,ti) = p_stroke(t[ti], ssyn.si);\n        out_epsp(syn_id,ti) = grab_epsp(t[ti], ssyn);   \n      }\n#endif      \n    } \n#ifdef DEBUG     \n    NumericVector out_u(t.size());\n    for(size_t ti=0; ti<t.size(); ti++) {\n      out_u(ti) = u(t[ti], si);\n    }    \n    return List::create(Named(\"p_stroke\") = out_ps, Named(\"grab_epsp\") = out_epsp, Named(\"u\") = out_u);\n#endif\n    return int_values;\n}    \n",
+    "created" : 1389014986363.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1616483622",
+    "id" : "40D941DE",
+    "lastKnownWriteTime" : 1389022645,
+    "path" : "~/prog/alexeyche-junk/cns/R/srm/snnSRM/src/integrate.cpp",
+    "project_path" : "src/integrate.cpp",
+    "properties" : {
+    },
+    "source_on_save" : false,
+    "type" : "cpp"
+}

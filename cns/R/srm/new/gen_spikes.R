@@ -2,10 +2,10 @@
 
 TSNeurons <- setRefClass("TSNeurons", fields = list(M = "vector", patterns = "list"), 
                                     methods = list(
-                                    loadPattern = function(file, pattDur) {
+                                    loadPattern = function(file, pattDur, class) {
                                         l <- length(patterns)
                                         rawdata <- read.table(file, sep=",")
-                                        patt <- list(file=file, pattDur=pattDur, dt=pattDur/nrow(rawdata), rawdata=rawdata[,1], len=nrow(rawdata))
+                                        patt <- list(file=file, pattDur=pattDur, dt=pattDur/nrow(rawdata), rawdata=rawdata[,1], len=nrow(rawdata), class=class)
                                         data <- matrix(-Inf, nrow=M, ncol = patt$len)
                                         hb <- max(rawdata)
                                         lb <- min(rawdata)
@@ -18,7 +18,7 @@ TSNeurons <- setRefClass("TSNeurons", fields = list(M = "vector", patterns = "li
                                             patt_dt <- patt_dt + pattDur/patt$len
                                             data[ind_n, ri] <- patt_dt
                                         }
-                                        patt$data <- data
+                                        patt$data <- spikeMatToSpikeList(data)
                                         patterns[[l+1]] <<- patt                                  
                                     },
                                     preCalculate = function(T0, Tmax, dt) {

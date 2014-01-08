@@ -1,7 +1,5 @@
 
-grad <- function(neurons, T0, Tmax, net, first_spike=TRUE) {
-  
-  
+grad <- function(neurons, T0, Tmax, net, class, target_function_gen) {
   id_n = sapply(neurons, function(n) n$id)
   
   nspikes = lapply(net[id_n], function(sp) { 
@@ -9,8 +7,8 @@ grad <- function(neurons, T0, Tmax, net, first_spike=TRUE) {
     right = findInterval(Tmax, sp, rightmost.closed=TRUE)
     if(left<=right) sp[left:right]
   })
-  if(first_spike)
-    nspikes = lapply(nspikes, function(sp) sp[1])
+  
+  nspikes = lapply(1:length(nspikes), target_function_gen(nspikes, class))
   
   left_part = lapply(1:length(id_n), function(number) {  
               if(!is.null(nspikes[[number]])) {
@@ -30,6 +28,7 @@ grad <- function(neurons, T0, Tmax, net, first_spike=TRUE) {
       })
   })
   not_fired = sapply(nspikes, is.null)
+  #not_fired = rep(FALSE, length(neurons))
   int_options = list(T0 = T0, Tmax=Tmax)
   sfExport('int_options')
   sfExport('net')

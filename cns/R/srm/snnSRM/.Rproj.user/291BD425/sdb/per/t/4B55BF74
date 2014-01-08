@@ -1,0 +1,16 @@
+{
+    "contents" : "#include \"grad_funcs.h\"\n\ndouble p_stroke(const double &t, const SInput &si) {\n //printf(\"beta: %f, alpha: %f, tr: %f, u(t,si) = %f\\n\", (double)si.c[\"beta\"], (double)si.c[\"alpha\"], (double)si.c[\"tr\"], u(t, si));\n return si.get_c(\"beta\")/(1+exp(si.get_c(\"alpha\")*(si.get_c(\"tr\")-u(t, si))));\n}\n\ndouble grab_epsp(const double &t, const SSynInput &ssyn) {\n  double e_syn = 0;\n  const NumericVector &sp(ssyn.si.net[ssyn.syn_id-1]);\n  for(int syn_id=sp.size()-1; syn_id>=0; syn_id--) {\n    if(t - sp[syn_id] > EPSP_WORK_WINDOW) break;\n    e_syn += epsp(t - sp[syn_id], ssyn.si.c);\n  }\n  return e_syn;\n}\n\n",
+    "created" : 1389014999209.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2225683910",
+    "id" : "4B55BF74",
+    "lastKnownWriteTime" : 1389016020,
+    "path" : "~/prog/alexeyche-junk/cns/R/srm/snnSRM/src/grad_funcs.cpp",
+    "project_path" : "src/grad_funcs.cpp",
+    "properties" : {
+    },
+    "source_on_save" : false,
+    "type" : "cpp"
+}

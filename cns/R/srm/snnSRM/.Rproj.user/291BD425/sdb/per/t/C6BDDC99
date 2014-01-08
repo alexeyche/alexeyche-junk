@@ -1,0 +1,16 @@
+{
+    "contents" : "#ifndef BASE_H\n#define BASE_H\n\n#include <Rcpp.h>\nusing namespace Rcpp;\n\nstruct SInput {\n  SInput(const List &cc, const IntegerVector &idc, const IntegerVector &id_connc, const NumericVector &wc, const List &netc):\n        c(cc), id(idc), id_conn(id_connc), w(wc), net(netc) {}\n  const double& get_c(const char *name) const  { \n    return (double)c[name];\n  }\n  const List &c;\n  const IntegerVector &id;\n  const IntegerVector &id_conn;\n  const NumericVector &w;\n  const List &net;\n};\n\nstruct SSynInput {\n  SSynInput(const int syn_idc, const SInput &sic) : syn_id(syn_idc), si(sic) {}\n  const int syn_id;\n  const SInput &si;\n};\n\n#endif\n",
+    "created" : 1389015616121.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1966437346",
+    "id" : "C6BDDC99",
+    "lastKnownWriteTime" : 1389015823,
+    "path" : "~/prog/alexeyche-junk/cns/R/srm/snnSRM/src/base.h",
+    "project_path" : "src/base.h",
+    "properties" : {
+    },
+    "source_on_save" : false,
+    "type" : "h"
+}

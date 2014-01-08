@@ -1,6 +1,6 @@
 
 e0 <- 1.3 # mV
-ts <- 3 # ms
+ts <- 1 # ms
 tm <- 10 # ms
 epsp <- Vectorize(function(s) {
   if((s<0)||(s == Inf)) { return(0) }

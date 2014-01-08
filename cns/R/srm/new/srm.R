@@ -1,9 +1,15 @@
 
 run_srm <- function(neurons, net, run_options) {
-  neuron_map = sapply(neurons, function(n) n$get_id())
   attach(run_options, warn.conflicts=FALSE)
-  N = length(neurons)
   
+  neuron_map = sapply(neurons, function(n) n$get_id())
+  N = length(neurons)
+  learn_neurons_ids = NULL
+  for(i in 1:N) {
+    if(neuron_map[i] %in% learn_neurons) {
+      learn_neurons_ids = c(learn_neurons_ids, i)
+    }
+  }
   if(collect_stat) {
     uum = NULL # for stat collecting
     ppm = NULL
@@ -22,7 +28,7 @@ run_srm <- function(neurons, net, run_options) {
       #cat("t: ", t, " spike of ", id, "\n")
     }
     if((mode == "learn")&&(t>0)&&(t %% learn_window_size == 0)) {
-      gr = grad(neurons, t-learn_window_size, t+learn_window_size, net) 
+      gr = grad(neurons[learn_neurons_ids], t-learn_window_size, t, net, class, target_function_gen) 
       invisible(sapply(1:N, function(i) neurons[[i]]$w <- neurons[[i]]$w + learning_rate * gr[,i] ))
       if(collect_stat) {
         gradients[,,gr_it] = gr

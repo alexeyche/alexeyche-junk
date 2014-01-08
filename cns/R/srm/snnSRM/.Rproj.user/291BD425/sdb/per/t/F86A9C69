@@ -1,0 +1,16 @@
+{
+    "contents" : "#include \"neuron.h\"\n\ndouble epsp(const double s, const List &c) {\n    if(s<0) return 0;\n    return (double)c[\"e0\"]*(exp(-s/(double)c[\"tm\"])-exp(-s/(double)c[\"ts\"]));\n}\ndouble nu(const double &s, const List &c) {\n    if(s<0) return 0;\n    if(s<(double)c[\"dr\"]) return (double)c[\"u_abs\"];\n    return (double)c[\"u_abs\"]*exp(-(s+(double)c[\"dr\"])/(double)c[\"trf\"]) + (double)c[\"u_r\"]*exp(-s/(double)c[\"trs\"]);\n}\n\n\ndouble u(const double &t, const SInput &si) {\n  double e_syn = 0;\n  for(size_t id_it=0; id_it < si.id_conn.size(); id_it++) {\n    const int &syn_sp_i = si.id_conn[id_it];\n    //printf(\"syn_sp_i = %d\\n\", syn_sp_i);\n    const NumericVector &syn_sp(si.net[syn_sp_i-1]);\n    \n    //for(size_t tti=0; tti<syn_sp.size(); tti++) printf(\"syn_sp[%d] = %f\\n\", tti, syn_sp[tti]);\n    \n    for(int sp_it= syn_sp.size()-1; sp_it>=0; sp_it--) {\n      if(t-syn_sp[sp_it] > EPSP_WORK_WINDOW) {\n        //printf(\"t-syn_sp[%d] = %f > EPSP_WORK_WINDOW\\n\", sp_it, t-syn_sp[sp_it]);\n        break;\n      }\n      //printf(\"w[%d] = %f\\n\", id_it, si.w[id_it]);\n      //printf(\"e_syn_before: %f\\n\", e_syn);\n      e_syn += si.w[id_it] * epsp(t-syn_sp[sp_it], si.c); \n      //printf(\"e_syn_after: %f\\n\", e_syn);\n    }\n  }\n  double nu_pot = 0;\n  const NumericVector &y(si.net[si.id[0]-1]);\n  for(int yi = y.size()-1; yi>=0; yi--) {\n    double s = t - y[yi];\n    //printf(\"nu s of %d = %f\\n\", yi, s);\n    if(s < 0.001) continue; //ignoring spike that occurres right now\n\n    if(s > NU_WORK_WINDOW) {\n      break;\n    }\n    nu_pot += nu(s, si.c);\n  }\n  //printf(\"nu_pot %f\\n\", nu_pot);\n  return si.get_c(\"u_rest\") + e_syn + nu_pot;\n}\n\n\n// [[Rcpp::export]]\nSEXP USRM(const NumericVector t, const List constants, const IntegerVector neuron_id, \n                  const IntegerVector neuron_id_conn, const NumericVector neuron_w, const List net) {\n  SInput si(constants, neuron_id, neuron_id_conn, neuron_w, net);\n  NumericVector u_val(t.size());\n  for(size_t ti=0; ti<t.size(); ti++) {\n    u_val[ti] = u(t[ti], si);\n  }\n  return u_val;\n}\n\n",
+    "created" : 1389014451642.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3635709150",
+    "id" : "F86A9C69",
+    "lastKnownWriteTime" : 1389023696,
+    "path" : "~/prog/alexeyche-junk/cns/R/srm/snnSRM/src/neuron.cpp",
+    "project_path" : "src/neuron.cpp",
+    "properties" : {
+    },
+    "source_on_save" : false,
+    "type" : "cpp"
+}
