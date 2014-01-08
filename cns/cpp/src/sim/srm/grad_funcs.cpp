@@ -24,6 +24,7 @@ namespace srm {
     double integrand_epsp_gl(double t, void* data) {
         TNeuronSynapseGivenY *p = (TNeuronSynapseGivenY*)data;
 //        printf("int debug(%f): p'= %f epsp= %f\n", t, p_stroke(t, p->n, p->y), grab_epsp_syn(t, p->ind_syn, p->n, p->y));
-        return p_stroke(t, p->n, p->y)*grab_epsp_syn(t, p->ind_syn, p->n, p->y);
+        TTime null;
+        return p_stroke(t, p->n, p->y)*grab_epsp_syn(t, p->ind_syn, p->n, null);
     }   
 };

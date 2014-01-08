@@ -9,9 +9,8 @@ for(i in ls()) {
     l[[m[2]]] <- i
   }
 }
-par(mfrow=c(1,2))
 sl <- sort(names(l))
-rast_bef_last <- get(l[[sl[length(sl)-1] ]])
+#rast_bef_last <- get(l[[sl[length(sl)-1] ]])
 rast_last <- get(l[[sl[length(sl)] ]])
 
 plot_rast <- function(raster, newplot=TRUE, c=1) {
@@ -43,7 +42,19 @@ plot_rastl <- function(raster, newplot=TRUE, c=1) {
     points(x,y,col=c)
   }     
 }  
-plot_rast(rast_bef_last)
-plot_rast(rast_last)
+mean_rast_norm <- function(r) {
+    m <- matrix(0, nrow=nrow(r), ncol = ncol(r))
+    for(i in 1:ncol(r)) {
+        f <- which(r[,i]>0)
+        if(length(f)>0) {
+            m[f,i] <- i
+        }
+    }
+    return(m)
+}
+#par(mfrow=c(1,2))
+#plot_rast(rast_bef_last)
+#plot_rast(rast_last)
+
 #library(gplots)
 #filled.contour(weights)

@@ -16,13 +16,12 @@ namespace srm {
         printf("llh grad neuron %d\n", n->id());
     #endif
         for(size_t wi=0; wi<grad_val.n_elem; wi++) {
-            TTime null;
-            TNeuronSynapseGivenY n_syn_y(wi, n, null); // n->y);       
+            TNeuronSynapseGivenY n_syn_y(wi, n, n->y);       
             double int_part = - gauss_legendre(GAUSS_QUAD, integrand_epsp_gl, (void*)&n_syn_y, T0, Tmax);           
                             
         #if VERBOSE >= 3
             printf(" | syn # %zu    ----          spikes: [", wi);
-            for(size_t starti=n->in[wi]->y.n_elem(T0); starti<n->in[wi]->y.n_elem(Tmax); starti++) {
+            for(size_t starti=n->in[wi]->y.n_elem(T0-0.01); starti<n->in[wi]->y.n_elem(Tmax); starti++) {
                 printf("%f, ", n->in[wi]->y[starti]);
             }
             printf("]\n");
@@ -31,20 +30,19 @@ namespace srm {
 //            if(n->in[wi]->y.n_elem(Tmax) > 0) 
 //            if(n->y[0]< n->in[wi]->y[0]) { 
 //                mat ps_ep(1000,4);
-//                vec t = linspace<vec>(T0,Tmax, 1000);
-//                TTime null;
+//                vec t = linspace<vec>(0,Tmax, 1000);
 //                for(size_t ti=0; ti<t.n_elem; ti++) {
 //                    ps_ep(ti,0) = t(ti);
-//                    ps_ep(ti,1) = p_stroke(t(ti), n, null);
-//                    ps_ep(ti,2) = grab_epsp_syn(t(ti), wi, n, null);
-//                    ps_ep(ti,3) = n->u(t(ti),null);
+//                    ps_ep(ti,1) = p_stroke(t(ti), n, n->y);
+//                    ps_ep(ti,2) = grab_epsp_syn(t(ti), wi, n, n->y);
+//                    ps_ep(ti,3) = n->u(t(ti),n->y);
 //                }
 //                Log::Info << "sending data for [" << T0 << "," << Tmax << "]\n";
 //                send_arma_mat(ps_ep,"ps_ep", -1, true);
-//                throw SrmException("QuieeeeeT\n");
+//                throw SrmException("Quit");
 //            }           
             double spike_part = 0;
-            for(size_t yi=n->y.n_elem(T0); yi<n->y.n_elem(Tmax); yi++) {
+            for(size_t yi=n->y.n_elem(T0-0.01); yi<n->y.n_elem(Tmax); yi++) {
                 double &fi = n->y[yi];
                 spike_part += (p_stroke(fi, n, n->y)/n->p(fi))*grab_epsp_syn(fi, wi, n, n->y);
             #if VERBOSE >= 3

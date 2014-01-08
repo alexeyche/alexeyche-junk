@@ -1,6 +1,3 @@
-
-
-
 #include <sim/core.h>
 #include <sim/data/save.h>
 #include <sim/data/load.h>
@@ -22,7 +19,7 @@ using namespace srm;
 PROGRAM_INFO("SRM SIM", "Spike Responce Model simulator"); 
 PARAM_INT("seed", "seed", "", time(NULL));
 PARAM_DOUBLE("rate", "learning rate", "r", 1);
-PARAM_DOUBLE("simtime", "time to simulate(ms)", "t", 1100);
+PARAM_DOUBLE("simtime", "time to simulate(ms)", "t", 0);
 PARAM_STRING("mode", "modes for srm sim: \'run\', \'train\', \'stdp\',\'stabilize\'", "m", "run");
 PARAM_INT("epoch", "Num of epochs in learning mode", "e", 1);
 PARAM_STRING("stimuli-set", "Set of stimuli from config file", "s","train_set");
@@ -72,7 +69,7 @@ int main(int argc, char** argv)
     connect(&g, &g, TConnType::AllToAll, start_w);
 
 
-    TimeSeriesGroup tsg(c.nneurons_in, 200*ms, 100); 
+    TimeSeriesGroup tsg(c.nneurons_in, 100*ms, 100); 
     if(specpattern == "") {
         std::map<std::string, TStimSet>::iterator it_ss = c.sets.ss.find(stimset);
         if(it_ss == c.sets.ss.end()) {
@@ -90,14 +87,15 @@ int main(int argc, char** argv)
             }                
             it++;
         }
-        simtime = 0;
-        for(size_t pi=0; pi<tsg.patterns.size(); pi++) {
-            simtime += tsg.patterns[pi].pattDur + tsg.refrTime;
-        }
+                    
     } else {
         tsg.loadPatternFromFile(specpattern, specpattdur*ms, 1);
     }
-
+    if(simtime == 0) {
+        for(size_t pi=0; pi<tsg.patterns.size(); pi++) {
+            simtime += tsg.patterns[pi].pattDur + tsg.refrTime;
+        }
+    }
     mat start_w_ff(tsg.size(),g.size(), fill::zeros);
     start_w_ff.fill(c.neurons_in_start_weight);
     connect(&tsg, &g, TConnType::FeedForward, start_w_ff);
@@ -144,6 +142,8 @@ int main(int argc, char** argv)
     }
     std::vector<mat> rasters;
     vec weights(g.group.size(), g.group[0]->w.size(), fill::zeros);
+    double dt = 0.5;
+    mat mean_raster(g.size(), simtime/dt, fill::zeros);
     for(size_t ep=0; ep<epoch; ep++) {
         for(size_t ni=0; ni<g.group.size(); ni++) { g.group[ni]->y.clean(); }
         bool send=false;
@@ -154,8 +154,14 @@ int main(int argc, char** argv)
         if((rt == TRunType::RunAndLearnStabilize) && ((ep % 5 != 0)||(ep == 0))) {
             rt_cur = TRunType::Run;
         }
-        s.run(simtime*ms, 0.5, rt_cur, true, send);
-            
+        s.run(simtime*ms, dt, rt_cur, true, send);
+        for(size_t si=0; si<s.raster.n_rows; si++) {
+            for(size_t fi=0; fi< s.raster.n_cols; fi++) {
+                if(s.raster(si, fi)>0) {
+                    mean_raster(si, std::floor(s.raster(si, fi))) += 1;
+                }
+            }
+        }
         if( (rt_cur == TRunType::RunAndLearnStabilize) || (rt_cur == TRunType::RunAndLearnLogLikelyhood) || (rt_cur == TRunType::RunAndLearnSTDP)) {
             Log::Info << "weight after:\n";
             for(size_t ni=0; ni<g.group.size(); ni++) {
@@ -193,5 +199,6 @@ int main(int argc, char** argv)
         data::Save(modelFName, weights);
     }        
     send_arma_mat(weights, "weights");
+    send_arma_mat(mean_raster, "mean_raster");
 }
 

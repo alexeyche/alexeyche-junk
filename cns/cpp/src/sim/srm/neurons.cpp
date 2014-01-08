@@ -75,7 +75,11 @@ namespace srm {
 
     double SrmNeuron::p(const double &t, TTime &y_given) {
         double uc = u(t, y_given);
-        return (beta/alpha)*(log(1+exp(alpha*(tresh-uc))) - alpha*(tresh-uc));           
+//        Log::Info << "//===============================\n";
+//        Log::Info << "uc: " << uc << "\n";
+        double p = (beta/alpha)*(log(1+exp(alpha*(tresh-uc))) - alpha*(tresh-uc));           
+//        Log::Info << "p: " << p << "\n";
+        return p;
     }
     double SrmNeuron::p(const double &t) {
         return p(t, y);           

@@ -67,12 +67,12 @@ namespace srm {
             for(size_t el_i=0; el_i<sim_elem.size(); el_i++) { 
                 if(sim_elem[el_i]->isNeedPreCalc()) {
                     sim_elem[el_i]->preCalculate(T0, Tmax, dt);
-//                    TimeSeriesGroup *gr = (TimeSeriesGroup*)sim_elem[el_i];
-//                    for(unsigned int i=0; i<gr->group.size(); i++) {
-//                        Log::Info << "n " << i << ":\n";
-//                        Log::Info << "size of y: " << gr->group[i]->y.size() << "; y:\n";
-//                        gr->group[i]->y.print();
-//                    }
+                    TimeSeriesGroup *gr = (TimeSeriesGroup*)sim_elem[el_i];
+                    for(unsigned int i=0; i<gr->group.size(); i++) {
+                        Log::Info << "n " << i << ":\n";
+                        Log::Info << "size of y: " << gr->group[i]->y.size() << "; y:\n";
+                        gr->group[i]->y.print();
+                    }
 //                    send_arma_mat(gr->group[9]->y, "d_stat", 9);
                 }
             }
@@ -100,7 +100,7 @@ namespace srm {
                 
             }
             int max_spikes = 0;
-            double learn_dt = 5;
+            double learn_dt = 20;
             double learn_dti = 0;
 
             std::vector<SrmNeuron*> neuron_fired; // in window
@@ -141,10 +141,10 @@ namespace srm {
                             //    yl = t(ti)-learn_dt;
                             //    Log::Info << "Spike wasn't found. Taking " << t(ti)-learn_dt << "\n";
                             //}
-                            for(size_t it=0; it<10; it++) {
+                            for(size_t it=0; it<1; it++) {
                                 TLogLikelyhood llh(n, yl-learn_dt, yl+learn_dt);
                                 vec dPdw = llh.grad();
-                                printf("iter %zu  -- ", it);
+                                //printf("iter %zu  -- ", it);
                                 for(size_t wi=0; wi<n->w.size(); wi++) {
                                     n->w[wi] += learning_rate * dPdw(wi);
                                 #if VERBOSE >= 1                                
