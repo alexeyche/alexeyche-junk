@@ -8,7 +8,8 @@ ornstein_uhlenbeck <- function(T, n, nu,lambda,sigma,x0){
   }
   return(x);
 }
-path <- "/home/alexeyche/prog/sim"
+#path <- "/home/alexeyche/prog/sim"
+path <- "/home/alexeyche/my/sim"
 gen_ou <- function() {
     set.seed(8)
     d1 <- ornstein_uhlenbeck(10,999, 0.2, 1, 0.007, 0.15)

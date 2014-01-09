@@ -1,5 +1,6 @@
 #!/usr/bin/RScript
-setwd("~/prog/alexeyche-junk/cns/R/srm/new")
+#setwd("~/prog/alexeyche-junk/cns/R/srm/new")
+setwd("~/my/git/alexeyche-junk/cns/R/srm/new")
 
 source('include.R')
 
@@ -9,7 +10,8 @@ if(!sfIsRunning()) {
 }
 
 sfExport('constants')
-dir = "/home/alexeyche/prog/sim/R"
+#dir = "/home/alexeyche/prog/sim/R"
+dir = "/home/alexeyche/my/sim/R"
 system(sprintf("find %s -name \"*.png\" -type f -exec rm -f {} \\;", dir))
 
 M = 50
@@ -17,13 +19,17 @@ N = 10
 
 gr1 = TSNeurons(M = M, patterns = list())
 
-file <- "/home/alexeyche/prog/sim/stimuli/sd1.csv"
-file2 <- "/home/alexeyche/prog/sim/stimuli/sd2.csv"
+#file <- "/home/alexeyche/prog/sim/stimuli/sd1.csv"
+#file2 <- "/home/alexeyche/prog/sim/stimuli/sd2.csv"
+file <- "/home/alexeyche/my/sim/stimuli/sd1.csv"
+file2 <- "/home/alexeyche/my/sim/stimuli/sd2.csv"
+
 gr1$loadPattern(file, 100, 1)
 gr1$loadPattern(file2, 100, 2)
 id_m = 1:M
 id_n = (M+1):(M+N)
-start_w = 7
+
+start_w = 5
 neurons = list()
 for(i in 1:N) {
   conn <- id_m
@@ -35,24 +41,18 @@ Nro = 2
 id_ro = seq(M+N+1,M+N+Nro)
 for(i in 1:Nro) {
   conn <- id_n
-  w <- c(rep(start_w, N))
+  w <- c(rep(start_w*10, N))
   neurons[[N+i]] = neuron(w = w, id_conn = conn, id = id_ro[i])
 }
 
 epochs = 50
-run_mode = "run"
-#run_mode = "learn"
-run_options = list(T0 = 0, Tmax = 100, dt = 0.5, learning_rate = 3, 
-                   learn_window_size = 20, mode=run_mode, collect_stat=TRUE, 
+#run_mode = "run"
+run_mode = "learn"
+run_options = list(T0 = 0, Tmax = 100, dt = 0.5, learning_rate = 0.5, 
+                   learn_window_size = 50, mode=run_mode, collect_stat=TRUE, 
                    learn_neurons=id_ro,
-                   target_function_gen = function(nspikes, class) {  
-                     function(nspike_id) { 
-                       if(class == nspike_id) {
-                         return(nspikes[[nspike_id]])
-                       } else {
-                         return(NULL)
-                       }
-                     } 
-                   })
+                   target_set = list(target_function_gen = class_tf, depress_null=TRUE)
+                   )
 
-run_net(neurons, gr1$patterns, epochs, run_options)
+patterns = gr1$patterns
+run_net(neurons, patterns, epochs, run_options)

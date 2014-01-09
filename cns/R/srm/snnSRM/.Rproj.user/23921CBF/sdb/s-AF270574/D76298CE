@@ -1,0 +1,16 @@
+{
+    "contents" : "\nrun_net <- function(neurons, patterns, epochs, run_options, open_plots = FALSE) {\n  lengths = sapply(patterns, function(p) p$len)\n  stopifnot(all(lengths == lengths[1]))\n  \n  M = lengths[1]\n  N = length(neurons)\n  id_m = seq(1, M)\n  id_n = seq(M+1, M+N)\n  all_n = M\n  \n  model_file = sprintf(\"%s/%dx%d_lr%3.1f_lwz_%3.1f\", dir, M, N, run_options$learning_rate, run_options$learn_window_size)\n  \n  \n  if(file.exists(paste(model_file, \".idx\", sep=\"\"))) {\n    W = loadMatrix(model_file, 1)\n    invisible(sapply(1:(N), function(id) { \n        if(!neurons[[id]]$id %in% run_options$learn_neurons)\n            neurons[[id]]$w = W[1:length(neurons[[id]]$id_conn),id] \n      } \n    ))\n  } else {\n    cat(\"Can't find file for model \", model.file, \"\\n\")\n  }\n  \n  null_pattern.N = list()\n  for(i in 1:N) {\n    null_pattern.N[[i]] <- -Inf\n  }\n  \n  net = list()\n  for(ep in 1:epochs) {\n    for(id_patt in 1:length(patterns)) {\n      net[id_m] = patterns[[id_patt]]$data\n      net[id_n] = null_pattern.N\n      run_options$class = patterns[[id_patt]]$class\n      \n      c(net, neurons, sprob, spot, mean_grad) := run_srm(neurons, net, run_options)\n      \n      cat(\"epoch: \", ep, \", pattern # \", id_patt,\"\\n\")\n          \n      \n      W = get_weights_matrix(neurons)\n      not_fired = all(sapply(net[id_n], function(sp) length(sp) == 1))\n      \n      pic_filename = sprintf(\"%s/run_ep%s_patt%s.png\", dir, ep, id_patt)\n      png(pic_filename, width=1024, height=480)\n      if(!not_fired) \n        p1 = plot_rastl(net[id_n], sprintf(\"epoch %d, pattern %d\", ep, id_patt))\n\n      p2 = levelplot(W, col.regions=colorRampPalette(c(\"black\", \"white\")))\n      p3 = levelplot(mean_grad, col.regions=colorRampPalette(c(\"black\", \"white\")))\n      \n      if(!not_fired)\n        print(p1, position=c(0, 0, 0.5, 1), more=TRUE)\n      print(p2, position=c(0.5, 0, 1, 0.5), more=TRUE)\n      print(p3, position=c(0.5, 0.5, 1, 1))\n      dev.off()\n      if(open_plots) \n        system(sprintf(\"eog -w %s 1>/dev/null 2>/dev/null\",pic_filename), ignore.stdout=TRUE, ignore.stderr=TRUE, wait=FALSE)\n      \n    }\n  }\n  W = get_weights_matrix(neurons)\n  if(run_mode == \"learn\") {\n    saveMatrixList(model_file, list(W))\n  }\n}",
+    "created" : 1389263220722.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "682371766",
+    "id" : "D76298CE",
+    "lastKnownWriteTime" : 1389286792,
+    "path" : "~/my/git/alexeyche-junk/cns/R/srm/new/learn_and_run_net.R",
+    "project_path" : null,
+    "properties" : {
+    },
+    "source_on_save" : false,
+    "type" : "r_source"
+}

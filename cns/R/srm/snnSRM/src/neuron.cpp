@@ -2,12 +2,12 @@
 
 double epsp(const double s, const List &c) {
     if(s<0) return 0;
-    return (double)c["e0"]*(exp(-s/(double)c["tm"])-exp(-s/(double)c["ts"]));
+    return as<double>(c["e0"])*(exp(-s/as<double>(c["tm"]))-exp(-s/as<double>(c["ts"])));
 }
 double nu(const double &s, const List &c) {
     if(s<0) return 0;
-    if(s<(double)c["dr"]) return (double)c["u_abs"];
-    return (double)c["u_abs"]*exp(-(s+(double)c["dr"])/(double)c["trf"]) + (double)c["u_r"]*exp(-s/(double)c["trs"]);
+    if(s<as<double>(c["dr"])) return as<double>(c["u_abs"]);
+    return as<double>(c["u_abs"])*exp(-(s+as<double>(c["dr"]))/as<double>(c["trf"])) + as<double>(c["u_r"])*exp(-s/as<double>(c["trs"]));
 }
 
 
@@ -43,7 +43,7 @@ double u(const double &t, const SInput &si) {
     }
     nu_pot += nu(s, si.c);
   }
-  //printf("nu_pot %f\n", nu_pot);
+//  printf("nu_pot %f\n", nu_pot);
   return si.get_c("u_rest") + e_syn + nu_pot;
 }
 
@@ -51,6 +51,10 @@ double u(const double &t, const SInput &si) {
 // [[Rcpp::export]]
 SEXP USRM(const NumericVector t, const List constants, const IntegerVector neuron_id, 
                   const IntegerVector neuron_id_conn, const NumericVector neuron_w, const List net) {
+  //for(List::const_iterator it=constants.begin(); it != constants.end(); ++it) {
+  //  printf("%f ",as<double>(*it));
+  //}
+  //printf("\n");
   SInput si(constants, neuron_id, neuron_id_conn, neuron_w, net);
   NumericVector u_val(t.size());
   for(size_t ti=0; ti<t.size(); ti++) {

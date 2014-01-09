@@ -10,17 +10,18 @@ double integrand(double t, void* data) {
   const SSynInput &ssyn = *(SSynInput*)data;
   return p_stroke(t, ssyn.si) * grab_epsp(t, ssyn);
 }
-
+//#define DEBUG
 #define GAUSS_QUAD 256
 // [[Rcpp::export]]
 SEXP integrateSRM(const List constants, const List int_options, const IntegerVector neuron_id, 
                   const IntegerVector neuron_id_conn, const NumericVector neuron_w, const List net) {
     
-    const double &T0 = int_options["T0"];
-    const double &Tmax = int_options["Tmax"];
+    const double &T0 = as<double>(int_options["T0"]);
+    const double &Tmax = as<double>(int_options["Tmax"]);
     SInput si(constants, neuron_id, neuron_id_conn, neuron_w, net);
+
+#ifdef DEBUG  
     IntegerVector t = seq_len(Tmax);
-#ifdef DEBUG    
     NumericMatrix out_ps(si.id_conn.size(), t.size());
     NumericMatrix out_epsp(si.id_conn.size(), t.size());
 #endif    

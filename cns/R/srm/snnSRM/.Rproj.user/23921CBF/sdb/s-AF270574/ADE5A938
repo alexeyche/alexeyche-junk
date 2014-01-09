@@ -1,0 +1,16 @@
+{
+    "contents" : "\ngrad <- function(neurons, T0, Tmax, net, class, target_set) {\n  id_n = sapply(neurons, function(n) n$id)\n  \n  nspikes = lapply(net[id_n], function(sp) { \n    left = findInterval(T0, sp)+1\n    right = findInterval(Tmax, sp, rightmost.closed=TRUE)\n    if(left<=right) sp[left:right]\n  })\n\n  nspikes = lapply(1:length(nspikes), target_set$target_function_gen(nspikes, class, T0, Tmax))\n  \n  left_part = lapply(1:length(id_n), function(number) {  \n              if(!is.null(nspikes[[number]])) {\n                u = neurons[[number]]$u(nspikes[[number]], net) \n                #cat(\"n(\", neurons[[number]]$id, \")u=\",u,\"\\n\")\n                (p_stroke(u)/g(u))\n              }\n  })\n\n  spike_part = lapply(1:length(id_n), function(id_number) {\n        sapply(neurons[[id_number]]$id_conn, function(idc) {\n          if(!is.null(nspikes[[id_number]])) {\n            sum(left_part[[id_number]]*grab_epsp(nspikes[[id_number]], net[[idc]]))\n          } else {\n            0\n          }\n      })\n  })\n  if(!target_set$depress_null) {\n    not_fired = sapply(nspikes, is.null)\n  } else {\n    not_fired = rep(FALSE, length(neurons))\n  }    \n  int_options = list(T0 = T0, Tmax=Tmax)\n  sfExport('int_options')\n  sfExport('net')\n  sfExport('not_fired')\n  sfExport('neurons')\n  \n  int_part = sfLapply(1:length(neurons), function(ni)  { \n    if(not_fired[ni] == FALSE) {\n      integrateSRM(constants, int_options, neurons[[ni]]$id, neurons[[ni]]$id_conn, neurons[[ni]]$w, net)\n    } else {\n      rep(0, length(neurons[[ni]]$w))\n    }\n  })\n\n  return(mapply(\"+\", spike_part, int_part, SIMPLIFY=FALSE))\n}\n",
+    "created" : 1389265066446.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3035062649",
+    "id" : "ADE5A938",
+    "lastKnownWriteTime" : 1389285269,
+    "path" : "~/my/git/alexeyche-junk/cns/R/srm/new/llh.R",
+    "project_path" : null,
+    "properties" : {
+    },
+    "source_on_save" : false,
+    "type" : "r_source"
+}

@@ -1,0 +1,16 @@
+{
+    "contents" : "\nrun_srm <- function(neurons, net, run_options) {\n  attach(run_options, warn.conflicts=FALSE)\n  \n  neuron_map = sapply(neurons, function(n) n$get_id())\n  N = length(neurons)\n  learn_neurons_ids = NULL\n  for(i in 1:N) {\n    if(neuron_map[i] %in% learn_neurons) {\n      learn_neurons_ids = c(learn_neurons_ids, i)\n    }\n  }\n  if(collect_stat) {\n    uum = NULL # for stat collecting\n    ppm = NULL\n    gr_it = 1\n    maxw_len = 0\n    invisible(sapply(learn_neurons_ids, function(n_id) maxw_len<<-max(maxw_len, length(neurons[[n_id]]$w))))\n    gradients = array(0, dim=c(maxw_len, length(learn_neurons_ids), Tmax %/% learn_window_size))\n  }\n  \n  T = seq(T0, Tmax, by=dt)\n  for(t in T) {\n    uu = sapply(neurons, function(n) n$u(t, net))\n    pp = g(uu)\n    fired = pp*dt>runif(N)\n    idf = neuron_map[fired]\n    if(NA %in% idf) {\n      print(neurons[[11]]$w)\n      print(neurons[[12]]$w)\n    }\n    #cat(\"pp\" = pp, \" idf=\", idf, \" uu=\", uu, \" fired=\",fired, \"\\n\", sep=\"\")\n    for(id in idf) {\n      net[[id]] <- c(net[[id]], t)\n      #cat(\"t: \", t, \" spike of \", id, \"\\n\")\n    }\n    if((mode == \"learn\")&&(t>0)&&(t %% learn_window_size == 0)) {\n      gr = grad(neurons[learn_neurons_ids], t-learn_window_size, t, net, class, target_set) \n      invisible(sapply(1:length(learn_neurons_ids), function(i) neurons[[ learn_neurons_ids[i] ]]$w <- neurons[[ learn_neurons_ids[i] ]]$w + learning_rate * gr[[i]] ))\n      if(collect_stat) {\n        gradients[,,gr_it] = sapply(gr, function(row) { c(row, rep(0, maxw_len-length(row)))} )\n        gr_it = gr_it + 1\n      }\n    }\n    if(collect_stat) {\n      ppm = rbind(ppm, pp) \n      uum = rbind(uum, uu)\n    } \n  }\n  if(collect_stat) {\n    return(list(net, neurons, ppm, uum, grad=apply(gradients, c(1,2), mean)))\n  } else {\n    return(list(net, neurons))\n  }\n}\n",
+    "created" : 1389263224618.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "850194563",
+    "id" : "633EEFC7",
+    "lastKnownWriteTime" : 1389286411,
+    "path" : "~/my/git/alexeyche-junk/cns/R/srm/new/srm.R",
+    "project_path" : null,
+    "properties" : {
+    },
+    "source_on_save" : false,
+    "type" : "r_source"
+}
