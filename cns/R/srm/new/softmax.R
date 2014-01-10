@@ -10,14 +10,16 @@ net[[3]] <- c(-Inf, 5)
 net[[4]] <- c(-Inf)
 net[[5]] <- c(-Inf, 5)
 
+grab_epsp <- function(t, x) {
+    sapply(x, function(sp) sum(epsp(t-sp)))
+}
+
 SMNeuronLayer <- setRefClass("SMNeuronLayer", fields = list(w = "list", id_conns = "list", ids = "vector"),
                                               methods = list(
                                               r = function(t, net) {
-                                                r_mat = sapply(1:length(w), function(ni) {
-                                                    w[[ni]]*sapply(net[ id_conns[[ni]] ], function(sp) sum(epsp(t-sp)))
-                                                })
-                                                ee = exp(r_mat)
-                                                ee/rowSums(ee)
+                                                r_all = mapply( "%*%", w, lapply(id_conns, function(id_conn) grab_epsp(t, net[id_conn])) )
+                                                ee = exp(r_all)
+                                                ee/sum(ee)
                                               }))
 
 
@@ -31,6 +33,7 @@ r = sapply(seq(0, 20, by=0.5), function(t) nl$r(t, net))
 # rk(t, x) = ---------------------------------
 #            sum exp( wl %*% grap_epsp(t, x) )
 #             l
+# Pk = ( 1 - exp(-rk(tf, x)) ) * exp( - int rk(t, x) dt)
 
 # log Pk(y = [tfi] | x ) = sum log( rk(tfi, x) ) -   int rk(t, x) dt  
 #                           i                      [0,T] 
