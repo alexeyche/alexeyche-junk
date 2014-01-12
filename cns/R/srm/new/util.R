@@ -30,10 +30,20 @@ plotl <- function(x) {
 
 resample <- function(x, ...) x[sample.int(length(x), ...)] 
 
-get_weights_matrix <- function(neurons) {
+get_weights_matrix_old <- function(neurons) {
   W = lapply(neurons, function(n) n$w)
   maxw_len = 0
   invisible(sapply(neurons, function(n) maxw_len<<-max(maxw_len, length(n$w))))
   W = sapply(W, function(row) { c(row, rep(0, maxw_len-length(row)))} )
+  return(W)
+}
+
+get_weights_matrix <- function(layers) {
+  maxw_len = 0
+  for(neurons in layers)
+    invisible(sapply(neurons$weights, function(w) maxw_len<<-max(maxw_len, length(w))))
+  W = NULL
+  for(n in layers)
+    W = cbind(W, sapply(n$weights, function(row) { c(row, rep(0, maxw_len-length(row)))} ))
   return(W)
 }

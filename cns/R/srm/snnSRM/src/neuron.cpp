@@ -63,3 +63,26 @@ SEXP USRM(const NumericVector t, const List constants, const IntegerVector neuro
   return u_val;
 }
 
+
+// [[Rcpp::export]]
+SEXP USRMs(const NumericVector t, const List constants, const IntegerVector neurons_id, 
+                  const List neurons_id_conn, const List neurons_w, const List net) {
+  
+  if(neurons_id.size() != neurons_id_conn.size()) {
+    printf("Error. length(w) != length(id_conn).\n");
+    return 0;
+  }
+  NumericMatrix u_all(neurons_id.size(),t.size());
+  for(size_t it = 0; it<neurons_id.size(); it++) {
+    IntegerVector id(1); 
+    id[0] = neurons_id[it];
+    IntegerVector id_conn(neurons_id_conn[it]);
+    NumericVector w(neurons_w[it]);
+    SInput si(constants, id, id_conn, w, net);
+    for(size_t ti=0; ti<t.size(); ti++) {
+      u_all(it, ti) = u(t[ti], si);
+    }
+  }
+  return u_all;
+}
+

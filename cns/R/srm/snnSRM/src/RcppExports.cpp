@@ -45,14 +45,35 @@ BEGIN_RCPP
     return __sexp_result;
 END_RCPP
 }
-// rcpp_hello_world
-List rcpp_hello_world();
-RcppExport SEXP snnSRM_rcpp_hello_world() {
+// USRMs
+SEXP USRMs(const NumericVector t, const List constants, const IntegerVector neurons_id, const List neurons_id_conn, const List neurons_w, const List net);
+RcppExport SEXP snnSRM_USRMs(SEXP tSEXP, SEXP constantsSEXP, SEXP neurons_idSEXP, SEXP neurons_id_connSEXP, SEXP neurons_wSEXP, SEXP netSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
         Rcpp::RNGScope __rngScope;
-        List __result = rcpp_hello_world();
+        Rcpp::traits::input_parameter< const NumericVector >::type t(tSEXP );
+        Rcpp::traits::input_parameter< const List >::type constants(constantsSEXP );
+        Rcpp::traits::input_parameter< const IntegerVector >::type neurons_id(neurons_idSEXP );
+        Rcpp::traits::input_parameter< const List >::type neurons_id_conn(neurons_id_connSEXP );
+        Rcpp::traits::input_parameter< const List >::type neurons_w(neurons_wSEXP );
+        Rcpp::traits::input_parameter< const List >::type net(netSEXP );
+        SEXP __result = USRMs(t, constants, neurons_id, neurons_id_conn, neurons_w, net);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}
+// timesTwo
+SEXP timesTwo(NumericVector x);
+RcppExport SEXP snnSRM_timesTwo(SEXP xSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP );
+        SEXP __result = timesTwo(x);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);

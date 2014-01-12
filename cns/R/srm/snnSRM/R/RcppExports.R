@@ -9,7 +9,11 @@ USRM <- function(t, constants, neuron_id, neuron_id_conn, neuron_w, net) {
     .Call('snnSRM_USRM', PACKAGE = 'snnSRM', t, constants, neuron_id, neuron_id_conn, neuron_w, net)
 }
 
-rcpp_hello_world <- function() {
-    .Call('snnSRM_rcpp_hello_world', PACKAGE = 'snnSRM')
+USRMs <- function(t, constants, neurons_id, neurons_id_conn, neurons_w, net) {
+    .Call('snnSRM_USRMs', PACKAGE = 'snnSRM', t, constants, neurons_id, neurons_id_conn, neurons_w, net)
+}
+
+timesTwo <- function(x) {
+    .Call('snnSRM_timesTwo', PACKAGE = 'snnSRM', x)
 }
 

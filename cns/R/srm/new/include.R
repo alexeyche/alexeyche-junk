@@ -1,5 +1,7 @@
 require(snnSRM)
 require(snowfall)
+require(cubature)
+
 source('util.R')
 source('neuron.R')
 source('gen_spikes.R')
@@ -10,3 +12,4 @@ source('srm.R')
 source('serialize_to_bin.R')
 source('learn_and_run_net.R')
 source('target_functions.R')
+source('softmax.R')

@@ -1,32 +1,37 @@
 
-run_net <- function(neurons, patterns, epochs, run_options, open_plots = FALSE) {
+run_net <- function(layers, patterns, epochs, run_options, open_plots = FALSE) {
   lengths = sapply(patterns, function(p) p$len)
   stopifnot(all(lengths == lengths[1]))
   
   M = lengths[1]
-  N = length(neurons)
+  
+  N = sum(sapply(layers, function(l) l$len))
   id_m = seq(1, M)
   id_n = seq(M+1, M+N)
+  
   all_n = M
   
-  model_file = sprintf("%s/%dx%d_lr%3.1f_lwz_%3.1f", dir, M, N, run_options$learning_rate, run_options$learn_window_size)
+  model_file = sprintf("%s/%dx%d", dir, M, N-2)
   
   
   if(file.exists(paste(model_file, ".idx", sep=""))) {
-    W = loadMatrix(model_file, 1)
-    invisible(sapply(1:(N), function(id) { 
-        if(!neurons[[id]]$id %in% run_options$learn_neurons)
-            neurons[[id]]$w = W[1:length(neurons[[id]]$id_conn),id] 
-      } 
-    ))
+    if(run_options$learn_layer_id != 1) {
+      W = loadMatrix(model_file, 1)
+      invisible(sapply(1:(N-2), function(id) { 
+          layers[[1]]$weights[[id]] = W[1:length(layers[[1]]$id_conns[[id]]),id] 
+        } 
+      ))
+    }
   } else {
-    cat("Can't find file for model ", model.file, "\n")
+    cat("Can't find file for model ", model_file, "\n")
   }
   
   null_pattern.N = list()
+  
   for(i in 1:N) {
     null_pattern.N[[i]] <- -Inf
   }
+  
   
   net = list()
   for(ep in 1:epochs) {
@@ -35,12 +40,12 @@ run_net <- function(neurons, patterns, epochs, run_options, open_plots = FALSE) 
       net[id_n] = null_pattern.N
       run_options$class = patterns[[id_patt]]$class
       
-      c(net, neurons, sprob, spot, mean_grad) := run_srm(neurons, net, run_options)
+      c(net, layers, sprob, spot, mean_grad) := run_srm(layers, net, run_options)
       
       cat("epoch: ", ep, ", pattern # ", id_patt,"\n")
           
-      
-      W = get_weights_matrix(neurons)
+      neurons = layers[[1]]
+      W = get_weights_matrix(layers)
       not_fired = all(sapply(net[id_n], function(sp) length(sp) == 1))
       
       pic_filename = sprintf("%s/run_ep%s_patt%s.png", dir, ep, id_patt)
@@ -61,7 +66,7 @@ run_net <- function(neurons, patterns, epochs, run_options, open_plots = FALSE) 
       
     }
   }
-  W = get_weights_matrix(neurons)
+  W = get_weights_matrix(layers)
   if(run_mode == "learn") {
     saveMatrixList(model_file, list(W))
   }

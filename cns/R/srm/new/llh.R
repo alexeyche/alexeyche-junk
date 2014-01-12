@@ -1,5 +1,5 @@
 
-grad <- function(neurons, T0, Tmax, net, class, target_set) {
+grad_func <- function(neurons, T0, Tmax, net, target_set) {
   id_n = sapply(neurons, function(n) n$id)
   
   nspikes = lapply(net[id_n], function(sp) { 
@@ -8,7 +8,7 @@ grad <- function(neurons, T0, Tmax, net, class, target_set) {
     if(left<=right) sp[left:right]
   })
 
-  nspikes = lapply(1:length(nspikes), target_set$target_function_gen(nspikes, class, T0, Tmax))
+  nspikes = lapply(1:length(nspikes), target_set$target_function_gen(nspikes))
   
   left_part = lapply(1:length(id_n), function(number) {  
               if(!is.null(nspikes[[number]])) {
