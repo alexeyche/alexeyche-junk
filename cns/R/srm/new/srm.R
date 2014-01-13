@@ -24,10 +24,10 @@ run_srm <- function(layers, net, run_options) {
     for(neurons in layers) {
       if (!neurons$stochastic) next
       if(i==1) {
-        uu = neurons$u(time,net)
+        uu = neurons$u(time, net)
         pp = g(uu)  
       } else {
-        pp = neurons$rate(time,net)
+        pp = neurons$rate(time, net)
         uu = NULL
       }
       
@@ -36,7 +36,7 @@ run_srm <- function(layers, net, run_options) {
       
       #cat("pp" = pp, " idf=", idf, " uu=", uu, " fired=",fired, "\n", sep="")
       for(id in idf) {
-        net[[id]] <- c(net[[id]], t)
+        net[[id]] <- c(net[[id]], time)
         #cat("t: ", t, " spike of ", id, "\n")
       }
       if(collect_stat) {
@@ -45,9 +45,9 @@ run_srm <- function(layers, net, run_options) {
       }
       i=i+1
     }
-    if((mode == "learn")&&(t>0)&&(t %% learn_window_size == 0)) {
+    if((mode == "learn")&&(time>0)&&(time %% learn_window_size == 0)) {
       target_set$class = run_options$class
-      gr = layers[[learn_layer_id]]$grad(t-learn_window_size, t, net, target_set)
+      gr = layers[[learn_layer_id]]$grad(time-learn_window_size, time, net, target_set)
       
       invisible(sapply(1:layers[[learn_layer_id]]$len, function(i) layers[[learn_layer_id]]$weights[[i]] = layers[[learn_layer_id]]$weights[[i]] + learning_rate * gr[[i]] ))
       if(collect_stat) {

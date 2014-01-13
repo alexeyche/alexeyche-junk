@@ -1,5 +1,4 @@
 #!/usr/bin/RScript
-setwd("~/prog/alexeyche-junk/cns/R/srm/new")
 
 source('srm_funcs.R')
 source('llh.R')

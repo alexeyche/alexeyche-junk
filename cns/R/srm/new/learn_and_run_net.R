@@ -11,13 +11,13 @@ run_net <- function(layers, patterns, epochs, run_options, open_plots = FALSE) {
   
   all_n = M
   
-  model_file = sprintf("%s/%dx%d", dir, M, N-2)
+  model_file = sprintf("%s/%dx%d_lr%3.1f_lws_%3.1f", dir, M, N, run_options$learning_rate, run_options$learn_window_size)
   
   
   if(file.exists(paste(model_file, ".idx", sep=""))) {
     if(run_options$learn_layer_id != 1) {
       W = loadMatrix(model_file, 1)
-      invisible(sapply(1:(N-2), function(id) { 
+      invisible(sapply(1:(N), function(id) { 
           layers[[1]]$weights[[id]] = W[1:length(layers[[1]]$id_conns[[id]]),id] 
         } 
       ))
@@ -40,7 +40,7 @@ run_net <- function(layers, patterns, epochs, run_options, open_plots = FALSE) {
       net[id_n] = null_pattern.N
       run_options$class = patterns[[id_patt]]$class
       
-      c(net, layers, sprob, spot, mean_grad) := run_srm(layers, net, run_options)
+      c(net, layers, stat, mean_grad) := run_srm(layers, net, run_options)
       
       cat("epoch: ", ep, ", pattern # ", id_patt,"\n")
           
