@@ -60,9 +60,10 @@ run_options = list(T0 = 0, Tmax = 100, dt = 0.5, learning_rate = 0.5,
                    learn_layer_id = 1
 )
 patterns = gr1$patterns
-trials = 10
+trials = 30
 net_all = list()
-u_all = p_all = NULL
+u_all = list()
+p_all = list()
 for(id_patt in 1:length(patterns)) {
   for(trial in 1:trials) {
     net = list()
@@ -72,43 +73,63 @@ for(id_patt in 1:length(patterns)) {
     
     c(net, layers, stat, mean_grad) := run_srm(layers, net, run_options)
     net = lapply(net[id_n], function(sp) sp[sp != -Inf])
-    net_all[[trial+(id_patt-1)*trials]] = net
-    u_all = rbind(u_all, cbind(stat[[1]]$u, patterns[[id_patt]]$class))
-    p_all = rbind(p_all, cbind(stat[[1]]$p, patterns[[id_patt]]$class))
+    glob_id = trial+(id_patt-1)*trials
+    net_all[[glob_id]] = list(data=net, label=patterns[[id_patt]]$class)
+    u_all[[glob_id]] = list(data=stat[[1]]$u, label=patterns[[id_patt]]$class)
+    p_all[[glob_id]] = list(data=stat[[1]]$p, label=patterns[[id_patt]]$class)
+  }
+}
+
+split_data <- function(data, ratio=0.15) {
+  N = length(data)
+  ind = sample(N)
+  spl_i = ratio*N
+  test_i = ind[1:spl_i]
+  train_i = ind[(spl_i+1):N]
+  return(list(data[train_i], data[test_i]))
+}
+
+c(train, test) := split_data(u_all, ratio=0.1)
+c(train, test) := split_data(net_all, ratio=0.1)
+
+binKernel <- function(net_data, T0, Tmax, binSize=10) {
+  maxl = max(sapply(net_data, length))
+  breaks = seq(T0, Tmax, by=10)
+  lb = length(breaks)
+  for(i in 1:maxl) {
+    it_sp = sapply(net_data, function(sp) if(length(sp)>=i) sp[i] else NA)
   }
 }
 # val "pot"
-source_data = "pot" # prob, spike
+#source_data = "pot" # prob, spike
 #source_data = "prob"
 
-m = nrow(p_all)
-if(source_data == "prob") {  
-  pw = p_all[sample(m),]
-  #x = 1-exp(-pw[,1:10])
-  x = pw[,1:10]
-  y = pw[,11]
-} else 
-  if(source_data == "pot") {
-    uw = u_all[sample(m),]
-    y = uw[,11]    
-    x = normalizeData(uw[,1:10], "0_1")
-}
+#m = nrow(p_all)
+#if(source_data == "prob") {  
+#  pw = p_all[sample(m),]
+#  #x = 1-exp(-pw[,1:10])
+#  x = pw[,1:10]
+#  y = pw[,11]
+#} else 
+#  if(source_data == "pot") {
+#    uw = u_all[sample(m),]
+#    y = uw[,11]    
+#    x = normalizeData(uw[,1:10], "0_1")
+#}
+
+#y <- decodeClassLabels(y)
+#set <- splitForTrainingAndTest(x, y, ratio=0.15)
 
 
-
-y <- decodeClassLabels(y)
-set <- splitForTrainingAndTest(x, y, ratio=0.15)
-
-
-mod = rbfDDA(set$inputsTrain, set$targetsTrain)
+#mod = rbfDDA(set$inputsTrain, set$targetsTrain)
 #mod_rbf = rbf(set$inputsTrain, set$targetsTrain, size=10, maxit=100, initFuncParams=c(-4,4, 0, 0.02, 0.04))
 #mod = mlp(set$inputsTrain, set$targetsTrain, size=5, maxit=500)
-plotIterativeError(mod)
-filled.contour(weightMatrix(mod))
-predictions = predict(mod, set$inputsTest)
-plotRegressionError(predictions[,2], set$targetsTest[,2])
-confusionMatrix(set$targetsTrain,fitted.values(mod))
-confusionMatrix(set$targetsTest,predictions)
+#plotIterativeError(mod)
+#filled.contour(weightMatrix(mod))
+#predictions = predict(mod, set$inputsTest)
+#plotRegressionError(predictions[,2], set$targetsTest[,2])
+#confusionMatrix(set$targetsTrain,fitted.values(mod))
+#confusionMatrix(set$targetsTest,predictions)
 
-plotROC(fitted.values(mod)[,2], set$targetsTrain[,2])
-plotROC(predictions[,2], set$targetsTest[,2])
+#plotROC(fitted.values(mod)[,2], set$targetsTrain[,2])
+#plotROC(predictions[,2], set$targetsTest[,2])
