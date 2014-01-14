@@ -11,7 +11,7 @@ if(!sfIsRunning()) {
 
 sfExport('constants')
 #dir = "/home/alexeyche/prog/sim/R"
-dir = "/home/alexeyche/my/sim/R"
+dir = "/home/alexeyche/my/sim"
 system(sprintf("find %s -name \"*.png\" -type f -exec rm -f {} \\;", dir))
 
 M = 50
