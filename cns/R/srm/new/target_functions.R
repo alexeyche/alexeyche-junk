@@ -28,5 +28,8 @@ random_3spikes_tf <- function(nspikes) {
 }
 
 full_spike_tf <- function(nspikes) { 
-  function(nspike_id) nspikes[[nspike_id]]
+  function(nspike_id)  {
+    if(length(nspikes[[nspike_id]]) == 0) return(NULL)
+    return(nspikes[[nspike_id]])
+  }
 }

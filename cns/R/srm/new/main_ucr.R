@@ -13,7 +13,7 @@ source('target_functions.R')
 source('learn_and_run_net.R')
 source('srm.R')
 source('grad_funcs.R')
-
+ID_MAX=0
 require(snowfall)
 if(!sfIsRunning()) {
   sfInit(parallel=TRUE, cpus=10)
@@ -71,4 +71,4 @@ if(file.exists(paste(model_file, ".idx", sep=""))) {
 patterns = gr1$patterns
 layers = list(neurons)
 
-run_net(layers, patterns, run_options)
+#run_net(layers, patterns, run_options)

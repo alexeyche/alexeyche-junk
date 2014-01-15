@@ -48,9 +48,9 @@ TSNeurons <- setRefClass("TSNeurons", fields = list(M = "vector", patterns = "li
                                       patt$data <- gen_spikes
                                       patterns[[l+1]] <<- patt                          
                                     },
-                                    loadPatternFromFile = function(file, pattDur, class, hb=NULL, lb=NULL) {
+                                    loadPatternFromFile = function(file, pattDur, class, simdt, lambda=4, hb=NULL, lb=NULL) {
                                       rawdata <- c(read.table(file, sep=",")[,1])
-                                      .self$loadPattern(rawdata,pattDur, class, hb, lb)
+                                      .self$loadPattern(rawdata,pattDur, class, simdt, lambda, hb, lb)
                                     },
                                     loadPatterns = function(dataset, pattDur, simdt, lambda=4) {
                                       dmin = max(sapply(dataset, function(x) max(x$data)))
