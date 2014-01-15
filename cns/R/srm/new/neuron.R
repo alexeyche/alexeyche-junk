@@ -21,13 +21,27 @@ neuron = setRefClass("neuron", fields = list(w = "vector", id_conn = "vector", i
 
 
 SRMLayer = setRefClass("SRMLayer", fields = list(weights = "list", id_conns = "list", ids = "vector", len="vector", stochastic="logical"),
-                     methods = list(
-                       initialize = function(weights, id_conns, ids) {
-                         len <<- length(ids)
-                         stochastic <<- TRUE
+                     methods = list(                       
+                       initialize = function(N, start_weight) {
+                         ids <<- get_unique_ids(N)
+                         weights <<- list()
+                         id_conns <<- list()                         
+                         for(i in 1:N) {                           
+                           conn <- ids[ ids != ids[i] ] # id of srm neurons: no self connections
+                           w <- rep(start_w, N-1)
+                           id_conns[[i]] <<- conn
+                           weights[[i]] <<- w                           
+                         }                         
+                         len <<- N
+                         #stochastic <<- TRUE
                          weights <<- weights
-                         id_conns <<- id_conns
-                         ids <<-ids
+                         #id_conns <<- id_conns                         
+                       },
+                       connectFF = function(ids_to_connect, weight) {
+                         for(ni in 1:N) {
+                           id_conns[[ni]] <<- c(id_conns[[ni]], ids_to_connect)
+                           weights[[ni]] <<- c(weights[[ni]], rep(weight, length(ids_to_connect)))
+                         }
                        },
                        u = function(t, net) {
                          USRMs(t, constants, ids, id_conns, weights, net)

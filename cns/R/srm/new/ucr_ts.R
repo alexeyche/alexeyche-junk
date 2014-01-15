@@ -1,5 +1,4 @@
-setwd("~/my/git/alexeyche-junk/cns/R/srm/new")
-source('util.R')
+
 
 read_ts_file <- function(ts_name) {
   process_datamatrix <- function(m) {
@@ -54,12 +53,15 @@ eucl_dist_alg <- function(train, unknown_object) {
   return(class)
 }
 
+test = function() {
+
+  name = synth
+  c(train, test) := read_ts_file(name)
+
+  ucr_test(train, test, eucl_dist_alg)
+}
+
 synth = "synthetic_control"
 ecg = "ECG200"
 face = "FaceAll"
-
-name = face
-c(train, test) := read_ts_file(name)
-
-ucr_test(train, test, eucl_dist_alg)
 
