@@ -12,6 +12,14 @@ source('neuron.R')
 source('target_functions.R')
 source('learn_and_run_net.R')
 source('srm.R')
+source('grad_funcs.R')
+
+require(snowfall)
+if(!sfIsRunning()) {
+  sfInit(parallel=TRUE, cpus=10)
+  res = sfClusterEval(require('snnSRM'))
+}
+sfExport('constants')
 
 data = synth # synthetic control
 if(!exists('train_dataset')) {
@@ -22,24 +30,29 @@ if(!exists('train_dataset')) {
 duration = 300
 
 N = 10
-start_w = 1.5
+start_w = 3.0
 M = 20
 dt = 0.5
 if(!exists('gr1')) {
   gr1 = TSNeurons(M = M)
   gr1$loadPatterns(train_dataset, duration, dt, lambda=4)
+  patt_len = length(gr1$patterns)
+  gr1$patterns = gr1$patterns[sample(patt_len)]
 }
 #plot_rastl(gr1$patterns[[3]]$data)
 
-neurons = SRMLayer(N, start_w/4)
+neurons = SRMLayer(N, start_w/2)
 neurons$connectFF(gr1$ids, start_w)
 
-run_options = list(T0 = 0, Tmax = duration, dt = dt, learning_rate = 0.5, epochs = 100,
-                   learn_window_size = duration, mode="run", collect_stat=TRUE, 
-                   target_set = list(target_function_gen = random_2spikes_tf, depress_null=FALSE),
+runmode="learn"
+#runmode="run"
+run_options = list(T0 = 0, Tmax = duration, dt = dt, learning_rate = 0.05, epochs = 10,
+                   learn_window_size = 100, mode=runmode, collect_stat=TRUE, 
+                   target_set = list(target_function_gen = random_3spikes_tf, depress_null=FALSE),
                    learn_layer_id = 1
 )
-
+ro = run_options # for debug
+id_patt = 1
 
 #model_file = sprintf("%s/%s_%dx%d_lr%3.1f_lws_%3.1f", dir, data, M, N, run_options$learning_rate, run_options$learn_window_size)
 

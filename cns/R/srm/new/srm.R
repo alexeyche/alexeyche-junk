@@ -3,13 +3,13 @@ run_srm <- function(layers, net, ro) {
   
   N = layers[[1]]$len
   
-  if(collect_stat) {
+  if(ro$collect_stat) {
     uum = NULL # for stat collecting
     ppm = NULL
     gr_it = 1
     maxw_len = 0
     invisible(sapply(1:layers[[ro$learn_layer_id]]$len, function(n_id) maxw_len<<-max(maxw_len, length(layers[[ro$learn_layer_id]]$weights[[n_id]]))))
-    gradients = array(0, dim=c(maxw_len, layers[[ro$learn_layer_id]]$len, Tmax %/% ro$learn_window_size))
+    gradients = array(0, dim=c(maxw_len, layers[[ro$learn_layer_id]]$len, ro$Tmax %/% ro$learn_window_size))
   }
   stat = list()
   for(i in 1:length(layers)) {
@@ -30,19 +30,19 @@ run_srm <- function(layers, net, ro) {
       #cat("pp" = pp, " idf=", idf, " uu=", uu, " fired=",fired, "\n", sep="")
       for(id in idf) {
         net[[id]] <- c(net[[id]], time)
-        #cat("t: ", t, " spike of ", id, "\n")
+        #cat("t: ", time, " spike of ", id, "\n")
       }
-      if(collect_stat) {
+      if(ro$collect_stat) {
         stat[[i]]$p = rbind(stat[[i]]$p, pp) 
         stat[[i]]$u = rbind(stat[[i]]$u, c(uu))
       }
       i=i+1
     }
-    if((mode == "learn")&&(time>0)&&(time %% learn_window_size == 0)) {      
+    if((ro$mode == "learn")&&(time>0)&&(time %% ro$learn_window_size == 0)) {      
       gr = layers[[ro$learn_layer_id]]$grad(time-ro$learn_window_size, time, net, ro$target_set)
       
       invisible(sapply(1:layers[[ro$learn_layer_id]]$len, function(i) layers[[ro$learn_layer_id]]$weights[[i]] = layers[[ro$learn_layer_id]]$weights[[i]] + ro$learning_rate * gr[[i]] ))
-      if(collect_stat) {
+      if(ro$collect_stat) {
         gradients[,,gr_it] = sapply(gr, function(row) { c(row, rep(0, maxw_len-length(row)))} )
         gr_it = gr_it + 1
       }
@@ -51,7 +51,7 @@ run_srm <- function(layers, net, ro) {
      
   }
   
-  if(collect_stat) {
+  if(ro$collect_stat) {
     return(list(net, layers, stat, grad=apply(gradients, c(1,2), mean)))
   } else {
     return(list(net, layers))

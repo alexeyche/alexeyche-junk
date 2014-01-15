@@ -18,6 +18,10 @@ run_net <- function(layers, patterns, run_options, open_plots = FALSE, model_des
   }
   
   net = list()
+  net[id_m] = patterns[[1]]$data
+  net[id_n] = null_pattern.N
+  run_options$target_set$class = patterns[[id_patt]]$class
+  
   for(ep in 1:run_options$epochs) {
     for(id_patt in 1:length(patterns)) {
       net[id_m] = patterns[[id_patt]]$data

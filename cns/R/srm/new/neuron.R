@@ -44,7 +44,7 @@ SRMLayer = setRefClass("SRMLayer", fields = list(weights = "list", id_conns = "l
                          }
                        },
                        u = function(time, net) {
-                         USRMs(time, constants, ids, id_conns, weights, net)
+                         USRMs(time, constants, .self$ids, .self$id_conns, .self$weights, net)
                          #e_syn= sapply(net[id_conn], function(sp) sum(epsp(t-sp)))
                          #u_rest + sum(w*e_syn) + sum(nu(t-net[[id]]))
                        },

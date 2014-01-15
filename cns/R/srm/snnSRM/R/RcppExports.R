@@ -13,7 +13,3 @@ USRMs <- function(t, constants, neurons_id, neurons_id_conn, neurons_w, net) {
     .Call('snnSRM_USRMs', PACKAGE = 'snnSRM', t, constants, neurons_id, neurons_id_conn, neurons_w, net)
 }
 
-timesTwo <- function(x) {
-    .Call('snnSRM_timesTwo', PACKAGE = 'snnSRM', x)
-}
-
