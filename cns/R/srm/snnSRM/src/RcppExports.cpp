@@ -65,18 +65,3 @@ BEGIN_RCPP
     return __sexp_result;
 END_RCPP
 }
-// timesTwo
-SEXP timesTwo(NumericVector x);
-RcppExport SEXP snnSRM_timesTwo(SEXP xSEXP) {
-BEGIN_RCPP
-    SEXP __sexp_result;
-    {
-        Rcpp::RNGScope __rngScope;
-        Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP );
-        SEXP __result = timesTwo(x);
-        PROTECT(__sexp_result = Rcpp::wrap(__result));
-    }
-    UNPROTECT(1);
-    return __sexp_result;
-END_RCPP
-}
