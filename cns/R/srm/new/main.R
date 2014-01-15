@@ -24,7 +24,7 @@ gr1 = TSNeurons(M = M, patterns = list())
 file <- "/home/alexeyche/my/sim/stimuli/sd1.csv"
 file2 <- "/home/alexeyche/my/sim/stimuli/sd2.csv"
 
-gr1$loadPattern(file, 100, 1)
+gr1$loadPatternFromFile(file, 100, 1)
 gr1$loadPattern(file2, 100, 2)
 id_m = 1:M
 id_n = (M+1):(M+N)

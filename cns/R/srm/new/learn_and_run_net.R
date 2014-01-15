@@ -1,6 +1,6 @@
 
-run_net <- function(layers, patterns, epochs, run_options, open_plots = FALSE) {
-  lengths = sapply(patterns, function(p) p$len)
+run_net <- function(layers, patterns, run_options, open_plots = FALSE, model_descr=NULL) {
+  lengths = sapply(patterns, function(p) length(p$data))
   stopifnot(all(lengths == lengths[1]))
   
   M = lengths[1]
@@ -11,34 +11,18 @@ run_net <- function(layers, patterns, epochs, run_options, open_plots = FALSE) {
   
   all_n = M
   
-  model_file = sprintf("%s/%dx%d_lr%3.1f_lws_%3.1f", dir, M, N, run_options$learning_rate, run_options$learn_window_size)
-  
-  
-  if(file.exists(paste(model_file, ".idx", sep=""))) {
-    if(run_options$learn_layer_id != 1) {
-      W = loadMatrix(model_file, 1)
-      invisible(sapply(1:(N), function(id) { 
-          layers[[1]]$weights[[id]] = W[1:length(layers[[1]]$id_conns[[id]]),id] 
-        } 
-      ))
-    }
-  } else {
-    cat("Can't find file for model ", model_file, "\n")
-  }
-  
   null_pattern.N = list()
   
   for(i in 1:N) {
     null_pattern.N[[i]] <- -Inf
   }
   
-  
   net = list()
-  for(ep in 1:epochs) {
+  for(ep in 1:run_options$epochs) {
     for(id_patt in 1:length(patterns)) {
       net[id_m] = patterns[[id_patt]]$data
       net[id_n] = null_pattern.N
-      run_options$class = patterns[[id_patt]]$class
+      run_options$target_set$class = patterns[[id_patt]]$class
       
       c(net, layers, stat, mean_grad) := run_srm(layers, net, run_options)
       

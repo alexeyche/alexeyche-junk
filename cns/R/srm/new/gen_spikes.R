@@ -1,5 +1,7 @@
 #!/usr/bin/RScript
 
+require(zoo)
+
 TSNeurons <- setRefClass("TSNeurons", fields = list(M = "vector", patterns = "list", ids="vector"), 
                                     methods = list(
                                     initialize = function(M) {
@@ -42,18 +44,19 @@ TSNeurons <- setRefClass("TSNeurons", fields = list(M = "vector", patterns = "li
                                         neurons_rate[neurons_rate < 0] = 0
                                         t = t + simdt
                                       }
+                                      gen_spikes[sapply(gen_spikes, is.null)] = -Inf
                                       patt$data <- gen_spikes
-                                      patterns[[l+1]] <<- patt                                  
+                                      patterns[[l+1]] <<- patt                          
                                     },
                                     loadPatternFromFile = function(file, pattDur, class, hb=NULL, lb=NULL) {
-                                      rawdata <- c(read.table(file, sep=","))
+                                      rawdata <- c(read.table(file, sep=",")[,1])
                                       .self$loadPattern(rawdata,pattDur, class, hb, lb)
                                     },
                                     loadPatterns = function(dataset, pattDur, simdt, lambda=4) {
                                       dmin = max(sapply(dataset, function(x) max(x$data)))
                                       dmax = min(sapply(dataset, function(x) min(x$data)))
                                       for(d in dataset) {
-                                        .self$loadPattern(d$data, pattDur, d$label, simdt, labmda, dmax, dmin)
+                                        .self$loadPattern(d$data, pattDur, d$label, simdt, lambda, dmax, dmin)
                                       }
                                     },
                                     preCalculate = function(T0, Tmax, dt) {

@@ -1,6 +1,5 @@
 
-run_srm <- function(layers, net, run_options) {
-  attach(run_options, warn.conflicts=FALSE)
+run_srm <- function(layers, net, ro) {  
   
   N = layers[[1]]$len
   
@@ -9,8 +8,8 @@ run_srm <- function(layers, net, run_options) {
     ppm = NULL
     gr_it = 1
     maxw_len = 0
-    invisible(sapply(1:layers[[learn_layer_id]]$len, function(n_id) maxw_len<<-max(maxw_len, length(layers[[learn_layer_id]]$weights[[n_id]]))))
-    gradients = array(0, dim=c(maxw_len, layers[[learn_layer_id]]$len, Tmax %/% learn_window_size))
+    invisible(sapply(1:layers[[ro$learn_layer_id]]$len, function(n_id) maxw_len<<-max(maxw_len, length(layers[[ro$learn_layer_id]]$weights[[n_id]]))))
+    gradients = array(0, dim=c(maxw_len, layers[[ro$learn_layer_id]]$len, Tmax %/% ro$learn_window_size))
   }
   stat = list()
   for(i in 1:length(layers)) {
@@ -18,20 +17,14 @@ run_srm <- function(layers, net, run_options) {
     stat[[i]]$p = NULL
     stat[[i]]$u = NULL
   }
-  T = seq(T0, Tmax, by=dt)
+  T = seq(ro$T0, ro$Tmax, by=ro$dt)
   for(time in T) {
-    i = 1
-    for(neurons in layers) {
-      if (!neurons$stochastic) next
-      if(i==1) {
-        uu = neurons$u(time, net)
-        pp = g(uu)  
-      } else {
-        pp = neurons$rate(time, net)
-        uu = NULL
-      }
+    i=1
+    for(neurons in layers) {      
+      uu = neurons$u(time, net)
+      pp = g(uu)  
       
-      fired = pp*dt>runif(neurons$len)
+      fired = pp*ro$dt>runif(neurons$len)
       idf = neurons$ids[fired]
       
       #cat("pp" = pp, " idf=", idf, " uu=", uu, " fired=",fired, "\n", sep="")
@@ -45,11 +38,10 @@ run_srm <- function(layers, net, run_options) {
       }
       i=i+1
     }
-    if((mode == "learn")&&(time>0)&&(time %% learn_window_size == 0)) {
-      target_set$class = run_options$class
-      gr = layers[[learn_layer_id]]$grad(time-learn_window_size, time, net, target_set)
+    if((mode == "learn")&&(time>0)&&(time %% learn_window_size == 0)) {      
+      gr = layers[[ro$learn_layer_id]]$grad(time-ro$learn_window_size, time, net, ro$target_set)
       
-      invisible(sapply(1:layers[[learn_layer_id]]$len, function(i) layers[[learn_layer_id]]$weights[[i]] = layers[[learn_layer_id]]$weights[[i]] + learning_rate * gr[[i]] ))
+      invisible(sapply(1:layers[[ro$learn_layer_id]]$len, function(i) layers[[ro$learn_layer_id]]$weights[[i]] = layers[[ro$learn_layer_id]]$weights[[i]] + ro$learning_rate * gr[[i]] ))
       if(collect_stat) {
         gradients[,,gr_it] = sapply(gr, function(row) { c(row, rep(0, maxw_len-length(row)))} )
         gr_it = gr_it + 1
