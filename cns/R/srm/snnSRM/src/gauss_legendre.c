@@ -295,6 +295,7 @@ double gauss_legendre(int n, double (*f)(double,void*), void* data, double a, do
 }
 
 
+
 /* 2D Numerical computation of int(f(x,y),x=a..b,y=c..d) by Gauss-Legendre n-th order high precision quadrature 
 		[in]n     - quadrature order
 		[in]f     - integrand
@@ -537,3 +538,7 @@ void gauss_legendre_tbl(int n, double* x, double* w, double eps)
 
 	return;
 }
+
+
+
+

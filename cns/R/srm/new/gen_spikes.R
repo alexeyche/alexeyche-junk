@@ -9,6 +9,9 @@ TSNeurons <- setRefClass("TSNeurons", fields = list(M = "vector", patterns = "li
                                       patterns <<- list()
                                       M <<- M
                                     },
+                                    len = function() {
+                                      return(.self$M)
+                                    },
                                     loadPattern = function(rawdata, pattDur, label, simdt, lambda=4, hb=NULL, lb=NULL) {
                                       l <- length(patterns)
                                       

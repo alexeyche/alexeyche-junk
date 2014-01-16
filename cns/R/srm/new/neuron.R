@@ -58,7 +58,7 @@ SRMLayer = setRefClass("SRMLayer", fields = list(weights = "list", id_conns = "l
                          return(list(w=weights[[id]],id_conn=id_conns[[id]],id=ids[[id]]))
                        },
                        grad = function(T0, Tmax, net, target_set) {
-                         return(grad_func(.self$to_list(), T0, Tmax, net, target_set))
+                         return(grad_func(.self, T0, Tmax, net, target_set))
                        }, 
                        to_list = function() {
                          neurons = list()

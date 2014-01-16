@@ -1,45 +1,37 @@
 
-run_net <- function(layers, patterns, run_options, open_plots = FALSE, model_descr=NULL) {
+run_net <- function(layers, run_options, open_plots = FALSE, model_descr=NULL) {
+  input_neurons = layers[[1]]
+  net_neurons = layers[2:length(layers)]
+  patterns = input_neurons$patterns
   lengths = sapply(patterns, function(p) length(p$data))
   stopifnot(all(lengths == lengths[1]))
   
-  M = lengths[1]
-  
-  N = sum(sapply(layers, function(l) l$len))
-  id_m = seq(1, M)
-  id_n = seq(M+1, M+N)
-  
-  all_n = M
-  
-  null_pattern.N = list()
-  
-  for(i in 1:N) {
-    null_pattern.N[[i]] <- -Inf
-  }
+  id_m = input_neurons$ids
+  id_n = c(sapply(layers[2:length(layers)], function(n) n$ids))  
   
   net = list()
   net[id_m] = patterns[[1]]$data
-  net[id_n] = null_pattern.N
+  net[id_n] = -Inf
   run_options$target_set$class = patterns[[id_patt]]$class
   
   for(ep in 1:run_options$epochs) {
     for(id_patt in 1:length(patterns)) {
       net[id_m] = patterns[[id_patt]]$data
-      net[id_n] = null_pattern.N
+      net[id_n] = -Inf
       run_options$target_set$class = patterns[[id_patt]]$class
       
-      c(net, layers, stat, mean_grad) := run_srm(layers, net, run_options)
+      c(net, net_neurons, stat, mean_grad) := run_srm(net_neurons, net, run_options)
       
       cat("epoch: ", ep, ", pattern # ", id_patt,"\n")
           
-      neurons = layers[[1]]
-      W = get_weights_matrix(layers)
+      neurons = net_neurons[[1]]
+      W = get_weights_matrix(net_neurons)
       not_fired = all(sapply(net[id_n], function(sp) length(sp) == 1))
       
-      pic_filename = sprintf("%s/run_ep%s_patt%s.png", dir, ep, id_patt)
+      pic_filename = sprintf("%s/R/run_ep%s_patt%s_label%s.png", dir, ep, id_patt, patterns[[id_patt]]$label)
       png(pic_filename, width=1024, height=480)
       if(!not_fired) 
-        p1 = plot_rastl(net[id_n], sprintf("epoch %d, pattern %d", ep, id_patt))
+        p1 = plot_rastl(net[id_n], sprintf("epoch %d, pattern %d, class %d", ep, id_patt, patterns[[id_patt]]$label))
 
       p2 = levelplot(W, col.regions=colorRampPalette(c("black", "white")))
       p3 = levelplot(mean_grad, col.regions=colorRampPalette(c("black", "white")))
@@ -54,8 +46,5 @@ run_net <- function(layers, patterns, run_options, open_plots = FALSE, model_des
       
     }
   }
-  W = get_weights_matrix(layers)
-  if(run_mode == "learn") {
-    saveMatrixList(model_file, list(W))
-  }
+
 }

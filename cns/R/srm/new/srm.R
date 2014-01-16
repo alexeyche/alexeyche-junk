@@ -1,18 +1,18 @@
 
-run_srm <- function(layers, net, ro) {  
+run_srm <- function(net_neurons, net, ro) {  
   
-  N = layers[[1]]$len
+  N = net_neurons[[1]]$len
   
   if(ro$collect_stat) {
     uum = NULL # for stat collecting
     ppm = NULL
     gr_it = 1
     maxw_len = 0
-    invisible(sapply(1:layers[[ro$learn_layer_id]]$len, function(n_id) maxw_len<<-max(maxw_len, length(layers[[ro$learn_layer_id]]$weights[[n_id]]))))
-    gradients = array(0, dim=c(maxw_len, layers[[ro$learn_layer_id]]$len, ro$Tmax %/% ro$learn_window_size))
+    invisible(sapply(1:net_neurons[[ro$learn_layer_id]]$len, function(n_id) maxw_len<<-max(maxw_len, length(net_neurons[[ro$learn_layer_id]]$weights[[n_id]]))))
+    gradients = array(0, dim=c(maxw_len, net_neurons[[ro$learn_layer_id]]$len, ro$Tmax %/% ro$learn_window_size))
   }
   stat = list()
-  for(i in 1:length(layers)) {
+  for(i in 1:length(net_neurons)) {
     stat[[i]] = list()
     stat[[i]]$p = NULL
     stat[[i]]$u = NULL
@@ -20,7 +20,7 @@ run_srm <- function(layers, net, ro) {
   T = seq(ro$T0, ro$Tmax, by=ro$dt)
   for(time in T) {
     i=1
-    for(neurons in layers) {      
+    for(neurons in net_neurons) {      
       uu = neurons$u(time, net)
       pp = g(uu)  
       
@@ -39,9 +39,9 @@ run_srm <- function(layers, net, ro) {
       i=i+1
     }
     if((ro$mode == "learn")&&(time>0)&&(time %% ro$learn_window_size == 0)) {      
-      gr = layers[[ro$learn_layer_id]]$grad(time-ro$learn_window_size, time, net, ro$target_set)
+      gr = net_neurons[[ro$learn_layer_id]]$grad(time-ro$learn_window_size, time, net, ro$target_set)
       
-      invisible(sapply(1:layers[[ro$learn_layer_id]]$len, function(i) layers[[ro$learn_layer_id]]$weights[[i]] = layers[[ro$learn_layer_id]]$weights[[i]] + ro$learning_rate * gr[[i]] ))
+      invisible(sapply(1:net_neurons[[ro$learn_layer_id]]$len, function(i) net_neurons[[ro$learn_layer_id]]$weights[[i]] = net_neurons[[ro$learn_layer_id]]$weights[[i]] + ro$learning_rate * gr[[i]] ))
       if(ro$collect_stat) {
         gradients[,,gr_it] = sapply(gr, function(row) { c(row, rep(0, maxw_len-length(row)))} )
         gr_it = gr_it + 1
@@ -52,8 +52,8 @@ run_srm <- function(layers, net, ro) {
   }
   
   if(ro$collect_stat) {
-    return(list(net, layers, stat, grad=apply(gradients, c(1,2), mean)))
+    return(list(net, net_neurons, stat, grad=apply(gradients, c(1,2), mean)))
   } else {
-    return(list(net, layers))
+    return(list(net, net_neurons))
   }
 }
