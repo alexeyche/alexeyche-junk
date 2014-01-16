@@ -25,6 +25,26 @@ BEGIN_RCPP
     return __sexp_result;
 END_RCPP
 }
+// integrateSRM_vec
+SEXP integrateSRM_vec(const List constants, const List int_options, const IntegerVector neurons_id, const List neurons_id_conn, const List neurons_w, const List net);
+RcppExport SEXP snnSRM_integrateSRM_vec(SEXP constantsSEXP, SEXP int_optionsSEXP, SEXP neurons_idSEXP, SEXP neurons_id_connSEXP, SEXP neurons_wSEXP, SEXP netSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< const List >::type constants(constantsSEXP );
+        Rcpp::traits::input_parameter< const List >::type int_options(int_optionsSEXP );
+        Rcpp::traits::input_parameter< const IntegerVector >::type neurons_id(neurons_idSEXP );
+        Rcpp::traits::input_parameter< const List >::type neurons_id_conn(neurons_id_connSEXP );
+        Rcpp::traits::input_parameter< const List >::type neurons_w(neurons_wSEXP );
+        Rcpp::traits::input_parameter< const List >::type net(netSEXP );
+        SEXP __result = integrateSRM_vec(constants, int_options, neurons_id, neurons_id_conn, neurons_w, net);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}
 // USRM
 SEXP USRM(const NumericVector t, const List constants, const IntegerVector neuron_id, const IntegerVector neuron_id_conn, const NumericVector neuron_w, const List net);
 RcppExport SEXP snnSRM_USRM(SEXP tSEXP, SEXP constantsSEXP, SEXP neuron_idSEXP, SEXP neuron_id_connSEXP, SEXP neuron_wSEXP, SEXP netSEXP) {
@@ -59,6 +79,21 @@ BEGIN_RCPP
         Rcpp::traits::input_parameter< const List >::type neurons_w(neurons_wSEXP );
         Rcpp::traits::input_parameter< const List >::type net(netSEXP );
         SEXP __result = USRMs(t, constants, neurons_id, neurons_id_conn, neurons_w, net);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}
+// timesTwo
+SEXP timesTwo(NumericVector x);
+RcppExport SEXP snnSRM_timesTwo(SEXP xSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP );
+        SEXP __result = timesTwo(x);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);

@@ -5,11 +5,19 @@ integrateSRM <- function(constants, int_options, neuron_id, neuron_id_conn, neur
     .Call('snnSRM_integrateSRM', PACKAGE = 'snnSRM', constants, int_options, neuron_id, neuron_id_conn, neuron_w, net)
 }
 
+integrateSRM_vec <- function(constants, int_options, neurons_id, neurons_id_conn, neurons_w, net) {
+    .Call('snnSRM_integrateSRM_vec', PACKAGE = 'snnSRM', constants, int_options, neurons_id, neurons_id_conn, neurons_w, net)
+}
+
 USRM <- function(t, constants, neuron_id, neuron_id_conn, neuron_w, net) {
     .Call('snnSRM_USRM', PACKAGE = 'snnSRM', t, constants, neuron_id, neuron_id_conn, neuron_w, net)
 }
 
 USRMs <- function(t, constants, neurons_id, neurons_id_conn, neurons_w, net) {
     .Call('snnSRM_USRMs', PACKAGE = 'snnSRM', t, constants, neurons_id, neurons_id_conn, neurons_w, net)
+}
+
+timesTwo <- function(x) {
+    .Call('snnSRM_timesTwo', PACKAGE = 'snnSRM', x)
 }
 

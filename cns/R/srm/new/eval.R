@@ -1,42 +1,43 @@
-setwd("~/my/git/alexeyche-junk/cns/R/srm/new")
+#setwd("~/my/git/alexeyche-junk/cns/R/srm/new")
+setwd("~/prog/alexeyche-junk/cns/R/srm/new")
 source('include.R')
+source('ucr_ts.R')
 
-dir = "/home/alexeyche/my/sim/R"
+#dir = "/home/alexeyche/my/sim/R"
+dir = "~/prog/sim"
 #system(sprintf("find %s -name \"*.png\" -type f -exec rm -f {} \\;", dir))
+ID_MAX=0
 
 M = 50
 N = 10
 
-gr1 = TSNeurons(M = M, patterns = list())
+data = synth # synthetic control
 
-#file <- "/home/alexeyche/prog/sim/stimuli/sd1.csv"
-#file2 <- "/home/alexeyche/prog/sim/stimuli/sd2.csv"
-file <- "/home/alexeyche/my/sim/stimuli/sd1.csv"
-file2 <- "/home/alexeyche/my/sim/stimuli/sd2.csv"
+c(train_dataset, test_dataset) := read_ts_file(data)
 
-gr1$loadPattern(file, 100, 1)
-gr1$loadPattern(file2, 100, 2)
-id_m = 1:M
-id_n = (M+1):(M+N)
+train_dataset = train_dataset[c(1,101, 2, 102, 3, 103, 4, 104, 5, 105)] # cut
+
+duration = 100
+
+N = 10
+start_w.M = matrix(rnorm( M*N, mean=2, sd=0.5), ncol=N, nrow=M)
+start_w.N = matrix(rnorm( (N-1)*N, mean=2, sd=0.5), ncol=N, nrow=(N-1))
+M = 50
+dt = 0.5
+
+gr1 = TSNeurons(M = M)
+neurons = SRMLayer(N, start_w.N)
+
+gr1$loadPatterns(train_dataset, duration, dt, lambda=8)
+patt_len = length(gr1$patterns)
+neurons$connectFF(gr1$ids, start_w.M, 1:(N/2) )
 
 start_w = 5
-weights = list()
-id_conns = list()
-ids = NULL
-for(i in 1:N) {
-  conn <- id_m
-  conn <- c(conn, id_n[id_n != id_n[i]]) # id of srm neurons: no self connections
-  w <- c(rep(start_w, M), rep(start_w/4, N-1))
-  id_conns[[i]] = conn
-  weights[[i]] = w
-  ids = c(ids, id_n[i])
-}
 
-neurons = SRMLayer(id_conns = id_conns, weights = weights, ids=ids) 
-layers = list(neurons)
+
 model = "50x10_lr0.5_lws_100.0"
 
-model_file = sprintf("%s/%s", dir, model)
+model_file = sprintf("%s/R/%s", dir, model)
 
 if(file.exists(paste(model_file, ".idx", sep=""))) {
     W = loadMatrix(model_file, 1)
@@ -48,31 +49,28 @@ if(file.exists(paste(model_file, ".idx", sep=""))) {
   cat("Can't find file for model ", model_file, "\n")
 }
 
-null_pattern.N = list()
-for(i in 1:N) {
-  null_pattern.N[[i]] <- -Inf
-}
 
 
-run_options = list(T0 = 0, Tmax = 100, dt = 0.5, learning_rate = 0.5,
+run_options = list(T0 = 0, Tmax = duration, dt = 0.5, learning_rate = 0.5,
                    learn_window_size = 100, mode="run", collect_stat=TRUE, 
                    target_set = list(target_function_gen = random_2spikes_tf, depress_null=FALSE),
                    learn_layer_id = 1
 )
 patterns = gr1$patterns
-trials = 30
+trials = 1
 net_all = list()
 u_all = list()
 p_all = list()
+net_neurons = list(neurons)
 for(id_patt in 1:length(patterns)) {
   for(trial in 1:trials) {
     net = list()
-    net[id_m] = patterns[[id_patt]]$data
-    net[id_n] = null_pattern.N
+    net[gr1$ids] = patterns[[id_patt]]$data
+    net[neurons$ids] = -Inf
     run_options$class = patterns[[id_patt]]$class
     
-    c(net, layers, stat, mean_grad) := run_srm(layers, net, run_options)
-    net = lapply(net[id_n], function(sp) sp[sp != -Inf])
+    c(net, net_neurons, stat, mean_grad) := run_srm(net_neurons, net, run_options)
+    net = lapply(net[neurons$ids], function(sp) sp[sp != -Inf])
     glob_id = trial+(id_patt-1)*trials
     net_all[[glob_id]] = list(data=net, label=patterns[[id_patt]]$class)
     u_all[[glob_id]] = list(data=stat[[1]]$u, label=patterns[[id_patt]]$class)

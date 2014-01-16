@@ -26,9 +26,14 @@ SRMLayer = setRefClass("SRMLayer", fields = list(weights = "list", id_conns = "l
                          ids <<- get_unique_ids(N)
                          weights <<- list()
                          id_conns <<- list()                         
+                         if( is.matrix(start_weight) ) {
+                           start_w = start_weight
+                         } else {
+                           start_w = matrix(start_weight, ncol=N, nrow=N-1)
+                         }
                          for(i in 1:N) {                           
                            conn <- ids[ ids != ids[i] ] # id of srm neurons: no self connections
-                           w <- rep(start_w, N-1)
+                           w <- start_w[,i]
                            id_conns[[i]] <<- conn
                            weights[[i]] <<- w                           
                          }                         
@@ -37,10 +42,16 @@ SRMLayer = setRefClass("SRMLayer", fields = list(weights = "list", id_conns = "l
                          weights <<- weights
                          #id_conns <<- id_conns                         
                        },
-                       connectFF = function(ids_to_connect, weight) {
-                         for(ni in 1:N) {
+                       connectFF = function(ids_to_connect, weight, neurons_to_connect=NULL) {
+                         if(!is.matrix(weight)) {
+                           weight = matrix(weight, nrow=length(ids_to_connect), ncol=.self$N)
+                         }
+                         if(is.null(neurons_to_connect)) {
+                           neurons_to_connect=1:.self$len
+                         }
+                         for(ni in neurons_to_connect) {
                            id_conns[[ni]] <<- c(id_conns[[ni]], ids_to_connect)
-                           weights[[ni]] <<- c(weights[[ni]], rep(weight, length(ids_to_connect)))
+                           weights[[ni]] <<- c(weights[[ni]], weight[,ni])
                          }
                        },
                        u = function(time, net) {

@@ -1,4 +1,7 @@
-#include <Rcpp.h>
+//#include <Rcpp.h>
+
+// [[Rcpp::depends("RcppArmadillo")]]
+
 #include <RcppArmadillo.h>
 
 #include "gauss_legendre.h"
@@ -69,13 +72,13 @@ arma::vec integrand_vec(double t, void *data) {
 }
 
 
-
+// [[Rcpp::export]]
 SEXP integrateSRM_vec(const List constants,  const List int_options, const IntegerVector neurons_id, const List neurons_id_conn, const List neurons_w, const List net) {
     if(neurons_id.size() != neurons_id_conn.size()) {
         printf("Error. length(w) != length(id_conn).\n");
         return 0;
     }
     SIntData sint_d(constants,int_options,neurons_id,neurons_id_conn,neurons_w, net);
-    arma::vec out = integrand_vec(5, (void*)&SIntData);
+    arma::vec out = integrand_vec(5, (void*)&sint_d);
     return List::create(Named("out") = out);
 }

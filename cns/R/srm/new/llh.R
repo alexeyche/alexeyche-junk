@@ -4,7 +4,7 @@ require(cubature)
 integrand <- function(t, net, neurons) {
   syn_epsp = sapply(net, function(sp) sum(epsp(t-sp)))  
   ps = p_stroke(neurons$u(t, net))
-  sapply(1:neurons$len, function(id) syn_epsp[neurons$id_conns[[id]] ] * ps[id] )  
+  unlist(lapply(1:neurons$len, function(id) syn_epsp[neurons$id_conns[[id]] ] * ps[id] )  )
 }
 
 grad_func <- function(neurons, T0, Tmax, net, target_set) {
@@ -45,7 +45,9 @@ grad_func <- function(neurons, T0, Tmax, net, target_set) {
   }    
   int_options = list(T0 = T0, Tmax=Tmax)  
  
- grad = adaptIntegrate(function(t) integrand(t, net, neurons), T0, Tmax, tol=1e-03, fDim=length(id_n)*length(neurons$id_conns[[1]]), maxEval=100)$integral
+ 
+  
+ grad = adaptIntegrate(function(x) integrand(x, net, neurons), T0, Tmax, tol=1e-03, fDim=sum(sapply(neurons$id_conns, length)), maxEval=100)$integral
  int_part = list()
  iter=1
  for(id in 1:neurons$len) {

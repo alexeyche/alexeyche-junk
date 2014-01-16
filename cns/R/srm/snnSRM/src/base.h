@@ -1,7 +1,7 @@
 #ifndef BASE_H
 #define BASE_H
 
-#include <Rcpp.h>
+#include <RcppArmadillo.h>
 using namespace Rcpp;
 
 struct SInput {

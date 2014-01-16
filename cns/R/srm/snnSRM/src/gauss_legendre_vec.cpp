@@ -1,10 +1,7 @@
-
 #include "gauss_legendre.h"
 #include <RcppArmadillo.h>
 
-// [[Rcpp::depends(RcppArmadillo)]]
-
-arma::vec gauss_legendre_vec(int n, arma::vec (*f)(double,void*), int numDim, void* data, double a, double b) {
+arma::vec gauss_legendre_vec(int n, arma::vec (*f)(arma::vec,void*), int numDim, void* data, double a, double b) {
     double* x = NULL;
 	double* w = NULL;
 	arma::vec A(numDim), B(numDim), Ax(numDim), s(numDim);
