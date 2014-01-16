@@ -1,8 +1,9 @@
 #!/usr/bin/RScript
-#setwd("~/prog/alexeyche-junk/cns/R/srm/new")
-setwd("~/my/git/alexeyche-junk/cns/R/srm/new")
+setwd("~/prog/alexeyche-junk/cns/R/srm/new")
+#setwd("~/my/git/alexeyche-junk/cns/R/srm/new")
 require(snnSRM)
 require(snowfall)
+require(cubature)
 source('util.R')
 source('neuron.R')
 source('gen_spikes.R')
@@ -27,8 +28,8 @@ id_n = seq(M+1, M+N)
 
 gr1 = TSNeurons(M = M)
 
-#file <- "/home/alexeyche/prog/sim/stimuli/sd1.csv"
-file <- "/home/alexeyche/my/sim/stimuli/sd1.csv"
+file <- "/home/alexeyche/prog/sim/stimuli/sd1.csv"
+#file <- "/home/alexeyche/my/sim/stimuli/sd1.csv"
 gr1$loadPatternFromFile(file, 150, 1, 0.5)
 #net <- spikeMatToSpikeList(gr1$patterns[[1]]$data)
 net = list()
@@ -48,12 +49,13 @@ pattern[[3]] <- c(-Inf, 50,80)
 pattern[[4]] <- c(-Inf, 100)
 pattern[[5]] <- c(-Inf, 10)
 
-epochs = 50
-run_options = list(T0 = 0, Tmax = 150, dt = 0.5, learning_rate = 0.5, learn_window_size = 10, mode="run", collect_stat=FALSE)
+epochs = 30
+run_options = list(T0 = 0, Tmax = 150, dt = 0.5, learning_rate = 1, learn_window_size = 10, mode="run", collect_stat=FALSE)
 layers = list(neurons)
+target_set = list(target_function_gen = full_spike_tf, depress_null=TRUE)
 for(ep in 1:epochs) {
   net[id_n] <- pattern
-  gr = grad_func(layers[[1]], 0, 150, net, list(target_function_gen = full_spike_tf, depress_null=TRUE))
+  gr = grad_func(layers[[1]], 0, 150, net, target_set)
   net[id_n] <- null_pattern
   c(net, layers, stat) := run_srm(layers, net, run_options)
   
