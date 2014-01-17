@@ -1,10 +1,10 @@
-#setwd("~/my/git/alexeyche-junk/cns/R/srm/new")
-setwd("~/prog/alexeyche-junk/cns/R/srm/new")
+setwd("~/my/git/alexeyche-junk/cns/R/srm/new")
+#setwd("~/prog/alexeyche-junk/cns/R/srm/new")
 source('include.R')
 source('ucr_ts.R')
 
-#dir = "/home/alexeyche/my/sim/R"
-dir = "~/prog/sim"
+dir = "/home/alexeyche/my/sim"
+#dir = "~/prog/sim"
 #system(sprintf("find %s -name \"*.png\" -type f -exec rm -f {} \\;", dir))
 ID_MAX=0
 
@@ -20,8 +20,8 @@ train_dataset = train_dataset[c(1,101, 2, 102, 3, 103, 4, 104, 5, 105)] # cut
 duration = 100
 
 N = 10
-start_w.M = matrix(rnorm( M*N, mean=2, sd=0.5), ncol=N, nrow=M)
-start_w.N = matrix(rnorm( (N-1)*N, mean=2, sd=0.5), ncol=N, nrow=(N-1))
+start_w.M = 1 #matrix(rnorm( M*N, mean=2, sd=0.5), ncol=N, nrow=M)
+start_w.N = 1 #matrix(rnorm( (N-1)*N, mean=2, sd=0.5), ncol=N, nrow=(N-1))
 M = 50
 dt = 0.5
 
@@ -30,12 +30,12 @@ neurons = SRMLayer(N, start_w.N)
 
 gr1$loadPatterns(train_dataset, duration, dt, lambda=8)
 patt_len = length(gr1$patterns)
-neurons$connectFF(gr1$ids, start_w.M, 1:(N/2) )
+neurons$connectFF(gr1$ids, start_w.M)
 
 start_w = 5
 
 
-model = "50x10_lr0.5_lws_100.0"
+model = "===="
 
 model_file = sprintf("%s/R/%s", dir, model)
 
@@ -67,14 +67,14 @@ for(id_patt in 1:length(patterns)) {
     net = list()
     net[gr1$ids] = patterns[[id_patt]]$data
     net[neurons$ids] = -Inf
-    run_options$class = patterns[[id_patt]]$class
+    run_options$label = patterns[[id_patt]]$label
     
     c(net, net_neurons, stat, mean_grad) := run_srm(net_neurons, net, run_options)
     net = lapply(net[neurons$ids], function(sp) sp[sp != -Inf])
     glob_id = trial+(id_patt-1)*trials
-    net_all[[glob_id]] = list(data=net, label=patterns[[id_patt]]$class)
-    u_all[[glob_id]] = list(data=stat[[1]]$u, label=patterns[[id_patt]]$class)
-    p_all[[glob_id]] = list(data=stat[[1]]$p, label=patterns[[id_patt]]$class)
+    net_all[[glob_id]] = list(data=net, label=patterns[[id_patt]]$label)
+    u_all[[glob_id]] = list(data=stat[[1]]$u, label=patterns[[id_patt]]$label)
+    p_all[[glob_id]] = list(data=stat[[1]]$p, label=patterns[[id_patt]]$label)
   }
 }
 

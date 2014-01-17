@@ -1,7 +1,7 @@
-#setwd("~/my/git/alexeyche-junk/cns/R/srm/new")
-setwd("~/prog/alexeyche-junk/cns/R/srm/new")
-#dir = '~/my/sim'
-dir = '~/prog/sim'
+setwd("~/my/git/alexeyche-junk/cns/R/srm/new")
+#setwd("~/prog/alexeyche-junk/cns/R/srm/new")
+dir = '~/my/sim'
+#dir = '~/prog/sim'
 system(sprintf("find %s/R -name \"*.png\" -type f -exec rm -f {} \\;", dir))
 
 
@@ -37,8 +37,8 @@ start_w = 2.0
 M = 50
 dt = 0.5
 
-start_w.M = matrix(rnorm( M*N, mean=2, sd=0.5), ncol=N, nrow=M)
-start_w.N = matrix(rnorm( (N-1)*N, mean=2, sd=0.5), ncol=N, nrow=(N-1))
+start_w.M = 1 #matrix(rnorm( M*N, mean=2, sd=0.5), ncol=N, nrow=M)
+start_w.N = 1.5 #matrix(rnorm( (N-1)*N, mean=2, sd=0.5), ncol=N, nrow=(N-1))
 
 
 gr1 = TSNeurons(M = M)
@@ -52,7 +52,7 @@ neurons$connectFF(gr1$ids, start_w.M)
 
 runmode="learn"
 #runmode="run"
-run_options = list(T0 = 0, Tmax = duration, dt = dt, learning_rate = 0.001, epochs = 100,
+run_options = list(T0 = 0, Tmax = duration, dt = dt, learning_rate = 0.01, epochs = 100,
                    learn_window_size = 100, mode=runmode, collect_stat=TRUE, 
                    target_set = list(target_function_gen = random_5spikes_tf, depress_null=FALSE),
                    learn_layer_id = 1

@@ -44,7 +44,7 @@ SRMLayer = setRefClass("SRMLayer", fields = list(weights = "list", id_conns = "l
                        },
                        connectFF = function(ids_to_connect, weight, neurons_to_connect=NULL) {
                          if(!is.matrix(weight)) {
-                           weight = matrix(weight, nrow=length(ids_to_connect), ncol=.self$N)
+                           weight = matrix(weight, nrow=length(ids_to_connect), ncol=.self$len)
                          }
                          if(is.null(neurons_to_connect)) {
                            neurons_to_connect=1:.self$len
