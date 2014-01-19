@@ -31,6 +31,7 @@ neurons = SRMLayer(N, start_w.N)
 gr1$loadPatterns(train_dataset, duration, dt, lambda=8)
 gr1$loadPatterns(test_dataset, duration, dt, lambda=8)
 patt_len = length(gr1$patterns)
+neurons$connectFF(gr1$ids, start_w.M, 1:(N/2) )
 
 connection = matrix(gr1$ids, nrow=length(gr1$ids), ncol=N)
 connect_window = N*2
@@ -43,6 +44,7 @@ for(ni in 0:(N-1)) {
 
 neurons$connectFF(connection, start_w.M, 1:N )
 
+model = "50x10_lr0.5_lws_100.0"
 
 
 
@@ -75,7 +77,7 @@ trials = 6
 net_all = list()
 u_all = list()
 p_all = list()
-
+net_neurons = list(neurons)
 for(id_patt in 1:length(patterns)) {
   for(trial in 1:trials) {
     net = list()

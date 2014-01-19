@@ -46,7 +46,7 @@ neurons = SRMLayer(N, start_w.N, p_edge_prob=0.5)
 
 gr1$loadPatterns(train_dataset, duration, dt, lambda=8)
 patt_len = length(gr1$patterns)
-gr1$patterns = gr1$patterns[sample(patt_len)]
+#gr1$patterns = gr1$patterns[sample(patt_len)]
 #plot_rastl(gr1$patterns[[3]]$data)
 
 connection = matrix(gr1$ids, nrow=length(gr1$ids), ncol=N)
@@ -71,6 +71,7 @@ ro = run_options # for debug
 id_patt = 1
 
 #model_file = sprintf("%s/R/%s_%dx%d_lr%3.1f_lws_%3.1f", dir, data, M, N, run_options$learning_rate, run_options$learn_window_size)
+
 model_file = sprintf("%s/R/%s_%dx%d", dir, data, M, N)
 if(runmode=="run") {
   if(file.exists(paste(model_file, ".idx", sep=""))) {  
