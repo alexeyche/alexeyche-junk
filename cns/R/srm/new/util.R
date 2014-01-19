@@ -39,12 +39,21 @@ get_weights_matrix_old <- function(neurons) {
 }
 
 get_weights_matrix <- function(layers) {
-  maxw_len = 0
+  max_conn_id = -1
+  min_conn_id = Inf
   for(neurons in layers)
-    invisible(sapply(neurons$weights, function(w) maxw_len<<-max(maxw_len, length(w))))
-  W = NULL
-  for(n in layers)
-    W = cbind(W, sapply(n$weights, function(row) { c(row, rep(0, maxw_len-length(row)))} ))
+    invisible(sapply(neurons$id_conns, function(cid) { 
+      max_conn_id <<-max(max_conn_id, max(cid))
+      min_conn_id <<-min(min_conn_id, min(cid))
+    }))
+  W = matrix(0, nrow=max_conn_id, ncol=sum(sapply(layers, function(n) n$len)))
+  
+  n = layers[[1]]
+  for(ni in 1:n$len) {
+    for(syn_num in 1:length(n$id_conns[[ni]])) {
+      W[ n$id_conns[[ni]][syn_num] , ni] = n$weights[[ni]][syn_num]
+    }
+  } 
   return(W)
 }
 
