@@ -22,13 +22,15 @@ TSNeurons <- setRefClass("TSNeurons", fields = list(M = "vector", patterns = "li
                                       
 
                                       patt_dt <- 0
-                                      approx_data = rep(NA, pattDur/simdt)
+                                      approx_data = rep(NA, pattDur/simdt)                                      
                                       for(ri in 1:patt$len) {
                                         patt_dt <- patt_dt + pattDur/patt$len
                                         ct = ceiling(signif(patt_dt/simdt, digits=5))                                        
                                         approx_data[ct] = rawdata[ri]
                                       }
-                                      approx_data = na.approx(approx_data)
+                                      
+                                      #approx_data = na.approx(approx_data)
+                                      #approx_data = approx_data[!is.na(approx_data)]
                                       
                                       gen_spikes = vector("list", M)
                                                                        
@@ -36,9 +38,13 @@ TSNeurons <- setRefClass("TSNeurons", fields = list(M = "vector", patterns = "li
                                       dt <- (hb-lb)/(M-1)
                                       t = 0                                       
                                       for(i_val in 1:length(approx_data)) {
-                                        fired <- floor((approx_data[i_val]-lb)/dt)+1
+                                        if(is.na(approx_data[i_val])) {
+                                          fired=-1
+                                        } else  {
+                                          fired <- floor((approx_data[i_val]-lb)/dt)+1
+                                        }
                                         
-                                        if(neurons_rate[fired] == 0) {                                        
+                                        if((fired>0) && (neurons_rate[fired] == 0)) {                                        
                                           gen_spikes[[fired]] = c(gen_spikes[[fired]], t)
                                           neurons_rate[fired] = lambda 
                                         }                                        

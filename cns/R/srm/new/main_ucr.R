@@ -30,23 +30,23 @@ if(!exists('train_dataset')) {
 }
 #train_dataset = train_dataset[c(1,101, 2, 102, 3, 103, 4, 104, 5, 105)] # cut
 
-duration = 100
+duration = 300
 
 N = 10
 start_w = 2.0
 M = 50
 dt = 0.5
 
-start_w.M = 4 #matrix(rnorm( M*N, mean=2, sd=0.5), ncol=N, nrow=M)
-start_w.N = 4 #matrix(rnorm( (N-1)*N, mean=2, sd=0.5), ncol=N, nrow=(N-1))
+start_w.M = 10 #matrix(rnorm( M*N, mean=2, sd=0.5), ncol=N, nrow=M)
+start_w.N = 6 #matrix(rnorm( (N-1)*N, mean=2, sd=0.5), ncol=N, nrow=(N-1))
 
 
 gr1 = TSNeurons(M = M)
 neurons = SRMLayer(N, start_w.N, p_edge_prob=0.5)
 
-gr1$loadPatterns(train_dataset, duration, dt, lambda=8)
+gr1$loadPatterns(train_dataset, duration, dt, lambda=5)
 patt_len = length(gr1$patterns)
-#gr1$patterns = gr1$patterns[sample(patt_len)]
+gr1$patterns = gr1$patterns[sample(patt_len)]
 #plot_rastl(gr1$patterns[[3]]$data)
 
 connection = matrix(gr1$ids, nrow=length(gr1$ids), ncol=N)
@@ -62,7 +62,7 @@ neurons$connectFF(connection, start_w.M, 1:N )
 
 runmode="learn"
 #runmode="run"
-run_options = list(T0 = 0, Tmax = duration, dt = dt, learning_rate = 0.05, epochs = 50,
+run_options = list(T0 = 0, Tmax = duration, dt = dt, learning_rate = 0.01, epochs = 25,
                    learn_window_size = 100, mode=runmode, collect_stat=TRUE, 
                    target_set = list(target_function_gen = random_4spikes_tf, depress_null=FALSE),
                    learn_layer_id = 1
