@@ -5,6 +5,8 @@ double p_stroke(const double &t, const SInput &si) {
  return si.get_c("beta")/(1+exp(si.get_c("alpha")*(si.get_c("tr")-u(t, si))));
 }
 
+
+
 double grab_epsp(const double &t, const SSynInput &ssyn) {
   double e_syn = 0;
   const NumericVector &sp(ssyn.si.net[ssyn.syn_id-1]);
