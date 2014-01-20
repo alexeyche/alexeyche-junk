@@ -24,7 +24,7 @@ grad_func <- function(neurons, T0, Tmax, net, target_set) {
       }
     })
   }
-  print(sum(sapply(nspikes, length)/(Tmax-T0)))
+  #print(sum(sapply(nspikes, length)/(Tmax-T0)))
   #nspikes = lapply(1:length(nspikes), target_set$target_function_gen(nspikes))
   
   left_part = lapply(1:length(id_n), function(number) {  
@@ -51,33 +51,19 @@ grad_func <- function(neurons, T0, Tmax, net, target_set) {
   } else {
     not_fired = rep(FALSE, neurons$len)
   }    
-  int_options = list(T0 = T0, Tmax=Tmax)  
+  int_options = list(T0 = T0, Tmax=Tmax, dim=sum(sapply(neurons$id_conns, length)), quad=256)  
  
- 
-  
- grad = adaptIntegrate(function(x) integrand(x, net, neurons), T0, Tmax, tol=1e-03, fDim=sum(sapply(neurons$id_conns, length)), maxEval=100)$integral
- int_part = list()
- iter=1
- for(id in 1:neurons$len) {
-   if(!not_fired[id]) {
-     int_part[[id]] = -grad[iter:(iter+length(neurons$id_conns[[id]])-1)]
-   } else {
-     int_part[[id]] = rep(0, length(neurons$id_conns[[id]]))
-   }
-   iter = iter + length(neurons$id_conns[[id]])
- } 
-#   sfExport('int_options')
-#   sfExport('net')
-#   sfExport('not_fired')
-#   neuronsl = neurons$to_list()
-#   sfExport('neuronsl')
-#   int_part = sfLapply(1:length(neuronsl), function(ni)  { 
-#   if(not_fired[ni] == FALSE) {
-#    integrateSRM(constants, int_options, neuronsl[[ni]]$id, neuronsl[[ni]]$id_conn, neuronsl[[ni]]$w, net)
-#   } else {
-#    rep(0, length(neuronsl[[ni]]$w))
-#   }
-#   })
-  #int_part[,not_fired] = 0
+  grad = integrateSRM_vec(constants, int_options, neurons$ids, neurons$id_conns, neurons$weights, net)$out
+  int_part = list()
+  iter=1
+  for(id in 1:neurons$len) {
+    if(!not_fired[id]) {
+      int_part[[id]] = -grad[iter:(iter+length(neurons$id_conns[[id]])-1)]
+    } else {
+      int_part[[id]] = rep(0, length(neurons$id_conns[[id]]))
+    }
+    iter = iter + length(neurons$id_conns[[id]])
+  } 
+
   return(mapply("+", spike_part, int_part, SIMPLIFY=FALSE))
 }

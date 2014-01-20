@@ -1,7 +1,7 @@
-#setwd("~/my/git/alexeyche-junk/cns/R/srm/new")
-setwd("~/prog/alexeyche-junk/cns/R/srm/new")
-#dir = '~/my/sim'
-dir = '~/prog/sim'
+setwd("~/my/git/alexeyche-junk/cns/R/srm/new")
+#setwd("~/prog/alexeyche-junk/cns/R/srm/new")
+dir = '~/my/sim'
+#dir = '~/prog/sim'
 system(sprintf("find %s/R -name \"*.png\" -type f -exec rm -f {} \\;", dir))
 
 
