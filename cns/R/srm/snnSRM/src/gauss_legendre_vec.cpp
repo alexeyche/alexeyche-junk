@@ -1,7 +1,7 @@
-#include "gauss_legendre.h"
-#include <RcppArmadillo.h>
 
-arma::vec gauss_legendre_vec(int n, arma::vec (*f)(arma::vec,void*), int numDim, void* data, double a, double b) {
+#include "gauss_legendre_vec.h"
+
+arma::vec gauss_legendre_vec(int n, arma::vec (*f)(const arma::vec&,void*), int numDim, void* data, double a, double b) {
     double* x = NULL;
 	double* w = NULL;
 	arma::vec A(numDim), B(numDim), Ax(numDim), s(numDim);
@@ -38,20 +38,20 @@ arma::vec gauss_legendre_vec(int n, arma::vec (*f)(arma::vec,void*), int numDim,
 
 	if(n&1) /* n - odd */
 	{
-		s = w[0]*((*f)(B,data));
-		for (i=1;i<m;i++)
+        s = w[0]*((*f)(B,data));
+        for (i=1;i<m;i++)
 		{
 			Ax = A*x[i];
-			s += w[i]*((*f)(B+Ax,data)+(*f)(B-Ax,data));
+            s += w[i]*((*f)(B+Ax,data)+(*f)(B-Ax,data));
 		}
 
 	}else{ /* n - even */
 		
-		s = 0.0;
+		s.fill(0.0);
 		for (i=0;i<m;i++)
 		{
 			Ax = A*x[i];
-			s += w[i]*((*f)(B+Ax,data)+(*f)(B-Ax,data));			
+            s += w[i]*((*f)(B+Ax,data)+(*f)(B-Ax,data));			
 		}
 	}
 
@@ -60,6 +60,6 @@ arma::vec gauss_legendre_vec(int n, arma::vec (*f)(arma::vec,void*), int numDim,
 		free(x);
 		free(w);
 	}
-	return A*s;
+	return A % s;
 
 }
