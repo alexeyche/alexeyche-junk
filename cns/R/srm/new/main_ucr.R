@@ -34,18 +34,18 @@ if(!exists('train_dataset')) {
 
 duration = 300
 
-N = 10
+N = 20
 start_w = 2.0
 M = 50
 dt = 0.5
 
-start_w.M = 8.5 #matrix(rnorm( M*N, mean=2, sd=0.5), ncol=N, nrow=M)
-start_w.N = 4.25 #matrix(rnorm( (N-1)*N, mean=2, sd=0.5), ncol=N, nrow=(N-1))
+start_w.M = 10 #matrix(rnorm( M*N, mean=2, sd=0.5), ncol=N, nrow=M)
+start_w.N = 5 #matrix(rnorm( (N-1)*N, mean=2, sd=0.5), ncol=N, nrow=(N-1))
 
 
 gr1 = TSNeurons(M = M)
 gr2 = TSNeurons(M = M, ids_c = 100:(100+M))
-neurons = SRMLayer(N, start_w.N, p_edge_prob=0.7)
+neurons = SRMLayer(N, start_w.N, p_edge_prob=0.5)
 
 gr1$loadPatterns(train_dataset, duration, dt, lambda=5)
 gr2$loadPatterns(test_dataset, duration, dt, lambda=5)
