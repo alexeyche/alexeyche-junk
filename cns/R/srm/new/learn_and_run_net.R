@@ -14,11 +14,13 @@ run_net <- function(layers, run_options, open_plots = FALSE, model_descr=NULL) {
   net[id_n] = -Inf
   run_options$target_set$class = patterns[[id_patt]]$class
   
+  
   for(ep in 1:run_options$epochs) {
+    net_all = list()
     for(id_patt in 1:length(patterns)) {
       net[id_m] = patterns[[id_patt]]$data
       net[id_n] = -Inf
-      run_options$target_set$class = patterns[[id_patt]]$class
+      run_options$target_set$label = patterns[[id_patt]]$label
       
       c(net, net_neurons, stat, mean_grad) := run_srm(net_neurons, net, run_options)
       
@@ -43,7 +45,21 @@ run_net <- function(layers, run_options, open_plots = FALSE, model_descr=NULL) {
       dev.off()
       if(open_plots) 
         system(sprintf("eog -w %s 1>/dev/null 2>/dev/null",pic_filename), ignore.stdout=TRUE, ignore.stderr=TRUE, wait=FALSE)
+      net_all[[id_patt]] = list(data=net, label=patterns[[id_patt]]$label)
       
+    }
+    if(! is.null(run_options$test_function)) {
+      test_net_all = list()
+      for(id_patt in 1:length(run_options$test_patterns)) {
+        
+        net[id_m] = run_options$test_patterns[[id_patt]]$data
+        net[id_n] = -Inf
+        run_options$target_set$class = run_options$test_patterns[[id_patt]]$label
+        
+        c(net, net_neurons, stat, mean_grad) := run_srm(net_neurons, net, run_options)
+        test_net_all[[id_patt]] = list(data=net, label=run_options$test_patterns[[id_patt]]$label)
+      }
+      run_options$test_function(net_all, test_net_all)
     }
   }
 

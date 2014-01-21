@@ -41,7 +41,11 @@ run_srm <- function(net_neurons, net, ro) {
     if((ro$mode == "learn")&&(time>0)&&(time %% ro$learn_window_size == 0)) {      
       gr = net_neurons[[ro$learn_layer_id]]$grad(time-ro$learn_window_size, time, net, ro$target_set)
       
-      invisible(sapply(1:net_neurons[[ro$learn_layer_id]]$len, function(i) net_neurons[[ro$learn_layer_id]]$weights[[i]] = net_neurons[[ro$learn_layer_id]]$weights[[i]] + ro$learning_rate * gr[[i]] ))
+      invisible(sapply(1:net_neurons[[ro$learn_layer_id]]$len, function(i) {
+        net_neurons[[ro$learn_layer_id]]$weights[[i]] = net_neurons[[ro$learn_layer_id]]$weights[[i]] + ro$learning_rate * gr[[i]]  - ro$weight_decay * net_neurons[[ro$learn_layer_id]]$weights[[i]]
+      }
+      ))
+      
       if(ro$collect_stat) {
         gradients[,,gr_it] = sapply(gr, function(row) { c(row, rep(0, maxw_len-length(row)))} )
         gr_it = gr_it + 1

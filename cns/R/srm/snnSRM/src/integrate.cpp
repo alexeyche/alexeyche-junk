@@ -71,22 +71,24 @@ arma::vec integrand_vec(const arma::vec &t, void *data) {
         
     std::vector<double> out;
     out.reserve(t.size());
+    size_t ti = 0;
     for(size_t it = 0; it< sint_d->neurons_id.size(); it++) {
         IntegerVector id(1); 
         id[0] = sint_d->neurons_id[it];
         IntegerVector id_conn(sint_d->neurons_id_conn[it]);
         NumericVector w(sint_d->neurons_w[it]);
         SInput si(sint_d->constants, id, id_conn, w, sint_d->net);
-
+       
         arma::vec out_n(id_conn.size(), arma::fill::zeros);
         for(size_t syn_id=0; syn_id<id_conn.size(); syn_id++) {
-            const double &cur_t = t(syn_id+it*syn_id);
+            const double &cur_t = t(ti);
+            ti++;
             const NumericVector &sp(sint_d->net[ id_conn[syn_id]-1 ]);
             for(int spike_id=sp.size()-1; spike_id>=0; spike_id--) {
                 double s = cur_t - sp[spike_id];
                 if(s > EPSP_WORK_WINDOW) break;
                 if(s <= 0) continue;      
-                
+               
                 out_n(syn_id) += epsp(s, sint_d->constants); 
             } 
             out_n(syn_id) *= p_stroke(cur_t, si);
@@ -109,9 +111,6 @@ SEXP integrateSRM_vec(const List constants,  const List int_options, const Integ
     const int &quad = as<int>(int_options["quad"]);    
 
     SIntData sint_d(constants,int_options,neurons_id,neurons_id_conn,neurons_w, net);
-    //arma::vec t(117);
-    //t.fill(50);
-    //arma::vec out = integrand_vec(t, (void*)&sint_d);
     arma::vec out = gauss_legendre_vec(quad, integrand_vec, dim, (void*)&sint_d, T0, Tmax);
     return List::create( Named("out") = out);
 }

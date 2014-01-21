@@ -1,10 +1,10 @@
-#setwd("~/my/git/alexeyche-junk/cns/R/srm/new")
-setwd("~/prog/alexeyche-junk/cns/R/srm/new")
+setwd("~/my/git/alexeyche-junk/cns/R/srm/new")
+#setwd("~/prog/alexeyche-junk/cns/R/srm/new")
 source('include.R')
 source('ucr_ts.R')
 
-#dir = "/home/alexeyche/my/sim/R"
-dir = "~/prog/sim"
+dir = "/home/alexeyche/my/sim"
+#dir = "~/prog/sim"
 #system(sprintf("find %s -name \"*.png\" -type f -exec rm -f {} \\;", dir))
 ID_MAX=0
 
@@ -17,7 +17,7 @@ c(train_dataset, test_dataset) := read_ts_file(data)
 
 #train_dataset = train_dataset[c(1,101, 2, 102, 3, 103, 4, 104, 5, 105)] # cut
 
-duration = 100
+duration = 300
 
 N = 10
 start_w.M = 4 #matrix(rnorm( M*N, mean=2, sd=0.5), ncol=N, nrow=M)
@@ -73,7 +73,7 @@ run_options = list(T0 = 0, Tmax = duration, dt = 0.5, learning_rate = 0.5,
 #patterns = gr1$patterns[1:length(train_dataset)] #[c(1:10,51:60, 101:110, 151:160, 201:210, 251:260)]
 patterns = gr1$patterns #[(length(train_dataset)+1):(length(train_dataset)+length(test_dataset))] #[c(1:10,51:60, 101:110, 151:160, 201:210, 251:260)]
 
-trials = 6
+trials = 10
 net_all = list()
 u_all = list()
 p_all = list()
@@ -111,37 +111,16 @@ split_data <- function(data, ratio=0.3) {
 
 #ucr_test(train, test, eucl_dist_alg)
 
-binKernel <- function(net_data, T0, Tmax, binSize=10) {
-  maxl = max(sapply(net_data, length))
-  breaks = seq(T0, Tmax, by=binSize)
-  lb = length(breaks)-1
-  hist_ans = matrix(0, length(net_data), lb)
-  
-  for(i in 1:maxl) {
-    it_sp = sapply(net_data, function(sp) if(length(sp)>=i) sp[i] else -1)
-    time_ids = ceiling((it_sp-T0)/binSize)
-    for(j in 1:length(time_ids)) {
-      if(time_ids[j]>0) {
-        hist_ans[j,  time_ids[j]] = hist_ans[j,  time_ids[j]] + 1
-      }
-    } 
-  }
-  return(hist_ans)
-}
+
 #  binKernel(net_all[[2]]$data, 0, 100, 5)
 kernSize=10
-spikes_proc = list()
-for(id_patt in 1:length(patterns)) {
-  st_i = (id_patt-1)*trials+1
-  fin_i = st_i + trials -1
-  data_proc_l = lapply(net_all[st_i:fin_i], function(n) binKernel(n$data, 0, duration, kernSize))
-  data_proc = array(0, dim=c(N, duration/kernSize, length(data_proc_l)))
-  for(i in 1:length(data_proc_l)) {
-    data_proc[,,i] = data_proc_l[[i]]
-  }
-  spikes_proc[[id_patt]] = list(data=apply(data_proc, c(1,2), mean), label=patterns[[id_patt]]$label)
-}
-ucr_test(spikes_proc[1:300], spikes_proc[301:600], eucl_dist_alg)
+
+
+perf = ucr_test(spikes_proc[1:300], spikes_proc[301:600], eucl_dist_alg)
+prob_labels = sapply(spikes_proc[301:600][perf$prob_tc], function(x) x$label)
+perf_bl = ucr_test(train_dataset, test_dataset, eucl_dist_alg)
+prob_labels_bl = sapply(test_dataset[perf_bl$prob_tc], function(x) x$label)
+
 #dist = matrix(0, nrow=length(spikes_proc), ncol=length(spikes_proc))
 #for(i in 1:length(spikes_proc)) {
 #  for(j in 1:length(spikes_proc)) {

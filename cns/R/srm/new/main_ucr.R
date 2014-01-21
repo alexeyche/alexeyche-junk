@@ -16,6 +16,7 @@ source('learn_and_run_net.R')
 source('srm.R')
 source('grad_funcs.R')
 source('serialize_to_bin.R')
+source('eval_funcs.R')
 ID_MAX=0
 #require(snowfall)
 #if(!sfIsRunning()) {
@@ -29,6 +30,7 @@ if(!exists('train_dataset')) {
   c(train_dataset, test_dataset) := read_ts_file(data)
 }
 #train_dataset = train_dataset[c(1,101, 2, 102, 3, 103, 4, 104, 5, 105)] # cut
+#test_dataset = test_dataset[c(1,101, 2, 102, 3, 103, 4, 104, 5, 105)]
 
 duration = 300
 
@@ -37,14 +39,16 @@ start_w = 2.0
 M = 50
 dt = 0.5
 
-start_w.M = 10 #matrix(rnorm( M*N, mean=2, sd=0.5), ncol=N, nrow=M)
-start_w.N = 6 #matrix(rnorm( (N-1)*N, mean=2, sd=0.5), ncol=N, nrow=(N-1))
+start_w.M = 8.5 #matrix(rnorm( M*N, mean=2, sd=0.5), ncol=N, nrow=M)
+start_w.N = 4.25 #matrix(rnorm( (N-1)*N, mean=2, sd=0.5), ncol=N, nrow=(N-1))
 
 
 gr1 = TSNeurons(M = M)
-neurons = SRMLayer(N, start_w.N, p_edge_prob=0.5)
+gr2 = TSNeurons(M = M, ids_c = 100:(100+M))
+neurons = SRMLayer(N, start_w.N, p_edge_prob=0.7)
 
 gr1$loadPatterns(train_dataset, duration, dt, lambda=5)
+gr2$loadPatterns(test_dataset, duration, dt, lambda=5)
 patt_len = length(gr1$patterns)
 gr1$patterns = gr1$patterns[sample(patt_len)]
 #plot_rastl(gr1$patterns[[3]]$data)
@@ -62,10 +66,17 @@ neurons$connectFF(connection, start_w.M, 1:N )
 
 runmode="learn"
 #runmode="run"
-run_options = list(T0 = 0, Tmax = duration, dt = dt, learning_rate = 0.01, epochs = 25,
-                   learn_window_size = 100, mode=runmode, collect_stat=TRUE, 
+run_options = list(T0 = 0, Tmax = duration, dt = dt, learning_rate = 0.05, epochs = 25, weight_decay = 0,
+                   learn_window_size = 150, mode=runmode, collect_stat=TRUE, 
                    target_set = list(target_function_gen = random_4spikes_tf, depress_null=FALSE),
                    learn_layer_id = 1
+#                    test_patterns = gr2$patterns, 
+#                    test_function = function(train_set, test_set) {
+#                      kernSize=10
+#                      train_processed = post_process_set(train_set, 1, 0, duration, binKernel, kernSize)
+#                      test_processed = post_process_set(test_set, 1, 0, duration, binKernel, kernSize)
+#                      perf = ucr_test(train_processed, test_processed, eucl_dist_alg)
+#                    }
 )
 ro = run_options # for debug
 id_patt = 1

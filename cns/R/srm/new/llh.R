@@ -15,15 +15,19 @@ grad_func <- function(neurons, T0, Tmax, net, target_set) {
     right = findInterval(Tmax, sp, rightmost.closed=TRUE)
     if(left<=right) sp[left:right]
   })  
-  if(sum(sapply(nspikes, length)/(Tmax-T0)) > 0.6) { 
-    nspikes = lapply(1:length(id_n), function(ni) { 
-      if(!is.null(nspikes[[ni]])) {
+  
+  nspikes = lapply(1:length(id_n), function(ni) { 
+    if(!is.null(nspikes[[ni]])) {
+      if( (length(nspikes[[ni]])/(Tmax-T0)) > 0.75)  { # 10 per trial ms
         probs = g(neurons$u_one(ni, nspikes[[ni]], net))
         most_likely = probs>=mean(probs)
         nspikes[[ni]][most_likely]
+      } else {
+        nspikes[[ni]]
       }
-    })
-  }
+    }
+  })
+  
   #print(sum(sapply(nspikes, length)/(Tmax-T0)))
   #nspikes = lapply(1:length(nspikes), target_set$target_function_gen(nspikes))
   

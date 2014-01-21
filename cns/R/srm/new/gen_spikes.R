@@ -4,8 +4,12 @@ require(zoo)
 
 TSNeurons <- setRefClass("TSNeurons", fields = list(M = "vector", patterns = "list", ids="vector"), 
                                     methods = list(
-                                    initialize = function(M) {
-                                      ids <<- get_unique_ids(M)
+                                    initialize = function(M, ids_c=NULL) {
+                                      if(is.null(ids_c)) {
+                                        ids <<- get_unique_ids(M)
+                                      } else {
+                                        ids <<-- ids_c
+                                      }
                                       patterns <<- list()
                                       M <<- M
                                     },
