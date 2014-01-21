@@ -1,7 +1,7 @@
-setwd("~/my/git/alexeyche-junk/cns/R/srm/new")
-#setwd("~/prog/alexeyche-junk/cns/R/srm/new")
-dir = '~/my/sim'
-#dir = '~/prog/sim'
+#setwd("~/my/git/alexeyche-junk/cns/R/srm/new")
+setwd("~/prog/alexeyche-junk/cns/R/srm/new")
+#dir = '~/my/sim'
+dir = '~/prog/sim'
 system(sprintf("find %s/R -name \"*.png\" -type f -exec rm -f {} \\;", dir))
 
 
@@ -28,13 +28,16 @@ ID_MAX=0
 data = synth # synthetic control
 if(!exists('train_dataset')) {
   c(train_dataset, test_dataset) := read_ts_file(data)
+  train_dataset = train_dataset[c(sample(1:50, 5), sample(51:100, 5), sample(101:150,5),
+                                  sample(151:200, 5), sample(201:250,5), sample(251:300,5))] # cut
+  test_dataset = test_dataset[c(sample(1:50, 5), sample(51:100, 5), sample(101:150,5),
+                                sample(151:200, 5), sample(201:250,5), sample(251:300,5))]
+  
 }
-#train_dataset = train_dataset[c(1,101, 2, 102, 3, 103, 4, 104, 5, 105)] # cut
-#test_dataset = test_dataset[c(1,101, 2, 102, 3, 103, 4, 104, 5, 105)]
 
 duration = 300
 
-N = 20
+N = 10
 start_w = 2.0
 M = 50
 dt = 0.5
@@ -44,7 +47,7 @@ start_w.N = 5 #matrix(rnorm( (N-1)*N, mean=2, sd=0.5), ncol=N, nrow=(N-1))
 
 
 gr1 = TSNeurons(M = M)
-gr2 = TSNeurons(M = M, ids_c = 100:(100+M))
+gr2 = TSNeurons(M = M, ids_c = 1000:(1000+M))
 neurons = SRMLayer(N, start_w.N, p_edge_prob=0.5)
 
 gr1$loadPatterns(train_dataset, duration, dt, lambda=5)
@@ -66,17 +69,20 @@ neurons$connectFF(connection, start_w.M, 1:N )
 
 runmode="learn"
 #runmode="run"
-run_options = list(T0 = 0, Tmax = duration, dt = dt, learning_rate = 0.05, epochs = 25, weight_decay = 0,
+test_trials=3
+
+run_options = list(T0 = 0, Tmax = duration, dt = dt, learning_rate = 0.1, epochs = 100, weight_decay = 0,
                    learn_window_size = 150, mode=runmode, collect_stat=TRUE, 
                    target_set = list(target_function_gen = random_4spikes_tf, depress_null=FALSE),
-                   learn_layer_id = 1
-#                    test_patterns = gr2$patterns, 
-#                    test_function = function(train_set, test_set) {
-#                      kernSize=10
-#                      train_processed = post_process_set(train_set, 1, 0, duration, binKernel, kernSize)
-#                      test_processed = post_process_set(test_set, 1, 0, duration, binKernel, kernSize)
-#                      perf = ucr_test(train_processed, test_processed, eucl_dist_alg)
-#                    }
+                   learn_layer_id = 1,
+                   test_patterns = gr2$patterns, 
+                   test_function = function(train_set, test_set) {
+                     kernSize=10
+                     train_processed = post_process_set(train_set, test_trials, 0, duration, binKernel, kernSize)
+                     test_processed = post_process_set(test_set, test_trials, 0, duration, binKernel, kernSize)
+                     perf = ucr_test(train_processed, test_processed, eucl_dist_alg)
+                     return(perf$rate)
+                   }, trials=test_trials
 )
 ro = run_options # for debug
 id_patt = 1

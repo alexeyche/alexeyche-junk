@@ -1,10 +1,11 @@
-setwd("~/my/git/alexeyche-junk/cns/R/srm/new")
-#setwd("~/prog/alexeyche-junk/cns/R/srm/new")
+#setwd("~/my/git/alexeyche-junk/cns/R/srm/new")
+setwd("~/prog/alexeyche-junk/cns/R/srm/new")
 source('include.R')
 source('ucr_ts.R')
+source('eval_funcs.R')
 
-dir = "/home/alexeyche/my/sim"
-#dir = "~/prog/sim"
+#dir = "/home/alexeyche/my/sim"
+dir = "~/prog/sim"
 #system(sprintf("find %s -name \"*.png\" -type f -exec rm -f {} \\;", dir))
 ID_MAX=0
 
@@ -31,7 +32,7 @@ neurons = SRMLayer(N, start_w.N)
 gr1$loadPatterns(train_dataset, duration, dt, lambda=8)
 gr1$loadPatterns(test_dataset, duration, dt, lambda=8)
 patt_len = length(gr1$patterns)
-neurons$connectFF(gr1$ids, start_w.M, 1:(N/2) )
+
 
 connection = matrix(gr1$ids, nrow=length(gr1$ids), ncol=N)
 connect_window = N*2
@@ -44,7 +45,6 @@ for(ni in 0:(N-1)) {
 
 neurons$connectFF(connection, start_w.M, 1:N )
 
-model = "50x10_lr0.5_lws_100.0"
 
 
 
@@ -114,6 +114,8 @@ split_data <- function(data, ratio=0.3) {
 
 #  binKernel(net_all[[2]]$data, 0, 100, 5)
 kernSize=10
+
+spikes_proc = post_process_set(net_all, trials, 0, duration, binKernel, kernSize)
 
 
 perf = ucr_test(spikes_proc[1:300], spikes_proc[301:600], eucl_dist_alg)

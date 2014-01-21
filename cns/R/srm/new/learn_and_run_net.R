@@ -14,7 +14,7 @@ run_net <- function(layers, run_options, open_plots = FALSE, model_descr=NULL) {
   net[id_n] = -Inf
   run_options$target_set$class = patterns[[id_patt]]$class
   
-  
+  loss = NULL
   for(ep in 1:run_options$epochs) {
     net_all = list()
     for(id_patt in 1:length(patterns)) {
@@ -37,11 +37,16 @@ run_net <- function(layers, run_options, open_plots = FALSE, model_descr=NULL) {
 
       p2 = levelplot(W, col.regions=colorRampPalette(c("black", "white")))
       p3 = levelplot(mean_grad, col.regions=colorRampPalette(c("black", "white")))
+      if(!is.null(loss))
+        p4 = xyplot(y~x, list(x=1:ep,y=loss), type="l")
       
       if(!not_fired)
-        print(p1, position=c(0, 0, 0.5, 1), more=TRUE)
+        print(p1, position=c(0, 0.5, 0.5, 1), more=TRUE)
+      if(!is.null(loss))
+        print(p4, position=c(0, 0, 0.5, 0.5), more=TRUE)
       print(p2, position=c(0.5, 0, 1, 0.5), more=TRUE)
       print(p3, position=c(0.5, 0.5, 1, 1))
+      
       dev.off()
       if(open_plots) 
         system(sprintf("eog -w %s 1>/dev/null 2>/dev/null",pic_filename), ignore.stdout=TRUE, ignore.stderr=TRUE, wait=FALSE)
@@ -49,17 +54,23 @@ run_net <- function(layers, run_options, open_plots = FALSE, model_descr=NULL) {
       
     }
     if(! is.null(run_options$test_function)) {
+      mode_acc = run_options$mode
       test_net_all = list()
       for(id_patt in 1:length(run_options$test_patterns)) {
-        
-        net[id_m] = run_options$test_patterns[[id_patt]]$data
-        net[id_n] = -Inf
-        run_options$target_set$class = run_options$test_patterns[[id_patt]]$label
-        
-        c(net, net_neurons, stat, mean_grad) := run_srm(net_neurons, net, run_options)
-        test_net_all[[id_patt]] = list(data=net, label=run_options$test_patterns[[id_patt]]$label)
+        for(trial in 1:run_options$trials) {
+          glob_id = trial+(id_patt-1)*run_options$trials
+          
+          net[id_m] = run_options$test_patterns[[id_patt]]$data
+          net[id_n] = -Inf
+          run_options$target_set$class = run_options$test_patterns[[id_patt]]$label
+          run_options$mode = "run"          
+          
+          c(net, net_neurons, stat, mean_grad) := run_srm(net_neurons, net, run_options)
+          test_net_all[[glob_id]] = list(data=net, label=run_options$test_patterns[[id_patt]]$label)
+        }
       }
-      run_options$test_function(net_all, test_net_all)
+      run_options$mode = mode_acc
+      loss <- c(loss, run_options$test_function(net_all, test_net_all))
     }
   }
 
