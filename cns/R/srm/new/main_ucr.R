@@ -1,7 +1,7 @@
-#setwd("~/my/git/alexeyche-junk/cns/R/srm/new")
-setwd("~/prog/alexeyche-junk/cns/R/srm/new")
-#dir = '~/my/sim'
-dir = '~/prog/sim'
+setwd("~/my/git/alexeyche-junk/cns/R/srm/new")
+#setwd("~/prog/alexeyche-junk/cns/R/srm/new")
+dir = '~/my/sim'
+#dir = '~/prog/sim'
 system(sprintf("find %s/R -name \"*.png\" -type f -exec rm -f {} \\;", dir))
 
 
@@ -27,18 +27,20 @@ ID_MAX=0
 
 data = synth # synthetic control
 if(!exists('train_dataset')) {
+  set.seed(1234)
   c(train_dataset, test_dataset) := read_ts_file(data)
   train_dataset = train_dataset[c(sample(1:50, 5), sample(51:100, 5), sample(101:150,5),
                                   sample(151:200, 5), sample(201:250,5), sample(251:300,5))] # cut
   test_dataset = test_dataset[c(sample(1:50, 5), sample(51:100, 5), sample(101:150,5),
                                 sample(151:200, 5), sample(201:250,5), sample(251:300,5))]
   
+  ucr_test(train_dataset, test_dataset, eucl_dist_alg)
+ 
 }
 
 duration = 300
 
 N = 10
-start_w = 2.0
 M = 50
 dt = 0.5
 
@@ -71,7 +73,7 @@ runmode="learn"
 #runmode="run"
 test_trials=3
 
-run_options = list(T0 = 0, Tmax = duration, dt = dt, learning_rate = 0.1, epochs = 100, weight_decay = 0,
+run_options = list(T0 = 0, Tmax = duration, dt = dt, learning_rate = 0.5, epochs = 100, weight_decay = 0,
                    learn_window_size = 150, mode=runmode, collect_stat=TRUE, 
                    target_set = list(target_function_gen = random_4spikes_tf, depress_null=FALSE),
                    learn_layer_id = 1,

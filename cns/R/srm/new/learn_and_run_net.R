@@ -16,7 +16,7 @@ run_net <- function(layers, run_options, open_plots = FALSE, model_descr=NULL) {
   
   loss = NULL
   for(ep in 1:run_options$epochs) {
-    net_all = list()
+#    net_all = list()
     for(id_patt in 1:length(patterns)) {
       net[id_m] = patterns[[id_patt]]$data
       net[id_n] = -Inf
@@ -50,12 +50,13 @@ run_net <- function(layers, run_options, open_plots = FALSE, model_descr=NULL) {
       dev.off()
       if(open_plots) 
         system(sprintf("eog -w %s 1>/dev/null 2>/dev/null",pic_filename), ignore.stdout=TRUE, ignore.stderr=TRUE, wait=FALSE)
-      net_all[[id_patt]] = list(data=net, label=patterns[[id_patt]]$label)
+      #net_all[[id_patt]] = list(data=net, label=patterns[[id_patt]]$label)
       
     }
     if(! is.null(run_options$test_function)) {
       mode_acc = run_options$mode
       test_net_all = list()
+      cat("Running net on test data (N=", length(run_options$test_patterns),") with ", run_options$trials, " sampling trials\n", sep="")
       for(id_patt in 1:length(run_options$test_patterns)) {
         for(trial in 1:run_options$trials) {
           glob_id = trial+(id_patt-1)*run_options$trials
@@ -69,6 +70,21 @@ run_net <- function(layers, run_options, open_plots = FALSE, model_descr=NULL) {
           test_net_all[[glob_id]] = list(data=net, label=run_options$test_patterns[[id_patt]]$label)
         }
       }
+      net_all = list()
+      cat("Running net on train data (N=", length(patterns),") with ", run_options$trials, " sampling trials\n", sep="")
+      for(id_patt in 1:length(patterns)) {
+        for(trial in 1:run_options$trials) {
+          glob_id = trial+(id_patt-1)*run_options$trials
+          
+          net[id_m] = patterns[[id_patt]]$data
+          net[id_n] = -Inf
+          run_options$target_set$class = patterns[[id_patt]]$label
+          run_options$mode = "run"          
+          
+          c(net, net_neurons, stat, mean_grad) := run_srm(net_neurons, net, run_options)
+          net_all[[glob_id]] = list(data=net, label=patterns[[id_patt]]$label)
+        }
+      }     
       run_options$mode = mode_acc
       loss <- c(loss, run_options$test_function(net_all, test_net_all))
     }

@@ -1,11 +1,11 @@
-#setwd("~/my/git/alexeyche-junk/cns/R/srm/new")
-setwd("~/prog/alexeyche-junk/cns/R/srm/new")
+setwd("~/my/git/alexeyche-junk/cns/R/srm/new")
+#setwd("~/prog/alexeyche-junk/cns/R/srm/new")
 source('include.R')
 source('ucr_ts.R')
 source('eval_funcs.R')
 
-#dir = "/home/alexeyche/my/sim"
-dir = "~/prog/sim"
+dir = "/home/alexeyche/my/sim"
+#dir = "~/prog/sim"
 #system(sprintf("find %s -name \"*.png\" -type f -exec rm -f {} \\;", dir))
 ID_MAX=0
 
@@ -14,7 +14,14 @@ N = 10
 
 data = synth # synthetic control
 
+set.seed(1234)
 c(train_dataset, test_dataset) := read_ts_file(data)
+train_dataset = train_dataset[c(sample(1:50, 5), sample(51:100, 5), sample(101:150,5),
+                                sample(151:200, 5), sample(201:250,5), sample(251:300,5))] # cut
+test_dataset = test_dataset[c(sample(1:50, 5), sample(51:100, 5), sample(101:150,5),
+                              sample(151:200, 5), sample(201:250,5), sample(251:300,5))]
+
+ucr_test(train_dataset, test_dataset, eucl_dist_alg)
 
 #train_dataset = train_dataset[c(1,101, 2, 102, 3, 103, 4, 104, 5, 105)] # cut
 
@@ -118,8 +125,9 @@ kernSize=10
 spikes_proc = post_process_set(net_all, trials, 0, duration, binKernel, kernSize)
 
 
-perf = ucr_test(spikes_proc[1:300], spikes_proc[301:600], eucl_dist_alg)
-prob_labels = sapply(spikes_proc[301:600][perf$prob_tc], function(x) x$label)
+
+perf = ucr_test(spikes_proc[1:length(train_dataset)], spikes_proc[ (length(train_dataset)+1):(length(test_dataset)+length(train_dataset))], eucl_dist_alg)
+prob_labels = sapply(spikes_proc[(length(train_dataset)+1):(length(test_dataset)+length(train_dataset))][perf$prob_tc], function(x) x$label)
 perf_bl = ucr_test(train_dataset, test_dataset, eucl_dist_alg)
 prob_labels_bl = sapply(test_dataset[perf_bl$prob_tc], function(x) x$label)
 
