@@ -1,12 +1,12 @@
-setwd("~/my/git/alexeyche-junk/cns/R/srm/new")
-#setwd("~/prog/alexeyche-junk/cns/R/srm/new")
+#setwd("~/my/git/alexeyche-junk/cns/R/srm/new")
+setwd("~/prog/alexeyche-junk/cns/R/srm/new")
 source('include.R')
 source('ucr_ts.R')
 source('eval_funcs.R')
 source('layers.R')
 
-dir = "/home/alexeyche/my/sim"
-#dir = "~/prog/sim"
+#dir = "/home/alexeyche/my/sim"
+dir = "~/prog/sim"
 #system(sprintf("find %s -name \"*.png\" -type f -exec rm -f {} \\;", dir))
 ID_MAX=0
 
@@ -56,7 +56,7 @@ neurons$connectFF(connection, start_w.M, 1:N )
 
 
 model_file = sprintf("%s/R/%s_%dx%d", dir, data, M, N)
-
+model_file = "/mnt/yandex.disk/synthetic_control_50x10"
 
 if(file.exists(paste(model_file, ".idx", sep=""))) {
     W = loadMatrix(model_file, 1)
@@ -80,7 +80,7 @@ run_options = list(T0 = 0, Tmax = duration, dt = 0.5, learning_rate = 0.5,
 #patterns = gr1$patterns[1:length(train_dataset)] #[c(1:10,51:60, 101:110, 151:160, 201:210, 251:260)]
 patterns = gr1$patterns #[(length(train_dataset)+1):(length(train_dataset)+length(test_dataset))] #[c(1:10,51:60, 101:110, 151:160, 201:210, 251:260)]
 
-trials = 10
+trials = 1
 net_all = list()
 u_all = list()
 p_all = list()
@@ -131,6 +131,8 @@ prob_labels = sapply(spikes_proc[(length(train_dataset)+1):(length(test_dataset)
 perf_bl = ucr_test(train_dataset, test_dataset, eucl_dist_alg)
 prob_labels_bl = sapply(test_dataset[perf_bl$prob_tc], function(x) x$label)
 
+p = plot_rastl(net_all[[6]]$data)
+computeKernelMatrix( kernelFactory("binned_lin",300, 5), net_all[[6]]$data, 20)
 #dist = matrix(0, nrow=length(spikes_proc), ncol=length(spikes_proc))
 #for(i in 1:length(spikes_proc)) {
 #  for(j in 1:length(spikes_proc)) {
