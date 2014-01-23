@@ -24,7 +24,7 @@ SEXP simLayers(const List sim_options, const List constants, List layers, List n
             const arma::vec coins(u.size(), arma::fill::randu); 
             for(size_t ui=0; ui<u.size(); ui++) {
                 if(g(u(ui), constants)*dt > coins(ui)) {
-                    printf("spike %d at %f with u = %f  and  p = %f\n", ids[ui], T(ti), u(ui), g(u(ui), constants));
+                    //printf("spike %d at %f with u = %f  and  p = %f\n", ids[ui], T(ti), u(ui), g(u(ui), constants));
                     NumericVector st = net[ids[ui]-1];
                     st.push_back(T(ti));
                     net[ids[ui]-1] = st;
