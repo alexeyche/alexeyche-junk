@@ -1,13 +1,12 @@
 
-run_net <- function(layers, run_options, open_plots = FALSE, model_descr=NULL) {
-  input_neurons = layers[[1]]
-  net_neurons = layers[2:length(layers)]
+run_net <- function(input_neurons, layers, run_options, open_plots = FALSE, model_descr=NULL) {
+  net_neurons = layers
   patterns = input_neurons$patterns
   lengths = sapply(patterns, function(p) length(p$data))
   stopifnot(all(lengths == lengths[1]))
   
   id_m = input_neurons$ids
-  id_n = c(sapply(layers[2:length(layers)], function(n) n$ids))  
+  id_n = c(sapply(net_neurons$l, function(n) n$ids))  
   
   net = list()
   net[id_m] = patterns[[1]]$data
@@ -26,8 +25,8 @@ run_net <- function(layers, run_options, open_plots = FALSE, model_descr=NULL) {
       
       cat("epoch: ", ep, ", pattern # ", id_patt,"\n")
           
-      neurons = net_neurons[[1]]
-      W = get_weights_matrix(net_neurons)
+      neurons = net_neurons$l[[1]]
+      W = get_weights_matrix(net_neurons$l)
       not_fired = all(sapply(net[id_n], function(sp) length(sp) == 1))
       
       pic_filename = sprintf("%s/R/run_ep%s_patt%s_label%s.png", dir, ep, id_patt, patterns[[id_patt]]$label)

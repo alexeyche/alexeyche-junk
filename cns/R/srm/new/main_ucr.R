@@ -17,6 +17,8 @@ source('srm.R')
 source('grad_funcs.R')
 source('serialize_to_bin.R')
 source('eval_funcs.R')
+source('layers.R')
+
 ID_MAX=0
 #require(snowfall)
 #if(!sfIsRunning()) {
@@ -106,9 +108,9 @@ model_file = sprintf("%s/R/%s_%dx%d", dir, data, M, N)
   }
 #}
 patterns = gr1$patterns
-layers = list(gr1, neurons)
+layers = SimLayers( list(neurons) )
 
-run_net(layers, run_options)
+run_net(gr1, layers, run_options)
 
 W = get_weights_matrix(list(neurons))
 if(runmode == "learn") {

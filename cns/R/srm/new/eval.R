@@ -3,6 +3,7 @@ setwd("~/my/git/alexeyche-junk/cns/R/srm/new")
 source('include.R')
 source('ucr_ts.R')
 source('eval_funcs.R')
+source('layers.R')
 
 dir = "/home/alexeyche/my/sim"
 #dir = "~/prog/sim"
@@ -16,11 +17,10 @@ data = synth # synthetic control
 
 set.seed(1234)
 c(train_dataset, test_dataset) := read_ts_file(data)
-train_dataset = train_dataset[c(sample(1:50, 5), sample(51:100, 5), sample(101:150,5),
-                                sample(151:200, 5), sample(201:250,5), sample(251:300,5))] # cut
-test_dataset = test_dataset[c(sample(1:50, 5), sample(51:100, 5), sample(101:150,5),
-                              sample(151:200, 5), sample(201:250,5), sample(251:300,5))]
-
+train_dataset = train_dataset[c(sample(1:50, 10), sample(51:100, 10), sample(101:150,10),
+                                  sample(151:200, 10), sample(201:250,10), sample(251:300,10))] # cut
+test_dataset = test_dataset[c(sample(1:50, 10), sample(51:100, 10), sample(101:150, 10),
+                                sample(151:200, 10), sample(201:250,5), sample(251:300, 10))]
 ucr_test(train_dataset, test_dataset, eucl_dist_alg)
 
 #train_dataset = train_dataset[c(1,101, 2, 102, 3, 103, 4, 104, 5, 105)] # cut
@@ -73,7 +73,7 @@ if(file.exists(paste(model_file, ".idx", sep=""))) {
 net_neurons = list(neurons)
 
 run_options = list(T0 = 0, Tmax = duration, dt = 0.5, learning_rate = 0.5,
-                   learn_window_size = 100, mode="run", collect_stat=TRUE, 
+                   learn_window_size = 300, mode="run", collect_stat=TRUE, 
                    target_set = list(target_function_gen = random_2spikes_tf, depress_null=FALSE),
                    learn_layer_id = 1
 )
@@ -84,7 +84,7 @@ trials = 10
 net_all = list()
 u_all = list()
 p_all = list()
-net_neurons = list(neurons)
+net_neurons = SimLayers(list(neurons))
 for(id_patt in 1:length(patterns)) {
   for(trial in 1:trials) {
     net = list()
@@ -96,8 +96,8 @@ for(id_patt in 1:length(patterns)) {
     net = lapply(net[neurons$ids], function(sp) sp[sp != -Inf])
     glob_id = trial+(id_patt-1)*trials
     net_all[[glob_id]] = list(data=net, label=patterns[[id_patt]]$label)
-    u_all[[glob_id]] = list(data=stat[[1]]$u, label=patterns[[id_patt]]$label)
-    p_all[[glob_id]] = list(data=stat[[1]]$p, label=patterns[[id_patt]]$label)    
+#    u_all[[glob_id]] = list(data=stat[[1]]$u, label=patterns[[id_patt]]$label)
+#    p_all[[glob_id]] = list(data=stat[[1]]$p, label=patterns[[id_patt]]$label)    
   }
 }
 
