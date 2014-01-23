@@ -10,6 +10,13 @@ double nu(const double &s, const List &c) {
     return as<double>(c["u_abs"])*exp(-(s+as<double>(c["dr"]))/as<double>(c["trf"])) + as<double>(c["u_r"])*exp(-s/as<double>(c["trs"]));
 }
 
+double g(const double &u, const List &c) {
+//   (beta/alpha)*(log(1.1+exp(alpha*(tr-u))) -alpha*(tr-u))  
+    return ( as<double>(c["beta"])/as<double>(c["alpha"]) ) * 
+                ( log( 1 + exp( as<double>(c["alpha"])*(as<double>(c["tr"])-u))) - 
+                                    as<double>(c["alpha"])*(as<double>(c["tr"])-u)) ;
+}
+
 
 double u(const double &t, const SInput &si) {
   double e_syn = 0;
@@ -61,6 +68,24 @@ SEXP USRM(const NumericVector t, const List constants, const IntegerVector neuro
     u_val[ti] = u(t[ti], si);
   }
   return u_val;
+}
+
+NumericVector simNeurons(const double t, const List &constants, Reference &neurons, const List &net) {
+  const IntegerVector ids = as<const IntegerVector>(neurons.field("ids"));
+  const List weights = as<const List>(neurons.field("weights"));
+  const List id_conns = as<const List>(neurons.field("id_conns"));
+
+  NumericVector u_all(ids.size());
+  
+  for(size_t it = 0; it<ids.size(); it++) {
+    IntegerVector id(1); 
+    id[0] = ids(it);
+    IntegerVector id_conn(id_conns[it]);
+    NumericVector w(weights[it]);
+    SInput si(constants, id, id_conn, w, net);
+    u_all(it) = u(t, si);
+  }
+  return u_all;
 }
 
 

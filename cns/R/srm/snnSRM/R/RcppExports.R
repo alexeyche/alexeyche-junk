@@ -17,6 +17,10 @@ USRMs <- function(t, constants, neurons_id, neurons_id_conn, neurons_w, net) {
     .Call('snnSRM_USRMs', PACKAGE = 'snnSRM', t, constants, neurons_id, neurons_id_conn, neurons_w, net)
 }
 
+simLayers <- function(sim_options, constants, layers, net) {
+    .Call('snnSRM_simLayers', PACKAGE = 'snnSRM', sim_options, constants, layers, net)
+}
+
 timesTwo <- function(x) {
     .Call('snnSRM_timesTwo', PACKAGE = 'snnSRM', x)
 }

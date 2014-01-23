@@ -23,8 +23,8 @@ nu <- Vectorize(function(s) {
 #plot(t, nu(t-25), type="l")
 
 # stochastic threshold g(u):
-alpha <- 1
-beta <- 1
+alpha <- 0.75
+beta <- 0.75
 tr <- -50 # mV
 g <- Vectorize(function(u) {
   ans=(beta/alpha)*(log(1.1+exp(alpha*(tr-u))) -alpha*(tr-u))   

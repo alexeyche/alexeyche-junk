@@ -53,7 +53,7 @@ run_net <- function(layers, run_options, open_plots = FALSE, model_descr=NULL) {
       #net_all[[id_patt]] = list(data=net, label=patterns[[id_patt]]$label)
       
     }
-    if(! is.null(run_options$test_function)) {
+    if((! is.null(run_options$test_function))&&(ep %% run_options$test_run_freq == 0)) {
       mode_acc = run_options$mode
       test_net_all = list()
       cat("Running net on test data (N=", length(run_options$test_patterns),") with ", run_options$trials, " sampling trials\n", sep="")
