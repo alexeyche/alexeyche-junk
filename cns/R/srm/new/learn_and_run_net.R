@@ -23,9 +23,7 @@ run_net <- function(input_neurons, layers, run_options, open_plots = FALSE, mode
       run_options$target_set$label = patterns[[id_patt]]$label
       
       c(net, net_neurons, stat, mean_grad) := run_srm(net_neurons, net, run_options)
-      if(ep>1) {        
-        mean_dev = c(mean_dev, reward_func(net[id_n], run_options))
-      }
+      mean_dev = c(mean_dev, reward_func(net[id_n], run_options))
       cat("epoch: ", ep, ", pattern # ", id_patt,"\n")
           
       neurons = net_neurons$l[[1]]

@@ -27,10 +27,13 @@ get_mean_activity = function(net_all, ro) {
 }
 
 reward_func = function(curr_act, ro) {
-  fp = get_finger_print(curr_act, ro$T0, ro$Tmax, ro$fp_window, ro$fp_kernel_size)
-  c(mean_act, dev_range) := ro$mean_activity_stat
-  dev_norm = ( sum( (fp-mean_act)^2)-dev_range[1])/(dev_range[2]-dev_range[1])
-  return(dev_norm - ro$dev_frac_norm)  
+  if(!is.null(ro$mean_activity_stat)) {
+      fp = get_finger_print(curr_act, ro$T0, ro$Tmax, ro$fp_window, ro$fp_kernel_size)
+      c(mean_act, dev_range) := ro$mean_activity_stat
+      dev_norm = ( sum( (fp-mean_act)^2)-dev_range[1])/(dev_range[2]-dev_range[1])
+      return(dev_norm - ro$dev_frac_norm)  
+  }
+  return(1.0)
 }
 
 

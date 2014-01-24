@@ -44,10 +44,9 @@ run_srm <- function(net_neurons, net, ro) {
         gradients = lapply(2:lg, function(gi) mapply("+", gradients[[gi-1]], gradients[[gi]], SIMPLIFY=FALSE))
     }
     
-    if(!is.null(ro$mean_activity_stat)) {
-        rew = reward_func(net[ net_neurons$l[[ro$learn_layer_id]]$ids ], ro)           
-        gradients = lapply(gradients, function(sp) sp * rew)
-    }   
+    rew = reward_func(net[ net_neurons$l[[ro$learn_layer_id]]$ids ], ro)           
+    gradients = lapply(gradients, function(sp) sp * rew)
+    
     for(ni in 1:net_neurons$l[[ro$learn_layer_id]]$len) {
         acc = ro$learning_rate * gradients[[i]]  - ro$weight_decay * net_neurons$l[[ro$learn_layer_id]]$weights[[i]]
 
