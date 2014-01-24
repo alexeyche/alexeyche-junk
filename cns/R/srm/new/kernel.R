@@ -1,9 +1,9 @@
 
-SQRT_2PI = sqrt(2*pi)
+SQRT_2PI = 
 
 
 gaussian_kernel = function(s, sigma) {
-  sum((1/SQRT_2PI)*exp(-(s^2)/sigma))
+  sum((1/sqrt(2*pi*sigma^2))*exp(-(s^2)/(2*sigma^2)))
 }
 
 get_finger_print = function(spikes, T0, Tmax, window, sigma) {
@@ -18,7 +18,7 @@ get_finger_print = function(spikes, T0, Tmax, window, sigma) {
 }
 
 
-x = lapply(net_all, function(x) get_finger_print(x$data, 0, 300, 30, 200))
+x = lapply(net_all, function(x) get_finger_print(x$data, 0, 300, 30, 15))
 x = simplify2array(x)
 xm = apply(x, c(1,2), mean)
 x1 = x[,,1]
