@@ -24,7 +24,7 @@ binSpikeTrains <- function(st, T, binSize) {
 }
 binnedLinear <- function(ks, st1, st2, ksize) {
     x <- binSpikeTrains( list(st1, st2), ks$T, ksize[1])
-    v <- x[,1] %*% t(x[,2])
+    v <- t(x[,1]) %*%  x[,2]
     return(v)
 }
 
@@ -73,6 +73,10 @@ computeKernelMatrix <- function(ks, sts, ksize, sts2=NULL) {
         KM <- matrix(0, nrow=N, ncol=N) 
         for(k1 in 1:N) {
             for(k2 in k1:N) {
+                if ((length(sts[[k1]]) == 0)||(length(sts[[k2]]) == 0)) {
+                  KM[k1, k2] = KM[k2, k1] = 0
+                  next
+                } 
                 KM[k1,k2] <- ks$kernel(ks, sts[[k1]], sts[[k2]], ksize)
                 KM[k2,k1] <- Conj(KM[k1,k2])
             }
