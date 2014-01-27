@@ -1,7 +1,7 @@
 #setwd("~/my/git/alexeyche-junk/cns/R/srm/new")
 setwd("~/prog/alexeyche-junk/cns/R/srm/new")
-#dir = '~/prog/sim/0.15run_sec'
-dir = '~/prog/sim/0.125run_sec'
+dir = '~/prog/sim/0.15run_sec'
+#dir = '~/prog/sim/0.125run_sec'
 system(sprintf("find %s/R -maxdepth 1 -name \"*.png\" -type f -exec rm -f {} \\;", dir))
 
 

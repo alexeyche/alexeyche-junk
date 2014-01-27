@@ -61,43 +61,43 @@ run_net <- function(input_neurons, layers, run_options, open_plots = FALSE, mode
       run_options$mean_activity_stat = get_mean_activity(net_all, run_options)
     
     if((! is.null(run_options$test_function))&&(ep %% run_options$test_run_freq == 0)) {
-      mode_acc = run_options$mode
-      test_net_all = list()
-      cat("Running net on test data (N=", length(run_options$test_patterns),") with ", run_options$trials, " sampling trials\n", sep="")
-      for(id_patt in 1:length(run_options$test_patterns)) {
-        for(trial in 1:run_options$trials) {
-          glob_id = trial+(id_patt-1)*run_options$trials
-          
-          net[id_m] = run_options$test_patterns[[id_patt]]$data
-          net[id_n] = -Inf
-          run_options$target_set$class = run_options$test_patterns[[id_patt]]$label
-          run_options$mode = "run"          
-          
-          c(net, net_neurons, stat, mean_grad) := run_srm(net_neurons, net, run_options)
-          net = lapply(net[neurons$ids], function(sp) sp[sp != -Inf])
-
-          test_net_all[[glob_id]] = list(data=net, label=run_options$test_patterns[[id_patt]]$label)
-        }
-      }
-      net_all = list()
-      cat("Running net on train data (N=", length(patterns),") with ", run_options$trials, " sampling trials\n", sep="")
-      for(id_patt in 1:length(patterns)) {
-        for(trial in 1:run_options$trials) {
-          glob_id = trial+(id_patt-1)*run_options$trials
-          
-          net[id_m] = patterns[[id_patt]]$data
-          net[id_n] = -Inf
-          run_options$target_set$class = patterns[[id_patt]]$label
-          run_options$mode = "run"          
-          
-          c(net, net_neurons, stat, mean_grad) := run_srm(net_neurons, net, run_options)
-          net = lapply(net[neurons$ids], function(sp) sp[sp != -Inf])
-          
-          net_all[[glob_id]] = list(data=net, label=patterns[[id_patt]]$label)
-        }
-      }     
-      run_options$mode = mode_acc
-      loss <- c(loss, run_options$test_function(net_all, test_net_all))
+#      mode_acc = run_options$mode
+#      test_net_all = list()
+#      cat("Running net on test data (N=", length(run_options$test_patterns),") with ", run_options$trials, " sampling trials\n", sep="")
+#      for(id_patt in 1:length(run_options$test_patterns)) {
+#        for(trial in 1:run_options$trials) {
+#          glob_id = trial+(id_patt-1)*run_options$trials
+#          
+#          net[id_m] = run_options$test_patterns[[id_patt]]$data
+#          net[id_n] = -Inf
+#          run_options$target_set$class = run_options$test_patterns[[id_patt]]$label
+#          run_options$mode = "run"          
+#          
+#          c(net, net_neurons, stat, mean_grad) := run_srm(net_neurons, net, run_options)
+#          net = lapply(net[neurons$ids], function(sp) sp[sp != -Inf])
+#
+#          test_net_all[[glob_id]] = list(data=net, label=run_options$test_patterns[[id_patt]]$label)
+#        }
+#      }
+#      net_all = list()
+#      cat("Running net on train data (N=", length(patterns),") with ", run_options$trials, " sampling trials\n", sep="")
+#      for(id_patt in 1:length(patterns)) {
+#        for(trial in 1:run_options$trials) {
+#          glob_id = trial+(id_patt-1)*run_options$trials
+#          
+#          net[id_m] = patterns[[id_patt]]$data
+#          net[id_n] = -Inf
+#          run_options$target_set$class = patterns[[id_patt]]$label
+#          run_options$mode = "run"          
+#          
+#          c(net, net_neurons, stat, mean_grad) := run_srm(net_neurons, net, run_options)
+#          net = lapply(net[neurons$ids], function(sp) sp[sp != -Inf])
+#          
+#          net_all[[glob_id]] = list(data=net, label=patterns[[id_patt]]$label)
+#        }
+#      }     
+#      run_options$mode = mode_acc
+#      loss <- c(loss, run_options$test_function(net_all, test_net_all))
       model_file = sprintf("%s/R/%s_%dx%d_%d", dir, data, M, N, ep)
  
       W = get_weights_matrix(list(neurons))
