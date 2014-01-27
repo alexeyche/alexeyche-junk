@@ -27,7 +27,6 @@ grad_func <- function(neurons, T0, Tmax, net, target_set) {
                 return(ans)
               }
   })
-  
   spike_part = lapply(1:length(id_n), function(id_number) {
         sapply(neurons$id_conns[[id_number]], function(idc) {
           if(!is.null(nspikes[[id_number]])) {
@@ -45,6 +44,7 @@ grad_func <- function(neurons, T0, Tmax, net, target_set) {
   int_options = list(T0 = T0, Tmax=Tmax, dim=sum(sapply(neurons$id_conns, length)), quad=256)  
  
   grad = integrateSRM_vec(constants, int_options, neurons$ids, neurons$id_conns, neurons$weights, net)$out
+  
   int_part = list()
   iter=1
   for(id in 1:neurons$len) {
@@ -55,6 +55,6 @@ grad_func <- function(neurons, T0, Tmax, net, target_set) {
     }
     iter = iter + length(neurons$id_conns[[id]])
   } 
-
+  print(int_part)
   return(mapply("+", spike_part, int_part, SIMPLIFY=FALSE))
 }
