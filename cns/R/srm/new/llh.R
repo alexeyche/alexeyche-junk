@@ -1,12 +1,4 @@
 
-require(cubature)
-
-integrand <- function(t, net, neurons) {
-  syn_epsp = sapply(net, function(sp) sum(epsp(t-sp)))  
-  ps = p_stroke(neurons$u(t, net))
-  unlist(lapply(1:neurons$len, function(id) syn_epsp[neurons$id_conns[[id]] ] * ps[id] )  )
-}
-
 grad_func <- function(neurons, T0, Tmax, net, target_set) {
   id_n = neurons$ids #sapply(neurons, function(n) n$id)
   
@@ -16,30 +8,15 @@ grad_func <- function(neurons, T0, Tmax, net, target_set) {
     if(left<=right) sp[left:right]
   })  
   
-  if(sum(sapply(nspikes, length)/(Tmax-T0)) > 0.15) {
-    nspikes = lapply(1:length(id_n), function(ni) { 
-        if(!is.null(nspikes[[ni]])) {
-          probs = g(neurons$u_one(ni, nspikes[[ni]], net))
-          most_likely = probs>=mean(probs)
-          nspikes[[ni]][most_likely]
-        }
-   })
-  }
-#  nspikes = lapply(1:length(id_n), function(ni) { 
-#    if(!is.null(nspikes[[ni]])) {
-#      if( (length(nspikes[[ni]])/(Tmax-T0)) > 0.034)  {  #  >= 4 spikes
-#        probs = g(neurons$u_one(ni, nspikes[[ni]], net))
-#        most_likely = probs>=mean(probs)
-#        nspikes[[ni]][most_likely]
-#        #NULL
-#      } else {
-#        nspikes[[ni]]
-#      }
-#    }
-#  })
-  
-  #print(sum(sapply(nspikes, length)/(Tmax-T0)))
-  #nspikes = lapply(1:length(nspikes), target_set$target_function_gen(nspikes))
+#  if(sum(sapply(nspikes, length)/(Tmax-T0)) > 0.175) {
+#    nspikes = lapply(1:length(id_n), function(ni) { 
+#        if(!is.null(nspikes[[ni]])) {
+#          probs = g(neurons$u_one(ni, nspikes[[ni]], net))
+#          most_likely = probs>=mean(probs)
+#          nspikes[[ni]][most_likely]
+#        }
+#   })
+#  }
   
   left_part = lapply(1:length(id_n), function(number) {  
               if(!is.null(nspikes[[number]])) {

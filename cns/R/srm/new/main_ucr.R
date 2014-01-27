@@ -1,7 +1,8 @@
-#setwd("~/my/git/alexeyche-junk/cns/R/srm/new")
-setwd("~/prog/alexeyche-junk/cns/R/srm/new")
-dir = '~/prog/sim/0.15run_sec'
+setwd("~/my/git/alexeyche-junk/cns/R/srm/new")
+#setwd("~/prog/alexeyche-junk/cns/R/srm/new")
+#dir = '~/prog/sim/0.15run_sec'
 #dir = '~/prog/sim/0.125run_sec'
+dir = '/home/alexeyche/my/sim/run_0.175'
 system(sprintf("find %s/R -maxdepth 1 -name \"*.png\" -type f -exec rm -f {} \\;", dir))
 
 
@@ -77,7 +78,7 @@ runmode="learn"
 test_trials=5
 
 run_options = list(T0 = 0, Tmax = duration, dt = dt, 
-                   learning_rate = 0.005, epochs = 100, start_epoch = 1, weight_decay = 0,
+                   learning_rate = 0.01, epochs = 100, start_epoch = 1, weight_decay = 0,
                    reward_learning=FALSE,
                    fp_window = 30, fp_kernel_size = 15, dev_frac_norm = 0.25,
                    learn_window_size = 150, mode=runmode, collect_stat=TRUE, 
