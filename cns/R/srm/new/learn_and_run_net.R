@@ -14,7 +14,7 @@ run_net <- function(input_neurons, layers, run_options, open_plots = FALSE, mode
   run_options$target_set$class = patterns[[id_patt]]$class
   
   loss = NULL  
-  for(ep in 1:run_options$epochs) {
+  for(ep in run_options$start_epoch:run_options$epochs) {
     mean_dev = NULL
     net_all = list()    
     for(id_patt in 1:length(patterns)) {
@@ -22,7 +22,7 @@ run_net <- function(input_neurons, layers, run_options, open_plots = FALSE, mode
       net[id_n] = -Inf
       run_options$target_set$label = patterns[[id_patt]]$label
       
-      c(net, net_neurons, stat, mean_grad) := run_srm(net_neurons, net, run_options)
+      c(net, net_neurons, stat, grad) := run_srm(net_neurons, net, run_options)
       mean_dev = c(mean_dev, reward_func(net[id_n], run_options))
       cat("epoch: ", ep, ", pattern # ", id_patt,"\n")
           
@@ -36,18 +36,18 @@ run_net <- function(input_neurons, layers, run_options, open_plots = FALSE, mode
         p1 = plot_rastl(net[id_n], sprintf("epoch %d, pattern %d, class %d", ep, id_patt, patterns[[id_patt]]$label))
 
       p2 = levelplot(W, col.regions=colorRampPalette(c("black", "white")))
-      p3 = levelplot(mean_grad, col.regions=colorRampPalette(c("black", "white")))
-#      if(!is.null(loss))
-#        p4 = xyplot(y~x, list(x=1:ep,y=loss), type="l")
-      if(!is.null(mean_dev))
-        p4 = xyplot(y~x, list(x=1:id_patt,y=mean_dev), type="l")
+      p3 = levelplot(list_to_matrix(grad), col.regions=colorRampPalette(c("black", "white")))
+      if(!is.null(loss))
+        p4 = xyplot(y~x, list(x=1:ep,y=loss), type="l")
+#      if(!is.null(mean_dev))
+#        p4 = xyplot(y~x, list(x=1:id_patt,y=mean_dev), type="l")
       
       if(!not_fired)
         print(p1, position=c(0, 0.5, 0.5, 1), more=TRUE)
-#      if(!is.null(loss))
-#        print(p4, position=c(0, 0, 0.5, 0.5), more=TRUE)
-      if(!is.null(mean_dev))
-        print(p4, position=c(0, 0, 0.5, 0.5), more=TRUE)      
+      if(!is.null(loss))
+        print(p4, position=c(0, 0, 0.5, 0.5), more=TRUE)
+#      if(!is.null(mean_dev))
+#        print(p4, position=c(0, 0, 0.5, 0.5), more=TRUE)      
       print(p2, position=c(0.5, 0, 1, 0.5), more=TRUE)
       print(p3, position=c(0.5, 0.5, 1, 1))
       
@@ -57,7 +57,8 @@ run_net <- function(input_neurons, layers, run_options, open_plots = FALSE, mode
       net_all[[id_patt]] = list(data=net[id_n], label=patterns[[id_patt]]$label)
       
     }
-    run_options$mean_activity_stat = get_mean_activity(net_all, run_options)
+    if(run_options$reward_learning)
+      run_options$mean_activity_stat = get_mean_activity(net_all, run_options)
     
     if((! is.null(run_options$test_function))&&(ep %% run_options$test_run_freq == 0)) {
       mode_acc = run_options$mode
@@ -97,7 +98,13 @@ run_net <- function(input_neurons, layers, run_options, open_plots = FALSE, mode
       }     
       run_options$mode = mode_acc
       loss <- c(loss, run_options$test_function(net_all, test_net_all))
+      model_file = sprintf("%s/R/%s_%dx%d_%d", dir, data, M, N, ep)
+ 
+      W = get_weights_matrix(list(neurons))
+      saveMatrixList(model_file, list(W))
+      system(sprintf("R --slave --args %s < eval.R > %s/R/%d.log", model_file, dir, ep), wait=FALSE) 
     }
+
   }
 
 }

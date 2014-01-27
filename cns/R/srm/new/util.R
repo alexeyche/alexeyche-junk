@@ -57,6 +57,16 @@ get_weights_matrix <- function(layers) {
   return(W)
 }
 
+list_to_matrix = function(l) {
+  maxw_len = 0
+  invisible(sapply(l, function(n) maxw_len<<-max(maxw_len, length(n))))
+  m = matrix(0, nrow=length(l), ncol=maxw_len)
+  for(sp_i in 1:length(l)) {
+    m[sp_i,] = c(l[[sp_i]], rep(0, maxw_len - length(l[[sp_i]]) ) )
+  }
+  return(m)
+}
+
 get_unique_ids <- function(n) {
   if(!exists('ID_MAX')) { assign('ID_MAX', 0, envir=.GlobalEnv) }
   id_max = get('ID_MAX',.GlobalEnv)

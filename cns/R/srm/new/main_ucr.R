@@ -1,7 +1,7 @@
-setwd("~/my/git/alexeyche-junk/cns/R/srm/new")
-#setwd("~/prog/alexeyche-junk/cns/R/srm/new")
-dir = '~/my/sim/tmp'
-#dir = '~/prog/sim'
+#setwd("~/my/git/alexeyche-junk/cns/R/srm/new")
+setwd("~/prog/alexeyche-junk/cns/R/srm/new")
+#dir = '~/prog/sim/0.15run_sec'
+dir = '~/prog/sim/0.125run_sec'
 system(sprintf("find %s/R -maxdepth 1 -name \"*.png\" -type f -exec rm -f {} \\;", dir))
 
 
@@ -32,10 +32,10 @@ data = synth # synthetic control
 if(!exists('train_dataset')) {
   set.seed(1234)
   c(train_dataset, test_dataset) := read_ts_file(data)
-  train_dataset = train_dataset[c(sample(1:50, 10), sample(51:100, 10), sample(101:150,10),
-                                  sample(151:200, 10), sample(201:250,10), sample(251:300,10))] # cut
-  test_dataset = test_dataset[c(sample(1:50, 10), sample(51:100, 10), sample(101:150, 10),
-                                sample(151:200, 10), sample(201:250,10), sample(251:300, 10))]
+ #train_dataset = train_dataset[c(sample(1:50, 10), sample(51:100, 10), sample(101:150,10),
+#                                 sample(151:200, 10), sample(201:250,10), sample(251:300,10))] # cut
+# test_dataset = test_dataset[c(sample(1:50, 10), sample(51:100, 10), sample(101:150, 10),
+#                               sample(151:200, 10), sample(201:250,10), sample(251:300, 10))]
   
   ucr_test(train_dataset, test_dataset, eucl_dist_alg)
  
@@ -77,18 +77,19 @@ runmode="learn"
 test_trials=5
 
 run_options = list(T0 = 0, Tmax = duration, dt = dt, 
-                   learning_rate = 0.01, epochs = 100, weight_decay = 0,
-                   fp_window = 30, fp_kernel_size = 15, dev_frac_norm = 0.5,
+                   learning_rate = 0.005, epochs = 100, start_epoch = 1, weight_decay = 0,
+                   reward_learning=FALSE,
+                   fp_window = 30, fp_kernel_size = 15, dev_frac_norm = 0.25,
                    learn_window_size = 150, mode=runmode, collect_stat=TRUE, 
                    target_set = list(target_function_gen = random_4spikes_tf, depress_null=FALSE),
                    learn_layer_id = 1,
                    test_patterns = gr2$patterns, 
                    test_function = function(train_set, test_set) {
-                     kernSize=10
-                     train_processed = post_process_set(train_set, test_trials, 0, duration, binKernel, kernSize)
-                     test_processed = post_process_set(test_set, test_trials, 0, duration, binKernel, kernSize)
-                     perf = ucr_test(train_processed, test_processed, eucl_dist_alg)
-                     return(perf$rate)
+#                     kernSize=10
+#                     train_processed = post_process_set(train_set, test_trials, 0, duration, binKernel, kernSize)
+#                     test_processed = post_process_set(test_set, test_trials, 0, duration, binKernel, kernSize)
+#                     perf = ucr_test(train_processed, test_processed, eucl_dist_alg)
+#                     return(perf$rate)
                    }, trials=test_trials, test_run_freq=5
 )
 ro = run_options # for debug
@@ -98,6 +99,7 @@ id_patt = 1
 
 model_file = sprintf("%s/R/%s_%dx%d", dir, data, M, N)
 if(runmode=="run") {
+  model_file = "/home/alexeyche/prog/sim/0.15run/R/synthetic_control_50x10_100"
   if(file.exists(paste(model_file, ".idx", sep=""))) {  
     W = loadMatrix(model_file, 1)
     invisible(sapply(1:N, function(id) { 
@@ -112,6 +114,7 @@ if(runmode=="run") {
 }
 patterns = gr1$patterns
 layers = SimLayers( list(neurons) )
+input_neurons = gr1
 
 run_net(gr1, layers, run_options)
 

@@ -47,12 +47,13 @@ SRMLayer = setRefClass("SRMLayer", fields = list(weights = "list", id_conns = "l
                          if(is.null(neurons_to_connect)) {
                            neurons_to_connect=1:.self$len
                          }
+                         if(!is.matrix(ids_to_connect)) {
+                           ids_to_connect = matrix(ids_to_connect, nrow=length(ids_to_connect), ncol=length(neurons_to_connect))
+                         }                         
+                         
                          if(!is.matrix(weight)) {
                            weight = matrix(weight, nrow=nrow(ids_to_connect), ncol=length(neurons_to_connect))
                          }
-                         if(!is.matrix(ids_to_connect)) {
-                            ids_to_connect = matrix(ids_to_connect, nrow=nrow(ids_to_connect), ncol=length(neurons_to_connect))
-                         }                         
                          
                          for(ni in neurons_to_connect) {
                            conn_exists = ids_to_connect[,ni] != 0

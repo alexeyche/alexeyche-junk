@@ -1,7 +1,5 @@
 #!/usr/bin/RScript
 
-require(zoo)
-
 TSNeurons <- setRefClass("TSNeurons", fields = list(M = "vector", patterns = "list", ids="vector"), 
                                     methods = list(
                                     initialize = function(M, ids_c=NULL) {

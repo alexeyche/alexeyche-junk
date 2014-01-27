@@ -1,11 +1,12 @@
 #!/usr/bin/RScript
-#setwd("~/prog/alexeyche-junk/cns/R/srm/new")
-setwd("~/my/git/alexeyche-junk/cns/R/srm/new")
+setwd("~/prog/alexeyche-junk/cns/R/srm/new")
+#setwd("~/my/git/alexeyche-junk/cns/R/srm/new")
 require(snnSRM)
 require(snowfall)
 require(cubature)
 source('util.R')
 source('neuron.R')
+source('layers.R')
 source('gen_spikes.R')
 source('plot_funcs.R')
 source('grad_funcs.R')
@@ -14,14 +15,6 @@ source('srm.R')
 source('target_functions.R')
 ID_MAX=0
 
-if(!sfIsRunning()) {
-  sfInit(parallel=TRUE, cpus=10)
-  res = sfClusterEval(require('snnSRM'))
-}
-sfExport('constants')
-#dir = "/home/alexeyche/prog/sim/R"
-dir = "/home/alexeyche/my/sim/R"
-
 M = 50
 N = 5
 id_m = seq(1, M)
@@ -29,8 +22,8 @@ id_n = seq(M+1, M+N)
 
 gr1 = TSNeurons(M = M)
 
-#file <- "/home/alexeyche/prog/sim/stimuli/sd1.csv"
-file <- "/home/alexeyche/my/sim/stimuli/sd1.csv"
+file <- "/home/alexeyche/prog/sim/stimuli/sd1.csv"
+#file <- "/home/alexeyche/my/sim/stimuli/sd1.csv"
 gr1$loadPatternFromFile(file, 150, 1, 0.5)
 #net <- spikeMatToSpikeList(gr1$patterns[[1]]$data)
 net = list()
@@ -51,12 +44,13 @@ pattern[[4]] <- c(-Inf, 100)
 pattern[[5]] <- c(-Inf, 10)
 
 epochs = 30
-run_options = list(T0 = 0, Tmax = 150, dt = 0.5, learning_rate = 0.5, learn_window_size = 10, mode="run", collect_stat=FALSE)
-layers = list(neurons)
+run_options = list(T0 = 0, Tmax = 150, dt = 0.5, learning_rate = 1, learn_window_size = 150, mode="run", collect_stat=FALSE)
+layers = SimLayers(list(neurons))
 target_set = list(target_function_gen = full_spike_tf, depress_null=TRUE)
 for(ep in 1:epochs) {
   net[id_n] <- pattern
-  gr = grad_func(layers[[1]], 0, 150, net, target_set)
+  #gr = grad_func(layers[[1]], 0, 150, net, target_set)
+  gr = layers$l[[1]]$grad(0, 150, net, target_set)
   net[id_n] <- null_pattern
   c(net, layers, stat) := run_srm(layers, net, run_options)
   
@@ -70,7 +64,7 @@ for(ep in 1:epochs) {
     print(p1, position=c(0, 0.5, 1, 1), more=TRUE)
   print(p2, position=c(0, 0, 1, 0.5))
   
-  invisible(sapply(1:N, function(i) layers[[1]]$weights[[i]] <- layers[[1]]$weights[[i]] + run_options$learning_rate * gr[[i]] ))
+  invisible(sapply(1:N, function(i) layers$l[[1]]$weights[[i]] <- layers$l[[1]]$weights[[i]] + run_options$learning_rate * gr[[i]] ))
   
 }
 

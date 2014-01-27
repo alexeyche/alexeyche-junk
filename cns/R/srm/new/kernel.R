@@ -7,15 +7,17 @@ gaussian_kernel = function(s, sigma) {
 get_finger_print = function(spikes, T0, Tmax, window, sigma) {
   K = matrix(0, nrow=length(spikes), ncol=(Tmax-T0)/window)
   scale_factor = 1
+  num_spikes = 0
   for(sp_i in 1:length(spikes)) {
     if(length(spikes[[sp_i]]) == 0) next
     if((length(spikes[[sp_i]]) == 1)&&(spikes[[sp_i]][1] == -Inf)) next
     for(t0_i in 1:((Tmax-T0)/window)) {
       K[sp_i, t0_i] = integrate( Vectorize(function(t) gaussian_kernel(t-spikes[[sp_i]], sigma)), (t0_i-1)*window, (t0_i-1)*window + window)$value 
-    }
+    }    
     scale_factor = scale_factor + 1
+    num_spikes = num_spikes + length(spikes[[sp_i]])
   }
-  return(K/scale_factor)
+  return(K)
 }
 
 get_mean_activity = function(net_all, ro) {

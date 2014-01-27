@@ -6,14 +6,16 @@ binKernel <- function(net_data, T0, Tmax, binSize=10) {
   
   hist_ans = matrix(0, length(net_data), lb)
   
-  for(i in 1:maxl) {
-    it_sp = sapply(net_data, function(sp) if(length(sp)>=i) sp[i] else -1)
-    time_ids = ceiling((it_sp-T0)/binSize)
-    for(j in 1:length(time_ids)) {
-      if(time_ids[j]>0) {
-        hist_ans[j,  time_ids[j]] = hist_ans[j,  time_ids[j]] + 1
-      }
-    } 
+  if(maxl>0) {
+    for(i in 1:maxl) {
+      it_sp = sapply(net_data, function(sp) if(length(sp)>=i) sp[i] else -1)
+      time_ids = ceiling((it_sp-T0)/binSize)
+      for(j in 1:length(time_ids)) {
+        if(time_ids[j]>0) {
+          hist_ans[j,  time_ids[j]] = hist_ans[j,  time_ids[j]] + 1
+        }
+      } 
+    }
   }
   return(hist_ans)
 }
