@@ -1,10 +1,10 @@
-#setwd("~/my/git/alexeyche-junk/cns/R/srm/new")
-setwd("~/prog/alexeyche-junk/cns/R/srm/new")
+setwd("~/my/git/alexeyche-junk/cns/R/srm/new")
+#setwd("~/prog/alexeyche-junk/cns/R/srm/new")
 #dir = '~/prog/sim/0.15run_sec'
 #dir = '~/prog/sim'
-dir = '~/prog/sim/last3'
+#dir = '~/prog/sim/last3'
 #dir = '~/prog/sim/0.125run_sec'
-#dir = '/home/alexeyche/my/sim/run_0.175'
+dir = '/home/alexeyche/my/sim/last_arr'
 #dir = '/home/alexeyche/prog/sim/0.6run_sec'
 #dir = '/home/alexeyche/prog/sim/0.6run_sec_low_lr'
 #system(sprintf("find %s/R -maxdepth 1 -name \"*.png\" -type f -exec rm -f {} \\;", dir))
@@ -82,7 +82,7 @@ runmode="learn"
 test_trials=5
 
 run_options = list(T0 = 0, Tmax = duration, dt = dt, 
-                   learning_rate = 0.01, epochs = 50, start_epoch = 1, weight_decay = 0,
+                   learning_rate = 0.01, epochs = 50, start_epoch = 10, weight_decay = 0,
                    reward_learning=FALSE,
                    fp_window = 30, fp_kernel_size = 15, dev_frac_norm = 0.25,
                    learn_window_size = 150, mode=runmode, collect_stat=TRUE, 
@@ -103,8 +103,8 @@ id_patt = 1
 #model_file = sprintf("%s/R/%s_%dx%d_lr%3.1f_lws_%3.1f", dir, data, M, N, run_options$learning_rate, run_options$learn_window_size)
 
 model_file = sprintf("%s/R/%s_%dx%d", dir, data, M, N)
-if(runmode=="run") {
-  model_file = "/home/alexeyche/prog/sim/last2/R/synthetic_control_50x10_8"
+#if(runmode=="run") {
+  model_file = "/home/alexeyche/my/sim/last/R/synthetic_control_50x10_9"
   if(file.exists(paste(model_file, ".idx", sep=""))) {  
     W = loadMatrix(model_file, 1)
     invisible(sapply(1:N, function(id) { 
@@ -116,7 +116,7 @@ if(runmode=="run") {
   } else {
     cat("Can't find file for model ", model_file, "\n")
   }
-}
+#}
 patterns = gr1$patterns
 layers = SimLayers( list(neurons) )
 input_neurons = gr1

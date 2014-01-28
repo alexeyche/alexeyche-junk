@@ -22,7 +22,7 @@ read_ts_file <- function(ts_name) {
 }
 
 ucr_test <- function(train, test, Classification_Algorithm) {
-  problem_test_cases = NULL
+  conf_m = list()
   l = length(train)
   lt = length(test)
   correct = 0
@@ -30,16 +30,12 @@ ucr_test <- function(train, test, Classification_Algorithm) {
     predicted_class = Classification_Algorithm(train, test[[i]]$data)
     if(predicted_class == test[[i]]$label) {
       correct = correct +1
-    } else {
-      problem_test_cases = c(problem_test_cases, i)
     }
-    #if(i %% 50 == 0) {
-    #  cat(i," out of ", lt, " done\n")
-    #}
+    conf_m[[i]] = list(pred=predicted_class, true=test[[i]]$label)
   }
   rate = (lt-correct)/lt
   cat("The error rate is ", rate, "\n")
-  return(list(rate=rate, prob_tc=problem_test_cases))
+  return(list(rate=rate, prob_tc=conf_m))
 }
 
 eucl_dist_alg <- function(train, unknown_object) {
