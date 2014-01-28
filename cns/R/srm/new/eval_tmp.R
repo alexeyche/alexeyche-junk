@@ -83,6 +83,7 @@ run_options = list(T0 = 0, Tmax = duration, dt = 0.5, learning_rate = 0.5,
 #patterns = gr1$patterns[1:length(train_dataset)] #[c(1:10,51:60, 101:110, 151:160, 201:210, 251:260)]
 patterns = gr1$patterns #[(length(train_dataset)+1):(length(train_dataset)+length(test_dataset))] #[c(1:10,51:60, 101:110, 151:160, 201:210, 251:260)]
 
+
 trials = 10
 net_all = list()
 u_all = list()
@@ -113,13 +114,8 @@ split_data <- function(data, ratio=0.3) {
   return(list(data[train_i], data[test_i]))
 }
 
-kernSize=17.5
-cat("kernSize:", kernSize,"\n")
-
-spikes_proc = post_process_set(net_all, trials, 0, duration, binKernel, kernSize)
-
-perf = ucr_test(spikes_proc[1:length(train_dataset)], spikes_proc[ (length(train_dataset)+1):(length(test_dataset)+length(train_dataset))], eucl_dist_alg)
-prob_labels = sapply(spikes_proc[(length(train_dataset)+1):(length(test_dataset)+length(train_dataset))][perf$prob_tc], function(x) x$label)
-perf_bl = ucr_test(train_dataset, test_dataset, eucl_dist_alg)
-prob_labels_bl = sapply(test_dataset[perf_bl$prob_tc], function(x) x$label)
-
+for(kernSize in c(15, 20, 25, 30, 37.5)) {
+    spikes_proc = post_process_set(net_all, trials, 0, duration, binKernel, kernSize)
+    perf = ucr_test(spikes_proc[1:length(train_dataset)], spikes_proc[ (length(train_dataset)+1):(length(test_dataset)+length(train_dataset))], eucl_dist_alg)    
+    cat("kernSize", kernSize, "rate", perf$rate, "\n")
+}
