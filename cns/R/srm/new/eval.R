@@ -1,13 +1,13 @@
-setwd("~/my/git/alexeyche-junk/cns/R/srm/new")
-#setwd("~/prog/alexeyche-junk/cns/R/srm/new")
+#setwd("~/my/git/alexeyche-junk/cns/R/srm/new")
+setwd("~/prog/alexeyche-junk/cns/R/srm/new")
 require(snnSRM)
 source('include.R')
 source('ucr_ts.R')
 source('eval_funcs.R')
 source('layers.R')
 
-dir = "/home/alexeyche/my/sim"
-#dir = "~/prog/sim"
+#dir = "/home/alexeyche/my/sim"
+dir = "~/prog/sim"
 #system(sprintf("find %s -name \"*.png\" -type f -exec rm -f {} \\;", dir))
 ID_MAX=0
 

@@ -8,15 +8,15 @@ grad_func <- function(neurons, T0, Tmax, net, target_set) {
     if(left<=right) sp[left:right]
   })  
   
-#  if(sum(sapply(nspikes, length)/(Tmax-T0)) > 0.175) {
-#    nspikes = lapply(1:length(id_n), function(ni) { 
-#        if(!is.null(nspikes[[ni]])) {
-#          probs = g(neurons$u_one(ni, nspikes[[ni]], net))
-#          most_likely = probs>=mean(probs)
-#          nspikes[[ni]][most_likely]
-#        }
-#   })
-#  }
+  if(sum(sapply(nspikes, length)/(Tmax-T0)) > 0.15) {
+    nspikes = lapply(1:length(id_n), function(ni) { 
+        if(!is.null(nspikes[[ni]])) {
+          probs = g(neurons$u_one(ni, nspikes[[ni]], net))
+          most_likely = probs>=mean(probs)
+          nspikes[[ni]][most_likely]
+        }
+   })
+  }
   
   left_part = lapply(1:length(id_n), function(number) {  
               if(!is.null(nspikes[[number]])) {
@@ -55,6 +55,5 @@ grad_func <- function(neurons, T0, Tmax, net, target_set) {
     }
     iter = iter + length(neurons$id_conns[[id]])
   } 
-  print(int_part)
   return(mapply("+", spike_part, int_part, SIMPLIFY=FALSE))
 }

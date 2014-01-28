@@ -8,11 +8,11 @@ epsp <- Vectorize(function(s) {
 })
 
 # absolute(-100 mV) refractoriness with exponential restore
-u_abs <- -250 # mV
+u_abs <- -150 # mV
 u_r <- -50#-50 # mV
-trf <- 5.25 # ms
-trs <- 5 # ms
-dr <- 2 # ms
+trf <- 3.25 # ms
+trs <- 3 # ms
+dr <- 1 # ms
 nu <- Vectorize(function(s) {
  if(s<0) { return(0)}
  if(s<dr) { return(u_abs) }

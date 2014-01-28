@@ -59,7 +59,11 @@ run_net <- function(input_neurons, layers, run_options, open_plots = FALSE, mode
     }
     if(run_options$reward_learning)
       run_options$mean_activity_stat = get_mean_activity(net_all, run_options)
-    
+      
+    model_file = sprintf("%s/R/%s_%dx%d_%d", dir, data, M, N, ep)
+ 
+    W = get_weights_matrix(list(neurons))
+    saveMatrixList(model_file, list(W))
     if((! is.null(run_options$test_function))&&(ep %% run_options$test_run_freq == 0)) {
 #      mode_acc = run_options$mode
 #      test_net_all = list()
@@ -98,10 +102,7 @@ run_net <- function(input_neurons, layers, run_options, open_plots = FALSE, mode
 #      }     
 #      run_options$mode = mode_acc
 #      loss <- c(loss, run_options$test_function(net_all, test_net_all))
-      model_file = sprintf("%s/R/%s_%dx%d_%d", dir, data, M, N, ep)
- 
-      W = get_weights_matrix(list(neurons))
-      saveMatrixList(model_file, list(W))
+      
       system(sprintf("R --slave --args %s < eval.R > %s/R/%d.log", model_file, dir, ep), wait=FALSE) 
     }
 
