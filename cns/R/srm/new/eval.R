@@ -83,7 +83,7 @@ run_options = list(T0 = 0, Tmax = duration, dt = 0.5, learning_rate = 0.5,
 #patterns = gr1$patterns[1:length(train_dataset)] #[c(1:10,51:60, 101:110, 151:160, 201:210, 251:260)]
 patterns = gr1$patterns #[(length(train_dataset)+1):(length(train_dataset)+length(test_dataset))] #[c(1:10,51:60, 101:110, 151:160, 201:210, 251:260)]
 
-trials = 10
+trials = 1
 net_all = list()
 u_all = list()
 p_all = list()
@@ -99,8 +99,8 @@ for(id_patt in 1:length(patterns)) {
     net = lapply(net[neurons$ids], function(sp) sp[sp != -Inf])
     glob_id = trial+(id_patt-1)*trials
     net_all[[glob_id]] = list(data=net, label=patterns[[id_patt]]$label)
-#    u_all[[glob_id]] = list(data=stat[[1]]$u, label=patterns[[id_patt]]$label)
-#    p_all[[glob_id]] = list(data=stat[[1]]$p, label=patterns[[id_patt]]$label)    
+    u_all[[glob_id]] = list(data=stat[[1]], label=patterns[[id_patt]]$label)
+    p_all[[glob_id]] = list(data=matrix(g(stat[[1]]), nrow=duration/dt, ncol=N), label=patterns[[id_patt]]$label)    
   }
 }
 
@@ -112,10 +112,37 @@ split_data <- function(data, ratio=0.3) {
   train_i = ind[(spl_i+1):N]
   return(list(data[train_i], data[test_i]))
 }
-
+#R> sp_proc = post_process_set2(net_all_sp, 15, 0, 300, 10, 5)
+#R> perf = ucr_test(sp_proc[1:300], sp_proc[301:600], eucl_dist_alg)
+#The error rate is  0.1033333 
+# R> model_file
+# [1] "/home/alexeyche/prog/sim/last_last_1/R/synthetic_control_50x10_30"
 
 for(kernSize in c(10, 15, 20, 25, 30, 37.5)) {
     spikes_proc = post_process_set(net_all, trials, 0, duration, binKernel, kernSize)
     perf = ucr_test(spikes_proc[1:length(train_dataset)], spikes_proc[ (length(train_dataset)+1):(length(test_dataset)+length(train_dataset))], eucl_dist_alg)    
     cat("kernSize", kernSize, "rate", perf$rate, "\n")
 }
+
+confm_base = matrix(0, nrow=6, ncol=6)
+invisible(sapply(ans$prob_tc, function(x) confm_base[x$true, x$pred] <<- confm_base[x$true, x$pred] +1))
+confm = matrix(0, nrow=6, ncol=6)
+invisible(sapply(perf$prob_tc, function(x) confm[x$true, x$pred] <<- confm[x$true, x$pred] +1))
+
+
+# R> confm_base
+# [,1] [,2] [,3] [,4] [,5] [,6]
+# [1,]   22   10    3    4    5    6
+# [2,]    0   50    0    0    0    0
+# [3,]    0    0   49    0    1    0
+# [4,]    0    0    0   50    0    0
+# [5,]    0    0    3    0   47    0
+# [6,]    0    0    0    4    0   46
+# R> confm
+# [,1] [,2] [,3] [,4] [,5] [,6]
+# [1,]   45    5    0    0    0    0
+# [2,]    1   48    0    1    0    0
+# [3,]    1    0   47    0    2    0
+# [4,]    0    0    0   48    0    2
+# [5,]    0    0    7    0   43    0
+# [6,]    2    0    0   10    0   38
