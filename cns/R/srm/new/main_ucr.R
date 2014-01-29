@@ -11,7 +11,7 @@ setwd("~/prog/alexeyche-junk/cns/R/srm/new")
 #dir = '/home/alexeyche/prog/sim/last_arr_0.9'
 #dir = '/home/alexeyche/prog/sim/last_arr_1'
 #dir = '/home/alexeyche/prog/sim/last_arr_0.75'
-dir = '/home/alexeyche/prog/sim/last_last_0.75'
+#dir = '/home/alexeyche/prog/sim/last_last_0.75'
 #system(sprintf("find %s/R -maxdepth 1 -name \"*.png\" -type f -exec rm -f {} \\;", dir))
 
 

@@ -1,13 +1,13 @@
-#setwd("~/my/git/alexeyche-junk/cns/R/srm/new")
-setwd("~/prog/alexeyche-junk/cns/R/srm/new")
+setwd("~/my/git/alexeyche-junk/cns/R/srm/new")
+#setwd("~/prog/alexeyche-junk/cns/R/srm/new")
 require(snnSRM)
 source('include.R')
 source('ucr_ts.R')
 source('eval_funcs.R')
 source('layers.R')
 
-#dir = "/home/alexeyche/my/sim"
-dir = "~/prog/sim"
+dir = "/home/alexeyche/my/sim"
+#dir = "~/prog/sim"
 #system(sprintf("find %s -name \"*.png\" -type f -exec rm -f {} \\;", dir))
 ID_MAX=0
 
@@ -35,10 +35,11 @@ M = 50
 dt = 0.5
 
 gr1 = TSNeurons(M = M)
+gr2 = TSNeurons(M = M, ids_c = 1000:(1000+M))
 neurons = SRMLayer(N, start_w.N)
 
 gr1$loadPatterns(train_dataset, duration, dt, lambda=5)
-gr1$loadPatterns(test_dataset, duration, dt, lambda=5)
+gr2$loadPatterns(test_dataset, duration, dt, lambda=5)
 patt_len = length(gr1$patterns)
 
 
@@ -60,6 +61,7 @@ if(length(args)>0) {
 } else {
   model_file = sprintf("%s/R/%s_%dx%d", dir, data, M, N)
 }
+model_file=""
 
 if(file.exists(paste(model_file, ".idx", sep=""))) {
     W = loadMatrix(model_file, 1)
@@ -75,47 +77,46 @@ if(file.exists(paste(model_file, ".idx", sep=""))) {
 }
 
 
-run_options = list(T0 = 0, Tmax = duration, dt = 0.5, learning_rate = 0.5,
-                   learn_window_size = 300, mode="run", collect_stat=TRUE, 
-                   target_set = list(target_function_gen = random_2spikes_tf, depress_null=FALSE),
-                   learn_layer_id = 1
-)
+
 #patterns = gr1$patterns[1:length(train_dataset)] #[c(1:10,51:60, 101:110, 151:160, 201:210, 251:260)]
 patterns = gr1$patterns #[(length(train_dataset)+1):(length(train_dataset)+length(test_dataset))] #[c(1:10,51:60, 101:110, 151:160, 201:210, 251:260)]
 
-trials = 10
-net_all = list()
-u_all = list()
-p_all = list()
+
+trials = 3
+
+run_options = list(T0 = 0, Tmax = duration, dt = 0.5, learning_rate = 0.5,
+                   learn_window_size = 300, mode="run", collect_stat=TRUE, 
+                   target_set = list(target_function_gen = random_2spikes_tf, depress_null=FALSE),
+                   learn_layer_id = 1, evalTrial = trials
+)
+
 net_neurons = SimLayers(list(neurons))
-for(id_patt in 1:length(patterns)) {
-  for(trial in 1:trials) {
-    net = list()
-    net[gr1$ids] = patterns[[id_patt]]$data
-    net[neurons$ids] = -Inf
-    run_options$class = patterns[[id_patt]]$class
-    
-    c(net, net_neurons, stat, mean_grad) := run_srm(net_neurons, net, run_options)
-    net = lapply(net[neurons$ids], function(sp) sp[sp != -Inf])
-    glob_id = trial+(id_patt-1)*trials
-    net_all[[glob_id]] = list(data=net, label=patterns[[id_patt]]$label)
-#    u_all[[glob_id]] = list(data=stat[[1]]$u, label=patterns[[id_patt]]$label)
-#    p_all[[glob_id]] = list(data=stat[[1]]$p, label=patterns[[id_patt]]$label)    
-  }
-}
-
-split_data <- function(data, ratio=0.3) {
-  N = length(data)
-  ind = sample(N)
-  spl_i = ratio*N
-  test_i = ind[1:spl_i]
-  train_i = ind[(spl_i+1):N]
-  return(list(data[train_i], data[test_i]))
-}
 
 
-for(kernSize in c(10, 15, 20, 25, 30, 37.5)) {
-    spikes_proc = post_process_set(net_all, trials, 0, duration, binKernel, kernSize)
-    perf = ucr_test(spikes_proc[1:length(train_dataset)], spikes_proc[ (length(train_dataset)+1):(length(test_dataset)+length(train_dataset))], eucl_dist_alg)    
-    cat("kernSize", kernSize, "rate", perf$rate, "\n")
+o_train = evalNet(gr1$patterns, run_options, constants, net_neurons$l)
+o_test = evalNet(gr2$patterns, run_options, constants, net_neurons$l)
+
+
+sigma = 10
+window = 10
+
+k_out_train = lapply(o_train$spikes, function(st) kernelPass_spikes(st, list(sigma = sigma, window = window, T0 = 0, Tmax = duration, quad = 256)) )
+k_out_test = lapply(o_test$spikes, function(st) kernelPass_spikes(st, list(sigma = sigma, window = window, T0 = 0, Tmax = duration, quad = 256)) )
+
+k_out_train_m = mean_on_trials(k_out_train, trials)
+k_out_test_m = mean_on_trials(k_out_test, trials)
+
+perf = ucr_test(k_out_train_m, k_out_test_m, eucl_dist_alg)
+
+for(bw in seq(50, 150, by=10)) {
+  sm_st_tr = smooth_stat(o_train$stat, bw)
+  sm_st_test = smooth_stat(o_test$stat, bw)
+  sm_st_tr_m = mean_on_trials(sm_st_tr, trials)
+  sm_st_test_m = mean_on_trials(sm_st_test, trials)
+  cat("bw:", bw, " ")
+  perfs = ucr_test(sm_st_tr_m, sm_st_test_m, eucl_dist_alg)
 }
+  
+
+
+
