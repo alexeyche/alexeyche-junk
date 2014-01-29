@@ -1,13 +1,13 @@
-setwd("~/my/git/alexeyche-junk/cns/R/srm/new")
-#setwd("~/prog/alexeyche-junk/cns/R/srm/new")
+#setwd("~/my/git/alexeyche-junk/cns/R/srm/new")
+setwd("~/prog/alexeyche-junk/cns/R/srm/new")
 require(snnSRM)
 source('include.R')
 source('ucr_ts.R')
 source('eval_funcs.R')
 source('layers.R')
 
-dir = "/home/alexeyche/my/sim"
-#dir = "~/prog/sim"
+#dir = "/home/alexeyche/my/sim"
+dir = "~/prog/sim"
 #system(sprintf("find %s -name \"*.png\" -type f -exec rm -f {} \\;", dir))
 ID_MAX=0
 
@@ -114,7 +114,7 @@ split_data <- function(data, ratio=0.3) {
 }
 
 
-for(kernSize in c(15, 20, 25, 30, 37.5)) {
+for(kernSize in c(10, 15, 20, 25, 30, 37.5)) {
     spikes_proc = post_process_set(net_all, trials, 0, duration, binKernel, kernSize)
     perf = ucr_test(spikes_proc[1:length(train_dataset)], spikes_proc[ (length(train_dataset)+1):(length(test_dataset)+length(train_dataset))], eucl_dist_alg)    
     cat("kernSize", kernSize, "rate", perf$rate, "\n")
