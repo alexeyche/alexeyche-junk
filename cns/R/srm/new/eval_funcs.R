@@ -50,3 +50,29 @@ post_process_set = function(set, trials, T0, Tmax, kernel, kernSize) {
   }
   return(spikes_proc)
 }
+
+mean_on_trials = function(x, trials)  {
+  if(trials == 1) return(x)
+  it_tr = 1
+  out = list()
+  for(i in seq(1, length(x), by=trials)) {    
+    acc = NULL
+    for(el in x[i:(i+trials-1)]) {
+      if(is.null(acc)) { 
+        acc = el$data
+      } else {
+        acc = acc + el$data
+      }
+    }
+    out[[it_tr]]= list(data = acc, label=x[[i]]$label)
+    it_tr = it_tr+1
+  }
+  return(out)
+}
+
+smooth_stat = function(stat, bw) {
+  lapply(stat, function(x) { 
+    d = sapply(1:nrow(x$data), function(i) ksmooth(1:ncol(x$data), x$data[i,], bandwidth=bw)$y)
+    list(data=d, label=x$label, trial=x$trial)
+  })
+}

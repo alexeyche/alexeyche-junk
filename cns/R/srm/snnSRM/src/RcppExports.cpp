@@ -5,6 +5,24 @@
 
 using namespace Rcpp;
 
+// evalNet
+SEXP evalNet(const List patterns, const List run_options, const List constants, List layers);
+RcppExport SEXP snnSRM_evalNet(SEXP patternsSEXP, SEXP run_optionsSEXP, SEXP constantsSEXP, SEXP layersSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< const List >::type patterns(patternsSEXP );
+        Rcpp::traits::input_parameter< const List >::type run_options(run_optionsSEXP );
+        Rcpp::traits::input_parameter< const List >::type constants(constantsSEXP );
+        Rcpp::traits::input_parameter< List >::type layers(layersSEXP );
+        SEXP __result = evalNet(patterns, run_options, constants, layers);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}
 // integrateSRM
 SEXP integrateSRM(const List constants, const List int_options, const IntegerVector neuron_id, const IntegerVector neuron_id_conn, const NumericVector neuron_w, const List net);
 RcppExport SEXP snnSRM_integrateSRM(SEXP constantsSEXP, SEXP int_optionsSEXP, SEXP neuron_idSEXP, SEXP neuron_id_connSEXP, SEXP neuron_wSEXP, SEXP netSEXP) {
@@ -79,6 +97,38 @@ BEGIN_RCPP
         Rcpp::traits::input_parameter< const List >::type neurons_w(neurons_wSEXP );
         Rcpp::traits::input_parameter< const List >::type net(netSEXP );
         SEXP __result = USRMs(t, constants, neurons_id, neurons_id_conn, neurons_w, net);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}
+// kernelPass_spikes
+SEXP kernelPass_spikes(List d, const List kernel_options);
+RcppExport SEXP snnSRM_kernelPass_spikes(SEXP dSEXP, SEXP kernel_optionsSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< List >::type d(dSEXP );
+        Rcpp::traits::input_parameter< const List >::type kernel_options(kernel_optionsSEXP );
+        SEXP __result = kernelPass_spikes(d, kernel_options);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}
+// kernelPass_stat
+SEXP kernelPass_stat(List d, const List kernel_options);
+RcppExport SEXP snnSRM_kernelPass_stat(SEXP dSEXP, SEXP kernel_optionsSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< List >::type d(dSEXP );
+        Rcpp::traits::input_parameter< const List >::type kernel_options(kernel_optionsSEXP );
+        SEXP __result = kernelPass_stat(d, kernel_options);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);
