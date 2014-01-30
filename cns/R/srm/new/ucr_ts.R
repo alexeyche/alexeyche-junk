@@ -21,7 +21,7 @@ read_ts_file <- function(ts_name, dir=dir) {
   return( list(process_datamatrix(ts_train), process_datamatrix(ts_test)) )
 }
 
-ucr_test <- function(train, test, Classification_Algorithm) {
+ucr_test <- function(train, test, Classification_Algorithm, verbose=TRUE) {
   conf_m = list()
   l = length(train)
   lt = length(test)
@@ -34,7 +34,8 @@ ucr_test <- function(train, test, Classification_Algorithm) {
     conf_m[[i]] = list(pred=predicted_class, true=test[[i]]$label)
   }
   rate = (lt-correct)/lt
-  cat("The error rate is ", rate, "\n")
+  if(verbose)
+      cat("The error rate is ", rate, "\n")
   return(list(rate=rate, prob_tc=conf_m))
 }
 

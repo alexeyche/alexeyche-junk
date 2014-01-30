@@ -1,18 +1,10 @@
 
-e0 <- 1.3 # mV
-ts <- 1 # ms
-tm <- 10 # ms
 epsp <- Vectorize(function(s) {
   if((s<0)||(s == Inf)) { return(0) }
   e0*(exp(-s/tm)-exp(-s/ts))
 })
 
 # absolute(-100 mV) refractoriness with exponential restore
-u_abs <- -150 # mV
-u_r <- -50#-50 # mV
-trf <- 3.25 # ms
-trs <- 3 # ms
-dr <- 1 # ms
 nu <- Vectorize(function(s) {
  if(s<0) { return(0)}
  if(s<dr) { return(u_abs) }
@@ -23,15 +15,12 @@ nu <- Vectorize(function(s) {
 #plot(t, nu(t-25), type="l")
 
 # stochastic threshold g(u):
-alpha <- 0.75
-beta <- 0.75
-tr <- -50 # mV
+
 g <- Vectorize(function(u) {
   ans=(beta/alpha)*(log(1+exp(alpha*(tr-u))) -alpha*(tr-u))   
   return(ans)
 })
 
-u_rest <- -70 # mV
 u_srm <- function(t, x, y, w) {
   e_syn <- 0
   for(i in 1:length(x)) {

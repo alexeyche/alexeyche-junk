@@ -30,14 +30,14 @@ variable {
  type: FLOAT
  size: 1
  min:  0.02666667
- max:  0.1
+ max:  0.5
 }
 
 variable {
  name: "refr"
  type: ENUM
- size: 3
+ size: 1
  options: "low"
  options: "middle"
- options: "big"
+ options: "high"
 }

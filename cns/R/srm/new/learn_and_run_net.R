@@ -1,5 +1,5 @@
 
-run_net <- function(input_neurons, layers, run_options, open_plots = FALSE, model_descr=NULL) {
+run_net <- function(input_neurons, layers, run_options, open_plots = FALSE, model_descr=NULL, verbose=TRUE) {
   net_neurons = layers
   patterns = input_neurons$patterns
   lengths = sapply(patterns, function(p) length(p$data))
@@ -11,7 +11,6 @@ run_net <- function(input_neurons, layers, run_options, open_plots = FALSE, mode
   net = list()
   net[id_m] = patterns[[1]]$data
   net[id_n] = -Inf
-  run_options$target_set$class = patterns[[id_patt]]$class
   
   loss = NULL  
   stable = NULL  
@@ -25,13 +24,14 @@ run_net <- function(input_neurons, layers, run_options, open_plots = FALSE, mode
       
       c(net, net_neurons, stat, grad) := run_srm(net_neurons, net, run_options)
       mean_dev = c(mean_dev, reward_func(net[id_n], run_options))
-      cat("epoch: ", ep, ", pattern # ", id_patt,"\n")
+      if(verbose)
+          cat("epoch: ", ep, ", pattern # ", id_patt,"\n")
           
       neurons = net_neurons$l[[1]]
       W = get_weights_matrix(net_neurons$l)
       not_fired = all(sapply(net[id_n], function(sp) length(sp) == 1))
       
-      pic_filename = sprintf("%s/R/run_ep%s_patt%s_label%s.png", dir, ep, id_patt, patterns[[id_patt]]$label)
+      pic_filename = sprintf("%s/run_ep%s_patt%s_label%s.png", dir, ep, id_patt, patterns[[id_patt]]$label)
       png(pic_filename, width=1024, height=480)
       if(!not_fired) 
         p1 = plot_rastl(net[id_n], sprintf("epoch %d, pattern %d, class %d", ep, id_patt, patterns[[id_patt]]$label))
@@ -70,7 +70,7 @@ run_net <- function(input_neurons, layers, run_options, open_plots = FALSE, mode
     if(run_options$reward_learning)
       run_options$mean_activity_stat = get_mean_activity(net_all, run_options)
       
-    model_file = sprintf("%s/R/%s_%dx%d_%d", dir, data, M, N, ep)
+    model_file = sprintf("%s/%s_%dx%d_%d", dir, data, M, N, ep)
  
     W = get_weights_matrix(list(neurons))
     saveMatrixList(model_file, list(W))
@@ -83,10 +83,11 @@ run_net <- function(input_neurons, layers, run_options, open_plots = FALSE, mode
       if((length(stable)>0)&&(t_out$stable>(5*stable[length(stable)]))) {
         t_out$stable <- stable[length(stable)]
       }
-      
-      stable <- c(stable, t_out$stable)      
+      if(!is.null(t_out$stable)) { 
+          stable <- c(stable, t_out$stable)      
+      }
       loss <- c(loss, t_out$loss)
-      system( sprintf("echo %s > %s/R/%d.log", t_out$loss, dir, ep))
+      system( sprintf("echo %s > %s/%d.log", t_out$loss, dir, ep))
 #      mode_acc = run_options$mode
 #      test_net_all = list()
 #      cat("Running net on test data (N=", length(run_options$test_patterns),") with ", run_options$trials, " sampling trials\n", sep="")
@@ -129,5 +130,5 @@ run_net <- function(input_neurons, layers, run_options, open_plots = FALSE, mode
     }
 
   }
-
+  return(loss)
 }
