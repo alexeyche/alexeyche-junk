@@ -1,20 +1,5 @@
-#setwd("~/my/git/alexeyche-junk/cns/R/srm/new")
 setwd("~/prog/alexeyche-junk/cns/R/srm/new")
-dir = '~/prog/sim/stable_run'
-#dir = '~/prog/sim/0.15run_sec'
-#dir = '~/prog/sim'
-#dir = '~/prog/sim/last3'
-#dir = '~/prog/sim/0.125run_sec'
-#dir = '/home/alexeyche/my/sim/last_arr'
-#dir = '/home/alexeyche/prog/sim/0.6run_sec'
-#dir = '/home/alexeyche/prog/sim/0.6run_sec_low_lr'
-#dir = '/home/alexeyche/prog/sim/last_arr'
-#dir = '/home/alexeyche/prog/sim/last_arr_0.9'
-#dir = '/home/alexeyche/prog/sim/last_arr_1'
-#dir = '/home/alexeyche/prog/sim/last_arr_0.75'
-#dir = '/home/alexeyche/prog/sim/last_last_0.75'
-system(sprintf("find %s/R -maxdepth 1 -name \"*.png\" -type f -exec rm -f {} \\;", dir))
-
+dir = '~/prog/sim/spear_run'
 
 source('util.R')
 source('plot_funcs.R')
@@ -31,25 +16,27 @@ source('eval_funcs.R')
 source('layers.R')
 source('kernel.R')
 
-ID_MAX=0
-#require(snowfall)
-#if(!sfIsRunning()) {
-#  sfInit(parallel=TRUE, cpus=10)
-#  res = sfClusterEval(require('snnSRM'))
-#}
-#sfExport('constants')
+args <- commandArgs(trailingOnly = TRUE)
+args <- c('name', '1','1','0.1','0.04','low')
+name = args[1]
+alpha = as.numeric(args[2])
+beta = as.numeric(args[3])
+lr = as.numeric(args[4])
+llh_depr = as.numeric(args[5])
+refr = as.character(args[6])
+
+dir = sprintf("%s/%s", dir, name)
+
 
 data = synth # synthetic control
 
 set.seed(1234)
-c(train_dataset, test_dataset) := read_ts_file(data,'~/prog/sim')
-elems = 50
+c(train_dataset, test_dataset) := read_ts_file(data, '~/prog/sim')
+elems = 5
 train_dataset = train_dataset[c(sample(1:50, elems), sample(51:100, elems), sample(101:150,elems),
                                 sample(151:200, elems), sample(201:250,elems), sample(251:300,elems))] # cut
 test_dataset = test_dataset[c(sample(1:50, elems), sample(51:100, elems), sample(101:150, elems),
                               sample(151:200, elems), sample(201:250,elems), sample(251:300, elems))]
-
-ucr_test(train_dataset, test_dataset, eucl_dist_alg)
 
 duration = 300
 
@@ -82,16 +69,14 @@ for(ni in 0:(N-1)) {
 
 neurons$connectFF(connection, start_w.M, 1:N )
 
-runmode="learn"
-#runmode="run"
 test_trials=3
 
 run_options = list(T0 = 0, Tmax = duration, dt = dt, 
-                   learning_rate = 1, epochs = 100, start_epoch = 1, weight_decay = 0,
+                   learning_rate = lr, epochs = 100, start_epoch = 1, weight_decay = 0,
                    reward_learning=FALSE,
                    fp_window = 30, fp_kernel_size = 15, dev_frac_norm = 0.25,
-                   learn_window_size = 150, mode=runmode, collect_stat=TRUE, 
-                   target_set = list(target_function_gen = random_4spikes_tf, depress_null=FALSE),
+                   learn_window_size = 150, mode='learn', collect_stat=TRUE, 
+                   target_set = list(depress_null=FALSE),
                    learn_layer_id = 1,
                    test_patterns = gr2$patterns, 
                    test_function = function(train_set, test_set) {
@@ -100,42 +85,8 @@ run_options = list(T0 = 0, Tmax = duration, dt = dt,
                      
                      k_out_train = lapply(train_set, function(st) kernelPass_spikes(st, list(sigma = sigma, window = window, T0 = 0, Tmax = duration, quad = 256)) )
                      k_out_test = lapply(test_set, function(st) kernelPass_spikes(st, list(sigma = sigma, window = window, T0 = 0, Tmax = duration, quad = 256)) )
-                     
-                     cat("diff of train set\n")
-                     v1 = diffTrials(k_out_train, test_trials)
-                     cat("diff of test set\n")
-                     v2 = diffTrials(k_out_test, test_trials)
+
                      perf = ucr_test(mean_on_trials(k_out_train, test_trials), mean_on_trials(k_out_test, test_trials), eucl_dist_alg)
-                     return( list(stable=v1+v2, loss=perf$rate))
-                   }, evalTrial=test_trials, test_run_freq=1
+                     return( list(loss=perf$rate))
+                   }, evalTrial=test_trials, test_run_freq=2
 )
-ro = run_options # for debug
-id_patt = 1
-
-#model_file = sprintf("%s/R/%s_%dx%d_lr%3.1f_lws_%3.1f", dir, data, M, N, run_options$learning_rate, run_options$learn_window_size)
-
-model_file = sprintf("%s/R/%s_%dx%d", dir, data, M, N)
-if(runmode=="run") {
-  model_file = "/home/alexeyche/my/sim/last/R/synthetic_control_50x10_9"
-  if(file.exists(paste(model_file, ".idx", sep=""))) {  
-    W = loadMatrix(model_file, 1)
-    invisible(sapply(1:N, function(id) { 
-      id_to_conn = which(W[,id] != 0)
-      neurons$weights[[id]] = W[id_to_conn, id] 
-      neurons$id_conns[[id]] = id_to_conn
-    }))
-    cat("Load - Ok\n")
-  } else {
-    cat("Can't find file for model ", model_file, "\n")
-  }
-}
-patterns = gr1$patterns
-layers = SimLayers( list(neurons) )
-input_neurons = gr1
-
-run_net(gr1, layers, run_options)
-
-W = get_weights_matrix(list(neurons))
-if(runmode == "learn") {
-  saveMatrixList(model_file, list(W))
-}

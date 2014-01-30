@@ -18,10 +18,11 @@ data = synth # synthetic control
 
 set.seed(1234)
 c(train_dataset, test_dataset) := read_ts_file(data)
-#train_dataset = train_dataset[c(sample(1:50, 10), sample(51:100, 10), sample(101:150,10),
-#                                  sample(151:200, 10), sample(201:250,10), sample(251:300,10))] # cut
-#test_dataset = test_dataset[c(sample(1:50, 10), sample(51:100, 10), sample(101:150, 10),
-#                                sample(151:200, 10), sample(201:250,5), sample(251:300, 10))]
+elems = 1
+train_dataset = train_dataset[c(sample(1:50, elems), sample(51:100, elems), sample(101:150,elems),
+                               sample(151:200, elems), sample(201:250,elems), sample(251:300,elems))] # cut
+test_dataset = test_dataset[c(sample(1:50, elems), sample(51:100, elems), sample(101:150, elems),
+                               sample(151:200, elems), sample(201:250,elems), sample(251:300, elems))]
 ans = ucr_test(train_dataset, test_dataset, eucl_dist_alg)
 
 #train_dataset = train_dataset[c(1,101, 2, 102, 3, 103, 4, 104, 5, 105)] # cut
@@ -62,6 +63,8 @@ if(length(args)>0) {
   model_file = sprintf("%s/R/%s_%dx%d", dir, data, M, N)
 }
 
+model_file='/home/alexeyche/prog/sim/stable_run/R/synthetic_control_50x10_50'
+
 if(file.exists(paste(model_file, ".idx", sep=""))) {
     W = loadMatrix(model_file, 1)
     
@@ -75,36 +78,16 @@ if(file.exists(paste(model_file, ".idx", sep=""))) {
   cat("Can't find file for model ", model_file, "\n")
 }
 
+trials = 10
 
 run_options = list(T0 = 0, Tmax = duration, dt = 0.5, learning_rate = 0.5,
                    learn_window_size = 300, mode="run", collect_stat=TRUE, 
                    target_set = list(target_function_gen = random_2spikes_tf, depress_null=FALSE),
                    learn_layer_id = 1, evalTrial = trials
 )
-#patterns = gr1$patterns[1:length(train_dataset)] #[c(1:10,51:60, 101:110, 151:160, 201:210, 251:260)]
-patterns = gr1$patterns #[(length(train_dataset)+1):(length(train_dataset)+length(test_dataset))] #[c(1:10,51:60, 101:110, 151:160, 201:210, 251:260)]
 
-trials = 10
-net_all = list()
-u_all = list()
-p_all = list()
+
 net_neurons = SimLayers(list(neurons))
-for(id_patt in 1:length(patterns)) {
-  for(trial in 1:trials) {
-    net = list()
-    net[gr1$ids] = patterns[[id_patt]]$data
-    net[neurons$ids] = -Inf
-    run_options$class = patterns[[id_patt]]$class
-    
-    c(net, net_neurons, stat, mean_grad) := run_srm(net_neurons, net, run_options)
-    net = lapply(net[neurons$ids], function(sp) sp[sp != -Inf])
-    glob_id = trial+(id_patt-1)*trials
-    net_all[[glob_id]] = list(data=net, label=patterns[[id_patt]]$label)
-#    u_all[[glob_id]] = list(data=stat[[1]]$u, label=patterns[[id_patt]]$label)
-#    p_all[[glob_id]] = list(data=stat[[1]]$p, label=patterns[[id_patt]]$label)    
-  }
-}
-
 
 o_train = evalNet(gr1$patterns, run_options, constants, net_neurons$l)
 o_test = evalNet(gr2$patterns, run_options, constants, net_neurons$l)
@@ -116,35 +99,32 @@ window = 10
 k_out_train = lapply(o_train$spikes, function(st) kernelPass_spikes(st, list(sigma = sigma, window = window, T0 = 0, Tmax = duration, quad = 256)) )
 k_out_test = lapply(o_test$spikes, function(st) kernelPass_spikes(st, list(sigma = sigma, window = window, T0 = 0, Tmax = duration, quad = 256)) )
 
-k_out_train_m = mean_on_trials(k_out_train, trials)
-k_out_test_m = mean_on_trials(k_out_test, trials)
+cat("diff of train set\n")
+d1 = diffTrials(k_out_train, trials)
+cat("diff of test set\n")
+d2 = diffTrials(k_out_test, trials)
+cat(d1,"+",d2,"\n")
+#k_out_train_m = mean_on_trials(k_out_train, trials)
+#k_out_test_m = mean_on_trials(k_out_test, trials)
+#
+#perf = ucr_test(k_out_train_m, k_out_test_m, eucl_dist_alg)
+#
+#for(bw in seq(50, 150, by=10)) {
+#  sm_st_tr = smooth_stat(o_train$stat, bw)
+#  sm_st_test = smooth_stat(o_test$stat, bw)
+#  sm_st_tr_m = mean_on_trials(sm_st_tr, trials)
+#  sm_st_test_m = mean_on_trials(sm_st_test, trials)
+#  cat("bw:", bw, " ")
+#  perfs = ucr_test(sm_st_tr_m, sm_st_test_m, eucl_dist_alg)
+#}
 
-perf = ucr_test(k_out_train_m, k_out_test_m, eucl_dist_alg)
 
-for(bw in seq(50, 150, by=10)) {
-  sm_st_tr = smooth_stat(o_train$stat, bw)
-  sm_st_test = smooth_stat(o_test$stat, bw)
-  sm_st_tr_m = mean_on_trials(sm_st_tr, trials)
-  sm_st_test_m = mean_on_trials(sm_st_test, trials)
-  cat("bw:", bw, " ")
-  perfs = ucr_test(sm_st_tr_m, sm_st_test_m, eucl_dist_alg)
-}
 #R> sp_proc = post_process_set2(net_all_sp, 15, 0, 300, 10, 5)
 #R> perf = ucr_test(sp_proc[1:300], sp_proc[301:600], eucl_dist_alg)
 #The error rate is  0.1033333 
 # R> model_file
 # [1] "/home/alexeyche/prog/sim/last_last_1/R/synthetic_control_50x10_30"
 
-for(kernSize in c(10, 15, 20, 25, 30, 37.5)) {
-    spikes_proc = post_process_set(net_all, trials, 0, duration, binKernel, kernSize)
-    perf = ucr_test(spikes_proc[1:length(train_dataset)], spikes_proc[ (length(train_dataset)+1):(length(test_dataset)+length(train_dataset))], eucl_dist_alg)    
-    cat("kernSize", kernSize, "rate", perf$rate, "\n")
-}
-
-confm_base = matrix(0, nrow=6, ncol=6)
-invisible(sapply(ans$prob_tc, function(x) confm_base[x$true, x$pred] <<- confm_base[x$true, x$pred] +1))
-confm = matrix(0, nrow=6, ncol=6)
-invisible(sapply(perf$prob_tc, function(x) confm[x$true, x$pred] <<- confm[x$true, x$pred] +1))
 
 
 # R> confm_base

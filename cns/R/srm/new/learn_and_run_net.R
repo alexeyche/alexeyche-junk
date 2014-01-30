@@ -14,6 +14,7 @@ run_net <- function(input_neurons, layers, run_options, open_plots = FALSE, mode
   run_options$target_set$class = patterns[[id_patt]]$class
   
   loss = NULL  
+  stable = NULL  
   for(ep in run_options$start_epoch:run_options$epochs) {
     mean_dev = NULL
     net_all = list()    
@@ -37,15 +38,24 @@ run_net <- function(input_neurons, layers, run_options, open_plots = FALSE, mode
 
       p2 = levelplot(W, col.regions=colorRampPalette(c("black", "white")))
       p3 = levelplot(list_to_matrix(grad), col.regions=colorRampPalette(c("black", "white")))
-      if(!is.null(loss))
-        p4 = xyplot(y~x, list(x=1:ep,y=loss), type="l")
+      if(!is.null(loss)) {
+        dfrm = data.frame(x=1:length(loss), y=c(loss))
+        p4 = xyplot(y~x, data=dfrm, type="l")
+      }
+      if(!is.null(stable)) {
+        dfrm = data.frame(x=1:length(stable), y=c(stable))
+        p5 = xyplot(y~x, data=dfrm, type="l")
+      }
 #      if(!is.null(mean_dev))
 #        p4 = xyplot(y~x, list(x=1:id_patt,y=mean_dev), type="l")
       
       if(!not_fired)
         print(p1, position=c(0, 0.5, 0.5, 1), more=TRUE)
       if(!is.null(loss))
-        print(p4, position=c(0, 0, 0.5, 0.5), more=TRUE)
+        print(p4, position=c(0, 0, 0.5, 0.25), more=TRUE)
+      if(!is.null(stable)) {
+        print(p5, position=c(0, 0.25, 0.5, 0.5), more=TRUE)
+      }
 #      if(!is.null(mean_dev))
 #        print(p4, position=c(0, 0, 0.5, 0.5), more=TRUE)      
       print(p2, position=c(0.5, 0, 1, 0.5), more=TRUE)
@@ -65,6 +75,18 @@ run_net <- function(input_neurons, layers, run_options, open_plots = FALSE, mode
     W = get_weights_matrix(list(neurons))
     saveMatrixList(model_file, list(W))
     if((! is.null(run_options$test_function))&&(ep %% run_options$test_run_freq == 0)) {
+      o_train = evalNet(patterns, run_options, constants, net_neurons$l)
+      o_test = evalNet(run_options$test_patterns, run_options, constants, net_neurons$l)
+      
+      t_out <- run_options$test_function(o_train$spikes, o_test$spikes)
+      
+      if((length(stable)>0)&&(t_out$stable>(5*stable[length(stable)]))) {
+        t_out$stable <- stable[length(stable)]
+      }
+      
+      stable <- c(stable, t_out$stable)      
+      loss <- c(loss, t_out$loss)
+      system( sprintf("echo %s > %s/R/%d.log", t_out$loss, dir, ep))
 #      mode_acc = run_options$mode
 #      test_net_all = list()
 #      cat("Running net on test data (N=", length(run_options$test_patterns),") with ", run_options$trials, " sampling trials\n", sep="")
@@ -103,7 +125,7 @@ run_net <- function(input_neurons, layers, run_options, open_plots = FALSE, mode
 #      run_options$mode = mode_acc
 #      loss <- c(loss, run_options$test_function(net_all, test_net_all))
       
-      system(sprintf("R --slave --args %s < eval.R > %s/R/%d.log", model_file, dir, ep), wait=FALSE) 
+      #system(sprintf("R --slave --args %s < eval.R > %s/R/%d.log", model_file, dir, ep), wait=FALSE) 
     }
 
   }

@@ -17,7 +17,7 @@ saveMatrixList <- function(baseName, mtxList) {
         flush(con)
 
         offset <- as.integer(seek(con))
-        cat('offset', offset)
+#        cat('offset', offset)
         writeBin(offset, idxCon)
     }
 

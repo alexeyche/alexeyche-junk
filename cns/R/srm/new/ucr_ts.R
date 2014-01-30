@@ -1,6 +1,6 @@
 
 
-read_ts_file <- function(ts_name) {
+read_ts_file <- function(ts_name, dir=dir) {
   process_datamatrix <- function(m) {
     l = ncol(m)
     out = list()

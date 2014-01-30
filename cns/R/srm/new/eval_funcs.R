@@ -76,3 +76,28 @@ smooth_stat = function(stat, bw) {
     list(data=d, label=x$label, trial=x$trial)
   })
 }
+
+
+buildConusionMatrix = function(perf, nclasses) {
+    confm_base = matrix(0, nrow=nclasses, ncol=nclasses)
+    invisible(sapply(perf$prob_tc, function(x) confm_base[x$true, x$pred] <<- confm_base[x$true, x$pred] +1))
+    return(confm_base)
+}
+
+diffTrials = function(x, trials) {
+  all_cumd = 0
+  for(i in seq(1, length(x), by=trials)) {    
+    subx = x[i:(i+trials-1)]
+    cmb = combn(trials, 2)
+    cumd = 0
+    for(i in 1:ncol(cmb)) {
+      difference = sum((subx[[ cmb[1,i] ]]$data - subx[[ cmb[2,i] ]]$data) ^2)
+      cat(cmb[1,i],"-",cmb[2,i],":", difference, " ", sep="")
+      cumd = cumd + difference
+    }
+    cat("cumd: ", cumd, "\n", sep="")
+    all_cumd = all_cumd + cumd
+  }
+  cat("final cumd: ", all_cumd, "\n", sep="")
+  return(all_cumd)
+}

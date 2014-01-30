@@ -27,7 +27,7 @@ alpha <- 0.75
 beta <- 0.75
 tr <- -50 # mV
 g <- Vectorize(function(u) {
-  ans=(beta/alpha)*(log(1.1+exp(alpha*(tr-u))) -alpha*(tr-u))   
+  ans=(beta/alpha)*(log(1+exp(alpha*(tr-u))) -alpha*(tr-u))   
   return(ans)
 })
 
