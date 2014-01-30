@@ -1,9 +1,11 @@
-#setwd("~/prog/alexeyche-junk/cns/R/srm/new")
-#dir = '~/prog/sim/spear_run'
+setwd("~/prog/alexeyche-junk/cns/R/srm/new")
+dir = '~/prog/sim/spear_run'
 
-setwd("~/my/git/alexeyche-junk/cns/R/srm/new")
-dir = '~/my/sim/spear_run'
+#setwd("~/my/git/alexeyche-junk/cns/R/srm/new")
+#dir = '~/my/sim/spear_run'
 source('constants.R')
+
+Sys.setenv("DISPLAY"=":0.0")
 
 args <- commandArgs(trailingOnly = TRUE)
 
@@ -13,9 +15,10 @@ system(sprintf("mkdir %s",dir))
 
 alpha = as.numeric(args[2])
 beta = as.numeric(args[3])
-lr = as.numeric(args[4])
-llh_depr = as.numeric(args[5])
-refr_mode = as.character(args[6])
+llh_depr = as.numeric(args[4])
+refr_mode = as.character(args[5])
+duration = as.numeric(args[6])
+edge_prob = as.numeric(args[7])
 
 if(refr_mode == 'low') {
     u_abs <- -120 # mV
@@ -58,8 +61,8 @@ source('kernel.R')
 data = synth # synthetic control
 
 set.seed(1234)
-c(train_dataset, test_dataset) := read_ts_file(data, '~/my/sim')
-elems = 2
+c(train_dataset, test_dataset) := read_ts_file(data, '~/prog/sim')
+elems = 10
 train_dataset = train_dataset[c(sample(1:50, elems), sample(51:100, elems), sample(101:150,elems),
                                 sample(151:200, elems), sample(201:250,elems), sample(251:300,elems))] # cut
 test_dataset = test_dataset[c(sample(1:50, elems), sample(51:100, elems), sample(101:150, elems),
@@ -89,10 +92,11 @@ for(ni in 0:(N-1)) {
 
 neurons$connectFF(connection, start_w.M, 1:N )
 
-test_trials=3
+test_trials=5
+
 
 run_options = list(T0 = 0, Tmax = duration, dt = dt, 
-                   learning_rate = lr, epochs = 10, start_epoch = 1, weight_decay = 0,
+                   learning_rate = lr, epochs = 25, start_epoch = 1, weight_decay = 0,
                    reward_learning=FALSE,
                    fp_window = 30, fp_kernel_size = 15, dev_frac_norm = 0.25,
                    learn_window_size = 150, mode='learn', collect_stat=TRUE, 

@@ -37,6 +37,6 @@ start_w.N = 5 #matrix(rnorm( (N-1)*N, mean=2, sd=0.5), ncol=N, nrow=(N-1))
 
 # learning
 llh_depr = 0.04
-lr = 0.01
+lr = 0.025
 
 refr_mode = 'middle'

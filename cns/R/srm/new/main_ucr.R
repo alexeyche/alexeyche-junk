@@ -15,6 +15,7 @@ dir = '~/prog/sim/stable_run'
 #dir = '/home/alexeyche/prog/sim/last_last_0.75'
 system(sprintf("find %s/R -maxdepth 1 -name \"*.png\" -type f -exec rm -f {} \\;", dir))
 
+source('constants.R')
 
 source('util.R')
 source('plot_funcs.R')
@@ -32,26 +33,20 @@ source('layers.R')
 source('kernel.R')
 
 ID_MAX=0
-#require(snowfall)
-#if(!sfIsRunning()) {
-#  sfInit(parallel=TRUE, cpus=10)
-#  res = sfClusterEval(require('snnSRM'))
-#}
-#sfExport('constants')
 
 data = synth # synthetic control
 
 set.seed(1234)
 c(train_dataset, test_dataset) := read_ts_file(data,'~/prog/sim')
-elems = 50
+elems = 5
 train_dataset = train_dataset[c(sample(1:50, elems), sample(51:100, elems), sample(101:150,elems),
                                 sample(151:200, elems), sample(201:250,elems), sample(251:300,elems))] # cut
 test_dataset = test_dataset[c(sample(1:50, elems), sample(51:100, elems), sample(101:150, elems),
                               sample(151:200, elems), sample(201:250,elems), sample(251:300, elems))]
 
-ucr_test(train_dataset, test_dataset, eucl_dist_alg)
-
-duration = 300
+perf = ucr_test(train_dataset, test_dataset, eucl_dist_alg)
+cat("baseline:", perf$rate, "\n")
+q()
 
 N = 10
 M = 50
@@ -63,7 +58,7 @@ start_w.N = 5 #matrix(rnorm( (N-1)*N, mean=2, sd=0.5), ncol=N, nrow=(N-1))
 
 gr1 = TSNeurons(M = M)
 gr2 = TSNeurons(M = M, ids_c = 1000:(1000+M))
-neurons = SRMLayer(N, start_w.N, p_edge_prob=0.5)
+neurons = SRMLayer(N, start_w.N, p_edge_prob=edge_prob)
 
 gr1$loadPatterns(train_dataset, duration, dt, lambda=5)
 gr2$loadPatterns(test_dataset, duration, dt, lambda=5)

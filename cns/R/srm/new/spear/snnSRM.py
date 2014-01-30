@@ -2,8 +2,11 @@
 
 import subprocess
 
-codedir = '/home/alexeyche/my/git/alexeyche-junk/cns/R/srm/new'
-cmd = "/usr/local/bin/R --slave --args %(run_name)s %(alpha)s %(beta)s %(lr)s %(llh_depr)s %(refr)s < %(codedir)s/main_ucr_opt.R 2> /dev/null"
+#codedir = '/home/alexeyche/my/git/alexeyche-junk/cns/R/srm/new'
+
+codedir = "/home/alexeyche/prog/alexeyche-junk/cns/R/srm/new"
+
+cmd = "R --slave --args %(run_name)s %(alpha)s %(beta)s %(lr)s %(llh_depr)s %(refr)s %(duration)s %(edge_prob)s < %(codedir)s/main_ucr_opt.R 2> /dev/null"
 
 def run_snn(d):
     p = subprocess.Popen(cmd % d, stdout=subprocess.PIPE, shell=True) 
@@ -19,11 +22,13 @@ def main(job_id, params):
                       'beta' : params['beta'][0],
                       'lr' : params['lr'][0],
                       'llh_depr' : params['llh_depr'][0],
-                      'refr' : params['refr'][0]
+                      'refr' : params['refr'][0],
+                      'duration' : params['duration'][0],
+                      'edge_prob' : params['edge_prob'][0],
                   }
                )
     return l
 
 if __name__ == '__main__':
-    print main(1, { 'alpha' : [1], 'beta' : [1], 'lr' : [0.01], 'llh_depr' : [0.04], 'refr' : ['low'] })
+    print main(1, { 'alpha' : [1], 'beta' : [1], 'lr' : [0.01], 'llh_depr' : [0.04], 'refr' : ['low'], 'duration' : [150], 'edge_prob' : [0.5] })
  

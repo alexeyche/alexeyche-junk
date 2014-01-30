@@ -33,6 +33,25 @@ variable {
  max:  0.5
 }
 
+
+variable {
+ name: "duration"
+ type: FLOAT
+ size: 1
+ min:  100
+ max:  350
+}
+
+
+variable {
+ name: "edge_prob"
+ type: FLOAT
+ size: 1
+ min:  0.2
+ max:  0.7
+}
+
+
 variable {
  name: "refr"
  type: ENUM

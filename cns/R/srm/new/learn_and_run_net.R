@@ -15,14 +15,17 @@ run_net <- function(input_neurons, layers, run_options, open_plots = FALSE, mode
   loss = NULL  
   stable = NULL  
   for(ep in run_options$start_epoch:run_options$epochs) {
+    warn_count=0
     mean_dev = NULL
     net_all = list()    
     for(id_patt in 1:length(patterns)) {
       net[id_m] = patterns[[id_patt]]$data
       net[id_n] = -Inf
       run_options$target_set$label = patterns[[id_patt]]$label
-      
+          
       c(net, net_neurons, stat, grad) := run_srm(net_neurons, net, run_options)
+
+      
       mean_dev = c(mean_dev, reward_func(net[id_n], run_options))
       if(verbose)
           cat("epoch: ", ep, ", pattern # ", id_patt,"\n")
@@ -62,6 +65,12 @@ run_net <- function(input_neurons, layers, run_options, open_plots = FALSE, mode
       print(p3, position=c(0.5, 0.5, 1, 1))
       
       dev.off()
+      if(sum(sapply(net[id_n], length))> 150*length(id_n)) {
+        warn_count = warn_count + 1
+      }     
+      if(warn_count>5) {
+        return(c(1.0))
+      }
       if(open_plots) 
         system(sprintf("eog -w %s 1>/dev/null 2>/dev/null",pic_filename), ignore.stdout=TRUE, ignore.stderr=TRUE, wait=FALSE)
       net_all[[id_patt]] = list(data=net[id_n], label=patterns[[id_patt]]$label)
