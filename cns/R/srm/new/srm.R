@@ -51,7 +51,10 @@ run_srm <- function(net_neurons, net, ro) {
         
       #  net_neurons$l[[ro$learn_layer_id]]$weights[[i]] =  sqrt(sum(w^2))*(net_neurons$l[[ro$learn_layer_id]]$weights[[i]] + ro$learning_rate*gradients[[i]])/sqrt(sum( (w+ro$learning_rate*dw)^2))
       #net_neurons$l[[ro$learn_layer_id]]$weights[[i]] = net_neurons$l[[ro$learn_layer_id]]$weights[[i]] + ro$learning_rate*(gradients[[i]]-mw)
-      net_neurons$l[[ro$learn_layer_id]]$weights[[i]] = net_neurons$l[[ro$learn_layer_id]]$weights[[i]] + ro$learning_rate*gradients[[i]]
+      w = net_neurons$l[[ro$learn_layer_id]]$weights[[i]]
+      dw = ro$learning_rate*gradients[[i]]
+      net_neurons$l[[ro$learn_layer_id]]$weights[[i]] =  sqrt(sum(w^2))*(w + dw)/sqrt(sum( (w+dw)^2))
+      #net_neurons$l[[ro$learn_layer_id]]$weights[[i]] = net_neurons$l[[ro$learn_layer_id]]$weights[[i]] + acc
     }
   }     
   

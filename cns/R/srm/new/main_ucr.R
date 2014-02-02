@@ -72,7 +72,7 @@ gr1 = TSNeurons(M = M)
 gr2 = TSNeurons(M = M, ids_c = 1000:(1000+M))
 
 
-inhib_frac = 0.5
+inhib_frac = 0.25
 neurons = SRMLayer(N, start_w.N, p_edge_prob=edge_prob, ninh=ceiling(N*inhib_frac))
 
 gr1$loadPatterns(train_dataset, duration, dt, lambda=5)
