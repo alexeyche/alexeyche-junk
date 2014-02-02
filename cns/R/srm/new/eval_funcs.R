@@ -92,12 +92,12 @@ diffTrials = function(x, trials) {
     cumd = 0
     for(i in 1:ncol(cmb)) {
       difference = sum((subx[[ cmb[1,i] ]]$data - subx[[ cmb[2,i] ]]$data) ^2)
-      cat(cmb[1,i],"-",cmb[2,i],":", difference, " ", sep="")
+#      cat(cmb[1,i],"-",cmb[2,i],":", difference, " ", sep="")
       cumd = cumd + difference
     }
-    cat("cumd: ", cumd, "\n", sep="")
+#    cat("cumd: ", cumd, "\n", sep="")
     all_cumd = all_cumd + cumd
   }
-  cat("final cumd: ", all_cumd, "\n", sep="")
+#  cat("final cumd: ", all_cumd, "\n", sep="")
   return(all_cumd)
 }

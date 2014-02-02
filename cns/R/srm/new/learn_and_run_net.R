@@ -14,6 +14,7 @@ run_net <- function(input_neurons, layers, run_options, open_plots = FALSE, mode
   
   loss = NULL  
   stable = NULL  
+  
   for(ep in run_options$start_epoch:run_options$epochs) {
     warn_count=0
     mean_dev = NULL
@@ -24,11 +25,11 @@ run_net <- function(input_neurons, layers, run_options, open_plots = FALSE, mode
       run_options$target_set$label = patterns[[id_patt]]$label
           
       c(net, net_neurons, stat, grad) := run_srm(net_neurons, net, run_options)
-
+      c(grad, spikes_survived) := grad
       
       mean_dev = c(mean_dev, reward_func(net[id_n], run_options))
       if(verbose)
-          cat("epoch: ", ep, ", pattern # ", id_patt,"\n")
+          cat("epoch: ", ep, ", pattern # ", id_patt, ", spikes survived: ", spikes_survived,"\n", sep="")
           
       neurons = net_neurons$l[[1]]
       W = get_weights_matrix(net_neurons$l)
@@ -40,7 +41,8 @@ run_net <- function(input_neurons, layers, run_options, open_plots = FALSE, mode
         p1 = plot_rastl(net[id_n], sprintf("epoch %d, pattern %d, class %d", ep, id_patt, patterns[[id_patt]]$label))
 
       p2 = levelplot(W, col.regions=colorRampPalette(c("black", "white")))
-      p3 = levelplot(list_to_matrix(grad), col.regions=colorRampPalette(c("black", "white")))
+      if(length(grad)!=0)
+        p3 = levelplot(list_to_matrix(grad), col.regions=colorRampPalette(c("black", "white")))
       if(!is.null(loss)) {
         dfrm = data.frame(x=1:length(loss), y=c(loss))
         p4 = xyplot(y~x, data=dfrm, type="l")
@@ -62,7 +64,8 @@ run_net <- function(input_neurons, layers, run_options, open_plots = FALSE, mode
 #      if(!is.null(mean_dev))
 #        print(p4, position=c(0, 0, 0.5, 0.5), more=TRUE)      
       print(p2, position=c(0.5, 0, 1, 0.5), more=TRUE)
-      print(p3, position=c(0.5, 0.5, 1, 1))
+      if(length(grad)!=0)
+        print(p3, position=c(0.5, 0.5, 1, 1))
       
       dev.off()
       if(sum(sapply(net[id_n], length))> 150*length(id_n)) {

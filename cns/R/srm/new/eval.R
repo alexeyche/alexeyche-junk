@@ -1,6 +1,31 @@
 #setwd("~/my/git/alexeyche-junk/cns/R/srm/new")
 setwd("~/prog/alexeyche-junk/cns/R/srm/new")
 require(snnSRM)
+source('constants.R')
+
+if(refr_mode == 'low') {
+  u_abs <- -120 # mV
+  u_r <- -50#-50 # mV
+  trf <- 2.25 # ms
+  trs <- 2 # ms
+  dr <- 1 # ms
+} else 
+  if(refr_mode == 'middle') {
+    u_abs <- -150 # mV
+    u_r <- -50#-50 # mV
+    trf <- 3.25 # ms
+    trs <- 3 # ms
+    dr <- 1 # ms
+  } else
+    if(refr_mode == 'high') {
+      u_abs <- -250 # mV
+      u_r <- -70#-50 # mV
+      trf <- 5.25 # ms
+      trs <- 5 # ms
+      dr <- 3 # ms
+    }
+
+
 source('include.R')
 source('ucr_ts.R')
 source('eval_funcs.R')
@@ -17,8 +42,8 @@ N = 10
 data = synth # synthetic control
 
 set.seed(1234)
-c(train_dataset, test_dataset) := read_ts_file(data)
-elems = 1
+c(train_dataset, test_dataset) := read_ts_file(data, '~/prog/sim')
+elems = 50
 train_dataset = train_dataset[c(sample(1:50, elems), sample(51:100, elems), sample(101:150,elems),
                                sample(151:200, elems), sample(201:250,elems), sample(251:300,elems))] # cut
 test_dataset = test_dataset[c(sample(1:50, elems), sample(51:100, elems), sample(101:150, elems),
@@ -27,7 +52,6 @@ ans = ucr_test(train_dataset, test_dataset, eucl_dist_alg)
 
 #train_dataset = train_dataset[c(1,101, 2, 102, 3, 103, 4, 104, 5, 105)] # cut
 
-duration = 300
 
 N = 10
 start_w.M = 4 #matrix(rnorm( M*N, mean=2, sd=0.5), ncol=N, nrow=M)
@@ -62,9 +86,10 @@ if(length(args)>0) {
 } else {
   model_file = sprintf("%s/R/%s_%dx%d", dir, data, M, N)
 }
-
-model_file='/home/alexeyche/prog/sim/stable_run/R/synthetic_control_50x10_50'
-
+#model_file = '/home/alexeyche/prog/sim/verylast_run/synthetic_control_50x10_9'
+#model_file = '/home/alexeyche/prog/sim/verylast_run3/synthetic_control_50x10_27'
+#model_file = '/home/alexeyche/prog/sim/verylast_run4/synthetic_control_50x10_10'  # quazi_good
+#model_file = '/home/alexeyche/prog/sim/spear_run/run20058/synthetic_control_50x10_22'
 if(file.exists(paste(model_file, ".idx", sep=""))) {
     W = loadMatrix(model_file, 1)
     
@@ -92,22 +117,31 @@ net_neurons = SimLayers(list(neurons))
 o_train = evalNet(gr1$patterns, run_options, constants, net_neurons$l)
 o_test = evalNet(gr2$patterns, run_options, constants, net_neurons$l)
 
+#window=10
+for(window in c(8,10, 12, 14, 16, 20)) {
+  for(sigma in c(2,3,4, 6, 8, 10)) {
+    k_out_train = lapply(o_train$spikes, function(st) kernelPass_spikes(st, list(sigma = sigma, window = window, T0 = 0, Tmax = duration, quad = 256)) )
+    k_out_test = lapply(o_test$spikes, function(st) kernelPass_spikes(st, list(sigma = sigma, window = window, T0 = 0, Tmax = duration, quad = 256)) )
+     
+    k_out_train_m = mean_on_trials(k_out_train, trials)
+    k_out_test_m = mean_on_trials(k_out_test, trials)
+    
+    cat("k: ", sigma, "w: ", window," ")
+    perf = ucr_test(k_out_train_m, k_out_test_m, eucl_dist_alg)
+    
+  }
+}
 
-sigma = 10
-window = 10
+for(binSize in c(10, 12.5, duration/7)) {
+  k_out_train_m = post_process_set(o_train$spikes, trials, 0, duration, binKernel, binSize)
+  k_out_test_m = post_process_set(o_test$spikes, trials, 0, duration, binKernel, binSize)
+  perf = ucr_test(k_out_train_m, k_out_test_m, eucl_dist_alg)
+}
 
-k_out_train = lapply(o_train$spikes, function(st) kernelPass_spikes(st, list(sigma = sigma, window = window, T0 = 0, Tmax = duration, quad = 256)) )
-k_out_test = lapply(o_test$spikes, function(st) kernelPass_spikes(st, list(sigma = sigma, window = window, T0 = 0, Tmax = duration, quad = 256)) )
+#sigma = 10
+#window = 10
 
-cat("diff of train set\n")
-d1 = diffTrials(k_out_train, trials)
-cat("diff of test set\n")
-d2 = diffTrials(k_out_test, trials)
-cat(d1,"+",d2,"\n")
-#k_out_train_m = mean_on_trials(k_out_train, trials)
-#k_out_test_m = mean_on_trials(k_out_test, trials)
-#
-#perf = ucr_test(k_out_train_m, k_out_test_m, eucl_dist_alg)
+
 #
 #for(bw in seq(50, 150, by=10)) {
 #  sm_st_tr = smooth_stat(o_train$stat, bw)

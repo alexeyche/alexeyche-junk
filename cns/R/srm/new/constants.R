@@ -14,8 +14,8 @@ dr <- 1 # ms
 
 
 # stochastic treshold
-alpha <- 0.75
-beta <- 0.75
+alpha <- 0.71
+beta <- 0.72
 tr <- -50 # mV
 
 # srm
@@ -29,14 +29,14 @@ duration = 300
 
 N = 10
 M = 50
-edge_prob = 0.5
+edge_prob = 0.1
 
 # start weights
 start_w.M = 10 #matrix(rnorm( M*N, mean=2, sd=0.5), ncol=N, nrow=M)
 start_w.N = 5 #matrix(rnorm( (N-1)*N, mean=2, sd=0.5), ncol=N, nrow=(N-1))
 
 # learning
-llh_depr = 0.04
-lr = 0.025
+llh_depr = 0.2
+lr = 1
 
-refr_mode = 'middle'
+refr_mode = 'high'

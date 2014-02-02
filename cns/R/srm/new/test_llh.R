@@ -1,7 +1,8 @@
 #!/usr/bin/RScript
-#setwd("~/prog/alexeyche-junk/cns/R/srm/new")
-setwd("~/my/git/alexeyche-junk/cns/R/srm/new")
+setwd("~/prog/alexeyche-junk/cns/R/srm/new")
+#setwd("~/my/git/alexeyche-junk/cns/R/srm/new")
 require(snnSRM)
+source('constants.R')
 source('util.R')
 source('neuron.R')
 source('layers.R')
@@ -20,8 +21,8 @@ id_n = seq(M+1, M+N)
 
 gr1 = TSNeurons(M = M)
 
-#file <- "/home/alexeyche/prog/sim/stimuli/sd1.csv"
-file <- "/home/alexeyche/my/sim/stimuli/sd1.csv"
+file <- "/home/alexeyche/prog/sim/stimuli/sd1.csv"
+#file <- "/home/alexeyche/my/sim/stimuli/sd1.csv"
 gr1$loadPatternFromFile(file, 150, 1, 0.5)
 #net <- spikeMatToSpikeList(gr1$patterns[[1]]$data)
 net = list()
@@ -42,14 +43,14 @@ for(i in 1:N) {
   null_pattern[[i]] <- -Inf
 }
 pattern = list()
-pattern[[1]] <- c(-Inf) #, 75)
+pattern[[1]] <- c(-Inf, 5) #, 45, 60 , 75, 95)
 pattern[[2]] <- c(-Inf, 65)
 pattern[[3]] <- c(-Inf, 50,80)
 pattern[[4]] <- c(-Inf, 100)
 pattern[[5]] <- c(-Inf, 10)
 
-epochs = 1
-run_options = list(T0 = 0, Tmax = 150, dt = 0.5, learning_rate = 0.1, learn_window_size = 150, mode="run", collect_stat=FALSE)
+epochs = 100
+run_options = list(T0 = 0, Tmax = 150, dt = 0.5, learning_rate = 0.25, learn_window_size = 150, mode="run", collect_stat=FALSE)
 layers = SimLayers(list(neurons))
 target_set = list(target_function_gen = full_spike_tf, depress_null=TRUE)
 
@@ -65,17 +66,17 @@ for(ep in 1:epochs) {
   
   not_fired = all(sapply(net[id_n], function(sp) length(sp) == 1))
   
-#  if(!not_fired)
-#    p1 = plot_rastl(net[id_n], sprintf("epoch %d", ep))
+ if(!not_fired)
+   p1 = plot_rastl(net[id_n], sprintf("epoch %d", ep))
   
-#  p2 = levelplot(sapply(gr, function(x) x), col.regions=colorRampPalette(c("black", "white")))
-#  if(!not_fired) 
-#    print(p1, position=c(0, 0.5, 1, 1), more=TRUE)
-#  print(p2, position=c(0, 0, 1, 0.5))
+ p2 = levelplot(sapply(gr, function(x) x), col.regions=colorRampPalette(c("black", "white")))
+ if(!not_fired) 
+   print(p1, position=c(0, 0.5, 1, 1), more=TRUE)
+ print(p2, position=c(0, 0, 1, 0.5))
   net_all[[ep]] = net[id_n]
   grads[[ep]] = gr
   
-  invisible(sapply(2:N, function(i) layers$l[[1]]$weights[[i]] <- layers$l[[1]]$weights[[i]] + run_options$learning_rate * gr[[i]] ))
+  invisible(sapply(1:N, function(i) layers$l[[1]]$weights[[i]] <- layers$l[[1]]$weights[[i]] + run_options$learning_rate * gr[[i]] ))
   
 }
 

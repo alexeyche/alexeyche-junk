@@ -22,7 +22,7 @@ neuron = setRefClass("neuron", fields = list(w = "vector", id_conn = "vector", i
 
 SRMLayer = setRefClass("SRMLayer", fields = list(weights = "list", id_conns = "list", ids = "vector", len="vector", stochastic="logical"),
                      methods = list(                       
-                       initialize = function(N, start_weight, p_edge_prob=1) {
+                       initialize = function(N, start_weight, p_edge_prob=1, ninh=0) {
                          ids <<- get_unique_ids(N)
                          weights <<- list()
                          id_conns <<- list()                         
@@ -31,13 +31,19 @@ SRMLayer = setRefClass("SRMLayer", fields = list(weights = "list", id_conns = "l
                          } else {
                            start_w = matrix(start_weight, ncol=N, nrow=N-1)
                          }
-                         for(i in 1:N) {                           
+                         
+                         inh_idxs = ids[(length(ids)-ninh):length(ids)]
+                         for(i in 1:N) {                                                      
                            full_conn <- ids[ ids != ids[i] ] # id of srm neurons: no self connections
                            conn_exists = p_edge_prob > runif(length(full_conn))
                            w <- start_w[,i]
                            id_conns[[i]] <<- full_conn[conn_exists]
-                           weights[[i]] <<- w[conn_exists]                           
-                         }                         
+                           weights[[i]] <<- w[conn_exists]          
+                           inh = id_conns[[i]] %in% inh_idxs
+                           if(any(inh))
+                              weights[[i]][inh]  <<- -weights[[i]][inh]
+                         }
+                         
                          len <<- N
                          #stochastic <<- TRUE
                          weights <<- weights

@@ -13,6 +13,7 @@ run_srm <- function(net_neurons, net, ro) {
   if(ro$collect_stat) {
     uum = NULL # for stat collecting
     ppm = NULL
+    grad_stat = NULL
   }
 
   sim_times = seq(ro$T0, ro$Tmax, by=ro$learn_window_size)
@@ -22,7 +23,9 @@ run_srm <- function(net_neurons, net, ro) {
         sim_out = net_neurons$sim(sim_options, net)
         
         if (ro$mode == "learn") {
-          gradients[[length(gradients)+1]] = net_neurons$l[[ro$learn_layer_id]]$grad(sim_time0, sim_time0+ro$learn_window_size, net, ro$target_set)
+          c(grad, stat) := net_neurons$l[[ro$learn_layer_id]]$grad(sim_time0, sim_time0+ro$learn_window_size, net, ro$target_set)
+          gradients[[length(gradients)+1]] = grad
+          grad_stat <- c(grad_stat, stat)
         }     
     } else {
         break
@@ -38,15 +41,22 @@ run_srm <- function(net_neurons, net, ro) {
     rew = reward_func(net[ net_neurons$l[[ro$learn_layer_id]]$ids ], ro)           
     gradients = lapply(gradients, function(sp) sp * rew)
     
+    #mw = mean(unlist(gradients))
+    
+    #w = unlist(net_neurons$l[[ro$learn_layer_id]]$weights)
+    #dw = unlist(gradients)
+    
     for(i in 1:net_neurons$l[[ro$learn_layer_id]]$len) {
-        acc = ro$learning_rate * gradients[[i]]  - ro$weight_decay * net_neurons$l[[ro$learn_layer_id]]$weights[[i]]
+        #acc = ro$learning_rate * gradients[[i]]  - ro$weight_decay * net_neurons$l[[ro$learn_layer_id]]$weights[[i]]        
         
-        net_neurons$l[[ro$learn_layer_id]]$weights[[i]] =  net_neurons$l[[ro$learn_layer_id]]$weights[[i]] + acc 
+      #  net_neurons$l[[ro$learn_layer_id]]$weights[[i]] =  sqrt(sum(w^2))*(net_neurons$l[[ro$learn_layer_id]]$weights[[i]] + ro$learning_rate*gradients[[i]])/sqrt(sum( (w+ro$learning_rate*dw)^2))
+      #net_neurons$l[[ro$learn_layer_id]]$weights[[i]] = net_neurons$l[[ro$learn_layer_id]]$weights[[i]] + ro$learning_rate*(gradients[[i]]-mw)
+      net_neurons$l[[ro$learn_layer_id]]$weights[[i]] = net_neurons$l[[ro$learn_layer_id]]$weights[[i]] + ro$learning_rate*gradients[[i]]
     }
   }     
   
   if(ro$collect_stat) {
-    return(list(net, net_neurons, sim_out$stat, grad=gradients ))
+    return(list(net, net_neurons, sim_out$stat, grad=list(gradients, mean(grad_stat)) ))
   } else {
     return(list(net, net_neurons))
   }
