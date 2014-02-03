@@ -24,7 +24,7 @@ u_rest <- -70 # mV
 
 # input spike train
 duration = 300
-
+dt = 0.5
 # net cfg
 
 N = 10
@@ -40,3 +40,15 @@ llh_depr = 0.2
 lr = 1
 
 refr_mode = 'high'
+
+stdp_learning=TRUE
+Aplus = 1.5
+Aminus = 1.5
+tplus = 10
+tminus = 10
+constants = list(dt=dt, e0=e0, ts=ts, tm=tm, u_abs=u_abs, u_r=u_r, trf=trf, trs=trs, 
+                 dr=dr, alpha=alpha, beta=beta, tr=tr, u_rest=u_rest,
+                 stdp_learning=stdp_learning, Aplus=Aplus, Aminus=Aminus, tplus=tplus, tminus=tminus)
+
+
+

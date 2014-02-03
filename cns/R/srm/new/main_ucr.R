@@ -62,7 +62,7 @@ cat("baseline:", perf$rate, "\n")
 
 N = 50
 M = 50
-dt = 0.5
+
 
 start_w.M = matrix(rnorm( M*N, mean=10, sd=0.5), ncol=N, nrow=M)
 start_w.N = matrix(rnorm( (N-1)*N, mean=10, sd=0.5), ncol=N, nrow=(N-1))

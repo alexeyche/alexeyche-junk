@@ -3,7 +3,6 @@
 source('srm_funcs.R')
 source('llh.R')
 require(snnSRM)
-constants = list(e0=e0, ts=ts, tm=tm, u_abs=u_abs, u_r=u_r, trf=trf, trs=trs, dr=dr, alpha=alpha, beta=beta, tr=tr, u_rest=u_rest)
 
 neuron = setRefClass("neuron", fields = list(w = "vector", id_conn = "vector", id = "vector"),
                                 methods = list( 
