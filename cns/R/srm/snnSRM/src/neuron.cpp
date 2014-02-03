@@ -17,8 +17,21 @@ double g(const double &u, const List &c) {
                                     as<double>(c["alpha"])*(as<double>(c["tr"])-u)) ;
 }
 
+double stdp(const double &s, const SInput &si) {
+    double dw;
+    if(s<=0) {
+        dw = si.get_c("Aplus")*exp(s/si.get_c("tplus"));
+    } else {
+        dw = si.get_c("Aminus")*exp(-s/si.get_c("tminus"));
+    }
+    return(dw);
+}
+
+
 
 double u(const double &t, const SInput &si) {
+  const NumericVector &y(si.net[si.id[0]-1]);
+  
   double e_syn = 0;
   for(size_t id_it=0; id_it < si.id_conn.size(); id_it++) {
     const int &syn_sp_i = si.id_conn[id_it];
@@ -28,27 +41,34 @@ double u(const double &t, const SInput &si) {
     //for(size_t tti=0; tti<syn_sp.size(); tti++) printf("syn_sp[%d] = %f\n", tti, syn_sp[tti]);
     
     for(int sp_it= syn_sp.size()-1; sp_it>=0; sp_it--) {
-      if(t-syn_sp[sp_it] > EPSP_WORK_WINDOW) {
-        //printf("t-syn_sp[%d] = %f > EPSP_WORK_WINDOW\n", sp_it, t-syn_sp[sp_it]);
-        break;
-      }
-      //printf("w[%d] = %f\n", id_it, si.w[id_it]);
-      //printf("e_syn_before: %f\n", e_syn);
-      e_syn += si.w[id_it] * epsp(t-syn_sp[sp_it], si.c); 
-      //printf("e_syn_after: %f\n", e_syn);
+        if(t-syn_sp[sp_it] > EPSP_WORK_WINDOW) {
+            //printf("t-syn_sp[%d] = %f > EPSP_WORK_WINDOW\n", sp_it, t-syn_sp[sp_it]);
+            break;
+        }
+        if(t-syn_sp[sp_it]<0) {
+            continue;
+        }
+
+        //printf("w[%d] = %f\n", id_it, si.w[id_it]);
+        //printf("e_syn_before: %f\n", e_syn);
+        e_syn += si.w[id_it] * epsp(t-syn_sp[sp_it], si.c); 
+        //printf("e_syn_after: %f\n", e_syn);
+               
     }
+    
   }
   double nu_pot = 0;
-  const NumericVector &y(si.net[si.id[0]-1]);
   for(int yi = y.size()-1; yi>=0; yi--) {
     double s = t - y[yi];
     //printf("nu s of %d = %f\n", yi, s);
+    
     if(s < 0.001) continue; //ignoring spike that occurres right now
-
+    
     if(s > NU_WORK_WINDOW) {
       break;
     }
     nu_pot += nu(s, si.c);
+    
   }
 //  printf("nu_pot %f\n", nu_pot);
   return si.get_c("u_rest") + e_syn + nu_pot;
