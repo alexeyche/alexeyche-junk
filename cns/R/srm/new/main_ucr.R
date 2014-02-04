@@ -72,8 +72,6 @@ test_dataset = test_dataset[c(sample(1:50, elems), sample(51:100, elems), sample
 
 perf = ucr_test(train_dataset, test_dataset, eucl_dist_alg, verbose=FALSE)
 #cat("baseline:", perf$rate, "\n")
-cat(perf$rate, "\n")
-q()
 
 start_w.M = matrix(rnorm( M*N, mean=start_w.M.mean, sd=start_w.M.sd), ncol=N, nrow=M)
 start_w.N = matrix(rnorm( (N-1)*N, mean=start_w.N.mean, sd=start_w.N.sd), ncol=N, nrow=(N-1))

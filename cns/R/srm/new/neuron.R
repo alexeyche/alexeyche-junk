@@ -92,6 +92,15 @@ SRMLayer = setRefClass("SRMLayer", fields = list(weights = "list", id_conns = "l
                        }
                        ))
 
+SimLayers = setRefClass("SimLayers", fields=list(l="list", all_ids="vector"), methods=list(
+                    initialize = function(layers_c) {
+                        all_ids <<- unlist(lapply(layers_c, function(n) n$ids))
+                        l <<- layers_c
+                    },
+                    sim = function(sim_options, net) {
+                      simLayers(sim_options, constants, .self$l, net)
+                    }))
+
 test_neurons = function() {
   net <- list()
   net[[1]] <- c(10, 11, 12)
