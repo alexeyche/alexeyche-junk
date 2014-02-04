@@ -1,5 +1,5 @@
 language: PYTHON
-name:     "snnSRM"
+name:     "snn"
 
 variable {
  name: "alpha"
