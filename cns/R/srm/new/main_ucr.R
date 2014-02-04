@@ -136,9 +136,10 @@ if(runmode=="run") {
 layers = SimLayers( list(neurons) )
 input_neurons = gr1
 
-run_net(gr1, layers, run_options, verbose=FALSE)
+loss = run_net(gr1, layers, run_options, verbose=FALSE)
 
 W = get_weights_matrix(list(neurons))
 if(runmode == "learn") {
   saveMatrixList(model_file, list(W))
 }
+cat(min(loss), "\n")
