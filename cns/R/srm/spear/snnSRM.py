@@ -4,13 +4,15 @@ import subprocess
 import tempfile
 import shutil
 
-codedir = '/home/alexeyche/my/git/alexeyche-junk/cns/R/srm/new'
-#codedir = "/home/alexeyche/prog/alexeyche-junk/cns/R/srm/new"
+codedir = '/home/alexeyche/my/git/alexeyche-junk/cns/R/srm'
+#codedir = "/home/alexeyche/prog/alexeyche-junk/cns/R/srm"
 
 script_name = 'main_ucr.R'
 runs_dir = '/home/alexeyche/my/sim/runs'
+#runs_dir = '/home/alexeyche/prog/sim/runs'
 
-cmd = "Rscript %(codedir)s/%(script_name)s --const-file=%(const_file)s --run-name=%(run_name)s --runs-dir=%(runs_dir)s 2> %(runs_dir)s/%(run_name)s.err.log"
+cmd = "Rscript %(codedir)s/%(script_name)s  \
+            --const-file=%(const_file)s --run-name=%(run_name)s --runs-dir=%(runs_dir)s --no-verbose 2> %(runs_dir)s/%(run_name)s.err.log"
 
 def run_snn(d):
     p = subprocess.Popen(cmd % d, stdout=subprocess.PIPE, shell=True) 
@@ -45,7 +47,6 @@ def main(job_id, params):
                       'runs_dir' : runs_dir,
                       'run_name' : 'run%s' % job_id,
                       'const_file' : tmp
-                      
                   }
                )
     return l

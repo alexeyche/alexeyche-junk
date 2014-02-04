@@ -33,12 +33,16 @@ if(!file.exists(data_dir)) {
     q()
 }
 
+verbose=TRUE
+if(grep("--no-verbose", args)>0) {
+    verbose=FALSE
+}
+
 system(sprintf("find %s -maxdepth 1 -name \"*.png\" -type f -exec rm -f {} \\;", dir))
 
 #===================================================================================================
 
 Sys.setenv("DISPLAY"=":0.0")
-
 
 source('util.R')
 source('plot_funcs.R')
@@ -55,8 +59,6 @@ source('kernel.R')
 
 constants = list(dt=dt, e0=e0, ts=ts, tm=tm, u_abs=u_abs, u_r=u_r, trf=trf, trs=trs, 
                  dr=dr, alpha=alpha, beta=beta, tr=tr, u_rest=u_rest)
-                 
-
 
 ID_MAX=0
 
@@ -71,7 +73,8 @@ test_dataset = test_dataset[c(sample(1:50, elems), sample(51:100, elems), sample
 
 
 perf = ucr_test(train_dataset, test_dataset, eucl_dist_alg, verbose=FALSE)
-#cat("baseline:", perf$rate, "\n")
+if(verbose)
+    cat("baseline:", perf$rate, "\n")
 
 start_w.M = matrix(rnorm( M*N, mean=start_w.M.mean, sd=start_w.M.sd), ncol=N, nrow=M)
 start_w.N = matrix(rnorm( (N-1)*N, mean=start_w.N.mean, sd=start_w.N.sd), ncol=N, nrow=(N-1))
@@ -134,7 +137,7 @@ if(runmode=="run") {
 layers = SimLayers( list(neurons) )
 input_neurons = gr1
 
-loss = run_net(gr1, layers, run_options, verbose=FALSE)
+loss = run_net(gr1, layers, run_options, verbose=verbose)
 
 W = get_weights_matrix(list(neurons))
 if(runmode == "learn") {

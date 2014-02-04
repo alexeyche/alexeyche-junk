@@ -26,7 +26,6 @@ variable {
  options: 'low'
  options: 'middle'
  options: 'high'
- max:  0.5
 }
 
 
