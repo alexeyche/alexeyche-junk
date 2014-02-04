@@ -1,6 +1,6 @@
 #setwd("~/my/git/alexeyche-junk/cns/R/srm/new")
 setwd("~/prog/alexeyche-junk/cns/R/srm/new")
-require(snnSRM)
+require(snn)
 source('constants.R')
 
 if(refr_mode == 'low') {

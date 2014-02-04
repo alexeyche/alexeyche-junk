@@ -2,7 +2,7 @@
 
 source('srm_funcs.R')
 source('llh.R')
-require(snnSRM)
+require(snn)
 
 neuron = setRefClass("neuron", fields = list(w = "vector", id_conn = "vector", id = "vector"),
                                 methods = list( 

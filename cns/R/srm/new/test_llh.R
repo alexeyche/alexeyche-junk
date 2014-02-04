@@ -1,7 +1,7 @@
 #!/usr/bin/RScript
 setwd("~/prog/alexeyche-junk/cns/R/srm/new")
 #setwd("~/my/git/alexeyche-junk/cns/R/srm/new")
-require(snnSRM)
+require(snn)
 source('constants.R')
 source('util.R')
 source('neuron.R')

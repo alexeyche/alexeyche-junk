@@ -6,7 +6,7 @@ source('include.R')
 
 if(!sfIsRunning()) {
   sfInit(parallel=TRUE, cpus=10)
-  res = sfClusterEval(require('snnSRM'))
+  res = sfClusterEval(require('snn'))
 }
 
 sfExport('constants')

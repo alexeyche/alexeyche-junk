@@ -1,4 +1,4 @@
-require(snnSRM)
+require(snn)
 require(snowfall)
 require(cubature)
 
