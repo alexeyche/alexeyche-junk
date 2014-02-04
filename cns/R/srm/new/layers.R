@@ -48,9 +48,9 @@
 #neurons$connectFF(connection, start_w.M, 1:N )
 
 
-SimLayers = setRefClass("SimLayers", fields=list(l="list"), methods=list(
-                    initialize = function(layers_c=NULL) {
-                      if(!is.null(layers_c)) 
+SimLayers = setRefClass("SimLayers", fields=list(l="list", all_ids="vector"), methods=list(
+                    initialize = function(layers_c) {
+                        all_ids <<- unlist(lapply(layers_c, function(n) n$ids))
                         l <<- layers_c
                     },
                     sim = function(sim_options, net) {

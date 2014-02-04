@@ -15,6 +15,7 @@ if(llh_depr_mode == 'no') {
     llh_factor = 1
 } else {
   cat(sprintf("Can't find depression mode %s\n", llh_depr_mode))
+  q()
 }
 
 grad_func <- function(neurons, T0, Tmax, net, target_set) {
@@ -85,4 +86,3 @@ grad_func <- function(neurons, T0, Tmax, net, target_set) {
 }
 
 
-#ss = integrateSRM(constants, int_options, neurons$ids[5], neurons$id_conns[[5]], neurons$weights[[5]], net)

@@ -1,4 +1,4 @@
-
+#!/usr/bin/Rscript
 
 gaussian_kernel = function(s, sigma) {
   sum((1/sqrt(2*pi*sigma^2))*exp(-(s^2)/(2*sigma^2)))
