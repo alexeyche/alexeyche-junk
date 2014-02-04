@@ -1,71 +1,81 @@
 
-e0 <- 1.3 # mV
-ts <- 0.7 # ms
-tm <- 10 # ms
-epsp <- Vectorize(function(s) {
-  if(s<0) { return(0) }
-  e0*(exp(-s/tm)-exp(-s/ts))
-})
-nu0 <- -150 # mV
-nu <- Vectorize(function(s) {
-  if(s<0) { return(0)}
-  nu0*exp(-s/tm)
-})
-#t<-seq(-5,50, length.out=500)
-#plot(t, epsp(t), type="l", ylim=c(-5,1))
-#lines(t, nu(t))
-
-
-N <- 10
-M <- 1
-u_rest <- -70 # mV
-w <- matrix(rep(2, M*N), nrow=M, ncol=N)
-
-x <- vector("list", N)
-for(i in 1:N) { x[[i]]=c(-Inf)}
-x[[3]] <- c(10,15,20)
-x[[4]] <- c(11,16,21)
-x[[5]] <- c(13,17,22)
-x[[6]] <- c(22, 22, 23)
-
-u_srm <- function(t, x, y) {
-  e_syn <- 0
-  for(i in 1:length(x)) {
-    e_syn <- e_syn + w[1,i]*sum(epsp(t-x[[i]]))
-  }
-  u_rest + e_syn + sum(nu(t-y))
+apply_grad_norm <- function(weights, grads, ro) {
+    if(ro$weights_norm_type == 'mult_glob') {
+        w = unlist(weights)
+        dw = unlist(grads)
+        new_weights = lapply(1:length(weights), function(i) {
+            sqrt(sum(w^2))*(weights[[i]] + ro$learning_rate*grads[[i]])/sqrt(sum( (w+ro$learning_rate*dw)^2 ))
+        })
+        return(new_weights)
+    } else 
+    if(ro$weights_norm_type == 'mult_local') {
+        new_weights = lapply(1:length(weights), function(i) {
+            dw = ro$learning_rate*grads[[i]]       
+            sqrt(sum(weights[[i]]^2))*(weights[[i]]+dw)/sqrt( sum(weights[[i]] + dw)^2)
+        })
+        return(new_weights)
+    } else 
+    if(ro$weights_norm_type == 'add') {
+        mw = mean(unlist(grads))       
+        new_weights = lapply(1:length(weights), function(i) weights[[i]] + ro$learning_rate*(grads[[i]]-mw))
+        return(new_weights)
+    } else
+    if(ro$weights_norm_type == 'no') {
+        new_weights = lapply(1:length(weights), function(i) weights[[i]] + ro$learning_rate*grads[[i]])
+        return(new_weights)         
+    } else {
+        cat(sprintf("Can't find code for weight normalization type %s\n", ro$weights_norm_type))
+        q()
+    }
 }
 
-u_tresh <- -50 # mV
-du <- 3 # mV
-p0 <- 1 # 1/ms
-g <- Vectorize(function(u) {
-  p0*exp((u-u_tresh)/du)
-})
-#u_prim <- seq(-70,-45, length.out=500)
-#plot(u_prim, g(u_prim), type="l")
-
-p <- function(t, x, y) { g(u_srm(t, x, y))}
-
-y <- c(-Inf)
-uall <- c()
-pall <- c()
-tsim <- seq(0, 200, by=0.1)
-for(t in tsim) {
-  curu <- u_srm(t, x, y)
-  uall <- c(uall, curu)
-  curp <- g(curu)
-  pall <- c(pall, curp)
+run_srm <- function(net_neurons, net, ro) {  
+  N = net_neurons$l[[1]]$len
   
-  #cat("curu: ", curu, ", curp: ", curp, "\n")
-  if((curp)>runif(1)) {
-    #cat("we had a spike!\n")  
-    y <- c(y, t)
-  }  
+  gr_it = 1
+  #maxw_len = 0
+  #invisible(sapply(1:net_neurons$l[[ro$learn_layer_id]]$len, function(n_id) maxw_len<<-max(maxw_len, length(net_neurons$l[[ro$learn_layer_id]]$weights[[n_id]]))))
+  #gradients = array(0, dim=c(maxw_len, net_neurons$l[[ro$learn_layer_id]]$len, ro$Tmax %/% ro$learn_window_size)) 
+  
+  gradients = list()
+
+  if(ro$collect_stat) {
+    uum = NULL # for stat collecting
+    ppm = NULL
+    grad_stat = NULL
+  }
+
+  sim_times = seq(ro$T0, ro$Tmax, by=ro$learn_window_size)
+  for(sim_time0 in sim_times) {
+    if(sim_time0<ro$Tmax) {
+        sim_options = list(T0=sim_time0, Tmax= (sim_time0+ro$learn_window_size), dt=ro$dt, saveStat=ro$collect_stat)
+        sim_out = net_neurons$sim(sim_options, net)
+        
+        if (ro$mode == "learn") {
+          c(grad, stat) := net_neurons$l[[ro$learn_layer_id]]$grad(sim_time0, sim_time0+ro$learn_window_size, net, ro$target_set)
+          gradients[[length(gradients)+1]] = grad
+          grad_stat <- c(grad_stat, stat)
+        }     
+    } else {
+        break
+    }
+  }
+  if(ro$mode == "learn") {
+    lg = length(gradients) 
+    if(lg>1) {
+        gradients = lapply(2:lg, function(gi) mapply("+", gradients[[gi-1]], gradients[[gi]], SIMPLIFY=FALSE))
+    }
+    gradients = gradients[[1]]
+    
+    rew = reward_func(net[ net_neurons$l[[ro$learn_layer_id]]$ids ], ro)           
+    gradients = lapply(gradients, function(sp) sp * rew)
+    
+    net_neurons$l[[ro$learn_layer_id]]$weights = apply_grad_norm(net_neurons$l[[ro$learn_layer_id]]$weights, gradients, ro)
+  }     
+  
+  if(ro$collect_stat) {
+    return(list(net, net_neurons, sim_out$stat, grad=list(gradients, mean(grad_stat)) ))
+  } else {
+    return(list(net, net_neurons))
+  }
 }
-
-plot(tsim, pall, type="l")
-
-
-
-

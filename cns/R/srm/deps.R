@@ -1,0 +1,5 @@
+install.packages('Rcpp')
+install.packages('snowfall')
+install.packages('reshape2')
+install.packages('ggplot2')
+install.packages('lattice')
