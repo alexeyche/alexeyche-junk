@@ -1,2 +1,0 @@
-useDynLib(snnSRM)
-exportPattern("^[[:alpha:]]+")
