@@ -1,4 +1,28 @@
 
+if(refr_mode == 'low') {
+    u_abs <- -120 # mV
+    u_r <- -50#-50 # mV
+    trf <- 2.25 # ms
+    trs <- 2 # ms
+    dr <- 1 # ms
+} else 
+if(refr_mode == 'middle') {
+    u_abs <- -150 # mV
+    u_r <- -50#-50 # mV
+    trf <- 3.25 # ms
+    trs <- 3 # ms
+    dr <- 1 # ms
+} else
+if(refr_mode == 'high') {
+    u_abs <- -250 # mV
+    u_r <- -70#-50 # mV
+    trf <- 5.25 # ms
+    trs <- 5 # ms
+    dr <- 3 # ms
+} else {
+    cat(sprintf("Can't find refration mode %s\n", refr_mode))
+}
+
 epsp <- Vectorize(function(s) {
   if((s<0)||(s == Inf)) { return(0) }
   e0*(exp(-s/tm)-exp(-s/ts))

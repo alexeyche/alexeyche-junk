@@ -1,6 +1,35 @@
 
+apply_grad_norm <- function(weights, grads, ro) {
+    if(ro$weights_norm_type == 'mult_glob') {
+        w = unlist(weights)
+        dw = unlist(grads)
+        new_weights = lapply(1:length(weights), function(i) {
+            sqrt(sum(w^2))*(weights[[i]] + ro$learning_rate*grads[[i]])/sqrt(sum( (w+ro$learning_rate*dw)^2 ))
+        })
+        return(new_weights)
+    } else 
+    if(ro$weights_norm_type == 'mult_local') {
+        new_weights = lapply(1:length(weights), function(i) {
+            dw = ro$learning_rate*grads[[i]]       
+            sqrt(sum(weights[[i]]^2))*(weights[[i]]+dw)/sqrt( sum(weights[[i]] + dw)^2)
+        })
+        return(new_weights)
+    } else 
+    if(ro$weights_norm_type == 'add') {
+        mw = mean(unlist(grads))       
+        new_weights = lapply(1:length(weights), function(i) weights[[i]] + ro$learning_rate*(grads[[i]]-mw))
+        return(new_weights)
+    } else
+    if(ro$weights_norm_type == 'no') {
+        new_weights = lapply(1:length(weights), function(i) weights[[i]] + ro$learning_rate*grads[[i]])
+        return(new_weights)         
+    } else {
+        cat(sprintf("Can't find code for weight normalization type %s\n", ro$weights_norm_type))
+        q()
+    }
+}
+
 run_srm <- function(net_neurons, net, ro) {  
-  
   N = net_neurons$l[[1]]$len
   
   gr_it = 1
@@ -41,21 +70,7 @@ run_srm <- function(net_neurons, net, ro) {
     rew = reward_func(net[ net_neurons$l[[ro$learn_layer_id]]$ids ], ro)           
     gradients = lapply(gradients, function(sp) sp * rew)
     
-    #mw = mean(unlist(gradients))
-    
-    #w = unlist(net_neurons$l[[ro$learn_layer_id]]$weights)
-    #dw = unlist(gradients)
-    
-    for(i in 1:net_neurons$l[[ro$learn_layer_id]]$len) {
-        #acc = ro$learning_rate * gradients[[i]]  - ro$weight_decay * net_neurons$l[[ro$learn_layer_id]]$weights[[i]]        
-        
-      #  net_neurons$l[[ro$learn_layer_id]]$weights[[i]] =  sqrt(sum(w^2))*(net_neurons$l[[ro$learn_layer_id]]$weights[[i]] + ro$learning_rate*gradients[[i]])/sqrt(sum( (w+ro$learning_rate*dw)^2))
-      #net_neurons$l[[ro$learn_layer_id]]$weights[[i]] = net_neurons$l[[ro$learn_layer_id]]$weights[[i]] + ro$learning_rate*(gradients[[i]]-mw)
-      w = net_neurons$l[[ro$learn_layer_id]]$weights[[i]]
-      dw = ro$learning_rate*gradients[[i]]
-      net_neurons$l[[ro$learn_layer_id]]$weights[[i]] =  sqrt(sum(w^2))*(w + dw)/sqrt(sum( (w+dw)^2))
-      #net_neurons$l[[ro$learn_layer_id]]$weights[[i]] = net_neurons$l[[ro$learn_layer_id]]$weights[[i]] + acc
-    }
+    net_neurons$l[[ro$learn_layer_id]]$weights = apply_grad_norm(net_neurons$l[[ro$learn_layer_id]]$weights, gradients, ro)
   }     
   
   if(ro$collect_stat) {

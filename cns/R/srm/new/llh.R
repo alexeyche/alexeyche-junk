@@ -1,4 +1,22 @@
 
+if(llh_depr_mode == 'low') {
+    llh_depr_mode_value = 0.5
+} else 
+if(llh_depr_mode == 'middle') {
+    llh_depr_mode_value = 0.15
+    llh_factor = 1.25
+} else
+if(llh_depr_mode == 'high') {
+    llh_depr_mode_value = 0.03
+    llh_factor = 1.5
+} else
+if(llh_depr_mode == 'no') {
+    llh_depr_mode_value = Inf
+    llh_factor = 1
+} else {
+  cat(sprintf("Can't find depression mode %s\n", llh_depr_mode))
+}
+
 grad_func <- function(neurons, T0, Tmax, net, target_set) {
   id_n = neurons$ids #sapply(neurons, function(n) n$id)
   
@@ -7,40 +25,22 @@ grad_func <- function(neurons, T0, Tmax, net, target_set) {
     right = findInterval(Tmax, sp, rightmost.closed=TRUE)
     if(left<=right) sp[left:right]
   })  
-  activ_min = list()
-  for(ni in 1:length(id_n)) {
-    if(!is.null(nspikes[[ni]])) {
-      activ = net[ neurons$id_conns[[ni]] ]
-      activ_sp = list()
-      for(sp in nspikes[[ni]]) {
-        activ_sp[[length(activ_sp)+1]] = lapply(activ, function(a) { a=a[a!=-Inf]; a-sp } )
-      }      
-    }
-  }
+
   spikes_survived <- NULL
   nspikes = lapply(1:length(id_n), function(ni) { 
    if(!is.null(nspikes[[ni]])) {
-     #if( (length(nspikes[[ni]])/(Tmax-T0)) > llh_depr) { #0.04666667) { #0.06)  {  #  >= 4 spikes
+     if( (length(nspikes[[ni]])/(Tmax-T0)) > llh_depr_mode_value) {
        probs = g(neurons$u_one(ni, nspikes[[ni]], net))
-       most_likely = probs>=mean(probs)        
+       most_likely = probs>= (mean(probs)*llh_factor)
        new_nspikes = nspikes[[ni]][most_likely]        
        spikes_survived <<- c(spikes_survived, length(new_nspikes)/length(nspikes[[ni]]) )
        new_nspikes
-       #NULL
-     #} else {
-     #  nspikes[[ni]]
-     #}
+     } else {
+       spikes_survived <<- c(spikes_survived, 1)
+       nspikes[[ni]]
+     }
    }
   })
-#   if(sum(sapply(nspikes, length)/(Tmax-T0)) > 0.2) {
-#    nspikes = lapply(1:length(id_n), function(ni) { 
-#        if(!is.null(nspikes[[ni]])) {
-#          probs = g(neurons$u_one(ni, nspikes[[ni]], net))
-#          most_likely = probs>=mean(probs)
-#          nspikes[[ni]][most_likely]
-#        }
-#   })
-#   }
   
   left_part = lapply(1:length(id_n), function(number) {  
               if(!is.null(nspikes[[number]])) {

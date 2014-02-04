@@ -1,17 +1,13 @@
 
+#data cfg
+samples_from_dataset = 10
+
 # epsp
 e0 <- 1.3 # mV
 ts <- 1 # ms
 tm <- 10 # ms
 
-
-# refractoriness
-u_abs <- -150 # mV
-u_r <- -50#-50 # mV
-trf <- 3.25 # ms
-trs <- 3 # ms
-dr <- 1 # ms
-
+refr_mode = 'high' # 'middle', 'low'
 
 # stochastic treshold
 alpha <- 0.71
@@ -25,30 +21,26 @@ u_rest <- -70 # mV
 # input spike train
 duration = 300
 dt = 0.5
-# net cfg
 
-N = 10
+# net cfg
+N = 50
 M = 50
-edge_prob = 0.1
+net_edge_prob = 0.1
+inhib_frac = 0.25
+net_neurons_for_input = N/2
+afferent_per_neuron = M/5
 
 # start weights
-start_w.M = 10 #matrix(rnorm( M*N, mean=2, sd=0.5), ncol=N, nrow=M)
-start_w.N = 5 #matrix(rnorm( (N-1)*N, mean=2, sd=0.5), ncol=N, nrow=(N-1))
+start_w.M.mean = 10
+start_w.M.sd = 0.5
+start_w.N.mean = 10
+start_w.N.sd = 0.5
 
 # learning
-llh_depr = 0.2
+learn_window_size = duration/2
+llh_depr = 0.5 # 75 spikes per window
+
 lr = 1
 
-refr_mode = 'high'
-
-stdp_learning=TRUE
-Aplus = 1.5
-Aminus = 1.5
-tplus = 10
-tminus = 10
-constants = list(dt=dt, e0=e0, ts=ts, tm=tm, u_abs=u_abs, u_r=u_r, trf=trf, trs=trs, 
-                 dr=dr, alpha=alpha, beta=beta, tr=tr, u_rest=u_rest,
-                 stdp_learning=stdp_learning, Aplus=Aplus, Aminus=Aminus, tplus=tplus, tminus=tminus)
-
-
-
+epochs = 30
+weights_norm_type = 'mult_glob' # 'add', 'mult_local', 'no'

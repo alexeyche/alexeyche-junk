@@ -17,19 +17,15 @@ variable {
  max:  1.2
 }
 
-variable {
- name: "lr"
- type: FLOAT
- size: 1
- min:  0.1
- max:  2
-}
 
 variable {
- name: "llh_depr"
- type: FLOAT
+ name: "llh_depr_mode"
+ type: ENUM
  size: 1
- min:  0.02666667
+ options: 'no'
+ options: 'low'
+ options: 'middle'
+ options: 'high'
  max:  0.5
 }
 
@@ -39,7 +35,7 @@ variable {
  type: FLOAT
  size: 1
  min:  100
- max:  350
+ max:  500
 }
 
 
@@ -47,16 +43,42 @@ variable {
  name: "edge_prob"
  type: FLOAT
  size: 1
- min:  0.2
+ min:  0.05
  max:  0.7
 }
 
-
 variable {
- name: "refr"
+ name: "refr_mode"
  type: ENUM
  size: 1
  options: "low"
  options: "middle"
  options: "high"
 }
+
+variable {
+ name: "net_neurons_for_input"
+ type: INT
+ size: 1
+ min: 5
+ max: 30
+}
+
+variable {
+ name: "afferent_per_neuron"
+ type: INT
+ size: 1
+ min: 5
+ max: 30
+}
+
+variable {
+ name: "weights_norm_type"
+ type: ENUM
+ size: 1
+ options: "mult_glob"
+ options: "mult_local"
+ options: "add"
+ options: "no"
+}
+
