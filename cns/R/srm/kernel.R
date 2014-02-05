@@ -54,8 +54,8 @@ reward_func = function(curr_act, Kmean_classes, mean_error=0) {
       }
       id_cl = which(names(Kmean_classes) == as.character(K$label))
       cl_exp = exp(class_rates)
-      softmax_rate = 3*cl_exp[id_cl]/sum(cl_exp)
-      vv = 3*cl_exp/sum(cl_exp)
+      softmax_rate = cl_exp[id_cl]/sum(cl_exp)
+      vv = cl_exp/sum(cl_exp)
       vv_srt = sort(vv, decreasing=TRUE)
       
       cat(K$label, "  <=>  ")
@@ -63,8 +63,8 @@ reward_func = function(curr_act, Kmean_classes, mean_error=0) {
           id_cl_true = which(vv == vv_srt[id_cl])
           cat(names(Kmean_classes)[id_cl_true], ":", vv[id_cl_true]," ", sep="")
       }
-      cat(" => ", softmax_rate-mean_error, "\n", sep="")
-      return(softmax_rate-mean(vv))
+      cat(" => ", softmax_rate-mean(vv), "\n", sep="")
+      return(softmax_rate-max(vv))
   }
   return(0.0)
 }
