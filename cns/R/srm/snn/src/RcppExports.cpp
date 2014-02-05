@@ -7,7 +7,7 @@ using namespace Rcpp;
 
 // evalNet
 SEXP evalNet(const List patterns, const List run_options, const List constants, List layers);
-RcppExport SEXP snnSRM_evalNet(SEXP patternsSEXP, SEXP run_optionsSEXP, SEXP constantsSEXP, SEXP layersSEXP) {
+RcppExport SEXP snn_evalNet(SEXP patternsSEXP, SEXP run_optionsSEXP, SEXP constantsSEXP, SEXP layersSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
@@ -25,7 +25,7 @@ END_RCPP
 }
 // integrateSRM
 SEXP integrateSRM(const List constants, const List int_options, const IntegerVector neuron_id, const IntegerVector neuron_id_conn, const NumericVector neuron_w, const List net);
-RcppExport SEXP snnSRM_integrateSRM(SEXP constantsSEXP, SEXP int_optionsSEXP, SEXP neuron_idSEXP, SEXP neuron_id_connSEXP, SEXP neuron_wSEXP, SEXP netSEXP) {
+RcppExport SEXP snn_integrateSRM(SEXP constantsSEXP, SEXP int_optionsSEXP, SEXP neuron_idSEXP, SEXP neuron_id_connSEXP, SEXP neuron_wSEXP, SEXP netSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
@@ -45,7 +45,7 @@ END_RCPP
 }
 // integrateSRM_vec
 SEXP integrateSRM_vec(const List constants, const List int_options, const IntegerVector neurons_id, const List neurons_id_conn, const List neurons_w, const List net);
-RcppExport SEXP snnSRM_integrateSRM_vec(SEXP constantsSEXP, SEXP int_optionsSEXP, SEXP neurons_idSEXP, SEXP neurons_id_connSEXP, SEXP neurons_wSEXP, SEXP netSEXP) {
+RcppExport SEXP snn_integrateSRM_vec(SEXP constantsSEXP, SEXP int_optionsSEXP, SEXP neurons_idSEXP, SEXP neurons_id_connSEXP, SEXP neurons_wSEXP, SEXP netSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
@@ -65,7 +65,7 @@ END_RCPP
 }
 // USRM
 SEXP USRM(const NumericVector t, const List constants, const IntegerVector neuron_id, const IntegerVector neuron_id_conn, const NumericVector neuron_w, const List net);
-RcppExport SEXP snnSRM_USRM(SEXP tSEXP, SEXP constantsSEXP, SEXP neuron_idSEXP, SEXP neuron_id_connSEXP, SEXP neuron_wSEXP, SEXP netSEXP) {
+RcppExport SEXP snn_USRM(SEXP tSEXP, SEXP constantsSEXP, SEXP neuron_idSEXP, SEXP neuron_id_connSEXP, SEXP neuron_wSEXP, SEXP netSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
@@ -85,7 +85,7 @@ END_RCPP
 }
 // USRMs
 SEXP USRMs(const NumericVector t, const List constants, const IntegerVector neurons_id, const List neurons_id_conn, const List neurons_w, const List net);
-RcppExport SEXP snnSRM_USRMs(SEXP tSEXP, SEXP constantsSEXP, SEXP neurons_idSEXP, SEXP neurons_id_connSEXP, SEXP neurons_wSEXP, SEXP netSEXP) {
+RcppExport SEXP snn_USRMs(SEXP tSEXP, SEXP constantsSEXP, SEXP neurons_idSEXP, SEXP neurons_id_connSEXP, SEXP neurons_wSEXP, SEXP netSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
@@ -103,32 +103,66 @@ BEGIN_RCPP
     return __sexp_result;
 END_RCPP
 }
-// kernelPass_spikes
-SEXP kernelPass_spikes(List d, const List kernel_options);
-RcppExport SEXP snnSRM_kernelPass_spikes(SEXP dSEXP, SEXP kernel_optionsSEXP) {
+// kernelWindow_spikes
+SEXP kernelWindow_spikes(List d, const List kernel_options);
+RcppExport SEXP snn_kernelWindow_spikes(SEXP dSEXP, SEXP kernel_optionsSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
         Rcpp::RNGScope __rngScope;
         Rcpp::traits::input_parameter< List >::type d(dSEXP );
         Rcpp::traits::input_parameter< const List >::type kernel_options(kernel_optionsSEXP );
-        SEXP __result = kernelPass_spikes(d, kernel_options);
+        SEXP __result = kernelWindow_spikes(d, kernel_options);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);
     return __sexp_result;
 END_RCPP
 }
-// kernelPass_stat
-SEXP kernelPass_stat(List d, const List kernel_options);
-RcppExport SEXP snnSRM_kernelPass_stat(SEXP dSEXP, SEXP kernel_optionsSEXP) {
+// kernelPass_autoCorr
+SEXP kernelPass_autoCorr(List d, const List kernel_options);
+RcppExport SEXP snn_kernelPass_autoCorr(SEXP dSEXP, SEXP kernel_optionsSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
         Rcpp::RNGScope __rngScope;
         Rcpp::traits::input_parameter< List >::type d(dSEXP );
         Rcpp::traits::input_parameter< const List >::type kernel_options(kernel_optionsSEXP );
-        SEXP __result = kernelPass_stat(d, kernel_options);
+        SEXP __result = kernelPass_autoCorr(d, kernel_options);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}
+// kernelPass_corr
+SEXP kernelPass_corr(List d1, List d2, const List kernel_options);
+RcppExport SEXP snn_kernelPass_corr(SEXP d1SEXP, SEXP d2SEXP, SEXP kernel_optionsSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< List >::type d1(d1SEXP );
+        Rcpp::traits::input_parameter< List >::type d2(d2SEXP );
+        Rcpp::traits::input_parameter< const List >::type kernel_options(kernel_optionsSEXP );
+        SEXP __result = kernelPass_corr(d1, d2, kernel_options);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}
+// kernelPass_crossNeurons
+SEXP kernelPass_crossNeurons(List d1, List d2, const List kernel_options);
+RcppExport SEXP snn_kernelPass_crossNeurons(SEXP d1SEXP, SEXP d2SEXP, SEXP kernel_optionsSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< List >::type d1(d1SEXP );
+        Rcpp::traits::input_parameter< List >::type d2(d2SEXP );
+        Rcpp::traits::input_parameter< const List >::type kernel_options(kernel_optionsSEXP );
+        SEXP __result = kernelPass_crossNeurons(d1, d2, kernel_options);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);
@@ -137,7 +171,7 @@ END_RCPP
 }
 // simLayers
 SEXP simLayers(const List sim_options, const List constants, List layers, List net);
-RcppExport SEXP snnSRM_simLayers(SEXP sim_optionsSEXP, SEXP constantsSEXP, SEXP layersSEXP, SEXP netSEXP) {
+RcppExport SEXP snn_simLayers(SEXP sim_optionsSEXP, SEXP constantsSEXP, SEXP layersSEXP, SEXP netSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
@@ -155,7 +189,7 @@ END_RCPP
 }
 // timesTwo
 SEXP timesTwo(NumericVector x);
-RcppExport SEXP snnSRM_timesTwo(SEXP xSEXP) {
+RcppExport SEXP snn_timesTwo(SEXP xSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {

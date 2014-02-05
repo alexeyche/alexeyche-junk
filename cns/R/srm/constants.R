@@ -27,8 +27,8 @@ N = 50
 M = 50
 net_edge_prob = 0.1
 inhib_frac = 0.25
-net_neurons_for_input = N/2
-afferent_per_neuron = M/5
+net_neurons_for_input = ceiling(N/2)
+afferent_per_neuron = ceiling(M/5)
 
 # start weights
 start_w.M.mean = 10
@@ -38,9 +38,9 @@ start_w.N.sd = 0.5
 
 # learning
 learn_window_size = duration/2
-llh_depr = 0.5 # 75 spikes per window
+llh_depr_mode = 'no' # 75 spikes per window
 
-lr = 1
+lr = 2
 
-epochs = 30
-weights_norm_type = 'mult_glob' # 'add', 'mult_local', 'no'
+epochs = 50
+weights_norm_type = 'no'

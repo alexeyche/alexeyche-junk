@@ -26,13 +26,14 @@ gray_plot <- function(data, lims = c(min(data),max(data)) ) {
 }
 
 
-plot_run_status = function(net, net_neurons, grad, loss, stable, pic_filename) {
+plot_run_status = function(net, net_neurons, grad, loss, stable, pic_filename, descr) {
     W = get_weights_matrix(net_neurons$l)
-    not_fired = all(sapply(net[net_neurons$all_ids], function(sp) length(sp) == 1))
+    id_n = net_neurons$all_ids
+    not_fired = all(sapply(net[id_n], function(sp) length(sp) == 1))
     
     png(pic_filename, width=1024, height=480)
     if(!not_fired) 
-      p1 = plot_rastl(net[id_n], sprintf("epoch %d, pattern %d, class %d", ep, id_patt, patterns[[id_patt]]$label))
+      p1 = plot_rastl(net[id_n], descr)
 
     p2 = levelplot(W, col.regions=colorRampPalette(c("black", "white")))
     if(length(grad)!=0)

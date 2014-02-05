@@ -2,38 +2,46 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 evalNet <- function(patterns, run_options, constants, layers) {
-    .Call('snnSRM_evalNet', PACKAGE = 'snnSRM', patterns, run_options, constants, layers)
+    .Call('snn_evalNet', PACKAGE = 'snn', patterns, run_options, constants, layers)
 }
 
 integrateSRM <- function(constants, int_options, neuron_id, neuron_id_conn, neuron_w, net) {
-    .Call('snnSRM_integrateSRM', PACKAGE = 'snnSRM', constants, int_options, neuron_id, neuron_id_conn, neuron_w, net)
+    .Call('snn_integrateSRM', PACKAGE = 'snn', constants, int_options, neuron_id, neuron_id_conn, neuron_w, net)
 }
 
 integrateSRM_vec <- function(constants, int_options, neurons_id, neurons_id_conn, neurons_w, net) {
-    .Call('snnSRM_integrateSRM_vec', PACKAGE = 'snnSRM', constants, int_options, neurons_id, neurons_id_conn, neurons_w, net)
+    .Call('snn_integrateSRM_vec', PACKAGE = 'snn', constants, int_options, neurons_id, neurons_id_conn, neurons_w, net)
 }
 
 USRM <- function(t, constants, neuron_id, neuron_id_conn, neuron_w, net) {
-    .Call('snnSRM_USRM', PACKAGE = 'snnSRM', t, constants, neuron_id, neuron_id_conn, neuron_w, net)
+    .Call('snn_USRM', PACKAGE = 'snn', t, constants, neuron_id, neuron_id_conn, neuron_w, net)
 }
 
 USRMs <- function(t, constants, neurons_id, neurons_id_conn, neurons_w, net) {
-    .Call('snnSRM_USRMs', PACKAGE = 'snnSRM', t, constants, neurons_id, neurons_id_conn, neurons_w, net)
+    .Call('snn_USRMs', PACKAGE = 'snn', t, constants, neurons_id, neurons_id_conn, neurons_w, net)
 }
 
-kernelPass_spikes <- function(d, kernel_options) {
-    .Call('snnSRM_kernelPass_spikes', PACKAGE = 'snnSRM', d, kernel_options)
+kernelWindow_spikes <- function(d, kernel_options) {
+    .Call('snn_kernelWindow_spikes', PACKAGE = 'snn', d, kernel_options)
 }
 
-kernelPass_stat <- function(d, kernel_options) {
-    .Call('snnSRM_kernelPass_stat', PACKAGE = 'snnSRM', d, kernel_options)
+kernelPass_autoCorr <- function(d, kernel_options) {
+    .Call('snn_kernelPass_autoCorr', PACKAGE = 'snn', d, kernel_options)
+}
+
+kernelPass_corr <- function(d1, d2, kernel_options) {
+    .Call('snn_kernelPass_corr', PACKAGE = 'snn', d1, d2, kernel_options)
+}
+
+kernelPass_crossNeurons <- function(d1, d2, kernel_options) {
+    .Call('snn_kernelPass_crossNeurons', PACKAGE = 'snn', d1, d2, kernel_options)
 }
 
 simLayers <- function(sim_options, constants, layers, net) {
-    .Call('snnSRM_simLayers', PACKAGE = 'snnSRM', sim_options, constants, layers, net)
+    .Call('snn_simLayers', PACKAGE = 'snn', sim_options, constants, layers, net)
 }
 
 timesTwo <- function(x) {
-    .Call('snnSRM_timesTwo', PACKAGE = 'snnSRM', x)
+    .Call('snn_timesTwo', PACKAGE = 'snn', x)
 }
 

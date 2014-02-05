@@ -18,7 +18,7 @@ run_net <- function(input_neurons, layers, run_options, open_plots = FALSE, mode
   
     for(ep in run_options$start_epoch:run_options$epochs) {
         warn_count=0
-        mean_dev = NULL
+        reward = NULL
         net_all = list()    
         
         for(id_patt in 1:length(patterns)) {
@@ -27,14 +27,14 @@ run_net <- function(input_neurons, layers, run_options, open_plots = FALSE, mode
             run_options$target_set$label = patterns[[id_patt]]$label
                 
             c(net, net_neurons, stat, grad) := run_srm(net_neurons, net, run_options)
-            c(grad, spikes_survived) := grad
+            c(grad, spikes_survived, cur_reward) := grad
             
-            mean_dev = c(mean_dev, reward_func(net[id_n], run_options))
+            reward = c(reward, cur_reward)
             if(verbose)
                 cat("epoch: ", ep, ", pattern # ", id_patt, ", spikes survived: ", spikes_survived,"\n", sep="")
                 
             pic_filename = sprintf("%s/run_ep%s_patt%s_label%s.png", dir, ep, id_patt, patterns[[id_patt]]$label)
-            plot_run_status(net, net_neurons, grad, loss, stable, pic_filename)
+            plot_run_status(net, net_neurons, grad, loss, reward, pic_filename, sprintf("epoch %d, pattern %d, class %d", ep, id_patt, patterns[[id_patt]]$label))
             if(open_plots) system(sprintf("eog -w %s 1>/dev/null 2>/dev/null",pic_filename), ignore.stdout=TRUE, ignore.stderr=TRUE, wait=FALSE)
 
             
@@ -48,26 +48,26 @@ run_net <- function(input_neurons, layers, run_options, open_plots = FALSE, mode
         }
     
         if(run_options$reward_learning)
-            run_options$mean_activity_stat = get_mean_activity(net_all, run_options)
+            run_options$mean_activity_stat = get_mean_activity_classes(net_all, run_options)
       
         model_file = sprintf("%s/%s_%dx%d_%d", dir, data, M, N, ep)
         W = get_weights_matrix(net_neurons$l)
         saveMatrixList(model_file, list(W))
     
         if((! is.null(run_options$test_function))&&(ep %% run_options$test_run_freq == 0)) {
-            o_train = evalNet(patterns, run_options, constants, net_neurons$l)
-            o_test = evalNet(run_options$test_patterns, run_options, constants, net_neurons$l)
-            
-            t_out <- run_options$test_function(o_train$spikes, o_test$spikes)
-            
-            if((length(stable)>0)&&(t_out$stable>(5*stable[length(stable)]))) {
-              t_out$stable <- stable[length(stable)]
-            }
-            if(!is.null(t_out$stable)) { 
-                stable <- c(stable, t_out$stable)      
-            }
-            loss <- c(loss, t_out$loss)
-            system( sprintf("echo %s > %s/%d.log", t_out$loss, dir, ep))
+#             o_train = evalNet(patterns, run_options, constants, net_neurons$l)
+#             o_test = evalNet(run_options$test_patterns, run_options, constants, net_neurons$l)
+#             
+#             t_out <- run_options$test_function(o_train$spikes, o_test$spikes)
+#             
+#             if((length(stable)>0)&&(t_out$stable>(5*stable[length(stable)]))) {
+#               t_out$stable <- stable[length(stable)]
+#             }
+#             if(!is.null(t_out$stable)) { 
+#                 stable <- c(stable, t_out$stable)      
+#             }
+#             loss <- c(loss, t_out$loss)
+#             system( sprintf("echo %s > %s/%d.log", t_out$loss, dir, ep))
         }
     }
     return(loss)

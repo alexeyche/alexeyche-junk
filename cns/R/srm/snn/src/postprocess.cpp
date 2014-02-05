@@ -46,13 +46,13 @@ SEXP kernelWindow_spikes(List d, const List kernel_options) {
     for(size_t ti=1; ti<t.n_elem; ti++) {
         out.col(ti) = gauss_legendre_vec(quad, integrand_kernel_vec, data.size(), (void*)&id, t(ti-1), t(ti));
     }
-    return List::create(Named("data") = out, Named("label") = d["label"], Named("trial") = d["trial"]);
+    return List::create(Named("data") = out, Named("label") = d["label"]);
 }
 
 // correlation stuff:
 
 struct TIntDataVCorr {
-    TIntDataV(const List &data1_c, const List &data2_c, const double &sigma_c) : data1(data1_c), data2(data2_c), sigma(sigma_c) {}
+    TIntDataVCorr(const List &data1_c, const List &data2_c, const double &sigma_c) : data1(data1_c), data2(data2_c), sigma(sigma_c) {}
     double sigma;
     List data1;
     List data2;
@@ -86,14 +86,14 @@ arma::mat spikes_corr(const List &d1, const List &d2, const List &kernel_options
 // [[Rcpp::export]]
 SEXP kernelPass_autoCorr(List d, const List kernel_options) {
     List data = d["data"];
-    return List::create(Named("data") = spikes_corr(data, data, kernel_options), Named("label") = d["label"], Named("trial") = d["trial"]);
+    return List::create(Named("data") = spikes_corr(data, data, kernel_options), Named("label") = d["label"]);
 }
 
 // [[Rcpp::export]]
 SEXP kernelPass_corr(List d1, List d2, const List kernel_options) {
     List data1 = d1["data"];
     List data2 = d2["data"];
-    return List::create(Named("data") = spikes_corr(data1, data2, kernel_options), Named("label") = d["label"], Named("trial") = d["trial"]);
+    return List::create(Named("data") = spikes_corr(data1, data2, kernel_options));
 }
 
 
@@ -102,7 +102,7 @@ arma::vec integrand_kernel_cross_neuron_vec(const arma::vec &t, void *int_data) 
     TIntDataVCorr *d = (TIntDataVCorr*)int_data;
     arma::vec out(d->data1.size(), arma::fill::zeros);
     for(size_t el_i=0; el_i<d->data1.size(); el_i++) {
-        out(ind) = gaussian_kernel( t(ind) - as<arma::vec>(d->data1[el_i]), d->sigma)*gaussian_kernel( t(ind) - as<arma::vec>(d->data2[el_i]), d->sigma);
+        out(el_i) = gaussian_kernel( t(el_i) - as<arma::vec>(d->data1[el_i]), d->sigma)*gaussian_kernel( t(el_i) - as<arma::vec>(d->data2[el_i]), d->sigma);
     }
     return out;
 }
@@ -124,6 +124,7 @@ SEXP kernelPass_crossNeurons(List d1, List d2, const List kernel_options) {
 
     TIntDataVCorr id(data1, data2, sigma);
     arma::vec K = gauss_legendre_vec(quad, integrand_kernel_cross_neuron_vec, data1.size(), (void*)&id, T0, Tmax);
+    
     return List::create(Named("data") = K, Named("label1") = d1["label"], Named("label2") = d2["label"]);
 }
 

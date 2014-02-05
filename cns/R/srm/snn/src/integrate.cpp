@@ -9,7 +9,6 @@
 #include "base.h"
 #include "neuron.h"
 #include "grad_funcs.h"
-#include "romberg.h"
 
 using namespace Rcpp;
 

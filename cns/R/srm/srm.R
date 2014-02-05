@@ -67,14 +67,14 @@ run_srm <- function(net_neurons, net, ro) {
     }
     gradients = gradients[[1]]
     
-    rew = reward_func(net[ net_neurons$l[[ro$learn_layer_id]]$ids ], ro)           
+    rew = reward_func(list(data=net[ net_neurons$l[[ro$learn_layer_id]]$ids ], label=ro$target_set$label), ro)           
     gradients = lapply(gradients, function(sp) sp * rew)
     
     net_neurons$l[[ro$learn_layer_id]]$weights = apply_grad_norm(net_neurons$l[[ro$learn_layer_id]]$weights, gradients, ro)
   }     
   
   if(ro$collect_stat) {
-    return(list(net, net_neurons, sim_out$stat, grad=list(gradients, mean(grad_stat)) ))
+    return(list(net, net_neurons, sim_out$stat, grad=list(gradients, mean(grad_stat), rew) ))
   } else {
     return(list(net, net_neurons))
   }
