@@ -11,7 +11,7 @@ apply_grad_norm <- function(weights, grads, ro) {
     if(ro$weights_norm_type == 'mult_local') {
         new_weights = lapply(1:length(weights), function(i) {
             dw = ro$learning_rate*grads[[i]]       
-            sqrt(sum(weights[[i]]^2))*(weights[[i]]+dw)/sqrt( sum(weights[[i]] + dw)^2)
+            sqrt(sum(weights[[i]]^2))*(weights[[i]]+dw)/sqrt( sum( (weights[[i]] + dw)^2))
         })
         return(new_weights)
     } else 
@@ -67,7 +67,7 @@ run_srm <- function(net_neurons, net, ro) {
     }
     gradients = gradients[[1]]
     
-    rew = reward_func(list(data=net[ net_neurons$l[[ro$learn_layer_id]]$ids ], label=ro$target_set$label), ro)           
+    rew = reward_func(list(data=net[ net_neurons$l[[ro$learn_layer_id]]$ids ], label=ro$target_set$label), ro$mean_activity_stat$act, ro$mean_activity_stat$mean_error)
     gradients = lapply(gradients, function(sp) sp * rew)
     
     net_neurons$l[[ro$learn_layer_id]]$weights = apply_grad_norm(net_neurons$l[[ro$learn_layer_id]]$weights, gradients, ro)

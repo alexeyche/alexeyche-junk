@@ -1,52 +1,57 @@
 #!/usr/bin/env Rscript
 
 args <- commandArgs(trailingOnly = FALSE)
-base_dir = dirname(substring( args[grep("--file=", args)], 8))
-setwd(base_dir)
-
-const_file = substring(args[grep("--const-file=", args)], 14)
-if(length(const_file) == 0) {
+if(length(grep("RStudio", args))>0) {
+  verbose = TRUE
+  #dir='~/prog/sim/runs/test'
+  dir='~/my/sim/runs/test'
+  #data_dir = '~/prog/sim'
+  data_dir = '~/my/sim'
+  #setwd("~/prog/alexeyche-junk/cns/R/srm")
+  setwd("~/my/git/alexeyche-junk/cns/R/srm")
+  source('constants.R')
+} else {
+  base_dir = dirname(substring( args[grep("--file=", args)], 8))
+  setwd(base_dir)
+  
+  const_file = substring(args[grep("--const-file=", args)], 14)
+  if(length(const_file) == 0) {
     const_file = paste(c(base_dir, 'constants.R'), collapse='/')
-}
-source(const_file)
-
-runs_dir = substring(args[grep("--runs-dir=", args)], 12)
-if((length(runs_dir) == 0)||(!file.exists(runs_dir))) {
+  }
+  source(const_file)
+  
+  runs_dir = substring(args[grep("--runs-dir=", args)], 12)
+  if((length(runs_dir) == 0)||(!file.exists(runs_dir))) {
     cat("Need created dir for runs in options (--runs-dir=%directory%)\n")
     q()
-}
-
-run_name = substring(args[grep("--run-name=", args)], 12)
-if(length(run_name) == 0) {
+  }
+  
+  run_name = substring(args[grep("--run-name=", args)], 12)
+  if(length(run_name) == 0) {
     run_name = format(Sys.time(), "%d_%m_%y_%H_%M")
-}
-
-dir = paste(c(runs_dir, run_name), collapse="/")
-dir.create(file.path(dir), showWarnings = FALSE)
-copy_ok = file.copy(const_file, dir)
-
-temp_spl = strsplit(runs_dir, "/")[[1]]
-data_dir = paste( temp_spl[1:(length(temp_spl)-1)], collapse='/')
-
-if(!file.exists(data_dir)) {
+  }
+  
+  dir = paste(c(runs_dir, run_name), collapse="/")
+  dir.create(file.path(dir), showWarnings = FALSE)
+  copy_ok = file.copy(const_file, dir)
+  
+  temp_spl = strsplit(runs_dir, "/")[[1]]
+  data_dir = paste( temp_spl[1:(length(temp_spl)-1)], collapse='/')
+  
+  if(!file.exists(data_dir)) {
     cat(sprintf("Need ts directory with time series data: %s\n", data_dir))
     q()
-}
-
-verbose=TRUE
-if(length(grep("--no-verbose", args))>0) {
+  }
+  
+  verbose=TRUE
+  if(length(grep("--no-verbose", args))>0) {
     verbose=FALSE
+  }
+  Sys.setenv("DISPLAY"=":0.0")  
 }
-Sys.setenv("DISPLAY"=":0.0")
 system(sprintf("find %s -maxdepth 1 -name \"*.png\" -type f -exec rm -f {} \\;", dir))
-
-
 #===================================================================================================
-# verbose = TRUE
-# dir='~/prog/sim/runs/test'
-# data_dir = '~/prog/sim'
-# setwd("~/prog/alexeyche-junk/cns/R/srm")
-# source('constants.R')
+
 
 
 source('util.R')

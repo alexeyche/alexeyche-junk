@@ -47,9 +47,16 @@ run_net <- function(input_neurons, layers, run_options, open_plots = FALSE, mode
             net_all[[id_patt]] = list(data=net[id_n], label=patterns[[id_patt]]$label)
         }
     
-        if(run_options$reward_learning)
-            run_options$mean_activity_stat = get_mean_activity_classes(net_all, run_options)
-      
+        if(run_options$reward_learning) {
+            mean_activity = get_mean_activity_classes(net_all, run_options)
+            err = NULL
+            for(sp in net_all) {
+                err = c(err, reward_func(sp, mean_activity))
+            }           
+            print(mean(err))
+            mean_error = mean(err)
+            run_options$mean_activity_stat = list(act=mean_activity, mean_error=mean_error)
+        } 
         model_file = sprintf("%s/%s_%dx%d_%d", dir, data, M, N, ep)
         W = get_weights_matrix(net_neurons$l)
         saveMatrixList(model_file, list(W))
