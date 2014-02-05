@@ -64,7 +64,7 @@ reward_func = function(curr_act, Kmean_classes, mean_error=0) {
           cat(names(Kmean_classes)[id_cl_true], ":", vv[id_cl_true]," ", sep="")
       }
       cat(" => ", softmax_rate-mean_error, "\n", sep="")
-      return(softmax_rate-mean_error)
+      return(softmax_rate-mean(vv))
   }
   return(0.0)
 }
