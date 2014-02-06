@@ -40,7 +40,7 @@ start_w.N.sd = 0.5
 learn_window_size = duration/2
 llh_depr_mode = 'no' # 75 spikes per window
 
-lr = 25
+lr = 1
 
-epochs = 50
+epochs = 100
 weights_norm_type = 'mult_local'

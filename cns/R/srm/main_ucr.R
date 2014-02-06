@@ -3,12 +3,12 @@
 args <- commandArgs(trailingOnly = FALSE)
 if(length(grep("RStudio", args))>0) {
   verbose = TRUE
-  #dir='~/prog/sim/runs/test'
-  dir='~/my/sim/runs/test'
-  #data_dir = '~/prog/sim'
-  data_dir = '~/my/sim'
-  #setwd("~/prog/alexeyche-junk/cns/R/srm")
-  setwd("~/my/git/alexeyche-junk/cns/R/srm")
+  dir='~/prog/sim/runs/test'
+  #dir='~/my/sim/runs/test'
+  data_dir = '~/prog/sim'
+  #data_dir = '~/my/sim'
+  setwd("~/prog/alexeyche-junk/cns/R/srm")
+  #setwd("~/my/git/alexeyche-junk/cns/R/srm")
   source('constants.R')
 } else {
   base_dir = dirname(substring( args[grep("--file=", args)], 8))

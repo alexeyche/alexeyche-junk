@@ -35,17 +35,14 @@ reward_func = function(curr_act, Kmean_classes, mean_error=0) {
 #      K = kernelPass_autoCorr(curr_act, list(sigma = ro$fp_kernel_size, window =  ro$fp_window_size, T0 = ro$T0, Tmax = ro$Tmax, quad = 256))
       K = kernelWindow_spikes(curr_act, list(sigma = ro$fp_kernel_size, window =  ro$fp_window_size, T0 = ro$T0, Tmax = ro$Tmax, quad = 256))
      
-      png(sprintf("/home/alexeyche/my/sim/runs/pics/curr_act_%s_%s.png", iter, K$label), width=1024, height=480)
+      png(sprintf("/home/alexeyche/prog/sim/runs/pics/curr_act_%s_%s.png", iter, K$label), width=1024, height=480)
       iter <<- iter + 1
       p = levelplot(K$data, col.regions=colorRampPalette(c("black", "white")))
       print(p)
       dev.off()
-
-#      diag(K$data) = 0
-      Krange = sum(K$data^2)
+      
       class_rates = NULL
       for(cl in names(Kmean_classes)) {
-        Kmean_range = sum(Kmean_classes[[cl]]^2)
         hb = max(max(K$data), max(Kmean_classes[[cl]]))
         lb = min(min(K$data), min(Kmean_classes[[cl]]))
 #        class_rates = c(class_rates, sum( (K$data-Kmean_classes[[cl]])^2/(hb^2)) )
@@ -54,17 +51,20 @@ reward_func = function(curr_act, Kmean_classes, mean_error=0) {
       }
       id_cl = which(names(Kmean_classes) == as.character(K$label))
       cl_exp = exp(class_rates)
-      softmax_rate = cl_exp[id_cl]/sum(cl_exp)
+      #softmax_rate = cl_exp[id_cl]/sum(cl_exp)
       vv = cl_exp/sum(cl_exp)
+      id_others = which(vv != vv[id_cl])
+      max_other = vv[which(vv == max(vv[id_others]))]
+      reward = exp((vv[id_cl] - max_other)*10) -1.02
+  
       vv_srt = sort(vv, decreasing=TRUE)
-      
       cat(K$label, "  <=>  ")
       for(id_cl in 1:length(vv_srt)) {
           id_cl_true = which(vv == vv_srt[id_cl])
           cat(names(Kmean_classes)[id_cl_true], ":", vv[id_cl_true]," ", sep="")
       }
-      cat(" => ", softmax_rate-mean(vv), "\n", sep="")
-      return(softmax_rate-max(vv))
+      cat(" => ", reward, "\n", sep="")
+      return(reward)
   }
   return(0.0)
 }
@@ -93,7 +93,7 @@ get_mean_activity_classes = function(net_all, ro) {
   for(sp in net_all) {
     #K = kernelPass_autoCorr(sp, kernel_options)
     K = kernelWindow_spikes(sp, kernel_options)
-    png(sprintf("/home/alexeyche/my/sim/runs/pics/mean_%s.png",K$label), width=1024, height=480)
+    png(sprintf("/home/alexeyche/prog/sim/runs/pics/mean_%s.png",K$label), width=1024, height=480)
     p = levelplot(K$data, col.regions=colorRampPalette(c("black", "white")))
     print(p)
     dev.off()
