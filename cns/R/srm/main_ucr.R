@@ -75,10 +75,11 @@ set.seed(1234)
 data = synth # synthetic control
 c(train_dataset, test_dataset) := read_ts_file(data, data_dir)
 elems = samples_from_dataset
-train_dataset = train_dataset[c(sample(1:50, elems), sample(51:100, elems), sample(101:150,elems),
-                                sample(151:200, elems), sample(201:250,elems), sample(251:300,elems))] # cut
+train_dataset = train_dataset[c(sample(1:50, elems), sample(51:100, elems))] #, sample(101:150,elems),
+#                                sample(151:200, elems), sample(201:250,elems), sample(251:300,elems))] # cut
 test_dataset = test_dataset[c(sample(1:50, elems), sample(51:100, elems), sample(101:150, elems),
                               sample(151:200, elems), sample(201:250,elems), sample(251:300, elems))]
+
 train_dataset = train_dataset[sample(1:length(train_dataset))]
 
 perf = ucr_test(train_dataset, test_dataset, eucl_dist_alg, verbose=FALSE)
@@ -113,7 +114,7 @@ test_trials=1
 run_options = list(T0 = 0, Tmax = duration, dt = dt, 
                    learning_rate = lr, epochs = epochs, start_epoch = 1, weight_decay = 0, weights_norm_type = weights_norm_type,
                    reward_learning=TRUE,
-                   fp_window_size = 30, fp_kernel_size = 15, 
+                   fp_window_size = 10, fp_kernel_size = 15, 
                    learn_window_size = learn_window_size, mode=runmode, collect_stat=TRUE, 
                    target_set = list(depress_null=FALSE),
                    learn_layer_id = 1,

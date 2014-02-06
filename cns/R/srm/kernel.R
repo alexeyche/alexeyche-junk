@@ -35,7 +35,7 @@ reward_func = function(curr_act, Kmean_classes, mean_error=0) {
 #      K = kernelPass_autoCorr(curr_act, list(sigma = ro$fp_kernel_size, window =  ro$fp_window_size, T0 = ro$T0, Tmax = ro$Tmax, quad = 256))
       K = kernelWindow_spikes(curr_act, list(sigma = ro$fp_kernel_size, window =  ro$fp_window_size, T0 = ro$T0, Tmax = ro$Tmax, quad = 256))
      
-      png(sprintf("/home/alexeyche/prog/sim/runs/pics/curr_act_%s_%s.png", iter, K$label), width=1024, height=480)
+      png(sprintf("/home/alexeyche/my/sim/runs/pics/curr_act_%s_%s.png", iter, K$label), width=1024, height=480)
       iter <<- iter + 1
       p = levelplot(K$data, col.regions=colorRampPalette(c("black", "white")))
       print(p)
@@ -55,7 +55,7 @@ reward_func = function(curr_act, Kmean_classes, mean_error=0) {
       vv = cl_exp/sum(cl_exp)
       id_others = which(vv != vv[id_cl])
       max_other = vv[which(vv == max(vv[id_others]))]
-      reward = exp((vv[id_cl] - max_other)*10) -1.02
+      reward = exp((vv[id_cl] - max_other)*5) -1.02
   
       vv_srt = sort(vv, decreasing=TRUE)
       cat(K$label, "  <=>  ")
@@ -91,11 +91,11 @@ get_mean_activity_classes = function(net_all, ro) {
   kernel_options = list(sigma = ro$fp_kernel_size, window =  ro$fp_window_size, T0 = ro$T0, Tmax = ro$Tmax, quad = 256)
   Kclasses = list()  
   for(sp in net_all) {
-    #K = kernelPass_autoCorr(sp, kernel_options)
     K = kernelWindow_spikes(sp, kernel_options)
-    png(sprintf("/home/alexeyche/prog/sim/runs/pics/mean_%s.png",K$label), width=1024, height=480)
-    p = levelplot(K$data, col.regions=colorRampPalette(c("black", "white")))
-    print(p)
+    png(sprintf("/home/alexeyche/my/sim/runs/pics/mean_%s.png",K$label), width=1024, height=480)
+    #p = levelplot(K$data, col.regions=colorRampPalette(c("black", "white")))
+    #print(p)
+    filled.contour(K$data)
     dev.off()
     
 #    diag(K$data) = 0
@@ -108,6 +108,18 @@ get_mean_activity_classes = function(net_all, ro) {
   Kmean_classes = list()
   for(cl in names(Kclasses)) {
     Kmean_classes[[cl]] = apply(Kclasses[[cl]], c(1,2), mean)
+  }
+  nm = names(Kmean_classes)
+  for(cl in nm) {
+    for(cl_other in nm[which(cl != nm)]) {
+        discr = abs(Kmean_classes[[cl]] - Kmean_classes[[cl_other]])
+        
+        png(sprintf("/home/alexeyche/my/sim/runs/pics/mean_%s-%s.png",cl, cl_other), width=1024, height=480)
+        filled.contour(discr)
+        #p = levelplot(discr, col.regions=colorRampPalette(c("black", "white")))
+        #print(p)
+        dev.off()
+    }
   }
   return(Kmean_classes)
 }
