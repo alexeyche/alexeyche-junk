@@ -29,17 +29,10 @@ get_mean_activity = function(net_all, ro) {
   return(list(mean_act=xm, deviation_range=c(min(dd), max(dd))) )
 }
 
-iter = 0
 reward_func = function(curr_act, Kdiscr_classes) {
   if( !is.null(Kdiscr_classes)) {
 #      K = kernelPass_autoCorr(curr_act, list(sigma = ro$fp_kernel_size, window =  ro$fp_window_size, T0 = ro$T0, Tmax = ro$Tmax, quad = 256))
       K = kernelWindow_spikes(curr_act, list(sigma = ro$fp_kernel_size, window =  ro$fp_window_size, T0 = ro$T0, Tmax = ro$Tmax, quad = 256))
-     
-      png(sprintf("/home/alexeyche/prog/sim/runs/pics/curr_act_%s_%s.png", iter, K$label), width=1024, height=480)
-      iter <<- iter + 1
-      p = levelplot(K$data, col.regions=colorRampPalette(c("black", "white")))
-      print(p)
-      dev.off()
       
       neuron_rates = rowSums(Kdiscr_classes[[K$label]]*K$data)
       cat(K$label, " => mean reward: ", mean(neuron_rates), "\n")      
@@ -85,14 +78,14 @@ get_mean_classes_discripancy = function(net_all, ro) {
   Kdiscr_classes = list()
   nm = names(Kmean_classes)
   for(cl in nm) {
-    png(sprintf("/home/alexeyche/prog/sim/runs/pics/mean_%s.png",cl), width=1024, height=480)
+    png(sprintf("/home/alexeyche/my/sim/runs/pics/mean_%s.png",cl), width=1024, height=480)
     filled.contour(Kmean_classes[[cl]])    
     dev.off()
     Kdiscr_classes[[cl]] = Kmean_classes[[cl]]
     for(cl_other in nm[which(cl != nm)]) {
-        Kdiscr_classes[[cl]] = Kdiscr_classes[[cl]] - Kmean_classes[[cl_other]]
+        Kdiscr_classes[[cl]] = 0.5*(max(Kmean_classes[[cl_other]])-min(Kmean_classes[[cl_other]])) - Kmean_classes[[cl_other]]
     }
-    png(sprintf("/home/alexeyche/prog/sim/runs/pics/discr_%s.png",cl), width=1024, height=480)
+    png(sprintf("/home/alexeyche/my/sim/runs/pics/discr_%s.png",cl), width=1024, height=480)
     filled.contour(Kdiscr_classes[[cl]])    
     dev.off()
   }

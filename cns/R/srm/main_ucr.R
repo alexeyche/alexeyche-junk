@@ -3,12 +3,12 @@
 args <- commandArgs(trailingOnly = FALSE)
 if(length(grep("RStudio", args))>0) {
   verbose = TRUE
-  dir='~/prog/sim/runs/test'
-  #dir='~/my/sim/runs/test'
-  data_dir = '~/prog/sim'
-  #data_dir = '~/my/sim'
-  setwd("~/prog/alexeyche-junk/cns/R/srm")
-  #setwd("~/my/git/alexeyche-junk/cns/R/srm")
+  #dir='~/prog/sim/runs/test'
+  dir='~/my/sim/runs/test'
+  #data_dir = '~/prog/sim'
+  data_dir = '~/my/sim'
+  #setwd("~/prog/alexeyche-junk/cns/R/srm")
+  setwd("~/my/git/alexeyche-junk/cns/R/srm")
   source('constants.R')
 } else {
   base_dir = dirname(substring( args[grep("--file=", args)], 8))
@@ -114,7 +114,7 @@ test_trials=2
 run_options = list(T0 = 0, Tmax = duration, dt = dt, 
                    learning_rate = lr, epochs = epochs, start_epoch = 1, weight_decay = 0, weights_norm_type = weights_norm_type,
                    reward_learning=TRUE,
-                   fp_window_size = 10, fp_kernel_size = 15, 
+                   fp_window_size = 10, fp_kernel_size = 100, 
                    learn_window_size = learn_window_size, mode=runmode, collect_stat=TRUE, 
                    target_set = list(depress_null=FALSE),
                    learn_layer_id = 1,

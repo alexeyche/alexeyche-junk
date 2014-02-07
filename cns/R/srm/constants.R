@@ -10,8 +10,8 @@ tm <- 10 # ms
 refr_mode = 'high' # 'middle', 'low'
 
 # stochastic treshold
-alpha <- 0.71
-beta <- 0.72
+alpha <- 0.70
+beta <- 0.70
 tr <- -50 # mV
 
 # srm
@@ -31,16 +31,16 @@ net_neurons_for_input = ceiling(N/2)
 afferent_per_neuron = ceiling(M/5)
 
 # start weights
-start_w.M.mean = 10
-start_w.M.sd = 0.5
-start_w.N.mean = 10
-start_w.N.sd = 0.5
+start_w.M.mean = 11
+start_w.M.sd = 1
+start_w.N.mean = 11
+start_w.N.sd = 1
 
 # learning
 learn_window_size = duration/2
 llh_depr_mode = 'no' # 75 spikes per window
 
-lr = 1
+lr = 5
 
 epochs = 50
 weights_norm_type = 'no'
