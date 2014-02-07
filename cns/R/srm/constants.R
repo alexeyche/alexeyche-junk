@@ -1,6 +1,6 @@
 
 #data cfg
-samples_from_dataset = 10
+samples_from_dataset = 50
 
 # epsp
 e0 <- 1.3 # mV
@@ -40,7 +40,7 @@ start_w.N.sd = 0.5
 learn_window_size = duration/2
 llh_depr_mode = 'no' # 75 spikes per window
 
-lr = 5
+lr = 1
 
-epochs = 1
-weights_norm_type = 'mult_local'
+epochs = 50
+weights_norm_type = 'no'

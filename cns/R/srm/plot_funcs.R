@@ -26,7 +26,7 @@ gray_plot <- function(data, lims = c(min(data),max(data)) ) {
 }
 
 
-plot_run_status = function(net, net_neurons, grad, loss, stable, pic_filename, descr) {
+plot_run_status = function(net, net_neurons, grad, loss, reward, pic_filename, descr) {
     W = get_weights_matrix(net_neurons$l)
     id_n = net_neurons$all_ids
     not_fired = all(sapply(net[id_n], function(sp) length(sp) == 1))
@@ -42,22 +42,18 @@ plot_run_status = function(net, net_neurons, grad, loss, stable, pic_filename, d
       dfrm = data.frame(x=1:length(loss), y=c(loss))
       p4 = xyplot(y~x, data=dfrm, type="l")
     }
-    if(!is.null(stable)) {
-      dfrm = data.frame(x=1:length(stable), y=c(stable))
+    if(!is.null(reward)) {
+      dfrm = data.frame(x=1:length(reward), y=c(reward))
       p5 = xyplot(y~x, data=dfrm, type="l")
     }
-#    if(!is.null(mean_dev))
-#      p4 = xyplot(y~x, list(x=1:id_patt,y=mean_dev), type="l")
     
     if(!not_fired)
       print(p1, position=c(0, 0.5, 0.5, 1), more=TRUE)
     if(!is.null(loss))
       print(p4, position=c(0, 0, 0.5, 0.25), more=TRUE)
-    if(!is.null(stable)) {
+    if(!is.null(reward)) {
       print(p5, position=c(0, 0.25, 0.5, 0.5), more=TRUE)
     }
-#    if(!is.null(mean_dev))
-#      print(p4, position=c(0, 0, 0.5, 0.5), more=TRUE)      
     print(p2, position=c(0.5, 0, 1, 0.5), more=TRUE)
     if(length(grad)!=0)
       print(p3, position=c(0.5, 0.5, 1, 1))

@@ -77,8 +77,8 @@ c(train_dataset, test_dataset) := read_ts_file(data, data_dir)
 elems = samples_from_dataset
 train_dataset = train_dataset[c(sample(1:50, elems), sample(51:100, elems))] #, sample(101:150,elems),
 #                                sample(151:200, elems), sample(201:250,elems), sample(251:300,elems))] # cut
-test_dataset = test_dataset[c(sample(1:50, elems), sample(51:100, elems), sample(101:150, elems),
-                              sample(151:200, elems), sample(201:250,elems), sample(251:300, elems))]
+test_dataset = test_dataset[c(sample(1:50, elems), sample(51:100, elems))]  #, sample(101:150, elems),
+                              #sample(151:200, elems), sample(201:250,elems), sample(251:300, elems))]
 
 train_dataset = train_dataset[sample(1:length(train_dataset))]
 
@@ -109,7 +109,7 @@ connection[,(net_neurons_for_input+1):N] = 0
 neurons$connectFF(connection, start_w.M, 1:N )
 
 runmode="learn"
-test_trials=1
+test_trials=2
 
 run_options = list(T0 = 0, Tmax = duration, dt = dt, 
                    learning_rate = lr, epochs = epochs, start_epoch = 1, weight_decay = 0, weights_norm_type = weights_norm_type,
@@ -120,7 +120,11 @@ run_options = list(T0 = 0, Tmax = duration, dt = dt,
                    learn_layer_id = 1,
                    test_patterns = gr2$patterns, 
                    test_function = function(train_set, test_set) {
-                      return(1)
+                     Ktrain = lapply(train_set, function(act) kernelWindow_spikes(act, list(sigma = ro$fp_kernel_size, window = ro$fp_window_size, T0 = ro$T0, Tmax = ro$Tmax, quad = 256)) )                                                         
+                     Ktest = lapply(test_set, function(act) kernelWindow_spikes(act, list(sigma = ro$fp_kernel_size, window = ro$fp_window_size, T0 = ro$T0, Tmax = ro$Tmax, quad = 256)) )                                                         
+                     
+                     perf = ucr_test(Ktrain, Ktest, eucl_dist_alg, FALSE)
+                     return(perf$rate)
                    }, evalTrial=test_trials, test_run_freq=5
 )
 

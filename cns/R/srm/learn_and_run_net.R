@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 
-run_net <- function(input_neurons, layers, run_options, open_plots = FALSE, model_descr=NULL, verbose=TRUE) {
+run_net <- function(input_neurons, layers, run_options, verbose=TRUE) {
     net_neurons = layers
     patterns = input_neurons$patterns
     lengths = sapply(patterns, function(p) length(p$data))
@@ -35,7 +35,7 @@ run_net <- function(input_neurons, layers, run_options, open_plots = FALSE, mode
                 
             pic_filename = sprintf("%s/run_ep%s_patt%s_label%s.png", dir, ep, id_patt, patterns[[id_patt]]$label)
             plot_run_status(net, net_neurons, grad, loss, reward, pic_filename, sprintf("epoch %d, pattern %d, class %d", ep, id_patt, patterns[[id_patt]]$label))
-            if(open_plots) system(sprintf("eog -w %s 1>/dev/null 2>/dev/null",pic_filename), ignore.stdout=TRUE, ignore.stderr=TRUE, wait=FALSE)
+#            if(open_plots) system(sprintf("eog -w %s 1>/dev/null 2>/dev/null",pic_filename), ignore.stdout=TRUE, ignore.stderr=TRUE, wait=FALSE)
 
             
             if(sum(sapply(net[id_n], length))> ((run_options$Tmax-run_options$T0)*length(id_n)/2)) {
@@ -47,34 +47,21 @@ run_net <- function(input_neurons, layers, run_options, open_plots = FALSE, mode
             net_all[[id_patt]] = list(data=net[id_n], label=patterns[[id_patt]]$label)
         }
     
-        if(run_options$reward_learning) {
-            mean_activity = get_mean_activity_classes(net_all, run_options)
-            err = NULL
-            for(sp in net_all) {
-                err = c(err, reward_func(sp, mean_activity))
-            }           
-            print(mean(err))
-            mean_error = mean(err)
-            run_options$mean_activity_stat = list(act=mean_activity, mean_error=mean_error)
+        if(run_options$reward_learning) {            
+            run_options$mean_activity_stat = get_mean_classes_discripancy(net_all, run_options)
         } 
         model_file = sprintf("%s/%s_%dx%d_%d", dir, data, M, N, ep)
         W = get_weights_matrix(net_neurons$l)
         saveMatrixList(model_file, list(W))
     
         if((! is.null(run_options$test_function))&&(ep %% run_options$test_run_freq == 0)) {
-#             o_train = evalNet(patterns, run_options, constants, net_neurons$l)
-#             o_test = evalNet(run_options$test_patterns, run_options, constants, net_neurons$l)
-#             
-#             t_out <- run_options$test_function(o_train$spikes, o_test$spikes)
-#             
-#             if((length(stable)>0)&&(t_out$stable>(5*stable[length(stable)]))) {
-#               t_out$stable <- stable[length(stable)]
-#             }
-#             if(!is.null(t_out$stable)) { 
-#                 stable <- c(stable, t_out$stable)      
-#             }
-#             loss <- c(loss, t_out$loss)
-#             system( sprintf("echo %s > %s/%d.log", t_out$loss, dir, ep))
+            o_train = evalNet(patterns, run_options, constants, net_neurons$l)
+            o_test = evalNet(run_options$test_patterns, run_options, constants, net_neurons$l)
+            
+            curloss <- run_options$test_function(o_train$spikes, o_test$spikes)
+            
+            loss <- c(loss, curloss)
+            system( sprintf("echo %s > %s/%d.log", curloss, dir, ep))
         }
     }
     return(loss)
