@@ -116,6 +116,26 @@ BEGIN_RCPP
     return __sexp_result;
 END_RCPP
 }
+// neuron_epsp
+SEXP neuron_epsp(const NumericVector t, const List constants, const IntegerVector neuron_id, const IntegerVector neuron_id_conn, const NumericVector neuron_w, const List net);
+RcppExport SEXP snn_neuron_epsp(SEXP tSEXP, SEXP constantsSEXP, SEXP neuron_idSEXP, SEXP neuron_id_connSEXP, SEXP neuron_wSEXP, SEXP netSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< const NumericVector >::type t(tSEXP );
+        Rcpp::traits::input_parameter< const List >::type constants(constantsSEXP );
+        Rcpp::traits::input_parameter< const IntegerVector >::type neuron_id(neuron_idSEXP );
+        Rcpp::traits::input_parameter< const IntegerVector >::type neuron_id_conn(neuron_id_connSEXP );
+        Rcpp::traits::input_parameter< const NumericVector >::type neuron_w(neuron_wSEXP );
+        Rcpp::traits::input_parameter< const List >::type net(netSEXP );
+        SEXP __result = neuron_epsp(t, constants, neuron_id, neuron_id_conn, neuron_w, net);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}
 // USRM
 SEXP USRM(const NumericVector t, const List constants, const IntegerVector neuron_id, const IntegerVector neuron_id_conn, const NumericVector neuron_w, const List net);
 RcppExport SEXP snn_USRM(SEXP tSEXP, SEXP constantsSEXP, SEXP neuron_idSEXP, SEXP neuron_id_connSEXP, SEXP neuron_wSEXP, SEXP netSEXP) {

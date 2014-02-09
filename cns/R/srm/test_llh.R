@@ -50,7 +50,7 @@ pattern[[4]] <- c(-Inf, 100)
 pattern[[5]] <- c(-Inf, 10)
 
 epochs = 100
-run_options = list(T0 = 0, Tmax = 150, dt = 0.5, learning_rate = 0.25, learn_window_size = 150, mode="run", collect_stat=FALSE)
+run_options = list(T0 = 0, Tmax = 150, dt = 0.1, learning_rate = 0.1, learn_window_size = 150, mode="run", collect_stat=FALSE)
 layers = SimLayers(list(neurons))
 
 T = seq(run_options$T0, run_options$Tmax, run_options$dt)
@@ -61,7 +61,7 @@ grads = list()
 for(ep in 1:epochs) {
   net[id_n] <- pattern
   #gr = grad_func(layers[[1]], 0, 150, net, target_set)
-  gr = layers$l[[1]]$grad(0, 150, net, target_set)
+  gr = layers$l[[1]]$grad(0, 150, net)
   net[id_n] <- null_pattern
   uu = pp = NULL
   for(t in T) {
@@ -69,8 +69,9 @@ for(ep in 1:epochs) {
     uu = cbind(uu, u)
     p = probf(u)
     pp = cbind(pp, p)
-    fired = ((probf(u))*dt)>runif(N)
+    fired = (p*dt)>runif(N)
     for(fi in which(fired==TRUE)) {
+      fp = p[fi]
       net[[ neurons$ids[fi] ]] = c(net[[ neurons$ids[fi] ]], t)
     }
   }

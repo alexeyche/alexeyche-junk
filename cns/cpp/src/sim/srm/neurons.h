@@ -28,7 +28,7 @@ namespace srm {
         int binary_search(const double &t) {
             const size_t &s = std::vector<double>::size();
 //            printf("DEBUG size : %zu\n", s);
-            if(s == 0) { throw SrmException("Binary search on empty TTime\n"); }
+            if(s == 0) { printf("Binary search on empty Y\n"); return R_NilValue; }
             if (std::vector<double>::operator[] (0) > t) { return -1;}
             if (std::vector<double>::operator[] (s-1) <= t) { return s-1;}
             size_t first = 0;

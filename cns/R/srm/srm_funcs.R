@@ -61,4 +61,8 @@ probf = function(u) {
   (pr + (u -u_rest)*gain_factor)/sim_dim
 }
 
+a_suppr = Vectorize(function(s) {
+  if(s<0) return(1)
+  return(1- exp(-s/ta))
+})
 

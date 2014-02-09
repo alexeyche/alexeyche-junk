@@ -93,7 +93,7 @@ double u(const double &t, const SInput &si) {
         double suppr = 1;
         if(y.size() > 0) {
     //        printf("bs: %f \n", binary_search(t, y));
-            suppr = a(syn_sp[sp_it] - binary_search(t, y), si.c);
+            suppr = a(syn_sp[sp_it] - binary_search(t-0.01, y), si.c);
         }
         e_syn += si.w[id_it] * epsp(t-syn_sp[sp_it], si.c)*suppr;
         //printf("e_syn_after: %f\n", e_syn);
@@ -102,6 +102,47 @@ double u(const double &t, const SInput &si) {
     
   }
   return si.get_c("u_rest") + e_syn;
+}
+
+arma::vec neuron_epsp_calc(const double &t, const SInput &si) {
+  const NumericVector &y(si.net[si.id[0]-1]);
+  
+  arma::vec epsp_out(si.id_conn.size(), arma::fill::zeros);
+  for(size_t id_it=0; id_it < si.id_conn.size(); id_it++) {
+    const int &syn_sp_i = si.id_conn[id_it];
+    const NumericVector &syn_sp(si.net[syn_sp_i-1]);
+    for(int sp_it= syn_sp.size()-1; sp_it>=0; sp_it--) {
+        if(t-syn_sp[sp_it] > EPSP_WORK_WINDOW) {
+            //printf("t-syn_sp[%d] = %f > EPSP_WORK_WINDOW\n", sp_it, t-syn_sp[sp_it]);
+            break;
+        }
+        if(t-syn_sp[sp_it]<0) {
+            continue;
+        }
+
+        //printf("w[%d] = %f\n", id_it, si.w[id_it]);
+        //printf("e_syn_before: %f\n", e_syn);
+        double suppr = 1;
+        if(y.size() > 0) {
+    //        printf("bs: %f \n", binary_search(t, y));
+            suppr = a(syn_sp[sp_it] - binary_search(t-0.01, y), si.c);
+        }
+        epsp_out(id_it) += epsp(t-syn_sp[sp_it], si.c)*suppr;
+        //printf("e_syn_after: %f\n", e_syn);
+    }
+    
+  }
+  return epsp_out;
+}
+// [[Rcpp::export]]
+SEXP neuron_epsp(const NumericVector t, const List constants, const IntegerVector neuron_id, 
+                  const IntegerVector neuron_id_conn, const NumericVector neuron_w, const List net) {
+  SInput si(constants, neuron_id, neuron_id_conn, neuron_w, net);
+  arma::mat epsp_out(t.size(), neuron_id_conn.size(), arma::fill::zeros);
+  for(size_t ti=0; ti<t.size(); ti++) {
+    epsp_out.row(ti) = neuron_epsp_calc(t[ti], si).t();
+  }
+  return List::create(Named("out") = epsp_out);
 }
 
 double u_old(const double &t, const SInput &si) {

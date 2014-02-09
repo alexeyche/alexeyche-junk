@@ -193,10 +193,10 @@ arma::vec integrand_vec_epsp(const arma::vec &t, void *data) {
     return out;
 }
 
+//#define TEST
 
 // [[Rcpp::export]]
 SEXP integrateSRM_epsp(Reference neurons, const List int_options, const List net, const List constants) {
-
     const double &T0 = as<double>(int_options["T0"]);
     const double &Tmax = as<double>(int_options["Tmax"]);
     const int &dim = as<int>(int_options["dim"]);    
@@ -209,14 +209,14 @@ SEXP integrateSRM_epsp(Reference neurons, const List int_options, const List net
         printf("Error. length(w) != length(id_conn).\n");
         return 0;
     }
-    SIntData sint_d(constants,int_options, ids, id_conns, weights, net);
+    SIntData sint_d(constants, int_options, ids, id_conns, weights, net);
 #ifdef TEST    
-    arma::mat testout(dim, 300);
-    arma::vec t = arma::linspace<arma::vec>(T0, Tmax, (T0-Tmax)/0.5);
+    arma::vec t = arma::linspace<arma::vec>(T0, Tmax, (Tmax-T0)/0.5);
+    arma::mat testout(dim, t.n_elem);
     for(size_t ti=0; ti<t.n_elem; ti++) {
         arma::vec curt(dim);    
         curt.fill(t[ti]);
-        out.col(ti) = integrand_vec_epsp(curt, (void*)&sint_d);
+        testout.col(ti) = integrand_vec_epsp(curt, (void*)&sint_d);
     }
 #endif    
     arma::vec out = gauss_legendre_vec(quad, integrand_vec_epsp, dim, (void*)&sint_d, T0, Tmax);

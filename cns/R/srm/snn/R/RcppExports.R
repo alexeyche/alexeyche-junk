@@ -25,6 +25,10 @@ test_binary_search <- function(t, y) {
     .Call('snn_test_binary_search', PACKAGE = 'snn', t, y)
 }
 
+neuron_epsp <- function(t, constants, neuron_id, neuron_id_conn, neuron_w, net) {
+    .Call('snn_neuron_epsp', PACKAGE = 'snn', t, constants, neuron_id, neuron_id_conn, neuron_w, net)
+}
+
 USRM <- function(t, constants, neuron_id, neuron_id_conn, neuron_w, net) {
     .Call('snn_USRM', PACKAGE = 'snn', t, constants, neuron_id, neuron_id_conn, neuron_w, net)
 }

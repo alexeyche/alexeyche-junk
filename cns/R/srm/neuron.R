@@ -85,7 +85,7 @@ SRMLayer = setRefClass("SRMLayer", fields = list(weights = "list", id_conns = "l
                        },
                        grad = function(T0, Tmax, net, target_set) {
                          #return(grad_func(.self, T0, Tmax, net, target_set))
-                         return(grad_func_new(.self, T0, Tmax, net, target_set))
+                         return(grad_func_new(.self, T0, Tmax, net))
                        },
                        P = function(T0, Tmax, net) {
                          pnf = probNoFire(T0, Tmax, .self, net, constants)$out
@@ -97,6 +97,9 @@ SRMLayer = setRefClass("SRMLayer", fields = list(weights = "list", id_conns = "l
                            }
                            return(p)                           
                          })
+                       },
+                       epsp_fun_one = function(t, net, ni) {
+                         neuron_epsp(t, constants, .self$ids[ni], .self$id_conns[[ni]], .self$weights[[ni]], net)$out
                        },
                        to_list = function() {
                          neurons = list()

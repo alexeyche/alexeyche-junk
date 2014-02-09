@@ -86,20 +86,25 @@ grad_func <- function(neurons, T0, Tmax, net, target_set) {
 }
 
 grad_func_new = function(neurons, T0, Tmax, net) {
- Y = sp_in_interval(net[neurons$ids], T0, Tmax)
- #lapply(net[ neurons$id_conns[[ni]] ], function(sp) {
-#   epsp(sp)
-# }
- 
- 
   int_options =list(T0=T0, Tmax=Tmax, dim=sum(sapply(neurons$id_conns, length)),quad=256)
   int_out = integrateSRM_epsp(neurons, int_options , net, constants)$out
   int_part = list()
   iter=1
   for(id in 1:neurons$len) {
     int_part[[id]] = int_out[iter:(iter+length(neurons$id_conns[[id]])-1)]
-  
     iter = iter + length(neurons$id_conns[[id]])
-  }
+  }  
+  Y = sp_in_interval(net[neurons$ids], T0, Tmax)
+  spike_part = lapply(1:neurons$len, function(ni) {
+    spM = sapply(Y[ni], function(sp) probf(neurons$u_one(ni, sp, net)))
+    epspM = neurons$epsp_fun_one(Y[[ni]], net, ni)
+    div_of_vals = sapply(1:nrow(epspM), function(ri) epspM[ri,]/spM[ri])
+    rowSums(div_of_vals)
+  })  
+  grad = mapply("-", spike_part, int_part, SIMPLIFY=FALSE)
+  #grad = lapply(grad, function(gr) gr*gain_factor)
+  return(grad)
+  #py = neurons$P(T0, Tmax, net)
+  #return(lapply(1:neurons$len, function(ni) grad[[ni]]*py[ni]))
 }
 
