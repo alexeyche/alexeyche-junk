@@ -63,6 +63,59 @@ BEGIN_RCPP
     return __sexp_result;
 END_RCPP
 }
+// probNoFire
+SEXP probNoFire(const double T0, const double Tmax, Reference neurons, const List net, const List constants);
+RcppExport SEXP snn_probNoFire(SEXP T0SEXP, SEXP TmaxSEXP, SEXP neuronsSEXP, SEXP netSEXP, SEXP constantsSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< const double >::type T0(T0SEXP );
+        Rcpp::traits::input_parameter< const double >::type Tmax(TmaxSEXP );
+        Rcpp::traits::input_parameter< Reference >::type neurons(neuronsSEXP );
+        Rcpp::traits::input_parameter< const List >::type net(netSEXP );
+        Rcpp::traits::input_parameter< const List >::type constants(constantsSEXP );
+        SEXP __result = probNoFire(T0, Tmax, neurons, net, constants);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}
+// integrateSRM_epsp
+SEXP integrateSRM_epsp(Reference neurons, const List int_options, const List net, const List constants);
+RcppExport SEXP snn_integrateSRM_epsp(SEXP neuronsSEXP, SEXP int_optionsSEXP, SEXP netSEXP, SEXP constantsSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< Reference >::type neurons(neuronsSEXP );
+        Rcpp::traits::input_parameter< const List >::type int_options(int_optionsSEXP );
+        Rcpp::traits::input_parameter< const List >::type net(netSEXP );
+        Rcpp::traits::input_parameter< const List >::type constants(constantsSEXP );
+        SEXP __result = integrateSRM_epsp(neurons, int_options, net, constants);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}
+// test_binary_search
+int test_binary_search(const double t, const NumericVector y);
+RcppExport SEXP snn_test_binary_search(SEXP tSEXP, SEXP ySEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< const double >::type t(tSEXP );
+        Rcpp::traits::input_parameter< const NumericVector >::type y(ySEXP );
+        int __result = test_binary_search(t, y);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}
 // USRM
 SEXP USRM(const NumericVector t, const List constants, const IntegerVector neuron_id, const IntegerVector neuron_id_conn, const NumericVector neuron_w, const List net);
 RcppExport SEXP snn_USRM(SEXP tSEXP, SEXP constantsSEXP, SEXP neuron_idSEXP, SEXP neuron_id_connSEXP, SEXP neuron_wSEXP, SEXP netSEXP) {

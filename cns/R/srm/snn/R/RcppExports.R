@@ -13,6 +13,18 @@ integrateSRM_vec <- function(constants, int_options, neurons_id, neurons_id_conn
     .Call('snn_integrateSRM_vec', PACKAGE = 'snn', constants, int_options, neurons_id, neurons_id_conn, neurons_w, net)
 }
 
+probNoFire <- function(T0, Tmax, neurons, net, constants) {
+    .Call('snn_probNoFire', PACKAGE = 'snn', T0, Tmax, neurons, net, constants)
+}
+
+integrateSRM_epsp <- function(neurons, int_options, net, constants) {
+    .Call('snn_integrateSRM_epsp', PACKAGE = 'snn', neurons, int_options, net, constants)
+}
+
+test_binary_search <- function(t, y) {
+    .Call('snn_test_binary_search', PACKAGE = 'snn', t, y)
+}
+
 USRM <- function(t, constants, neuron_id, neuron_id_conn, neuron_w, net) {
     .Call('snn_USRM', PACKAGE = 'snn', t, constants, neuron_id, neuron_id_conn, neuron_w, net)
 }

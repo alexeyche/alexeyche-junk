@@ -1,0 +1,79 @@
+
+verbose = TRUE
+dir='~/prog/sim/runs/test'
+#dir='~/my/sim/runs/test'
+data_dir = '~/prog/sim'
+#data_dir = '~/my/sim'
+setwd("~/prog/alexeyche-junk/cns/R/srm")
+#setwd("~/my/git/alexeyche-junk/cns/R/srm")
+source('constants.R')
+source('srm_funcs.R')
+
+require(snn)
+set.seed(1234)
+constants = list(dt=dt, e0=e0, ts=ts, tm=tm, u_abs=u_abs, u_r=u_r, trf=trf, trs=trs, 
+                 dr=dr, alpha=alpha, beta=beta, tr=tr, u_rest=u_rest, pr=pr, gain_factor=gain_factor, ta=ta, sim_dim=sim_dim)
+
+
+source('util.R')
+source('gen_spikes.R')
+source('plot_funcs.R')
+source('neuron.R')
+
+
+
+
+ID_MAX=0
+T0=0
+Tmax=1000
+dt=0.5
+N=10
+M=100
+start_w.N = 0.25
+start_w.M = 0.25
+
+gr1 = TSNeurons(M = M)
+neurons = SRMLayer(N, start_w.N, p_edge_prob=1)
+connection = matrix(gr1$ids, nrow=length(gr1$ids), ncol=N)
+neurons$connectFF(connection, start_w.M, 1:N )
+
+net = vector("list", M+N)
+net[1:length(net)] = -Inf
+
+gaussian_kernel = Vectorize(function(s, sigma) {
+  sum((1/sqrt(2*pi*sigma^2))*exp(-(s^2)/(2*sigma^2)))
+}, "s")
+
+
+get_synaptic_rates = function(mu) {
+  sigma=7
+  syn = 1:M - mu
+  if(mu>70) {
+    syn[1:30] = (syn[length(syn)]+1):(syn[length(syn)]+30)
+  } else 
+  if(mu<30) {
+    syn[100:71] = (syn[1]-1):(syn[1]-30)
+  }
+  return(890*gaussian_kernel(syn, sigma)/sim_dim)
+}
+
+T = seq(0, 1000, by=dt) 
+uu = pp = NULL
+mu=50
+for(t in T) {
+  syn_fired = ((get_synaptic_rates(mu)))*dt>runif(M)
+  for(fi in which(syn_fired==TRUE)) {
+    net[[ gr1$ids[fi] ]] = c(net[[ gr1$ids[fi] ]], t)
+  }
+  u = neurons$u(t, net)
+  uu = cbind(uu, u)
+  p = probf(u)
+  pp = cbind(pp, p)
+  fired = ((probf(u))*dt)>runif(N)
+  for(fi in which(fired==TRUE)) {
+    net[[ neurons$ids[fi] ]] = c(net[[ neurons$ids[fi] ]], t)
+  }
+}
+
+
+neurons$P(0, 100, net)

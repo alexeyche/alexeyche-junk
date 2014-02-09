@@ -76,3 +76,12 @@ get_unique_ids <- function(n) {
   assign('ID_MAX', id_max+n, envir=.GlobalEnv)
   return((id_max+1):(id_max+n))
 }
+
+sp_in_interval = function(net, T0, Tmax) {
+  nspikes = lapply(net, function(sp) { 
+    left = findInterval(T0, sp)+1
+    right = findInterval(Tmax, sp, rightmost.closed=TRUE)
+    if(left<=right) sp[left:right]
+  })  
+  return(nspikes)
+}

@@ -23,9 +23,13 @@ if(refr_mode == 'high') {
     cat(sprintf("Can't find refration mode %s\n", refr_mode))
 }
 
+# epsp <- Vectorize(function(s) {
+#   if((s<0)||(s == Inf)) { return(0) }
+#   e0*(exp(-s/tm)-exp(-s/ts))
+# })
 epsp <- Vectorize(function(s) {
   if((s<0)||(s == Inf)) { return(0) }
-  e0*(exp(-s/tm)-exp(-s/ts))
+  exp(-s/tm)
 })
 
 # absolute(-100 mV) refractoriness with exponential restore
@@ -53,5 +57,8 @@ u_srm <- function(t, x, y, w) {
   u_rest + e_syn + sum(nu(t-y))
 }
 
+probf = function(u) {
+  (pr + (u -u_rest)*gain_factor)/sim_dim
+}
 
 

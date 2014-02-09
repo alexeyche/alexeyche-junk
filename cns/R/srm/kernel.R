@@ -28,13 +28,15 @@ get_mean_activity = function(net_all, ro) {
   dd = sapply(1:dim(x)[3], function(i) sum((xm - x[,,i])^2))  
   return(list(mean_act=xm, deviation_range=c(min(dd), max(dd))) )
 }
-
+iter = 0
 reward_func = function(curr_act, Kdiscr_classes) {
   if( !is.null(Kdiscr_classes)) {
-#      K = kernelPass_autoCorr(curr_act, list(sigma = ro$fp_kernel_size, window =  ro$fp_window_size, T0 = ro$T0, Tmax = ro$Tmax, quad = 256))
       K = kernelWindow_spikes(curr_act, list(sigma = ro$fp_kernel_size, window =  ro$fp_window_size, T0 = ro$T0, Tmax = ro$Tmax, quad = 256))
-      
       neuron_rates = rowSums(Kdiscr_classes[[K$label]]*K$data)
+      png(sprintf("/home/alexeyche/prog/sim/runs/pics/kk_%s_%s.png",K$label,iter), width=1024, height=480)
+      plot(1:length(neuron_rates), neuron_rates, type="l")
+      dev.off()
+      iter <<- iter + 1 
       cat(K$label, " => mean reward: ", mean(neuron_rates), "\n")      
       return(neuron_rates)
   }
@@ -59,6 +61,11 @@ test_kernel_functions = function() {
   levelplot(K, col.regions=colorRampPalette(c("black", "white")))  
 }
 
+normalize_matrix = function(m) {
+  max(m)
+  min(m)
+}
+
 get_mean_classes_discripancy = function(net_all, ro) {
   kernel_options = list(sigma = ro$fp_kernel_size, window =  ro$fp_window_size, T0 = ro$T0, Tmax = ro$Tmax, quad = 256)
   Kclasses = list()  
@@ -71,23 +78,41 @@ get_mean_classes_discripancy = function(net_all, ro) {
       Kclasses[[as.character(K$label)]] = abind(Kclasses[[as.character(K$label)]], K$data)  
     }
   }
-  Kmean_classes = list()
+  Kmean_classes = list()  
   for(cl in names(Kclasses)) {
     Kmean_classes[[cl]] = apply(Kclasses[[cl]], c(1,2), mean)
   }
   Kdiscr_classes = list()
   nm = names(Kmean_classes)
   for(cl in nm) {
-    png(sprintf("/home/alexeyche/my/sim/runs/pics/mean_%s.png",cl), width=1024, height=480)
-    filled.contour(Kmean_classes[[cl]])    
+    png(sprintf("/home/alexeyche/prog/sim/runs/pics/mean_%s.png",cl), width=1024, height=480)
+    filled.contour(t(Kmean_classes[[cl]]))    
     dev.off()
     Kdiscr_classes[[cl]] = Kmean_classes[[cl]]
     for(cl_other in nm[which(cl != nm)]) {
-        Kdiscr_classes[[cl]] = 0.5*(max(Kmean_classes[[cl_other]])-min(Kmean_classes[[cl_other]])) - Kmean_classes[[cl_other]]
+        Kdiscr_classes[[cl]] = Kdiscr_classes[[cl]]  - Kmean_classes[[cl_other]]
     }
-    png(sprintf("/home/alexeyche/my/sim/runs/pics/discr_%s.png",cl), width=1024, height=480)
-    filled.contour(Kdiscr_classes[[cl]])    
-    dev.off()
   }
+  # mean_max = mean(sapply(Kdiscr_classes, max))
+  # mean_min = mean(sapply(Kdiscr_classes, min))
+  #Kdiscr_classes = lapply(Kdiscr_classes, function(m) mean_min+(mean_max-mean_min)*m/(max(m)-min(m)) )
+#Kdiscr_classes = lapply(names(Kdiscr_classes), function(cl) {
+#  depr = which(Kdiscr_classes[[cl]] < 0, arr.ind=TRUE)
+  #Kdiscr_classes[[cl]][depr] = 0
+  #Kdiscr_classes[[cl]]
+#})
+  invisible(lapply(names(Kdiscr_classes), function(cl) {
+            png(sprintf("/home/alexeyche/prog/sim/runs/pics/discr_%s.png",cl), width=1024, height=480)
+            filled.contour(t(Kdiscr_classes[[cl]]))
+            dev.off()  
+  }))
+
+ 
+#   Kdiscr_classes = lapply(Kdiscr_classes, function(m) exp(m/rew_ampl))
+#   invisible(lapply(names(Kdiscr_classes), function(cl) {
+#             png(sprintf("/home/alexeyche/prog/sim/runs/pics/discr_%s.png",cl), width=1024, height=480)
+#             filled.contour(Kdiscr_classes[[cl]])    
+#             dev.off()  
+#   }))
   return(Kdiscr_classes)
 }

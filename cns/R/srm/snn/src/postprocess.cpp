@@ -6,6 +6,10 @@ double gaussian_kernel(arma::vec s, double sigma) {
    return arma::accu( (1/sqrt(2*arma::datum::pi*pow(sigma,2)))*exp( -arma::pow(s, 2)/(2*pow(sigma,2)) ));
 }
 
+double gaussian_function(double t, double sigma) {
+    return (1/sqrt(2*arma::datum::pi*(sigma*sigma)))*exp( -(t*t)/(2*(sigma*sigma)) );
+}
+
 
 struct TIntData {
     double sigma;

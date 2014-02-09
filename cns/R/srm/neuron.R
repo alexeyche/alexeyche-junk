@@ -30,8 +30,11 @@ SRMLayer = setRefClass("SRMLayer", fields = list(weights = "list", id_conns = "l
                          } else {
                            start_w = matrix(start_weight, ncol=N, nrow=N-1)
                          }
-                         
-                         inh_idxs = ids[(length(ids)-ninh):length(ids)]
+                         if(ninh>0) {
+                            inh_idxs = ids[(length(ids)-ninh+1):length(ids)]
+                         } else {
+                            inh_idxs = NULL
+                         } 
                          for(i in 1:N) {                                                      
                            full_conn <- ids[ ids != ids[i] ] # id of srm neurons: no self connections
                            conn_exists = p_edge_prob > runif(length(full_conn))
@@ -81,8 +84,20 @@ SRMLayer = setRefClass("SRMLayer", fields = list(weights = "list", id_conns = "l
                          return(list(w=weights[[id]],id_conn=id_conns[[id]],id=ids[[id]]))
                        },
                        grad = function(T0, Tmax, net, target_set) {
-                         return(grad_func(.self, T0, Tmax, net, target_set))
-                       }, 
+                         #return(grad_func(.self, T0, Tmax, net, target_set))
+                         return(grad_func_new(.self, T0, Tmax, net, target_set))
+                       },
+                       P = function(T0, Tmax, net) {
+                         pnf = probNoFire(T0, Tmax, .self, net, constants)$out
+                         spikes = sp_in_interval(net[.self$ids], T0, Tmax)
+                         sapply(1:.self$len, function(ni) {
+                           p = pnf[ni]
+                           if(!is.null(spikes[[ni]])) {
+                             p = p*Reduce("*", probf(spikes[[ni]]))
+                           }
+                           return(p)                           
+                         })
+                       },
                        to_list = function() {
                          neurons = list()
                          for(i in 1:.self$len) {

@@ -85,4 +85,21 @@ grad_func <- function(neurons, T0, Tmax, net, target_set) {
   return(list(mapply("+", spike_part, int_part, SIMPLIFY=FALSE), spikes_survived))
 }
 
+grad_func_new = function(neurons, T0, Tmax, net) {
+ Y = sp_in_interval(net[neurons$ids], T0, Tmax)
+ #lapply(net[ neurons$id_conns[[ni]] ], function(sp) {
+#   epsp(sp)
+# }
+ 
+ 
+  int_options =list(T0=T0, Tmax=Tmax, dim=sum(sapply(neurons$id_conns, length)),quad=256)
+  int_out = integrateSRM_epsp(neurons, int_options , net, constants)$out
+  int_part = list()
+  iter=1
+  for(id in 1:neurons$len) {
+    int_part[[id]] = int_out[iter:(iter+length(neurons$id_conns[[id]])-1)]
+  
+    iter = iter + length(neurons$id_conns[[id]])
+  }
+}
 

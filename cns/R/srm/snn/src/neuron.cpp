@@ -1,20 +1,35 @@
 #include "neuron.h"
 
-double epsp(const double s, const List &c) {
+double epsp_old(const double s, const List &c) {
     if(s<0) return 0;
     return as<double>(c["e0"])*(exp(-s/as<double>(c["tm"]))-exp(-s/as<double>(c["ts"])));
 }
+
+double epsp(const double s, const List &c) {
+    if(s<0) return 0;
+    return exp(-s/as<double>(c["tm"]));
+}
+
 double nu(const double &s, const List &c) {
     if(s<0) return 0;
     if(s<as<double>(c["dr"])) return as<double>(c["u_abs"]);
     return as<double>(c["u_abs"])*exp(-(s+as<double>(c["dr"]))/as<double>(c["trf"])) + as<double>(c["u_r"])*exp(-s/as<double>(c["trs"]));
 }
 
-double g(const double &u, const List &c) {
+double g_old(const double &u, const List &c) {
 //   (beta/alpha)*(log(1.1+exp(alpha*(tr-u))) -alpha*(tr-u))  
     return ( as<double>(c["beta"])/as<double>(c["alpha"]) ) * 
                 ( log( 1 + exp( as<double>(c["alpha"])*(as<double>(c["tr"])-u))) - 
                                     as<double>(c["alpha"])*(as<double>(c["tr"])-u)) ;
+}
+
+double a(const double &s, const List &c) {
+    if(s<0) return(0);
+    return( 1 - exp( - s/as<double>(c["ta"]) ) );
+}
+
+double g(const double &u, const List &c) {
+    return( (as<double>(c["pr"]) + (u - as<double>(c["u_rest"]))*as<double>(c["gain_factor"]))/as<double>(c["sim_dim"]) );
 }
 
 double stdp(const double &s, const SInput &si) {
@@ -27,9 +42,69 @@ double stdp(const double &s, const SInput &si) {
     return(dw);
 }
 
+double binary_search(const double &t, const NumericVector &y) {
+    const size_t &s = y.size();
+    if(s == 0) { printf("Binary search on empty Y\n"); return -9999; }
+    if (y[0] > t) { return -9999; } 
+    if (y[s-1] <= t) { return y[s-1];}
+    size_t first = 0;
+    size_t last= s;
+    size_t mid = first + (last-first)/2;
+    while(first < last) {
+        if(t < y[mid]) {
+            last = mid;
+        } else {
+            first = mid+1;
+        }
+        mid = first + (last - first) / 2;
+    }
 
+    last--;
+    return y[last];
+}
+
+// [[Rcpp::export]]
+int test_binary_search(const double t, const NumericVector y) {
+    return(binary_search(t, y));
+}
 
 double u(const double &t, const SInput &si) {
+  const NumericVector &y(si.net[si.id[0]-1]);
+  
+  double e_syn = 0;
+  for(size_t id_it=0; id_it < si.id_conn.size(); id_it++) {
+    const int &syn_sp_i = si.id_conn[id_it];
+    //printf("syn_sp_i = %d\n", syn_sp_i);
+    const NumericVector &syn_sp(si.net[syn_sp_i-1]);
+    
+    //for(size_t tti=0; tti<syn_sp.size(); tti++) printf("syn_sp[%d] = %f\n", tti, syn_sp[tti]);
+    
+    for(int sp_it= syn_sp.size()-1; sp_it>=0; sp_it--) {
+        if(t-syn_sp[sp_it] > EPSP_WORK_WINDOW) {
+            //printf("t-syn_sp[%d] = %f > EPSP_WORK_WINDOW\n", sp_it, t-syn_sp[sp_it]);
+            break;
+        }
+        if(t-syn_sp[sp_it]<0) {
+            continue;
+        }
+
+        //printf("w[%d] = %f\n", id_it, si.w[id_it]);
+        //printf("e_syn_before: %f\n", e_syn);
+        double suppr = 1;
+        if(y.size() > 0) {
+    //        printf("bs: %f \n", binary_search(t, y));
+            suppr = a(syn_sp[sp_it] - binary_search(t, y), si.c);
+        }
+        e_syn += si.w[id_it] * epsp(t-syn_sp[sp_it], si.c)*suppr;
+        //printf("e_syn_after: %f\n", e_syn);
+               
+    }
+    
+  }
+  return si.get_c("u_rest") + e_syn;
+}
+
+double u_old(const double &t, const SInput &si) {
   const NumericVector &y(si.net[si.id[0]-1]);
   
   double e_syn = 0;
@@ -89,6 +164,8 @@ SEXP USRM(const NumericVector t, const List constants, const IntegerVector neuro
   }
   return u_val;
 }
+
+
 
 NumericVector simNeurons(const double t, const List &constants, Reference &neurons, const List &net) {
   const IntegerVector ids = as<const IntegerVector>(neurons.field("ids"));

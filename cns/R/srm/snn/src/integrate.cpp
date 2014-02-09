@@ -9,6 +9,7 @@
 #include "base.h"
 #include "neuron.h"
 #include "grad_funcs.h"
+#include "postprocess.h"
 
 using namespace Rcpp;
 
@@ -113,3 +114,120 @@ SEXP integrateSRM_vec(const List constants,  const List int_options, const Integ
     arma::vec out = gauss_legendre_vec(quad, integrand_vec, dim, (void*)&sint_d, T0, Tmax);
     return List::create( Named("out") = out);
 }
+
+struct TProbNoFireData {
+    TProbNoFireData(Reference &n, const List &c, const List &netc) : neurons(n), constants(c), net(netc) {}
+    Reference &neurons;
+    const List &constants;
+    const List &net;
+};
+
+arma::vec integrand_probNoFire(const arma::vec &t, void *data) {
+  TProbNoFireData *d = (TProbNoFireData*)data;
+  const IntegerVector ids = as<const IntegerVector>(d->neurons.field("ids"));
+  const List weights = as<const List>(d->neurons.field("weights"));
+  const List id_conns = as<const List>(d->neurons.field("id_conns"));
+  NumericVector p_val(t.n_elem);
+  for(size_t it = 0; it<t.n_elem; it++) {
+      IntegerVector id(1); 
+      id[0] = ids[it];
+      IntegerVector id_conn(id_conns[it]);
+      NumericVector w(weights[it]);
+      SInput si(d->constants, id, id_conn, w, d->net);
+      p_val[it] = g(u(t[it], si), d->constants);
+  }
+  return(p_val);
+}
+
+#define DEFAULT_QUAD 256
+
+// [[Rcpp::export]]
+SEXP probNoFire(const double T0, const double Tmax, Reference neurons, const List net, const List constants) {
+    TProbNoFireData d(neurons, constants, net);
+//    arma::mat out(10, 2000);
+//    arma::vec t = arma::linspace<arma::vec>(T0, Tmax, 2000);
+//    for(size_t ti=0; ti<t.n_elem; ti++) {
+//        arma::vec curt(10);    
+//        curt.fill(t[ti]);
+//        out.col(ti) = integrand_probNoFire(curt, (void*)&d);
+//    }
+    arma::vec integral = gauss_legendre_vec(DEFAULT_QUAD, integrand_probNoFire, as<int>(neurons.field("len")), (void*)&d, T0, Tmax);
+
+    return List::create(Named("out") = arma::exp(-integral));
+}
+
+arma::vec integrand_vec_epsp(const arma::vec &t, void *data) {
+    SIntData *sint_d = (SIntData*)data;
+        
+    std::vector<double> out;
+    out.reserve(t.size());
+    size_t ti = 0;
+    for(size_t it = 0; it< sint_d->neurons_id.size(); it++) {
+//        printf("ti: %zu\n", ti);
+        IntegerVector id(1); 
+        id[0] = sint_d->neurons_id[it];
+        IntegerVector id_conn(sint_d->neurons_id_conn[it]);
+        NumericVector w(sint_d->neurons_w[it]);
+        const NumericVector &y(sint_d->net[id[0]-1]);
+
+        SInput si(sint_d->constants, id, id_conn, w, sint_d->net);
+       
+        arma::vec out_n(id_conn.size(), arma::fill::zeros);
+        for(size_t syn_id=0; syn_id<id_conn.size(); syn_id++) {
+            const double &cur_t = t(ti);
+            ti++;
+            const NumericVector &sp(sint_d->net[ id_conn[syn_id]-1 ]);
+            for(int spike_id=sp.size()-1; spike_id>=0; spike_id--) {
+                double s = cur_t - sp[spike_id];
+                if(s > EPSP_WORK_WINDOW) break;
+                if(s <= 0) continue;      
+                double suppr = 1;
+                if(y.size() > 0) {
+                    suppr = a(sp[spike_id] - binary_search(cur_t, y), sint_d->constants);
+                }
+                out_n(syn_id) += epsp(s, sint_d->constants)*suppr; 
+            } 
+        }    
+        out.insert(out.end(), out_n.begin(), out_n.end());
+    }   
+    return out;
+}
+
+
+// [[Rcpp::export]]
+SEXP integrateSRM_epsp(Reference neurons, const List int_options, const List net, const List constants) {
+
+    const double &T0 = as<double>(int_options["T0"]);
+    const double &Tmax = as<double>(int_options["Tmax"]);
+    const int &dim = as<int>(int_options["dim"]);    
+    const int &quad = as<int>(int_options["quad"]);    
+
+    const IntegerVector ids = as<const IntegerVector>(neurons.field("ids"));
+    const List weights = as<const List>(neurons.field("weights"));
+    const List id_conns = as<const List>(neurons.field("id_conns"));
+    if(ids.size() != id_conns.size()) {
+        printf("Error. length(w) != length(id_conn).\n");
+        return 0;
+    }
+    SIntData sint_d(constants,int_options, ids, id_conns, weights, net);
+#ifdef TEST    
+    arma::mat testout(dim, 300);
+    arma::vec t = arma::linspace<arma::vec>(T0, Tmax, (T0-Tmax)/0.5);
+    for(size_t ti=0; ti<t.n_elem; ti++) {
+        arma::vec curt(dim);    
+        curt.fill(t[ti]);
+        out.col(ti) = integrand_vec_epsp(curt, (void*)&sint_d);
+    }
+#endif    
+    arma::vec out = gauss_legendre_vec(quad, integrand_vec_epsp, dim, (void*)&sint_d, T0, Tmax);
+#ifdef TEST
+    return List::create( Named("out") = out, Named("testout") = testout);
+#else
+    return List::create( Named("out") = out);
+#endif    
+}
+
+
+
+
+

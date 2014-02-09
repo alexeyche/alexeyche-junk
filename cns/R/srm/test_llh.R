@@ -1,18 +1,18 @@
 #!/usr/bin/RScript
-setwd("~/prog/alexeyche-junk/cns/R/srm/new")
+setwd("~/prog/alexeyche-junk/cns/R/srm/")
 #setwd("~/my/git/alexeyche-junk/cns/R/srm/new")
 require(snn)
 source('constants.R')
 source('util.R')
 source('neuron.R')
-source('layers.R')
 source('gen_spikes.R')
 source('plot_funcs.R')
 source('grad_funcs.R')
 source('llh.R')
 source('srm.R')
-source('target_functions.R')
 ID_MAX=0
+constants = list(dt=dt, e0=e0, ts=ts, tm=tm, u_abs=u_abs, u_r=u_r, trf=trf, trs=trs, 
+                 dr=dr, alpha=alpha, beta=beta, tr=tr, u_rest=u_rest, pr=pr, gain_factor=gain_factor, ta=ta, sim_dim=sim_dim)
 
 M = 50
 N = 5
@@ -31,12 +31,12 @@ start_w = 5.5
 
 neurons = SRMLayer(N, start_w)
 neurons$connectFF(gr1$ids, start_w)
-inh_id = neurons$ids[1]
-
-for(i in 1:N) {
-    dd = which(neurons$id_conns[[i]] == inh_id)
-    neurons$weights[[i]][dd] = -start_w
-}
+# inh_id = neurons$ids[1]
+# 
+# for(i in 1:N) {
+#     dd = which(neurons$id_conns[[i]] == inh_id)
+#     neurons$weights[[i]][dd] = -start_w
+# }
 
 null_pattern = list()
 for(i in 1:N) {
@@ -52,7 +52,8 @@ pattern[[5]] <- c(-Inf, 10)
 epochs = 100
 run_options = list(T0 = 0, Tmax = 150, dt = 0.5, learning_rate = 0.25, learn_window_size = 150, mode="run", collect_stat=FALSE)
 layers = SimLayers(list(neurons))
-target_set = list(target_function_gen = full_spike_tf, depress_null=TRUE)
+
+T = seq(run_options$T0, run_options$Tmax, run_options$dt)
 
 net_all = list()
 grads = list()
@@ -62,7 +63,17 @@ for(ep in 1:epochs) {
   #gr = grad_func(layers[[1]], 0, 150, net, target_set)
   gr = layers$l[[1]]$grad(0, 150, net, target_set)
   net[id_n] <- null_pattern
-  c(net, layers, stat) := run_srm(layers, net, run_options)
+  uu = pp = NULL
+  for(t in T) {
+    u = neurons$u(t, net)
+    uu = cbind(uu, u)
+    p = probf(u)
+    pp = cbind(pp, p)
+    fired = ((probf(u))*dt)>runif(N)
+    for(fi in which(fired==TRUE)) {
+      net[[ neurons$ids[fi] ]] = c(net[[ neurons$ids[fi] ]], t)
+    }
+  }
   
   not_fired = all(sapply(net[id_n], function(sp) length(sp) == 1))
   
