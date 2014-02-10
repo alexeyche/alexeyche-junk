@@ -1,5 +1,4 @@
 require(lattice)
-require(gridExtra)
 
 plot_rastl <- function(raster, lab="") {
   x <- c()

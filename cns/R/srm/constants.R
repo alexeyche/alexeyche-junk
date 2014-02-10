@@ -27,6 +27,7 @@ u_rest <- -70 # mV
 # input spike train
 duration = 300
 dt = 0.5
+sim_dim = 1000
 
 # net cfg
 N = 50
@@ -52,5 +53,8 @@ rew_ampl = 1
 epochs = 50
 weights_norm_type = 'no'
 ws = 0.2
+target_rate = 5/sim_dim 
+target_rate_factor = 0.1
+weight_decay_factor = 0.026
 
-sim_dim = 1000
+

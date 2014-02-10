@@ -127,9 +127,22 @@ grad_func = function(neurons, T0, Tmax, net, mean_act) {
   })
   B2 =probInts - mean_act
   B = mapply("-", B1, B2, SIMPLIFY=FALSE)
+#   Btarget1 = lapply(1:neurons$len, function(ni) {
+#     if(spike_probs[[ni]][1] != 0) {
+#       sum(mean_act[ni]/(target_rate*(Tmax-T0) ))
+#     } else {
+#       0
+#     }
+#   })
+#   Btarget2 = mean_act-target_rate*(Tmax-T0)
+#   Btarget = mapply("-", Btarget1, Btarget2, SIMPLIFY=FALSE)
+#   Btarget = lapply(Btarget, function(val) val*target_rate_factor)
+#   Bfinal = mapply("-", B, Btarget, SIMPLIFY=FALSE)
+#   
   grad = mapply("*", dpdw, B, SIMPLIFY=FALSE)
   #grad = lapply(grad, function(gr) gr*gain_factor)
   return(grad)
+  
   #py = neurons$P(T0, Tmax, net)
   #return(lapply(1:neurons$len, function(ni) grad[[ni]]*py[ni]))
 }

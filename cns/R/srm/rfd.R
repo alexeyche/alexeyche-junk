@@ -1,11 +1,11 @@
 
 verbose = TRUE
-#dir='~/prog/sim/runs/test'
-dir='~/my/sim/runs/test'
-#data_dir = '~/prog/sim'
-data_dir = '~/my/sim'
-#setwd("~/prog/alexeyche-junk/cns/R/srm")
-setwd("~/my/git/alexeyche-junk/cns/R/srm")
+dir='~/prog/sim/runs/test'
+#dir='~/my/sim/runs/test'
+data_dir = '~/prog/sim'
+#data_dir = '~/my/sim'
+setwd("~/prog/alexeyche-junk/cns/R/srm")
+#setwd("~/my/git/alexeyche-junk/cns/R/srm")
 source('constants.R')
 source('srm_funcs.R')
 
@@ -59,7 +59,7 @@ get_synaptic_rates = function(mu) {
 
 T0 = 0
 Tmax = 1000
-learn_window = 20
+learn_window = 100
 lrate = 0.001
 T = seq(T0, Tmax, by=dt) 
 uu = pp = NULL
@@ -75,7 +75,7 @@ for(ep in 1:30) {
   cumProbs = rep(0, N)
   for(curt in T) {
     if(curt %% 200 == 0) {
-      mu = sample( seq(0, 100, by=25), 1)
+      mu = sample( seq(1, 100, by=1), 1)
     }
     syn_fired = ((get_synaptic_rates(mu)))*dt>runif(M)
     for(fi in which(syn_fired==TRUE)) {
@@ -106,7 +106,7 @@ for(ep in 1:30) {
       print(p3, position=c(0, 0.66, 1, 1))
     
       for(ni in 1:neurons$len) {
-        neurons$weights[[ni]] = neurons$weights[[ni]] + ratecalc(neurons$weights[[ni]])*0.01*gr[[ni]]
+        neurons$weights[[ni]] = neurons$weights[[ni]] + ratecalc(neurons$weights[[ni]])*0.01*(gr[[ni]]-neurons$weights[[ni]]*weight_decay_factor) 
       }
     }
   }
@@ -116,3 +116,4 @@ for(ep in 1:30) {
 }
 
 
+111
