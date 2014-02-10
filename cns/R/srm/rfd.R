@@ -56,6 +56,7 @@ get_synaptic_rates = function(mu) {
   }
   return(890*gaussian_kernel(syn, sigma)/sim_dim)
 }
+
 T0 = 0
 Tmax = 1000
 learn_window = 20
