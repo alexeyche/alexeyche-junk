@@ -1,6 +1,6 @@
 #!/usr/bin/RScript
-setwd("~/prog/alexeyche-junk/cns/R/srm/")
-#setwd("~/my/git/alexeyche-junk/cns/R/srm/new")
+#setwd("~/prog/alexeyche-junk/cns/R/srm/")
+setwd("~/my/git/alexeyche-junk/cns/R/srm/")
 require(snn)
 source('constants.R')
 source('util.R')
@@ -21,8 +21,8 @@ id_n = seq(M+1, M+N)
 
 gr1 = TSNeurons(M = M)
 
-file <- "/home/alexeyche/prog/sim/stimuli/sd1.csv"
-#file <- "/home/alexeyche/my/sim/stimuli/sd1.csv"
+#file <- "/home/alexeyche/prog/sim/stimuli/sd1.csv"
+file <- "/home/alexeyche/my/sim/stimuli/sd1.csv"
 gr1$loadPatternFromFile(file, 150, 1, 0.5)
 #net <- spikeMatToSpikeList(gr1$patterns[[1]]$data)
 net = list()
@@ -53,6 +53,9 @@ epochs = 100
 run_options = list(T0 = 0, Tmax = 150, dt = 0.1, learning_rate = 0.1, learn_window_size = 150, mode="run", collect_stat=FALSE)
 layers = SimLayers(list(neurons))
 
+sim_options = list(T0=0, Tmax= 150, dt=0.5, saveStat=TRUE)
+net[id_n] <- null_pattern
+ss = layers$sim(sim_options, net)
 T = seq(run_options$T0, run_options$Tmax, run_options$dt)
 
 net_all = list()

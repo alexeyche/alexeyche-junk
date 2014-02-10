@@ -38,7 +38,6 @@ SEXP integrateSRM(const List constants, const List int_options, const IntegerVec
     for(size_t syn_id=0; syn_id<si.id_conn.size(); syn_id++) {
       SSynInput ssyn(si.id_conn[syn_id], si);
       int_values[syn_id] = - gauss_legendre(GAUSS_QUAD, integrand, (void*)&ssyn, T0, Tmax);
-//      int_values[syn_id] = - integrateRomberg(integrand, (void*)&ssyn, T0, Tmax, 10, 10);
 #ifdef DEBUG          
       for(size_t ti=0; ti<t.size(); ti++) {
         out_ps(syn_id,ti) = p_stroke(t[ti], ssyn.si);
@@ -100,7 +99,7 @@ arma::vec integrand_vec(const arma::vec &t, void *data) {
 
 
 // [[Rcpp::export]]
-SEXP integrateSRM_vec(const List constants,  const List int_options, const IntegerVector neurons_id, const List neurons_id_conn, const List neurons_w, const List net) {
+SEXP integrateSRM_epsp_pstroke(const List constants,  const List int_options, const IntegerVector neurons_id, const List neurons_id_conn, const List neurons_w, const List net) {
     if(neurons_id.size() != neurons_id_conn.size()) {
         printf("Error. length(w) != length(id_conn).\n");
         return 0;
@@ -122,7 +121,7 @@ struct TProbNoFireData {
     const List &net;
 };
 
-arma::vec integrand_probNoFire(const arma::vec &t, void *data) {
+arma::vec integrand_prob(const arma::vec &t, void *data) {
   TProbNoFireData *d = (TProbNoFireData*)data;
   const IntegerVector ids = as<const IntegerVector>(d->neurons.field("ids"));
   const List weights = as<const List>(d->neurons.field("weights"));
@@ -144,16 +143,15 @@ arma::vec integrand_probNoFire(const arma::vec &t, void *data) {
 // [[Rcpp::export]]
 SEXP probNoFire(const double T0, const double Tmax, Reference neurons, const List net, const List constants) {
     TProbNoFireData d(neurons, constants, net);
-//    arma::mat out(10, 2000);
-//    arma::vec t = arma::linspace<arma::vec>(T0, Tmax, 2000);
-//    for(size_t ti=0; ti<t.n_elem; ti++) {
-//        arma::vec curt(10);    
-//        curt.fill(t[ti]);
-//        out.col(ti) = integrand_probNoFire(curt, (void*)&d);
-//    }
-    arma::vec integral = gauss_legendre_vec(DEFAULT_QUAD, integrand_probNoFire, as<int>(neurons.field("len")), (void*)&d, T0, Tmax);
-
+    arma::vec integral = gauss_legendre_vec(DEFAULT_QUAD, integrand_prob, as<int>(neurons.field("len")), (void*)&d, T0, Tmax);
     return List::create(Named("out") = arma::exp(-integral));
+}
+
+// [[Rcpp::export]]
+SEXP probInt(const double T0, const double Tmax, Reference neurons, const List net, const List constants) {
+    TProbNoFireData d(neurons, constants, net);
+    arma::vec integral = gauss_legendre_vec(DEFAULT_QUAD, integrand_prob, as<int>(neurons.field("len")), (void*)&d, T0, Tmax);
+    return List::create(Named("out") = integral);
 }
 
 arma::vec integrand_vec_epsp(const arma::vec &t, void *data) {

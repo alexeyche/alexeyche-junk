@@ -18,7 +18,7 @@ if(llh_depr_mode == 'no') {
   q()
 }
 
-grad_func <- function(neurons, T0, Tmax, net, target_set) {
+grad_func_old <- function(neurons, T0, Tmax, net, target_set) {
   id_n = neurons$ids #sapply(neurons, function(n) n$id)
   
   nspikes = lapply(net[id_n], function(sp) { 
@@ -85,7 +85,11 @@ grad_func <- function(neurons, T0, Tmax, net, target_set) {
   return(list(mapply("+", spike_part, int_part, SIMPLIFY=FALSE), spikes_survived))
 }
 
-grad_func_new = function(neurons, T0, Tmax, net) {
+ratecalc = function(weights) {
+  4*10^(-2)*(weights^4)/(weights^4+ws^4)
+}
+
+grad_func = function(neurons, T0, Tmax, net, mean_act) {
   int_options =list(T0=T0, Tmax=Tmax, dim=sum(sapply(neurons$id_conns, length)),quad=256)
   int_out = integrateSRM_epsp(neurons, int_options , net, constants)$out
   int_part = list()
@@ -95,13 +99,35 @@ grad_func_new = function(neurons, T0, Tmax, net) {
     iter = iter + length(neurons$id_conns[[id]])
   }  
   Y = sp_in_interval(net[neurons$ids], T0, Tmax)
+  spike_probs = lapply(1:neurons$len, function(ni) {
+    if(!is.null(Y[[ni]][1])) {
+      sapply(Y[ni], function(sp) probf(neurons$u_one(ni, sp, net))) 
+    } else {
+      0
+    }
+  })
   spike_part = lapply(1:neurons$len, function(ni) {
-    spM = sapply(Y[ni], function(sp) probf(neurons$u_one(ni, sp, net)))
-    epspM = neurons$epsp_fun_one(Y[[ni]], net, ni)
-    div_of_vals = sapply(1:nrow(epspM), function(ri) epspM[ri,]/spM[ri])
-    rowSums(div_of_vals)
-  })  
-  grad = mapply("-", spike_part, int_part, SIMPLIFY=FALSE)
+    if(!is.null(Y[[ni]])) {
+      epspM = neurons$epsp_fun_one(Y[[ni]], net, ni)
+      div_of_vals = sapply(1:nrow(epspM), function(ri) epspM[ri,]/spike_probs[[ni]][ri])
+      rowSums(div_of_vals)
+    } else {
+      rep(0, length(neurons$id_conns[[ni]]))
+    }
+  })
+  dpdw = mapply("-", spike_part, int_part, SIMPLIFY=FALSE)
+  #================
+  probInts = probInt(T0, Tmax, neurons, net, constants)$out
+  B1 = lapply(1:neurons$len, function(ni) {
+    if(spike_probs[[ni]][1] != 0) {
+      sum(log(spike_probs[[ni]]/ mean_act[ni]))
+    } else {
+      0
+    }
+  })
+  B2 =probInts - mean_act
+  B = mapply("-", B1, B2, SIMPLIFY=FALSE)
+  grad = mapply("*", dpdw, B, SIMPLIFY=FALSE)
   #grad = lapply(grad, function(gr) gr*gain_factor)
   return(grad)
   #py = neurons$P(T0, Tmax, net)

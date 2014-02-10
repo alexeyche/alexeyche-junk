@@ -43,9 +43,9 @@ BEGIN_RCPP
     return __sexp_result;
 END_RCPP
 }
-// integrateSRM_vec
-SEXP integrateSRM_vec(const List constants, const List int_options, const IntegerVector neurons_id, const List neurons_id_conn, const List neurons_w, const List net);
-RcppExport SEXP snn_integrateSRM_vec(SEXP constantsSEXP, SEXP int_optionsSEXP, SEXP neurons_idSEXP, SEXP neurons_id_connSEXP, SEXP neurons_wSEXP, SEXP netSEXP) {
+// integrateSRM_epsp_pstroke
+SEXP integrateSRM_epsp_pstroke(const List constants, const List int_options, const IntegerVector neurons_id, const List neurons_id_conn, const List neurons_w, const List net);
+RcppExport SEXP snn_integrateSRM_epsp_pstroke(SEXP constantsSEXP, SEXP int_optionsSEXP, SEXP neurons_idSEXP, SEXP neurons_id_connSEXP, SEXP neurons_wSEXP, SEXP netSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
@@ -56,7 +56,7 @@ BEGIN_RCPP
         Rcpp::traits::input_parameter< const List >::type neurons_id_conn(neurons_id_connSEXP );
         Rcpp::traits::input_parameter< const List >::type neurons_w(neurons_wSEXP );
         Rcpp::traits::input_parameter< const List >::type net(netSEXP );
-        SEXP __result = integrateSRM_vec(constants, int_options, neurons_id, neurons_id_conn, neurons_w, net);
+        SEXP __result = integrateSRM_epsp_pstroke(constants, int_options, neurons_id, neurons_id_conn, neurons_w, net);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);
@@ -76,6 +76,25 @@ BEGIN_RCPP
         Rcpp::traits::input_parameter< const List >::type net(netSEXP );
         Rcpp::traits::input_parameter< const List >::type constants(constantsSEXP );
         SEXP __result = probNoFire(T0, Tmax, neurons, net, constants);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}
+// probInt
+SEXP probInt(const double T0, const double Tmax, Reference neurons, const List net, const List constants);
+RcppExport SEXP snn_probInt(SEXP T0SEXP, SEXP TmaxSEXP, SEXP neuronsSEXP, SEXP netSEXP, SEXP constantsSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< const double >::type T0(T0SEXP );
+        Rcpp::traits::input_parameter< const double >::type Tmax(TmaxSEXP );
+        Rcpp::traits::input_parameter< Reference >::type neurons(neuronsSEXP );
+        Rcpp::traits::input_parameter< const List >::type net(netSEXP );
+        Rcpp::traits::input_parameter< const List >::type constants(constantsSEXP );
+        SEXP __result = probInt(T0, Tmax, neurons, net, constants);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);

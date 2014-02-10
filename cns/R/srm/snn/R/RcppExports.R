@@ -9,12 +9,16 @@ integrateSRM <- function(constants, int_options, neuron_id, neuron_id_conn, neur
     .Call('snn_integrateSRM', PACKAGE = 'snn', constants, int_options, neuron_id, neuron_id_conn, neuron_w, net)
 }
 
-integrateSRM_vec <- function(constants, int_options, neurons_id, neurons_id_conn, neurons_w, net) {
-    .Call('snn_integrateSRM_vec', PACKAGE = 'snn', constants, int_options, neurons_id, neurons_id_conn, neurons_w, net)
+integrateSRM_epsp_pstroke <- function(constants, int_options, neurons_id, neurons_id_conn, neurons_w, net) {
+    .Call('snn_integrateSRM_epsp_pstroke', PACKAGE = 'snn', constants, int_options, neurons_id, neurons_id_conn, neurons_w, net)
 }
 
 probNoFire <- function(T0, Tmax, neurons, net, constants) {
     .Call('snn_probNoFire', PACKAGE = 'snn', T0, Tmax, neurons, net, constants)
+}
+
+probInt <- function(T0, Tmax, neurons, net, constants) {
+    .Call('snn_probInt', PACKAGE = 'snn', T0, Tmax, neurons, net, constants)
 }
 
 integrateSRM_epsp <- function(neurons, int_options, net, constants) {

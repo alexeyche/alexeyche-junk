@@ -51,5 +51,6 @@ rew_ampl = 1
 
 epochs = 50
 weights_norm_type = 'no'
+ws = 0.2
 
 sim_dim = 1000

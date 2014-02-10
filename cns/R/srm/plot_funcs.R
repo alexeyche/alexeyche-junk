@@ -1,4 +1,6 @@
 require(lattice)
+require(gridExtra)
+
 plot_rastl <- function(raster, lab="") {
   x <- c()
   y <- c()
@@ -59,3 +61,4 @@ plot_run_status = function(net, net_neurons, grad, loss, reward, pic_filename, d
       print(p3, position=c(0.5, 0.5, 1, 1))
     dev.off()   
 }
+

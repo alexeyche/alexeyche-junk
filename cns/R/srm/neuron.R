@@ -19,7 +19,7 @@ neuron = setRefClass("neuron", fields = list(w = "vector", id_conn = "vector", i
                                 }))
 
 
-SRMLayer = setRefClass("SRMLayer", fields = list(weights = "list", id_conns = "list", ids = "vector", len="vector", stochastic="logical"),
+SRMLayer = setRefClass("SRMLayer", fields = list(weights = "list", id_conns = "list", ids = "vector", len="vector", stochastic="logical", mean_act="vector"),
                      methods = list(                       
                        initialize = function(N, start_weight, p_edge_prob=1, ninh=0) {
                          ids <<- get_unique_ids(N)
@@ -49,6 +49,7 @@ SRMLayer = setRefClass("SRMLayer", fields = list(weights = "list", id_conns = "l
                          len <<- N
                          #stochastic <<- TRUE
                          weights <<- weights
+                         mean_act <<- rep(0, N)
                          #id_conns <<- id_conns                         
                        },
                        connectFF = function(ids_to_connect, weight, neurons_to_connect=NULL) {
@@ -71,21 +72,15 @@ SRMLayer = setRefClass("SRMLayer", fields = list(weights = "list", id_conns = "l
                        },
                        u = function(time, net) {
                          USRMs(time, constants, .self$ids, .self$id_conns, .self$weights, net)
-                         #e_syn= sapply(net[id_conn], function(sp) sum(epsp(t-sp)))
-                         #u_rest + sum(w*e_syn) + sum(nu(t-net[[id]]))
                        },
                        u_one = function(num, t, net) {
-                         USRM(t, constants, ids[[num]], id_conns[[num]], weights[[num]], net)
-                         #e_syn= sapply(net[id_conn], function(sp) sum(epsp(t-sp)))
-                         #u_rest + sum(w*e_syn) + sum(nu(t-net[[id]]))
+                         USRM(t, constants, ids[num], id_conns[[num]], weights[[num]], net)
                        },
-
                        get = function(id) {
                          return(list(w=weights[[id]],id_conn=id_conns[[id]],id=ids[[id]]))
                        },
                        grad = function(T0, Tmax, net, target_set) {
-                         #return(grad_func(.self, T0, Tmax, net, target_set))
-                         return(grad_func_new(.self, T0, Tmax, net))
+                         return(grad_func(.self, T0, Tmax, net))
                        },
                        P = function(T0, Tmax, net) {
                          pnf = probNoFire(T0, Tmax, .self, net, constants)$out
@@ -117,6 +112,9 @@ SimLayers = setRefClass("SimLayers", fields=list(l="list", all_ids="vector"), me
                     },
                     sim = function(sim_options, net) {
                       simLayers(sim_options, constants, .self$l, net)
+                      for(n in .self$l) {
+                         mean_act = sapply(net[n$ids], length)/(sim_options$Tmax-sim_options$T0)
+                      }
                     }))
 
 test_neurons = function() {

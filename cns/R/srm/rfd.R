@@ -1,11 +1,11 @@
 
 verbose = TRUE
-dir='~/prog/sim/runs/test'
-#dir='~/my/sim/runs/test'
-data_dir = '~/prog/sim'
-#data_dir = '~/my/sim'
-setwd("~/prog/alexeyche-junk/cns/R/srm")
-#setwd("~/my/git/alexeyche-junk/cns/R/srm")
+#dir='~/prog/sim/runs/test'
+dir='~/my/sim/runs/test'
+#data_dir = '~/prog/sim'
+data_dir = '~/my/sim'
+#setwd("~/prog/alexeyche-junk/cns/R/srm")
+setwd("~/my/git/alexeyche-junk/cns/R/srm")
 source('constants.R')
 source('srm_funcs.R')
 
@@ -56,24 +56,62 @@ get_synaptic_rates = function(mu) {
   }
   return(890*gaussian_kernel(syn, sigma)/sim_dim)
 }
-
-T = seq(0, 1000, by=dt) 
+T0 = 0
+Tmax = 1000
+learn_window = 20
+lrate = 0.001
+T = seq(T0, Tmax, by=dt) 
 uu = pp = NULL
 mu=50
-for(t in T) {
-  syn_fired = ((get_synaptic_rates(mu)))*dt>runif(M)
-  for(fi in which(syn_fired==TRUE)) {
-    net[[ gr1$ids[fi] ]] = c(net[[ gr1$ids[fi] ]], t)
+
+cumProbs = rep(0, N)
+counts = 0
+mean_act = NULL
+mean_act_ep = rep(0, N)
+for(ep in 1:30) {
+  net[1:length(net)] = -Inf
+  counts = 0
+  cumProbs = rep(0, N)
+  for(curt in T) {
+    if(curt %% 200 == 0) {
+      mu = sample( seq(0, 100, by=25), 1)
+    }
+    syn_fired = ((get_synaptic_rates(mu)))*dt>runif(M)
+    for(fi in which(syn_fired==TRUE)) {
+      net[[ gr1$ids[fi] ]] = c(net[[ gr1$ids[fi] ]], curt)
+    }
+    u = neurons$u(curt, net)
+    uu = cbind(uu, u)
+    p = probf(u)
+    pp = cbind(pp, p)
+    fired = ((probf(u))*dt)>runif(N)
+    for(fi in which(fired==TRUE)) {
+      net[[ neurons$ids[fi] ]] = c(net[[ neurons$ids[fi] ]], curt)
+    }    
+    if((curt %% learn_window == 0) && (curt>0)) {
+      probInts = probInt(curt-learn_window, curt, neurons, net, constants)$out
+      cumProbs = cumProbs + probInts
+      counts = counts + 1
+    }
+    if((curt %% learn_window == 0) && (curt>0) && (!is.null(mean_act))) {
+      gr = grad_func(neurons, curt-learn_window, curt, net, mean_act)
+      
+      W = get_weights_matrix(list(neurons))
+      p3 = levelplot(t(list_to_matrix(gr)), col.regions=colorRampPalette(c("black", "white")))
+      p1 = plot_rastl(net)
+      p2 = levelplot(W, col.regions=colorRampPalette(c("black", "white")))
+      print(p1, position=c(0, 0, 1, 0.33), more=TRUE)
+      print(p2, position=c(0, 0.33, 1, 0.66), more=TRUE)
+      print(p3, position=c(0, 0.66, 1, 1))
+    
+      for(ni in 1:neurons$len) {
+        neurons$weights[[ni]] = neurons$weights[[ni]] + ratecalc(neurons$weights[[ni]])*0.01*gr[[ni]]
+      }
+    }
   }
-  u = neurons$u(t, net)
-  uu = cbind(uu, u)
-  p = probf(u)
-  pp = cbind(pp, p)
-  fired = ((probf(u))*dt)>runif(N)
-  for(fi in which(fired==TRUE)) {
-    net[[ neurons$ids[fi] ]] = c(net[[ neurons$ids[fi] ]], t)
-  }
+  cat("ep: ", ep, "\n")    
+  mean_act = cumProbs/counts
+  
 }
 
 
-neurons$P(0, 100, net)
