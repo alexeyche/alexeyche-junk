@@ -65,6 +65,10 @@ simLayers <- function(sim_options, constants, layers, net) {
     .Call('snn_simLayers', PACKAGE = 'snn', sim_options, constants, layers, net)
 }
 
+simLayers_old <- function(sim_options, constants, layers, net) {
+    .Call('snn_simLayers_old', PACKAGE = 'snn', sim_options, constants, layers, net)
+}
+
 timesTwo <- function(x) {
     .Call('snn_timesTwo', PACKAGE = 'snn', x)
 }

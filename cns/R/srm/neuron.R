@@ -82,7 +82,7 @@ SRMLayer = setRefClass("SRMLayer", fields = list(weights = "list", id_conns = "l
                          c(u, epsps_cur) := USRMsFull(time, constants, .self$ids, .self$id_conns, .self$weights, net)                         
                          .self$epsps_cur <- epsps_cur                         
                          .self$current_u <- u
-                         .self$mean_act <- rep(1, .self$len) #.self$mean_act - .self$mean_act/1000 + probf(u)
+                         .self$mean_act <- rep(0.01, .self$len) #.self$mean_act - .self$mean_act/1000 + probf(u)
                          return(u)
                        },
                        uFull = function(time, net) {
@@ -91,7 +91,7 @@ SRMLayer = setRefClass("SRMLayer", fields = list(weights = "list", id_conns = "l
                        C = function(t, dt, net) {
                          Y = sp_in_interval(net[.self$ids], t-dt, t)                                                  
                          C_curr = lapply(1:.self$len, function(ni) {
-                           if(!is.null(Y[[ni]])) {
+                           if(!is.null(Y[[ni]])) {                             
                              .self$epsps_cur[[ni]]/probf(.self$current_u[ni]) - .self$epsps_cur[[ni]]
                            } else {
                              0 - .self$epsps_cur[[ni]]
@@ -104,7 +104,7 @@ SRMLayer = setRefClass("SRMLayer", fields = list(weights = "list", id_conns = "l
                          Y = sp_in_interval(net[.self$ids], t-dt, t)                                                  
                          B_curr = lapply(1:.self$len, function(ni) {
                            if(!is.null(Y[[ni]])) {
-                             probf(.self$current_u[ni])/.self$mean_act[ni] - (probf(.self$current_u[ni]) - .self$mean_act[ni])
+                             log(probf(.self$current_u[ni])/.self$mean_act[ni]) - (probf(.self$current_u[ni]) - .self$mean_act[ni])
                            } else {
                              0 - (probf(.self$current_u[ni]) - .self$mean_act[ni])
                            }

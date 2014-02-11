@@ -206,9 +206,7 @@ SEXP USRM(const NumericVector t, const List constants, const IntegerVector neuro
   return u_val;
 }
 
-
-
-NumericVector simNeurons(const double t, const List &constants, Reference &neurons, const List &net) {
+NumericVector simNeurons_old(const double t, const List &constants, Reference &neurons, const List &net) {
   const IntegerVector ids = as<const IntegerVector>(neurons.field("ids"));
   const List weights = as<const List>(neurons.field("weights"));
   const List id_conns = as<const List>(neurons.field("id_conns"));
@@ -310,4 +308,25 @@ SEXP USRMsFull(const NumericVector t, const List constants, const IntegerVector 
   }
   return List::create(Named("u") = u_all, Named("epsps") = epsps);
 }
+
+List simNeurons(const double t, const List &constants, Reference &neurons, const List &net) {
+  const IntegerVector ids = as<const IntegerVector>(neurons.field("ids"));
+  const List weights = as<const List>(neurons.field("weights"));
+  const List id_conns = as<const List>(neurons.field("id_conns"));
+
+  NumericVector u_all(ids.size());
+  List epsps(ids.size());
+  for(size_t it = 0; it<ids.size(); it++) {
+    IntegerVector id(1); 
+    id[0] = ids(it);
+    IntegerVector id_conn(id_conns[it]);
+    NumericVector w(weights[it]);
+    SInput si(constants, id, id_conn, w, net);
+    List out = uFull(t, si);
+    u_all(it) = as<double>(out["u"]);
+    epsps[it] = out["epsp"];
+  }
+  return List::create(Named("u") = u_all, Named("epsps") = epsps);
+}
+
 

@@ -1,11 +1,11 @@
 
 verbose = TRUE
-#dir='~/prog/sim/runs/test'
-dir='~/my/sim/runs/test'
-#data_dir = '~/prog/sim'
-data_dir = '~/my/sim'
-#setwd("~/prog/alexeyche-junk/cns/R/srm")
-setwd("~/my/git/alexeyche-junk/cns/R/srm")
+dir='~/prog/sim/runs/test'
+#dir='~/my/sim/runs/test'
+data_dir = '~/prog/sim'
+#data_dir = '~/my/sim'
+setwd("~/prog/alexeyche-junk/cns/R/srm")
+#setwd("~/my/git/alexeyche-junk/cns/R/srm")
 source('constants.R')
 source('srm_funcs.R')
 
@@ -52,15 +52,16 @@ Cacc = NULL
 Bacc = NULL
 mean_act_acc = NULL
 
-mean_act = 1
+mean_act = 1/sim_dim
 learn_window = 2
+Ts = seq(T0,Tmax,by=dt)
 for(tr in 1:1) {
   uu = pp = grgr = NULL
-  net[[1]] = c(40)
-  net[[2]] = c(70)
-  net[[3]] = -Inf
+  net[[1]] = c(50)
+  net[[2]] = c(90)
+  net[[3]] = c(-Inf)
   
-  for(ct in seq(T0, Tmax, by=dt)) {
+  for(ct in Ts) {
     u = neurons$u(ct, net)
     mean_act_acc = rbind(mean_act_acc, neurons$mean_act)
     uu = cbind(uu, u)
@@ -68,7 +69,7 @@ for(tr in 1:1) {
     pp = cbind(pp, p)
     fired = ((probf(u))*dt)>runif(N)
     for(fi in which(fired==TRUE)) {
-      net[[ neurons$ids[fi] ]] = c(net[[ neurons$ids[fi] ]], ct)
+     net[[ neurons$ids[fi] ]] = c(net[[ neurons$ids[fi] ]], ct)
     }
     Cacc = rbind(Cacc, neurons$C(ct, dt, net)[[1]])
     Bacc = rbind(Bacc, neurons$B(ct, dt, net)[[1]])
@@ -85,3 +86,5 @@ for(tr in 1:1) {
 }
 #plot(n1.dwdt, xlim=c(-100,100))
 #points(n2.dwdt, xlim=c(-100,100))
+
+plot(Ts, Cacc[,2], type="l")

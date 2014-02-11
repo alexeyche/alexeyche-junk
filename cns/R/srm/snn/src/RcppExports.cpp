@@ -299,6 +299,24 @@ BEGIN_RCPP
     return __sexp_result;
 END_RCPP
 }
+// simLayers_old
+SEXP simLayers_old(const List sim_options, const List constants, List layers, List net);
+RcppExport SEXP snn_simLayers_old(SEXP sim_optionsSEXP, SEXP constantsSEXP, SEXP layersSEXP, SEXP netSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< const List >::type sim_options(sim_optionsSEXP );
+        Rcpp::traits::input_parameter< const List >::type constants(constantsSEXP );
+        Rcpp::traits::input_parameter< List >::type layers(layersSEXP );
+        Rcpp::traits::input_parameter< List >::type net(netSEXP );
+        SEXP __result = simLayers_old(sim_options, constants, layers, net);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}
 // timesTwo
 SEXP timesTwo(NumericVector x);
 RcppExport SEXP snn_timesTwo(SEXP xSEXP) {

@@ -15,6 +15,7 @@ double g(const double &g, const List &c);
 double binary_search(const double &t, const NumericVector &y);
 double a(const double &s, const List &c);
 
-NumericVector simNeurons(const double t, const List &constants, Reference &neurons, const List &net);
+List simNeurons(const double t, const List &constants, Reference &neurons, const List &net);
+NumericVector simNeurons_old(const double t, const List &constants, Reference &neurons, const List &net);
 
 #endif

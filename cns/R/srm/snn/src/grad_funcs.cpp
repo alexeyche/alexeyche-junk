@@ -17,3 +17,20 @@ double grab_epsp(const double &t, const SSynInput &ssyn) {
   return e_syn;
 }
 
+
+NumericVector C_calc(bool Yspike, double p, NumericVector epsps) {
+    NumericVector ans = - epsps;
+    if(Yspike == true) {
+        ans += epsps/p;
+    }
+    return ans;
+}
+
+double B_calc(bool Yspike, double p, double pmean, const List &constants) {
+    double ans = - ( p - pmean );
+    if(Yspike) {
+        ans += log(p/pmean);
+    }
+    return ans;
+}
+
