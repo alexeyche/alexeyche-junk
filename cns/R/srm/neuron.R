@@ -150,10 +150,11 @@ SimLayers = setRefClass("SimLayers", fields=list(l="list", all_ids="vector"), me
                         l <<- layers_c
                     },
                     sim = function(sim_options, net) {
-                      simLayers(sim_options, constants, .self$l, net)
+                      s = simLayers(sim_options, constants, .self$l, net)
                       for(n in .self$l) {
                          mean_act = sapply(net[n$ids], length)/(sim_options$Tmax-sim_options$T0)
                       }
+                      return(s)
                     }))
 
 test_neurons = function() {

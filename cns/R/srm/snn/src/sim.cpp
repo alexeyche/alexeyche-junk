@@ -8,7 +8,6 @@ SEXP simLayers(const List sim_options, const List constants, List layers, List n
     const double &Tmax = as<double>(sim_options["Tmax"]);
     const double &dt = as<double>(sim_options["dt"]);    
     const bool &saveStat = as<bool>(sim_options["saveStat"]);    
-    
     const double sim_dim = as<double>(constants["sim_dim"]);
 
     arma::vec T = arma::linspace(T0, Tmax, (Tmax-T0)/dt);
@@ -23,6 +22,7 @@ SEXP simLayers(const List sim_options, const List constants, List layers, List n
     arma::mat stat(neurons_num, T.n_elem, arma::fill::zeros);
     arma::mat Bstat(neurons_num, T.n_elem, arma::fill::zeros);
     arma::cube Cstat(net.size(), net.size(), T.n_elem, arma::fill::zeros);
+
     arma::vec mean_acc(neurons_num, arma::fill::zeros);
     for(size_t ti=0; ti<T.n_elem; ti++) {
         size_t neuron_it = 0;
@@ -51,9 +51,9 @@ SEXP simLayers(const List sim_options, const List constants, List layers, List n
                 if(saveStat) {
                     stat(neuron_it, ti) = p;
                     Bstat(neuron_it, ti) = B;
-                    IntegerVector id_conn = as<IntegerVector>(layer.field("id_conns"))[ui];
+                    IntegerVector id_conn = as<IntegerVector>(as<List>(layer.field("id_conns"))[ui]);
                     for(size_t idi=0; idi<id_conn.size(); idi++) {
-                        Cstat(ids[ui]-1, id_conn[idi]-1, ti) = as<NumericVector>(epsps_current[ui])[idi];
+                        Cstat(ids[ui]-1, id_conn[idi]-1, ti) = C[idi];
                     }
                     neuron_it++;
                 }

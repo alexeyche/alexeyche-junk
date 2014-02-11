@@ -45,5 +45,10 @@ pattern = gr1$patterns[[1]]$data
 net[gr1$ids] = pattern
 net[neurons$ids] = -Inf
 
+sim_opt = list(T0=0, Tmax=Tmax, dt=dt, saveStat=TRUE)
+sl = SimLayers(list(neurons))
+
+st = sl$sim(sim_opt, net)
+
 
 
