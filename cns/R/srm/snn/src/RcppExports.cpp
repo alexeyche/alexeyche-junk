@@ -195,6 +195,26 @@ BEGIN_RCPP
     return __sexp_result;
 END_RCPP
 }
+// USRMsFull
+SEXP USRMsFull(const NumericVector t, const List constants, const IntegerVector neurons_id, const List neurons_id_conn, const List neurons_w, const List net);
+RcppExport SEXP snn_USRMsFull(SEXP tSEXP, SEXP constantsSEXP, SEXP neurons_idSEXP, SEXP neurons_id_connSEXP, SEXP neurons_wSEXP, SEXP netSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< const NumericVector >::type t(tSEXP );
+        Rcpp::traits::input_parameter< const List >::type constants(constantsSEXP );
+        Rcpp::traits::input_parameter< const IntegerVector >::type neurons_id(neurons_idSEXP );
+        Rcpp::traits::input_parameter< const List >::type neurons_id_conn(neurons_id_connSEXP );
+        Rcpp::traits::input_parameter< const List >::type neurons_w(neurons_wSEXP );
+        Rcpp::traits::input_parameter< const List >::type net(netSEXP );
+        SEXP __result = USRMsFull(t, constants, neurons_id, neurons_id_conn, neurons_w, net);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}
 // kernelWindow_spikes
 SEXP kernelWindow_spikes(List d, const List kernel_options);
 RcppExport SEXP snn_kernelWindow_spikes(SEXP dSEXP, SEXP kernel_optionsSEXP) {

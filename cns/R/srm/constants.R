@@ -56,5 +56,6 @@ ws = 0.2
 target_rate = 5/sim_dim 
 target_rate_factor = 0.1
 weight_decay_factor = 0.026
+mean_time = 60*sim_dim
 
 

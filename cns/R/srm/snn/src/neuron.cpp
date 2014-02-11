@@ -249,3 +249,65 @@ SEXP USRMs(const NumericVector t, const List constants, const IntegerVector neur
   return u_all;
 }
 
+//=====================================================
+
+List uFull(const double &t, const SInput &si) {
+  const NumericVector &y(si.net[si.id[0]-1]);
+  
+  NumericVector e_syn(si.id_conn.size());
+  for(size_t id_it=0; id_it < si.id_conn.size(); id_it++) {
+    const int &syn_sp_i = si.id_conn[id_it];
+    //printf("syn_sp_i = %d\n", syn_sp_i);
+    const NumericVector &syn_sp(si.net[syn_sp_i-1]);
+    
+    //for(size_t tti=0; tti<syn_sp.size(); tti++) printf("syn_sp[%d] = %f\n", tti, syn_sp[tti]);
+    
+    for(int sp_it= syn_sp.size()-1; sp_it>=0; sp_it--) {
+        if(t-syn_sp[sp_it] > EPSP_WORK_WINDOW) {
+            //printf("t-syn_sp[%d] = %f > EPSP_WORK_WINDOW\n", sp_it, t-syn_sp[sp_it]);
+            break;
+        }
+        if(t-syn_sp[sp_it]<0) {
+            continue;
+        }
+
+        //printf("w[%d] = %f\n", id_it, si.w[id_it]);
+        //printf("e_syn_before: %f\n", e_syn);
+        double suppr = 1;
+        if(y.size() > 0) {
+    //        printf("bs: %f \n", binary_search(t, y));
+            suppr = a(syn_sp[sp_it] - binary_search(t-0.01, y), si.c);
+        }
+        e_syn[id_it] += epsp(t-syn_sp[sp_it], si.c)*suppr;
+        //printf("e_syn_after: %f\n", e_syn);
+               
+    }
+    
+  }
+  NumericVector e_syn_w = e_syn * si.w;
+  return List::create(Named("u") = si.get_c("u_rest") + std::accumulate(e_syn_w.begin(), e_syn_w.end(), 0.0), Named("epsp") = e_syn);
+}
+
+// [[Rcpp::export]]
+SEXP USRMsFull(const NumericVector t, const List constants, const IntegerVector neurons_id, 
+                  const List neurons_id_conn, const List neurons_w, const List net) {
+  
+  if(neurons_id.size() != neurons_id_conn.size()) {
+    printf("Error. length(w) != length(id_conn).\n");
+    return 0;
+  }
+  List epsps(neurons_id.size());
+  NumericVector u_all(neurons_id.size());
+  for(size_t it = 0; it<neurons_id.size(); it++) {
+    IntegerVector id(1); 
+    id[0] = neurons_id[it];
+    IntegerVector id_conn(neurons_id_conn[it]);
+    NumericVector w(neurons_w[it]);
+    SInput si(constants, id, id_conn, w, net);
+    List out = uFull(t[0], si);
+    u_all(it) = as<double>(out["u"]);
+    epsps[it] = out["epsp"];
+  }
+  return List::create(Named("u") = u_all, Named("epsps") = epsps);
+}
+

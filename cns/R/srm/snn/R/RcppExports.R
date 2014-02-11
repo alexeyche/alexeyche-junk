@@ -41,6 +41,10 @@ USRMs <- function(t, constants, neurons_id, neurons_id_conn, neurons_w, net) {
     .Call('snn_USRMs', PACKAGE = 'snn', t, constants, neurons_id, neurons_id_conn, neurons_w, net)
 }
 
+USRMsFull <- function(t, constants, neurons_id, neurons_id_conn, neurons_w, net) {
+    .Call('snn_USRMsFull', PACKAGE = 'snn', t, constants, neurons_id, neurons_id_conn, neurons_w, net)
+}
+
 kernelWindow_spikes <- function(d, kernel_options) {
     .Call('snn_kernelWindow_spikes', PACKAGE = 'snn', d, kernel_options)
 }

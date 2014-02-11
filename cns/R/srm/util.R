@@ -80,7 +80,7 @@ get_unique_ids <- function(n) {
 sp_in_interval = function(net, T0, Tmax) {
   nspikes = lapply(net, function(sp) { 
     left = findInterval(T0, sp)+1
-    right = findInterval(Tmax, sp, rightmost.closed=TRUE)
+    right = findInterval(Tmax+0.01, sp, rightmost.closed=TRUE)
     if(left<=right) sp[left:right]
   })  
   return(nspikes)
