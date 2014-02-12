@@ -44,34 +44,8 @@ run_srm <- function(net_neurons, net, ro) {
     ppm = NULL
     grad_stat = NULL
   }
-
-  sim_times = seq(ro$T0, ro$Tmax, by=ro$learn_window_size)
-  for(sim_time0 in sim_times) {
-    if(sim_time0<ro$Tmax) {
-        sim_options = list(T0=sim_time0, Tmax= (sim_time0+ro$learn_window_size), dt=ro$dt, saveStat=ro$collect_stat)
-        sim_out = net_neurons$sim(sim_options, net)
-        
-        if (ro$mode == "learn") {
-          c(grad, stat) := net_neurons$l[[ro$learn_layer_id]]$grad(sim_time0, sim_time0+ro$learn_window_size, net, ro$target_set)
-          gradients[[length(gradients)+1]] = grad
-          grad_stat <- c(grad_stat, stat)
-        }     
-    } else {
-        break
-    }
-  }
-  if(ro$mode == "learn") {
-    lg = length(gradients) 
-    if(lg>1) {
-        gradients = lapply(2:lg, function(gi) mapply("+", gradients[[gi-1]], gradients[[gi]], SIMPLIFY=FALSE))
-    }
-    gradients = gradients[[1]]
-    
-    rew = reward_func(list(data=net[ net_neurons$l[[ro$learn_layer_id]]$ids ], label=ro$target_set$label), ro$mean_activity_stat)    
-    gradients = lapply(1:length(gradients), function(sp_i) gradients[[sp_i]] * rew[sp_i])
-    
-    net_neurons$l[[ro$learn_layer_id]]$weights = apply_grad_norm(net_neurons$l[[ro$learn_layer_id]]$weights, gradients, ro)
-  }     
+  
+       
   
   if(ro$collect_stat) {
     return(list(net, net_neurons, sim_out$stat, grad=list(gradients, mean(grad_stat), mean(rew)) ))

@@ -77,7 +77,7 @@ mean_act = NULL
 mean_act_ep = rep(0, N)
 mean_grads = list()
 mean_Cstat = list()
-for(ep in 1:200) {
+for(ep in 1:1) {
   net[1:length(net)] = -Inf
   counts = 0
   cumProbs = rep(0, N)
@@ -90,7 +90,7 @@ for(ep in 1:200) {
       net[[ gr1$ids[fi] ]] = c(net[[ gr1$ids[fi] ]], curt)
     }
   }
-  sim_opt = list(T0=T0, Tmax=Tmax, dt=dt, saveStat=TRUE, seed=seed_num, learn=TRUE)
+  sim_opt = list(T0=T0, Tmax=Tmax, dt=dt, saveStat=TRUE, seed=seed_num, learn=(ro$runmode == "learn"))
   #if(ep < 11) {
   #  sim_opt$learn = FALSE
   #}

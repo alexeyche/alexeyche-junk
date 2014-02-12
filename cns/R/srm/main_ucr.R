@@ -3,12 +3,12 @@
 args <- commandArgs(trailingOnly = FALSE)
 if(length(grep("RStudio", args))>0) {
   verbose = TRUE
-  dir='~/prog/sim/runs/test'
-  #dir='~/my/sim/runs/test'
-  data_dir = '~/prog/sim'
-  #data_dir = '~/my/sim'
-  setwd("~/prog/alexeyche-junk/cns/R/srm")
-  #setwd("~/my/git/alexeyche-junk/cns/R/srm")
+  #dir='~/prog/sim/runs/test'
+  dir='~/my/sim/runs/test'
+  #data_dir = '~/prog/sim'
+  data_dir = '~/my/sim'
+  #setwd("~/prog/alexeyche-junk/cns/R/srm")
+  setwd("~/my/git/alexeyche-junk/cns/R/srm")
   source('constants.R')
 } else {
   base_dir = dirname(substring( args[grep("--file=", args)], 8))
@@ -67,7 +67,12 @@ source('eval_funcs.R')
 source('kernel.R')
 
 constants = list(dt=dt, e0=e0, ts=ts, tm=tm, u_abs=u_abs, u_r=u_r, trf=trf, trs=trs, 
-                 dr=dr, alpha=alpha, beta=beta, tr=tr, u_rest=u_rest)
+                 dr=dr, alpha=alpha, beta=beta, tr=tr, u_rest=u_rest, pr=pr, gain_factor=gain_factor, 
+                 ta=ta, sim_dim=sim_dim, tc=tc,
+                 target_rate=target_rate,
+                 target_rate_factor=target_rate_factor,
+                 weight_decay_factor=weight_decay_factor,
+                 ws=ws, mean_time=mean_time, added_lrate = added_lrate)
 
 ID_MAX=0
 
@@ -104,7 +109,8 @@ for(i in 1:net_neurons_for_input) {
   cc = sample(gr1$ids, M-afferent_per_neuron)
   connection[cc,i] = 0
 }
-connection[,(net_neurons_for_input+1):N] = 0
+if(net_neurons_for_input<N)
+  connection[,(net_neurons_for_input+1):N] = 0
 
 neurons$connectFF(connection, start_w.M, 1:N )
 
@@ -118,6 +124,7 @@ run_options = list(T0 = 0, Tmax = duration, dt = dt,
                    learn_window_size = learn_window_size, mode=runmode, collect_stat=TRUE, 
                    target_set = list(depress_null=FALSE),
                    learn_layer_id = 1,
+                   seed_num = seed_num,
                    test_patterns = gr2$patterns, 
                    test_function = function(train_set, test_set) {
                      Ktrain = lapply(train_set, function(act) kernelWindow_spikes(act, list(sigma = ro$fp_kernel_size, window = ro$fp_window_size, T0 = ro$T0, Tmax = ro$Tmax, quad = 256)) )                                                         
@@ -148,10 +155,10 @@ if(runmode=="run") {
   }
 }
 
-layers = SimLayers( list(neurons) )
+net_neurons = SimLayers( list(neurons) )
 input_neurons = gr1
 
-loss = run_net(gr1, layers, run_options, verbose=verbose)
+loss = run_net(gr1, net_neurons, run_options, verbose=verbose)
 
 W = get_weights_matrix(list(neurons))
 if(runmode == "learn") {
