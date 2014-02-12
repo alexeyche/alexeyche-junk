@@ -8,5 +8,6 @@ double p_stroke(const double &t, const SInput &si);
 double grab_epsp(const double &t, const SSynInput &ssyn);
 NumericVector C_calc(bool Yspike, double p, NumericVector epsps);
 double B_calc(bool Yspike, double p, double pmean, const List &constants);
+double ratecalc(const double &weight, const List &constants);
 
 #endif

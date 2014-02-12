@@ -19,8 +19,8 @@ neuron = setRefClass("neuron", fields = list(w = "vector", id_conn = "vector", i
                                 }))
 
 
-SRMLayer = setRefClass("SRMLayer", fields = list(weights = "list", id_conns = "list", ids = "vector", len="vector", stochastic="logical", 
-                                                 mean_act="vector", epsps_cur="list",  Cacc="list", Bacc="list", current_u="vector"),
+SRMLayer = setRefClass("SRMLayer", fields = list(weights = "list", id_conns = "list", 
+                                                 ids = "vector", len="vector", mean_acc="vector", mean_count="vector"),
                      methods = list(                       
                        initialize = function(N, start_weight, p_edge_prob=1, ninh=0) {
                          ids <<- get_unique_ids(N)
@@ -47,16 +47,11 @@ SRMLayer = setRefClass("SRMLayer", fields = list(weights = "list", id_conns = "l
                               weights[[i]][inh]  <<- -weights[[i]][inh]
                          }
                          
-                         len <<- N
-                         #stochastic <<- TRUE
+                         len <<- N                         
                          weights <<- weights                         
-                         mean_act <<- rep(0, N)
+                         mean_acc <<- rep(0, N)
+                         mean_count <<- 0
                          
-                         Cacc <<- lapply(1:N, function(ni) rep(0, length(id_conns[[ni]])))
-                         Bacc <<- lapply(1:N, function(ni) rep(0, length(id_conns[[ni]])))
-                         current_u <<- rep(0, N)
-                         #id_conns <<- id_conns       
-                         mean_act <<- rep(0, N)
                        },
                        connectFF = function(ids_to_connect, weight, neurons_to_connect=NULL) {
                          if(is.null(neurons_to_connect)) {
@@ -75,43 +70,16 @@ SRMLayer = setRefClass("SRMLayer", fields = list(weights = "list", id_conns = "l
                            id_conns[[ni]] <<- c(id_conns[[ni]], ids_to_connect[conn_exists,ni])                           
                            weights[[ni]] <<- c(weights[[ni]], weight[conn_exists,ni])
                          }
-                         Cacc <<- lapply(1:.self$len, function(ni) rep(0, length(id_conns[[ni]])))
-                         Bacc <<- lapply(1:.self$len, function(ni) rep(0, length(id_conns[[ni]])))
                        },
                        u = function(time, net) {
                          c(u, epsps_cur) := USRMsFull(time, constants, .self$ids, .self$id_conns, .self$weights, net)                         
                          .self$epsps_cur <- epsps_cur                         
-                         .self$current_u <- u
-                         .self$mean_act <- rep(0.01, .self$len) #.self$mean_act - .self$mean_act/1000 + probf(u)
+                         .self$current_u <- u                         
                          return(u)
                        },
                        uFull = function(time, net) {
                          USRMsFull(time, constants, .self$ids, .self$id_conns, .self$weights, net)
-                       },
-                       C = function(t, dt, net) {
-                         Y = sp_in_interval(net[.self$ids], t-dt, t)                                                  
-                         C_curr = lapply(1:.self$len, function(ni) {
-                           if(!is.null(Y[[ni]])) {                             
-                             .self$epsps_cur[[ni]]/probf(.self$current_u[ni]) - .self$epsps_cur[[ni]]
-                           } else {
-                             0 - .self$epsps_cur[[ni]]
-                           }
-                         })
-                         .self$Cacc <- lapply(1:.self$len, function(ni) .self$Cacc[[ni]]*0.99 + C_curr[[ni]])
-                         return(.self$Cacc)
-                       },
-                       B = function(t, dt, net) {
-                         Y = sp_in_interval(net[.self$ids], t-dt, t)                                                  
-                         B_curr = lapply(1:.self$len, function(ni) {
-                           if(!is.null(Y[[ni]])) {
-                             log(probf(.self$current_u[ni])/.self$mean_act[ni]) - (probf(.self$current_u[ni]) - .self$mean_act[ni])
-                           } else {
-                             0 - (probf(.self$current_u[ni]) - .self$mean_act[ni])
-                           }
-                         })
-                         .self$Bacc <- lapply(1:.self$len, function(ni) B_curr[[ni]])
-                         return(.self$Bacc)
-                       },
+                       },                      
                        u_one = function(num, t, net) {
                          USRM(t, constants, ids[num], id_conns[[num]], weights[[num]], net)
                        },

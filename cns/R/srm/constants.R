@@ -1,4 +1,6 @@
 
+seed_num = 1234
+
 #data cfg
 samples_from_dataset = 10
 
@@ -49,6 +51,7 @@ llh_depr_mode = 'no' # 75 spikes per window
 
 lr = 0.5
 rew_ampl = 1
+tc = 100
 
 epochs = 50
 weights_norm_type = 'no'
@@ -56,6 +59,6 @@ ws = 0.2
 target_rate = 5/sim_dim 
 target_rate_factor = 0.1
 weight_decay_factor = 0.026
-mean_time = 60*sim_dim
+mean_time =  1000 #60*sim_dim
 
-
+added_lrate = 1

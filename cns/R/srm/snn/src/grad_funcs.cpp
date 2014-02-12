@@ -17,6 +17,10 @@ double grab_epsp(const double &t, const SSynInput &ssyn) {
   return e_syn;
 }
 
+arma::vec Cintegrand(const arma::vec &t, void *data) {
+    SInput si = *(SInput*)data; 
+}
+
 
 NumericVector C_calc(bool Yspike, double p, NumericVector epsps) {
     NumericVector ans = - epsps;
@@ -31,6 +35,14 @@ double B_calc(bool Yspike, double p, double pmean, const List &constants) {
     if(Yspike) {
         ans += log(p/pmean);
     }
+    ans +=  as<double>(constants["target_rate_factor"])*(pmean-as<double>(constants["target_rate"]));
+    if(Yspike) {
+        ans -= as<double>(constants["target_rate_factor"])*log(pmean/as<double>(constants["target_rate"]));
+    }
     return ans;
+}
+
+double ratecalc(const double &weight, const List &constants) {
+    return 0.04 * pow(weight, 4)/( pow(weight, 4) + pow(as<double>(constants["ws"]), 4));
 }
 
