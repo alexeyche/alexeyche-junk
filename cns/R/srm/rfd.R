@@ -34,7 +34,7 @@ Tmax=1000
 dt=0.5
 N=10
 M=100
-start_w.N = 0.25
+start_w.N = 0.1
 start_w.M = 0.25
 
 gr1 = TSNeurons(M = M)
@@ -77,7 +77,7 @@ mean_act = NULL
 mean_act_ep = rep(0, N)
 mean_grads = list()
 mean_Cstat = list()
-for(ep in 1:100) {
+for(ep in 1:200) {
   net[1:length(net)] = -Inf
   counts = 0
   cumProbs = rep(0, N)
