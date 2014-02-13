@@ -27,22 +27,22 @@ u_rest <- -70 # mV
 
 
 # input spike train
-duration = 600
+duration = 500
 dt = 0.5
 sim_dim = 1000
 
 # net cfg
 N = 10
 M = 50
-net_edge_prob = 0.5
+net_edge_prob = 0.75
 inhib_frac = 0.0
 net_neurons_for_input = N
-afferent_per_neuron = ceiling(M/5)
+afferent_per_neuron = M
 
 # start weights
-start_w.M.mean = 0.5
+start_w.M.mean = 0.25
 start_w.M.sd = 0.01
-start_w.N.mean = 0.5
+start_w.N.mean = 0.25
 start_w.N.sd = 0.01
 
 # learning
@@ -51,12 +51,13 @@ llh_depr_mode = 'no' # 75 spikes per window
 
 tc = 100
 lr = 11
-epochs = 50
+epochs = 100
 weights_norm_type = 'no'
 ws = 0.2
 target_rate = 5/sim_dim 
 target_rate_factor = 0.1
 weight_decay_factor = 0.026
+
 mean_time =  1000 #60*sim_dim
 
 added_lrate = 1

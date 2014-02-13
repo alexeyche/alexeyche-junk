@@ -3,12 +3,12 @@
 args <- commandArgs(trailingOnly = FALSE)
 if(length(grep("RStudio", args))>0) {
   verbose = TRUE
-  dir='~/prog/sim/runs/test'
-  #dir='~/my/sim/runs/test'
-  data_dir = '~/prog/sim'
-  #data_dir = '~/my/sim'
-  setwd("~/prog/alexeyche-junk/cns/R/srm")
-  #setwd("~/my/git/alexeyche-junk/cns/R/srm")
+  #dir='~/prog/sim/runs/test'
+  dir='~/my/sim/runs/testrstudio'
+  #data_dir = '~/prog/sim'
+  data_dir = '~/my/sim'
+  #setwd("~/prog/alexeyche-junk/cns/R/srm")
+  setwd("~/my/git/alexeyche-junk/cns/R/srm")
   source('constants.R')
 } else {
   base_dir = dirname(substring( args[grep("--file=", args)], 8))
@@ -80,9 +80,9 @@ set.seed(1234)
 data = synth # synthetic control
 c(train_dataset, test_dataset) := read_ts_file(data, data_dir)
 elems = samples_from_dataset
-train_dataset = train_dataset[c(sample(1:50, elems), sample(51:100, elems))] #, sample(101:150,elems),
+train_dataset = train_dataset[c(sample(1:50, elems), sample(101:150, elems))] #, sample(101:150,elems),
 #                                sample(151:200, elems), sample(201:250,elems), sample(251:300,elems))] # cut
-test_dataset = test_dataset[c(sample(1:50, elems), sample(51:100, elems))]  #, sample(101:150, elems),
+test_dataset = test_dataset[c(sample(1:50, elems), sample(101:150, elems))]  #, sample(101:150, elems),
                               #sample(151:200, elems), sample(201:250,elems), sample(251:300, elems))]
 
 train_dataset = train_dataset[sample(1:length(train_dataset))]
@@ -105,12 +105,12 @@ gr2$loadPatterns(test_dataset, duration, dt, lambda=5)
 patt_len = length(gr1$patterns)
 
 connection = matrix(gr1$ids, nrow=length(gr1$ids), ncol=N)
-for(i in 1:net_neurons_for_input) {
-  cc = sample(gr1$ids, M-afferent_per_neuron)
-  connection[cc,i] = 0
-}
-if(net_neurons_for_input<N)
-  connection[,(net_neurons_for_input+1):N] = 0
+#for(i in 1:net_neurons_for_input) {
+#  cc = sample(gr1$ids, M-afferent_per_neuron)
+#  connection[cc,i] = 0
+#}
+#if(net_neurons_for_input<N)
+#  connection[,(net_neurons_for_input+1):N] = 0
 
 neurons$connectFF(connection, start_w.M, 1:N )
 
