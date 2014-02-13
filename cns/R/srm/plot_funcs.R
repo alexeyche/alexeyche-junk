@@ -1,4 +1,4 @@
-require(lattice)
+-require(lattice)
 
 plot_rastl <- function(raster, lab="") {
   x <- c()
@@ -54,3 +54,15 @@ plot_run_status = function(net, net_neurons, sim_out, pic_filename, descr) {
     dev.off()   
 }
 
+#wstat.df = NULL
+#for(x in 1:dim(sim_out$stat$wstat)[1]) {
+#  for(y in 1:dim(sim_out$stat$wstat)[2]) {
+#    wstat.df = cbind(wstat.df, sim_out$stat$wstat[x,y,])
+#  }
+#}
+
+#wstat.df = as.data.frame(wstat.df)
+#wstat.df = melt(wstat.df, measure.vars = names(wstat.df),  variable.name = 'grp', value.name = 'y') 
+#z = 1:dim(sim_out$stat$wstat)[3]
+#wstat.df$z = z
+#xyplot( y ~ z , data = wstat.df, groups = grp, type="l") 

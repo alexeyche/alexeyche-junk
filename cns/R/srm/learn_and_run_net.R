@@ -49,13 +49,13 @@ run_net <- function(input_neurons, net_neurons, ro, verbose=TRUE) {
         saveMatrixList(model_file, list(W))
     
         if((! is.null(ro$test_function))&&(ep %% ro$test_run_freq == 0)) {
-            o_train = evalNet(patterns, ro, constants, net_neurons$l)
-            o_test = evalNet(ro$test_patterns, ro, constants, net_neurons$l)
+            #o_train = evalNet(patterns, ro, constants, net_neurons$l)
+            #o_test = evalNet(ro$test_patterns, ro, constants, net_neurons$l)
             
-            curloss <- ro$test_function(o_train$spikes, o_test$spikes)
+            #curloss <- ro$test_function(o_train$spikes, o_test$spikes)
             
-            loss <- c(loss, curloss)
-            system( sprintf("echo %s > %s/%d.log", curloss, dir, ep))
+            #loss <- c(loss, curloss)
+            #system( sprintf("echo %s > %s/%d.log", curloss, dir, ep))
         }
     }
     return(loss)

@@ -65,7 +65,7 @@ SEXP simLayers(const List sim_options, const List constants, List layers, List n
                 IntegerVector id_conn = as<IntegerVector>(id_conns[ui]);
                 NumericVector weight = as<NumericVector>(weights[ui]);
                 
-                NumericVector C = C_calc(Yspike, p, epsps_current[ui]);
+                NumericVector C = C_calc(Yspike, p, epsps_current[ui], constants);
                 double B = B_calc(Yspike, p, mean_acc[ui]/(mean_count[0]+1), constants);
                 
                 NumericVector dw(id_conn.size());

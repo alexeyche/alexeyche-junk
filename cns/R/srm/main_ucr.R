@@ -3,12 +3,12 @@
 args <- commandArgs(trailingOnly = FALSE)
 if(length(grep("RStudio", args))>0) {
   verbose = TRUE
-  #dir='~/prog/sim/runs/test'
-  dir='~/my/sim/runs/test'
-  #data_dir = '~/prog/sim'
-  data_dir = '~/my/sim'
-  #setwd("~/prog/alexeyche-junk/cns/R/srm")
-  setwd("~/my/git/alexeyche-junk/cns/R/srm")
+  dir='~/prog/sim/runs/test'
+  #dir='~/my/sim/runs/test'
+  data_dir = '~/prog/sim'
+  #data_dir = '~/my/sim'
+  setwd("~/prog/alexeyche-junk/cns/R/srm")
+  #setwd("~/my/git/alexeyche-junk/cns/R/srm")
   source('constants.R')
 } else {
   base_dir = dirname(substring( args[grep("--file=", args)], 8))
@@ -127,11 +127,12 @@ run_options = list(T0 = 0, Tmax = duration, dt = dt,
                    seed_num = seed_num,
                    test_patterns = gr2$patterns, 
                    test_function = function(train_set, test_set) {
-                     Ktrain = lapply(train_set, function(act) kernelWindow_spikes(act, list(sigma = ro$fp_kernel_size, window = ro$fp_window_size, T0 = ro$T0, Tmax = ro$Tmax, quad = 256)) )                                                         
-                     Ktest = lapply(test_set, function(act) kernelWindow_spikes(act, list(sigma = ro$fp_kernel_size, window = ro$fp_window_size, T0 = ro$T0, Tmax = ro$Tmax, quad = 256)) )                                                         
+#                     Ktrain = lapply(train_set, function(act) kernelWindow_spikes(act, list(sigma = ro$fp_kernel_size, window = ro$fp_window_size, T0 = ro$T0, Tmax = ro$Tmax, quad = 256)) )                                                         
+#                     Ktest = lapply(test_set, function(act) kernelWindow_spikes(act, list(sigma = ro$fp_kernel_size, window = ro$fp_window_size, T0 = ro$T0, Tmax = ro$Tmax, quad = 256)) )                                                         
                      
-                     perf = ucr_test(Ktrain, Ktest, eucl_dist_alg, FALSE)
-                     return(perf$rate)
+#                     perf = ucr_test(Ktrain, Ktest, eucl_dist_alg, FALSE)
+#                     return(perf$rate)
+                     return(1)
                    }, evalTrial=test_trials, test_run_freq=5
 )
 
@@ -141,6 +142,7 @@ id_patt = 1
 patterns = gr1$patterns
 
 model_file = sprintf("%s/%s_%dx%d", dir, data, M, N)
+#model_file = "/home/alexeyche/prog/sim/runs/test/synthetic_control_50x10_49"
 if(runmode=="run") {
   if(file.exists(paste(model_file, ".idx", sep=""))) {  
     W = loadMatrix(model_file, 1)
@@ -157,6 +159,7 @@ if(runmode=="run") {
 
 net_neurons = SimLayers( list(neurons) )
 input_neurons = gr1
+ep=id_patt=1
 
 loss = run_net(gr1, net_neurons, run_options, verbose=verbose)
 

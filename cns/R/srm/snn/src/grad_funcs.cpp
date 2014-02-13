@@ -22,12 +22,12 @@ arma::vec Cintegrand(const arma::vec &t, void *data) {
 }
 
 
-NumericVector C_calc(bool Yspike, double p, NumericVector epsps) {
+NumericVector C_calc(bool Yspike, double p, NumericVector epsps, const List &constants) {
     NumericVector ans = - epsps;
     if(Yspike == true) {
         ans += epsps/p;
     }
-    return ans;
+    return ans; //* as<double>(constants["gain_factor"]);
 }
 
 double B_calc(bool Yspike, double p, double pmean, const List &constants) {

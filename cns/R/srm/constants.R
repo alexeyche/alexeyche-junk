@@ -27,22 +27,22 @@ u_rest <- -70 # mV
 
 
 # input spike train
-duration = 300
+duration = 600
 dt = 0.5
 sim_dim = 1000
 
 # net cfg
 N = 10
 M = 50
-net_edge_prob = 0.75
+net_edge_prob = 0.5
 inhib_frac = 0.0
 net_neurons_for_input = N
 afferent_per_neuron = ceiling(M/5)
 
 # start weights
-start_w.M.mean = 1
+start_w.M.mean = 0.5
 start_w.M.sd = 0.01
-start_w.N.mean = 1
+start_w.N.mean = 0.5
 start_w.N.sd = 0.01
 
 # learning
