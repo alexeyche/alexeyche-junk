@@ -6,7 +6,7 @@ SEXP evalNet(const List patterns, const List run_options, const List constants, 
     const double &Tmax = as<double>(run_options["Tmax"]);
     const double &dt = as<double>(run_options["dt"]);    
     const int &evalTrial = as<int>(run_options["evalTrial"]);    
-    List sim_options = List::create(Named("T0") = T0, Named("Tmax") = Tmax, Named("dt") = dt, Named("saveStat") = true) ;
+    List sim_options = List::create(Named("T0") = T0, Named("Tmax") = Tmax, Named("dt") = dt, Named("saveStat") = true, Named("learn") = false, Named("seed") = 0);
     
     List net_all(patterns.size()*evalTrial);
     List stat_all(patterns.size()*evalTrial);

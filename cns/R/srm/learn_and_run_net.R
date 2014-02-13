@@ -30,7 +30,7 @@ run_net <- function(input_neurons, net_neurons, ro, verbose=TRUE) {
                 cat("epoch: ", ep, ", pattern # ", id_patt, "\n", sep="")
                 
             pic_filename = sprintf("%s/run_ep%s_patt%s_label%s.png", dir, ep, id_patt, patterns[[id_patt]]$label)
-            plot_run_status(net, net_neurons, sim_out, pic_filename, 
+            plot_run_status(net, net_neurons, sim_out, loss, pic_filename, 
                             sprintf("epoch %d, pattern %d, class %d", 
                                     ep, id_patt, patterns[[id_patt]]$label))
 #            if(open_plots) system(sprintf("eog -w %s 1>/dev/null 2>/dev/null",pic_filename), ignore.stdout=TRUE, ignore.stderr=TRUE, wait=FALSE)
@@ -49,13 +49,13 @@ run_net <- function(input_neurons, net_neurons, ro, verbose=TRUE) {
         saveMatrixList(model_file, list(W))
     
         if((! is.null(ro$test_function))&&(ep %% ro$test_run_freq == 0)) {
-            #o_train = evalNet(patterns, ro, constants, net_neurons$l)
-            #o_test = evalNet(ro$test_patterns, ro, constants, net_neurons$l)
+            o_train = evalNet(patterns, ro, constants, net_neurons$l)
+            o_test = evalNet(ro$test_patterns, ro, constants, net_neurons$l)
             
-            #curloss <- ro$test_function(o_train$spikes, o_test$spikes)
+            curloss <- ro$test_function(o_train$spikes, o_test$spikes)
             
-            #loss <- c(loss, curloss)
-            #system( sprintf("echo %s > %s/%d.log", curloss, dir, ep))
+            loss <- c(loss, curloss)
+            system( sprintf("echo %s > %s/%d.log", curloss, dir, ep))
         }
     }
     return(loss)
