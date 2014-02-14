@@ -34,11 +34,11 @@ Tmax=1000
 dt=1
 N=10
 M=100
-start_w.N = 0.3
+start_w.N = 0.1
 start_w.M = 0.3
 
 gr1 = TSNeurons(M = M)
-neurons = SRMLayer(N, start_w.N, p_edge_prob=1)
+neurons = SRMLayer(N, start_w.N, p_edge_prob=0)
 connection = matrix(gr1$ids, nrow=length(gr1$ids), ncol=N)
 neurons$connectFF(connection, start_w.M, 1:N )
 
@@ -71,7 +71,7 @@ mean_act = NULL
 mean_act_ep = rep(0, N)
 mean_grads = list()
 mean_Cstat = list()
-for(ep in 1:400) {
+for(ep in 1:75) {
   net[1:length(net)] = -Inf
   counts = 0
   cumProbs = rep(0, N)
@@ -113,7 +113,8 @@ for(ep in 1:400) {
 #   mean_act = cumProbs/counts
   
 }
-#W = get_weights_matrix(list(neurons))
+W = get_weights_matrix(list(neurons))
+levelplot(W, col.regions=colorRampPalette(c("black", "white")))
 #saveMatrixList("/var/tmp/rfd.model", list(W))
 
 

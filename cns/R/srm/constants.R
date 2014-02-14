@@ -60,4 +60,4 @@ weight_decay_factor = 0.026
 
 mean_time =  1000 #60*sim_dim
 
-added_lrate = 1
+added_lrate = 2.5
