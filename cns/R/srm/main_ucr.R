@@ -3,12 +3,12 @@
 args <- commandArgs(trailingOnly = FALSE)
 if(length(grep("RStudio", args))>0) {
   verbose = TRUE
-  #dir='~/prog/sim/runs/test'
-  dir='~/my/sim/runs/testrstudio'
-  #data_dir = '~/prog/sim'
-  data_dir = '~/my/sim'
-  #setwd("~/prog/alexeyche-junk/cns/R/srm")
-  setwd("~/my/git/alexeyche-junk/cns/R/srm")
+  dir='~/prog/sim/runs/test'
+  #dir='~/my/sim/runs/testrstudio'
+  data_dir = '~/prog/sim'
+  #data_dir = '~/my/sim'
+  setwd("~/prog/alexeyche-junk/cns/R/srm")
+  #setwd("~/my/git/alexeyche-junk/cns/R/srm")
   source('constants.R')
 } else {
   base_dir = dirname(substring( args[grep("--file=", args)], 8))
@@ -127,12 +127,11 @@ run_options = list(T0 = 0, Tmax = duration, dt = dt,
                    seed_num = seed_num,
                    test_patterns = gr2$patterns, 
                    test_function = function(train_set, test_set) {
-#                     Ktrain = lapply(train_set, function(act) kernelWindow_spikes(act, list(sigma = ro$fp_kernel_size, window = ro$fp_window_size, T0 = ro$T0, Tmax = ro$Tmax, quad = 256)) )                                                         
-#                     Ktest = lapply(test_set, function(act) kernelWindow_spikes(act, list(sigma = ro$fp_kernel_size, window = ro$fp_window_size, T0 = ro$T0, Tmax = ro$Tmax, quad = 256)) )                                                         
+                     Ktrain = lapply(train_set, function(act) kernelWindow_spikes(act, list(sigma = ro$fp_kernel_size, window = ro$fp_window_size, T0 = ro$T0, Tmax = ro$Tmax, quad = 256)) )
+                     Ktest = lapply(test_set, function(act) kernelWindow_spikes(act, list(sigma = ro$fp_kernel_size, window = ro$fp_window_size, T0 = ro$T0, Tmax = ro$Tmax, quad = 256)) )
                      
-#                     perf = ucr_test(Ktrain, Ktest, eucl_dist_alg, FALSE)
-#                     return(perf$rate)
-                     return(1)
+                     perf = ucr_test(Ktrain, Ktest, eucl_dist_alg, FALSE)
+                     return(perf$rate)                     
                    }, evalTrial=test_trials, test_run_freq=5
 )
 

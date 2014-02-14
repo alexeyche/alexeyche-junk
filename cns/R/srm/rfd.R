@@ -1,11 +1,11 @@
 
 verbose = TRUE
-#dir='~/prog/sim/runs/test'
-dir='~/my/sim/runs/test'
-#data_dir = '~/prog/sim'
-data_dir = '~/my/sim'
-#setwd("~/prog/alexeyche-junk/cns/R/srm")
-setwd("~/my/git/alexeyche-junk/cns/R/srm")
+dir='~/prog/sim/runs/test'
+#dir='~/my/sim/runs/test'
+data_dir = '~/prog/sim'
+#data_dir = '~/my/sim'
+setwd("~/prog/alexeyche-junk/cns/R/srm")
+#setwd("~/my/git/alexeyche-junk/cns/R/srm")
 source('constants.R')
 source('srm_funcs.R')
 
@@ -24,7 +24,7 @@ source('util.R')
 source('gen_spikes.R')
 source('plot_funcs.R')
 source('neuron.R')
-
+source('serialize_to_bin.R')
 
 
 
@@ -90,7 +90,7 @@ for(ep in 1:1) {
       net[[ gr1$ids[fi] ]] = c(net[[ gr1$ids[fi] ]], curt)
     }
   }
-  sim_opt = list(T0=T0, Tmax=Tmax, dt=dt, saveStat=TRUE, seed=seed_num, learn=(ro$runmode == "learn"))
+  sim_opt = list(T0=T0, Tmax=Tmax, dt=dt, saveStat=TRUE, seed=seed_num, learn=TRUE)
   #if(ep < 11) {
   #  sim_opt$learn = FALSE
   #}
@@ -118,3 +118,7 @@ for(ep in 1:1) {
 #   mean_act = cumProbs/counts
   
 }
+#W = get_weights_matrix(list(neurons))
+#saveMatrixList("/var/tmp/rfd.model", list(W))
+
+

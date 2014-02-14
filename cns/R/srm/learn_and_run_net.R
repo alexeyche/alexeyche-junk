@@ -14,6 +14,7 @@ run_net <- function(input_neurons, net_neurons, ro, verbose=TRUE) {
     
     loss = NULL  
     stable = NULL  
+    
     sim_opt = list(T0=ro$T0, Tmax=ro$Tmax, dt=ro$dt, saveStat=ro$collect_stat, 
                    seed=ro$seed_num, learn=TRUE)
     

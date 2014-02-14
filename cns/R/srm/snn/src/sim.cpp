@@ -17,7 +17,7 @@ SEXP simLayers(const List sim_options, const List constants, List layers, List n
     arma::vec T = arma::linspace(T0, Tmax, (Tmax-T0)/dt);
    
     
-    arma::mat Cacc, stat, Bstat;
+    arma::mat Cacc, stat, Bstat, Istat;
     arma::cube dwstat, Cstat, wstat;
     
     if(saveStat) {
@@ -29,12 +29,12 @@ SEXP simLayers(const List sim_options, const List constants, List layers, List n
         Cacc = arma::mat(neurons_num, net.size(), arma::fill::zeros);
         stat = arma::mat(neurons_num, T.n_elem, arma::fill::zeros);
         Bstat = arma::mat(neurons_num, T.n_elem, arma::fill::zeros);
+        Istat = arma::mat(neurons_num, T.n_elem, arma::fill::zeros);
         dwstat = arma::cube(neurons_num, net.size(), T.n_elem, arma::fill::zeros);
         wstat = arma::cube(neurons_num, net.size(), T.n_elem, arma::fill::zeros);
         Cstat = arma::cube(neurons_num, net.size(), T.n_elem, arma::fill::zeros);
     }
     
-    int neurons_it = 0;
     for(size_t ti=0; ti<T.n_elem; ti++) {
         size_t neuron_it = 0;
         for(size_t li=0; li<layers.size(); li++) {
@@ -67,22 +67,24 @@ SEXP simLayers(const List sim_options, const List constants, List layers, List n
                 
                 NumericVector C = C_calc(Yspike, p, epsps_current[ui], constants);
                 double B = B_calc(Yspike, p, mean_acc[ui]/(mean_count[0]+1), constants);
-                
+                 
                 NumericVector dw(id_conn.size());
+                bool pr=false;
                 for(size_t idi=0; idi<id_conn.size(); idi++) {
-                    Cacc(neurons_it, id_conn[idi]-1) += (-Cacc(neurons_it, id_conn[idi]-1) + C[idi])/as<double>(constants["tc"]);
-                    dw[idi] = ratecalc(weight[idi], constants)*(Cacc(neurons_it, id_conn[idi]-1)*B - as<double>(constants["weight_decay_factor"])*fired[idi]*weight[idi]);
-                }                    
+                    Cacc(neuron_it, id_conn[idi]-1) += (-Cacc(neuron_it, id_conn[idi]-1) + C[idi])/as<double>(constants["tc"]);
+                    dw[idi] = ratecalc(weight[idi], constants)*(Cacc(neuron_it, id_conn[idi]-1)*B - as<double>(constants["weight_decay_factor"])*fired[idi]*weight[idi]);
+                }              
                 if(learn) {
                     weights[ui] = weight + as<double>(constants["added_lrate"])*dw;    
                 }
                 if(saveStat) {
+                    Istat(neuron_it, ti) = log(p/(mean_acc[ui]/(mean_count[0]+1)));
                     stat(neuron_it, ti) = p;
                     Bstat(neuron_it, ti) = B;
                     for(size_t idi=0; idi<id_conn.size(); idi++) {
-                        Cstat(neurons_it, id_conn[idi]-1, ti) = Cacc(neurons_it, id_conn[idi]-1);
-                        dwstat(neurons_it, id_conn[idi]-1, ti) = dw[idi];
-                        wstat(neurons_it, id_conn[idi]-1, ti) = weight[idi];
+                        Cstat(neuron_it, id_conn[idi]-1, ti) = Cacc(neuron_it, id_conn[idi]-1);
+                        dwstat(neuron_it, id_conn[idi]-1, ti) = dw[idi];
+                        wstat(neuron_it, id_conn[idi]-1, ti) = weight[idi];
                     }
                     neuron_it++;
                 }
@@ -92,7 +94,7 @@ SEXP simLayers(const List sim_options, const List constants, List layers, List n
         }
     }
     if(saveStat) {
-        return List::create(Named("stat") = List::create(Named("pstat") = stat, Named("Cstat") = Cstat, Named("Bstat") = Bstat, Named("dwstat") = dwstat, Named("wstat") = wstat) );
+        return List::create(Named("stat") = List::create(Named("pstat") = stat, Named("Cstat") = Cstat, Named("Bstat") = Bstat, Named("dwstat") = dwstat, Named("wstat") = wstat, Named("Istat") = arma::mean(Istat,1)) );
     } else {
         return List::create(Named("stat") = R_NilValue);
     }
