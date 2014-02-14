@@ -141,14 +141,14 @@ arma::vec integrand_prob(const arma::vec &t, void *data) {
 #define DEFAULT_QUAD 256
 
 // [[Rcpp::export]]
-SEXP probNoFire(const double T0, const double Tmax, Reference neurons, const List net, const List constants) {
+List probNoFire(const double T0, const double Tmax, Reference neurons, const List net, const List constants) {
     TProbNoFireData d(neurons, constants, net);
     arma::vec integral = gauss_legendre_vec(DEFAULT_QUAD, integrand_prob, as<int>(neurons.field("len")), (void*)&d, T0, Tmax);
     return List::create(Named("out") = arma::exp(-integral));
 }
 
 // [[Rcpp::export]]
-SEXP probInt(const double T0, const double Tmax, Reference neurons, const List net, const List constants) {
+List probInt(const double T0, const double Tmax, Reference neurons, const List net, const List constants) {
     TProbNoFireData d(neurons, constants, net);
     arma::vec integral = gauss_legendre_vec(DEFAULT_QUAD, integrand_prob, as<int>(neurons.field("len")), (void*)&d, T0, Tmax);
     return List::create(Named("out") = integral);

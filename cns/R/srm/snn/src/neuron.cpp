@@ -42,7 +42,7 @@ double stdp(const double &s, const SInput &si) {
     return(dw);
 }
 
-double binary_search(const double &t, const NumericVector &y) {
+size_t binary_search(const double &t, const NumericVector &y) {
     const size_t &s = y.size();
     if(s == 0) { printf("Binary search on empty Y\n"); return -9999; }
     if (y[0] > t) { return -9999; } 
@@ -60,7 +60,11 @@ double binary_search(const double &t, const NumericVector &y) {
     }
 
     last--;
-    return y[last];
+    return last;
+}
+
+double binary_search_value(const double &t, const NumericVector &y) {
+    return y[binary_search(t,y)];
 }
 
 // [[Rcpp::export]]
@@ -93,7 +97,7 @@ double u(const double &t, const SInput &si) {
         double suppr = 1;
         if(y.size() > 0) {
     //        printf("bs: %f \n", binary_search(t, y));
-            suppr = a(syn_sp[sp_it] - binary_search(t-0.01, y), si.c);
+            suppr = a(syn_sp[sp_it] - binary_search_value(t-0.01, y), si.c);
         }
         e_syn += si.w[id_it] * epsp(t-syn_sp[sp_it], si.c)*suppr;
         //printf("e_syn_after: %f\n", e_syn);

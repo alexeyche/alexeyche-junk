@@ -28,7 +28,7 @@ u_rest <- -70 # mV
 
 # input spike train
 duration = 500
-dt = 0.5
+dt = 1
 sim_dim = 1000
 
 # net cfg

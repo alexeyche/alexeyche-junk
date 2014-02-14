@@ -1,11 +1,11 @@
 
 verbose = TRUE
-dir='~/prog/sim/runs/test'
-#dir='~/my/sim/runs/test'
-data_dir = '~/prog/sim'
-#data_dir = '~/my/sim'
-setwd("~/prog/alexeyche-junk/cns/R/srm")
-#setwd("~/my/git/alexeyche-junk/cns/R/srm")
+#dir='~/prog/sim/runs/test'
+dir='~/my/sim/runs/test'
+#data_dir = '~/prog/sim'
+data_dir = '~/my/sim'
+#setwd("~/prog/alexeyche-junk/cns/R/srm")
+setwd("~/my/git/alexeyche-junk/cns/R/srm")
 source('constants.R')
 source('srm_funcs.R')
 
@@ -31,11 +31,11 @@ source('serialize_to_bin.R')
 ID_MAX=0
 T0=0
 Tmax=1000
-dt=0.5
+dt=1
 N=10
 M=100
-start_w.N = 0.1
-start_w.M = 0.25
+start_w.N = 0.3
+start_w.M = 0.3
 
 gr1 = TSNeurons(M = M)
 neurons = SRMLayer(N, start_w.N, p_edge_prob=1)
@@ -50,17 +50,11 @@ gaussian_kernel = Vectorize(function(s, sigma) {
 }, "s")
 
 
-get_synaptic_rates = function(mu) {
-  sigma=7
-  syn = 1:M - mu
-  if(mu>70) {
-    syn[1:30] = (syn[length(syn)]+1):(syn[length(syn)]+30)
-  } else 
-  if(mu<30) {
-    syn[100:71] = (syn[1]-1):(syn[1]-30)
-  }
-  return( (890*gaussian_kernel(syn, sigma)+1)/sim_dim )
-}
+vmax=50
+v0=1
+gauss_rates = Vectorize(function(k,j) {
+    ((vmax-v0)*exp(-0.01*( min( abs(j-k), 100-abs(j-k) ) )^2) + v0 )/sim_dim
+},"j")
 
 T0 = 0
 Tmax = 1000
@@ -77,7 +71,7 @@ mean_act = NULL
 mean_act_ep = rep(0, N)
 mean_grads = list()
 mean_Cstat = list()
-for(ep in 1:1) {
+for(ep in 1:400) {
   net[1:length(net)] = -Inf
   counts = 0
   cumProbs = rep(0, N)
@@ -85,19 +79,20 @@ for(ep in 1:1) {
     if(curt %% 200 == 0) {
       mu = sample( seq(1, 100, by=1), 1)
     }
-    syn_fired = ((get_synaptic_rates(mu)))*dt>runif(M)
+    syn_fired = (gauss_rates(mu, 1:M)*dt)>runif(M)
     for(fi in which(syn_fired==TRUE)) {
       net[[ gr1$ids[fi] ]] = c(net[[ gr1$ids[fi] ]], curt)
     }
   }
   sim_opt = list(T0=T0, Tmax=Tmax, dt=dt, saveStat=TRUE, seed=seed_num, learn=TRUE)
-  #if(ep < 11) {
-  #  sim_opt$learn = FALSE
-  #}
   s = sl$sim(sim_opt, net)
   mean_grads[[ep]] = apply(s$stat$dwstat, c(1,2), mean)
   mean_Cstat[[ep]] = apply(s$stat$Cstat, c(1,2), mean)
-  #W = get_weights_matrix(sl$l)
+  if(ep %% 60 == 0) {
+    W = get_weights_matrix(sl$l)
+    levelplot(W, col.regions=colorRampPalette(c("black", "white")))
+  }
+  cat("ep: ", ep, "\n")
 #     if((curt %% learn_window == 0) && (curt>0) && (!is.null(mean_act))) {
 #       gr = grad_func(neurons, curt-learn_window, curt, net, mean_act)
 #       

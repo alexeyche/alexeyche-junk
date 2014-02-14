@@ -1,5 +1,6 @@
 #include "sim.h"
 #include "grad_funcs.h"
+#include "integrate.h"
 
 // [[Rcpp::export]]
 SEXP simLayers(const List sim_options, const List constants, List layers, List net) {
@@ -19,7 +20,7 @@ SEXP simLayers(const List sim_options, const List constants, List layers, List n
     
     arma::mat Cacc, stat, Bstat, Istat;
     arma::cube dwstat, Cstat, wstat;
-    
+    double Istat_freq;
     if(saveStat) {
         int neurons_num = 0;
         for(size_t li=0; li<layers.size(); li++) {
@@ -29,7 +30,9 @@ SEXP simLayers(const List sim_options, const List constants, List layers, List n
         Cacc = arma::mat(neurons_num, net.size(), arma::fill::zeros);
         stat = arma::mat(neurons_num, T.n_elem, arma::fill::zeros);
         Bstat = arma::mat(neurons_num, T.n_elem, arma::fill::zeros);
-        Istat = arma::mat(neurons_num, T.n_elem, arma::fill::zeros);
+        Istat_freq = 500; 
+        Istat = arma::mat(neurons_num, (Tmax-T0)/Istat_freq, arma::fill::zeros);
+        Pacc = arma::vec(neurons_numm arma::fill::ones);
         dwstat = arma::cube(neurons_num, net.size(), T.n_elem, arma::fill::zeros);
         wstat = arma::cube(neurons_num, net.size(), T.n_elem, arma::fill::zeros);
         Cstat = arma::cube(neurons_num, net.size(), T.n_elem, arma::fill::zeros);
@@ -78,7 +81,8 @@ SEXP simLayers(const List sim_options, const List constants, List layers, List n
                     weights[ui] = weight + as<double>(constants["added_lrate"])*dw;    
                 }
                 if(saveStat) {
-                    Istat(neuron_it, ti) = log(p/(mean_acc[ui]/(mean_count[0]+1)));
+                    if(Yspike)
+                        Pacc(neuron_it) *= p;
                     stat(neuron_it, ti) = p;
                     Bstat(neuron_it, ti) = B;
                     for(size_t idi=0; idi<id_conn.size(); idi++) {
@@ -91,10 +95,16 @@ SEXP simLayers(const List sim_options, const List constants, List layers, List n
             }
             mean_count[0] = mean_count[0] + 1;
             layer.field("mean_count") = mean_count; 
+            
+            if( (saveStat) && (T[ti] % Istat_freq == 0) && (T[ti] > 0) ) {
+                NumericVector pnf = probNoFire(T[ti]-Istat_freq, T[ti], layer, net, constants)["out"];
+                Istat.col( (T[ti]/Istat_freq)-1) = pnf*Pacc;
+                Pacc.fill(1);
+            }
         }
     }
     if(saveStat) {
-        return List::create(Named("stat") = List::create(Named("pstat") = stat, Named("Cstat") = Cstat, Named("Bstat") = Bstat, Named("dwstat") = dwstat, Named("wstat") = wstat, Named("Istat") = arma::mean(Istat,1)) );
+        return List::create(Named("stat") = List::create(Named("pstat") = stat, Named("Cstat") = Cstat, Named("Bstat") = Bstat, Named("dwstat") = dwstat, Named("wstat") = wstat, Named("Istat") = Istat) );
     } else {
         return List::create(Named("stat") = R_NilValue);
     }
