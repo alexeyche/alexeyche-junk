@@ -21,25 +21,23 @@ arma::vec Cintegrand(const arma::vec &t, void *data) {
     SInput si = *(SInput*)data; 
 }
 
-
 NumericVector C_calc(bool Yspike, double p, NumericVector epsps, const List &constants) {
-    NumericVector ans = - epsps;
-    if(Yspike == true) {
-        ans += epsps/p;
-    }
-    return ans; //* as<double>(constants["gain_factor"]);
+    const double gain_factor = as<double>(constants["gain_factor"]);
+    const double dt = as<double>(constants["dt"]);
+//    static bool pr2 = false;
+//    if(!pr2) std::cout << "gain_factor: " << gain_factor << "\n";
+//    pr2=true; 
+    return ( gain_factor/p ) * ( Yspike - p ) * epsps / 1000;
 }
 
+
 double B_calc(bool Yspike, double p, double pmean, const List &constants) {
-    double ans = - ( p - pmean );
-    if(Yspike) {
-        ans += log(p/pmean);
-    }
-    ans +=  as<double>(constants["target_rate_factor"])*(pmean-as<double>(constants["target_rate"]));
-    if(Yspike) {
-        ans -= as<double>(constants["target_rate_factor"])*log(pmean/as<double>(constants["target_rate"]));
-    }
-    return ans;
+    const double gamma = as<const double>(constants["target_rate_factor"]);
+    const double targ_rate = as<double>(constants["target_rate"])/1000;
+//    static bool pr = false;
+//    if(!pr) std::cout << "gamma: " << gamma << " " << " targ_rate " << targ_rate << "\n";
+//    pr=true; 
+    return ((Yspike*log(p/pmean) - (p - pmean)) - gamma * ( Yspike * log( pmean/targ_rate) - (pmean - targ_rate) ));
 }
 
 double ratecalc(const double &weight, const List &constants) {

@@ -69,6 +69,10 @@ simLayers_old <- function(sim_options, constants, layers, net) {
     .Call('snn_simLayers_old', PACKAGE = 'snn', sim_options, constants, layers, net)
 }
 
+generateCorrPoiss <- function(M, r, corr, T0, Tmax, dt, tauc) {
+    .Call('snn_generateCorrPoiss', PACKAGE = 'snn', M, r, corr, T0, Tmax, dt, tauc)
+}
+
 timesTwo <- function(x) {
     .Call('snn_timesTwo', PACKAGE = 'snn', x)
 }

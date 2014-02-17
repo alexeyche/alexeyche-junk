@@ -58,7 +58,7 @@ u_srm <- function(t, x, y, w) {
 }
 
 probf = function(u) {
-  (pr + (u -u_rest)*gain_factor)/sim_dim
+  pr + (u -u_rest)*gain_factor
 }
 
 a_suppr = Vectorize(function(s) {

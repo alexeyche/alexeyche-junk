@@ -12,7 +12,7 @@ source('llh.R')
 source('srm.R')
 ID_MAX=0
 constants = list(dt=dt, e0=e0, ts=ts, tm=tm, u_abs=u_abs, u_r=u_r, trf=trf, trs=trs, 
-                 dr=dr, alpha=alpha, beta=beta, tr=tr, u_rest=u_rest, pr=pr, gain_factor=gain_factor, ta=ta, sim_dim=sim_dim)
+                 dr=dr, alpha=alpha, beta=beta, tr=tr, u_rest=u_rest, pr=pr, gain_factor=gain_factor, ta=ta)
 
 M = 50
 N = 5

@@ -6,8 +6,8 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 
-#define EPSP_WORK_WINDOW 100
-#define NU_WORK_WINDOW 100
+#define EPSP_WORK_WINDOW 200
+#define NU_WORK_WINDOW 200
 double nu(const double &s, const List &c);
 double epsp(const double s, const List &c);
 double u(const double &t, const SInput &si);

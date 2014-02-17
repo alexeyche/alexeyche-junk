@@ -64,7 +64,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // probNoFire
-SEXP probNoFire(const double T0, const double Tmax, Reference neurons, const List net, const List constants);
+List probNoFire(const double T0, const double Tmax, Reference neurons, const List net, const List constants);
 RcppExport SEXP snn_probNoFire(SEXP T0SEXP, SEXP TmaxSEXP, SEXP neuronsSEXP, SEXP netSEXP, SEXP constantsSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
@@ -75,7 +75,7 @@ BEGIN_RCPP
         Rcpp::traits::input_parameter< Reference >::type neurons(neuronsSEXP );
         Rcpp::traits::input_parameter< const List >::type net(netSEXP );
         Rcpp::traits::input_parameter< const List >::type constants(constantsSEXP );
-        SEXP __result = probNoFire(T0, Tmax, neurons, net, constants);
+        List __result = probNoFire(T0, Tmax, neurons, net, constants);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);
@@ -83,7 +83,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // probInt
-SEXP probInt(const double T0, const double Tmax, Reference neurons, const List net, const List constants);
+List probInt(const double T0, const double Tmax, Reference neurons, const List net, const List constants);
 RcppExport SEXP snn_probInt(SEXP T0SEXP, SEXP TmaxSEXP, SEXP neuronsSEXP, SEXP netSEXP, SEXP constantsSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
@@ -94,7 +94,7 @@ BEGIN_RCPP
         Rcpp::traits::input_parameter< Reference >::type neurons(neuronsSEXP );
         Rcpp::traits::input_parameter< const List >::type net(netSEXP );
         Rcpp::traits::input_parameter< const List >::type constants(constantsSEXP );
-        SEXP __result = probInt(T0, Tmax, neurons, net, constants);
+        List __result = probInt(T0, Tmax, neurons, net, constants);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);
@@ -311,6 +311,27 @@ BEGIN_RCPP
         Rcpp::traits::input_parameter< List >::type layers(layersSEXP );
         Rcpp::traits::input_parameter< List >::type net(netSEXP );
         SEXP __result = simLayers_old(sim_options, constants, layers, net);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}
+// generateCorrPoiss
+SEXP generateCorrPoiss(int M, double r, double corr, double T0, double Tmax, double dt, double tauc);
+RcppExport SEXP snn_generateCorrPoiss(SEXP MSEXP, SEXP rSEXP, SEXP corrSEXP, SEXP T0SEXP, SEXP TmaxSEXP, SEXP dtSEXP, SEXP taucSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< int >::type M(MSEXP );
+        Rcpp::traits::input_parameter< double >::type r(rSEXP );
+        Rcpp::traits::input_parameter< double >::type corr(corrSEXP );
+        Rcpp::traits::input_parameter< double >::type T0(T0SEXP );
+        Rcpp::traits::input_parameter< double >::type Tmax(TmaxSEXP );
+        Rcpp::traits::input_parameter< double >::type dt(dtSEXP );
+        Rcpp::traits::input_parameter< double >::type tauc(taucSEXP );
+        SEXP __result = generateCorrPoiss(M, r, corr, T0, Tmax, dt, tauc);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);

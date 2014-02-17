@@ -29,7 +29,7 @@ double a(const double &s, const List &c) {
 }
 
 double g(const double &u, const List &c) {
-    return( (as<double>(c["pr"]) + (u - as<double>(c["u_rest"]))*as<double>(c["gain_factor"]))/as<double>(c["sim_dim"]) );
+    return (as<double>(c["pr"]) + (u - as<double>(c["u_rest"]))*as<double>(c["gain_factor"]))/1000;
 }
 
 double stdp(const double &s, const SInput &si) {
@@ -46,7 +46,7 @@ size_t binary_search(const double &t, const NumericVector &y) {
     const size_t &s = y.size();
     if(s == 0) { printf("Binary search on empty Y\n"); return -9999; }
     if (y[0] > t) { return -9999; } 
-    if (y[s-1] <= t) { return y[s-1];}
+    if (y[s-1] <= t) { return s-1;}
     size_t first = 0;
     size_t last= s;
     size_t mid = first + (last-first)/2;
@@ -96,11 +96,11 @@ double u(const double &t, const SInput &si) {
         //printf("e_syn_before: %f\n", e_syn);
         double suppr = 1;
         if(y.size() > 0) {
-    //        printf("bs: %f \n", binary_search(t, y));
+            //printf("bs: %f \n", binary_search(t, y));
             suppr = a(syn_sp[sp_it] - binary_search_value(t-0.01, y), si.c);
         }
         e_syn += si.w[id_it] * epsp(t-syn_sp[sp_it], si.c)*suppr;
-        //printf("e_syn_after: %f\n", e_syn);
+       // printf("e_syn_after: %f\n", e_syn);
                
     }
     
@@ -129,7 +129,7 @@ arma::vec neuron_epsp_calc(const double &t, const SInput &si) {
         double suppr = 1;
         if(y.size() > 0) {
     //        printf("bs: %f \n", binary_search(t, y));
-            suppr = a(syn_sp[sp_it] - binary_search(t-0.01, y), si.c);
+            suppr = a(syn_sp[sp_it] - binary_search_value(t-0.01, y), si.c);
         }
         epsp_out(id_it) += epsp(t-syn_sp[sp_it], si.c)*suppr;
         //printf("e_syn_after: %f\n", e_syn);
@@ -257,6 +257,7 @@ List uFull(const double &t, const SInput &si) {
   const NumericVector &y(si.net[si.id[0]-1]);
   
   NumericVector e_syn(si.id_conn.size());
+  NumericVector a_syn(si.id_conn.size(), 1.0);
   IntegerVector fired(si.id_conn.size());
   for(size_t id_it=0; id_it < si.id_conn.size(); id_it++) {
     const int &syn_sp_i = si.id_conn[id_it];
@@ -264,7 +265,8 @@ List uFull(const double &t, const SInput &si) {
     const NumericVector &syn_sp(si.net[syn_sp_i-1]);
     
     //for(size_t tti=0; tti<syn_sp.size(); tti++) printf("syn_sp[%d] = %f\n", tti, syn_sp[tti]);
-    
+
+    double ylast = binary_search_value(t-0.01, y);
     for(int sp_it= syn_sp.size()-1; sp_it>=0; sp_it--) {
         double s = t-syn_sp[sp_it];
         if(s > EPSP_WORK_WINDOW) {
@@ -277,21 +279,20 @@ List uFull(const double &t, const SInput &si) {
         if(s<=si.get_c("dt")+0.01) {
             fired[id_it] = 1;
         }
-        //printf("w[%d] = %f\n", id_it, si.w[id_it]);
-        //printf("e_syn_before: %f\n", e_syn);
-        double suppr = 1;
+//        printf("w[%d] = %f\n", id_it, si.w[id_it]);
+//        printf("e_syn_before: %f\n", e_syn[id_it]);
         if(y.size() > 0) {
-    //        printf("bs: %f \n", binary_search(t, y));
-            suppr = a(syn_sp[sp_it] - binary_search(t-0.01, y), si.c);
+    //            printf("bs: %f \n", binary_search(t, y));
+            a_syn[id_it] = a(syn_sp[sp_it] - ylast, si.c);
         }
-        e_syn[id_it] += epsp(t-syn_sp[sp_it], si.c)*suppr;
-        //printf("e_syn_after: %f\n", e_syn);
-               
+        e_syn[id_it] += epsp(t-syn_sp[sp_it], si.c);
+//        printf("e_syn_after: %f\n", e_syn[id_it]);
+                       
     }
     
   }
-  NumericVector e_syn_w = e_syn * si.w;
-  return List::create(Named("u") = si.get_c("u_rest") + std::accumulate(e_syn_w.begin(), e_syn_w.end(), 0.0), Named("epsp") = e_syn, Named("fired") = fired);
+  NumericVector e_syn_w = e_syn * si.w * a_syn;
+  return List::create(Named("u") = si.get_c("u_rest") + std::accumulate(e_syn_w.begin(), e_syn_w.end(), 0.0), Named("epsp") = e_syn * a_syn, Named("fired") = fired);
 }
 
 // [[Rcpp::export]]

@@ -7,10 +7,10 @@ samples_from_dataset = 10
 # epsp
 e0 <- 1 # mV
 ts <- 1 # ms
-tm <- 20 # ms
+tm <- 20 #*10^-3 # ms
 
 # epsp suppr
-ta = 50
+ta = 50 #*10^-3
 
 refr_mode = 'high' # 'middle', 'low'
 
@@ -29,7 +29,7 @@ u_rest <- -70 # mV
 # input spike train
 duration = 500
 dt = 1
-sim_dim = 1000
+
 
 # net cfg
 N = 10
@@ -54,10 +54,9 @@ lr = 11
 epochs = 100
 weights_norm_type = 'no'
 ws = 0.2
-target_rate = 5/sim_dim 
+target_rate = 5 # Hz
 target_rate_factor = 0.1
 weight_decay_factor = 0.026
 
-mean_time =  1000 #60*sim_dim
 
-added_lrate = 2.5
+added_lrate = 1
