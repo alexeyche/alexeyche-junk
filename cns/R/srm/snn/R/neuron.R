@@ -4,10 +4,11 @@
 SRMLayerClass = setRefClass("SRMLayerClass", fields = c("obj"),
                      methods = list(                       
                        initialize = function(N, start_weight, p_edge_prob, ninh=0) {
-                         obj <<- new(SRMLayer, N, start_weight, p_edge_prob, ninh)
-                         ids <<- get_unique_ids(N)
+                         obj <<- new(SRMLayer, N)
+                         ids <- get_unique_ids(N)
                          obj$W <<- list()
                          obj$id_conns <<- list()                         
+                         obj$syn <<- list()
                          if( is.matrix(start_weight) ) {
                            start_w = start_weight
                          } else {
@@ -27,6 +28,7 @@ SRMLayerClass = setRefClass("SRMLayerClass", fields = c("obj"),
                            inh = obj$id_conns[[i]] %in% inh_idxs
                            if(any(inh))
                               obj$W[[i]][inh]  <<- -weights[[i]][inh]
+                           obj$syn[[i]] <<- rep(0, length(obj$W[[i]]))
                          }
                          
                          obj$N <<- N
