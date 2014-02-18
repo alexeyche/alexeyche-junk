@@ -68,7 +68,7 @@ public:
                         incr(incr_)
     {}
     SRMLayer(const SRMLayer &l) : N(l.N), ids(l.ids), W(l.W), id_conns(l.id_conns), syn(l.syn), a(l.a), C(l.C), pacc(l.pacc), incr(l.incr) {}
-    SRMLayer(int N_) : N(N_), ids(N), a(N, arma::fill::zeros), C(N), W(N), id_conns(N), syn(N), pacc(N, fill::zeros), incr(0) { }
+    SRMLayer(int N_) : N(N_), ids(N), a(N, arma::fill::zeros), C(N), W(N), id_conns(N), syn(N), pacc(N, arma::fill::zeros), incr(0) { }
 
     void prepare(const List &c) {
         stat_p.clear(); stat_u.clear(); stat_B.clear(); stat_C.clear(); stat_W.clear();
@@ -165,6 +165,7 @@ public:
             layers[li]->saveStat = saveStat;
             num_neurons += layers[li]->N;
         }
+        cout << num_neurons << "num\n";
         if(num_neurons > net.size()) {
            ::Rf_error( "net list is less than size of layers\n");
         }
@@ -184,7 +185,7 @@ namespace Rcpp {
             return call.eval();
     };
 
-    template <> SRMLayer as<SRMLayer>( SEXP s ) throw(not_compatible) {
+    template <> SRMLayer as<SRMLayer>( SEXP s )  { // throw(not_compatible) {
             try {
                 if ( TYPEOF(s) != S4SXP ) {
                     ::Rf_error( "supplied object is not of type SRMLayer." );
@@ -198,7 +199,7 @@ namespace Rcpp {
                 Rcpp::Environment env( s4obj );
                 Rcpp::XPtr<SRMLayer> xptr( env.get(".pointer") );
 
-                    return SRMLayer(xptr->N, xptr->ids, xptr->W, xptr->id_conns, xptr->syn, xptr->a, xptr->C, xptr->pacc );
+                    return SRMLayer(xptr->N, xptr->ids, xptr->W, xptr->id_conns, xptr->syn, xptr->a, xptr->C, xptr->pacc, xptr->incr );
             }
             catch(...) {
                 ::Rf_error( "supplied object could not be converted to SRMLayer." );
@@ -221,6 +222,8 @@ RCPP_MODULE(snnMod){
     .field("stat_B", &SRMLayer::stat_B, "Statistics of B")
     .field("stat_C", &SRMLayer::stat_C, "Statistics of C")
     .field("stat_W", &SRMLayer::stat_W, "Statistics of W")
+    .field("pacc", &SRMLayer::pacc, "Accum for p")
+    .field("incr", &SRMLayer::incr, "Increment of simulations")
     .method("prepare", &SRMLayer::prepare)
     ;
     class_<SIM>( "SIM" )

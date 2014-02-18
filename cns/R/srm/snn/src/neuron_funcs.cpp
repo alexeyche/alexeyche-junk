@@ -17,6 +17,7 @@ arma::vec C_calc(bool Yspike, double p, arma::vec  epsps, const List &c) {
 double B_calc(bool Yspike, double p, double pmean, const List &c) {
     const double gamma = as<const double>(c["target_rate_factor"]);
     const double targ_rate = as<double>(c["target_rate"])/as<double>(c["sim_dim"]);
+//    std::cout << "Yspike " << float(Yspike) << " p " << p << " pmean " << pmean << "\n";
     return ((Yspike*log(p/pmean) - (p - pmean)) - gamma * ( Yspike * log( pmean/targ_rate) - (pmean - targ_rate) ));
 }
 
