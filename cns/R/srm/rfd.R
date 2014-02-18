@@ -30,11 +30,11 @@ ID_MAX=0
 dt=1
 N=10
 M=100
-start_w.N = 0.25
-start_w.M = 0.25
+start_w.N = 0.05
+start_w.M = 0.05
 
 gr1 = TSNeurons(M = M)
-neurons = SRMLayerClass$new(N, start_w.N, p_edge_prob=0.25)
+neurons = SRMLayerClass$new(N, start_w.N, p_edge_prob=0.1)
 connection = matrix(gr1$ids, nrow=length(gr1$ids), ncol=N)
 neurons$connectFF(connection, start_w.M, 1:N )
 
@@ -49,7 +49,7 @@ T = seq(T0, Tmax, by=dt)
 
 Wacc = vector("list",N)
 
-for(ep in 1:1) {
+for(ep in 31:50) {
   file = sprintf("%s/ep_%d_%4.1fsec", dir2save, ep, Tmax/sim_dim)
   net_m = loadMatrix(file, 1)
   net = list()
@@ -71,6 +71,7 @@ for(ep in 1:1) {
     Wacc[[i]] = cbind(Wacc[[i]], colMeans(Wm[((Tmax/2)+1):Tmax,]) )
   }
 }
+c1 = list_to_matrix(neurons$obj$stat_C[[1]])[,1]
 W = list_to_matrix(neurons$obj$W)
 levelplot(t(W), col.regions=colorRampPalette(c("black", "white")))
 levelplot(t(Wacc[[1]]) , col.regions=colorRampPalette(c("black", "white")))

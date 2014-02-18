@@ -157,15 +157,14 @@ public:
         const double dt = as<double>(sim_options["dt"]);    
         const bool saveStat = as<bool>(sim_options["saveStat"]);    
         const bool learn = as<bool>(sim_options["learn"]);    
-        arma::vec T = arma::linspace(T0, Tmax, (Tmax-T0)/dt);
-        
+        arma::vec T = arma::linspace(T0, Tmax, (Tmax-T0)/dt + 1);
+
         int num_neurons = 0;
         for(size_t li=0; li<layers.size(); li++) {
             layers[li]->prepare(constants);
             layers[li]->saveStat = saveStat;
             num_neurons += layers[li]->N;
         }
-        cout << num_neurons << "num\n";
         if(num_neurons > net.size()) {
            ::Rf_error( "net list is less than size of layers\n");
         }
