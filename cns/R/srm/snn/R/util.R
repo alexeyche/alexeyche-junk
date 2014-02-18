@@ -35,3 +35,13 @@ plotl <- function(x) {
         invisible()
     }    
 }
+
+list_to_matrix = function(l) {
+  maxw_len = 0
+  invisible(sapply(l, function(n) maxw_len<<-max(maxw_len, length(n))))
+  m = matrix(0, nrow=length(l), ncol=maxw_len)
+  for(sp_i in 1:length(l)) {
+    m[sp_i,] = c(l[[sp_i]], rep(0, maxw_len - length(l[[sp_i]]) ) )
+  }
+  return(m)
+}

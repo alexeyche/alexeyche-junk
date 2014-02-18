@@ -33,7 +33,7 @@ sim_dim = 1000
 
 # net cfg
 N = 10
-M = 50
+M = 100
 net_edge_prob = 0.75
 inhib_frac = 0.0
 net_neurons_for_input = N

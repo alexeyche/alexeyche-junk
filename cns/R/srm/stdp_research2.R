@@ -3,12 +3,12 @@
 library(snn)
 
 verbose = TRUE
-#dir='~/prog/sim/runs/test'
-dir='~/my/sim/runs/test'
-#data_dir = '~/prog/sim'
-data_dir = '~/my/sim'
-#setwd("~/prog/alexeyche-junk/cns/R/srm")
-setwd("~/my/git/alexeyche-junk/cns/R/srm")
+dir='~/prog/sim/runs/test'
+#dir='~/my/sim/runs/test'
+data_dir = '~/prog/sim'
+#data_dir = '~/my/sim'
+setwd("~/prog/alexeyche-junk/cns/R/srm")
+#setwd("~/my/git/alexeyche-junk/cns/R/srm")
 source('constants.R')
 source('srm_funcs.R')
 
@@ -45,5 +45,9 @@ net[[3]] = numeric(0)
 
 s$sim(sim_opt, constants, net)
 
-#plotl(l$obj$stat_p[[1]])
-
+plotl(l$obj$stat_p[[1]])
+Cm = list_to_matrix(l$obj$stat_C[[1]])
+Wm = list_to_matrix(l$obj$stat_W[[1]])
+plotl(Wm[,1])
+plotl(Wm[,2])
+plotl(l$obj$stat_B[[1]])
