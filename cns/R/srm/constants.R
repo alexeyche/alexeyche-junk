@@ -27,14 +27,14 @@ u_rest <- -70 # mV
 
 
 # input spike train
-duration = 1500
+duration = 2000
 dt = 1
 sim_dim = 1000
 
 # net cfg
 N = 10
 M = 100
-net_edge_prob = 0.5
+net_edge_prob = 0.0
 inhib_frac = 0.0
 net_neurons_for_input = N
 afferent_per_neuron = M
@@ -51,7 +51,7 @@ llh_depr_mode = 'no' # 75 spikes per window
 
 tc = 100
 lr = 11
-epochs = 200
+epochs = 400
 weights_norm_type = 'no'
 ws = 0.2
 target_rate = 5 # Hz
