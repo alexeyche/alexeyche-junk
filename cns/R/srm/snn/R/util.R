@@ -66,11 +66,11 @@ get_weights_matrix <- function(layers) {
       }
     }))
   }
-  W = matrix(0, nrow=max_conn_id, ncol=sum(sapply(layers, function(n) n$len)))
+  W = matrix(0, nrow=max_conn_id, ncol=sum(sapply(layers, function(n) n$len())))
   
   n = layers[[1]]
   for(ni in 1:n$len()) {
-    for(syn_num in 1:length(n$id_conns[[ni]])) {
+    for(syn_num in 1:length(n$id_conns()[[ni]])) {
       W[ n$id_conns()[[ni]][syn_num] , ni] = n$W()[[ni]][syn_num]
     }
   } 
