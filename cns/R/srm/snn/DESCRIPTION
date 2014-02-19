@@ -7,5 +7,5 @@ Author: alexeyche
 Maintainer: Alexey Chernyshev <alexey.chernushev@gmail.com>
 Description: Package contains a bunch of Spiking Neural Networks methods 
 License:  GPL (>=2)
-Depends: Rcpp (>= 0.10.6), RcppArmadillo
+Depends: Rcpp (>= 0.10.6), RcppArmadillo, zoo
 LinkingTo: Rcpp RcppArmadillo

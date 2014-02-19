@@ -47,6 +47,7 @@ list_to_matrix = function(l) {
 }
 
 blank_net = function(N) {
+    if(N<=0) return(list())
     net = list()
     for(i in 1:N) {
         net[[i]] = numeric(0)
@@ -75,4 +76,22 @@ get_weights_matrix <- function(layers) {
     }
   } 
   return(W)
+}
+gr_pl = function(m) {
+  levelplot(m, col.regions=colorRampPalette(c("black", "white")))
+}
+
+loadWeightsFromFile = function(n, model_file) {
+  if(file.exists(paste(model_file, ".idx", sep=""))) {  
+    W = loadMatrix(model_file, 1)
+    invisible(sapply(1:N, function(id) { 
+      id_to_conn = which(W[,id] != 0)
+      n$obj$W[[id]] <<- W[id_to_conn, id] 
+      n$obj$id_conns[[id]] <<- id_to_conn
+    }))  
+    cat("Load - Ok\n")
+  } else {
+    cat("Can't find file for model ", model_file, "\n")
+  }
+  
 }

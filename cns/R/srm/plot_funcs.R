@@ -33,7 +33,7 @@ plot_run_status = function(net, neurons, loss, pic_filename, descr) {
     id_n = neurons$ids()
     not_fired = all(sapply(net[id_n], function(sp) length(sp) == 1))
     
-    png(pic_filename, width=1824, height=1024)
+    png(pic_filename, width=1024, height=768)
     if(!not_fired) 
       p1 = plot_rastl(net, descr)
 

@@ -31,8 +31,8 @@ TSNeurons <- setRefClass("TSNeurons", fields = list(M = "vector", patterns = "li
                                         approx_data[ct] = rawdata[ri]
                                       }
                                       
-                                      #approx_data = na.approx(approx_data)
-                                      #approx_data = approx_data[!is.na(approx_data)]
+                                      approx_data = na.approx(approx_data)
+                                      approx_data = approx_data[!is.na(approx_data)]
                                       
                                       gen_spikes = vector("list", M)
                                                                        
@@ -55,9 +55,10 @@ TSNeurons <- setRefClass("TSNeurons", fields = list(M = "vector", patterns = "li
                                         neurons_rate[neurons_rate < 0] = 0
                                         t = t + simdt
                                       }
-                                      gen_spikes[sapply(gen_spikes, is.null)] = -Inf
+                                      null_ids = which( sapply(gen_spikes, is.null) == TRUE )
+                                      gen_spikes[null_ids] = blank_net(length(null_ids))
                                       patt$data <- gen_spikes
-                                      patterns[[l+1]] <<- patt                          
+                                      patterns[[l+1]] <<- patt                    
                                     },
                                     loadPatternFromFile = function(file, pattDur, class, simdt, lambda=4, hb=NULL, lb=NULL) {
                                       rawdata <- c(read.table(file, sep=",")[,1])

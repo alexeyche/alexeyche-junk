@@ -3,12 +3,12 @@
 args <- commandArgs(trailingOnly = FALSE)
 if(length(grep("RStudio", args))>0) {
   verbose = TRUE
-  dir='~/prog/sim/runs/test'
-  #dir='~/my/sim/runs/testrstudio'
-  data_dir = '~/prog/sim'
-  #data_dir = '~/my/sim'
-  setwd("~/prog/alexeyche-junk/cns/R/srm")
-  #setwd("~/my/git/alexeyche-junk/cns/R/srm")
+  #dir='~/prog/sim/runs/test'
+  dir='~/my/sim/runs/testrstudio'
+  #data_dir = '~/prog/sim'
+  data_dir = '~/my/sim'
+  #setwd("~/prog/alexeyche-junk/cns/R/srm")
+  setwd("~/my/git/alexeyche-junk/cns/R/srm")
   source('constants.R')
 } else {
   if(length(args) == 5) {
@@ -54,6 +54,11 @@ if(length(grep("RStudio", args))>0) {
   if(length(grep("--no-verbose", args))>0) {
     verbose=FALSE
   }
+
+  model_file = substring(args[grep("--model-file=", args)], 14)
+  if(length(model_file) == 0) {
+    model_file = NULL
+  }
   Sys.setenv("DISPLAY"=":0.0")  
 }
 system(sprintf("find %s -maxdepth 1 -name \"*.png\" -type f -exec rm -f {} \\;", dir))
@@ -86,16 +91,19 @@ ID_MAX=0
 data = synth # synthetic control
 c(train_dataset, test_dataset) := read_ts_file(data, data_dir)
 elems = samples_from_dataset
-train_dataset = train_dataset[c(sample(1:50, elems), sample(101:150, elems))] #, sample(101:150,elems),
+train_dataset = train_dataset[ c(sample(51:101, elems))] #, sample(101:150, elems))] #, sample(101:150,elems),
 #                                sample(151:200, elems), sample(201:250,elems), sample(251:300,elems))] # cut
 test_dataset = test_dataset[c(sample(1:50, elems), sample(101:150, elems))]  #, sample(101:150, elems),
                               #sample(151:200, elems), sample(201:250,elems), sample(251:300, elems))]
 
+train_dataset[[1]]$label=1
+train_dataset[[2]] = list(data = -train_dataset[[1]]$data, label=2)
+
 train_dataset = train_dataset[sample(1:length(train_dataset))]
 
-perf = ucr_test(train_dataset, test_dataset, eucl_dist_alg, verbose=FALSE)
-if(verbose)
-    cat("baseline:", perf$rate, "\n")
+#perf = ucr_test(train_dataset, test_dataset, eucl_dist_alg, verbose=FALSE)
+#if(verbose)
+#    cat("baseline:", perf$rate, "\n")
 
 start_w.M = matrix(rnorm( M*N, mean=start_w.M.mean, sd=start_w.M.sd), ncol=N, nrow=M)
 start_w.N = matrix(rnorm( (N-1)*N, mean=start_w.N.mean, sd=start_w.N.sd), ncol=N, nrow=(N-1))
@@ -104,10 +112,10 @@ gr1 = TSNeurons(M = M)
 gr2 = TSNeurons(M = M, ids_c = 1000:(1000+M))
 
 
-n = SRMLayerClass$new(N, start_w.N, p_edge_prob=0.1, ninh=ceiling(N*inhib_frac))
+n = SRMLayerClass$new(N, start_w.N, p_edge_prob=net_edge_prob, ninh=ceiling(N*inhib_frac))
 
 gr1$loadPatterns(train_dataset, duration, dt, lambda=5)
-gr2$loadPatterns(test_dataset, duration, dt, lambda=5)
+#gr2$loadPatterns(test_dataset, duration, dt, lambda=5)
 patt_len = length(gr1$patterns)
 
 connection = matrix(gr1$ids, nrow=length(gr1$ids), ncol=N)
@@ -131,7 +139,7 @@ run_options = list(T0 = 0, Tmax = duration, dt = dt,
                    target_set = list(depress_null=FALSE),
                    learn_layer_id = 1,
                    seed_num = seed_num,
-                   test_patterns = gr2$patterns, 
+                   #test_patterns = gr2$patterns, 
                    test_function = function(train_set, test_set) {
 #                     Ktrain = lapply(train_set, function(act) kernelWindow_spikes(act, list(sigma = ro$fp_kernel_size, window = ro$fp_window_size, T0 = ro$T0, Tmax = ro$Tmax, quad = 256)) )
 #                     Ktest = lapply(test_set, function(act) kernelWindow_spikes(act, list(sigma = ro$fp_kernel_size, window = ro$fp_window_size, T0 = ro$T0, Tmax = ro$Tmax, quad = 256)) )
@@ -146,21 +154,14 @@ ro = run_options
 id_patt = 1
 patterns = gr1$patterns
 
-model_file = sprintf("%s/%s_%dx%d", dir, data, M, N)
-if(runmode=="run") {
-  if(file.exists(paste(model_file, ".idx", sep=""))) {  
-    W = loadMatrix(model_file, 1)
-    invisible(sapply(1:N, function(id) { 
-      id_to_conn = which(W[,id] != 0)
-      n$obj$weights[[id]] = W[id_to_conn, id] 
-      n$obj$id_conns[[id]] = id_to_conn
-    }))
-    cat("Load - Ok\n")
-  } else {
-    cat("Can't find file for model ", model_file, "\n")
-  }
-}
-
+if(is.null(model_file)) {
+  model_file = sprintf("%s/%s_%dx%d", dir, data, M, N)
+  if(runmode=="run") 
+    loadWeightsFromFile(n, model_file)
+} else {
+  loadWeightsFromFile(n, model_file)
+}   
+  
 input_neurons = gr1
 ep=id_patt=1
 
