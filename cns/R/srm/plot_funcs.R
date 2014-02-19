@@ -28,7 +28,7 @@ gray_plot <- function(data, lims = c(min(data),max(data)) ) {
 
 Istat = NULL
 
-plot_run_status = function(net, neurons, sim_out, loss, pic_filename, descr) {
+plot_run_status = function(net, neurons, loss, pic_filename, descr) {
     W = neurons$Wm()
     id_n = neurons$ids()
     not_fired = all(sapply(net[id_n], function(sp) length(sp) == 1))
