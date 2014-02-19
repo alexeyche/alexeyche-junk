@@ -11,6 +11,13 @@ if(length(grep("RStudio", args))>0) {
   #setwd("~/my/git/alexeyche-junk/cns/R/srm")
   source('constants.R')
 } else {
+  if(length(args) == 5) {
+    cat("Available options: \n")
+    cat("\t\t--const-file=%constants.R% constants.R by default\n")
+    cat("\t\t--runs-dir=%dir_with_runs% created dir for runs\n")
+    cat("\t\t--run-name=%name% name for current run (data by default)\n")
+    q()
+  }
   base_dir = dirname(substring( args[grep("--file=", args)], 8))
   setwd(base_dir)
   
@@ -52,13 +59,11 @@ if(length(grep("RStudio", args))>0) {
 system(sprintf("find %s -maxdepth 1 -name \"*.png\" -type f -exec rm -f {} \\;", dir))
 #===================================================================================================
 
+library(snn)
 
-
-source('util.R')
+source('srm_funcs.R')
 source('plot_funcs.R')
 source('ucr_ts.R')
-source('gen_spikes.R')
-source('neuron.R')
 source('learn_and_run_net.R')
 source('srm.R')
 source('grad_funcs.R')
@@ -66,17 +71,18 @@ source('serialize_to_bin.R')
 source('eval_funcs.R')
 source('kernel.R')
 
+
+set.seed(seed_num)
 constants = list(dt=dt, e0=e0, ts=ts, tm=tm, u_abs=u_abs, u_r=u_r, trf=trf, trs=trs, 
                  dr=dr, alpha=alpha, beta=beta, tr=tr, u_rest=u_rest, pr=pr, gain_factor=gain_factor, 
                  ta=ta, tc=tc,
                  target_rate=target_rate,
                  target_rate_factor=target_rate_factor,
                  weight_decay_factor=weight_decay_factor,
-                 ws=ws, mean_time=mean_time, added_lrate = added_lrate)
+                 ws=ws, added_lrate = added_lrate, sim_dim=sim_dim)
 
 ID_MAX=0
 
-set.seed(1234)
 data = synth # synthetic control
 c(train_dataset, test_dataset) := read_ts_file(data, data_dir)
 elems = samples_from_dataset
@@ -98,21 +104,21 @@ gr1 = TSNeurons(M = M)
 gr2 = TSNeurons(M = M, ids_c = 1000:(1000+M))
 
 
-neurons = SRMLayer(N, start_w.N, p_edge_prob=net_edge_prob, ninh=ceiling(N*inhib_frac))
+n = SRMLayerClass$new(N, start_w.N, p_edge_prob=0.1, ninh=ceiling(N*inhib_frac))
 
 gr1$loadPatterns(train_dataset, duration, dt, lambda=5)
 gr2$loadPatterns(test_dataset, duration, dt, lambda=5)
 patt_len = length(gr1$patterns)
 
 connection = matrix(gr1$ids, nrow=length(gr1$ids), ncol=N)
-#for(i in 1:net_neurons_for_input) {
-#  cc = sample(gr1$ids, M-afferent_per_neuron)
-#  connection[cc,i] = 0
-#}
-#if(net_neurons_for_input<N)
-#  connection[,(net_neurons_for_input+1):N] = 0
+for(i in 1:net_neurons_for_input) {
+  cc = sample(gr1$ids, M-afferent_per_neuron)
+  connection[cc,i] = 0
+}
+if(net_neurons_for_input<N)
+  connection[,(net_neurons_for_input+1):N] = 0
 
-neurons$connectFF(connection, start_w.M, 1:N )
+n$connectFF(connection, start_w.M, 1:N )
 
 runmode="learn"
 test_trials=2
@@ -127,11 +133,11 @@ run_options = list(T0 = 0, Tmax = duration, dt = dt,
                    seed_num = seed_num,
                    test_patterns = gr2$patterns, 
                    test_function = function(train_set, test_set) {
-                     Ktrain = lapply(train_set, function(act) kernelWindow_spikes(act, list(sigma = ro$fp_kernel_size, window = ro$fp_window_size, T0 = ro$T0, Tmax = ro$Tmax, quad = 256)) )
-                     Ktest = lapply(test_set, function(act) kernelWindow_spikes(act, list(sigma = ro$fp_kernel_size, window = ro$fp_window_size, T0 = ro$T0, Tmax = ro$Tmax, quad = 256)) )
-                     
-                     perf = ucr_test(Ktrain, Ktest, eucl_dist_alg, FALSE)
-                     return(perf$rate)                     
+#                     Ktrain = lapply(train_set, function(act) kernelWindow_spikes(act, list(sigma = ro$fp_kernel_size, window = ro$fp_window_size, T0 = ro$T0, Tmax = ro$Tmax, quad = 256)) )
+#                     Ktest = lapply(test_set, function(act) kernelWindow_spikes(act, list(sigma = ro$fp_kernel_size, window = ro$fp_window_size, T0 = ro$T0, Tmax = ro$Tmax, quad = 256)) )
+#                     
+#                     perf = ucr_test(Ktrain, Ktest, eucl_dist_alg, FALSE)
+#                     return(perf$rate)                     
                    }, evalTrial=test_trials, test_run_freq=5
 )
 
@@ -141,14 +147,13 @@ id_patt = 1
 patterns = gr1$patterns
 
 model_file = sprintf("%s/%s_%dx%d", dir, data, M, N)
-#model_file = "/home/alexeyche/prog/sim/runs/test/synthetic_control_50x10_49"
 if(runmode=="run") {
   if(file.exists(paste(model_file, ".idx", sep=""))) {  
     W = loadMatrix(model_file, 1)
     invisible(sapply(1:N, function(id) { 
       id_to_conn = which(W[,id] != 0)
-      neurons$weights[[id]] = W[id_to_conn, id] 
-      neurons$id_conns[[id]] = id_to_conn
+      n$obj$weights[[id]] = W[id_to_conn, id] 
+      n$obj$id_conns[[id]] = id_to_conn
     }))
     cat("Load - Ok\n")
   } else {
@@ -156,13 +161,12 @@ if(runmode=="run") {
   }
 }
 
-net_neurons = SimLayers( list(neurons) )
 input_neurons = gr1
 ep=id_patt=1
 
-loss = run_net(gr1, net_neurons, run_options, verbose=verbose)
+loss = run_net(gr1, n, run_options, verbose=verbose)
 
-W = get_weights_matrix(list(neurons))
+W = n$Wm()
 if(runmode == "learn") {
   saveMatrixList(model_file, list(W))
 }

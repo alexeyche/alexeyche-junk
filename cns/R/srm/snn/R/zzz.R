@@ -38,7 +38,7 @@ loadModule("snnMod", TRUE)
 #
 ### define an onLoad expression to set some methods
 #evalqOnLoad({
-#    setMethod("show", "Rcpp_bdtDate", .show_date)
+#    setMethod("show", "Rcpp_SRMLayer", .show_SRMLayer)
 #    setGeneric("format", function(x,...) standardGeneric("format") )
 #    setMethod("format", "Rcpp_bdtDate", .format_date )
 #})

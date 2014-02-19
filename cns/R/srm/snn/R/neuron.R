@@ -1,10 +1,11 @@
 #!/usr/bin/RScript
 
 
-SRMLayerClass = setRefClass("SRMLayerClass", fields = c("obj"),
+SRMLayerClass = setRefClass("SRMLayerClass", fields = c("obj", "prop"),
                      methods = list(                       
                        initialize = function(N, start_weight, p_edge_prob, ninh=0) {
                          obj <<- new(SRMLayer, N)
+                         prop <<- list(edge_prob=p_edge_prob, ninh=ninh)
                          ids <- get_unique_ids(N)
                          obj$W <<- list()
                          obj$id_conns <<- list()                         
@@ -54,5 +55,27 @@ SRMLayerClass = setRefClass("SRMLayerClass", fields = c("obj"),
                            obj$syn[[ni]] <<- rep(0, length(obj$W[[ni]]))
                          }
                          obj$C <<- obj$syn
+                       },
+                       ids = function() {
+                        return (.self$obj$ids)
+                       },
+                       W = function() {
+                        return (.self$obj$W)
+                       },
+                       Wm = function() {
+                        return (get_weights_matrix(list(.self)))
+                       },
+                       len = function() {
+                        return (.self$obj$N)
+                       },
+                       id_conns = function() {
+                        return (.self$obj$id_conns)
                        }))
-                       
+
+setMethod("show", "SRMLayerClass", function(x) {
+    cat("SRMLayer with ", x$obj$N, " neurons:\n", sep="")
+    cat(" | ids:", c(x$ids()), "\n", sep=" ")
+    cat(" | Pedge = ", x$prop$edge_prob, ", Num inhib. = ", x$prop$ninh, "\n", sep="")
+})
+
+

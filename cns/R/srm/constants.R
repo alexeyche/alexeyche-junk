@@ -34,15 +34,15 @@ sim_dim = 1000
 # net cfg
 N = 10
 M = 100
-net_edge_prob = 0.75
+net_edge_prob = 0.25
 inhib_frac = 0.0
 net_neurons_for_input = N
 afferent_per_neuron = M
 
 # start weights
-start_w.M.mean = 0.25
+start_w.M.mean = 0.20
 start_w.M.sd = 0.01
-start_w.N.mean = 0.25
+start_w.N.mean = 0.20
 start_w.N.sd = 0.01
 
 # learning

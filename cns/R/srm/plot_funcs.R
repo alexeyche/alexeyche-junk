@@ -28,9 +28,9 @@ gray_plot <- function(data, lims = c(min(data),max(data)) ) {
 
 Istat = NULL
 
-plot_run_status = function(net, net_neurons, sim_out, loss, pic_filename, descr) {
-    W = get_weights_matrix(net_neurons$l)
-    id_n = net_neurons$all_ids
+plot_run_status = function(net, neurons, sim_out, loss, pic_filename, descr) {
+    W = neurons$Wm()
+    id_n = neurons$ids()
     not_fired = all(sapply(net[id_n], function(sp) length(sp) == 1))
     
     png(pic_filename, width=1824, height=1024)
@@ -38,24 +38,24 @@ plot_run_status = function(net, net_neurons, sim_out, loss, pic_filename, descr)
       p1 = plot_rastl(net, descr)
 
     p2 = levelplot(W, col.regions=colorRampPalette(c("black", "white")))
-    mean_grad = apply(sim_out$stat$dwstat, c(1,2), mean)
-    p3 = levelplot(mean_grad, col.regions=colorRampPalette(c("black", "white")))
-    if(!is.null(loss)) {
-     dfrm = data.frame(x=1:length(loss), y=c(loss))
-     p4 = xyplot(y~x, data=dfrm, type="l")
-    }
-    Istat <<- cbind(Istat, sim_out$stat$Istat)
-    Idf = data.frame(t(Istat))
+#    mean_grad = apply(sim_out$stat$dwstat, c(1,2), mean)
+#    p3 = levelplot(mean_grad, col.regions=colorRampPalette(c("black", "white")))
+#    if(!is.null(loss)) {
+#     dfrm = data.frame(x=1:length(loss), y=c(loss))
+#     p4 = xyplot(y~x, data=dfrm, type="l")
+#    }
+#    Istat <<- cbind(Istat, sim_out$stat$Istat)
+#    Idf = data.frame(t(Istat))
     #Idf = melt(Idf, measure.vars = names(Idf),  variable.name = 'grp', value.name = 'y') 
-    z = 1:ncol(Istat)
-    p5 = xyplot(X1+X2+X3+X4+X5+X6+X7+X8+X9+X10~z, data=Idf, type="l")
+#    z = 1:ncol(Istat)
+#    p5 = xyplot(X1+X2+X3+X4+X5+X6+X7+X8+X9+X10~z, data=Idf, type="l")
     if(!not_fired)
       print(p1, position=c(0, 0.66, 0.5, 1), more=TRUE)
-    if(!is.null(loss))
-      print(p4, position=c(0,0.33, 0.5, 0.66), more=TRUE)
-    print(p5, position=c(0,0,0.5,0.33), more=TRUE)
-    print(p2, position=c(0.5, 0, 1, 0.5), more=TRUE)
-    print(p3, position=c(0.5, 0.5, 1, 1))
+#    if(!is.null(loss))
+#      print(p4, position=c(0,0.33, 0.5, 0.66), more=TRUE)
+#    print(p5, position=c(0,0,0.5,0.33), more=TRUE)
+    print(p2, position=c(0.5, 0, 1, 0.5)) #, more=TRUE)
+#    print(p3, position=c(0.5, 0.5, 1, 1))
     dev.off()   
 }
 
