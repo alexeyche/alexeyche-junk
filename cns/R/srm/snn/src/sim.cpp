@@ -56,19 +56,20 @@ typedef vector< vector<arma::vec> > TVecStatAcc;
 
 class SRMLayer {
 public:
-    SRMLayer(int &N_, arma::uvec &ids_, TVecNums &W_, TVecIDs &id_conns_, TVecNums &syn_, arma::vec &a_, TVecNums &C_, arma::vec &pacc_, int incr_) : 
+    SRMLayer(int &N_, arma::uvec &ids_, TVecNums &W_, TVecIDs &id_conns_, TVecNums &syn_, TVecNums &syn_spec_, arma::vec &a_, TVecNums &C_, arma::vec &pacc_, int incr_) : 
                         N(N_),
                         ids(ids_),
                         W(W_),
                         id_conns(id_conns_),
                         syn(syn_),
+                        syn_spec(syn_spec_),
                         a(a_),
                         C(C_),
                         pacc(pacc_),
                         incr(incr_)
     {}
-    SRMLayer(const SRMLayer &l) : N(l.N), ids(l.ids), W(l.W), id_conns(l.id_conns), syn(l.syn), a(l.a), C(l.C), pacc(l.pacc), incr(l.incr) {}
-    SRMLayer(int N_) : N(N_), ids(N), a(N, arma::fill::zeros), C(N), W(N), id_conns(N), syn(N), pacc(N, arma::fill::zeros), incr(0) { }
+    SRMLayer(const SRMLayer &l) : N(l.N), ids(l.ids), W(l.W), id_conns(l.id_conns), syn(l.syn), syn_spec(l.syn_spec), a(l.a), C(l.C), pacc(l.pacc), incr(l.incr) {}
+    SRMLayer(int N_) : N(N_), ids(N), a(N, arma::fill::zeros), C(N), W(N), id_conns(N), syn(N), syn_spec(N), pacc(N, arma::fill::zeros), incr(0) { }
 
     void prepare(const List &c) {
         stat_p.clear(); stat_u.clear(); stat_B.clear(); stat_C.clear(); stat_W.clear();
@@ -91,13 +92,13 @@ public:
             for(size_t  syn_i=0; syn_i < id_conns[ni].n_elem; syn_i++) {
                 int num_spikes = n.getNumSpikes( id_conns[ni](syn_i), t, dt);
                 if(num_spikes > 0) {
-                    syn[ni](syn_i) += num_spikes*asD("e0", c);
+                    syn[ni](syn_i) += num_spikes*syn_spec[ni](syn_i);
                     fired(syn_i) = 1;
                 }
                 syn[ni](syn_i) *= a(ni);
             }
             double u = asD("u_rest", c) + sum(syn[ni] % W[ni]);
-            double p = g(u, c)*dt;
+            double p = probf(u, c)*dt;
             bool Yspike = false;
             if(p > coins(ni)) {
                 n.push_back(ids(ni), t);
@@ -105,7 +106,7 @@ public:
                 Yspike = true;
             }
             pacc(ni) += p;
-            C[ni] += -C[ni]/as<double>(c["tc"]) + C_calc(Yspike, p, syn[ni], c);
+            C[ni] += -C[ni]/as<double>(c["tc"]) + C_calc(Yspike, p, u, syn[ni], c);
             syn[ni] -= syn[ni]/asD("tm", c);
             a += (1-a)/asD("ta", c);
             
@@ -128,7 +129,8 @@ public:
     arma::uvec ids;
     TVecNums W;
     TVecIDs id_conns;
-    
+    TVecNums syn_spec;
+
     // vars
     TVecNums syn;
     arma::vec a;
@@ -198,7 +200,7 @@ namespace Rcpp {
                 Rcpp::Environment env( s4obj );
                 Rcpp::XPtr<SRMLayer> xptr( env.get(".pointer") );
 
-                    return SRMLayer(xptr->N, xptr->ids, xptr->W, xptr->id_conns, xptr->syn, xptr->a, xptr->C, xptr->pacc, xptr->incr );
+                    return SRMLayer(xptr->N, xptr->ids, xptr->W, xptr->id_conns, xptr->syn, xptr->syn_spec, xptr->a, xptr->C, xptr->pacc, xptr->incr );
             }
             catch(...) {
                 ::Rf_error( "supplied object could not be converted to SRMLayer." );
@@ -216,6 +218,7 @@ RCPP_MODULE(snnMod){
     .field("C", &SRMLayer::C, "C")
     .field("id_conns", &SRMLayer::id_conns, "IDs of connections")
     .field("syn", &SRMLayer::syn, "synapses")
+    .field("syn_spec", &SRMLayer::syn_spec, "synapse specializations")
     .field("stat_p", &SRMLayer::stat_p, "Statistics of probs")
     .field("stat_u", &SRMLayer::stat_u, "Statistics of pots")
     .field("stat_B", &SRMLayer::stat_B, "Statistics of B")

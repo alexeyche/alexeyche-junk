@@ -112,8 +112,7 @@ gr1 = TSNeurons(M = M)
 gr2 = TSNeurons(M = M, ids_c = 1000:(1000+M))
 
 
-n = SRMLayerClass$new(N, start_w.N, p_edge_prob=net_edge_prob, ninh=ceiling(N*inhib_frac))
-
+n = SRMLayerClass$new(N, start_w.N, p_edge_prob=net_edge_prob, e0=constants[["e0"]], ninh=ceiling(N*inhib_frac))
 gr1$loadPatterns(train_dataset, duration, dt, lambda=5)
 #gr2$loadPatterns(test_dataset, duration, dt, lambda=5)
 patt_len = length(gr1$patterns)
@@ -126,7 +125,7 @@ for(i in 1:net_neurons_for_input) {
 if(net_neurons_for_input<N)
   connection[,(net_neurons_for_input+1):N] = 0
 
-n$connectFF(connection, start_w.M, 1:N )
+n$connectFF(connection, start_w.M, constants[["e0"]], 1:N )
 
 runmode="learn"
 test_trials=2

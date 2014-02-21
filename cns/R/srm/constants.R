@@ -5,7 +5,7 @@ seed_num = 1234
 samples_from_dataset = 1
 
 # epsp
-e0 <- 1 # mV
+e0 <- 2 # mV
 ts <- 1 # ms
 tm <- 20 #*10^-3 # ms
 
@@ -15,11 +15,11 @@ ta = 50 #*10^-3
 refr_mode = 'high' # 'middle', 'low'
 
 # stochastic treshold
-alpha <- 0.70
-beta <- 0.70
+alpha <- 0.25
+beta <- 10
 tr <- -50 # mV
 
-gain_factor = 12.5
+gain_factor = 7.5 #12.5
 pr = 1
 
 # srm
@@ -32,17 +32,17 @@ dt = 1
 sim_dim = 1000
 
 # net cfg
-N = 10
+N = 30
 M = 100
-net_edge_prob = 0.0
-inhib_frac = 0.0
+net_edge_prob = 0.5
+inhib_frac = 0.2
 net_neurons_for_input = N
 afferent_per_neuron = M
 
 # start weights
-start_w.M.mean = 0.20
+start_w.M.mean = 0.2
 start_w.M.sd = 0.01
-start_w.N.mean = 0.20
+start_w.N.mean = 0.2
 start_w.N.sd = 0.01
 
 # learning
