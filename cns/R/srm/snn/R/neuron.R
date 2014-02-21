@@ -3,7 +3,7 @@
 
 SRMLayerClass = setRefClass("SRMLayerClass", fields = c("obj", "prop"),
                      methods = list(                       
-                       initialize = function(N, start_weight, p_edge_prob, e0=1, ninh=0) {
+                       initialize = function(N, start_weight, p_edge_prob, ninh=0) {
                          obj <<- new(SRMLayer, N)
                          prop <<- list(edge_prob=p_edge_prob, ninh=ninh)
                          ids <- get_unique_ids(N)
@@ -29,9 +29,9 @@ SRMLayerClass = setRefClass("SRMLayerClass", fields = c("obj", "prop"),
                            obj$W[[i]] <<- w[conn_exists]          
                            inh = obj$id_conns[[i]] %in% inh_idxs
                            obj$syn[[i]] <<- rep(0, length(obj$W[[i]]))
-                           obj$syn_spec[[i]] <<- rep(e0, length(obj$W[[i]]))
+                           obj$syn_spec[[i]] <<- rep(1, length(obj$W[[i]]))
                            if(any(inh)) {
-                               obj$syn_spec[[i]][inh] <<- rep(-e0, length(obj$syn_spec[[i]][inh]))
+                               obj$syn_spec[[i]][inh] <<- rep(-1, length(obj$syn_spec[[i]][inh]))
                            }
                          }
                          
@@ -39,7 +39,7 @@ SRMLayerClass = setRefClass("SRMLayerClass", fields = c("obj", "prop"),
                          obj$ids <<- ids
                          obj$C <<- obj$syn
                        },
-                       connectFF = function(ids_to_connect, weight, e0=1, neurons_to_connect=NULL) {
+                       connectFF = function(ids_to_connect, weight, neurons_to_connect=NULL) {
                          if(is.null(neurons_to_connect)) {
                            neurons_to_connect=1:obj$N
                          }
@@ -56,7 +56,7 @@ SRMLayerClass = setRefClass("SRMLayerClass", fields = c("obj", "prop"),
                            obj$id_conns[[ni]] <<- c(obj$id_conns[[ni]], ids_to_connect[conn_exists,ni])                           
                            obj$W[[ni]] <<- c(obj$W[[ni]], weight[conn_exists,ni])
                            obj$syn[[ni]] <<- rep(0, length(obj$W[[ni]]))
-                           obj$syn_spec[[ni]] <<- rep(e0, length(obj$W[[ni]]))
+                           obj$syn_spec[[ni]] <<- rep(1, length(obj$W[[ni]]))
                          }
                          obj$C <<- obj$syn
                        },

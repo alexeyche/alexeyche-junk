@@ -92,7 +92,7 @@ public:
             for(size_t  syn_i=0; syn_i < id_conns[ni].n_elem; syn_i++) {
                 int num_spikes = n.getNumSpikes( id_conns[ni](syn_i), t, dt);
                 if(num_spikes > 0) {
-                    syn[ni](syn_i) += num_spikes*syn_spec[ni](syn_i);
+                    syn[ni](syn_i) += num_spikes*syn_spec[ni](syn_i)*asD("e0",c);
                     fired(syn_i) = 1;
                 }
                 syn[ni](syn_i) *= a(ni);
