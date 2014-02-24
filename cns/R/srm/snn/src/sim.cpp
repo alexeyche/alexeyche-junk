@@ -1,63 +1,20 @@
 
-#include <RcppArmadillo.h>
-
-using namespace Rcpp;
-using namespace std;
 
 #include "neuron_funcs.h"
-
-class SRMLayer;
-class SIM;
-RCPP_EXPOSED_CLASS(SRMLayer)
-RCPP_EXPOSED_CLASS(SIM)
+#include "sim.h"
+#include "inp_neurons.cpp"
+#include "layer.h"
+#include "netsim.h"
 
 double asD(const char *name, const List &c) {
     return as<double>(c[name]);
 }
 
-class NetSim {
-public:    
-    NetSim(List &net_) : net(net_), active_ids(net.size(), arma::fill::zeros) {}
-    int getNumSpikes(size_t i, const double &t, const double &dt) {
-        size_t c_id = i-1;
-        
-        int num_sp = 0;
-        NumericVector sp = as<NumericVector>(net[c_id]);
-        for(size_t sp_i = active_ids(c_id); sp_i < sp.size(); sp_i++) {
-            if (sp[sp_i] >= t-dt) {
-                if(sp[sp_i] < t) {
-                    // spike in (t-dt, t]
-                    num_sp += 1;
-                } else {
-                    // this is spike in future;
-                    break;
-                }
-            } else {
-                active_ids(c_id)+=1; // this is spike in past
-            }
-        }
-        return num_sp;
-    }
-    void push_back(size_t id, const double &t) {
-        size_t c_id = id-1;
-        NumericVector sp = net[c_id];
-        sp.push_back(t);
-        net[c_id] = sp;
-    }
-    List net;
-    arma::ivec active_ids;
-};
 
-
-typedef vector< arma::uvec > TVecIDs;
-typedef vector< arma::vec > TVecNums;
-typedef vector< vector<double> > TStatAcc;
-typedef vector< vector<arma::vec> > TVecStatAcc;
-
-class SRMLayer {
+class SRMLayer : public Layer {
 public:
     SRMLayer(int &N_, arma::uvec &ids_, TVecNums &W_, TVecIDs &id_conns_, TVecNums &syn_, TVecNums &syn_spec_, arma::vec &a_, TVecNums &C_, arma::vec &pacc_, int incr_) : 
-                        N(N_),
+                        Layer(N_),
                         ids(ids_),
                         W(W_),
                         id_conns(id_conns_),
@@ -68,9 +25,11 @@ public:
                         pacc(pacc_),
                         incr(incr_)
     {}
-    SRMLayer(const SRMLayer &l) : N(l.N), ids(l.ids), W(l.W), id_conns(l.id_conns), syn(l.syn), syn_spec(l.syn_spec), a(l.a), C(l.C), pacc(l.pacc), incr(l.incr) {}
-    SRMLayer(int N_) : N(N_), ids(N), a(N, arma::fill::zeros), C(N), W(N), id_conns(N), syn(N), syn_spec(N), pacc(N, arma::fill::zeros), incr(0) { }
-
+    SRMLayer(const SRMLayer &l) : Layer(l.num()), ids(l.ids), W(l.W), id_conns(l.id_conns), syn(l.syn), syn_spec(l.syn_spec), a(l.a), C(l.C), pacc(l.pacc), incr(l.incr) {}
+    SRMLayer(int N_) : Layer(N_), ids(N), a(N, arma::fill::zeros), C(N), W(N), id_conns(N), syn(N), syn_spec(N), pacc(N, arma::fill::zeros), incr(0) { }
+    const int num() const {
+        return N;
+    }
     void prepare(const List &c) {
         stat_p.clear(); stat_u.clear(); stat_B.clear(); stat_C.clear(); stat_W.clear();
         for(size_t ni=0; ni < N; ni++) {
@@ -123,9 +82,7 @@ public:
         }
         incr++;
     }
-    
     // consts 
-    int N;
     arma::uvec ids;
     TVecNums W;
     TVecIDs id_conns;
@@ -150,16 +107,20 @@ public:
 class SIM {
 public:
     SIM() {}
-    void addLayer(SRMLayer &l) {
+    void addSRMLayer(SRMLayer &l) {
         layers.push_back(&l);
     }
+    void addFBLayer(FBLayer &l) {
+        layers.push_back(&l);
+    }
+
     void sim(const List sim_options, const List constants, List net) {
         const double T0 = as<double>(sim_options["T0"]);
         const double Tmax = as<double>(sim_options["Tmax"]);
         const double dt = as<double>(sim_options["dt"]);    
         const bool saveStat = as<bool>(sim_options["saveStat"]);    
         const bool learn = as<bool>(sim_options["learn"]);    
-        arma::vec T = arma::linspace(T0, Tmax, (Tmax-T0)/dt + 1);
+        arma::vec T = arma::linspace(T0, Tmax, (Tmax-T0)/dt);
 
         int num_neurons = 0;
         for(size_t li=0; li<layers.size(); li++) {
@@ -177,41 +138,15 @@ public:
             }
         }
     }
-    vector<SRMLayer*> layers;
+    vector<Layer*> layers;
 };
 
-namespace Rcpp {
-    template <> SEXP wrap<SRMLayer>( const SRMLayer& el ) {
-            Rcpp::Language call( "new", Symbol( "SRMLayer" ), el) ;
-            return call.eval();
-    };
-
-    template <> SRMLayer as<SRMLayer>( SEXP s )  { // throw(not_compatible) {
-            try {
-                if ( TYPEOF(s) != S4SXP ) {
-                    ::Rf_error( "supplied object is not of type SRMLayer." );
-                }
-
-                Rcpp::S4 s4obj( s );
-                if ( !s4obj.is("Rcpp_SRMLayer" ) ) {
-                    ::Rf_error( "supplied object is not of type SRMLayer." );
-                }
-
-                Rcpp::Environment env( s4obj );
-                Rcpp::XPtr<SRMLayer> xptr( env.get(".pointer") );
-
-                    return SRMLayer(xptr->N, xptr->ids, xptr->W, xptr->id_conns, xptr->syn, xptr->syn_spec, xptr->a, xptr->C, xptr->pacc, xptr->incr );
-            }
-            catch(...) {
-                ::Rf_error( "supplied object could not be converted to SRMLayer." );
-            }
-    };
-};
+#include "rcpp_wrap.h"
 
 RCPP_MODULE(snnMod){
     class_<SRMLayer>( "SRMLayer" )
     .constructor<size_t>()
-    .field("N", &SRMLayer::N, "Number of neurons")
+    .method("num", &SRMLayer::num)
     .field("ids", &SRMLayer::ids, "Unique ids of neurons")
     .field("a", &SRMLayer::a, "Neurons refr")
     .field("W", &SRMLayer::W, "Weights")
@@ -230,8 +165,19 @@ RCPP_MODULE(snnMod){
     ;
     class_<SIM>( "SIM" )
     .constructor()
-    .method("addLayer", &SIM::addLayer)
+    .method("addSRMLayer", &SIM::addSRMLayer)
+    .method("addFBLayer", &SIM::addFBLayer)
     .method("sim", &SIM::sim)
+    ;
+    class_<FBLayer>("FBLayer")
+    .constructor<size_t>()
+    .method("num", &FBLayer::num)
+    .field("a", &FBLayer::a)
+    .field("w", &FBLayer::w)
+    .field("v", &FBLayer::v)
+    .field("I", &FBLayer::I)
+    .field("stat_v", &FBLayer::stat_v)
+    .field("stat_w", &FBLayer::stat_w)
     ;
 }
 

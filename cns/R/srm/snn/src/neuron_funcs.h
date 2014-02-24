@@ -1,5 +1,10 @@
-#ifndef NEURON_FUCNS
-#define NEURON_FUCNS
+#ifndef NEURON_FUNCS
+#define NEURON_FUNCS
+
+#include <RcppArmadillo.h>
+
+using namespace Rcpp;
+
 
 double probf(const double &u, const List &c);
 
