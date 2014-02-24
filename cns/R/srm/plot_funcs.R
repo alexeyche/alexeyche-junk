@@ -1,6 +1,6 @@
--require(lattice)
+require(lattice)
 
-plot_rastl <- function(raster, lab="") {
+ plot_rastl <- function(raster, lab="") {
   x <- c()
   y <- c()
   
@@ -9,7 +9,7 @@ plot_rastl <- function(raster, lab="") {
     y <- c(y, rep(i, length(raster[[i]])))
   }
   return(xyplot(y~x,list(x=x, y=y), main=lab, xlim=c(0, max(x))))
-} 
+}
 require(reshape2)
 require(ggplot2)
 get_gray_plot <- function(data, lims = c(min(data),max(data))) {

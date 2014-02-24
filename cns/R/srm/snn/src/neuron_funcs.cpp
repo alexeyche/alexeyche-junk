@@ -2,16 +2,35 @@
 #include <RcppArmadillo.h>
 using namespace Rcpp;
 
+#define LINEAR 1
+#define EXP 2
 
-double g(const double &u, const List &c) {
+#define PROB_FUNC EXP
+
+double probf(const double &u, const List &c) {
+#if PROB_FUNC == LINEAR 
     return (as<double>(c["pr"]) + (u - as<double>(c["u_rest"]))*as<double>(c["gain_factor"]))/as<double>(c["sim_dim"]);
+#elif PROB_FUNC == EXP
+//   (beta/alpha)*(log(1.1+exp(alpha*(tr-u))) -alpha*(tr-u))  
+    return ( as<double>(c["beta"])/as<double>(c["alpha"]) ) * 
+                ( log( 1 + exp( as<double>(c["alpha"])*(as<double>(c["tr"])-u))) - 
+                                    as<double>(c["alpha"])*(as<double>(c["tr"])-u))/as<double>(c["sim_dim"]) ;
+#endif    
 }
 
-arma::vec C_calc(bool Yspike, double p, arma::vec  epsps, const List &c) {
-    const double gain_factor = as<double>(c["gain_factor"]);
+double pstroke(const double &u, const List &c) {
+#if PROB_FUNC == LINEAR 
+    return as<double>(c["gain_factor"])/as<double>(c["sim_dim"]);
+#elif PROB_FUNC == EXP
+    return as<double>(c["beta"])/(1+exp(as<double>(c["alpha"])*(as<double>(c["tr"])-u)))/as<double>(c["sim_dim"]);
+#endif
+}
+
+
+arma::vec C_calc(bool Yspike, double p, double u, arma::vec  epsps, const List &c) {
+    const double pstr = pstroke(u, c);
     const double dt = as<double>(c["dt"]);
-    const double sim_dim = as<double>(c["sim_dim"]);
-    return ( gain_factor/p ) * ( Yspike - p ) * epsps / sim_dim;
+    return ( pstr/p ) * ( Yspike - p ) * epsps;
 }
 
 double B_calc(bool Yspike, double p, double pmean, const List &c) {

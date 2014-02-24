@@ -113,7 +113,6 @@ gr2 = TSNeurons(M = M, ids_c = 1000:(1000+M))
 
 
 n = SRMLayerClass$new(N, start_w.N, p_edge_prob=net_edge_prob, ninh=ceiling(N*inhib_frac))
-
 gr1$loadPatterns(train_dataset, duration, dt, lambda=5)
 #gr2$loadPatterns(test_dataset, duration, dt, lambda=5)
 patt_len = length(gr1$patterns)
