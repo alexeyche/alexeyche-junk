@@ -4,22 +4,24 @@ library(snn)
 
 source('plot_funcs.R')
 
-constants = list(tau = 1, sim_dim=1000)
+constants = list(tau = 1/1000, sim_dim=1000)
 
 N = 1500
-HiHerz = 0
-LowHerz = 2000
+
+lowF = 100
+highF = 2000
+
 gain = 500 # Hz
 fstim = 200 # Hz
 
-Tmax=10000
+Tmax=1000
 T0 = 0
-dt = 1
+dt = 0.1
 
 Ts = seq(T0, Tmax, length.out = (Tmax-T0)/dt)
 
-fbl = FBLayerClass$new(N, HiHerz, LowHerz, constants)
-fbl$setInput( gain*(sin(4*pi*fstim*Ts) + sin(6*pi*fstim*Ts))/constants$sim_dim)
+fbl = FBLayerClass$new(N, lowF, highF, constants)
+fbl$setInput( gain*(sin(4*pi*fstim*Ts) + sin(6*pi*fstim*Ts)))
 
 net = blank_net(N)
 

@@ -27,12 +27,12 @@ public:
         if(Iiter<I.n_elem) {
             Ival = I(Iiter);
         }
-        v += dt*(-a % w -v + Ival)/(asD("tau", c)*asD("sim_dim",c));
-        w += dt*(v-w)/(asD("tau", c)*asD("sim_dim",c));
+        v += dt*(-a % w -v + Ival)/(asD("tau",c));
+        w += dt*(v-w)/(asD("tau",c));
 
         arma:: vec coins(N, arma::fill::randu);
         for(size_t ni=0; ni<N; ni++) {
-            if( v(ni)*dt > coins(ni) ) {
+            if( ((v(ni)*dt)) > coins(ni) ) {
                 n.push_back(ni+1, t);
             }
             stat_v[ni].push_back(v(ni));
