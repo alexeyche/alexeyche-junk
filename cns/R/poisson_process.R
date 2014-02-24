@@ -17,7 +17,7 @@
 #   x = matrix(rexp(ntrials*maxN,lambda),ntrials,maxN)
 #   return(apply(x,1,getN,tt=tt))
 # }
-
+require(sde)
 draw_pp <- function(ntrials, lambda, t_max) {
   k <- 0; t<-0
   k <- numeric(ntrials)
@@ -109,3 +109,31 @@ test <- function(r = c(0.05,0.05), coeff = 1) {
 }
 
 
+correl_poiss = function (lambda, corr, n=10000)
+{
+  
+  merke = c()
+  aussortieren = c()
+  
+  for (i in lambda)
+  {
+    merke=cbind(merke,runif(n+length(lambda)))
+  }
+  
+  merke=merke%*%base::chol(corr)
+  
+  for (i in 1:length(lambda))
+  {
+    merke[,i]=merke[,i] / sort(merke[,i],decreasing=TRUE)[1]
+    merke[,i]=qpois(merke[,i],lambda[i])
+    aussortieren = c(aussortieren,which(merke[,i]==max(merke[,i])))
+  }
+  return(merke[-aussortieren,])
+}
+
+lx = rpois(10000, 8)
+ly = rpois(10000, 8)
+lt = rpois(10000, 2)
+
+x = lx+lt
+y = ly+lt
