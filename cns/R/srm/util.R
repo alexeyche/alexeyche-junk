@@ -85,3 +85,4 @@ sp_in_interval = function(net, T0, Tmax) {
   })  
   return(nspikes)
 }
+logspace <- function( d1, d2, n) exp(log(10)*seq(d1, d2, length.out=n))
