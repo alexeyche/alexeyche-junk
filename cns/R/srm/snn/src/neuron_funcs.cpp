@@ -5,7 +5,7 @@ using namespace Rcpp;
 #define LINEAR 1
 #define EXP 2
 
-#define PROB_FUNC EXP
+#define PROB_FUNC LINEAR
 
 double probf(const double &u, const List &c) {
 #if PROB_FUNC == LINEAR 

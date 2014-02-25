@@ -30,6 +30,9 @@ public:
     const int num() const {
         return N;
     }
+    void setNum(int N_) {
+        N = N_;
+    }
     void prepare(const List &c) {
         stat_p.clear(); stat_u.clear(); stat_B.clear(); stat_C.clear(); stat_W.clear();
         for(size_t ni=0; ni < N; ni++) {
@@ -95,8 +98,6 @@ public:
     arma::vec pacc;
     int incr;
 
-    // stat
-    bool saveStat;
     TStatAcc stat_p;
     TStatAcc stat_u;
     TStatAcc stat_B;
@@ -147,6 +148,7 @@ RCPP_MODULE(snnMod){
     class_<SRMLayer>( "SRMLayer" )
     .constructor<size_t>()
     .method("num", &SRMLayer::num)
+    .method("setNum", &SRMLayer::setNum)
     .field("ids", &SRMLayer::ids, "Unique ids of neurons")
     .field("a", &SRMLayer::a, "Neurons refr")
     .field("W", &SRMLayer::W, "Weights")

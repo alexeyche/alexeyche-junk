@@ -50,11 +50,11 @@ plot_run_status = function(net, neurons, loss, pic_filename, descr) {
 #    z = 1:ncol(Istat)
 #    p5 = xyplot(X1+X2+X3+X4+X5+X6+X7+X8+X9+X10~z, data=Idf, type="l")
     if(!not_fired)
-      print(p1, position=c(0, 0.66, 0.5, 1), more=TRUE)
+      print(p1, position=c(0, 0.33, 0.5, 1), more=TRUE)
 #    if(!is.null(loss))
 #      print(p4, position=c(0,0.33, 0.5, 0.66), more=TRUE)
 #    print(p5, position=c(0,0,0.5,0.33), more=TRUE)
-    print(p2, position=c(0.5, 0, 1, 0.5)) #, more=TRUE)
+    print(p2, position=c(0.5, 0, 1, 1)) #, more=TRUE)
 #    print(p3, position=c(0.5, 0.5, 1, 1))
     dev.off()   
 }

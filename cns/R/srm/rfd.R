@@ -34,12 +34,12 @@ start_w.N = 0.05
 start_w.M = 0.05
 
 gr1 = TSNeurons(M = M)
-neurons = SRMLayerClass$new(N, start_w.N, p_edge_prob=0.1)
+neurons = SRMLayerClass$new(N, start_w.N, p_edge_prob=0.0)
 connection = matrix(gr1$ids, nrow=length(gr1$ids), ncol=N)
 neurons$connectFF(connection, start_w.M, 1:N )
 
-s = new(SIM)
-s$addLayer(neurons$obj)
+s = SIMClass(list(neurons))
+
 
 dir2save = "~/prog/sim/rfd_files"
 
@@ -49,7 +49,7 @@ T = seq(T0, Tmax, by=dt)
 
 Wacc = vector("list",N)
 
-for(ep in 31:50) {
+for(ep in 26:36) {
   file = sprintf("%s/ep_%d_%4.1fsec", dir2save, ep, Tmax/sim_dim)
   net_m = loadMatrix(file, 1)
   net = list()

@@ -19,7 +19,7 @@ alpha <- 0.25
 beta <- 10
 tr <- -50 # mV
 
-gain_factor = 7.5 #12.5
+gain_factor = 12.5
 pr = 1
 
 # srm
@@ -32,7 +32,7 @@ dt = 1
 sim_dim = 1000
 
 # net cfg
-N = 30
+N = 10
 M = 100
 net_edge_prob = 0.5
 inhib_frac = 0.2

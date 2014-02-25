@@ -35,13 +35,13 @@ SRMLayerClass = setRefClass("SRMLayerClass", fields = c("obj", "prop"),
                            }
                          }
                          
-                         obj$N <<- N
+                         obj$setNum(N)
                          obj$ids <<- ids
                          obj$C <<- obj$syn
                        },
                        connectFF = function(ids_to_connect, weight, neurons_to_connect=NULL) {
                          if(is.null(neurons_to_connect)) {
-                           neurons_to_connect=1:obj$N
+                           neurons_to_connect=1:obj$num()
                          }
                          if(!is.matrix(ids_to_connect)) {
                            ids_to_connect = matrix(ids_to_connect, nrow=length(ids_to_connect), ncol=length(neurons_to_connect))
@@ -70,7 +70,7 @@ SRMLayerClass = setRefClass("SRMLayerClass", fields = c("obj", "prop"),
                         return (get_weights_matrix(list(.self)))
                        },
                        len = function() {
-                        return (.self$obj$N)
+                        return (.self$obj$num())
                        },
                        id_conns = function() {
                         return (.self$obj$id_conns)
