@@ -46,7 +46,7 @@ start_w.N.sd = 0.01
 
 # C
 tc = 100
-
+mean_p_dur = 60 * sim_dim
 ws = 0.2
 target_rate = 5 # Hz
 target_rate_factor = 0.1

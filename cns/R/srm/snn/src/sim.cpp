@@ -29,7 +29,9 @@ public:
                         prev_dw(prev_dw_)
     {}
     SRMLayer(const SRMLayer &l) : Layer(l.num()), ids(l.ids), W(l.W), id_conns(l.id_conns), syn(l.syn), syn_spec(l.syn_spec), a(l.a), C(l.C), pacc(l.pacc), incr(l.incr), prev_dw(l.prev_dw) {}
-    SRMLayer(int N_) : Layer(N_), ids(N), a(N, arma::fill::zeros), C(N), W(N), id_conns(N), syn(N), syn_spec(N), pacc(N, arma::fill::zeros), incr(0), prev_dw(N, arma::fill::zeros) { }
+    SRMLayer(int N_) : Layer(N_), ids(N), a(N, arma::fill::zeros), C(N), W(N), id_conns(N), syn(N), syn_spec(N), pacc(N, arma::fill::zeros), incr(0), prev_dw(N, arma::fill::zeros) { 
+        
+    }
     const int num() const {
         return N;
     }
@@ -73,56 +75,60 @@ public:
                 n.push_back(ids(ni), t);
                 a(ni) = 0;
                 Yspike = true;
+                pacc(ni) += 1;
             }
-            pacc(ni) += p;
+            pacc(ni) += -pacc(ni)/(asD("mean_p_dur",c));
             C[ni] += -C[ni]/as<double>(c["tc"]) + C_calc(Yspike, p, u, syn[ni], c);
             syn[ni] -= syn[ni]/asD("tm", c);
             a += (1-a)/asD("ta", c);
             
-            double B = B_calc(Yspike, p, pacc(ni)/(incr+1), c);
-            arma::vec dw = asD("added_lrate",c)*ratecalc(W[ni],c) % (C[ni]*B - asD("weight_decay_factor",c)*(fired % W[ni]) );
+            if (incr>=asD("mean_p_dur",c)) {
+                double B = B_calc(Yspike, p, pacc(ni)/asD("mean_p_dur",c), c);
+                arma::vec dw = asD("added_lrate",c)*ratecalc(W[ni],c) % (C[ni]*B - asD("weight_decay_factor",c)*(fired % W[ni]) );
 #ifdef FINITE_CHECK            
-            if(!arma::is_finite(dw)) {
-                cout << "Found infinity in dw, for neuron " << ni << "\n";
-                cout << "added_lrate = " << asD("added_lrate",c) << " ratecalc(W[ni]) = \n"; 
-                ratecalc(W[ni],c).t().print();
-                cout << "C[ni] = " << "\n";
-                C[ni].t().print();
-                cout << "B = " << B << " Yspike = " << Yspike  << " u = " << u << " p = " <<  p << " pm = " << pacc(ni)/(incr+1) <<  "\n";
-                cout<< " weight decay: " << asD("weight_decay_factor",c) << "\n";
-                cout << "fired: \n";
-                fired.t().print();
-                cout << "W[ni] = \n";
-                W[ni].t().print();
-                ::Rf_error("error");
-
-            }
-#endif            
-            if(arma::any(dw)) {
-                arma::vec dw_c = dt*(prev_dw + dw)/2;
-#ifdef FINITE_CHECK
-                if(!arma::is_finite(dw_c)) {
-                    cout << "dw_c is infinite \n";
-                    cout << "prev_dw: " << "\n";
-                    prev_dw.t().print();
-                    cout << "dw: " << "\n";
-                    dw.t().print();
+                if(!arma::is_finite(dw)) {
+                    cout << "Found infinity in dw, for neuron " << ni << "\n";
+                    cout << "added_lrate = " << asD("added_lrate",c) << " ratecalc(W[ni]) = \n"; 
+                    ratecalc(W[ni],c).t().print();
+                    cout << "C[ni] = " << "\n";
+                    C[ni].t().print();
+                    cout << "B = " << B << " Yspike = " << Yspike  << " u = " << u << " p = " <<  p << " pm = " << pacc(ni)/(incr+1) <<  "\n";
+                    cout<< " weight decay: " << asD("weight_decay_factor",c) << "\n";
+                    cout << "fired: \n";
+                    fired.t().print();
+                    cout << "W[ni] = \n";
+                    W[ni].t().print();
                     ::Rf_error("error");
+
                 }
+#endif            
+                if(arma::any(dw)) {
+                    arma::vec dw_c = dw; //dt*(prev_dw + dw)/2;
+#ifdef FINITE_CHECK
+                    if(!arma::is_finite(dw_c)) {
+                        cout << "dw_c is infinite \n";
+                        cout << "prev_dw: " << "\n";
+                        prev_dw.t().print();
+                        cout << "dw: " << "\n";
+                        dw.t().print();
+                        ::Rf_error("error");
+                    }
 #endif                
-                W[ni] += dw_c;
+                    W[ni] += dw_c;
+                
+                }
+                prev_dw = dw;
+                if(saveStat) {
+                    stat_p[ni].push_back(p);
+                    stat_u[ni].push_back(u);
+                    stat_B[ni].push_back(B);
+                    stat_C[ni].push_back(C[ni]);
+                    stat_W[ni].push_back(W[ni]);
+                }
             }
-            prev_dw = dw;
             
-            if(saveStat) {
-                stat_p[ni].push_back(p);
-                stat_u[ni].push_back(u);
-                stat_B[ni].push_back(B);
-                stat_C[ni].push_back(C[ni]);
-                stat_W[ni].push_back(W[ni]);
-            }
         }
-        incr++;
+        incr+=dt;
     }
     // consts 
     arma::uvec ids;
@@ -135,7 +141,7 @@ public:
     arma::vec a;
     TVecNums C;
     arma::vec pacc;
-    int incr;
+    double incr;
     arma::vec prev_dw;
 
     TStatAcc stat_p;

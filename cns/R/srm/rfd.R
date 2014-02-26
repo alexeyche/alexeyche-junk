@@ -1,11 +1,11 @@
 
 verbose = TRUE
-#dir='~/prog/sim/runs/test'
-dir='~/my/sim/runs/test'
-#data_dir = '~/prog/sim'
-data_dir = '~/my/sim'
-#setwd("~/prog/alexeyche-junk/cns/R/srm")
-setwd("~/my/git/alexeyche-junk/cns/R/srm")
+dir='~/prog/sim/runs/test'
+#dir='~/my/sim/runs/test'
+data_dir = '~/prog/sim'
+#data_dir = '~/my/sim'
+setwd("~/prog/alexeyche-junk/cns/R/srm")
+#setwd("~/my/git/alexeyche-junk/cns/R/srm")
 source('constants.R')
 source('srm_funcs.R')
 
@@ -16,7 +16,7 @@ constants = list(dt=dt, e0=e0, ts=ts, tm=tm, alpha=alpha, beta=beta, tr=tr, u_re
                  target_rate=target_rate,
                  target_rate_factor=target_rate_factor,
                  weight_decay_factor=weight_decay_factor,
-                 ws=ws, added_lrate = added_lrate, sim_dim=sim_dim)
+                 ws=ws, added_lrate = added_lrate, sim_dim=sim_dim, mean_p_dur=mean_p_dur)
 
 
 source('plot_funcs.R')
@@ -40,8 +40,8 @@ neurons$connectFF(connection, start_w.M, 1:N )
 s = SIMClass(list(neurons))
 
 
-#dir2save = "~/prog/sim/rfd_files"
-dir2save = "~/my/sim/rfd_files"
+dir2save = "~/prog/sim/rfd_files"
+#dir2save = "~/my/sim/rfd_files"
 
 T0 = 0
 Tmax = 30000
@@ -49,7 +49,7 @@ T = seq(T0, Tmax, by=dt)
 
 Wacc = vector("list",N)
 
-for(ep in 1:1) {
+for(ep in 1:20) {
   file = sprintf("%s/ep_%d_%4.1fsec", dir2save, ep, Tmax/sim_dim)
   net_m = loadMatrix(file, 1)
   net = list()
@@ -65,10 +65,12 @@ for(ep in 1:1) {
   #plotl(sapply(I_acc, mean))
 #  W = get_weights_matrix(list(neurons))
 #  filled.contour(W)
-  for(i in 1:N) {  
-    Wm = list_to_matrix(neurons$obj$stat_W[[i]])  
-    Wacc[[i]] = cbind(Wacc[[i]], colMeans(Wm[1:Tmax/2,]) )
-    Wacc[[i]] = cbind(Wacc[[i]], colMeans(Wm[((Tmax/2)+1):Tmax,]) )
+  if(Tmax*ep>mean_p_dur) {
+    for(i in 1:N) {  
+      Wm = list_to_matrix(neurons$obj$stat_W[[i]])  
+      Wacc[[i]] = cbind(Wacc[[i]], colMeans(Wm[1:Tmax/2,]) )
+      Wacc[[i]] = cbind(Wacc[[i]], colMeans(Wm[((Tmax/2)+1):Tmax,]) )
+    }
   }
 }
 c1 = list_to_matrix(neurons$obj$stat_C[[1]])[,1]

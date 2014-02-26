@@ -11,21 +11,21 @@ T = seq(T0, Tmax, by=dt)
 Twhole = Tmax*100 # 50 min
 
 
-#dir2save = "~/prog/sim/rfd_files"
-dir2save = "~/my/sim/rfd_files"
+dir2save = "~/prog/sim/rfd_files"
+#dir2save = "~/my/sim/rfd_files"
 
 net = list()
 for(i in 1:(M+N)) net[[i]] = numeric(0)
 ID_MAX=0
 gr1 = TSNeurons(M = M)
 
-vmax=50
+vmax=30
 v0=1
 gauss_rates = Vectorize(function(k,j) {
   ((vmax-v0)*exp(-0.01*( min( abs(j-k), 100-abs(j-k) ) )^2) + v0 )/sim_dim
 },"j")
 
-for(ep in 1:100) {
+for(ep in 1:2) {
   for(i in 1:(M+N)) net[[i]] = numeric(0)
   for(curt in T) {
     if(curt %% 200 == 0) {
