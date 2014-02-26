@@ -11,6 +11,8 @@ double asD(const char *name, const List &c) {
 }
 
 
+//#define FINITE_CHECK
+
 class SRMLayer : public Layer {
 public:
     SRMLayer(int &N_, arma::uvec &ids_, TVecNums &W_, TVecIDs &id_conns_, TVecNums &syn_, TVecNums &syn_spec_, arma::vec &a_, TVecNums &C_, arma::vec &pacc_, int incr_, arma::vec prev_dw_) : 
@@ -53,7 +55,7 @@ public:
         arma::vec coins(N, arma::fill::randu);
         for(size_t ni=0; ni<N; ni++) {
             arma::uvec fired(id_conns[ni].n_elem, arma::fill::zeros);
-            for(size_t  syn_i=0; syn_i < id_conns[ni].n_elem; syn_i++) {
+            for(size_t syn_i=0; syn_i < id_conns[ni].n_elem; syn_i++) {
                 int num_spikes = n.getNumSpikes( id_conns[ni](syn_i), t, dt);
                 if(num_spikes > 0) {
                     if(num_spikes > 1) {
@@ -79,9 +81,39 @@ public:
             
             double B = B_calc(Yspike, p, pacc(ni)/(incr+1), c);
             arma::vec dw = asD("added_lrate",c)*ratecalc(W[ni],c) % (C[ni]*B - asD("weight_decay_factor",c)*(fired % W[ni]) );
-            if(arma::any(dw))
-                W[ni] += dt*(prev_dw + dw)/2;
+#ifdef FINITE_CHECK            
+            if(!arma::is_finite(dw)) {
+                cout << "Found infinity in dw, for neuron " << ni << "\n";
+                cout << "added_lrate = " << asD("added_lrate",c) << " ratecalc(W[ni]) = \n"; 
+                ratecalc(W[ni],c).t().print();
+                cout << "C[ni] = " << "\n";
+                C[ni].t().print();
+                cout << "B = " << B << " Yspike = " << Yspike  << " u = " << u << " p = " <<  p << " pm = " << pacc(ni)/(incr+1) <<  "\n";
+                cout<< " weight decay: " << asD("weight_decay_factor",c) << "\n";
+                cout << "fired: \n";
+                fired.t().print();
+                cout << "W[ni] = \n";
+                W[ni].t().print();
+                ::Rf_error("error");
+
+            }
+#endif            
+            if(arma::any(dw)) {
+                arma::vec dw_c = dt*(prev_dw + dw)/2;
+#ifdef FINITE_CHECK
+                if(!arma::is_finite(dw_c)) {
+                    cout << "dw_c is infinite \n";
+                    cout << "prev_dw: " << "\n";
+                    prev_dw.t().print();
+                    cout << "dw: " << "\n";
+                    dw.t().print();
+                    ::Rf_error("error");
+                }
+#endif                
+                W[ni] += dw_c;
+            }
             prev_dw = dw;
+            
             if(saveStat) {
                 stat_p[ni].push_back(p);
                 stat_u[ni].push_back(u);

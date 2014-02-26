@@ -1,11 +1,11 @@
 
 verbose = TRUE
-dir='~/prog/sim/runs/test'
-#dir='~/my/sim/runs/test'
-data_dir = '~/prog/sim'
-#data_dir = '~/my/sim'
-setwd("~/prog/alexeyche-junk/cns/R/srm")
-#setwd("~/my/git/alexeyche-junk/cns/R/srm")
+#dir='~/prog/sim/runs/test'
+dir='~/my/sim/runs/test'
+#data_dir = '~/prog/sim'
+data_dir = '~/my/sim'
+#setwd("~/prog/alexeyche-junk/cns/R/srm")
+setwd("~/my/git/alexeyche-junk/cns/R/srm")
 source('constants.R')
 source('srm_funcs.R')
 
@@ -40,7 +40,8 @@ neurons$connectFF(connection, start_w.M, 1:N )
 s = SIMClass(list(neurons))
 
 
-dir2save = "~/prog/sim/rfd_files"
+#dir2save = "~/prog/sim/rfd_files"
+dir2save = "~/my/sim/rfd_files"
 
 T0 = 0
 Tmax = 30000
@@ -48,7 +49,7 @@ T = seq(T0, Tmax, by=dt)
 
 Wacc = vector("list",N)
 
-for(ep in 1:40) {
+for(ep in 1:1) {
   file = sprintf("%s/ep_%d_%4.1fsec", dir2save, ep, Tmax/sim_dim)
   net_m = loadMatrix(file, 1)
   net = list()
