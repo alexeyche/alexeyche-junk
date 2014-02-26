@@ -11,7 +11,8 @@ T = seq(T0, Tmax, by=dt)
 Twhole = Tmax*100 # 50 min
 
 
-dir2save = "~/prog/sim/rfd_files"
+#dir2save = "~/prog/sim/rfd_files"
+dir2save = "~/my/sim/rfd_files"
 
 net = list()
 for(i in 1:(M+N)) net[[i]] = numeric(0)
