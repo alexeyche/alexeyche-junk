@@ -11,8 +11,7 @@ source('srm_funcs.R')
 
 require(snn)
 set.seed(seed_num)
-constants = list(dt=dt, e0=e0, ts=ts, tm=tm, u_abs=u_abs, u_r=u_r, trf=trf, trs=trs, 
-                 dr=dr, alpha=alpha, beta=beta, tr=tr, u_rest=u_rest, pr=pr, gain_factor=gain_factor, 
+constants = list(dt=dt, e0=e0, ts=ts, tm=tm, alpha=alpha, beta=beta, tr=tr, u_rest=u_rest, pr=pr, gain_factor=gain_factor, 
                  ta=ta, tc=tc,
                  target_rate=target_rate,
                  target_rate_factor=target_rate_factor,
@@ -49,7 +48,7 @@ T = seq(T0, Tmax, by=dt)
 
 Wacc = vector("list",N)
 
-for(ep in 26:36) {
+for(ep in 1:40) {
   file = sprintf("%s/ep_%d_%4.1fsec", dir2save, ep, Tmax/sim_dim)
   net_m = loadMatrix(file, 1)
   net = list()

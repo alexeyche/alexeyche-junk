@@ -74,10 +74,21 @@ SRMLayerClass = setRefClass("SRMLayerClass", fields = c("obj", "prop"),
                        },
                        id_conns = function() {
                         return (.self$obj$id_conns)
+                       },
+                       get_stat = function() {
+                        st = list()
+                        st$C = list()
+                        st$W = list()
+                        for(ni in 1:.self$len()) {
+                            st$C[[ni]] = list_to_matrix(.self$obj$stat_C[[ni]])
+                            st$W[[ni]] = list_to_matrix(.self$obj$stat_W[[ni]])
+                        }
+                        st$B = list_to_matrix(.self$obj$stat_B)
+                        return(st)
                        }))
 
 setMethod("show", "SRMLayerClass", function(x) {
-    cat("SRMLayer with ", x$obj$N, " neurons:\n", sep="")
+    cat("SRMLayer with ", x$len(), " neurons:\n", sep="")
     cat(" | ids:", c(x$ids()), "\n", sep=" ")
     cat(" | Pedge = ", x$prop$edge_prob, ", Num inhib. = ", x$prop$ninh, "\n", sep="")
 })

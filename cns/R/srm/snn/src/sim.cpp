@@ -13,7 +13,7 @@ double asD(const char *name, const List &c) {
 
 class SRMLayer : public Layer {
 public:
-    SRMLayer(int &N_, arma::uvec &ids_, TVecNums &W_, TVecIDs &id_conns_, TVecNums &syn_, TVecNums &syn_spec_, arma::vec &a_, TVecNums &C_, arma::vec &pacc_, int incr_) : 
+    SRMLayer(int &N_, arma::uvec &ids_, TVecNums &W_, TVecIDs &id_conns_, TVecNums &syn_, TVecNums &syn_spec_, arma::vec &a_, TVecNums &C_, arma::vec &pacc_, int incr_, arma::vec prev_dw_) : 
                         Layer(N_),
                         ids(ids_),
                         W(W_),
@@ -23,10 +23,11 @@ public:
                         a(a_),
                         C(C_),
                         pacc(pacc_),
-                        incr(incr_)
+                        incr(incr_),
+                        prev_dw(prev_dw_)
     {}
-    SRMLayer(const SRMLayer &l) : Layer(l.num()), ids(l.ids), W(l.W), id_conns(l.id_conns), syn(l.syn), syn_spec(l.syn_spec), a(l.a), C(l.C), pacc(l.pacc), incr(l.incr) {}
-    SRMLayer(int N_) : Layer(N_), ids(N), a(N, arma::fill::zeros), C(N), W(N), id_conns(N), syn(N), syn_spec(N), pacc(N, arma::fill::zeros), incr(0) { }
+    SRMLayer(const SRMLayer &l) : Layer(l.num()), ids(l.ids), W(l.W), id_conns(l.id_conns), syn(l.syn), syn_spec(l.syn_spec), a(l.a), C(l.C), pacc(l.pacc), incr(l.incr), prev_dw(l.prev_dw) {}
+    SRMLayer(int N_) : Layer(N_), ids(N), a(N, arma::fill::zeros), C(N), W(N), id_conns(N), syn(N), syn_spec(N), pacc(N, arma::fill::zeros), incr(0), prev_dw(N, arma::fill::zeros) { }
     const int num() const {
         return N;
     }
@@ -45,6 +46,7 @@ public:
             stat_W.push_back(vector<arma::vec>());
         }
         a.fill(1.0);
+        prev_dw.fill(0.0);
     }
 
     void simdt(const double &t, const double &dt, const List &c, NetSim &n)  {
@@ -54,6 +56,9 @@ public:
             for(size_t  syn_i=0; syn_i < id_conns[ni].n_elem; syn_i++) {
                 int num_spikes = n.getNumSpikes( id_conns[ni](syn_i), t, dt);
                 if(num_spikes > 0) {
+                    if(num_spikes > 1) {
+                        cout << "warning: too many spikes\n";
+                    }
                     syn[ni](syn_i) += num_spikes*syn_spec[ni](syn_i)*asD("e0",c);
                     fired(syn_i) = 1;
                 }
@@ -73,8 +78,10 @@ public:
             a += (1-a)/asD("ta", c);
             
             double B = B_calc(Yspike, p, pacc(ni)/(incr+1), c);
-            W[ni] += asD("added_lrate",c)*ratecalc(W[ni],c) % (C[ni]*B - asD("weight_decay_factor",c)*(fired % W[ni]) );
-           
+            arma::vec dw = asD("added_lrate",c)*ratecalc(W[ni],c) % (C[ni]*B - asD("weight_decay_factor",c)*(fired % W[ni]) );
+            if(arma::any(dw))
+                W[ni] += dt*(prev_dw + dw)/2;
+            prev_dw = dw;
             if(saveStat) {
                 stat_p[ni].push_back(p);
                 stat_u[ni].push_back(u);
@@ -97,6 +104,7 @@ public:
     TVecNums C;
     arma::vec pacc;
     int incr;
+    arma::vec prev_dw;
 
     TStatAcc stat_p;
     TStatAcc stat_u;

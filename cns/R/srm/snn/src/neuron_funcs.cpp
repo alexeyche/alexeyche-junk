@@ -11,7 +11,7 @@ double probf(const double &u, const List &c) {
 #if PROB_FUNC == LINEAR 
     return (as<double>(c["pr"]) + (u - as<double>(c["u_rest"]))*as<double>(c["gain_factor"]))/as<double>(c["sim_dim"]);
 #elif PROB_FUNC == EXP
-//   (beta/alpha)*(log(1.1+exp(alpha*(tr-u))) -alpha*(tr-u))  
+//   (beta/alpha)*(log(1+exp(alpha*(tr-u))) -alpha*(tr-u))  
     return ( as<double>(c["beta"])/as<double>(c["alpha"]) ) * 
                 ( log( 1 + exp( as<double>(c["alpha"])*(as<double>(c["tr"])-u))) - 
                                     as<double>(c["alpha"])*(as<double>(c["tr"])-u))/as<double>(c["sim_dim"]) ;
@@ -29,7 +29,6 @@ double pstroke(const double &u, const List &c) {
 
 arma::vec C_calc(bool Yspike, double p, double u, arma::vec  epsps, const List &c) {
     const double pstr = pstroke(u, c);
-    const double dt = as<double>(c["dt"]);
     return ( pstr/p ) * ( Yspike - p ) * epsps;
 }
 

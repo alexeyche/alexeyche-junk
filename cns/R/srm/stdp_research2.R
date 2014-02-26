@@ -12,9 +12,8 @@ setwd("~/prog/alexeyche-junk/cns/R/srm")
 source('constants.R')
 source('srm_funcs.R')
 
-constants = list(dt=dt, e0=e0, ts=ts, tm=tm, u_abs=u_abs, u_r=u_r, trf=trf, trs=trs, 
-                 dr=dr, alpha=alpha, beta=beta, tr=tr, u_rest=u_rest, pr=pr, gain_factor=gain_factor, 
-                 ta=ta, tc=tc,
+constants = list(dt=dt, e0=e0, ts=ts, tm=tm, alpha=alpha, beta=beta, tr=tr, u_rest=u_rest, 
+                 pr=pr, gain_factor=gain_factor, ta=ta, tc=tc,
                  target_rate=target_rate,
                  target_rate_factor=target_rate_factor,
                  weight_decay_factor=weight_decay_factor,
@@ -32,8 +31,8 @@ gr1 = TSNeurons$new(M)
 l = SRMLayerClass$new(N, start_w.N, net_edge_prob)
 l$connectFF(gr1$ids, start_w.M)
 
-s = new(SIM)
-s$addLayer(l$obj)
+s = SIMClass$new(list(l))
+
 
 sim_opt = list(T0=T0, Tmax=Tmax, dt=dt, saveStat=TRUE, learn=TRUE)
 net = list()
@@ -50,4 +49,5 @@ Cm = list_to_matrix(l$obj$stat_C[[1]])
 Wm = list_to_matrix(l$obj$stat_W[[1]])
 plotl(Wm[,1])
 plotl(Wm[,2])
+plotl(Cm[,2])
 plotl(l$obj$stat_B[[1]])
