@@ -12,12 +12,12 @@ setwd("~/my/git/alexeyche-junk/cns/R/srm")
 source('constants.R')
 source('srm_funcs.R')
 
-constants = list(dt=dt, e0=e0, ts=ts, tm=tm, alpha=alpha, beta=beta, tr=tr, u_rest=u_rest, 
-                 pr=pr, gain_factor=gain_factor, ta=ta, tc=tc,
+constants = list(dt=dt, e0=e0, ts=ts, tm=tm, alpha=alpha, beta=beta, tr=tr, u_rest=u_rest, pr=pr, gain_factor=gain_factor, 
+                 ta=ta, tc=tc,
                  target_rate=target_rate,
                  target_rate_factor=target_rate_factor,
                  weight_decay_factor=weight_decay_factor,
-                 ws=ws, added_lrate = added_lrate, sim_dim=sim_dim)
+                 ws=ws, added_lrate = added_lrate, sim_dim=sim_dim, mean_p_dur=mean_p_dur)
 
 T0 = 0
 Tmax = 200

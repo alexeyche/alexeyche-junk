@@ -57,8 +57,14 @@ public:
         arma::vec coins(N, arma::fill::randu);
         for(size_t ni=0; ni<N; ni++) {
             arma::uvec fired(id_conns[ni].n_elem, arma::fill::zeros);
+                        
+//            arma::vec num_spikes = n.getNumSpikesV(id_conns[ni],t);
+//            fired(arma::find(num_spikes>0)) = 1;
+//            syn[ni] += num_spikes % syn_spec[ni] * asD("e0",c);
+//            syn[ni] *= a(ni);
+
             for(size_t syn_i=0; syn_i < id_conns[ni].n_elem; syn_i++) {
-                int num_spikes = n.getNumSpikes( id_conns[ni](syn_i), t, dt);
+                int num_spikes = n.getNumSpikes( id_conns[ni](syn_i), t);
                 if(num_spikes > 0) {
                     if(num_spikes > 1) {
                         cout << "warning: too many spikes\n";
@@ -178,7 +184,7 @@ public:
         if(num_neurons > net.size()) {
            ::Rf_error( "net list is less than size of layers\n");
         }
-        NetSim ns(net);
+        NetSim ns(net, T.n_elem, dt);
         for(size_t ti=0; ti<T.n_elem; ti++) {
             for(size_t li=0; li<layers.size(); li++) {
                 layers[li]->simdt(T(ti), dt, constants, ns);

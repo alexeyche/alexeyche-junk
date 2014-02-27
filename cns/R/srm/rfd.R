@@ -1,11 +1,11 @@
 
 verbose = TRUE
-dir='~/prog/sim/runs/test'
-#dir='~/my/sim/runs/test'
-data_dir = '~/prog/sim'
-#data_dir = '~/my/sim'
-setwd("~/prog/alexeyche-junk/cns/R/srm")
-#setwd("~/my/git/alexeyche-junk/cns/R/srm")
+#dir='~/prog/sim/runs/test'
+dir='~/my/sim/runs/test'
+#data_dir = '~/prog/sim'
+data_dir = '~/my/sim'
+#setwd("~/prog/alexeyche-junk/cns/R/srm")
+setwd("~/my/git/alexeyche-junk/cns/R/srm")
 source('constants.R')
 source('srm_funcs.R')
 
@@ -40,14 +40,34 @@ neurons$connectFF(connection, start_w.M, 1:N )
 s = SIMClass(list(neurons))
 
 
-dir2save = "~/prog/sim/rfd_files"
-#dir2save = "~/my/sim/rfd_files"
+#dir2save = "~/prog/sim/rfd_files"
+dir2save = "~/my/sim/rfd_files"
 
 T0 = 0
 Tmax = 30000
 T = seq(T0, Tmax, by=dt) 
 
 Wacc = vector("list",N)
+
+#benchMSim = function() {
+#  ep =1
+#  file = sprintf("%s/ep_%d_%4.1fsec", dir2save, ep, Tmax/sim_dim)
+#  net_m = loadMatrix(file, 1)
+#  net = list()
+#  invisible(sapply(1:nrow(net_m), function(id) { 
+#   net[[id]] <<- net_m[id, which(net_m[id,] != 0)]
+#  }))
+#  sim_opt = list(T0=T0, Tmax=Tmax, dt=dt, saveStat=TRUE, learn=TRUE)
+#  s$sim(sim_opt, constants, net)
+#
+#}
+# SpMat per synapse
+#         test replications elapsed relative user.self sys.self user.child  
+#1 benchMSim()            3  37.966        1    37.266      0.5          0
+
+#library(rbenchmark)
+#benchmark(benchMSim(), replications = 3)
+#q()
 
 for(ep in 1:20) {
   file = sprintf("%s/ep_%d_%4.1fsec", dir2save, ep, Tmax/sim_dim)

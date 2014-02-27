@@ -7,10 +7,46 @@ using namespace Rcpp;
 using namespace std;
 
 
-
 class NetSim {
 public:    
-    NetSim(List &net_) : net(net_), active_ids(net.size(), arma::fill::zeros) {}
+    NetSim(const List &net, const int T_size, const double &dt_) : sp_spikes(net.size(), T_size+1), dt(dt_) {
+        for(size_t sp_i=0; sp_i < net.size(); sp_i++) {
+            NumericVector sp = net[sp_i];
+            for(size_t spike_i=0; spike_i < sp.size(); spike_i++) {
+                sp_spikes(sp_i, (int)(sp[spike_i]/dt)) = 1;
+            }
+        }
+//        sp_spikes.print();
+    }
+//    arma::vec getNumSpikesV(const arma::uvec &i, const double &t) {
+//        arma::uvec c_id = i - 1;
+//        std::cout << "SpMat read access: " << c_id << ":" << (int)(t/dt) << "\n";
+//        arma::SpSubview<double> all_spikes = sp_spikes.col((int)(t/dt));
+//        std::cout << "ok: " << all_spikes  << "\n";
+//        arma::vec n_spikes = all_spikes(c_id);
+//        return n_spikes;
+//    }
+    int getNumSpikes(size_t i, const double &t) {
+        size_t c_id = i-1;
+//        std::cout << "SpMat read access: " << c_id << ":" << (int)(t/dt) << "\n";
+        int n_spikes = sp_spikes(c_id, (int)(t/dt));
+//        std::cout << "ok: " << n_spikes  << "\n";
+        return n_spikes;
+    }
+    void push_back(size_t id, const double &t) {
+        size_t c_id = id-1;
+//        std::cout << "SpMat write access: " << c_id << ":" << (int)(t/dt) << "\n";
+        sp_spikes(c_id, (int)(t/dt)) = 1;
+//        std::cout << "ok\n";
+    }
+    arma::sp_mat sp_spikes;    
+    const double &dt;
+};
+
+
+class NetSimOld {
+public:    
+    NetSimOld(List &net_) : net(net_), active_ids(net.size(), arma::fill::zeros) {}
     int getNumSpikes(size_t i, const double &t, const double &dt) {
         size_t c_id = i-1;
         
