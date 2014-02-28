@@ -1,12 +1,12 @@
 #!/usr/bin/RScript
 
-TSNeurons <- setRefClass("TSNeurons", fields = list(M = "vector", patterns = "list", ids="vector"), 
+TSNeurons <- setRefClass("TSNeurons", fields = list(M = "vector", patterns = "list", ids_prop="vector"), 
                                     methods = list(
                                     initialize = function(M, ids_c=NULL) {
                                       if(is.null(ids_c)) {
-                                        ids <<- get_unique_ids(M)
+                                        ids_prop <<- get_unique_ids(M)
                                       } else {
-                                        ids <<-- ids_c
+                                        ids_prop <<-- ids_c
                                       }
                                       patterns <<- list()
                                       M <<- M
@@ -89,6 +89,9 @@ TSNeurons <- setRefClass("TSNeurons", fields = list(M = "vector", patterns = "li
                                                 break
                                             }
                                         }
+                                    },
+                                    ids = function() {
+                                        return(.self$ids_prop)
                                     }))
 
 

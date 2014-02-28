@@ -1,42 +1,52 @@
-# for dt = 1e-02
-b = c(0.0098687868984, 0.342274100117, 0.0295561392345, 0.418654959115, 0.117221965496, 0.0, 0.349356590009, 0.0774428562063, 0.954022777217)
-d = c(1.21892249696, 0.1, 0.1, 0.392920957712, 0.1, 0.1, 0.161005882994, 0.163416471944, 0.1)
-kd = c(0.1, 0.136449917762, 0.65322835574, 0.104151955315, 0.638143717035, 0.142705228061, 0.1, 0.104307072219, 0.282565337538)
-R = c(0.783879343778, 0.287651006583, 0.1, 1.37094851554, 1.67950981309, 0.246658596647, 0.41030883898, 1.02869091536, 0.1)
 
+
+b = rep(0, 9)
+d = seq(0.000075, 0.025, length.out=9)
+kd = rep(1, 9)
+R = rep(0.1, 9)
 
 source('../serialize_to_bin.R')
 source('encode.R')
 require(entropy)
 source('../plot_funcs.R')
+source('../snn/R/util.R')
 
 dt = 1e-03
 
 
-#dir2load = "/home/alexeyche/my/sim/ucr_fb_spikes/wavelets"
-dir2load = "/home/alexeyche/prog/sim/ucr_fb_spikes/wavelets"
+dir2load = "/home/alexeyche/my/sim/ucr_fb_spikes/wavelets"
+dir2save = "/home/alexeyche/my/sim/ucr_fb_spikes"
 labels = c("train", "test")
 nums = c(300, 300)
 
 entrop_all = NULL
 
-net_all = list()
+net_sp_all = list()
+wave_all = list()
+
 for(ds_num in 1:length(labels)) {
+    net_all = list()
     for(ds_j in 1:nums[ds_num]) {
         m = loadMatrix( sprintf("%s/%s_wavelets", dir2load, labels[[ds_num]]), ds_j)
         entrop = NULL
         net = list()
         for(fi in 1:nrow(m)) {
-            sp = iaf_encode(m[fi,], dt, b[fi], d[fi], 0, R[fi], kd[fi])
+            sp = iaf_encode(m[fi,], dt, b[fi], d[fi], 0, kd[fi], R[fi])
             net[[fi]] = sp
             if(length(sp)> 5) {
-                entrop = c(entrop, entropy(diff(sp)))
+              entrop = c(entrop, entropy(diff(sp)))
             } else {
-                entrop = c(entrop, 50)
+              entrop = c(entrop, 100/(1+length(sp)))
             }
         }
         entrop_all = cbind(entrop_all, entrop)
-        net_all[[ds_num*ds_j]] = net
+        net_all[[ds_j]] = list_to_matrix(net)
+        net_sp_all[[ (ds_num-1)*nums[1] + ds_j ]] = net
+        wave_all[[ (ds_num-1)*nums[1] + ds_j ]] = m
     }
+    saveMatrixList(sprintf("%s/%s_spikes", dir2save, labels[[ds_num]]), net_all)
 }
+
+
+
 filled.contour(entrop_all)

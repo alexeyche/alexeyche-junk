@@ -6,13 +6,17 @@
 using namespace Rcpp;
 using namespace std;
 
+#include "sim.h"
 
 class NetSim {
 public:    
-    NetSim(const List &net, const int T_size, const double &dt_) : sp_spikes(net.size(), T_size+1), dt(dt_) {
+    NetSim(const List &net, const int T_size, const double &dt_, int num_neurons) : sp_spikes(net.size(), T_size+1), dt(dt_) {
         for(size_t sp_i=0; sp_i < net.size(); sp_i++) {
             NumericVector sp = net[sp_i];
             for(size_t spike_i=0; spike_i < sp.size(); spike_i++) {
+                if((int)(sp[spike_i]/dt) > T_size) {
+                    break;
+                }
                 sp_spikes(sp_i, (int)(sp[spike_i]/dt)) = 1;
             }
         }
@@ -38,9 +42,11 @@ public:
 //        std::cout << "SpMat write access: " << c_id << ":" << (int)(t/dt) << "\n";
         sp_spikes(c_id, (int)(t/dt)) = 1;
 //        std::cout << "ok\n";
+        sp.push_back( TSpikePair(id, t) );
     }
     arma::sp_mat sp_spikes;    
     const double &dt;
+    TVecSpikes sp;
 };
 
 

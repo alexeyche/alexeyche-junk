@@ -184,11 +184,18 @@ public:
         if(num_neurons > net.size()) {
            ::Rf_error( "net list is less than size of layers\n");
         }
-        NetSim ns(net, T.n_elem, dt);
+        NetSim ns(net, T.n_elem, dt, num_neurons);
         for(size_t ti=0; ti<T.n_elem; ti++) {
             for(size_t li=0; li<layers.size(); li++) {
                 layers[li]->simdt(T(ti), dt, constants, ns);
             }
+        }
+        for(size_t spi=0; spi<ns.sp.size(); spi++) {
+            int c_id = ns.sp[spi].first-1;
+            double sp_time = ns.sp[spi].second;
+            NumericVector sp_times = net[c_id];
+            sp_times.push_back(sp_time);
+            net[c_id] = sp_times;
         }
     }
     vector<Layer*> layers;

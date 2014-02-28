@@ -11,6 +11,8 @@ typedef vector< arma::uvec > TVecIDs;
 typedef vector< arma::vec > TVecNums;
 typedef vector< vector<double> > TStatAcc;
 typedef vector< vector<arma::vec> > TVecStatAcc;
+typedef pair<int, double> TSpikePair;
+typedef vector<TSpikePair> TVecSpikes;
 
 class SRMLayer;
 class SIM;

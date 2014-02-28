@@ -1,12 +1,15 @@
 require(lattice)
 
- plot_rastl <- function(raster, lab="") {
+plot_rastl <- function(raster, lab="",T0=0, Tmax=Inf) {
   x <- c()
   y <- c()
   
   for(i in 1:length(raster)) {
-    x <- c(x, raster[[i]])
-    y <- c(y, rep(i, length(raster[[i]])))
+    rast = raster[[i]]
+    rast = rast[rast >= T0]
+    rast = rast[rast < Tmax]
+    x <- c(x, rast)
+    y <- c(y, rep(i, length(rast)))
   }
   return(xyplot(y~x,list(x=x, y=y), main=lab, xlim=c(0, max(x))))
 }
