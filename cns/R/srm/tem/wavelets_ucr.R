@@ -12,8 +12,9 @@ source('../plot_funcs.R')
 require(wavelets)
 require(entropy)
 
-c(trds, testds) := read_ts_file(synth, "~/my/sim")
-dir2save = "/home/alexeyche/my/sim/ucr_fb_spikes/wavelets"
+c(trds, testds) := read_ts_file(synth, "~/prog/sim")
+#dir2save = "/home/alexeyche/my/sim/ucr_fb_spikes/wavelets"
+dir2save = "/home/alexeyche/prog/sim/ucr_fb_spikes/wavelets"
 
 for(ds_and_label in list(list(trds, "train"), list(testds, "test"))) {
     ds = ds_and_label[[1]]

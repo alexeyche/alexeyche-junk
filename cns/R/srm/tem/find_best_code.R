@@ -23,7 +23,8 @@ source('../serialize_to_bin.R')
 source('encode.R')
 require(entropy)
 
-dir2load = "/home/alexeyche/my/sim/ucr_fb_spikes/wavelets"
+#dir2load = "/home/alexeyche/my/sim/ucr_fb_spikes/wavelets"
+dir2load = "/home/alexeyche/prog/sim/ucr_fb_spikes/wavelets"
 labels = c("train", "test")
 nums = c(300, 300)
 
@@ -38,7 +39,7 @@ for(ds_num in 1:length(labels)) {
             if(length(sp)> 5) {
                 entrop = c(entrop, entropy(diff(sp)))
             } else {
-                entrop = c(entrop, 50)
+                entrop = c(entrop, 50/(1+length(sp)))
             }
         }
         entrop_all = cbind(entrop_all, entrop)

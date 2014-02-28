@@ -6,8 +6,8 @@ import shutil
 from numpy.core.defchararray import join as npjoin
 import numpy as np
 
-codedir = '/home/alexeyche/my/git/alexeyche-junk/cns/R/srm/tem'
-#codedir = "/home/alexeyche/prog/alexeyche-junk/cns/R/srm"
+#codedir = '/home/alexeyche/my/git/alexeyche-junk/cns/R/srm/tem'
+codedir = "/home/alexeyche/prog/alexeyche-junk/cns/R/srm/tem"
 
 script_name = 'find_best_code.R'
 cmd = "Rscript %(codedir)s/%(script_name)s --params=\"%(params)s\""

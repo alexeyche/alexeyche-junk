@@ -10,10 +10,11 @@ source('encode.R')
 require(entropy)
 source('../plot_funcs.R')
 
-dt = 1e-02
+dt = 1e-03
 
 
-dir2load = "/home/alexeyche/my/sim/ucr_fb_spikes/wavelets"
+#dir2load = "/home/alexeyche/my/sim/ucr_fb_spikes/wavelets"
+dir2load = "/home/alexeyche/prog/sim/ucr_fb_spikes/wavelets"
 labels = c("train", "test")
 nums = c(300, 300)
 
@@ -38,3 +39,4 @@ for(ds_num in 1:length(labels)) {
         net_all[[ds_num*ds_j]] = net
     }
 }
+filled.contour(entrop_all)
