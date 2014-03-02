@@ -31,7 +31,7 @@ dt = 1
 sim_dim = 1000
 
 # net cfg
-N = 10
+N = 25
 M = 100
 net_edge_prob = 0.5
 inhib_frac = 0.2

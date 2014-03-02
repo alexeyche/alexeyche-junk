@@ -30,10 +30,10 @@ for(i in 1:300) {
   id1 = (i-1)*M+1
   id2 = (i-1)*M+M
   
-  maxCol = max(sapply(1:M, function(ni) length(which(nengo_m_train[ni,]!=0))))
+  maxCol = max(sapply(1:M, function(ni) length(which(nengo_m_train[id1-1+ni,]!=0))))
   mm = matrix(0, M, maxCol)
   for(ni in 1:M) {
-    mm[ni,] = unlist(nengo_m_train[ni,1:maxCol])
+    mm[ni,] = unlist(nengo_m_train[id1-1+ni,1:maxCol])
   }
   train_set[[i]] = mm
 }
@@ -46,10 +46,10 @@ for(i in 301:600) {
   id1 = (i-1)*M+1
   id2 = (i-1)*M+M
   
-  maxCol = max(sapply(1:M, function(ni) length(which(nengo_m_test[ni,]!=0))))
+  maxCol = max(sapply(1:M, function(ni) length(which(nengo_m_test[id1-1+ni,]!=0))))
   mm = matrix(0, M, maxCol)
   for(ni in 1:M) {
-    mm[ni,] = unlist(nengo_m_test[ni,1:maxCol])
+    mm[ni,] = unlist(nengo_m_test[id1-1+ni,1:maxCol])
   }
   test_set[[i-300]] = mm
 }

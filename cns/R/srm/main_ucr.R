@@ -123,8 +123,10 @@ data_ids = 1:300
 
 # mix:
 
+data_ids = data_ids[c(1:5,51:55)]
 data_ids = sample(data_ids)
-#data_ids = data_ids[c(1:10,51:60)]
+
+data_lens = NULL
 
 train_nets = list()
 Tcur = 0
@@ -133,46 +135,51 @@ nr = NULL
 for(f in train_spikes) {
     net = blank_net(M)
     for(spi in data_ids) {
-        net_m = loadMatrix(f, spi)*150
+        net_m = loadMatrix(f, spi)*500
         invisible(sapply(1:nrow(net_m), function(id) { 
           sp = net_m[id, which(net_m[id,] != 0)] + Tcur
           net[[id]] <<- c(net[[id]], sp)
         }))
+        data_lens = c(data_lens, max(net_m))
         Tcur = Tcur + max(net_m) + timeout
     }
     train_nets[[ length(train_nets) + 1 ]] = list(data = net, labels = labels) 
 }
 
+timeline = cumsum(data_lens + timeout)
 
 start_w.M = matrix(rnorm( M*N, mean=start_w.M.mean, sd=start_w.M.sd), ncol=N, nrow=M)
 start_w.N = matrix(rnorm( (N-1)*N, mean=start_w.N.mean, sd=start_w.N.sd), ncol=N, nrow=(N-1))
 
 gr1 = TSNeurons(M = M)
-neurons = SRMLayerClass$new(N, start_w.N, p_edge_prob=0.0)
+neurons = SRMLayerClass$new(N, start_w.N, p_edge_prob=0.5,ninh=N)
 connection = matrix(gr1$ids(), nrow=length(gr1$ids()), ncol=N)
 neurons$connectFF(connection, start_w.M, 1:N )
 
 s = SIMClass$new(list(neurons))
 # collect statistics
-Tmax = max(sapply(net[gr1$ids()], max))
+Tmax = max(sapply(train_nets[[1]]$data, max))
 
 net = list()
 net[neurons$ids()] = blank_net(N)
+#net[gr1$ids()] = train_nets[[1]]$data
+it = 0
 for(T0 in seq(0, mean_p_dur-Tmax, by=Tmax)) {
-  cur_timeout = timeout
-  if(T0 == 0) 
-    cur_timeout=0
-  for(i in gr1$ids()) {
-     net[[i]] = c(net[[i]], train_nets[[1]]$data[[i]]+T0+cur_timeout )
-  }
+cur_timeout = timeout
+
+for(i in gr1$ids()) {
+   net[[i]] = c(net[[i]], train_nets[[1]]$data[[i]]+T0+it*cur_timeout )
+}
+it = it +1
 } 
 
 sim_opt = list(T0=0, Tmax=max(sapply(net[gr1$ids()], max)), dt=dt, saveStat=FALSE, learn=FALSE)
 s$sim(sim_opt, constants, net)
+plot_data_rates(net[neurons$ids()], timeline, labels[data_ids])
 
 Wacc = vector("list",N)
 
-for(ep in 6:100) {
+for(ep in 1:150) {
   net = list()
   
   net[gr1$ids()] = train_nets[[1]]$data
@@ -183,10 +190,12 @@ for(ep in 6:100) {
   s$sim(sim_opt, constants, net)
   cat("ep: ", ep, "\n")
     
+  
   for(i in 1:N) {
     Wm = neurons$obj$W[[i]]
     Wacc[[i]] = cbind(Wacc[[i]], Wm)
   }
+  plot_data_rates(net[neurons$ids()], timeline, labels[data_ids])
 }
 
 W = list_to_matrix(neurons$obj$W)

@@ -11,7 +11,7 @@ plot_rastl <- function(raster, lab="",T0=0, Tmax=Inf) {
     x <- c(x, rast)
     y <- c(y, rep(i, length(rast)))
   }
-  return(xyplot(y~x,list(x=x, y=y), main=lab, xlim=c(0, max(x))))
+  return(xyplot(y~x,list(x=x, y=y), main=lab, xlim=c(T0, max(x))))
 }
 
 plot_dwt = function(mx) { 
@@ -92,3 +92,25 @@ plot_run_status = function(net, neurons, loss, pic_filename, descr) {
 #z = 1:dim(sim_out$stat$wstat)[3]
 #wstat.df$z = z
 #xyplot( y ~ z , data = wstat.df, groups = grp, type="l") 
+
+
+plot_data_rates = function(net, timeline, labels) {
+  N = length(net)
+  data_rates = matrix(0, N, length(data_ids))
+  for(i in 1:N) {
+    for(sp in net[[i]]) {
+      tm_sp = timeline - sp      
+      patt_id = which(tm_sp == min(tm_sp[tm_sp>0]) )
+      data_rates[i, patt_id] = data_rates[i, patt_id] + 1
+    }
+  }
+  ul = unique(labels)
+  mean_data_rates = matrix(0, N, length(ul))
+  for(lab in ul) {
+    mean_data_rates[, which(lab == ul)] = rowMeans(data_rates[, which(labels[data_ids] == lab)])
+  }
+  x = rep(1:N, length(ul))
+  y = c(mean_data_rates)
+  cols = c(sapply(ul, function(lab) rep(lab, N)))
+  plot(x,y, col=cols)
+}
