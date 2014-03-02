@@ -15,7 +15,7 @@ double asD(const char *name, const List &c) {
 
 class SRMLayer : public Layer {
 public:
-    SRMLayer(int &N_, arma::uvec &ids_, TVecNums &W_, TVecIDs &id_conns_, TVecNums &syn_, TVecNums &syn_spec_, arma::vec &a_, TVecNums &C_, arma::vec &pacc_, int incr_, arma::vec prev_dw_) : 
+    SRMLayer(int &N_, arma::uvec &ids_, TVecNums &W_, TVecIDs &id_conns_, TVecNums &syn_, TVecNums &syn_spec_, arma::vec &a_, TVecNums &C_, arma::vec &pacc_, int incr_) : 
                         Layer(N_),
                         ids(ids_),
                         W(W_),
@@ -25,13 +25,10 @@ public:
                         a(a_),
                         C(C_),
                         pacc(pacc_),
-                        incr(incr_),
-                        prev_dw(prev_dw_)
+                        incr(incr_)
     {}
-    SRMLayer(const SRMLayer &l) : Layer(l.num()), ids(l.ids), W(l.W), id_conns(l.id_conns), syn(l.syn), syn_spec(l.syn_spec), a(l.a), C(l.C), pacc(l.pacc), incr(l.incr), prev_dw(l.prev_dw) {}
-    SRMLayer(int N_) : Layer(N_), ids(N), a(N, arma::fill::zeros), C(N), W(N), id_conns(N), syn(N), syn_spec(N), pacc(N, arma::fill::zeros), incr(0), prev_dw(N, arma::fill::zeros) { 
-        
-    }
+    SRMLayer(const SRMLayer &l) : Layer(l.num()), ids(l.ids), W(l.W), id_conns(l.id_conns), syn(l.syn), syn_spec(l.syn_spec), a(l.a), C(l.C), pacc(l.pacc), incr(l.incr) {}
+    SRMLayer(int N_) : Layer(N_), ids(N), a(N, arma::fill::zeros), C(N), W(N), id_conns(N), syn(N), syn_spec(N), pacc(N, arma::fill::zeros), incr(0) { }
     const int num() const {
         return N;
     }
@@ -50,7 +47,6 @@ public:
             stat_W.push_back(vector<arma::vec>());
         }
         a.fill(1.0);
-        prev_dw.fill(0.0);
     }
 
     void simdt(const double &t, const double &dt, const List &c, NetSim &n)  {
@@ -120,16 +116,17 @@ public:
                         ::Rf_error("error");
                     }
 #endif                
-                    W[ni] += dw_c;
+                    if(learn)
+                        W[ni] += dw_c;
                 
                 }
-                prev_dw = dw;
                 if(saveStat) {
                     stat_p[ni].push_back(p);
                     stat_u[ni].push_back(u);
                     stat_B[ni].push_back(B);
                     stat_C[ni].push_back(C[ni]);
-                    stat_W[ni].push_back(W[ni]);
+                    if(learn)
+                        stat_W[ni].push_back(W[ni]);
                 }
             }
             
@@ -148,7 +145,6 @@ public:
     TVecNums C;
     arma::vec pacc;
     double incr;
-    arma::vec prev_dw;
 
     TStatAcc stat_p;
     TStatAcc stat_u;
@@ -179,12 +175,13 @@ public:
         for(size_t li=0; li<layers.size(); li++) {
             layers[li]->prepare(constants);
             layers[li]->saveStat = saveStat;
+            layers[li]->learn = learn;
             num_neurons += layers[li]->N;
         }
         if(num_neurons > net.size()) {
            ::Rf_error( "net list is less than size of layers\n");
         }
-        NetSim ns(net, T.n_elem, dt, num_neurons);
+        NetSim ns(net, T.n_elem, T0, dt, num_neurons);
         for(size_t ti=0; ti<T.n_elem; ti++) {
             for(size_t li=0; li<layers.size(); li++) {
                 layers[li]->simdt(T(ti), dt, constants, ns);

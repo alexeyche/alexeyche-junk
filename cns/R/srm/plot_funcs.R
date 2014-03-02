@@ -13,6 +13,24 @@ plot_rastl <- function(raster, lab="",T0=0, Tmax=Inf) {
   }
   return(xyplot(y~x,list(x=x, y=y), main=lab, xlim=c(0, max(x))))
 }
+
+plot_dwt = function(mx) { 
+  par(mfrow=c(length(mx@W),1), mar = rep(2,4))
+  for(i in length(mx@W):1) {
+    plot(mx@W[[i]], type="l")
+  }
+}
+
+plot_rast_dwt = function(net) {
+  par(mfrow=c(length(net),1), mar = rep(2,4))
+  for(i in 1:length(net)) {
+    x = net[[i]]
+    y = rep(i, length(x))
+    plot(x,y)
+  }
+}
+
+
 require(reshape2)
 require(ggplot2)
 get_gray_plot <- function(data, lims = c(min(data),max(data))) {

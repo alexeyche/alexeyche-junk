@@ -10,6 +10,7 @@ public:
     virtual void simdt(const double &t, const double &dt, const List &c, NetSim &n) = 0;
     virtual void prepare(const List &c) = 0;
     bool saveStat;
+    bool learn;
     int N;
 };
 

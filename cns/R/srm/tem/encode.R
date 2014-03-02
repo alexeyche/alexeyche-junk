@@ -31,3 +31,25 @@ iaf_encode = function(u, dt, b, d, sd_tr, R, C) {
   }
   return(sp)
 }
+
+lif_encode = function(u, dt, t_rc, t_ref) {
+  v = 0
+  ref = 0
+  sp = NULL
+  t = 0
+  for(i in 1:length(u)) {
+    t = t + dt
+    v = v + dt*(u[i]-v)/t_rc
+    if(v<0) v = 0
+    if(ref>0) {
+      v = 0
+      ref = ref - dt
+    }
+    if(v>1) {
+      v = 0
+      ref = t_ref
+      sp = c(sp, t)
+    }
+  }
+  return(sp)
+}

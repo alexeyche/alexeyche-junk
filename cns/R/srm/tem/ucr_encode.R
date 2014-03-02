@@ -1,9 +1,5 @@
 
 
-b = rep(0, 9)
-d = seq(0.000075, 0.025, length.out=9)
-kd = rep(1, 9)
-R = rep(0.1, 9)
 
 source('../serialize_to_bin.R')
 source('encode.R')
@@ -11,11 +7,27 @@ require(entropy)
 source('../plot_funcs.R')
 source('../snn/R/util.R')
 
-dt = 1e-03
+dt = 0.1
+t_rc = 2
+t_ref = 0.2
+Tmax = length(u)*dt
 
 
-dir2load = "/home/alexeyche/my/sim/ucr_fb_spikes/wavelets"
-dir2save = "/home/alexeyche/my/sim/ucr_fb_spikes"
+g = c(604.4949,140.6818,32.71212,17.08333,12.05808,10.04798,10.04798,8.037879,8.037879)
+#g = (1 - z)/(intercept - 1.0)
+b = 0
+
+#sp = lif_encode(u*g+b, dt, t_rc, t_ref)
+#par(mfrow=c(2,1))
+#plot(seq(0,Tmax,length.out =length(u)), u, xlim=c(0,Tmax), type="l")
+#plot(sp, rep(1,length(sp)), xlim=c(0,Tmax))
+
+#r = length(sp)/Tmax
+
+#dir2load = "/home/alexeyche/my/sim/ucr_fb_spikes/wavelets"
+dir2load = "/home/alexeyche/prog/sim/ucr_fb_spikes/wavelets"
+#dir2save = "/home/alexeyche/my/sim/ucr_fb_spikes"
+dir2save = "/home/alexeyche/prog/sim/ucr_fb_spikes"
 labels = c("train", "test")
 nums = c(300, 300)
 
@@ -31,7 +43,7 @@ for(ds_num in 1:length(labels)) {
         entrop = NULL
         net = list()
         for(fi in 1:nrow(m)) {
-            sp = iaf_encode(m[fi,], dt, b[fi], d[fi], 0, kd[fi], R[fi])
+            sp = lif_encode(m[fi,]*g[fi]+b, dt, t_rc, t_ref)
             net[[fi]] = sp
             if(length(sp)> 5) {
               entrop = c(entrop, entropy(diff(sp)))
@@ -50,3 +62,5 @@ for(ds_num in 1:length(labels)) {
 
 
 filled.contour(entrop_all)
+
+plot_rastl(net_sp_all[[51]])

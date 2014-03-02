@@ -3,14 +3,16 @@
 args <- commandArgs(trailingOnly = FALSE)
 if(length(grep("RStudio", args))>0) {
   verbose = TRUE
-  #dir='~/prog/sim/runs/test'
-  dir='~/my/sim/runs/testrstudio'
-  #data_dir = '~/prog/sim'
-  data_dir = '~/my/sim'
-  #setwd("~/prog/alexeyche-junk/cns/R/srm")
-  setwd("~/my/git/alexeyche-junk/cns/R/srm")
-  train_spikes = list("/home/alexeyche/my/sim/ucr_fb_spikes/train_spikes")
-  test_spiks  = list("/home/alexeyche/my/sim/ucr_fb_spikes/test_spikes")
+  dir='~/prog/sim/runs/test'
+  #dir='~/my/sim/runs/testrstudio'
+  data_dir = '~/prog/sim'
+  #data_dir = '~/my/sim'
+  setwd("~/prog/alexeyche-junk/cns/R/srm")
+  #setwd("~/my/git/alexeyche-junk/cns/R/srm")
+  #train_spikes = list("/home/alexeyche/my/sim/ucr_fb_spikes/train_spikes")
+  #test_spikes  = list("/home/alexeyche/my/sim/ucr_fb_spikes/test_spikes")
+  train_spikes = list("/home/alexeyche/prog/sim/ucr_nengo_spikes/train_spikes")
+  test_spikes  = list("/home/alexeyche/prog/sim/ucr_nengo_spikes/test_spikes")
   source('constants.R')
 } else {
   if(length(args) == 5) {
@@ -122,15 +124,16 @@ data_ids = 1:300
 # mix:
 
 data_ids = sample(data_ids)
+#data_ids = data_ids[c(1:10,51:60)]
 
 train_nets = list()
 Tcur = 0
-timeout = 200
+timeout = 100
 nr = NULL
 for(f in train_spikes) {
     net = blank_net(M)
     for(spi in data_ids) {
-        net_m = loadMatrix(f, spi)*sim_dim/5
+        net_m = loadMatrix(f, spi)*150
         invisible(sapply(1:nrow(net_m), function(id) { 
           sp = net_m[id, which(net_m[id,] != 0)] + Tcur
           net[[id]] <<- c(net[[id]], sp)
@@ -150,17 +153,45 @@ connection = matrix(gr1$ids(), nrow=length(gr1$ids()), ncol=N)
 neurons$connectFF(connection, start_w.M, 1:N )
 
 s = SIMClass$new(list(neurons))
-for(ep in 4:10) {
+# collect statistics
+Tmax = max(sapply(net[gr1$ids()], max))
+
+net = list()
+net[neurons$ids()] = blank_net(N)
+for(T0 in seq(0, mean_p_dur-Tmax, by=Tmax)) {
+  cur_timeout = timeout
+  if(T0 == 0) 
+    cur_timeout=0
+  for(i in gr1$ids()) {
+     net[[i]] = c(net[[i]], train_nets[[1]]$data[[i]]+T0+cur_timeout )
+  }
+} 
+
+sim_opt = list(T0=0, Tmax=max(sapply(net[gr1$ids()], max)), dt=dt, saveStat=FALSE, learn=FALSE)
+s$sim(sim_opt, constants, net)
+
+Wacc = vector("list",N)
+
+for(ep in 6:100) {
   net = list()
   
   net[gr1$ids()] = train_nets[[1]]$data
   net[neurons$ids()] = blank_net(N)
   
-  T0 = 0
   Tmax = max(sapply(net[gr1$ids()], max))
-  sim_opt = list(T0=T0, Tmax=Tmax, dt=dt, saveStat=FALSE, learn=TRUE)
+  sim_opt = list(T0=0, Tmax=Tmax, dt=dt, saveStat=FALSE, learn=TRUE)
   s$sim(sim_opt, constants, net)
+  cat("ep: ", ep, "\n")
+    
+  for(i in 1:N) {
+    Wm = neurons$obj$W[[i]]
+    Wacc[[i]] = cbind(Wacc[[i]], Wm)
+  }
 }
 
 W = list_to_matrix(neurons$obj$W)
 gr_pl(W)
+levelplot(t(Wacc[[1]]) , col.regions=colorRampPalette(c("black", "white")))
+
+
+

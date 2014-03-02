@@ -31,18 +31,18 @@ dt = 1
 sim_dim = 1000
 
 # net cfg
-N = 30
-M = 9
+N = 10
+M = 100
 net_edge_prob = 0.5
 inhib_frac = 0.2
 net_neurons_for_input = N
 afferent_per_neuron = M
 
 # start weights
-start_w.M.mean = 0.2
-start_w.M.sd = 0.01
-start_w.N.mean = 0.2
-start_w.N.sd = 0.01
+start_w.M.mean = 0.1
+start_w.M.sd = 0.001
+start_w.N.mean = 0.1
+start_w.N.sd = 0.001
 
 # C
 tc = 100
