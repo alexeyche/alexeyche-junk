@@ -14,8 +14,8 @@ ta = 50 #*10^-3
 
 
 # stochastic treshold
-alpha <- 0.25
-beta <- 10
+alpha <- 1
+beta <- 20
 tr <- -50 # mV
 
 gain_factor = 12.5

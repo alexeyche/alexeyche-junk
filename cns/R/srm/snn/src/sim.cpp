@@ -60,7 +60,7 @@ public:
 //            syn[ni] *= a(ni);
 
             for(size_t syn_i=0; syn_i < id_conns[ni].n_elem; syn_i++) {
-                int num_spikes = n.getNumSpikes( id_conns[ni](syn_i), t);
+                int num_spikes = n.getNumSpikes( id_conns[ni](syn_i), t-syn_del[ni](syn_i));
                 if(num_spikes > 0) {
                     if(num_spikes > 1) {
                         cout << "warning: too many spikes\n";
@@ -74,7 +74,7 @@ public:
             double p = probf(u, c)*dt;
             bool Yspike = false;
             if(p > coins(ni)) {
-                n.push_back(ids(ni), t);
+                n.push_back(ids(ni), t+axon_del(ni));
                 a(ni) = 0;
                 Yspike = true;
                 pacc(ni) += 1;
@@ -83,9 +83,9 @@ public:
             C[ni] += -C[ni]/as<double>(c["tc"]) + C_calc(Yspike, p, u, syn[ni], c);
             syn[ni] -= syn[ni]/asD("tm", c);
             a += (1-a)/asD("ta", c);
-            
+            double B=0; 
             if (incr>=asD("mean_p_dur",c)) {
-                double B = B_calc(Yspike, p, pacc(ni)/asD("mean_p_dur",c), c);
+                B = B_calc(Yspike, p, pacc(ni)/asD("mean_p_dur",c), c);
                 arma::vec dw = asD("added_lrate",c)*ratecalc(W[ni],c) % (C[ni]*B - asD("weight_decay_factor",c)*(fired % W[ni]) );
 #ifdef FINITE_CHECK            
                 if(!arma::is_finite(dw)) {
@@ -120,16 +120,16 @@ public:
                         W[ni] += dw_c;
                 
                 }
-                if(saveStat) {
-                    stat_p[ni].push_back(p);
-                    stat_u[ni].push_back(u);
-                    stat_B[ni].push_back(B);
-                    stat_C[ni].push_back(C[ni]);
-                    if(learn)
-                        stat_W[ni].push_back(W[ni]);
-                }
+
             }
-            
+            if(saveStat) {
+                stat_p[ni].push_back(p);
+                stat_u[ni].push_back(u);
+                stat_B[ni].push_back(B);
+                stat_C[ni].push_back(C[ni]);
+                if(learn)
+                    stat_W[ni].push_back(W[ni]);
+            }            
         }
         incr+=dt;
     }
@@ -138,6 +138,8 @@ public:
     TVecNums W;
     TVecIDs id_conns;
     TVecNums syn_spec;
+    TVecNums syn_del;
+    arma::vec axon_del;
 
     // vars
     TVecNums syn;
@@ -181,7 +183,7 @@ public:
         if(num_neurons > net.size()) {
            ::Rf_error( "net list is less than size of layers\n");
         }
-        NetSim ns(net, T.n_elem, T0, dt, num_neurons);
+        NetSim ns(net, T.n_elem, dt);
         for(size_t ti=0; ti<T.n_elem; ti++) {
             for(size_t li=0; li<layers.size(); li++) {
                 layers[li]->simdt(T(ti), dt, constants, ns);
@@ -212,6 +214,8 @@ RCPP_MODULE(snnMod){
     .field("id_conns", &SRMLayer::id_conns, "IDs of connections")
     .field("syn", &SRMLayer::syn, "synapses")
     .field("syn_spec", &SRMLayer::syn_spec, "synapse specializations")
+    .field("syn_del", &SRMLayer::syn_del, "synapse delays")
+    .field("axon_del", &SRMLayer::axon_del, "axon delays")
     .field("stat_p", &SRMLayer::stat_p, "Statistics of probs")
     .field("stat_u", &SRMLayer::stat_u, "Statistics of pots")
     .field("stat_B", &SRMLayer::stat_B, "Statistics of B")

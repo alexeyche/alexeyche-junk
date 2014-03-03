@@ -10,7 +10,7 @@ using namespace std;
 
 class NetSim {
 public:    
-    NetSim(const List &net, const int T_size, const double &dt_, int num_neurons) : sp_spikes(net.size(), T_size+1), dt(dt_) {
+    NetSim(const List &net, const int T_size, const double &dt_) : sp_spikes(net.size(), T_size+1), dt(dt_) {
         for(size_t sp_i=0; sp_i < net.size(); sp_i++) {
             NumericVector sp = net[sp_i];
             for(size_t spike_i=0; spike_i < sp.size(); spike_i++) {
@@ -31,9 +31,11 @@ public:
 //        return n_spikes;
 //    }
     int getNumSpikes(size_t i, const double &t) {
+        int index = (int)(t/dt);
+        if ((index<0)||(index>(sp_spikes.n_cols-1))) return 0;
         size_t c_id = i-1;
 //        std::cout << "SpMat read access: " << c_id << ":" << (int)(t/dt) << "\n";
-        int n_spikes = sp_spikes(c_id, (int)(t/dt));
+        int n_spikes = sp_spikes(c_id, index);
 //        std::cout << "ok: " << n_spikes  << "\n";
         return n_spikes;
     }

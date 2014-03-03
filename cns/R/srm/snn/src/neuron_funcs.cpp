@@ -5,7 +5,7 @@ using namespace Rcpp;
 #define LINEAR 1
 #define EXP 2
 
-#define PROB_FUNC LINEAR
+#define PROB_FUNC EXP
 
 double probf(const double &u, const List &c) {
 #if PROB_FUNC == LINEAR 
@@ -21,6 +21,12 @@ double probf(const double &u, const List &c) {
 #endif    
 }
 
+// [[Rcpp::export]]
+double probFun(double u, const List c) {
+    return probf(u, c);
+}
+
+
 double pstroke(const double &u, const List &c) {
 #if PROB_FUNC == LINEAR 
     return as<double>(c["gain_factor"])/as<double>(c["sim_dim"]);
@@ -30,7 +36,7 @@ double pstroke(const double &u, const List &c) {
 }
 
 
-arma::vec C_calc(bool Yspike, double p, double u, arma::vec  epsps, const List &c) {
+arma::vec C_calc(bool Yspike, double p, double u, arma::vec epsps, const List &c) {
     const double pstr = pstroke(u, c);
     return ( pstr/p ) * ( Yspike - p ) * epsps;
 }
