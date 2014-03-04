@@ -66,6 +66,11 @@ public:
                         cout << "warning: too many spikes\n";
                     }
                     syn[ni](syn_i) += num_spikes*syn_spec[ni](syn_i)*asD("e0",c);
+//                    if(syn_spec[ni](syn_i)<0) {
+//                        cout << "inh spike at synapse " << id_conns[ni](syn_i) << " of neuron " << ids(ni) << " at " << t << "\n";
+//                        cout << "syn epsp: " << syn[ni](syn_i) << "\n";
+//                        cout << "==================================\n";
+//                    }
                     fired(syn_i) = 1;
                 }
                 syn[ni](syn_i) *= a(ni);
@@ -74,7 +79,7 @@ public:
             double p = probf(u, c)*dt;
             bool Yspike = false;
             if(p > coins(ni)) {
-                n.push_back(ids(ni), t+axon_del(ni));
+                n.push_back(ids(ni), t+dt+axon_del(ni));
                 a(ni) = 0;
                 Yspike = true;
                 pacc(ni) += 1;
@@ -109,8 +114,6 @@ public:
 #ifdef FINITE_CHECK
                     if(!arma::is_finite(dw_c)) {
                         cout << "dw_c is infinite \n";
-                        cout << "prev_dw: " << "\n";
-                        prev_dw.t().print();
                         cout << "dw: " << "\n";
                         dw.t().print();
                         ::Rf_error("error");

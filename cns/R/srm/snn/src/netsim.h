@@ -41,9 +41,11 @@ public:
     }
     void push_back(size_t id, const double &t) {
         size_t c_id = id-1;
-//        std::cout << "SpMat write access: " << c_id << ":" << (int)(t/dt) << "\n";
-        sp_spikes(c_id, (int)(t/dt)) = 1;
-//        std::cout << "ok\n";
+        int index = (int)(t/dt);
+ //       std::cout << "SpMat write access: " << c_id << ":" << index << "\n";
+        if ((index<0)||(index>=(sp_spikes.n_cols))) return;
+        sp_spikes(c_id, index) = 1;
+ //       std::cout << "ok\n";
         sp.push_back( TSpikePair(id, t) );
     }
     arma::sp_mat sp_spikes;    

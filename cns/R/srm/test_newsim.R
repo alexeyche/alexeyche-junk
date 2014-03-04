@@ -14,13 +14,6 @@ source('srm_funcs.R')
 require(snn)
 set.seed(1234)
 
-e0 = 30
-constants = list(dt=dt, e0=e0, ts=ts, tm=tm, alpha=alpha, beta=beta, tr=tr, u_rest=u_rest, pr=pr, gain_factor=gain_factor, 
-                 ta=ta, tc=tc,
-                 target_rate=target_rate,
-                 target_rate_factor=target_rate_factor,
-                 weight_decay_factor=weight_decay_factor,
-                 ws=ws, added_lrate = added_lrate, sim_dim=sim_dim, mean_p_dur=mean_p_dur)
 
 
 source('util.R')
@@ -31,19 +24,20 @@ source('plot_funcs.R')
 
 ID_MAX=0
 T0=0
-Tmax=1000
-dt=0.5
+Tmax=300000
+dt=1
 N=10
-M=100
-start_w.N = 0.25
-start_w.M = 0.25
+M=50
+start_w.N = 7.5
+start_w.M = 7.5
+ws = 7.5
 
-gr1 = TSNeurons$new(M = M)
-neurons = SRMLayerClass$new(N, start_w.N, p_edge_prob=1.0, ninh=N)
-connection = matrix(gr1$ids(), nrow=length(gr1$ids()), ncol=N)
-neurons$connectFF(connection, start_w.M, 1:N )
-
-net = list()
+constants = list(dt=dt, e0=e0, ts=ts, tm=tm, alpha=alpha, beta=beta, tr=tr, u_rest=u_rest, pr=pr, gain_factor=gain_factor, 
+                 ta=ta, tc=tc,
+                 target_rate=target_rate,
+                 target_rate_factor=target_rate_factor,
+                 weight_decay_factor=weight_decay_factor,
+                 ws=ws, added_lrate = added_lrate, sim_dim=sim_dim, mean_p_dur=mean_p_dur)
 
 gen_fun_pattern = function(M, T0, Tmax, dt, fun, frac=50) {
     net = blank_net(M)
@@ -55,19 +49,75 @@ gen_fun_pattern = function(M, T0, Tmax, dt, fun, frac=50) {
     }
     return(net)
 }
+fun = Vectorize(function(t) {
+  v = t/5
+  vf = floor(v)
+  if(vf %% 2  == 0) {
+    fr = v - vf  
+  } else {
+    fr = 1 -(v - vf)   
+  }
+  fr_n = -1+2*fr
+  return(fr_n)
+})
 
-pattern = gen_fun_pattern(M, T0, Tmax, dt*10, sin)
+pattern_fun = sin
+pattern_frac = dt*7.5
+patt_dur = 800
+timeout = 400
+
+gr1 = TSNeurons$new(M = M)
+neurons = SRMLayerClass$new(N, start_w.N, p_edge_prob=0.5, ninh=N, syn_delay_rate=1, axon_delay_rate=1,delay_dist_gain=5)
+connection = matrix(gr1$ids(), nrow=length(gr1$ids()), ncol=N)
+input_conns = 35
+for(ni in 1:N) {
+    connection[sample(M, M-input_conns), ni] = 0
+}
+neurons$connectFF(connection, start_w.M, 1:N, syn_delay_rate=1, delay_dist_gain=5)
+
+
+sl = SIMClass$new(list(neurons))
+# net = list()
+# 
+# mean_p_dur_pattern = gen_fun_pattern(M, 0, mean_p_dur, pattern_frac, pattern_fun)
+# sim_opt = list(T0=0, Tmax=mean_p_dur, dt=dt, saveStat=FALSE, learn=FALSE)
+# net[gr1$ids()] = mean_p_dur_pattern
+# net[neurons$ids()] = blank_net(N)
+# 
+# sl$sim(sim_opt, constants, net)
+# for(ep in 1:5) {
+#     net = list()
+#     net = blank_net(M+N)
+#     
+
+#     pattern = gen_fun_pattern(M, 0, patt_dur, pattern_frac, pattern_fun)
+#     for(t0 in seq(0, Tmax-patt_dur-timeout, by=patt_dur+timeout)) {
+#         sapply(1:M, function(mi) {
+#             net[[ gr1$ids()[mi] ]] <<- c(net[[ gr1$ids()[mi] ]], pattern[[mi]]+t0)
+#         })
+#     }
+#     
+#     sim_opt = list(T0=0, Tmax=Tmax, dt=dt, saveStat=(Tmax<=5000), learn=TRUE)
+#     sl$sim(sim_opt, constants, net)
+#     cat("ep:", ep, "\n")
+# }
+# 
+# #plot_rastl(net)
+# #st = neurons$get_stat()
+# #plotl(st$C[[3]][,8])
+# #plotl(st$W[[3]][,1])
+# 
+# #plotl(st$B[3,])
+# W = neurons$Wm()
+# gr_pl(W)
+pattern = gen_fun_pattern(M, 0, patt_dur, pattern_frac, pattern_fun)
+net = list()
+net = blank_net(M+N)
 
 net[gr1$ids()] = pattern
-net[neurons$ids()] = blank_net(N)
-
-sim_opt = list(T0=0, Tmax=Tmax, dt=dt, saveStat=TRUE, learn=TRUE)
-sl = SIMClass$new(list(neurons))
-
+sim_opt = list(T0=0, Tmax=patt_dur+100, dt=dt, saveStat=TRUE, learn=FALSE)
+constants$alpha = 1 #10
+constants$beta = 10 #100000
 sl$sim(sim_opt, constants, net)
-
+st = neurons$get_stat()
 plot_rastl(net)
-#st = neurons$get_stat()
-#plotl(st$C[[3]][,6])
-
-#plotl(neurons$obj$stat_u[[2]])
