@@ -76,20 +76,33 @@ public:
                 syn[ni](syn_i) *= a(ni);
             }
             double u = asD("u_rest", c) + sum(syn[ni] % W[ni]);
-            double p = probf(u, c)*dt;
             bool Yspike = false;
-            if(p > coins(ni)) {
+            double p = 0;
+            if(!determ) {
+                p = probf(u, c)*dt;
+                if(p > coins(ni)) {
+                    Yspike = true;
+                }
+            } else {
+                if(u >= as<double>(c["tr"])) {
+                    Yspike = true;
+                }            
+            }
+            
+            if(Yspike) {
                 n.push_back(ids(ni), t+dt+axon_del(ni));
                 a(ni) = 0;
                 Yspike = true;
                 pacc(ni) += 1;
             }
             pacc(ni) += -pacc(ni)/(asD("mean_p_dur",c));
-            C[ni] += -C[ni]/as<double>(c["tc"]) + C_calc(Yspike, p, u, syn[ni], c);
             syn[ni] -= syn[ni]/asD("tm", c);
             a += (1-a)/asD("ta", c);
+            if(!determ) {
+                C[ni] += -C[ni]/as<double>(c["tc"]) + C_calc(Yspike, p, u, syn[ni], c);
+            }
             double B=0; 
-            if (incr>=asD("mean_p_dur",c)) {
+            if (incr>=asD("mean_p_dur",c)&&(!determ)) {
                 B = B_calc(Yspike, p, pacc(ni)/asD("mean_p_dur",c), c);
                 arma::vec dw = asD("added_lrate",c)*ratecalc(W[ni],c) % (C[ni]*B - asD("weight_decay_factor",c)*(fired % W[ni]) );
 #ifdef FINITE_CHECK            
@@ -174,13 +187,17 @@ public:
         const double dt = as<double>(sim_options["dt"]);    
         const bool saveStat = as<bool>(sim_options["saveStat"]);    
         const bool learn = as<bool>(sim_options["learn"]);    
+        const bool determ = as<bool>(sim_options["determ"]);    
         arma::vec T = arma::linspace(T0, Tmax, (Tmax-T0)/dt);
-
+        if(determ && learn) {
+            ::Rf_error( "Net can't learn being in detemenitic mode" );
+        }
         int num_neurons = 0;
         for(size_t li=0; li<layers.size(); li++) {
             layers[li]->prepare(constants);
             layers[li]->saveStat = saveStat;
             layers[li]->learn = learn;
+            layers[li]->determ = determ;
             num_neurons += layers[li]->N;
         }
         if(num_neurons > net.size()) {

@@ -21,6 +21,8 @@ double probf(const double &u, const List &c) {
     return p;
 }
 
+
+
 // [[Rcpp::export]]
 double probFun(double u, const List c) {
     return probf(u, c);

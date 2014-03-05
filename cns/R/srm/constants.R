@@ -19,7 +19,7 @@ beta <- 20
 tr <- -50 # mV
 
 gain_factor = 12.5
-pr = 0.1
+pr = 1
 
 # srm
 u_rest <- -70 # mV
@@ -50,7 +50,7 @@ mean_p_dur = 60 * sim_dim
 ws = 5
 target_rate = 5 # Hz
 target_rate_factor = 0.1
-weight_decay_factor = 0.01
+weight_decay_factor = 0.026
 
 
 added_lrate = 1

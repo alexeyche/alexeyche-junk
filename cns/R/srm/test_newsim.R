@@ -65,11 +65,14 @@ pattern_fun = sin
 pattern_frac = dt*7.5
 patt_dur = 800
 timeout = 400
+pattern = gen_fun_pattern(M, 0, patt_dur, pattern_frac, pattern_fun)
 
 gr1 = TSNeurons$new(M = M)
-neurons = SRMLayerClass$new(N, start_w.N, p_edge_prob=0.5, ninh=N, syn_delay_rate=1, axon_delay_rate=1,delay_dist_gain=5)
+neurons = SRMLayerClass$new(N, start_w.N, p_edge_prob=0.5, ninh=N, 
+                            syn_delay_rate=1, axon_delay_rate=1,delay_dist_gain=5)
+
 connection = matrix(gr1$ids(), nrow=length(gr1$ids()), ncol=N)
-input_conns = 35
+input_conns = 50
 for(ni in 1:N) {
     connection[sample(M, M-input_conns), ni] = 0
 }
@@ -77,47 +80,43 @@ neurons$connectFF(connection, start_w.M, 1:N, syn_delay_rate=1, delay_dist_gain=
 
 
 sl = SIMClass$new(list(neurons))
-# net = list()
-# 
-# mean_p_dur_pattern = gen_fun_pattern(M, 0, mean_p_dur, pattern_frac, pattern_fun)
-# sim_opt = list(T0=0, Tmax=mean_p_dur, dt=dt, saveStat=FALSE, learn=FALSE)
-# net[gr1$ids()] = mean_p_dur_pattern
-# net[neurons$ids()] = blank_net(N)
-# 
-# sl$sim(sim_opt, constants, net)
-# for(ep in 1:5) {
-#     net = list()
-#     net = blank_net(M+N)
-#     
+net = list()
 
-#     pattern = gen_fun_pattern(M, 0, patt_dur, pattern_frac, pattern_fun)
-#     for(t0 in seq(0, Tmax-patt_dur-timeout, by=patt_dur+timeout)) {
-#         sapply(1:M, function(mi) {
-#             net[[ gr1$ids()[mi] ]] <<- c(net[[ gr1$ids()[mi] ]], pattern[[mi]]+t0)
-#         })
-#     }
-#     
-#     sim_opt = list(T0=0, Tmax=Tmax, dt=dt, saveStat=(Tmax<=5000), learn=TRUE)
-#     sl$sim(sim_opt, constants, net)
-#     cat("ep:", ep, "\n")
-# }
-# 
+mean_p_dur_pattern = gen_fun_pattern(M, 0, mean_p_dur, pattern_frac, pattern_fun)
+sim_opt = list(T0=0, Tmax=mean_p_dur, dt=dt, saveStat=FALSE, learn=FALSE, determ=FALSE)
+net[gr1$ids()] = mean_p_dur_pattern
+net[neurons$ids()] = blank_net(N)
+
+sl$sim(sim_opt, constants, net)
+for(ep in 1:15) {
+    net = list()
+    net = blank_net(M+N)
+    
+    for(t0 in seq(0, Tmax-patt_dur-timeout, by=patt_dur+timeout)) {
+        sapply(1:M, function(mi) {
+            net[[ gr1$ids()[mi] ]] <<- c(net[[ gr1$ids()[mi] ]], pattern[[mi]]+t0)
+        })
+    }
+    
+    sim_opt = list(T0=0, Tmax=Tmax, dt=dt, saveStat=(Tmax<=5000), learn=TRUE, determ=FALSE)
+    sl$sim(sim_opt, constants, net)
+    cat("ep:", ep, "\n")
+}
+
 # #plot_rastl(net)
 # #st = neurons$get_stat()
 # #plotl(st$C[[3]][,8])
 # #plotl(st$W[[3]][,1])
 # 
 # #plotl(st$B[3,])
-# W = neurons$Wm()
-# gr_pl(W)
+ W = neurons$Wm()
+ gr_pl(W)
 pattern = gen_fun_pattern(M, 0, patt_dur, pattern_frac, pattern_fun)
 net = list()
 net = blank_net(M+N)
 
 net[gr1$ids()] = pattern
-sim_opt = list(T0=0, Tmax=patt_dur+100, dt=dt, saveStat=TRUE, learn=FALSE)
-constants$alpha = 1 #10
-constants$beta = 10 #100000
+sim_opt = list(T0=0, Tmax=patt_dur+100, dt=dt, saveStat=TRUE, learn=FALSE, determ=FALSE)
+
 sl$sim(sim_opt, constants, net)
-st = neurons$get_stat()
 plot_rastl(net)
