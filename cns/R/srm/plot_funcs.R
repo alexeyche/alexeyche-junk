@@ -48,17 +48,26 @@ gray_plot <- function(data, lims = c(min(data),max(data)) ) {
 }
 
 Istat = NULL
+Wacc = vector("list",N)
 
-plot_run_status = function(net, neurons, loss, pic_filename, descr) {
+plot_run_status = function(net, neurons, loss, timeline, labels, pic_filename, descr) {
     W = neurons$Wm()
     id_n = neurons$ids()
     not_fired = all(sapply(net[id_n], function(sp) length(sp) == 1))
     
     png(pic_filename, width=1024, height=768)
     if(!not_fired) 
-      p1 = plot_rastl(net, descr)
-
+      p1 = plot_rastl(net, descr, T0=0,Tmax=2000)
+    
+    for(i in 1:ncol(W)) {        
+        Wacc[[i]] <<- cbind(Wacc[[i]], W[,i])
+    }
+    
     p2 = levelplot(W, col.regions=colorRampPalette(c("black", "white")))
+    p3 = plot_data_rates(net[neurons$ids()], timeline, labels)
+    n_to_plot = sample(length(id_n),1)
+    p4 = levelplot(t(Wacc[[n_to_plot]]), col.regions=colorRampPalette(c("black", "white")), 
+                   main=sprintf("Profile neuron %s", n_to_plot))
 #    mean_grad = apply(sim_out$stat$dwstat, c(1,2), mean)
 #    p3 = levelplot(mean_grad, col.regions=colorRampPalette(c("black", "white")))
 #    if(!is.null(loss)) {
@@ -71,12 +80,13 @@ plot_run_status = function(net, neurons, loss, pic_filename, descr) {
 #    z = 1:ncol(Istat)
 #    p5 = xyplot(X1+X2+X3+X4+X5+X6+X7+X8+X9+X10~z, data=Idf, type="l")
     if(!not_fired)
-      print(p1, position=c(0, 0.33, 0.5, 1), more=TRUE)
-#    if(!is.null(loss))
-#      print(p4, position=c(0,0.33, 0.5, 0.66), more=TRUE)
+      print(p1, position=c(0, 0.66, 0.5, 1), more=TRUE)
+
+
 #    print(p5, position=c(0,0,0.5,0.33), more=TRUE)
-    print(p2, position=c(0.5, 0, 1, 1)) #, more=TRUE)
-#    print(p3, position=c(0.5, 0.5, 1, 1))
+    print(p2, position=c(0.5, 0, 1, 0.5), more=TRUE) #, more=TRUE)
+    print(p3, position=c(0.5, 0.5, 1, 1), more=TRUE)
+    print(p4, position=c(0,0.33, 0.5, 0.66))
     dev.off()   
 }
 
@@ -96,21 +106,35 @@ plot_run_status = function(net, neurons, loss, pic_filename, descr) {
 
 plot_data_rates = function(net, timeline, labels) {
   N = length(net)
-  data_rates = matrix(0, N, length(data_ids))
+  data_rates = matrix(0, N, length(labels))
   for(i in 1:N) {
     for(sp in net[[i]]) {
-      tm_sp = timeline - sp      
-      patt_id = which(tm_sp == min(tm_sp[tm_sp>0]) )
-      data_rates[i, patt_id] = data_rates[i, patt_id] + 1
+      if(length(sp)>0) {
+        tm_sp = timeline - sp      
+        pos_tm = tm_sp>0
+        if(any(pos_tm)) {
+            patt_id = which(tm_sp == min(tm_sp[pos_tm]) )
+            data_rates[i, patt_id] = data_rates[i, patt_id] + 1.0
+        }
+      }
     }
   }
   ul = unique(labels)
   mean_data_rates = matrix(0, N, length(ul))
-  for(lab in ul) {
-    mean_data_rates[, which(lab == ul)] = rowMeans(data_rates[, which(labels[data_ids] == lab)])
+  if(ncol(data_rates)>length(ul)) {
+      for(lab in ul) {
+          mean_data_rates[, which(lab == ul)] = rowMeans(data_rates[, which(labels == lab)])
+      }
+  } else {
+      mean_data_rates = data_rates
   }
+      
   x = rep(1:N, length(ul))
   y = c(mean_data_rates)
   cols = c(sapply(ul, function(lab) rep(lab, N)))
-  plot(x,y, col=cols)
+  dfrm <- data.frame( y=c(mean_data_rates),
+                      x=1:N, 
+                      grp=rep(labels,each=N))
+  
+  return(xyplot(y~x, group=grp, data=dfrm,, col=c("red","blue")))
 }

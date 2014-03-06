@@ -86,7 +86,7 @@ public:
                     Yspike = true;
                 }
             } else {
-                if(u >= as<double>(c["tr"])) {
+                if(u >= asD("tr",c)) {
                     Yspike = true;
                 }            
             }
@@ -176,6 +176,7 @@ public:
         const bool saveStat = as<bool>(sim_options["saveStat"]);    
         const bool learn = as<bool>(sim_options["learn"]);    
         const bool determ = as<bool>(sim_options["determ"]);    
+        const NumericVector pattTimeline = as<NumericVector>(sim_options["patternTimeline"]);    
         arma::vec T = arma::linspace(T0, Tmax, (Tmax-T0)/dt);
         if(determ && learn) {
             ::Rf_error( "Net can't learn being in detemenitic mode" );
@@ -192,10 +193,23 @@ public:
            ::Rf_error( "net list is less than size of layers\n");
         }
         NetSim ns(net, T.n_elem, dt);
+        size_t patt_id = 0;
+        bool refreshNet = false;
         for(size_t ti=0; ti<T.n_elem; ti++) {
+            if(pattTimeline[patt_id] >= T(ti)) {
+                refreshNet = true;
+            }
             for(size_t li=0; li<layers.size(); li++) {
                 layers[li]->simdt(T(ti), dt, constants, ns);
+                if(refreshNet) { 
+                    layers[li]->prepare(constants); 
+                }
             }
+            if(refreshNet) {
+                patt_id++;
+                refreshNet = false;
+            }
+            
         }
         for(size_t spi=0; spi<ns.sp.size(); spi++) {
             int c_id = ns.sp[spi].first-1;

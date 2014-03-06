@@ -3,12 +3,12 @@
 args <- commandArgs(trailingOnly = FALSE)
 if(length(grep("RStudio", args))>0) {
   verbose = TRUE
-  dir='~/prog/sim/runs/test'
-  #dir='~/my/sim/runs/testrstudio'
-  data_dir = '~/prog/sim'
-  #data_dir = '~/my/sim'
-  setwd("~/prog/alexeyche-junk/cns/R/srm")
-  #setwd("~/my/git/alexeyche-junk/cns/R/srm")
+  #dir='~/prog/sim/runs/test'
+  dir='~/my/sim/runs/testrstudio'
+  #data_dir = '~/prog/sim'
+  data_dir = '~/my/sim'
+  #setwd("~/prog/alexeyche-junk/cns/R/srm")
+  setwd("~/my/git/alexeyche-junk/cns/R/srm")
   #train_spikes = list("/home/alexeyche/my/sim/ucr_fb_spikes/train_spikes")
   #test_spikes  = list("/home/alexeyche/my/sim/ucr_fb_spikes/test_spikes")
   #train_spikes = list("/home/alexeyche/prog/sim/ucr_nengo_spikes/train_spikes")
@@ -45,7 +45,7 @@ if(length(grep("RStudio", args))>0) {
   
   dir = paste(c(runs_dir, run_name), collapse="/")
   dir.create(file.path(dir), showWarnings = FALSE)
-  copy_ok = file.copy(const_file, dir)
+  copy_ok = file.copy(const_file, dir, overwrite=TRUE)
   
   temp_spl = strsplit(runs_dir, "/")[[1]]
   data_dir = paste( temp_spl[1:(length(temp_spl)-1)], collapse='/')
@@ -103,8 +103,7 @@ source('grad_funcs.R')
 source('serialize_to_bin.R')
 source('eval_funcs.R')
 source('kernel.R')
-source('gen_data_ucr.R')
-
+source('gen_spikes.R')
 
 
 
@@ -132,21 +131,18 @@ train_dataset = train_dataset[sample(1:length(train_dataset))]
 
 
 
-labels = c(rep(1, 50), rep(2, 50), rep(3, 50), rep(4, 50), rep(5, 50), rep(6, 50))
-data_ids = 1:300
-
-# mix:
+labels = sapply(train_dataset, function(x) x$label)
 
 
 timeline = NULL
 
-train_nets = list()
 Tcur = 0
 nr = NULL
 
 train_net = blank_net(M)
 for(ds in train_dataset) {
-    p = genSpikePattern(M, ds$data, duration, dt, lambda=5)
+    p = genSpikePattern(M, ds$data, duration, dt, lambda=30)
+    
     invisible(sapply(1:length(p), function(id) { 
           sp = p[[id]] + Tcur
           train_net[[id]] <<- c(train_net[[id]], sp)
@@ -154,7 +150,7 @@ for(ds in train_dataset) {
     Tcur = Tcur + duration
     timeline = c(timeline, Tcur)
 }
-
+Tmax = max(sapply(train_net, function(x) if(length(x)>0) max(x) else -Inf))
 
 start_w.M = matrix(rnorm( M*N, mean=start_w.M.mean, sd=start_w.M.sd), ncol=N, nrow=M)
 start_w.N = matrix(rnorm( (N-1)*N, mean=start_w.N.mean, sd=start_w.N.sd), ncol=N, nrow=(N-1))
@@ -166,44 +162,36 @@ neurons$connectFF(connection, start_w.M, 1:N )
 
 s = SIMClass$new(list(neurons))
 # collect statistics
-Tmax = max(sapply(train_net, max))
 
-net = list()
-net[neurons$ids()] = blank_net(N)
-for(T0 in seq(0, mean_p_dur-Tmax, by=Tmax)) {
-    for(i in gr1$ids()) {
-       net[[i]] = c(net[[i]], train_net[[i]]+T0 )
-    }
-} 
+loss = NULL
 
-sim_opt = list(T0=0, Tmax=max(sapply(net[gr1$ids()], max)), dt=dt, saveStat=FALSE, learn=FALSE)
-s$sim(sim_opt, constants, net)
-plot_data_rates(net[neurons$ids()], timeline, labels[data_ids])
-
-Wacc = vector("list",N)
-
-for(ep in 1:epochs) {
-  net = list()
-  
-  net[gr1$ids()] = train_net
-  net[neurons$ids()] = blank_net(N)
-  
-  Tmax = max(sapply(net[gr1$ids()], max))
-  sim_opt = list(T0=0, Tmax=Tmax, dt=dt, saveStat=FALSE, learn=TRUE)
-  s$sim(sim_opt, constants, net)
-  cat("ep: ", ep, "\n")
+for(ep in 0:epochs) {
+    net = list()
+    net[neurons$ids()] = blank_net(N)
+    nruns = 0
+    for(T0 in seq(0, mean_p_dur/6-Tmax, by=Tmax)) {
+        for(i in gr1$ids()) {
+            net[[i]] = c(net[[i]], train_net[[i]]+T0 )
+        }
+        nruns = nruns + 1
+    } 
     
-  
-  for(i in 1:N) {
-    Wm = neurons$obj$W[[i]]
-    Wacc[[i]] = cbind(Wacc[[i]], Wm)
-  }
-  plot_data_rates(net[neurons$ids()], timeline, labels[data_ids])
+    
+    sim_opt = list(T0=0, Tmax=max(sapply(net, function(x) if(length(x)>0) max(x) else -Inf)), 
+                   dt=dt, saveStat=FALSE, learn=(ep > 0), determ=FALSE, patternTimeline = timeline)
+    s$sim(sim_opt, constants, net)
+    pic_filename = sprintf("%s/run_ep%s.png", dir, ep)
+    plot_run_status(net, neurons, loss, rep(timeline, nruns), rep(labels, nruns), pic_filename, sprintf("Epoch %s", ep))
+    cat("ep: ", ep, "\n")    
 }
 
-W = list_to_matrix(neurons$obj$W)
-gr_pl(W)
-levelplot(t(Wacc[[1]]) , col.regions=colorRampPalette(c("black", "white")))
+#W = list_to_matrix(neurons$obj$W)
+#gr_pl(W)
+#levelplot(t(Wacc[[1]]) , col.regions=colorRampPalette(c("black", "white")))
 
-
+W = neurons$Wm()
+if(runmode == "learn") {
+    saveMatrixList(model_file, list(W))
+}
+cat(min(loss), "\n")
 

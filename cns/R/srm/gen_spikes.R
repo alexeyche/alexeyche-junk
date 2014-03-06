@@ -1,48 +1,50 @@
 #!/usr/bin/RScript
 
-TSNeurons <- setRefClass("TSNeurons", fields = list(M = "vector", patterns = "list", ids="vector"), 
-                                    methods = list(
-                                    initialize = function(M, ids_c=NULL) {
-                                      if(is.null(ids_c)) {
-                                        ids <<- get_unique_ids(M)
-                                      } else {
-                                        ids <<-- ids_c
-                                      }
-                                      patterns <<- list()
-                                      M <<- M
-                                    },
-                                    len = function() {
-                                      return(.self$M)
-                                    },
-                                    
-                                    loadPatterns = function(dataset, pattDur, simdt, lambda=4) {
-                                      dmin = max(sapply(dataset, function(x) max(x$data)))
-                                      dmax = min(sapply(dataset, function(x) min(x$data)))
-                                      for(d in dataset) {
-                                        .self$loadPattern(d$data, pattDur, d$label, simdt, lambda, dmax, dmin)
-                                      }
-                                    },
-                                    preCalculate = function(T0, Tmax, dt) {
-                                        T0_current <- T0
-                                        for(pattern in patterns) {
-                                            patt_ti <- 0
-                                            for(t in seq(T0_current, Tmax, by=dt)) {
-                                                patt_index <- patt_ti/pattern$dt
-                                                cat("t: ", t, " patt_index: ", patt_index, " patt_ti: ", patt_ti, "\n") 
-                                                patt_ti <- patt_ti + dt    
-                                                if(patt_index > pattern$len) {
-                                                    T0_current = t
-                                                    break
-                                                }
+require(zoo)
 
-                                            }
-                                            if(T0_current>=Tmax) {
-                                                break
-                                            }
-                                        }
-                                    }))
-
-
+#TSNeurons <- setRefClass("TSNeurons", fields = list(M = "vector", patterns = "list", ids="vector"), 
+#                                    methods = list(
+#                                    initialize = function(M, ids_c=NULL) {
+#                                      if(is.null(ids_c)) {
+#                                        ids <<- get_unique_ids(M)
+#                                      } else {
+#                                        ids <<-- ids_c
+#                                      }
+#                                      patterns <<- list()
+#                                      M <<- M
+#                                    },
+#                                    len = function() {
+#                                      return(.self$M)
+#                                    },
+#                                    
+#                                    loadPatterns = function(dataset, pattDur, simdt, lambda=4) {
+#                                      dmin = max(sapply(dataset, function(x) max(x$data)))
+#                                      dmax = min(sapply(dataset, function(x) min(x$data)))
+#                                      for(d in dataset) {
+#                                        .self$loadPattern(d$data, pattDur, d$label, simdt, lambda, dmax, dmin)
+#                                      }
+#                                    },
+#                                    preCalculate = function(T0, Tmax, dt) {
+#                                        T0_current <- T0
+#                                        for(pattern in patterns) {
+#                                            patt_ti <- 0
+#                                            for(t in seq(T0_current, Tmax, by=dt)) {
+#                                                patt_index <- patt_ti/pattern$dt
+#                                                cat("t: ", t, " patt_index: ", patt_index, " patt_ti: ", patt_ti, "\n") 
+#                                                patt_ti <- patt_ti + dt    
+#                                                if(patt_index > pattern$len) {
+#                                                    T0_current = t
+#                                                    break
+#                                                }
+#
+#                                            }
+#                                            if(T0_current>=Tmax) {
+#                                                break
+#                                            }
+#                                        }
+#                                    }))
+#
+#
 
 #file <- "/home/alexeyche/prog/sim/stimuli/d1.csv"
 
@@ -67,7 +69,6 @@ spikeMatToSpikeList <- function(m) {
 }
 
 genSpikePattern = function(M, rawdata, pattDur, simdt, lambda=4, hb=NULL, lb=NULL) {
-  patt <- list(pattDur=pattDur, dt=pattDur/length(rawdata), len=length(rawdata))
   
   if(is.null(hb)) hb <- max(rawdata)
   if(is.null(lb)) lb <- min(rawdata)
@@ -75,14 +76,14 @@ genSpikePattern = function(M, rawdata, pattDur, simdt, lambda=4, hb=NULL, lb=NUL
 
   patt_dt <- 0
   approx_data = rep(NA, pattDur/simdt)                                      
-  for(ri in 1:patt$len) {
-    patt_dt <- patt_dt + pattDur/patt$len
+  for(ri in 1:length(rawdata)) {
+    patt_dt <- patt_dt + pattDur/length(rawdata)
     ct = ceiling(signif(patt_dt/simdt, digits=5))                                        
     approx_data[ct] = rawdata[ri]
   }
   
-  #approx_data = na.approx(approx_data)
-  #approx_data = approx_data[!is.na(approx_data)]
+  approx_data = na.approx(approx_data)
+  approx_data = approx_data[!is.na(approx_data)]
   
   gen_spikes = vector("list", M)
                                    
@@ -105,9 +106,7 @@ genSpikePattern = function(M, rawdata, pattDur, simdt, lambda=4, hb=NULL, lb=NUL
     neurons_rate[neurons_rate < 0] = 0
     t = t + simdt
   }
-  gen_spikes[sapply(gen_spikes, is.null)] = -Inf
-  patt$data <- gen_spikes
-  return(patt)
+  return(gen_spikes)
 }
 
 genSpikePatternFromFile = function(M, file, pattDur, class, simdt, lambda=4, hb=NULL, lb=NULL) {
