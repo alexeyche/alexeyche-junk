@@ -51,5 +51,9 @@ double B_calc(bool Yspike, double p, double pmean, const List &c) {
 }
 
 arma::vec ratecalc(const arma::vec &weights, const List &c) {
-    return 0.04 * arma::pow(weights, 4)/( arma::pow(weights, 4) + pow(as<double>(c["ws"]), 4));
+    arma::vec w4 = arma::pow(weights, 4);
+    return 0.04 * w4/( w4 + as<double>(c["ws4"]));
+}
+arma::vec new_ratecalc(const arma::vec &weights, const List &c) {
+    return 0.04 * 1/( 1 + arma::exp(as<double>(c["ws"])-weights));
 }

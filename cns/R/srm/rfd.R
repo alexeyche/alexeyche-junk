@@ -24,13 +24,13 @@ N=10
 M=100
 start_w.N = 1
 start_w.M = 1
-ws = 1
+ws = 0.5
 constants = list(dt=dt, e0=e0, ts=ts, tm=tm, alpha=alpha, beta=beta, tr=tr, u_rest=u_rest, pr=pr, gain_factor=gain_factor, 
                  ta=ta, tc=tc,
                  target_rate=target_rate,
                  target_rate_factor=target_rate_factor,
                  weight_decay_factor=weight_decay_factor,
-                 ws=ws, added_lrate = added_lrate, sim_dim=sim_dim, mean_p_dur=mean_p_dur)
+                 ws=ws, ws4=ws^4, added_lrate = added_lrate, sim_dim=sim_dim, mean_p_dur=mean_p_dur)
 gr1 = TSNeurons(M = M)
 neurons = SRMLayerClass$new(N, start_w.N, p_edge_prob=0.0)
 connection = matrix(gr1$ids(), nrow=length(gr1$ids()), ncol=N)
@@ -76,8 +76,8 @@ benchMSim = function() {
 # no determ 
 #test replications elapsed relative user.self sys.self user.child sys.child
 #1 benchMSim()            5  63.529        1    63.472    0.008          0         0
-# library(rbenchmark)
-# benchmark(benchMSim(), replications = 5)
+# library(rbenchmark);  benchmark(benchMSim(), replications = 5)
+#
 
 
 for(ep in 1:20) {
@@ -89,7 +89,7 @@ for(ep in 1:20) {
   }))
   
   
-  sim_opt = list(T0=T0, Tmax=Tmax, dt=dt, saveStat=TRUE, learn=TRUE, determ=FALSE)
+  sim_opt = list(T0=T0, Tmax=Tmax, dt=dt, saveStat=Tmax<5000, learn=TRUE, determ=FALSE)
   s$sim(sim_opt, constants, net)
     
   cat("ep: ", ep, "\n")
@@ -97,16 +97,14 @@ for(ep in 1:20) {
 #  W = get_weights_matrix(list(neurons))
 #  filled.contour(W)
   if(Tmax*ep>mean_p_dur) {
-    for(i in 1:N) {  
-      Wm = list_to_matrix(neurons$obj$stat_W[[i]])  
-      Wacc[[i]] = cbind(Wacc[[i]], colMeans(Wm[1:Tmax/2,]) )
-      Wacc[[i]] = cbind(Wacc[[i]], colMeans(Wm[((Tmax/2)+1):Tmax,]) )
+    for(i in 1:N) {        
+      Wacc[[i]] = cbind(Wacc[[i]], neurons$obj$W[[i]])
     }
   }
 }
-c1 = list_to_matrix(neurons$obj$stat_C[[1]])[,1]
+#c1 = list_to_matrix(neurons$obj$stat_C[[1]])[,1]
 W = list_to_matrix(neurons$obj$W)
 levelplot(t(W), col.regions=colorRampPalette(c("black", "white")))
-levelplot(t(Wacc[[1]]) , col.regions=colorRampPalette(c("black", "white")))
-levelplot(t(Wacc[[2]]) , col.regions=colorRampPalette(c("black", "white")))
-levelplot(t(Wacc[[3]]) , col.regions=colorRampPalette(c("black", "white")))
+#levelplot(t(Wacc[[1]]) , col.regions=colorRampPalette(c("black", "white")))
+#levelplot(t(Wacc[[2]]) , col.regions=colorRampPalette(c("black", "white")))
+#levelplot(t(Wacc[[3]]) , col.regions=colorRampPalette(c("black", "white")))

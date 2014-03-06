@@ -34,7 +34,7 @@ sim_dim = 1000
 N = 25
 M = 100
 net_edge_prob = 0.5
-inhib_frac = 0.2
+inhib_frac = 1
 net_neurons_for_input = N
 afferent_per_neuron = M
 
@@ -48,9 +48,11 @@ start_w.N.sd = 0.001
 tc = 100
 mean_p_dur = 60 * sim_dim
 ws = 5
+
 target_rate = 5 # Hz
 target_rate_factor = 0.1
 weight_decay_factor = 0.026
 
-
 added_lrate = 1
+epochs=10
+

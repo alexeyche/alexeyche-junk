@@ -14,55 +14,7 @@ TSNeurons <- setRefClass("TSNeurons", fields = list(M = "vector", patterns = "li
                                     len = function() {
                                       return(.self$M)
                                     },
-                                    loadPattern = function(rawdata, pattDur, label, simdt, lambda=4, hb=NULL, lb=NULL) {
-                                      l <- length(patterns)
-                                      
-                                      patt <- list(pattDur=pattDur, dt=pattDur/length(rawdata), rawdata=rawdata, len=length(rawdata), label=label)
-                                      
-                                      if(is.null(hb)) hb <- max(rawdata)
-                                      if(is.null(lb)) lb <- min(rawdata)
-                                      
-
-                                      patt_dt <- 0
-                                      approx_data = rep(NA, pattDur/simdt)                                      
-                                      for(ri in 1:patt$len) {
-                                        patt_dt <- patt_dt + pattDur/patt$len
-                                        ct = ceiling(signif(patt_dt/simdt, digits=5))                                        
-                                        approx_data[ct] = rawdata[ri]
-                                      }
-                                      
-                                      #approx_data = na.approx(approx_data)
-                                      #approx_data = approx_data[!is.na(approx_data)]
-                                      
-                                      gen_spikes = vector("list", M)
-                                                                       
-                                      neurons_rate = rep(0, M)                                      
-                                      dt <- (hb-lb)/(M-1)
-                                      t = 0                                       
-                                      for(i_val in 1:length(approx_data)) {
-                                        if(is.na(approx_data[i_val])) {
-                                          fired=-1
-                                        } else  {
-                                          fired <- floor((approx_data[i_val]-lb)/dt)+1
-                                        }
-                                        
-                                        if((fired>0) && (neurons_rate[fired] == 0)) {                                        
-                                          gen_spikes[[fired]] = c(gen_spikes[[fired]], t)
-                                          neurons_rate[fired] = lambda 
-                                        }                                        
-                                        refr_neurons = neurons_rate > 0
-                                        neurons_rate[refr_neurons] = neurons_rate[refr_neurons]-simdt
-                                        neurons_rate[neurons_rate < 0] = 0
-                                        t = t + simdt
-                                      }
-                                      gen_spikes[sapply(gen_spikes, is.null)] = -Inf
-                                      patt$data <- gen_spikes
-                                      patterns[[l+1]] <<- patt                          
-                                    },
-                                    loadPatternFromFile = function(file, pattDur, class, simdt, lambda=4, hb=NULL, lb=NULL) {
-                                      rawdata <- c(read.table(file, sep=",")[,1])
-                                      .self$loadPattern(rawdata,pattDur, class, simdt, lambda, hb, lb)
-                                    },
+                                    
                                     loadPatterns = function(dataset, pattDur, simdt, lambda=4) {
                                       dmin = max(sapply(dataset, function(x) max(x$data)))
                                       dmax = min(sapply(dataset, function(x) min(x$data)))
@@ -114,4 +66,52 @@ spikeMatToSpikeList <- function(m) {
     return(l)
 }
 
+genSpikePattern = function(M, rawdata, pattDur, simdt, lambda=4, hb=NULL, lb=NULL) {
+  patt <- list(pattDur=pattDur, dt=pattDur/length(rawdata), len=length(rawdata))
+  
+  if(is.null(hb)) hb <- max(rawdata)
+  if(is.null(lb)) lb <- min(rawdata)
+  
+
+  patt_dt <- 0
+  approx_data = rep(NA, pattDur/simdt)                                      
+  for(ri in 1:patt$len) {
+    patt_dt <- patt_dt + pattDur/patt$len
+    ct = ceiling(signif(patt_dt/simdt, digits=5))                                        
+    approx_data[ct] = rawdata[ri]
+  }
+  
+  #approx_data = na.approx(approx_data)
+  #approx_data = approx_data[!is.na(approx_data)]
+  
+  gen_spikes = vector("list", M)
+                                   
+  neurons_rate = rep(0, M)                                      
+  dt <- (hb-lb)/(M-1)
+  t = 0                                       
+  for(i_val in 1:length(approx_data)) {
+    if(is.na(approx_data[i_val])) {
+      fired=-1
+    } else  {
+      fired <- floor((approx_data[i_val]-lb)/dt)+1
+    }
+    
+    if((fired>0) && (neurons_rate[fired] == 0)) {                                        
+      gen_spikes[[fired]] = c(gen_spikes[[fired]], t)
+      neurons_rate[fired] = lambda 
+    }                                        
+    refr_neurons = neurons_rate > 0
+    neurons_rate[refr_neurons] = neurons_rate[refr_neurons]-simdt
+    neurons_rate[neurons_rate < 0] = 0
+    t = t + simdt
+  }
+  gen_spikes[sapply(gen_spikes, is.null)] = -Inf
+  patt$data <- gen_spikes
+  return(patt)
+}
+
+genSpikePatternFromFile = function(M, file, pattDur, class, simdt, lambda=4, hb=NULL, lb=NULL) {
+  rawdata <- c(read.table(file, sep=",")[,1])
+  return(genSpikePattern(rawdata,pattDur, class, simdt, lambda, hb, lb))
+}
 

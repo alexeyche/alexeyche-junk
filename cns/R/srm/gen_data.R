@@ -64,14 +64,14 @@ plot_syn_stat_list <- function(stat_list, new_plot=TRUE, clr="blue") {
 #par(mfrow=c(1,2))
 #plot_syn_stat(d1_stat,TRUE,clr="blue")
 #plot_syn_stat(d2_stat,TRUE,clr="red")
-require(stringr)
-l <- list()
-for(i in ls()) {
-    m <- str_match(i, "d_stat([0-9]+)")
-    if(!is.na(m[2])) {
-        l[[m[1]]] <- get(m[1])        
-    }
-}
+#require(stringr)
+#l <- list()
+#for(i in ls()) {
+#    m <- str_match(i, "d_stat([0-9]+)")
+#    if(!is.na(m[2])) {
+#        l[[m[1]]] <- get(m[1])        
+#    }
+#}
 
 
 

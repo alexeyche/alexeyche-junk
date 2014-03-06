@@ -11,8 +11,8 @@ if(length(grep("RStudio", args))>0) {
   #setwd("~/my/git/alexeyche-junk/cns/R/srm")
   #train_spikes = list("/home/alexeyche/my/sim/ucr_fb_spikes/train_spikes")
   #test_spikes  = list("/home/alexeyche/my/sim/ucr_fb_spikes/test_spikes")
-  train_spikes = list("/home/alexeyche/prog/sim/ucr_nengo_spikes/train_spikes")
-  test_spikes  = list("/home/alexeyche/prog/sim/ucr_nengo_spikes/test_spikes")
+  #train_spikes = list("/home/alexeyche/prog/sim/ucr_nengo_spikes/train_spikes")
+  #test_spikes  = list("/home/alexeyche/prog/sim/ucr_nengo_spikes/test_spikes")
   source('constants.R')
 } else {
   if(length(args) == 5) {
@@ -65,18 +65,15 @@ if(length(grep("RStudio", args))>0) {
     model_file = NULL
   }
   spike_dir = substring(args[grep("--spike-dir=", args)], 13)
-  if(length(spike_dir) == 0) {
-    cat("Need spike dir\n")
-    q()
-  } else {
+  train_spikes = list()
+  test_spikes = list()
+  if(length(spike_dir) != 0) {
     spike_files = system(sprintf("find %s -maxdepth 1 -name *.bin", spike_dir), intern=TRUE)
     spike_files = sapply(strsplit(spike_files, "[.]"), function(x) x[1])
     if(length(spike_files) == 0) {
         cat("Need *.bin files with spikes in spike dir\n")
         q()
     }
-    train_spikes = list()
-    test_spikes = list()
     for(f in spike_files) {
         if(length(grep("train", f)) > 0) {
             train_spikes[[ length(train_spikes)+1 ]] = f
@@ -106,6 +103,8 @@ source('grad_funcs.R')
 source('serialize_to_bin.R')
 source('eval_funcs.R')
 source('kernel.R')
+source('gen_data_ucr.R')
+
 
 
 
@@ -115,62 +114,66 @@ constants = list(dt=dt, e0=e0, ts=ts, tm=tm, alpha=alpha, beta=beta, tr=tr, u_re
                  target_rate=target_rate,
                  target_rate_factor=target_rate_factor,
                  weight_decay_factor=weight_decay_factor,
-                 ws=ws, added_lrate = added_lrate, sim_dim=sim_dim, mean_p_dur=mean_p_dur)
+                 ws=ws, ws4=ws^4, added_lrate = added_lrate, sim_dim=sim_dim, mean_p_dur=mean_p_dur)
 ID_MAX=0
+
+data = synth # synthetic control
+c(train_dataset, test_dataset) := read_ts_file(data, data_dir)
+elems = samples_from_dataset
+train_dataset = train_dataset[ c(sample(51:101, elems))] #, sample(101:150, elems))] #, sample(101:150,elems),
+#                                sample(151:200, elems), sample(201:250,elems), sample(251:300,elems))] # cut
+test_dataset = test_dataset[c(sample(1:50, elems), sample(101:150, elems))]  #, sample(101:150, elems),
+                              #sample(151:200, elems), sample(201:250,elems), sample(251:300, elems))]
+
+train_dataset[[1]]$label=1
+train_dataset[[2]] = list(data = -train_dataset[[1]]$data, label=2)
+
+train_dataset = train_dataset[sample(1:length(train_dataset))]
+
+
 
 labels = c(rep(1, 50), rep(2, 50), rep(3, 50), rep(4, 50), rep(5, 50), rep(6, 50))
 data_ids = 1:300
 
 # mix:
 
-data_ids = data_ids[c(1:5,51:55)]
-data_ids = sample(data_ids)
 
-data_lens = NULL
+timeline = NULL
 
 train_nets = list()
 Tcur = 0
-timeout = 100
 nr = NULL
-for(f in train_spikes) {
-    net = blank_net(M)
-    for(spi in data_ids) {
-        net_m = loadMatrix(f, spi)*500
-        invisible(sapply(1:nrow(net_m), function(id) { 
-          sp = net_m[id, which(net_m[id,] != 0)] + Tcur
-          net[[id]] <<- c(net[[id]], sp)
-        }))
-        data_lens = c(data_lens, max(net_m))
-        Tcur = Tcur + max(net_m) + timeout
-    }
-    train_nets[[ length(train_nets) + 1 ]] = list(data = net, labels = labels) 
+
+train_net = blank_net(M)
+for(ds in train_dataset) {
+    p = genSpikePattern(M, ds$data, duration, dt, lambda=5)
+    invisible(sapply(1:length(p), function(id) { 
+          sp = p[[id]] + Tcur
+          train_net[[id]] <<- c(train_net[[id]], sp)
+    }))
+    Tcur = Tcur + duration
+    timeline = c(timeline, Tcur)
 }
 
-timeline = cumsum(data_lens + timeout)
 
 start_w.M = matrix(rnorm( M*N, mean=start_w.M.mean, sd=start_w.M.sd), ncol=N, nrow=M)
 start_w.N = matrix(rnorm( (N-1)*N, mean=start_w.N.mean, sd=start_w.N.sd), ncol=N, nrow=(N-1))
 
 gr1 = TSNeurons(M = M)
-neurons = SRMLayerClass$new(N, start_w.N, p_edge_prob=0.5,ninh=N)
+neurons = SRMLayerClass$new(N, start_w.N, p_edge_prob=net_edge_prob,ninh=round(N*inhib_frac))
 connection = matrix(gr1$ids(), nrow=length(gr1$ids()), ncol=N)
 neurons$connectFF(connection, start_w.M, 1:N )
 
 s = SIMClass$new(list(neurons))
 # collect statistics
-Tmax = max(sapply(train_nets[[1]]$data, max))
+Tmax = max(sapply(train_net, max))
 
 net = list()
 net[neurons$ids()] = blank_net(N)
-#net[gr1$ids()] = train_nets[[1]]$data
-it = 0
 for(T0 in seq(0, mean_p_dur-Tmax, by=Tmax)) {
-cur_timeout = timeout
-
-for(i in gr1$ids()) {
-   net[[i]] = c(net[[i]], train_nets[[1]]$data[[i]]+T0+it*cur_timeout )
-}
-it = it +1
+    for(i in gr1$ids()) {
+       net[[i]] = c(net[[i]], train_net[[i]]+T0 )
+    }
 } 
 
 sim_opt = list(T0=0, Tmax=max(sapply(net[gr1$ids()], max)), dt=dt, saveStat=FALSE, learn=FALSE)
@@ -179,10 +182,10 @@ plot_data_rates(net[neurons$ids()], timeline, labels[data_ids])
 
 Wacc = vector("list",N)
 
-for(ep in 1:150) {
+for(ep in 1:epochs) {
   net = list()
   
-  net[gr1$ids()] = train_nets[[1]]$data
+  net[gr1$ids()] = train_net
   net[neurons$ids()] = blank_net(N)
   
   Tmax = max(sapply(net[gr1$ids()], max))

@@ -120,3 +120,8 @@ sim_opt = list(T0=0, Tmax=patt_dur+100, dt=dt, saveStat=TRUE, learn=FALSE, deter
 
 sl$sim(sim_opt, constants, net)
 plot_rastl(net)
+
+#sigmoid = function(x) 1/(1+exp(ws-abs(x)*4) )
+#poweroid = function(x) (x^4) / (ws^4 + x^4)
+#plot(sigmoid, xlim=c(-5,10))
+#plot(poweroid, xlim=c(-5,10))

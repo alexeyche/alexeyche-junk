@@ -15,7 +15,7 @@ double asD(const char *name, const List &c) {
 
 class SRMLayer : public Layer {
 public:
-    SRMLayer(int &N_, arma::uvec &ids_, TVecNums &W_, TVecIDs &id_conns_, TVecNums &syn_, TVecNums &syn_spec_, arma::vec &a_, TVecNums &C_, arma::vec &pacc_, int incr_) : 
+    SRMLayer(int &N_, arma::uvec &ids_, TVecNums &W_, TVecIDs &id_conns_, TVecNums &syn_, TVecNums &syn_spec_, arma::vec &a_, TVecNums &C_, arma::vec &B_, arma::vec &pacc_, int incr_) : 
                         Layer(N_),
                         ids(ids_),
                         W(W_),
@@ -24,11 +24,12 @@ public:
                         syn_spec(syn_spec_),
                         a(a_),
                         C(C_),
+                        B(B_),
                         pacc(pacc_),
                         incr(incr_)
     {}
-    SRMLayer(const SRMLayer &l) : Layer(l.num()), ids(l.ids), W(l.W), id_conns(l.id_conns), syn(l.syn), syn_spec(l.syn_spec), a(l.a), C(l.C), pacc(l.pacc), incr(l.incr) {}
-    SRMLayer(int N_) : Layer(N_), ids(N), a(N, arma::fill::zeros), C(N), W(N), id_conns(N), syn(N), syn_spec(N), pacc(N, arma::fill::zeros), incr(0) { }
+    SRMLayer(const SRMLayer &l) : Layer(l.num()), ids(l.ids), W(l.W), id_conns(l.id_conns), syn(l.syn), syn_spec(l.syn_spec), a(l.a), C(l.C), B(l.B), pacc(l.pacc), incr(l.incr) {}
+    SRMLayer(int N_) : Layer(N_), ids(N), a(N, arma::fill::zeros), C(N), B(N), W(N), id_conns(N), syn(N), syn_spec(N), pacc(N, arma::fill::zeros), incr(0) { }
     const int num() const {
         return N;
     }
@@ -47,6 +48,7 @@ public:
             stat_W.push_back(vector<arma::vec>());
         }
         a.fill(1.0);
+        B.fill(0.0);
     }
 
     void simdt(const double &t, const double &dt, const List &c, NetSim &n)  {
@@ -66,12 +68,12 @@ public:
                         cout << "warning: too many spikes\n";
                     }
                     syn[ni](syn_i) += num_spikes*syn_spec[ni](syn_i)*asD("e0",c);
+                    fired(syn_i) = 1;
 //                    if(syn_spec[ni](syn_i)<0) {
 //                        cout << "inh spike at synapse " << id_conns[ni](syn_i) << " of neuron " << ids(ni) << " at " << t << "\n";
 //                        cout << "syn epsp: " << syn[ni](syn_i) << "\n";
 //                        cout << "==================================\n";
 //                    }
-                    fired(syn_i) = 1;
                 }
                 syn[ni](syn_i) *= a(ni);
             }
@@ -92,19 +94,20 @@ public:
             if(Yspike) {
                 n.push_back(ids(ni), t+dt+axon_del(ni));
                 a(ni) = 0;
-                Yspike = true;
                 pacc(ni) += 1;
             }
+            
+            // common dynamics 
             pacc(ni) += -pacc(ni)/(asD("mean_p_dur",c));
             syn[ni] -= syn[ni]/asD("tm", c);
             a += (1-a)/asD("ta", c);
-            if(!determ) {
-                C[ni] += -C[ni]/as<double>(c["tc"]) + C_calc(Yspike, p, u, syn[ni], c);
-            }
-            double B=0; 
+            
             if (incr>=asD("mean_p_dur",c)&&(!determ)) {
-                B = B_calc(Yspike, p, pacc(ni)/asD("mean_p_dur",c), c);
-                arma::vec dw = asD("added_lrate",c)*ratecalc(W[ni],c) % (C[ni]*B - asD("weight_decay_factor",c)*(fired % W[ni]) );
+                B(ni) = B_calc(Yspike, p, pacc(ni)/asD("mean_p_dur",c), c);
+                C[ni] += -C[ni]/as<double>(c["tc"]) + C_calc(Yspike, p, u, syn[ni], c);
+                arma::vec dw = asD("added_lrate",c)*ratecalc(W[ni],c) % (C[ni]*B(ni) - asD("weight_decay_factor",c)*(fired % W[ni]) );
+                if(learn) W[ni] += dw;
+
 #ifdef FINITE_CHECK            
                 if(!arma::is_finite(dw)) {
                     cout << "Found infinity in dw, for neuron " << ni << "\n";
@@ -112,36 +115,20 @@ public:
                     ratecalc(W[ni],c).t().print();
                     cout << "C[ni] = " << "\n";
                     C[ni].t().print();
-                    cout << "B = " << B << " Yspike = " << Yspike  << " u = " << u << " p = " <<  p << " pm = " << pacc(ni)/(incr+1) <<  "\n";
+                    cout << "B = " << B(ni) << " Yspike = " << Yspike  << " u = " << u << " p = " <<  p << " pm = " << pacc(ni)/asD("mean_p_dur",c) <<  "\n";
                     cout<< " weight decay: " << asD("weight_decay_factor",c) << "\n";
                     cout << "fired: \n";
                     fired.t().print();
                     cout << "W[ni] = \n";
                     W[ni].t().print();
                     ::Rf_error("error");
-
                 }
-#endif            
-                if(arma::any(dw)) {
-                    arma::vec dw_c = dw; //dt*(prev_dw + dw)/2;
-#ifdef FINITE_CHECK
-                    if(!arma::is_finite(dw_c)) {
-                        cout << "dw_c is infinite \n";
-                        cout << "dw: " << "\n";
-                        dw.t().print();
-                        ::Rf_error("error");
-                    }
 #endif                
-                    if(learn)
-                        W[ni] += dw_c;
-                
-                }
-
             }
             if(saveStat) {
                 stat_p[ni].push_back(p);
                 stat_u[ni].push_back(u);
-                stat_B[ni].push_back(B);
+                stat_B[ni].push_back(B(ni));
                 stat_C[ni].push_back(C[ni]);
                 if(learn)
                     stat_W[ni].push_back(W[ni]);
@@ -161,6 +148,7 @@ public:
     TVecNums syn;
     arma::vec a;
     TVecNums C;
+    arma::vec B;
     arma::vec pacc;
     double incr;
 

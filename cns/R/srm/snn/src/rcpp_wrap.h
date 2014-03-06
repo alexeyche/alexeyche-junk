@@ -18,7 +18,7 @@ namespace Rcpp {
                 Rcpp::Environment env( s4obj );
                 Rcpp::XPtr<SRMLayer> xptr( env.get(".pointer") );
 
-                    return SRMLayer(xptr->N, xptr->ids, xptr->W, xptr->id_conns, xptr->syn, xptr->syn_spec, xptr->a, xptr->C, xptr->pacc, xptr->incr);
+                    return SRMLayer(xptr->N, xptr->ids, xptr->W, xptr->id_conns, xptr->syn, xptr->syn_spec, xptr->a, xptr->C, xptr->B, xptr->pacc, xptr->incr);
             }
             catch(...) {
                 ::Rf_error( "supplied object could not be converted to SRMLayer." );
