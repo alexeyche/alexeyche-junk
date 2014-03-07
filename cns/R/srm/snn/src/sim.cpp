@@ -176,7 +176,10 @@ public:
         const bool saveStat = as<bool>(sim_options["saveStat"]);    
         const bool learn = as<bool>(sim_options["learn"]);    
         const bool determ = as<bool>(sim_options["determ"]);    
-        const NumericVector pattTimeline = as<NumericVector>(sim_options["patternTimeline"]);    
+        NumericVector pattTimeline;
+        if(sim_options.size() > 6) {
+            pattTimeline = as<NumericVector>(sim_options["patternTimeline"]);    
+        }
         arma::vec T = arma::linspace(T0, Tmax, (Tmax-T0)/dt);
         if(determ && learn) {
             ::Rf_error( "Net can't learn being in detemenitic mode" );
@@ -196,7 +199,7 @@ public:
         size_t patt_id = 0;
         bool refreshNet = false;
         for(size_t ti=0; ti<T.n_elem; ti++) {
-            if(pattTimeline[patt_id] >= T(ti)) {
+            if((pattTimeline[patt_id] >= T(ti))&&(pattTimeline.size() < patt_id) ) {
                 refreshNet = true;
             }
             for(size_t li=0; li<layers.size(); li++) {
@@ -219,6 +222,7 @@ public:
             net[c_id] = sp_times;
         }
     }
+
     vector<Layer*> layers;
 };
 

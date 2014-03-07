@@ -5,3 +5,19 @@ probFun <- function(u, c) {
     .Call('snn_probFun', PACKAGE = 'snn', u, c)
 }
 
+kernelWindow <- function(d, kernel_options) {
+    .Call('snn_kernelWindow', PACKAGE = 'snn', d, kernel_options)
+}
+
+kernelCorrMat <- function(d, kernel_options) {
+    .Call('snn_kernelCorrMat', PACKAGE = 'snn', d, kernel_options)
+}
+
+kernelCrossCorrMat <- function(d1, d2, kernel_options) {
+    .Call('snn_kernelCrossCorrMat', PACKAGE = 'snn', d1, d2, kernel_options)
+}
+
+kernelCrossCorr <- function(d1, d2, kernel_options) {
+    .Call('snn_kernelCrossCorr', PACKAGE = 'snn', d1, d2, kernel_options)
+}
+

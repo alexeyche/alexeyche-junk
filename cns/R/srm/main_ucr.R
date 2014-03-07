@@ -14,6 +14,7 @@ if(length(grep("RStudio", args))>0) {
   #train_spikes = list("/home/alexeyche/prog/sim/ucr_nengo_spikes/train_spikes")
   #test_spikes  = list("/home/alexeyche/prog/sim/ucr_nengo_spikes/test_spikes")
   source('constants.R')
+  model_file = "~/my/sim/runs/testrstudio/model"
 } else {
   if(length(args) == 5) {
     cat("Available options: \n")
@@ -140,9 +141,10 @@ Tcur = 0
 nr = NULL
 
 train_net = blank_net(M)
+patterns = list()
 for(ds in train_dataset) {
     p = genSpikePattern(M, ds$data, duration, dt, lambda=30)
-    
+    patterns[[length(patterns)+1]] = list(data=p, label=ds$label)
     invisible(sapply(1:length(p), function(id) { 
           sp = p[[id]] + Tcur
           train_net[[id]] <<- c(train_net[[id]], sp)
@@ -174,7 +176,7 @@ for(ep in 0:epochs) {
             net[[i]] = c(net[[i]], train_net[[i]]+T0 )
         }
         nruns = nruns + 1
-    } 
+    }
     
     
     sim_opt = list(T0=0, Tmax=max(sapply(net, function(x) if(length(x)>0) max(x) else -Inf)), 
@@ -190,8 +192,29 @@ for(ep in 0:epochs) {
 #levelplot(t(Wacc[[1]]) , col.regions=colorRampPalette(c("black", "white")))
 
 W = neurons$Wm()
-if(runmode == "learn") {
-    saveMatrixList(model_file, list(W))
+saveMatrixList(model_file, list(W))
+
+labs = unique(sapply(patterns, function(x) x$label))
+responces = list()
+for(pi in 1:length(patterns)) {
+    p = patterns[[pi]]$data
+    net[gr1$ids()] = p
+    net[neurons$ids()] = blank_net(N)
+    
+    sim_opt = list(T0=0, Tmax=max(sapply(net, function(x) if(length(x)>0) max(x) else -Inf)), 
+                   dt=dt, saveStat=FALSE, learn=FALSE, determ=TRUE)
+    s$sim(sim_opt, constants, net)
+    responces[[pi]] = list(data=net[neurons$ids()], label=patterns[[pi]]$label)
 }
-cat(min(loss), "\n")
+kernel_options = list(T0=0,Tmax=duration, quad=256, sigma=0.5)
+Ksim = matrix(0, length(responces), length(responces))
+for(ri in 1:length(responces)) {
+    for(rj in 1:length(responces)) {
+    #    if(ri != rj) {
+            Ksim[ri,rj] = mean(kernelCrossCorr(responces[[ri]], responces[[rj]], kernel_options)$data)
+   #     }
+    }
+}
+
+#cat(min(loss), "\n")
 

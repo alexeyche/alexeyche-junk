@@ -85,7 +85,7 @@ genSpikePattern = function(M, rawdata, pattDur, simdt, lambda=4, hb=NULL, lb=NUL
   approx_data = na.approx(approx_data)
   approx_data = approx_data[!is.na(approx_data)]
   
-  gen_spikes = vector("list", M)
+  gen_spikes = blank_net(M)
                                    
   neurons_rate = rep(0, M)                                      
   dt <- (hb-lb)/(M-1)
