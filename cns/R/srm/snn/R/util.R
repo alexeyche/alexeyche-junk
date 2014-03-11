@@ -55,39 +55,59 @@ blank_net = function(N) {
     return(net)
 }
 
-
-get_weights_matrix <- function(layers) {
-  max_conn_id = -1
-  min_conn_id = Inf
-  for(neurons in layers) {
-    invisible(sapply(neurons$id_conns(), function(cid) { 
-      if(length(cid) !=0) {
-        max_conn_id <<-max(max_conn_id, max(cid))
-        min_conn_id <<-min(min_conn_id, min(cid))
-      }
-    }))
-  }
-  W = matrix(0, nrow=max_conn_id, ncol=sum(sapply(layers, function(n) n$len())))
-  
-  n = layers[[1]]
-  for(ni in 1:n$len()) {
-    for(syn_num in 1:length(n$id_conns()[[ni]])) {
-      W[ n$id_conns()[[ni]][syn_num] , ni] = n$W()[[ni]][syn_num]
+make_conn_matrix = function(layers) {
+    max_conn_id = -1
+    min_conn_id = Inf
+    for(neurons in layers) {
+        invisible(sapply(neurons$id_conns(), function(cid) { 
+            if(length(cid) !=0) {
+                max_conn_id <<-max(max_conn_id, max(cid))
+                min_conn_id <<-min(min_conn_id, min(cid))
+            }
+        }))
     }
-  } 
-  return(W)
+    conn_m = matrix(0, nrow=max_conn_id, ncol=sum(sapply(layers, function(n) n$len()))) 
+    return(conn_m)
 }
+
+
+get_stat_matrix <- function(neurons, stat_list) {
+    stat_m = make_conn_matrix(list(neurons))      
+    for(ni in 1:neurons$len()) {
+        for(syn_num in 1:length(neurons$id_conns()[[ni]])) {
+            stat_m[ neurons$id_conns()[[ni]][syn_num] , ni] = stat_list[[ni]][syn_num]
+        }
+    }
+    return(stat_m)
+}
+
 gr_pl = function(m) {
   levelplot(m, col.regions=colorRampPalette(c("black", "white")))
 }
 
-loadWeightsFromFile = function(n, model_file) {
+saveModelToFile = function(n, model_file) {
+    l = list()
+    l[[1]] = get_stat_matrix(n, n$obj$W)
+    l[[2]] = get_stat_matrix(n, n$obj$syn_spec)
+    l[[3]] = get_stat_matrix(n, n$obj$syn_del)
+    l[[4]] = n$obj$axon_del
+    saveMatrixList(model_file, l)
+}
+
+loadModelFromFile = function(n, model_file) {
   if(file.exists(paste(model_file, ".idx", sep=""))) {  
     W = loadMatrix(model_file, 1)
+    syn_spec = loadMatrix(model_file, 2)
+    syn_del = loadMatrix(model_file, 3)
+    axon_del = loadMatrix(model_file, 4)
+    
+    n$obj$axon_del = axon_del
     invisible(sapply(1:N, function(id) { 
       id_to_conn = which(W[,id] != 0)
       n$obj$W[[id]] <<- W[id_to_conn, id] 
       n$obj$id_conns[[id]] <<- id_to_conn
+      n$obj$syn_spec[[id]] <<- syn_spec[id_to_conn, id]
+      n$obj$syn_del[[id]] <<- syn_del[id_to_conn, id]
     }))  
     cat("Load - Ok\n")
   } else {

@@ -47,6 +47,7 @@ if(length(grep("RStudio", args))>0) {
   dir = paste(c(runs_dir, run_name), collapse="/")
   dir.create(file.path(dir), showWarnings = FALSE)
   copy_ok = file.copy(const_file, dir, overwrite=TRUE)
+  copy_ok = file.copy("make_dataset.R", dir, overwrite=TRUE)
   
   temp_spl = strsplit(runs_dir, "/")[[1]]
   data_dir = paste( temp_spl[1:(length(temp_spl)-1)], collapse='/')
@@ -97,15 +98,13 @@ library(snn)
 
 source('srm_funcs.R')
 source('plot_funcs.R')
-source('ucr_ts.R')
 source('learn_and_run_net.R')
 source('srm.R')
 source('grad_funcs.R')
 source('serialize_to_bin.R')
 source('eval_funcs.R')
 source('kernel.R')
-source('gen_spikes.R')
-
+source('eval_funcs.R')
 
 
 set.seed(seed_num)
@@ -117,42 +116,10 @@ constants = list(dt=dt, e0=e0, ts=ts, tm=tm, alpha=alpha, beta=beta, tr=tr, u_re
                  ws=ws, ws4=ws^4, added_lrate = added_lrate, sim_dim=sim_dim, mean_p_dur=mean_p_dur)
 ID_MAX=0
 
-data = synth # synthetic control
-c(train_dataset, test_dataset) := read_ts_file(data, data_dir)
-elems = samples_from_dataset
-train_dataset = train_dataset[ c(sample(51:101, elems))] #, sample(101:150, elems))] #, sample(101:150,elems),
-#                                sample(151:200, elems), sample(201:250,elems), sample(251:300,elems))] # cut
-test_dataset = test_dataset[c(sample(1:50, elems), sample(101:150, elems))]  #, sample(101:150, elems),
-                              #sample(151:200, elems), sample(201:250,elems), sample(251:300, elems))]
-
-train_dataset[[1]]$label=1
-train_dataset[[2]] = list(data = -train_dataset[[1]]$data, label=2)
-
-train_dataset = train_dataset[sample(1:length(train_dataset))]
-
-
+source('make_dataset.R')
 
 labels = sapply(train_dataset, function(x) x$label)
 
-
-timeline = NULL
-
-Tcur = 0
-nr = NULL
-
-train_net = blank_net(M)
-patterns = list()
-for(ds in train_dataset) {
-    p = genSpikePattern(M, ds$data, duration, dt, lambda=30)
-    patterns[[length(patterns)+1]] = list(data=p, label=ds$label)
-    invisible(sapply(1:length(p), function(id) { 
-          sp = p[[id]] + Tcur
-          train_net[[id]] <<- c(train_net[[id]], sp)
-    }))
-    Tcur = Tcur + duration
-    timeline = c(timeline, Tcur)
-}
-Tmax = max(sapply(train_net, function(x) if(length(x)>0) max(x) else -Inf))
 
 start_w.M = matrix(rnorm( M*N, mean=start_w.M.mean, sd=start_w.M.sd), ncol=N, nrow=M)
 start_w.N = matrix(rnorm( (N-1)*N, mean=start_w.N.mean, sd=start_w.N.sd), ncol=N, nrow=(N-1))
@@ -182,39 +149,18 @@ for(ep in 0:epochs) {
     sim_opt = list(T0=0, Tmax=max(sapply(net, function(x) if(length(x)>0) max(x) else -Inf)), 
                    dt=dt, saveStat=FALSE, learn=(ep > 0), determ=FALSE, patternTimeline = timeline)
     s$sim(sim_opt, constants, net)
+    discr = eval(patterns, gr1, neurons, s, duration, kernel_sigma)
     pic_filename = sprintf("%s/run_ep%s.png", dir, ep)
-    plot_run_status(net, neurons, loss, rep(timeline, nruns), rep(labels, nruns), pic_filename, sprintf("Epoch %s", ep))
-    cat("ep: ", ep, "\n")    
+    plot_run_status(net, neurons, discr, rep(timeline, nruns), rep(labels, nruns), pic_filename, sprintf("Epoch %s", ep))
+    cat("ep: ", ep, ", discr: ", discr, "\n")
 }
 
 #W = list_to_matrix(neurons$obj$W)
 #gr_pl(W)
 #levelplot(t(Wacc[[1]]) , col.regions=colorRampPalette(c("black", "white")))
 
-W = neurons$Wm()
-saveMatrixList(model_file, list(W))
-
-labs = unique(sapply(patterns, function(x) x$label))
-responces = list()
-for(pi in 1:length(patterns)) {
-    p = patterns[[pi]]$data
-    net[gr1$ids()] = p
-    net[neurons$ids()] = blank_net(N)
-    
-    sim_opt = list(T0=0, Tmax=max(sapply(net, function(x) if(length(x)>0) max(x) else -Inf)), 
-                   dt=dt, saveStat=FALSE, learn=FALSE, determ=TRUE)
-    s$sim(sim_opt, constants, net)
-    responces[[pi]] = list(data=net[neurons$ids()], label=patterns[[pi]]$label)
+if(is.null(model_file)) {
+    model_file = sprintf("%s/model", dir)
 }
-kernel_options = list(T0=0,Tmax=duration, quad=256, sigma=0.5)
-Ksim = matrix(0, length(responces), length(responces))
-for(ri in 1:length(responces)) {
-    for(rj in 1:length(responces)) {
-    #    if(ri != rj) {
-            Ksim[ri,rj] = mean(kernelCrossCorr(responces[[ri]], responces[[rj]], kernel_options)$data)
-   #     }
-    }
-}
-
-#cat(min(loss), "\n")
+saveModelToFile(neurons, model_file)
 

@@ -21,3 +21,7 @@ kernelCrossCorr <- function(d1, d2, kernel_options) {
     .Call('snn_kernelCrossCorr', PACKAGE = 'snn', d1, d2, kernel_options)
 }
 
+kernelCrossEntropy <- function(d1, d2, kernel_options) {
+    .Call('snn_kernelCrossEntropy', PACKAGE = 'snn', d1, d2, kernel_options)
+}
+

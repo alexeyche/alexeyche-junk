@@ -48,12 +48,16 @@ start_w.N.sd = 0.01
 # C
 tc = 100
 mean_p_dur = 60 * sim_dim
-ws = start_w.M.mean
+ws = start_w.M.mean/2
 
 target_rate = 5 # Hz
 target_rate_factor = 0.1
 weight_decay_factor = 0.026
 
 added_lrate = 1
-epochs=50
+epochs=100
+
+# postprocess
+kernel_sigma = 3
+
 

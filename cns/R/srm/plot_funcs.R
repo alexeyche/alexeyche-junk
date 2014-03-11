@@ -49,7 +49,7 @@ gray_plot <- function(data, lims = c(min(data),max(data)) ) {
 
 Istat = NULL
 Wacc = vector("list",N)
-
+lossAcc = NULL
 plot_run_status = function(net, neurons, loss, timeline, labels, pic_filename, descr) {
     W = neurons$Wm()
     id_n = neurons$ids()
@@ -68,12 +68,13 @@ plot_run_status = function(net, neurons, loss, timeline, labels, pic_filename, d
     n_to_plot = sample(length(id_n),1)
     p4 = levelplot(t(Wacc[[n_to_plot]]), col.regions=colorRampPalette(c("black", "white")), 
                    main=sprintf("Profile neuron %s", n_to_plot))
-#    mean_grad = apply(sim_out$stat$dwstat, c(1,2), mean)
-#    p3 = levelplot(mean_grad, col.regions=colorRampPalette(c("black", "white")))
-#    if(!is.null(loss)) {
-#     dfrm = data.frame(x=1:length(loss), y=c(loss))
-#     p4 = xyplot(y~x, data=dfrm, type="l")
-#    }
+    if(!is.null(loss)) {
+        lossAcc <<- c(lossAcc, loss)
+        dfrm = data.frame(x=1:length(lossAcc), y=c(log(lossAcc)))
+        p5 = xyplot(y~x, data=dfrm, type="l")
+    }
+    
+
 #    Istat <<- cbind(Istat, sim_out$stat$Istat)
 #    Idf = data.frame(t(Istat))
     #Idf = melt(Idf, measure.vars = names(Idf),  variable.name = 'grp', value.name = 'y') 
@@ -81,12 +82,10 @@ plot_run_status = function(net, neurons, loss, timeline, labels, pic_filename, d
 #    p5 = xyplot(X1+X2+X3+X4+X5+X6+X7+X8+X9+X10~z, data=Idf, type="l")
     if(!not_fired)
       print(p1, position=c(0, 0.66, 0.5, 1), more=TRUE)
-
-
-#    print(p5, position=c(0,0,0.5,0.33), more=TRUE)
     print(p2, position=c(0.5, 0, 1, 0.5), more=TRUE) #, more=TRUE)
     print(p3, position=c(0.5, 0.5, 1, 1), more=TRUE)
-    print(p4, position=c(0,0.33, 0.5, 0.66))
+    print(p4, position=c(0,0.33, 0.5, 0.66), more=TRUE)
+    print(p5, position=c(0,0, 0.5, 0.33))
     dev.off()   
 }
 

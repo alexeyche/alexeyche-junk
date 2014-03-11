@@ -39,7 +39,11 @@ public:
     void prepare(const List &c) {
         stat_p.clear(); stat_u.clear(); stat_B.clear(); stat_C.clear(); stat_W.clear();
         for(size_t ni=0; ni < N; ni++) {
-            syn[ni].fill(0.0);
+            if(syn[ni].n_elem == 0) {
+                syn[ni] = arma::vec(id_conns[ni].n_elem, arma::fill::zeros);
+            } else {
+                syn[ni].fill(0.0);
+            }
             C[ni].fill(0.0);
             stat_p.push_back(vector<double>());
             stat_u.push_back(vector<double>());

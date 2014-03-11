@@ -132,3 +132,48 @@ SEXP kernelCrossCorr(List d1, List d2, const List kernel_options) {
     return List::create(Named("data") = K, Named("label1") = d1["label"], Named("label2") = d2["label"]);
 }
 
+arma::vec integrand_kernel_cross_neuron_p(const arma::vec &t, void *int_data) {
+    TIntDataVCorr *d = (TIntDataVCorr*)int_data;
+    arma::vec out(d->data1.size() + d->data2.size(), arma::fill::zeros);
+    for(size_t el_i=0; el_i<d->data1.size(); el_i+=1) {
+        double r1 = gaussian_kernel( t(el_i) - as<arma::vec>(d->data1[el_i]), d->sigma);
+        double r2 = gaussian_kernel( t(el_i) - as<arma::vec>(d->data2[el_i]), d->sigma);
+        double pxy = r1/(r1+r2);
+        double pyx = r2/(r1+r2);
+
+        out(el_i) = -pxy*log2(pxy);
+        out(d->data1.size()+el_i) = -pyx*log2(pyx);
+    }
+    return out;
+}
+
+// [[Rcpp::export]]
+SEXP kernelCrossEntropy(List d1, List d2, const List kernel_options) {
+    List data1 = d1["data"];
+    List data2 = d2["data"];
+
+    if(data1.size() != data2.size()) {
+        printf("Two input lists must have identical size!\n");
+        return R_NilValue;
+    }
+    
+    const double &sigma = as<double>(kernel_options["sigma"]);
+    const double &T0 = as<double>(kernel_options["T0"]);
+    const double &Tmax = as<double>(kernel_options["Tmax"]);
+    const int &quad = as<int>(kernel_options["quad"]);
+
+
+    TIntDataVCorr id(data1, data2, sigma);
+//    arma::vec T = arma::linspace<arma::vec>(T0, Tmax, (Tmax-T0)/0.1);
+//    arma::mat out(data1.size()+data2.size(), T.n_elem, arma::fill::zeros);
+//    for(size_t ti=0; ti<T.n_elem; ti++) {
+//        arma::vec Tv(data1.size()+data2.size());
+//        Tv.fill(T(ti));
+//        out.col(ti) = integrand_kernel_cross_neuron_p(Tv, &id);
+//    }
+    arma::vec K = gauss_legendre_vec(quad, integrand_kernel_cross_neuron_p, data1.size()+data2.size(), (void*)&id, T0, Tmax)/(Tmax-T0);
+    arma::mat Km(K.memptr(), data1.size(), 2);
+    arma::vec Kout = arma::sum(Km, 1);
+    return List::create(Named("data") = Kout, Named("label1") = d1["label"], Named("label2") = d2["label"]);
+//    return List::create(Named("data") = out, Named("label1") = d1["label"], Named("label2") = d2["label"]);
+}

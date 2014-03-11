@@ -83,7 +83,7 @@ SRMLayerClass = setRefClass("SRMLayerClass", fields = c("obj", "prop"),
                         return (.self$obj$W)
                        },
                        Wm = function() {
-                        return (get_weights_matrix(list(.self)))
+                        return (get_stat_matrix(.self, .self$obj$W))
                        },
                        len = function() {
                         return (.self$obj$num())
