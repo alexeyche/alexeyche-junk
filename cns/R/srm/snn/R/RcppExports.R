@@ -25,3 +25,7 @@ kernelCrossEntropy <- function(d1, d2, kernel_options) {
     .Call('snn_kernelCrossEntropy', PACKAGE = 'snn', d1, d2, kernel_options)
 }
 
+decomposePatterns <- function(patt_net, timeline, labels) {
+    .Call('snn_decomposePatterns', PACKAGE = 'snn', patt_net, timeline, labels)
+}
+

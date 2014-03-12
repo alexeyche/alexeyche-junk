@@ -1,26 +1,17 @@
 
-eval_patterns = function(patterns, gr1, neurons, s, duration) {
-    responces = list()
-    for(pi in 1:length(patterns)) {
-        p = patterns[[pi]]$data
-        net = list()
-        net[gr1$ids()] = p
-        net[neurons$ids()] = blank_net(N)
-        
-        sim_opt = list(T0=0, Tmax=duration, dt=dt, saveStat=FALSE, learn=FALSE, determ=TRUE)
-        s$sim(sim_opt, constants, net)
-        responces[[pi]] = list(data=net[neurons$ids()], label=patterns[[pi]]$label)
-    } 
-    return(responces)
-}
+
+eval_sim_opt = list(dt=dt, saveStat=FALSE, learn=FALSE, determ=TRUE)
+
+
+
 
 simMatrix = function(responces, duration, sigma) {
-    kernel_options = list(T0=0,Tmax=duration, quad=256, sigma=sigma)
+    
     Ksim = matrix(0, length(responces), length(responces))
     for(ri in 1:length(responces)) {
         for(rj in 1:length(responces)) {
             if(ri!=rj) {
-                Ksim[ri,rj] = sum(kernelCrossCorr(responces[[ri]], responces[[rj]], kernel_options)$data^2)
+                Ksim[ri,rj] = sum(kernelCrossEntropy(responces[[ri]], responces[[rj]], kernel_options)$data^2)/length(responces[[ri]]$data)
             }
         }
     }
@@ -28,10 +19,28 @@ simMatrix = function(responces, duration, sigma) {
 }
 
 
-eval = function(patterns, gr1, neurons, s, duration, sigma) {
-    responces = eval_patterns(patterns, gr1, neurons, s, duration)
-    Ksim = simMatrix(responces, duration, sigma)
-    cat("Ksim:\n")
-    print(Ksim)    
-    return(sum(Ksim^2))
+eval = function(train_net, test_net, sim,  kernel_sigma) {
+    if(train_net$duration != test_net$duration) {
+        cat("Error!\n")
+        q()
+    }
+    s$sim(eval_sim_opt, constants, train_net)
+    s$sim(eval_sim_opt, constants, test_net)
+    train_resp = train_net$getResponces()
+    test_resp = test_net$getResponces()
+
+    #resp = list()
+    #resp[1:length(train_resp)] = train_resp
+    #resp[ (length(train_resp)+1):(length(train_resp)+length(test_resp)) ] = test_resp
+    #Ksim = simMatrix(resp, train_net$duration, kernel_sigma)
+    
+    c(r, confm_data) := ucr_test(train_resp, test_resp, cross_entropy_alg, FALSE)
+    labs = unique(train_net$labels)
+    confm = matrix(0, length(labs), length(labs))
+    for(d in confm_data) {
+        confm[d$pred, d$true] = confm[d$pred, d$true] + 1
+    }
+    cat("Conf:\n")
+    print(confm)    
+    return(r)
 }

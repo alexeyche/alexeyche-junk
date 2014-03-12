@@ -2,7 +2,7 @@
 seed_num = 1234
 
 #data cfg
-samples_from_dataset = 1
+samples_from_dataset = 5
 
 # epsp
 e0 <- 1 # mV
@@ -59,5 +59,5 @@ epochs=100
 
 # postprocess
 kernel_sigma = 3
-
+kernel_options = list(T0=0,Tmax=duration, quad=256, sigma=kernel_sigma)
 

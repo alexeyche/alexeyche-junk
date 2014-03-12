@@ -116,11 +116,6 @@ constants = list(dt=dt, e0=e0, ts=ts, tm=tm, alpha=alpha, beta=beta, tr=tr, u_re
                  ws=ws, ws4=ws^4, added_lrate = added_lrate, sim_dim=sim_dim, mean_p_dur=mean_p_dur)
 ID_MAX=0
 
-source('make_dataset.R')
-
-labels = sapply(train_dataset, function(x) x$label)
-
-
 start_w.M = matrix(rnorm( M*N, mean=start_w.M.mean, sd=start_w.M.sd), ncol=N, nrow=M)
 start_w.N = matrix(rnorm( (N-1)*N, mean=start_w.N.mean, sd=start_w.N.sd), ncol=N, nrow=(N-1))
 
@@ -129,29 +124,18 @@ neurons = SRMLayerClass$new(N, start_w.N, p_edge_prob=net_edge_prob,ninh=round(N
 connection = matrix(gr1$ids(), nrow=length(gr1$ids()), ncol=N)
 neurons$connectFF(connection, start_w.M, 1:N )
 
-s = SIMClass$new(list(neurons))
-# collect statistics
+source('make_dataset.R')
 
-loss = NULL
+
+s = SIMClass$new(list(neurons))
 
 for(ep in 0:epochs) {
-    net = list()
-    net[neurons$ids()] = blank_net(N)
-    nruns = 0
-    for(T0 in seq(0, mean_p_dur/6-Tmax, by=Tmax)) {
-        for(i in gr1$ids()) {
-            net[[i]] = c(net[[i]], train_net[[i]]+T0 )
-        }
-        nruns = nruns + 1
-    }
     
-    
-    sim_opt = list(T0=0, Tmax=max(sapply(net, function(x) if(length(x)>0) max(x) else -Inf)), 
-                   dt=dt, saveStat=FALSE, learn=(ep > 0), determ=FALSE, patternTimeline = timeline)
-    s$sim(sim_opt, constants, net)
-    discr = eval(patterns, gr1, neurons, s, duration, kernel_sigma)
+    sim_opt = list(dt=dt, saveStat=FALSE, learn=(ep > 0), determ=FALSE)
+    s$sim(sim_opt, constants, train_net)
+    discr = eval(train_net_ev, test_net_ev, s, kernel_sigma)
     pic_filename = sprintf("%s/run_ep%s.png", dir, ep)
-    plot_run_status(net, neurons, discr, rep(timeline, nruns), rep(labels, nruns), pic_filename, sprintf("Epoch %s", ep))
+    plot_run_status(train_net$net, neurons, discr, pic_filename, sprintf("Epoch %s", ep))
     cat("ep: ", ep, ", discr: ", discr, "\n")
 }
 

@@ -98,11 +98,11 @@ public:
             if(Yspike) {
                 n.push_back(ids(ni), t+dt+axon_del(ni));
                 a(ni) = 0;
-                pacc(ni) += 1;
+                if(!determ) pacc(ni) += 1;
             }
             
             // common dynamics 
-            pacc(ni) += -pacc(ni)/(asD("mean_p_dur",c));
+            if(!determ) pacc(ni) += -pacc(ni)/(asD("mean_p_dur",c));
             syn[ni] -= syn[ni]/asD("tm", c);
             a += (1-a)/asD("ta", c);
             
@@ -173,17 +173,16 @@ public:
         layers.push_back(&l);
     }
 
-    void sim(const List sim_options, const List constants, List net) {
-        const double T0 = as<double>(sim_options["T0"]);
-        const double Tmax = as<double>(sim_options["Tmax"]);
+    void sim(const List sim_options, const List constants, Reference net_ref) {
         const double dt = as<double>(sim_options["dt"]);    
         const bool saveStat = as<bool>(sim_options["saveStat"]);    
         const bool learn = as<bool>(sim_options["learn"]);    
         const bool determ = as<bool>(sim_options["determ"]);    
-        NumericVector pattTimeline;
-        if(sim_options.size() > 6) {
-            pattTimeline = as<NumericVector>(sim_options["patternTimeline"]);    
-        }
+        NumericVector pattTimeline = net_ref.field("timeline");
+        List net = net_ref.field("net");
+        double T0 = 0;
+        double Tmax = as<NumericVector>(net_ref.field("Tmax"))[0];
+
         arma::vec T = arma::linspace(T0, Tmax, (Tmax-T0)/dt);
         if(determ && learn) {
             ::Rf_error( "Net can't learn being in detemenitic mode" );

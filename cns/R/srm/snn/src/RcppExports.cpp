@@ -104,3 +104,20 @@ BEGIN_RCPP
     return __sexp_result;
 END_RCPP
 }
+// decomposePatterns
+SEXP decomposePatterns(List patt_net, NumericVector timeline, NumericVector labels);
+RcppExport SEXP snn_decomposePatterns(SEXP patt_netSEXP, SEXP timelineSEXP, SEXP labelsSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< List >::type patt_net(patt_netSEXP );
+        Rcpp::traits::input_parameter< NumericVector >::type timeline(timelineSEXP );
+        Rcpp::traits::input_parameter< NumericVector >::type labels(labelsSEXP );
+        SEXP __result = decomposePatterns(patt_net, timeline, labels);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}

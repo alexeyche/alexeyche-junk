@@ -141,8 +141,8 @@ arma::vec integrand_kernel_cross_neuron_p(const arma::vec &t, void *int_data) {
         double pxy = r1/(r1+r2);
         double pyx = r2/(r1+r2);
 
-        out(el_i) = -pxy*log2(pxy);
-        out(d->data1.size()+el_i) = -pyx*log2(pyx);
+        if(pxy > 1e-08) out(el_i) = -pxy*log2(pxy);
+        if(pyx > 1e-08) out(d->data1.size()+el_i) = -pyx*log2(pyx);
     }
     return out;
 }
@@ -177,3 +177,33 @@ SEXP kernelCrossEntropy(List d1, List d2, const List kernel_options) {
     return List::create(Named("data") = Kout, Named("label1") = d1["label"], Named("label2") = d2["label"]);
 //    return List::create(Named("data") = out, Named("label1") = d1["label"], Named("label2") = d2["label"]);
 }
+
+// [[Rcpp::export]]
+SEXP decomposePatterns(List patt_net, NumericVector timeline, NumericVector labels) {
+    vector<vector<vector<double> > > nets; // we need to go deeper
+    for(size_t li=0; li<labels.size(); li++) {
+        nets.push_back(vector<vector<double> >(patt_net.size()));
+    }
+
+    for(size_t ni=0; ni<patt_net.size(); ni++) {
+        size_t patt_id=0;
+        NumericVector patt_sp = as<NumericVector>(patt_net[ni]);
+        for(size_t sp_i=0; sp_i < patt_sp.size(); sp_i++) {
+            while(patt_sp[sp_i]>=timeline[patt_id]) patt_id++;
+            if(patt_id > labels.size()) break;
+            double Tshift = 0;
+            if(patt_id>0) {
+                Tshift = timeline[patt_id-1];
+            }
+            nets[patt_id][ni].push_back(patt_sp[sp_i] - Tshift);
+        }
+    }
+    
+    
+    List nets_l(nets.size());
+    for(size_t li=0; li<nets_l.size(); li++) {
+        nets_l[li] = List::create(Named("data") = wrap(nets[li]), Named("label") = labels[li]);
+    }
+    return nets_l;
+}
+

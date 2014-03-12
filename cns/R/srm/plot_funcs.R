@@ -50,7 +50,7 @@ gray_plot <- function(data, lims = c(min(data),max(data)) ) {
 Istat = NULL
 Wacc = vector("list",N)
 lossAcc = NULL
-plot_run_status = function(net, neurons, loss, timeline, labels, pic_filename, descr) {
+plot_run_status = function(net, neurons, loss, pic_filename, descr) {
     W = neurons$Wm()
     id_n = neurons$ids()
     not_fired = all(sapply(net[id_n], function(sp) length(sp) == 1))
@@ -64,7 +64,7 @@ plot_run_status = function(net, neurons, loss, timeline, labels, pic_filename, d
     }
     
     p2 = levelplot(W, col.regions=colorRampPalette(c("black", "white")))
-    p3 = plot_data_rates(net[neurons$ids()], timeline, labels)
+    #p3 = plot_data_rates(net[neurons$ids()], timeline, labels)
     n_to_plot = sample(length(id_n),1)
     p4 = levelplot(t(Wacc[[n_to_plot]]), col.regions=colorRampPalette(c("black", "white")), 
                    main=sprintf("Profile neuron %s", n_to_plot))
@@ -83,7 +83,7 @@ plot_run_status = function(net, neurons, loss, timeline, labels, pic_filename, d
     if(!not_fired)
       print(p1, position=c(0, 0.66, 0.5, 1), more=TRUE)
     print(p2, position=c(0.5, 0, 1, 0.5), more=TRUE) #, more=TRUE)
-    print(p3, position=c(0.5, 0.5, 1, 1), more=TRUE)
+   # print(p3, position=c(0.5, 0.5, 1, 1), more=TRUE)
     print(p4, position=c(0,0.33, 0.5, 0.66), more=TRUE)
     print(p5, position=c(0,0, 0.5, 0.33))
     dev.off()   

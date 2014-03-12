@@ -53,6 +53,21 @@ eucl_dist_alg <- function(train, unknown_object) {
   return(class)
 }
 
+cross_entropy_alg <- function(train, unknown_object) {
+  best_so_far = Inf
+  class = -1
+  for(i in 1:length(train)) {
+    dist = sum(kernelCrossEntropy(train[[i]], list(data=unknown_object, label="0"), kernel_options)$data^2)/length(train[[i]])
+    if(dist < best_so_far) {
+      class = train[[i]]$label
+      best_so_far = dist
+    }
+  }
+  return(class)
+
+}
+
+
 test = function() {
 
   name = synth
