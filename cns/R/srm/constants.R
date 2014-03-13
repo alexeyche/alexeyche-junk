@@ -40,9 +40,9 @@ net_neurons_for_input = N
 afferent_per_neuron = M
 
 # start weights
-start_w.M.mean = 2
+start_w.M.mean = 1.5
 start_w.M.sd = 0.01
-start_w.N.mean = 2
+start_w.N.mean = 1.5
 start_w.N.sd = 0.01
 
 # C

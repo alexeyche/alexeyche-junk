@@ -6,11 +6,11 @@ import numpy as np
 import os
 from numpy import genfromtxt
 
-from rbm_util import gray_plot
+#from rbm_util import gray_plot
 from crbm import CRBM
 from crbm import generate
 
-from rpy2.robjects.packages import importr
+#from rpy2.robjects.packages import importr
 
 csvfile = '/home/alexeyche/my/git/alexeyche-junk/ml/dbn/th/ts_toy.csv'
 #csvfile = '/home/alexeyche/prog/alexeyche-junk/ml/dbn/th/ts_toy.csv'

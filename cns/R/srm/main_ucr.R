@@ -129,8 +129,7 @@ source('make_dataset.R')
 
 s = SIMClass$new(list(neurons))
 
-for(ep in 0:epochs) {
-    
+for(ep in 0:epochs) {    
     sim_opt = list(dt=dt, saveStat=FALSE, learn=(ep > 0), determ=FALSE)
     s$sim(sim_opt, constants, train_net)
     discr = eval(train_net_ev, test_net_ev, s, kernel_sigma)
