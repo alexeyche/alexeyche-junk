@@ -70,7 +70,7 @@ plot_run_status = function(net, neurons, loss, pic_filename, descr) {
                    main=sprintf("Profile neuron %s", n_to_plot))
     if(!is.null(loss)) {
         lossAcc <<- c(lossAcc, loss)
-        dfrm = data.frame(x=1:length(lossAcc), y=c(log(lossAcc)))
+        dfrm = data.frame(x=1:length(lossAcc), y=c(lossAcc))
         p5 = xyplot(y~x, data=dfrm, type="l")
     }
     

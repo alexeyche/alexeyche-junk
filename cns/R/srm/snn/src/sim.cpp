@@ -15,10 +15,11 @@ double asD(const char *name, const List &c) {
 
 class SRMLayer : public Layer {
 public:
-    SRMLayer(int &N_, arma::uvec &ids_, TVecNums &W_, TVecIDs &id_conns_, TVecNums &syn_, TVecNums &syn_spec_, arma::vec &a_, TVecNums &C_, arma::vec &B_, arma::vec &pacc_, int incr_) : 
+    SRMLayer(int &N_, arma::uvec &ids_, TVecNums &W_, arma::vec &Ws4_, TVecIDs &id_conns_, TVecNums &syn_, TVecNums &syn_spec_, arma::vec &a_, TVecNums &C_, arma::vec &B_, arma::vec &pacc_, int incr_) : 
                         Layer(N_),
                         ids(ids_),
                         W(W_),
+                        Ws4(Ws4_),
                         id_conns(id_conns_),
                         syn(syn_),
                         syn_spec(syn_spec_),
@@ -28,8 +29,8 @@ public:
                         pacc(pacc_),
                         incr(incr_)
     {}
-    SRMLayer(const SRMLayer &l) : Layer(l.num()), ids(l.ids), W(l.W), id_conns(l.id_conns), syn(l.syn), syn_spec(l.syn_spec), a(l.a), C(l.C), B(l.B), pacc(l.pacc), incr(l.incr) {}
-    SRMLayer(int N_) : Layer(N_), ids(N), a(N, arma::fill::zeros), C(N), B(N), W(N), id_conns(N), syn(N), syn_spec(N), pacc(N, arma::fill::zeros), incr(0) { }
+    SRMLayer(const SRMLayer &l) : Layer(l.num()), ids(l.ids), W(l.W), Ws4(l.Ws4), id_conns(l.id_conns), syn(l.syn), syn_spec(l.syn_spec), a(l.a), C(l.C), B(l.B), pacc(l.pacc), incr(l.incr) {}
+    SRMLayer(int N_) : Layer(N_), ids(N), a(N, arma::fill::zeros), C(N), B(N), W(N), Ws4(N, arma::fill::zeros), id_conns(N), syn(N), syn_spec(N), pacc(N, arma::fill::zeros), incr(0) { }
     const int num() const {
         return N;
     }
@@ -44,6 +45,7 @@ public:
             } else {
                 syn[ni].fill(0.0);
             }
+            Ws4(ni) = (asD("weight_per_neuron", c)/id_conns[ni].n_elem)/2;
             C[ni].fill(0.0);
             stat_p.push_back(vector<double>());
             stat_u.push_back(vector<double>());
@@ -51,6 +53,7 @@ public:
             stat_C.push_back(vector<arma::vec>());
             stat_W.push_back(vector<arma::vec>());
         }
+        Ws4 = arma::pow(Ws4, 4);
         a.fill(1.0);
         B.fill(0.0);
     }
@@ -109,14 +112,14 @@ public:
             if (incr>=asD("mean_p_dur",c)&&(!determ)) {
                 B(ni) = B_calc(Yspike, p, pacc(ni)/asD("mean_p_dur",c), c);
                 C[ni] += -C[ni]/as<double>(c["tc"]) + C_calc(Yspike, p, u, syn[ni], c);
-                arma::vec dw = asD("added_lrate",c)*ratecalc(W[ni],c) % (C[ni]*B(ni) - asD("weight_decay_factor",c)*(fired % W[ni]) );
+                arma::vec dw = asD("added_lrate",c)*ratecalc(W[ni],Ws4(ni)) % (C[ni]*B(ni) - asD("weight_decay_factor",c)*(fired % W[ni]) );
                 if(learn) W[ni] += dw;
 
 #ifdef FINITE_CHECK            
                 if(!arma::is_finite(dw)) {
                     cout << "Found infinity in dw, for neuron " << ni << "\n";
                     cout << "added_lrate = " << asD("added_lrate",c) << " ratecalc(W[ni]) = \n"; 
-                    ratecalc(W[ni],c).t().print();
+                    ratecalc(W[ni],Ws4(ni)).t().print();
                     cout << "C[ni] = " << "\n";
                     C[ni].t().print();
                     cout << "B = " << B(ni) << " Yspike = " << Yspike  << " u = " << u << " p = " <<  p << " pm = " << pacc(ni)/asD("mean_p_dur",c) <<  "\n";
@@ -147,6 +150,7 @@ public:
     TVecNums syn_spec;
     TVecNums syn_del;
     arma::vec axon_del;
+    arma::vec Ws4;
 
     // vars
     TVecNums syn;

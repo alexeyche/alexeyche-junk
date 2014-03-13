@@ -32,27 +32,29 @@ dt = 1
 sim_dim = 1000
 
 # net cfg
-N = 10
+N = 30
 M = 100
-net_edge_prob = 0.0
-inhib_frac = 0
-net_neurons_for_input = N
+net_edge_prob = 0.5
+inhib_frac = 1
+net_neurons_for_input = 15
 afferent_per_neuron = M
 
 # start weights
-start_w.M.mean = 1.5
+start_w.M.mean = 2.5
 start_w.M.sd = 0.01
-start_w.N.mean = 1.5
+start_w.N.mean = 2.5
 start_w.N.sd = 0.01
+
+weight_per_neuron = 140
 
 # C
 tc = 100
 mean_p_dur = 60 * sim_dim
-ws = start_w.M.mean/2
+ws = 0.5
 
 target_rate = 5 # Hz
 target_rate_factor = 0.1
-weight_decay_factor = 0.026
+weight_decay_factor = 0.01 #0.026
 
 added_lrate = 1
 epochs=100

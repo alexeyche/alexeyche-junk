@@ -113,7 +113,7 @@ constants = list(dt=dt, e0=e0, ts=ts, tm=tm, alpha=alpha, beta=beta, tr=tr, u_re
                  target_rate=target_rate,
                  target_rate_factor=target_rate_factor,
                  weight_decay_factor=weight_decay_factor,
-                 ws=ws, ws4=ws^4, added_lrate = added_lrate, sim_dim=sim_dim, mean_p_dur=mean_p_dur)
+                 weight_per_neuron=weight_per_neuron, added_lrate = added_lrate, sim_dim=sim_dim, mean_p_dur=mean_p_dur)
 ID_MAX=0
 
 start_w.M = matrix(rnorm( M*N, mean=start_w.M.mean, sd=start_w.M.sd), ncol=N, nrow=M)
@@ -121,8 +121,21 @@ start_w.N = matrix(rnorm( (N-1)*N, mean=start_w.N.mean, sd=start_w.N.sd), ncol=N
 
 gr1 = TSNeurons(M = M)
 neurons = SRMLayerClass$new(N, start_w.N, p_edge_prob=net_edge_prob,ninh=round(N*inhib_frac))
+
 connection = matrix(gr1$ids(), nrow=length(gr1$ids()), ncol=N)
+for(i in 1:net_neurons_for_input) {
+  cc = sample(gr1$ids(), M-afferent_per_neuron)
+  connection[cc,i] = 0
+}
+
+if(net_neurons_for_input<N)
+  connection[,(net_neurons_for_input+1):N] = 0
+
 neurons$connectFF(connection, start_w.M, 1:N )
+for(ni in 1:N) {
+    ncon = length(neurons$obj$id_conns[[ni]])
+    neurons$obj$W[[ni]] = rep(weight_per_neuron/ncon, ncon)
+}
 
 source('make_dataset.R')
 
