@@ -45,7 +45,7 @@ public:
             } else {
                 syn[ni].fill(0.0);
             }
-            Ws4(ni) = (asD("weight_per_neuron", c)/id_conns[ni].n_elem)/2;
+            Ws4(ni) = asD("weight_per_neuron", c)/id_conns[ni].n_elem;
             C[ni].fill(0.0);
             stat_p.push_back(vector<double>());
             stat_u.push_back(vector<double>());

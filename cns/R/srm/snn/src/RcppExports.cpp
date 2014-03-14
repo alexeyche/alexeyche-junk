@@ -121,3 +121,20 @@ BEGIN_RCPP
     return __sexp_result;
 END_RCPP
 }
+// kernelVanRossumDist
+SEXP kernelVanRossumDist(List d1, List d2, const List kernel_options);
+RcppExport SEXP snn_kernelVanRossumDist(SEXP d1SEXP, SEXP d2SEXP, SEXP kernel_optionsSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< List >::type d1(d1SEXP );
+        Rcpp::traits::input_parameter< List >::type d2(d2SEXP );
+        Rcpp::traits::input_parameter< const List >::type kernel_options(kernel_optionsSEXP );
+        SEXP __result = kernelVanRossumDist(d1, d2, kernel_options);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}

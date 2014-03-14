@@ -36,5 +36,9 @@ test_net_ev = NetClass$new(test_patterns, list(neurons), duration)
 train_net = NetClass$new(patterns, list(neurons), duration)
 train_net$replicate(mean_p_dur)
 
+#patterns[[1]] = list(data=lapply(seq(1,300,length.out=100), function(id) id), label=1)
+#patterns[[2]] = list(data=lapply(seq(300,1,length.out=100), function(id) id), label=2)
+#train_net = NetClass$new(patterns, list(neurons), duration)
+#train_net$replicate(mean_p_dur)
 
 #Tmax = max(sapply(train_net, function(x) if(length(x)>0) max(x) else -Inf))

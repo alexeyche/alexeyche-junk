@@ -81,6 +81,20 @@ cross_corr_alg <- function(train, unknown_object) {
 
 }
 
+van_rossum_alg <- function(train, unknown_object) {
+  best_so_far = Inf
+  class = -1
+  for(i in 1:length(train)) {
+    dist = sum( (kernelVanRossumDist(train[[i]], list(data=unknown_object, label="0"), kernel_options)$data)^2 )
+    if(dist < best_so_far) {
+      class = train[[i]]$label
+      best_so_far = dist
+    }
+  }
+  return(class)
+
+}
+
 test = function() {
 
   name = synth

@@ -6,31 +6,41 @@ double gaussian_kernel(arma::vec s, double sigma) {
    return arma::accu( (1/sqrt(2*arma::datum::pi*pow(sigma,2)))*exp( -arma::pow(s, 2)/(2*pow(sigma,2)) ));
 }
 
+double exponential_kernel(arma::vec s, double tR) {
+    double sum = 0;
+    for(size_t si=0; si<s.n_elem; si++) {
+        if(s(si)>=0) {
+            sum+=exp(-s(si)/tR);
+        }
+    }
+    return sum;
+}
+
 double gaussian_function(double t, double sigma) {
     return (1/sqrt(2*arma::datum::pi*(sigma*sigma)))*exp( -(t*t)/(2*(sigma*sigma)) );
 }
 
 
 struct TIntData {
-    double sigma;
+    double param;
     arma::vec data;
 };
 
 struct TIntDataV {
-    TIntDataV(const List &data_c, const double &sigma_c) : data(data_c), sigma(sigma_c) {}
-    double sigma;
+    TIntDataV(const List &data_c, const double &param_c) : data(data_c), param(param_c) {}
+    double param;
     List data;
 };
 double integrand_kernel(double t, void *int_data) {
     TIntData *d = (TIntData*)int_data;
-    return gaussian_kernel(t - d->data, d->sigma) ;
+    return gaussian_kernel(t - d->data, d->param) ;
 }
 
 arma::vec integrand_kernel_vec(const arma::vec &t, void *int_data) {
     TIntDataV *d = (TIntDataV*)int_data;
     arma::vec out(d->data.size(), arma::fill::zeros);
     for(size_t el_i=0; el_i<d->data.size(); el_i++) {
-        out(el_i) = gaussian_kernel( t(el_i) - as<arma::vec>(d->data[el_i]), d->sigma);
+        out(el_i) = gaussian_kernel( t(el_i) - as<arma::vec>(d->data[el_i]), d->param);
     }
     return out;
 }
@@ -56,8 +66,8 @@ SEXP kernelWindow(List d, const List kernel_options) {
 // correlation stuff:
 
 struct TIntDataVCorr {
-    TIntDataVCorr(const List &data1_c, const List &data2_c, const double &sigma_c) : data1(data1_c), data2(data2_c), sigma(sigma_c) {}
-    double sigma;
+    TIntDataVCorr(const List &data1_c, const List &data2_c, const double &param_c) : data1(data1_c), data2(data2_c), param(param_c) {}
+    double param;
     List data1;
     List data2;
 };
@@ -68,7 +78,7 @@ arma::vec integrand_kernel_corr_vec(const arma::vec &t, void *int_data) {
     for(size_t el_i=0; el_i<d->data1.size(); el_i++) {
         for(size_t el_j=0; el_j<d->data2.size(); el_j++) {
             int ind = el_j+el_i*d->data1.size(); // Column major Tom to ground control
-            out(ind) = gaussian_kernel( t(ind) - as<arma::vec>(d->data1[el_i]), d->sigma)*gaussian_kernel( t(ind) - as<arma::vec>(d->data2[el_j]), d->sigma);
+            out(ind) = gaussian_kernel( t(ind) - as<arma::vec>(d->data1[el_i]), d->param)*gaussian_kernel( t(ind) - as<arma::vec>(d->data2[el_j]), d->param);
         }
     }
     return out;
@@ -106,7 +116,7 @@ arma::vec integrand_kernel_cross_neuron_vec(const arma::vec &t, void *int_data) 
     TIntDataVCorr *d = (TIntDataVCorr*)int_data;
     arma::vec out(d->data1.size(), arma::fill::zeros);
     for(size_t el_i=0; el_i<d->data1.size(); el_i++) {
-        out(el_i) = gaussian_kernel( t(el_i) - as<arma::vec>(d->data1[el_i]), d->sigma)*gaussian_kernel( t(el_i) - as<arma::vec>(d->data2[el_i]), d->sigma);
+        out(el_i) = gaussian_kernel( t(el_i) - as<arma::vec>(d->data1[el_i]), d->param)*gaussian_kernel( t(el_i) - as<arma::vec>(d->data2[el_i]), d->param);
     }
     return out;
 }
@@ -136,8 +146,8 @@ arma::vec integrand_kernel_cross_neuron_p(const arma::vec &t, void *int_data) {
     TIntDataVCorr *d = (TIntDataVCorr*)int_data;
     arma::vec out(d->data1.size() + d->data2.size(), arma::fill::zeros);
     for(size_t el_i=0; el_i<d->data1.size(); el_i+=1) {
-        double r1 = gaussian_kernel( t(el_i) - as<arma::vec>(d->data1[el_i]), d->sigma);
-        double r2 = gaussian_kernel( t(el_i) - as<arma::vec>(d->data2[el_i]), d->sigma);
+        double r1 = gaussian_kernel( t(el_i) - as<arma::vec>(d->data1[el_i]), d->param);
+        double r2 = gaussian_kernel( t(el_i) - as<arma::vec>(d->data2[el_i]), d->param);
         double pxy = r1/(r1+r2);
         double pyx = r2/(r1+r2);
 
@@ -207,3 +217,34 @@ SEXP decomposePatterns(List patt_net, NumericVector timeline, NumericVector labe
     return nets_l;
 }
 
+arma::vec integrand_kernel_van_rossum(const arma::vec &t, void *int_data) {
+    TIntDataVCorr *d = (TIntDataVCorr*)int_data;
+    arma::vec out(d->data1.size(), arma::fill::zeros);
+    for(size_t el_i=0; el_i<d->data1.size(); el_i+=1) {
+        double r1 = exponential_kernel( t(el_i) - as<arma::vec>(d->data1[el_i]), d->param);
+        double r2 = exponential_kernel( t(el_i) - as<arma::vec>(d->data2[el_i]), d->param);
+        out(el_i) = (r1-r2)*(r1-r2);
+    }
+    return out;
+}
+
+// [[Rcpp::export]]
+SEXP kernelVanRossumDist(List d1, List d2, const List kernel_options) {
+    List data1 = d1["data"];
+    List data2 = d2["data"];
+
+    if(data1.size() != data2.size()) {
+        printf("Two input lists must have identical size!\n");
+        return R_NilValue;
+    }
+    
+    const double &tR = as<double>(kernel_options["tR"]);
+    const double &T0 = as<double>(kernel_options["T0"]);
+    const double &Tmax = as<double>(kernel_options["Tmax"]);
+    const int &quad = as<int>(kernel_options["quad"]);
+    
+    TIntDataVCorr id(data1, data2, tR);
+    
+    arma::vec K = gauss_legendre_vec(quad, integrand_kernel_van_rossum, data1.size(), (void*)&id, T0, Tmax);
+    return List::create(Named("data") = K, Named("label1") = d1["label"], Named("label2") = d2["label"]);
+}    
