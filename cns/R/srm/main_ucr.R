@@ -144,9 +144,15 @@ source('make_dataset.R')
 s = SIMClass$new(list(neurons))
 
 for(ep in 0:epochs) {    
-    sim_opt = list(dt=dt, saveStat=TRUE, learn=(ep > 0), determ=FALSE)
-    s$sim(sim_opt, constants, train_net)
-    discr = eval(train_net_ev, test_net_ev, s, kernel_sigma)
+    if(ep == 0) { 
+        work_net = train_net_mean_p
+    } else {
+        work_net = train_net  
+    } 
+    
+    sim_opt = list(dt=dt, saveStat=FALSE, learn=(ep > 0), determ=FALSE)
+    s$sim(sim_opt, constants, work_net)
+    #discr = eval(train_net_ev, test_net_ev, s, kernel_sigma)
     pic_filename = sprintf("%s/run_ep%s.png", dir, ep)
     plot_run_status(train_net$net, neurons, discr, pic_filename, sprintf("Epoch %s", ep))
     cat("ep: ", ep, ", discr: ", discr, "\n")
