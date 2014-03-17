@@ -39,8 +39,8 @@ neurons$connectFF(connection, start_w.M, 1:N )
 s = SIMClass(list(neurons))
 
 
-#dir2save = "~/prog/sim/rfd_files"
-dir2save = "~/my/sim/rfd_files"
+dir2save = "~/prog/sim/rfd_files"
+#dir2save = "~/my/sim/rfd_files"
 
 T0 = 0
 Tmax = 30000
@@ -54,7 +54,10 @@ net = list()
 invisible(sapply(1:nrow(net_m), function(id) { 
     net[[id]] <<- net_m[id, which(net_m[id,] != 0)]
 }))
-sim_opt = list(T0=T0, Tmax=mean_p_dur, dt=dt, saveStat=FALSE, learn=TRUE, determ=FALSE)
+train_net = NetSim$new(list(net), list(neurons), Tmax)
+
+sim_opt = list(dt=dt, saveStat=FALSE, learn=TRUE, determ=FALSE)
+
 s$sim(sim_opt, constants, net)
 
 benchMSim = function() {

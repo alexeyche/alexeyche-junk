@@ -68,6 +68,7 @@ public:
 //            syn[ni] += num_spikes % syn_spec[ni] * asD("e0",c);
 //            syn[ni] *= a(ni);
 
+            double u = asD("u_rest", c);
             for(size_t syn_i=0; syn_i < id_conns[ni].n_elem; syn_i++) {
                 int num_spikes = n.getNumSpikes( id_conns[ni](syn_i), t-syn_del[ni](syn_i));
                 if(num_spikes > 0) {
@@ -83,8 +84,9 @@ public:
 //                    }
                 }
                 syn[ni](syn_i) *= a(ni);
+                u += W[ni](syn_i)*syn[ni](syn_i);
             }
-            double u = asD("u_rest", c) + sum(syn[ni] % W[ni]);
+            //double u = asD("u_rest", c) + sum(syn[ni] % W[ni]);
             bool Yspike = false;
             double p = 0;
             if(!determ) {
