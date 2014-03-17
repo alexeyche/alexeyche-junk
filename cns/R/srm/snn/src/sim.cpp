@@ -6,6 +6,7 @@
 #include "layer.h"
 #include "netsim.h"
 
+
 double asD(const char *name, const List &c) {
     return as<double>(c[name]);
 }
