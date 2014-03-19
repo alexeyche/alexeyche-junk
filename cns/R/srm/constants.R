@@ -29,12 +29,12 @@ u_rest <- -70 # mV
 duration = 1000
 # sim prop:
 dt = 1
-sim_dim = 2000
+sim_dim = 1000
 
 # net cfg
 M = 100
 N =24
-N2 = 24
+N2 = 0 #24
 net_edge_prob = 0.3
 net_edge_prob2 = 0.3
 inhib_frac = 0.25
@@ -48,8 +48,8 @@ afferent_per_neuron2 = N/4
 
 # start weights
 start_W.sd = 0.5
-weight_per_neuron = 400
-weight_per_neuron2 = 325
+weight_per_neuron = 300
+weight_per_neuron2 = 250
 
 
 # C
