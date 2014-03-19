@@ -3,19 +3,19 @@
 args <- commandArgs(trailingOnly = FALSE)
 if(length(grep("RStudio", args))>0) {
   verbose = TRUE
-  dir='~/prog/sim/runs/testrstudio'
-  #dir='~/my/sim/runs/testrstudio'
-  data_dir = '~/prog/sim'
-  #data_dir = '~/my/sim'
-  setwd("~/prog/alexeyche-junk/cns/R/srm")
-  #setwd("~/my/git/alexeyche-junk/cns/R/srm")
+  #dir='~/prog/sim/runs/testrstudio'
+  dir='~/my/sim/runs/testrstudio'
+  #data_dir = '~/prog/sim'
+  data_dir = '~/my/sim'
+  #setwd("~/prog/alexeyche-junk/cns/R/srm")
+  setwd("~/my/git/alexeyche-junk/cns/R/srm")
   #train_spikes = list("/home/alexeyche/my/sim/ucr_fb_spikes/train_spikes")
   #test_spikes  = list("/home/alexeyche/my/sim/ucr_fb_spikes/test_spikes")
   #train_spikes = list("/home/alexeyche/prog/sim/ucr_nengo_spikes/train_spikes")
   #test_spikes  = list("/home/alexeyche/prog/sim/ucr_nengo_spikes/test_spikes")
   source('constants.R')
-  #model_file = "~/my/sim/runs/testrstudio/model"
-  model_file = "~/prog/sim/runs/testrstudio/model"
+  model_file = "~/my/sim/runs/testrstudio/model"
+  #model_file = "~/prog/sim/runs/testrstudio/model"
 } else {
   if(length(args) == 5) {
     cat("Available options: \n")
@@ -117,12 +117,13 @@ constants = list(dt=dt, e0=e0, ts=ts, tm=tm, alpha=alpha, beta=beta, tr=tr, u_re
                  weight_per_neuron=weight_per_neuron, added_lrate = added_lrate, sim_dim=sim_dim, mean_p_dur=mean_p_dur)
 ID_MAX=0
 
-start_w.M = matrix(rnorm( M*N, mean=start_w.M.mean, sd=start_w.M.sd), ncol=N, nrow=M)
-start_w.N = matrix(rnorm( (N-1)*N, mean=start_w.N.mean, sd=start_w.N.sd), ncol=N, nrow=(N-1))
 
 gr1 = TSNeurons(M = M)
-neurons = SRMLayerClass$new(N, start_w.N, p_edge_prob=net_edge_prob,ninh=round(N*inhib_frac))
-
+neurons = SRMLayerClass$new(N, 0, p_edge_prob=net_edge_prob,ninh=round(N*inhib_frac), syn_delay_rate, axon_delay_rate, delay_dist_gain)
+neurons2 = NULL
+if(N2>0) {
+    neurons2 = SRMLayerClass$new(N2, 0, p_edge_prob=net_edge_prob2,ninh=round(N2*inhib_frac2), syn_delay_rate, axon_delay_rate, delay_dist_gain)
+}
 connection = matrix(gr1$ids(), nrow=length(gr1$ids()), ncol=N)
 for(i in 1:net_neurons_for_input) {
   cc = sample(gr1$ids(), M-afferent_per_neuron)
@@ -132,16 +133,38 @@ for(i in 1:net_neurons_for_input) {
 if(net_neurons_for_input<N)
   connection[,(net_neurons_for_input+1):N] = 0
 
-neurons$connectFF(connection, start_w.M, 1:N )
+neurons$connectFF(connection, 0, 1:N, syn_delay_rate, delay_dist_gain)
+
+sl = list(neurons)
+if(N2>0) {
+    sl[[length(sl)+1]] = neurons2
+    connection21 = matrix(neurons$ids(), nrow=N, ncol=N2)
+    for(i in 1:net_neurons_for_input2) {
+      cc = sample(1:N, N2-afferent_per_neuron2)
+      connection21[cc,i] = 0
+    }
+    connection12 = matrix(neurons2$ids(), nrow=N2, ncol=N)
+    for(i in 1:net_neurons_for_input) {
+      cc = sample(1:N2, N-afferent_per_neuron2)
+      connection12[cc,i] = 0
+    }
+    neurons2$connectFF(connection21, 0, 1:N2, syn_delay_rate, delay_dist_gain)
+    neurons$connectFF(connection12, 0, 1:N, syn_delay_rate, delay_dist_gain)
+}
 for(ni in 1:N) {
     ncon = length(neurons$obj$id_conns[[ni]])
-    neurons$obj$W[[ni]] = rep(weight_per_neuron/ncon, ncon)
+    neurons$obj$W[[ni]] = rnorm(ncon, mean=weight_per_neuron/ncon, sd=start_W.sd)
+}
+if(N2>0) {
+    for(ni in 1:N2) {
+        ncon = length(neurons2$obj$id_conns[[ni]])
+        neurons2$obj$W[[ni]] = rnorm(ncon, mean=weight_per_neuron2/ncon, sd=start_W.sd)
+    }   
 }
 
 source('make_dataset.R')
 
-
-s = SIMClass$new(list(neurons))
+s = SIMClass$new(sl)
 
 for(ep in 0:epochs) {    
     if(ep == 0) { 
@@ -152,10 +175,10 @@ for(ep in 0:epochs) {
     
     sim_opt = list(dt=dt, saveStat=FALSE, learn=(ep > 0), determ=FALSE)
     s$sim(sim_opt, constants, work_net)
-    #discr = eval(train_net_ev, test_net_ev, s, kernel_sigma)
+    c(sim, discr, loss) := eval(train_net_ev, test_net_ev, s, kernel_sigma)
     pic_filename = sprintf("%s/run_ep%s.png", dir, ep)
-    plot_run_status(train_net$net, neurons, discr, pic_filename, sprintf("Epoch %s", ep))
-    cat("ep: ", ep, ", discr: ", discr, "\n")
+    plot_run_status(work_net$net, neurons, sim, discr, loss, pic_filename, sprintf("Epoch %s", ep))
+    cat("ep: ", ep,  "\n")
 }
 
 #W = list_to_matrix(neurons$obj$W)

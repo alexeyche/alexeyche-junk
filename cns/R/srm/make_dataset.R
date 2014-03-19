@@ -18,12 +18,14 @@ test_dataset = test_dataset[c(sample(1:50, elems), sample(51:100, elems))]  #, s
 patterns = list()
 for(ds in train_dataset) {
     p = genSpikePattern(M, ds$data, duration, dt, lambda=30)
+#    p = lapply(p, function(sp) sp*2)
     patterns[[length(patterns)+1]] = list(data=p, label=ds$label)
 }
 
 test_patterns = list()
 for(ds in test_dataset) {
     p = genSpikePattern(M, ds$data, duration, dt, lambda=30)
+#    p = lapply(p, function(sp) sp*2)
     test_patterns[[length(test_patterns)+1]] = list(data=p, label=ds$label)
 }
 #gr_pl(1000*sapply(patterns, function(x) sapply(x$data, length))/duration)
@@ -37,7 +39,7 @@ train_net_mean_p = NetClass$new(patterns, list(neurons), duration)
 train_net_mean_p$replicate(mean_p_dur)
 
 train_net = NetClass$new(patterns, list(neurons), duration)
-train_net$replicate(train_net_ev$Tmax*10)
+train_net$replicate(train_net_ev$Tmax*5)
 
 #patterns[[1]] = list(data=lapply(seq(1,300,length.out=100), function(id) id), label=1)
 #patterns[[2]] = list(data=lapply(seq(300,1,length.out=100), function(id) id), label=2)
