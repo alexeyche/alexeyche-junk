@@ -153,7 +153,7 @@ if(N2>0) {
 }
 for(ni in 1:N) {
     ncon = length(neurons$obj$id_conns[[ni]])
-    neurons$obj$W[[ni]] = rnorm(ncon, mean=weight_per_neuron/ncon, sd=start_W.sd)
+    neurons$obj$W[[ni]] = abs(rnorm(ncon, mean=weight_per_neuron/ncon, sd=start_W.sd))
 }
 if(N2>0) {
     for(ni in 1:N2) {
@@ -165,6 +165,7 @@ if(N2>0) {
 source('make_dataset.R')
 
 s = SIMClass$new(sl)
+
 
 for(ep in 0:epochs) {    
     if(ep == 0) { 
@@ -180,13 +181,13 @@ for(ep in 0:epochs) {
     plot_run_status(work_net$net, neurons, sim, discr, loss, pic_filename, sprintf("Epoch %s", ep))
     cat("ep: ", ep,  "\n")
 }
-
-#W = list_to_matrix(neurons$obj$W)
-#gr_pl(W)
-#levelplot(t(Wacc[[1]]) , col.regions=colorRampPalette(c("black", "white")))
-
+# 
+# #W = list_to_matrix(neurons$obj$W)
+# #gr_pl(W)
+# #levelplot(t(Wacc[[1]]) , col.regions=colorRampPalette(c("black", "white")))
+# 
 if(is.null(model_file)) {
     model_file = sprintf("%s/model", dir)
 }
 saveModelToFile(neurons, model_file)
-
+# 

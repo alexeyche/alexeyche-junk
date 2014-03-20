@@ -10,14 +10,15 @@ using namespace Rcpp;
 double probf(const double &u, const List &c) {
 #if PROB_FUNC == LINEAR 
     double p = (as<double>(c["pr"]) + (u - as<double>(c["u_rest"]))*as<double>(c["gain_factor"]))/as<double>(c["sim_dim"]);
+    if(p < as<double>(c["pr"])/as<double>(c["sim_dim"])) return as<double>(c["pr"])/as<double>(c["sim_dim"]);
 
 #elif PROB_FUNC == EXP
 //   (beta/alpha)*(log(1+exp(alpha*(tr-u))) -alpha*(tr-u))  
+    if(u <= as<double>(c["u_rest"])) return as<double>(c["pr"])/as<double>(c["sim_dim"]);
     double p = (as<double>(c["pr"]) + ( as<double>(c["beta"])/as<double>(c["alpha"]) ) * 
                 ( log( 1 + exp( as<double>(c["alpha"])*(as<double>(c["tr"])-u))) - 
                                     as<double>(c["alpha"])*(as<double>(c["tr"])-u)))/as<double>(c["sim_dim"]);
 #endif    
-    if(p < as<double>(c["pr"])/as<double>(c["sim_dim"])) return as<double>(c["pr"])/as<double>(c["sim_dim"]);
     return p;
 }
 

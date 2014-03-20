@@ -92,6 +92,25 @@ public:
             double p = 0;
             if(!determ) {
                 p = probf(u, c)*dt;
+//                if(p > 1000) {
+//                    cout << "Something wrong: big p\n";
+//                    cout << "neuron id " << ids(ni) << "\n";
+//                    cout << "p: " << p << "\n";
+//                    cout << "u: " << u << "\n";
+//                    cout << "fired: \n";
+//                    fired.t().print();
+//                    for(size_t syn_i=0; syn_i < id_conns[ni].n_elem; syn_i++) {
+//                        int num_spikes = n.getNumSpikes( id_conns[ni](syn_i), t-syn_del[ni](syn_i));
+//                        cout << "num_spikes: " << num_spikes << "\n";
+//                        if(num_spikes > 0) {
+//                            cout << "syn_spec[" << ni << "](" << syn_i << ") = " << syn_spec[ni](syn_i) << ", e0 = " << asD("e0",c) << "\n";
+//                        }
+//                        cout << "a(" << ni << ") = " << a(ni) << "\n";
+//                        cout << "u+ =" << W[ni](syn_i) << " * " << syn[ni](syn_i) << "\n";
+//                    }
+//                    ::Rf_error("error");
+//
+//                }
                 if(p > coins(ni)) {
                     Yspike = true;
                 }

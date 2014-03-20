@@ -19,7 +19,7 @@ beta <- 20
 tr <- -50 # mV
 
 gain_factor = 12.5
-pr = 1
+pr = 0.1
 
 # srm
 u_rest <- -70 # mV
@@ -33,14 +33,14 @@ sim_dim = 1000
 
 # net cfg
 M = 100
-N =24
+N =250
 N2 = 0 #24
-net_edge_prob = 0.3
+net_edge_prob = 0.01
 net_edge_prob2 = 0.3
-inhib_frac = 0.25
+inhib_frac = 0.5
 inhib_frac2 = 0.25
 net_neurons_for_input = N
-afferent_per_neuron = M/2
+afferent_per_neuron = 5
 
 net_neurons_for_input2 = N2
 afferent_per_neuron2 = N/4
@@ -48,7 +48,7 @@ afferent_per_neuron2 = N/4
 
 # start weights
 start_W.sd = 0.5
-weight_per_neuron = 300
+weight_per_neuron = 120
 weight_per_neuron2 = 250
 
 
