@@ -58,9 +58,9 @@ mean_p_dur = 60 * sim_dim
 
 target_rate = 5 # Hz
 target_rate_factor = 0.1
-weight_decay_factor = 0.002
+weight_decay_factor = 0.007 #0.026
 
-added_lrate = 1
+added_lrate = 5
 epochs=100
 
 # postprocess
