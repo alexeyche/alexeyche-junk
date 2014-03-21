@@ -5,7 +5,7 @@
 
 #include "layer.h"
 
-SRMLayer* createSRMLayer(size_t N, size_t ninh) {
+SRMLayer* createSRMLayer(size_t N, Constants *c) {
     SRMLayer *l = (SRMLayer*)malloc(sizeof(SRMLayer));
     l->N = N;
     l->ids = (size_t*)malloc( l->N*sizeof(size_t));
@@ -23,6 +23,15 @@ SRMLayer* createSRMLayer(size_t N, size_t ninh) {
         l->nconn[ni] = 0;
     }
     return(l);
+}
+
+void connectSRMLayer(Matrix *conn_m, indVector ids_conn, Constants *c) {
+    assert(conn_m->ncol == ids_conn->size);
+    for(size_t i = 0; i<conn_m->nrow; i++) {
+        for(size_t j = 0; j<conn_m->ncol; j++) {
+            getMatrixElement(conn_m, i, j);
+        } 
+    }
 }
 
 void printSRMLayer(SRMLayer *l) {

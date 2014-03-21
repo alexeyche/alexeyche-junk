@@ -1,7 +1,8 @@
 
-#include <libactor/actor.h>
+#include "core.h"
 
-#include "layer.h"
+
+
 
 
 void *main_func(void *args) {
