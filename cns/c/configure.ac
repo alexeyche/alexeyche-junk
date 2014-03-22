@@ -1,10 +1,11 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ([2.68])
-AC_INIT(srm_sim, 0.1, alexey.chernushev@gmail.com)
-AC_CONFIG_SRCDIR([srm_sim/constants.h])
-AC_CONFIG_HEADERS([config.h])
+AC_PREREQ([2.69])
+AC_INIT([srm_sim], [0.1], [alexey.chernushev@gmail.com])
+AM_INIT_AUTOMAKE(srm_sim, 0.1)
+AC_CONFIG_SRCDIR([srm_sim/layer.c])
+#AC_CONFIG_HEADERS([config.h])
 
 # Checks for programs.
 AC_PROG_CC

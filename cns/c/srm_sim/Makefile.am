@@ -1,6 +1,11 @@
-CFLAGS = -std=c99 -Wmain -Wall -DNDEBUG
-LDFLAGS = -lactor
+# what flags you want to pass to the C compiler & linker
+CFLAGS = -Wall -std=c99 -O0 -g
+LDADD= -lactor
 
+# this lists the binaries to produce, the (non-PHONY, binary) targets in
+# the previous manual Makefile
 bin_PROGRAMS = srm_sim srm_sim_ut
-srm_sim_SOURCES = ./util/util.h ./util/util_gen.h ./util/ini.h ./constants.h ./core.h ./layer.h ./matrix.h ./sim.h ./sparse_matrix.h ./templates.h
-srm_sim_ut_SOURCES = ./util/util.h ./util/util_gen.h ./util/ini.h ./constants.h ./core.h ./layer.h ./matrix.h ./sim.h ./sparse_matrix.h ./templates.h
+bin_PROGRAMS = $(top_builddir)/bin/srm_sim
+__top_builddir__bin_srm_sim_SOURCES = ./srm_sim.c ./layer.c  ./matrix.c  ./util/util_vector.c ./util/ini.c ./templates.h ./layer.h ./matrix.h ./core.h ./util/util_vector.h ./util/ini.h ./sim.h constants.c util/util.c
+__top_builddir__bin_srm_sim_ut_SOURCES = ./layer.c ./srm_sim_ut.c ./matrix.c  ./util/util_vector.c ./util/ini.c ./templates.h ./layer.h ./matrix.h ./core.h ./util/util_vector.h ./util/ini.h ./sim.h ./constants.c util/util.c
+

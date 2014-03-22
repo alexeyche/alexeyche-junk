@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "util/util_gen.h"
+#include "util/util_vector.h"
 #include "matrix.h"
 #include "layer.h"
 //#include "sparse_matrix.h"

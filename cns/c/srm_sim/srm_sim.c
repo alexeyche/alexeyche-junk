@@ -1,21 +1,25 @@
 
 #include "core.h"
-
-
-
+#include "arg_opt.h"
 
 
 void *main_func(void *args) {
     struct actor_main *main_s = (struct actor_main*)args;
-    int x;
 	
-	/* Accessing the arguments passed to the application */
-	printf("Number of arguments: %d\n", main_s->argc);
-	for(x = 0; x < main_s->argc; x++) printf("Argument: %s\n", main_s->argv[x]);
-	
-    SRMLayer *l = createSRMLayer(30, 5);
+	ArgOptions a = parseOptions(main_s->argc, main_s->argv);
+    printf("args.jobs = %d \n", a.jobs); 	
+    printf("args.c = %s \n", a.const_filename); 	
+
+    Constants *c = createConstants(a.const_filename);
+    printConstants(c);
+
+
+    SRMLayer *l = createSRMLayer(c->N);
+    configureSRMLayer(l, c);
     printSRMLayer(l);
+
     deleteSRMLayer(l);
+    deleteConstants(c);
 }
 
 DECLARE_ACTOR_MAIN(main_func)

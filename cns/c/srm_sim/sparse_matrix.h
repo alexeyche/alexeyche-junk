@@ -2,7 +2,7 @@
 #define SPARSE_MATRIX_H
 
 #include "matrix.h"
-#include "util_gen.h"
+#include "util_vector.h"
 
 // http://software.intel.com/sites/products/documentation/hpc/mkl/mklman/GUID-9FCEB1C4-670D-4738-81D2-F378013412B0.htm
 
