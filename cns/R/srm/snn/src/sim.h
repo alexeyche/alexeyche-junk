@@ -9,8 +9,8 @@ using namespace std;
 
 typedef vector< arma::uvec > TVecIDs;
 typedef vector< arma::vec > TVecNums;
-typedef vector< vector<double> > TStatAcc;
-typedef vector< vector<arma::vec> > TVecStatAcc;
+typedef vector< vector<double> > TVecAcc;
+typedef vector< vector<arma::vec> > TVecArr;
 typedef pair<int, double> TSpikePair;
 typedef vector<TSpikePair> TVecSpikes;
 

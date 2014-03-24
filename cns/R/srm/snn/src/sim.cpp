@@ -14,9 +14,11 @@ double asD(const char *name, const List &c) {
 
 //#define FINITE_CHECK
 
+#define SYN_ACT_TOL 0.001
+
 class SRMLayer : public Layer {
 public:
-    SRMLayer(int &N_, arma::uvec &ids_, TVecNums &W_, arma::vec &Ws4_, TVecIDs &id_conns_, TVecNums &syn_, TVecNums &syn_spec_, arma::vec &a_, TVecNums &C_, arma::vec &B_, arma::vec &pacc_, int incr_) : 
+    SRMLayer(int &N_, arma::uvec &ids_, TVecNums &W_, arma::vec &Ws4_, TVecIDs &id_conns_, TVecNums &syn_, TVecNums &syn_spec_, arma::vec &a_, TVecNums &C_, arma::vec &B_, arma::vec &pacc_, int incr_, vector< set<size_t> > active_syns_) : 
                         Layer(N_),
                         ids(ids_),
                         W(W_),
@@ -28,18 +30,26 @@ public:
                         C(C_),
                         B(B_),
                         pacc(pacc_),
-                        incr(incr_)
+                        incr(incr_),
+                        active_syns(active_syns_)
     {}
-    SRMLayer(const SRMLayer &l) : Layer(l.num()), ids(l.ids), W(l.W), Ws4(l.Ws4), id_conns(l.id_conns), syn(l.syn), syn_spec(l.syn_spec), a(l.a), C(l.C), B(l.B), pacc(l.pacc), incr(l.incr) {}
-    SRMLayer(int N_) : Layer(N_), ids(N), a(N, arma::fill::zeros), C(N), B(N), W(N), Ws4(N, arma::fill::zeros), id_conns(N), syn(N), syn_spec(N), pacc(N, arma::fill::zeros), incr(0) { }
+    SRMLayer(const SRMLayer &l) : Layer(l.num()), ids(l.ids), W(l.W), Ws4(l.Ws4), id_conns(l.id_conns), syn(l.syn), syn_spec(l.syn_spec), a(l.a), C(l.C), B(l.B), pacc(l.pacc), incr(l.incr), active_syns(l.active_syns) {}
+    SRMLayer(int N_) : Layer(N_), ids(N), a(N, arma::fill::zeros), C(N), B(N), W(N), Ws4(N, arma::fill::zeros), id_conns(N), syn(N), syn_spec(N), pacc(N, arma::fill::zeros), incr(0), active_syns(N_) { }
     const int num() const {
         return N;
     }
     void setNum(int N_) {
         N = N_;
     }
+    const arma::uvec& getConns(size_t ni) const {
+        return id_conns[ni];
+    }
+    const arma::uvec& getIds() const {
+        return ids;
+    }
+
     void prepare(const List &c) {
-        stat_p.clear(); stat_u.clear(); stat_B.clear(); stat_C.clear(); stat_W.clear();
+        stat_p.clear(); stat_u.clear(); stat_B.clear(); stat_C.clear(); stat_W.clear(); 
         for(size_t ni=0; ni < N; ni++) {
             if(syn[ni].n_elem == 0) {
                 syn[ni] = arma::vec(id_conns[ni].n_elem, arma::fill::zeros);
@@ -63,31 +73,30 @@ public:
         arma::vec coins(N, arma::fill::randu);
         for(size_t ni=0; ni<N; ni++) {
             arma::uvec fired(id_conns[ni].n_elem, arma::fill::zeros);
-                        
-//            arma::vec num_spikes = n.getNumSpikesV(id_conns[ni],t);
-//            fired(arma::find(num_spikes>0)) = 1;
-//            syn[ni] += num_spikes % syn_spec[ni] * asD("e0",c);
-//            syn[ni] *= a(ni);
-
             double u = asD("u_rest", c);
-            for(size_t syn_i=0; syn_i < id_conns[ni].n_elem; syn_i++) {
-                int num_spikes = n.getNumSpikes( id_conns[ni](syn_i), t-syn_del[ni](syn_i));
-                if(num_spikes > 0) {
-                    if(num_spikes > 1) {
-                        cout << "warning: too many spikes\n";
-                    }
-                    syn[ni](syn_i) += num_spikes*syn_spec[ni](syn_i)*asD("e0",c);
-                    fired(syn_i) = 1;
-//                    if(syn_spec[ni](syn_i)<0) {
-//                        cout << "inh spike at synapse " << id_conns[ni](syn_i) << " of neuron " << ids(ni) << " at " << t << "\n";
-//                        cout << "syn epsp: " << syn[ni](syn_i) << "\n";
-//                        cout << "==================================\n";
-//                    }
+            
+            set<size_t>::iterator it = active_syns[ni].begin();
+            while(it != active_syns[ni].end()) {
+                set<size_t>::iterator current = it++;
+                
+                const size_t &syn_id = *it;
+                syn[ni]( syn_id ) *= a(ni);
+                u += W[ni]( syn_id )*syn[ni]( syn_id );
+                if(syn[ni]( syn_id ) < SYN_ACT_TOL) {
+                    active_syns[ni].erase(current);
                 }
-                syn[ni](syn_i) *= a(ni);
-                u += W[ni](syn_i)*syn[ni](syn_i);
             }
-            //double u = asD("u_rest", c) + sum(syn[ni] % W[ni]);
+
+            TSynSpikes ssp = n.getSpikes(ids(ni), t, dt );
+            for(size_t syn_sp_i=0; syn_sp_i<ssp.size(); syn_sp_i++) {
+                cout << "We have spike at " << ids(ni)-1 << " at synapse " << ssp[syn_sp_i].second << " at t = " << ssp[syn_sp_i].first << "\n"; 
+                
+                syn[ni]( ssp[syn_sp_i].second ) += syn_spec[ni]( ssp[syn_sp_i].second )*asD("e0",c);
+                active_syns[ni].insert( ssp[syn_sp_i].second );
+                u += W[ni]( ssp[syn_sp_i].second )*syn[ni]( ssp[syn_sp_i].second );
+                fired(ssp[syn_sp_i].second) = 1;
+            }
+            
             bool Yspike = false;
             double p = 0;
             if(!determ) {
@@ -121,7 +130,7 @@ public:
             }
             
             if(Yspike) {
-                n.push_back(ids(ni), t+dt+axon_del(ni));
+                n.prop_spike(ids(ni), t+dt+axon_del(ni));
                 a(ni) = 0;
                 if(!determ) pacc(ni) += 1;
             }
@@ -182,11 +191,13 @@ public:
     arma::vec pacc;
     double incr;
 
-    TStatAcc stat_p;
-    TStatAcc stat_u;
-    TStatAcc stat_B;
-    TVecStatAcc stat_C;
-    TVecStatAcc stat_W;
+    vector< set<size_t> > active_syns;
+    
+    TVecAcc stat_p;
+    TVecAcc stat_u;
+    TVecAcc stat_B;
+    TVecArr stat_C;
+    TVecArr stat_W;
 };
 
 class SIM {
@@ -224,7 +235,12 @@ public:
         if(num_neurons > net.size()) {
            ::Rf_error( "net list is less than size of layers\n");
         }
-        NetSim ns(net, T.n_elem, dt);
+        NetSim ns(net, layers);
+//        for(size_t nc=0; nc < ns.cons.size(); nc++) {
+//            for(size_t ci=0; ci < ns.cons[nc].size(); ci++) {
+//                cout << "Neuron with id " << nc + 1 << " will cause spikes in " << ns.cons[nc][ci].first << " on synapse id " << ns.cons[nc][ci].second << "\n";  
+//            }
+//        }
         size_t patt_id = 0;
         bool refreshNet = false;
         for(size_t ti=0; ti<T.n_elem; ti++) {
@@ -242,13 +258,6 @@ public:
                 refreshNet = false;
             }
             
-        }
-        for(size_t spi=0; spi<ns.sp.size(); spi++) {
-            int c_id = ns.sp[spi].first-1;
-            double sp_time = ns.sp[spi].second;
-            NumericVector sp_times = net[c_id];
-            sp_times.push_back(sp_time);
-            net[c_id] = sp_times;
         }
     }
 

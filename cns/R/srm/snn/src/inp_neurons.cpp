@@ -2,7 +2,7 @@
 #include "sim.h"
 #include "inp_neurons.h"
 #include "layer.h"
-
+#include "netsim.h"
 
 class FBLayer : public Layer {
 public:
@@ -14,6 +14,13 @@ public:
     const int num() const {
         return N;
     }
+    const arma::uvec& getConns(size_t ni) const {
+        return id_conns[ni];
+    }
+    const arma::uvec& getIds() const {
+        return ids;
+    }
+
     void prepare(const List &c) {
         stat_v.clear(); stat_w.clear();
         Iiter = 0;
@@ -33,7 +40,7 @@ public:
         arma:: vec coins(N, arma::fill::randu);
         for(size_t ni=0; ni<N; ni++) {
             if( ((v(ni)*dt)) > coins(ni) ) {
-                n.push_back(ni+1, t);
+                n.prop_spike(ni+1, t);
             }
             stat_v[ni].push_back(v(ni));
             stat_w[ni].push_back(w(ni));
@@ -41,7 +48,8 @@ public:
         
         Iiter++;
     }
-    
+    arma::uvec ids;
+    TVecIDs id_conns;
     
     
     // consts:
@@ -53,8 +61,8 @@ public:
     arma::vec w;
     arma::vec v;
     
-    TStatAcc stat_v;
-    TStatAcc stat_w;
+    TVecAcc stat_v;
+    TVecAcc stat_w;
 };
 
 
