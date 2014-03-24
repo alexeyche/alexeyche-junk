@@ -1,0 +1,117 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[T2A]{fontenc}
+\usepackage[utf8x]{inputenc}
+\usepackage{ucs}
+\usepackage{cmap}
+\usepackage[english,russian]{babel}
+\usepackage{amsmath}
+\usepackage{color,graphicx}
+\usepackage{indentfirst}
+\usepackage{ucs} 
+\usepackage[utf8x]{inputenc}
+
+\title{SRM методичка}
+\author{Чернышев Алексей}
+\setlength{\parindent}{1cm}
+\def\la{\left\langle\rule{0pt}{3em}}
+\def\ra{\right\rangle}
+
+\begin{document}
+\section*{Спайковые НС}
+\section*{Описание Spike Responce Model}
+Вся динамика модели нейрона \textit{Spike Responce Model} выражается уравнением:
+\begin{equation}\label{eq:u_srm}
+u_{i}(t) = u_{rest} + \sum_{j=1}^N w_{j} \sum_{f_{j}} exp(-\frac{t-t_{j}}{t_{m}})a(t_{j}- t_{i}),
+\end{equation}
+где потенциал покоя $u_{rest} = -70$ мВ, $w_{j}$ - описывает вес $j$-ого синапса, $t_{j}$ - время спайка на $j$-ом синапсе, $t_{i}$ - время спайка на данном нейроне, $t_{m} = 20$ мс - константа описывающая угасание синаптического потенциала.\\ 
+\indent Функция $a(t_{j}-t_{i})$ описывает феномен рефракторности конкретного синапса и отражает явления обратного распространения потенциала на синапс в случае генерирования спайка нейроном во время $t_{i}$. Такая функция описывается уравнением экспонециального восстановления:
+\begin{equation}\label{eq:a}
+a(t_{j}-t_{i})=1-exp(-\frac{t_{j}-t_{i}}{t_{a}}),
+\end{equation}
+где $t_{a} = 50$ мс - время восстановления синапса.\\
+\indent Генерация спайка производится стохастически согласно негомогенной пуассоновской плотности, описываемой через потенциал нейрона:
+\begin{equation}\label{eq:p_dens}
+p(u)=\frac{\beta}{\alpha}ln[1+exp(\alpha(U_{tresh}-u))]-\alpha(U_{tresh}-u)
+\end{equation}
+где константы $\alpha=1,\beta=20$, и порог $U_{tresh}$ по достижению которого функция резко растёт вверх равен $-50$ мВ.
+\section*{Обучение без учителя}
+\indent Обучение без учителя производится согласно оптимальной модели STDP описанной в работе Toyoizumi и др. [1]. Кратко опишем данную модель.\\
+\indent В качестве функции правдоподобия выбрана функция, которая отражает информацию $I$, которую нейрон должен максимизировать и мера выражающая отклонение частоты спайков нейрона от целевой $D$. Выражение $D$ является воплощением гомеостазиса нейрона, без которого, максимизация только информации приведет к бесконечному росту синапсов. Также в формулу правдоподобия внесен фактор регулиризации распада весов т.н. \textit{weight decay}.\\
+\indent Таким образом функция правдоподобия имеет вид:
+\begin{equation}\label{eq:lh}
+L=I-\gamma D - \lambda \Psi
+\end{equation} 
+где $\gamma$ - фактор влияния отклонения частоты от целевой, $\Psi$ - регуляризационный параметр выражающий распад весов и $\lambda$ - фактор, контролирующий распад.\\
+\indent Информацию, которую передает нейрон преобразовав входные спайки в выходные можно выразить:
+\begin{equation}\label{eq:I}
+I = \la\log \frac{P(Y|X)}{P(Y)} \ra_{Y,X}
+\end{equation}
+где $\langle..\rangle_{X}$ - среднее по ансамблю $X$, $P(Y|X)$ - вероятность спайков нейрона $Y$ при данных входных спайках на синапсах $X$, $P(Y)$ - вероятность выходных спайков.\\
+\indent В рамках модели \textit{Spike Responce Model} условную вероятность спайковой последовательности можно выразить через плотность \ref{eq:p_dens}:
+\begin{equation}\label{eq:p_y}
+P(Y_{0}|X) = S[0,T] = \int_{0}^{T} exp(-p(t))dt\;,
+\end{equation}
+где $Y_{0}$ - нулевая спайковая последовательность или, иначе говоря, отсутствие спайков, таким образом:
+\begin{equation}\label{eq:p_y_complex}
+P(Y|X)= S[0,t_{f1}]\; p(t_{f1})\;S[t_{f1},t_{f2}]\;p(t_{f2})...p(t_{fn}) \; S[t_{fn},T],
+\end{equation}
+что можно упростить, и считать только один интеграл:
+\begin{equation}\label{eq:p_y}
+P(Y|X)= S[0,T]\; p(t_{f1})\;p(t_{f2})\;...\;p(t_{fn})
+\end{equation}
+\indent Вероятность выходного спайка $P(Y)$ можно выразить простым среднем взвешенном на определенном интервале, например 1 мин.\\
+\indent Гомеостатический термин можно выразить расстоянием Кульбака — Лейблера между средней частотой нейрона и целевой частотой. В качестве целевой частоты целесообразнее выбрать небольшую - до 5 Герц, в связи с оптимальностью разреженного кодирования. Таким образом выражение $D$ имеет вид:
+\begin{equation}\label{eq:D}
+D=\la \log \frac{P(Y)}{\tilde{P}} \ra_{Y}
+\end{equation}
+где $\tilde{P} = 5$ Герц.
+
+\indent Третий, регуляризационный параметр является квадратом весов синапса помноженный на термин выражающий присутствие спайка на синапсе $j$:
+\begin{equation}\label{eq:reg}
+\Psi=\frac{1}{2}\sum_{j}w_{j}^2\langle n_{j} \rangle, 
+\end{equation} 
+здесь $n_{j}=1$, если спайк присутствует на синапсе и 0 если спайк отсутствует.
+\indent Дифференцируя выражение \ref{eq:I} получаем:
+\begin{equation}
+\frac{dI}{dw} = \la \frac{1}{P(Y|X)}\frac{dP(Y|X)}{dw_{j}}\log\frac{P(Y|X)}{P(Y)} \ra_{Y,X}
+\end{equation} 
+\begin{equation}
+\frac{dD}{dw} = \la \frac{1}{P(Y|X)}\frac{dP(Y|X)}{dw_{j}}\log\frac{P(Y)}{\tilde{P}} \ra_{Y,X}
+\end{equation}
+\begin{equation}
+\frac{d\Psi}{dw_{j}} = w_{j} \langle n_{j} \rangle_{X}
+\end{equation} 
+\indent Выражения выше можно выразить при помощи специально введенных переменных $c(t)$ и $B^{post}(t)$, так что:
+\begin{equation}
+\frac{dP}{dw} = P(Y|X)\int_{0}^{T} c_{j}(t)dt
+\end{equation} 
+где
+\begin{equation}
+c_{j}(t) = \frac{p'_{u}(t)}{p(t)}[y(t)-p(t)]\int_{0}^{\infty}ds'\epsilon(s') x_{j}(t-s')a(s'-t_{i}) 
+\end{equation} 
+а также
+\begin{equation}
+\log\frac{P(Y|X)}{P(Y)} - \gamma \; \log\frac{P(Y)}{\tilde{P}} = \int_{0}^{T}B^{post}_{i}(t)dt
+\end{equation} 
+где
+\begin{equation}
+B^{post}_{i}(t) = [y(t)\log \frac{p(t)}{\bar{p}(t)} - (p(t)-\tilde{p}(t))]-\gamma \; y(t)\log \frac{{p}(t)}{\tilde{p}(t)}
+\end{equation} 
+таким образом производную по весам функции правдоподобия можно выразить:
+\begin{equation}\label{eq:lh_dw}
+\frac{dL}{dw_{j}} = \int_{0}^{T}dt \la \int_{0}^{T} c_{j}(t')dt' \; B^{post}_{i}(t) - \lambda \; w_{j}x_{j}(t) \ra_{Y,X}
+\end{equation}
+\section*{Дискретная симуляция модели}
+Получена итоговая система дифференциальных уравнений, которая пригодна для непосредственной симуляции при помощи методов интеграции:
+\begin{equation}
+\begin{cases}
+\frac{du_{i}(t)}{dt} = u_{rest}+\sum_{j} w_{j} x_{j}(t) a_{i}(t)\\
+\frac{da_{i}(t)}{dt} = \frac{1 - a_{i}(t)}{t_{a_{i}}}\\
+\frac{dx_{j}(t)}{dt} = -\frac{x_{j}(t)}{t_{m}}\\
+\frac{dw_{j}(t)}{dt} = -\alpha[C_{j}(t)B^{post}_{i}(t) - \lambda\;w_{j}x_{j}(t)]\\
+\frac{dC_{j}(t)}{dt} = -\frac{C_{j}(t)}{t_{c}} + c_{j}(t)\\
+\frac{d\bar{p}(t)}{dt} = -\frac{\bar{p}(t)}{t_{\bar{p}}} + y_{i}(t)
+\end{cases}
+\end{equation}
+здесь $\alpha$ - коэффициент обучения, такой что $\alpha << 1$, (был выбран 0.04), $x_{j}(t)$ - функция, которая равна 1, если на синапсе $j$ в момент $t$ есть спайк и равна нулю в ином случае. Функция $y_{i}(t)$ аналогичная $x_{j}(t)$, но описывает присутствие спайка на нейроне $i$. Средняя частота взвешивается на интервале $t_{\bar{p}}$ = 1 мин. Взвешивание выражения $c_{i}(t)$ целесообразно на интервале до $t_{c}$ = 100 мс, для более гладкой автокорреляционной функции.
+\end{document}

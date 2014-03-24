@@ -1,9 +1,9 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2014.3.22)  22 MAR 2014 14:27
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2014.3.22)  24 MAR 2014 13:05
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
-**srm_method.tex
-(./srm_method.tex
+**srm_method2.tex
+(./srm_method2.tex
 LaTeX2e <2011/06/27>
 Babel <3.9f> and hyphenation patterns for 9 languages loaded.
 (/usr/share/texlive/texmf-dist/tex/latex/base/article.cls
@@ -182,30 +182,27 @@ Package graphics Info: Driver file: pdftex.def on input line 91.
 (/usr/share/texlive/texmf-dist/tex/latex/tools/indentfirst.sty
 Package: indentfirst 1995/11/23 v1.03 Indent first paragraph (DPC)
 )
-(./srm_method.aux
+(./srm_method2.aux
 
 LaTeX Warning: Label `eq:p_y' multiply defined.
 
-
-LaTeX Warning: Label `eq:H' multiply defined.
-
 )
-\openout1 = `srm_method.aux'.
+\openout1 = `srm_method2.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 17.
-LaTeX Font Info:    ... okay on input line 17.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 17.
-LaTeX Font Info:    ... okay on input line 17.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 17.
-LaTeX Font Info:    ... okay on input line 17.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 17.
-LaTeX Font Info:    ... okay on input line 17.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 17.
-LaTeX Font Info:    ... okay on input line 17.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 17.
-LaTeX Font Info:    ... okay on input line 17.
-LaTeX Font Info:    Checking defaults for T2A/cmr/m/n on input line 17.
-LaTeX Font Info:    ... okay on input line 17.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 19.
+LaTeX Font Info:    ... okay on input line 19.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 19.
+LaTeX Font Info:    ... okay on input line 19.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 19.
+LaTeX Font Info:    ... okay on input line 19.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 19.
+LaTeX Font Info:    ... okay on input line 19.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 19.
+LaTeX Font Info:    ... okay on input line 19.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 19.
+LaTeX Font Info:    ... okay on input line 19.
+LaTeX Font Info:    Checking defaults for T2A/cmr/m/n on input line 19.
+LaTeX Font Info:    ... okay on input line 19.
  (/usr/share/texlive/texmf-dist/tex/latex/ucs/ucsencs.def
 File: ucsencs.def 2011/01/21 Fixes to fontencodings LGR, T3
 )
@@ -271,95 +268,46 @@ File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
 e
 ))<<t2a.cmap>> (/usr/share/texlive/texmf-dist/tex/latex/ucs/data/uni-4.def
 File: uni-4.def 2013/05/13 UCS: Unicode data U+0400..U+04FF
-)<<ot1.cmap>><<oml.cmap>><<oms.cmap>><<omx.cmap>> <epsp.png, id=6, 678.535pt x 
-628.3475pt>
-File: epsp.png Graphic file (type png)
-
-<use epsp.png>
-Package pdftex.def Info: epsp.png used on input line 26.
-(pdftex.def)             Requested size: 258.75pt x 239.60866pt.
- <nu.png, id=7, 678.535pt x 628.3475pt>
-File: nu.png Graphic file (type png)
- <use nu.png>
-Package pdftex.def Info: nu.png used on input line 38.
-(pdftex.def)             Requested size: 258.75pt x 239.60866pt.
- [1
-
-{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map} <./epsp.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 47--48
-
- []
-
-LaTeX Font Info:    Try loading font information for OMS+cmr on input line 49.
-(/usr/share/texlive/texmf-dist/tex/latex/base/omscmr.fd
-File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
-LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 49.
-
-Underfull \hbox (badness 10000) in paragraph at lines 49--50
-
+Overfull \hbox (0.20853pt too wide) in paragraph at lines 22--23
+[]\T2A/cmr/m/n/10 Вся ди-на-ми-ка мо-де-ли ней-ро-на \T2A/cmr/m/it/10 Spike Res
+ponce Model \T2A/cmr/m/n/10 вы-ра-жа-ет-ся урав-
  []
 
-[2 <./nu.png>] <u_srm.png, id=29, 678.535pt x 628.3475pt>
-File: u_srm.png Graphic file (type png)
- <use u_srm.png>
-Package pdftex.def Info: u_srm.png used on input line 61.
-(pdftex.def)             Requested size: 345.0pt x 319.47502pt.
+<<ot1.cmap>><<oml.cmap>><<oms.cmap>><<omx.cmap>> [1
 
-<p_srm.png, id=30, 678.535pt x 628.3475pt>
-File: p_srm.png Graphic file (type png)
- <use p_srm.png>
-Package pdftex.def Info: p_srm.png used on input line 69.
-(pdftex.def)             Requested size: 345.0pt x 319.47502pt.
- [3 <./u_srm.png>]
-[4 <./p_srm.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 82--84
-
- []
-
-
-Overfull \hbox (10.35545pt too wide) in paragraph at lines 93--96
-\T2A/cmr/m/n/10 ных спай-ков для каж-до-го ней-ро-на $\OML/cmm/m/it/10 X[] \OT1
-/cmr/m/n/10 = \OMS/cmsy/m/n/10 f\OML/cmm/m/it/10 t[]; t[]; :::; t[]\OMS/cmsy/m/
-n/10 g\OML/cmm/m/it/10 ; X[] \OT1/cmr/m/n/10 = \OMS/cmsy/m/n/10 f\OML/cmm/m/it/
-10 t[]; t[]; :::; t[]\OMS/cmsy/m/n/10 g$
- []
-
-
-Overfull \hbox (6.30974pt too wide) in paragraph at lines 93--96
-\T2A/cmr/m/n/10 но вы-ве-сти ис-поль-зуя клас-си-че-ские урав-не-ния из Тео-рии
- Ин-фор-ма-ции. Пусть
- []
-
-[5] [6] (./srm_method.aux)
+{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}]
+(/usr/share/texlive/texmf-dist/tex/latex/ucs/data/uni-32.def
+File: uni-32.def 2013/05/13 UCS: Unicode data U+2000..U+20FF
+) [2] [3]
+(./srm_method2.aux)
 
 LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 4140 strings out of 494518
- 53726 string characters out of 6173752
- 119745 words of memory out of 5000000
- 7268 multiletter control sequences out of 15000+600000
- 8206 words of font info for 21 fonts, out of 8000000 for 9000
+ 4353 strings out of 494518
+ 56048 string characters out of 6173752
+ 120715 words of memory out of 5000000
+ 7488 multiletter control sequences out of 15000+600000
+ 7389 words of font info for 20 fonts, out of 8000000 for 9000
  430 hyphenation exceptions out of 8191
- 37i,7n,23p,1175b,619s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 37i,10n,23p,824b,619s stack positions out of 5000i,500n,10000p,200000b,80000s
  </tmp/texfonts/pk/ljfour/lh/lh-t2a/lati1000.600pk> </tmp/texfonts/pk/ljfour/
-lh/lh-t2a/larm1000.600pk> </tmp/texfonts/pk/ljfour/lh/lh-t2a/labx1000.600pk> </
-tmp/texfonts/pk/ljfour/lh/lh-t2a/labx1440.600pk></usr/share/texlive/texmf-dist/
-fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texlive/texmf-dist/fonts/
-type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/fonts/type1/
-public/amsfonts/cm/cmmi5.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/
-amsfonts/cm/cmmi7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfont
-s/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cm
-r5.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb><
-/usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/s
-hare/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb>
-Output written on srm_method.pdf (6 pages, 186866 bytes).
+lh/lh-t2a/larm1000.600pk> </tmp/texfonts/pk/ljfour/lh/lh-t2a/labx1440.600pk></u
+sr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/sha
+re/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/tex
+live/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></usr/share/texlive/te
+xmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/share/texlive/texmf-dis
+t/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts
+/type1/public/amsfonts/cm/cmr5.pfb></usr/share/texlive/texmf-dist/fonts/type1/p
+ublic/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/am
+sfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts
+/cm/cmsy7.pfb>
+Output written on srm_method2.pdf (3 pages, 139753 bytes).
 PDF statistics:
- 258 PDF objects out of 1000 (max. 8388607)
- 57 compressed objects within 1 object stream
+ 198 PDF objects out of 1000 (max. 8388607)
+ 47 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 41 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 21 words of extra memory for PDF output out of 10000 (max. 10000000)
 
