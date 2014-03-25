@@ -1,8 +1,5 @@
 #ifdef T
   
-#define TVEC(T) TNAME(T,Vector)
-
-
 typedef struct {
   T *array;
   size_t alloc_size;

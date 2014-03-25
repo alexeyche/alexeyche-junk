@@ -6,14 +6,16 @@
 
 #include "layer.h"
 #include "util/util.h"
+#include "matrix.h"
+#include "util/util_vector.h"
 
-SRMLayer* createSRMLayer(size_t N) {
+SRMLayer* createSRMLayer(size_t N, size_t *glob_idx) {
     SRMLayer *l = (SRMLayer*)malloc(sizeof(SRMLayer));
     l->N = N;
     l->ids = (size_t*)malloc( l->N*sizeof(size_t));
     l->nt = (nspec_t*)malloc( l->N*sizeof(nspec_t));
     for(size_t ni=0; ni<l->N; ni++) {
-        l->ids[ni] = IDX++;
+        l->ids[ni] = ++(*glob_idx);
     }
 
     l->W = (double**)malloc( l->N*sizeof(double*));
@@ -28,14 +30,14 @@ SRMLayer* createSRMLayer(size_t N) {
     return(l);
 }
 
-void connectSRMLayer(Matrix *conn_m, indVector *ids_conn, Constants *c) {
-    assert(conn_m->ncol == ids_conn->size);
-    for(size_t i = 0; i<conn_m->nrow; i++) {
-        for(size_t j = 0; j<conn_m->ncol; j++) {
-            getMatrixElement(conn_m, i, j);
-        } 
-    }
-}
+//void connectSRMLayer(SRMLayer *l, Matrix *conn_m, indVector *ids_conn, Constants *c) {
+//    assert(conn_m->ncol == ids_conn->size);
+//    for(size_t i = 0; i<conn_m->nrow; i++) {
+//        for(size_t j = 0; j<conn_m->ncol; j++) {
+//            double wij = getMatrixElement(conn_m, i, j);
+//        } 
+//    }
+//}
 
 void printSRMLayer(SRMLayer *l) {
     printf("SRMLayer, size: %zu \n", l->N);
@@ -74,7 +76,16 @@ void deleteSRMLayer(SRMLayer *l) {
     free(l);
 }
 
-void configureSRMLayer(SRMLayer *l, Constants *c) {
+nspec_t getSpecNeuron(SRMLayer *l, const size_t &id) {
+    for(size_t ni=0; ni<l->N; ni++) {
+        if( l->ids[ni] == id ) {
+            return(l->nt[ni])
+        }
+    }
+    printf("Error: Can't find neuron with id %zu\n", id);
+}
+
+void configureSRMLayer(SRMLayer *l, const indVector *inputIDs, Constants *c) {
     srand(c->seed);
     for(size_t ni=0; ni<l->N; ni++) {
         indVector *conns = TEMPLATE(createVector,ind)(0);
@@ -93,9 +104,26 @@ void configureSRMLayer(SRMLayer *l, Constants *c) {
         l->nconn[ni] = conns->size; 
         if(l->nconn[ni]>0) {
             l->id_conns[ni] = (size_t*) malloc(l->nconn[ni]*sizeof(size_t));
-            memcpy(l->id_conns[ni], conns->array, l->nconn[ni]*sizeof(ind));
+            memcpy(l->id_conns[ni], conns->array, l->nconn[ni]*sizeof(size_t));
+            l->W[ni] = (double*) malloc(l->nconn[ni]*sizeof(double));
+            l->syn[ni] = (double*) malloc(l->nconn[ni]*sizeof(double));
+            l->syn_spec[ni] = (double*) malloc(l->nconn[ni]*sizeof(double));
         }
         TEMPLATE(deleteVector,ind)(conns);
+    }
+    for(size_t ni=0; ni<l->N; ni++) {
+        double start_weight = c.weight_per_neuron/l->nconn[ni];
+        for(size_t syn_i=0; syn_i<l->nconn[ni]; syn_i++) {
+            l->W[ni][syn_i] = start_weight;
+            l->syn[ni][syn_i] = 0;
+            
+            if(getSpecNeuron(l, ni) == EXC) {
+                l->syn_spec[ni][syn_i] = c.e0;
+            } else 
+            if(getSpecNeuron(l, ni) == ING) {
+                l->syn_spec[ni][syn_i] = -c.e0;
+            }
+        }
     }
 }
 

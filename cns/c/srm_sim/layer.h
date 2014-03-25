@@ -6,8 +6,6 @@
 #include "constants.h"
 #include "core.h"
 
-static int IDX = 0;
-
 typedef enum {EXC, INH} nspec_t;
 
 typedef struct {
@@ -22,9 +20,13 @@ typedef struct {
     int *nconn;
 } SRMLayer;
 
-SRMLayer* createSRMLayer(size_t N);
+typedef SRMLayer* pSRMLayer;
+
+SRMLayer* createSRMLayer(size_t N, size_t *glob_idx);
 void printSRMLayer(SRMLayer *l);
 void deleteSRMLayer(SRMLayer *l);
-void configureSRMLayer(SRMLayer *l, Constants *c);
+void configureSRMLayer(SRMLayer *l, const indVector *inputIDs, Constants *c);
+
+//void connectSRMLayer(SRMLayer *l, Matrix *conn_m, indVector *ids_conn, Constants *c);
 
 #endif

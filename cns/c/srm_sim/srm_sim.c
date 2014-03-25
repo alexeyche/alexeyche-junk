@@ -2,6 +2,7 @@
 #include "core.h"
 #include "arg_opt.h"
 
+#include "sim.h"
 
 void *main_func(void *args) {
     struct actor_main *main_s = (struct actor_main*)args;
@@ -13,12 +14,10 @@ void *main_func(void *args) {
     Constants *c = createConstants(a.const_filename);
     printConstants(c);
 
+    Sim * s = createSim();
+    configureSim(s, c);    
 
-    SRMLayer *l = createSRMLayer(c->N);
-    configureSRMLayer(l, c);
-    printSRMLayer(l);
-
-    deleteSRMLayer(l);
+    deleteSim(s);
     deleteConstants(c);
 }
 

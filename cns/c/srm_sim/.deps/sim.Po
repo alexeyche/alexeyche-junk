@@ -1,4 +1,4 @@
-srm_sim.o: srm_sim.c core.h \
+sim.o: sim.c sim.h util/util_vector.h core.h \
  /usr/lib/gcc/x86_64-linux-gnu/4.6.1/include/stddef.h \
  /usr/local/include/libactor/actor.h /usr/local/include/libactor/types.h \
  /usr/include/stdio.h /usr/include/features.h \
@@ -25,8 +25,12 @@ srm_sim.o: srm_sim.c core.h \
  /usr/include/x86_64-linux-gnu/bits/time.h \
  /usr/include/x86_64-linux-gnu/bits/pthreadtypes.h \
  /usr/include/x86_64-linux-gnu/bits/setjmp.h /usr/include/assert.h \
- /usr/local/include/libactor/list.h arg_opt.h layer.h constants.h \
- util/ini.h
+ /usr/local/include/libactor/list.h templates.h layer.h constants.h \
+ util/ini.h core.h util/util_vector_tmpl.h
+
+sim.h:
+
+util/util_vector.h:
 
 core.h:
 
@@ -104,10 +108,14 @@ core.h:
 
 /usr/local/include/libactor/list.h:
 
-arg_opt.h:
+templates.h:
 
 layer.h:
 
 constants.h:
 
 util/ini.h:
+
+core.h:
+
+util/util_vector_tmpl.h:
