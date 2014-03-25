@@ -92,7 +92,7 @@ if(length(grep("RStudio", args))>0) {
 
   Sys.setenv("DISPLAY"=":0.0")  
 }
-system(sprintf("find %s -maxdepth 1 -name \"*.png\" -type f -exec rm -f {} \\;", dir))
+system(sprintf("find %s -maxdepth 1 -type f -name \"*.png\" -o -name \"*.bin\" -o -name \"*.idx\" -exec rm -f {} \\;", dir))
 #===================================================================================================
 
 library(snn)
@@ -180,14 +180,7 @@ for(ep in 0:epochs) {
     pic_filename = sprintf("%s/run_ep%s.png", dir, ep)
     plot_run_status(work_net$net, neurons, sim, discr, loss, pic_filename, sprintf("Epoch %s", ep))
     cat("ep: ", ep,  "\n")
+    
+    model_file_ep = sprintf("%s/model_ep%s", dir, ep)
+    saveModelToFile(neurons, model_file_ep)
 }
-# 
-# #W = list_to_matrix(neurons$obj$W)
-# #gr_pl(W)
-# #levelplot(t(Wacc[[1]]) , col.regions=colorRampPalette(c("black", "white")))
-# 
-if(is.null(model_file)) {
-    model_file = sprintf("%s/model", dir)
-}
-saveModelToFile(neurons, model_file)
-# 
