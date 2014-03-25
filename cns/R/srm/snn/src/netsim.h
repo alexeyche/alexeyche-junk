@@ -10,20 +10,31 @@
 #include "sim.h"
 class Layer;
 
-typedef pair<size_t,size_t> TConseq;
-typedef pair<double, size_t> TSynSpike;
+struct TConseq {
+    TConseq(size_t nid_, size_t syn_id_) : nid(nid_), syn_id(syn_id_) {}
+    size_t nid;
+    size_t syn_id;
+};
+struct TSynSpike {
+    TSynSpike(double t_, size_t syn_id_) : t(t_), syn_id(syn_id_) {}
+    double t;
+    size_t syn_id;
+};
+
 typedef vector<TSynSpike> TSynSpikes;
-typedef vector< TConseq > TConsequents;
+typedef vector<TConseq> TConsequents;
 typedef vector<TSynSpikes> TNeuronQueue;
 
 class NetSim {
 public:
     NetSim(List &net, const vector<Layer*> &layers);
-    void prop_spike(const size_t &id, const double &t);
+    void prop_spike(size_t id, double t);
     TSynSpikes getSpikes(size_t ni, const double &t, const double &dt);
 
     TNeuronQueue queue_of_spikes;
+    TNeuronQueue queue_of_input_spikes;
     arma::uvec spikes_iter;
+    arma::uvec input_spikes_iter;
     
     vector<TConsequents> cons;
     List net;

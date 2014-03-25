@@ -75,26 +75,24 @@ public:
             arma::uvec fired(id_conns[ni].n_elem, arma::fill::zeros);
             double u = asD("u_rest", c);
             
-            set<size_t>::iterator it = active_syns[ni].begin();
-            while(it != active_syns[ni].end()) {
-                set<size_t>::iterator current = it++;
-                
-                const size_t &syn_id = *it;
-                syn[ni]( syn_id ) *= a(ni);
-                u += W[ni]( syn_id )*syn[ni]( syn_id );
-                if(syn[ni]( syn_id ) < SYN_ACT_TOL) {
-                    active_syns[ni].erase(current);
+            set<size_t>::iterator it;
+            for (it = active_syns[ni].begin(); it != active_syns[ni].end(); ) {
+                syn[ni]( *it ) *= a(ni);
+                u += W[ni]( *it )*syn[ni]( *it );
+                if(abs(syn[ni]( *it )) < SYN_ACT_TOL) {
+                    active_syns[ni].erase(it++);
+                } else {
+                    ++it;
                 }
             }
 
             TSynSpikes ssp = n.getSpikes(ids(ni), t, dt );
             for(size_t syn_sp_i=0; syn_sp_i<ssp.size(); syn_sp_i++) {
-                cout << "We have spike at " << ids(ni)-1 << " at synapse " << ssp[syn_sp_i].second << " at t = " << ssp[syn_sp_i].first << "\n"; 
-                
-                syn[ni]( ssp[syn_sp_i].second ) += syn_spec[ni]( ssp[syn_sp_i].second )*asD("e0",c);
-                active_syns[ni].insert( ssp[syn_sp_i].second );
-                u += W[ni]( ssp[syn_sp_i].second )*syn[ni]( ssp[syn_sp_i].second );
-                fired(ssp[syn_sp_i].second) = 1;
+//                cout << "t:" << t << " We have spike at " << ids(ni)-1 << " at synapse " << ssp[syn_sp_i].syn_id << " at t = " << ssp[syn_sp_i].t << "\n"; 
+                syn[ni]( ssp[syn_sp_i].syn_id ) += syn_spec[ni]( ssp[syn_sp_i].syn_id )*asD("e0",c);
+                u += W[ni]( ssp[syn_sp_i].syn_id )*syn[ni]( ssp[syn_sp_i].syn_id );
+                active_syns[ni].insert( ssp[syn_sp_i].syn_id );
+                fired(ssp[syn_sp_i].syn_id) = 1;
             }
             
             bool Yspike = false;
