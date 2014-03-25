@@ -1,13 +1,21 @@
 
+#include "layer.h"
+
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
 
-#include "layer.h"
-#include "util/util.h"
-#include "matrix.h"
-#include "util/util_vector.h"
+#include <util/util.h>
+#include <matrix.h>
+#include <util/util_vector.h>
+
+#ifdef T
+#undef T
+#endif
+#define T pSRMLayer
+#include <util/util_vector_tmpl.c>
+
 
 SRMLayer* createSRMLayer(size_t N, size_t *glob_idx) {
     SRMLayer *l = (SRMLayer*)malloc(sizeof(SRMLayer));
@@ -76,13 +84,13 @@ void deleteSRMLayer(SRMLayer *l) {
     free(l);
 }
 
-nspec_t getSpecNeuron(SRMLayer *l, const size_t &id) {
+nspec_t getSpecNeuron(SRMLayer *l, const size_t *id) {
     for(size_t ni=0; ni<l->N; ni++) {
-        if( l->ids[ni] == id ) {
-            return(l->nt[ni])
+        if( l->ids[ni] == *id ) {
+            return(l->nt[ni]);
         }
     }
-    printf("Error: Can't find neuron with id %zu\n", id);
+    printf("Error: Can't find neuron with id %zu\n", *id);
 }
 
 void configureSRMLayer(SRMLayer *l, const indVector *inputIDs, Constants *c) {
@@ -95,7 +103,6 @@ void configureSRMLayer(SRMLayer *l, const indVector *inputIDs, Constants *c) {
         }
         for(size_t nj=0; nj<l->N; nj++) {        
             if(ni != nj) {
-                double r = getUnif();
                 if(c->net_edge_prob > getUnif()) {
                     TEMPLATE(insertVector,ind)(conns, nj);
                 }
@@ -112,16 +119,16 @@ void configureSRMLayer(SRMLayer *l, const indVector *inputIDs, Constants *c) {
         TEMPLATE(deleteVector,ind)(conns);
     }
     for(size_t ni=0; ni<l->N; ni++) {
-        double start_weight = c.weight_per_neuron/l->nconn[ni];
+        double start_weight = c->weight_per_neuron/l->nconn[ni];
         for(size_t syn_i=0; syn_i<l->nconn[ni]; syn_i++) {
             l->W[ni][syn_i] = start_weight;
             l->syn[ni][syn_i] = 0;
             
-            if(getSpecNeuron(l, ni) == EXC) {
-                l->syn_spec[ni][syn_i] = c.e0;
+            if(getSpecNeuron(l, &ni) == EXC) {
+                l->syn_spec[ni][syn_i] = c->e0;
             } else 
-            if(getSpecNeuron(l, ni) == ING) {
-                l->syn_spec[ni][syn_i] = -c.e0;
+            if(getSpecNeuron(l, &ni) == INH) {
+                l->syn_spec[ni][syn_i] = -c->e0;
             }
         }
     }

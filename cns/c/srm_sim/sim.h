@@ -1,7 +1,8 @@
 #ifndef SIM_H
 #define SIM_H
 
-#include <util/util_vector.h>
+#include <layer.h>
+#include <constants.h>
 
 typedef struct {
     double **net;

@@ -4,6 +4,7 @@
 
 #include "sim.h"
 
+
 void *main_func(void *args) {
     struct actor_main *main_s = (struct actor_main*)args;
 	
@@ -14,7 +15,8 @@ void *main_func(void *args) {
     Constants *c = createConstants(a.const_filename);
     printConstants(c);
 
-    Sim * s = createSim();
+    Sim *s = createSim();
+    printf("0net_size: %zu\n", s->n.net_size);
     configureSim(s, c);    
 
     deleteSim(s);
