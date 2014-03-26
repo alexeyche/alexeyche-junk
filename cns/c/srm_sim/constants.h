@@ -9,6 +9,8 @@
 
 
 typedef struct {
+    const char *input_spikes_filename;
+    
     double e0;
     double e_exc;
     double e_inh;

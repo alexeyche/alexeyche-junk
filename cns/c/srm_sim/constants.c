@@ -22,6 +22,9 @@ static int file_handler(void* user, const char* section, const char* name,
     Constants* c = (Constants*)user;
 
     #define MATCH(s, n) strcmp(section, s) == 0 && strcmp(name, n) == 0
+    if (MATCH("input", "input_spikes_filename")) {
+        c->input_spikes_filename = strdup(value);
+    } else 
     if (MATCH("srm", "e0")) {
         c->e0 = atof(value);
     } else 
@@ -136,6 +139,7 @@ void printConstants(Constants *c) {
     printf("N: %d,\n", c->layers_size->array[0]);
     printf("net_edge_prob: %f,\n", c->net_edge_prob);
     printf("input_edge_prob: %f,\n", c->input_edge_prob);
+    printf("input_spikes_filename: %s,\n", c->input_spikes_filename);
     printf("pr: %f,\n", c->pr);
     printf("seed: %d,\n", c->seed);
     printf("sim_dim: %f,\n", c->sim_dim);

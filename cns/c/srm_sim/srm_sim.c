@@ -19,7 +19,7 @@ void *main_func(void *args) {
     configureSim(s, c);    
     printSRMLayer(s->layers->array[0]);
 
-    pMatrixVector *ml = readMatrixList(a.input_spikes_filename); 
+    pMatrixVector *ml = readMatrixList(c->input_spikes_filename); 
     for(size_t mi=0; mi<ml->size; mi++) {
         printMatrix(ml->array[mi]);
     }
