@@ -1,10 +1,9 @@
 
 #include "matrix.h"
 
-#ifdef T
-#undef T
-#endif
+#include <templates_clean.h>
 #define T pMatrix
+#define DESTRUCT deleteMatrix
 #include <util/util_vector_tmpl.c>
 
 
@@ -37,26 +36,6 @@ void printMatrix(Matrix *m) {
         printf("\n");
     }
 }
-
-
-MatrixList* createMatrixList() {
-    MatrixList *ml = (MatrixList*) malloc(sizeof(MatrixList));
-    ml->mlist = TEMPLATE(createVector,pMatrix)();
-    return(ml);
-}
-
-void insertMatrixList(MatrixList *ml, Matrix *m) {
-    TEMPLATE(insertVector,pMatrix)(ml->mlist, m);
-}
-
-void deleteMatrixList(MatrixList *ml) {
-    for(size_t mi=0; mi<ml->mlist->size; mi++) {
-        deleteMatrix(ml->mlist->array[mi]);
-    }
-    TEMPLATE(deleteVector,pMatrix)(ml->mlist);
-    free(ml);
-}
-
 
 
 

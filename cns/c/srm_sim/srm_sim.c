@@ -19,12 +19,12 @@ void *main_func(void *args) {
     configureSim(s, c);    
     printSRMLayer(s->layers->array[0]);
 
-    MatrixList *ml = readMatrixList(a.input_spikes_filename); 
-    for(size_t mi=0; mi<ml->mlist->size; mi++) {
-        printMatrix(ml->mlist->array[mi]);
+    pMatrixVector *ml = readMatrixList(a.input_spikes_filename); 
+    for(size_t mi=0; mi<ml->size; mi++) {
+        printMatrix(ml->array[mi]);
     }
 
-    deleteMatrixList(ml);
+    TEMPLATE(deleteVector,pMatrix)(ml);
     deleteSim(s);
     deleteConstants(c);
 }

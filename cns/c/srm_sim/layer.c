@@ -10,9 +10,7 @@
 #include <matrix.h>
 #include <util/util_vector.h>
 
-#ifdef T
-#undef T
-#endif
+#include <templates_clean.h>
 #define T pSRMLayer
 #include <util/util_vector_tmpl.c>
 

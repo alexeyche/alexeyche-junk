@@ -15,10 +15,9 @@ typedef struct {
 
 typedef Matrix* pMatrix;
 
-#ifdef T
-#undef T
-#endif
+#include <templates_clean.h>
 #define T pMatrix
+#define DESTRUCT deleteMatrix
 #include <util/util_vector_tmpl.h>
 
 Matrix *createMatrix(size_t nr, size_t nc);
@@ -27,12 +26,5 @@ double getMatrixElement(Matrix *m, size_t i, size_t j);
 void deleteMatrix(Matrix *m);
 void printMatrix(Matrix *m);
 
-typedef struct {
-    pMatrixVector *mlist;
-} MatrixList;
-
-MatrixList* createMatrixList();
-void insertMatrixList(MatrixList *ml, Matrix *m);
-void deleteMatrixList(MatrixList *ml);
 
 #endif

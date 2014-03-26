@@ -18,6 +18,11 @@ void TEMPLATE(insertVector,T)(TVEC(T) *a, T element) {
 }
 
 void TEMPLATE(deleteVector,T)(TVEC(T) *a) {
+#ifdef DESTRUCT
+  for(size_t ai=0; ai<a->size; ai++) {
+    DESTRUCT(a->array[ai]);
+  }
+#endif  
   free(a->array);
   a->array = NULL;
   a->alloc_size = a->size = 0;

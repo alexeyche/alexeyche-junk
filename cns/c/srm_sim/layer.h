@@ -22,10 +22,9 @@ typedef struct {
 
 typedef SRMLayer* pSRMLayer;
 
-#ifdef T
-#undef T
-#endif
+#include <templates_clean.h>
 #define T pSRMLayer
+#define DESTRUCT deleteSRMLayer
 #include <util/util_vector_tmpl.h>
 
 

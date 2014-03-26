@@ -14,7 +14,7 @@ io.o: io.c io.h /usr/include/stdio.h /usr/include/features.h \
  /usr/include/x86_64-linux-gnu/bits/stdio.h \
  /usr/include/x86_64-linux-gnu/bits/stdio2.h matrix.h \
  /usr/include/stdlib.h /usr/include/x86_64-linux-gnu/bits/stdlib.h \
- templates.h util/util_vector_tmpl.h
+ templates.h templates_clean.h util/util_vector_tmpl.h
 
 io.h:
 
@@ -61,5 +61,7 @@ matrix.h:
 /usr/include/x86_64-linux-gnu/bits/stdlib.h:
 
 templates.h:
+
+templates_clean.h:
 
 util/util_vector_tmpl.h:

@@ -24,9 +24,6 @@ void freeSimNet(Net *n) {
 }
 
 void deleteSim(Sim *s) {
-    for(size_t li=0; li< s->layers->size; li++) {
-        deleteSRMLayer(s->layers->array[li]);
-    }
     TEMPLATE(deleteVector,pSRMLayer)(s->layers);
     freeSimNet(s->n);
     free(s);

@@ -1,15 +1,11 @@
 
 #include "util_vector.h"
 
-#ifdef T
-#undef T
-#endif
+#include <templates_clean.h>
 #define T double
 #include "util_vector_tmpl.c"
 
-#ifdef T
-#undef T
-#endif
+#include <templates_clean.h>
 #define T ind
 #include "util_vector_tmpl.c"
 

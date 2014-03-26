@@ -3,9 +3,9 @@
 
 
 
-MatrixList* readMatrixList(const char *filename) {
+pMatrixVector* readMatrixList(const char *filename) {
     FILE *f = fopen(filename, "r");    
-    MatrixList *mlist = createMatrixList();
+    pMatrixVector *mlist = TEMPLATE(createVector,pMatrix)();
     
     while(1) {    
         unsigned int i = 0, j = 0;
@@ -34,7 +34,7 @@ MatrixList* readMatrixList(const char *filename) {
                 printf("Error while reading matrix in matrix list file %s\n", filename);
                 break;
             }
-            insertMatrixList(mlist, m);
+            TEMPLATE(insertVector,pMatrix)(mlist, m);
         } else {
             printf("Found errors in input file %s\n", filename);        
         }

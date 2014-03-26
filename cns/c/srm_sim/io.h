@@ -4,6 +4,6 @@
 #include <stdio.h>
 #include <matrix.h>
 
-MatrixList* readMatrixList(const char *filename);
+pMatrixVector* readMatrixList(const char *filename);
 
 #endif

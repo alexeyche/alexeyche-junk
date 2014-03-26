@@ -27,7 +27,7 @@ srm_sim.o: srm_sim.c core.h \
  /usr/include/x86_64-linux-gnu/bits/setjmp.h /usr/include/assert.h \
  /usr/local/include/libactor/list.h arg_opt.h sim.h layer.h constants.h \
  util/util_vector.h core.h templates.h util/util_vector_tmpl.h util/ini.h \
- util/util_vector_tmpl.h constants.h io.h matrix.h
+ templates_clean.h util/util_vector_tmpl.h constants.h io.h matrix.h
 
 core.h:
 
@@ -122,6 +122,8 @@ templates.h:
 util/util_vector_tmpl.h:
 
 util/ini.h:
+
+templates_clean.h:
 
 util/util_vector_tmpl.h:
 

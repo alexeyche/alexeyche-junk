@@ -26,7 +26,7 @@ util_vector.o: util/util_vector.c util/util_vector.h core.h \
  /usr/include/x86_64-linux-gnu/bits/pthreadtypes.h \
  /usr/include/x86_64-linux-gnu/bits/setjmp.h /usr/include/assert.h \
  /usr/local/include/libactor/list.h templates.h util/util_vector_tmpl.h \
- util/util_vector_tmpl.c
+ templates_clean.h util/util_vector_tmpl.c
 
 util/util_vector.h:
 
@@ -109,5 +109,7 @@ core.h:
 templates.h:
 
 util/util_vector_tmpl.h:
+
+templates_clean.h:
 
 util/util_vector_tmpl.c:
