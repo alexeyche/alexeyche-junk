@@ -20,9 +20,10 @@ void *main_func(void *args) {
     printSRMLayer(s->layers->array[0]);
 
     pMatrixVector *ml = readMatrixList(c->input_spikes_filename); 
-    for(size_t mi=0; mi<ml->size; mi++) {
-        printMatrix(ml->array[mi]);
-    }
+    assert(ml);
+    readSpikesFromMatrix(s->net, ml->array[0]);
+    printSpikesList(s->net);
+    
 
     TEMPLATE(deleteVector,pMatrix)(ml);
     deleteSim(s);

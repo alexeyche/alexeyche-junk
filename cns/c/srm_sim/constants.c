@@ -13,6 +13,7 @@ Constants* createConstants(const char *filename) {
 }
 void deleteConstants(Constants *c) {
     TEMPLATE(deleteVector,ind)(c->layers_size);
+    free(c->input_spikes_filename);
     free(c);
 }
 
@@ -23,7 +24,9 @@ static int file_handler(void* user, const char* section, const char* name,
 
     #define MATCH(s, n) strcmp(section, s) == 0 && strcmp(name, n) == 0
     if (MATCH("input", "input_spikes_filename")) {
-        c->input_spikes_filename = strdup(value);
+        c->input_spikes_filename = (char*)malloc(strlen(value) +1);
+        assert(c->input_spikes_filename);
+        strcpy(c->input_spikes_filename, value);
     } else 
     if (MATCH("srm", "e0")) {
         c->e0 = atof(value);

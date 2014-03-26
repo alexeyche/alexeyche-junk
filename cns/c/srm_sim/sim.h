@@ -4,16 +4,12 @@
 #include <layer.h>
 #include <constants.h>
 
-typedef struct {
-    double **net;
-    size_t *net_lens;
-    size_t net_size;    
-} Net;
+#include <spikes_list.h>
 
 typedef struct {
     pSRMLayerVector *layers;
     
-    Net *n;    
+    SpikesList *net;    
 } Sim;
 
 Sim* createSim();

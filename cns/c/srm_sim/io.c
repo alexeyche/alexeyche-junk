@@ -4,7 +4,11 @@
 
 
 pMatrixVector* readMatrixList(const char *filename) {
-    FILE *f = fopen(filename, "r");    
+    FILE *f = fopen(filename, "rb");    
+    if(f == NULL) {
+        printf("Error in opening file %s\n", filename);
+        return(NULL);
+    }
     pMatrixVector *mlist = TEMPLATE(createVector,pMatrix)();
     
     while(1) {    

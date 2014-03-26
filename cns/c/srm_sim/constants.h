@@ -9,7 +9,7 @@
 
 
 typedef struct {
-    const char *input_spikes_filename;
+    char *input_spikes_filename;
     
     double e0;
     double e_exc;

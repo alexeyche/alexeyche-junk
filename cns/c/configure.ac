@@ -3,8 +3,8 @@
 
 AC_PREREQ([2.69])
 AC_INIT([srm_sim], [0.1], [alexey.chernushev@gmail.com])
-AM_INIT_AUTOMAKE(srm_sim, 0.1)
 AC_CONFIG_SRCDIR([srm_sim/layer.c])
+AM_INIT_AUTOMAKE
 #AC_CONFIG_HEADERS([config.h])
 
 # Checks for programs.
