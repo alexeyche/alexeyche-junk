@@ -3,7 +3,7 @@
 #include "arg_opt.h"
 
 #include "sim.h"
-
+#include "io.h"
 
 void *main_func(void *args) {
     struct actor_main *main_s = (struct actor_main*)args;
@@ -19,6 +19,12 @@ void *main_func(void *args) {
     configureSim(s, c);    
     printSRMLayer(s->layers->array[0]);
 
+    MatrixList *ml = readMatrixList(a.input_spikes_filename); 
+    for(size_t mi=0; mi<ml->mlist->size; mi++) {
+        printMatrix(ml->mlist->array[mi]);
+    }
+
+    deleteMatrixList(ml);
     deleteSim(s);
     deleteConstants(c);
 }

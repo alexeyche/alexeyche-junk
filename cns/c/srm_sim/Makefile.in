@@ -46,7 +46,8 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am___top_builddir__bin_srm_sim_OBJECTS = srm_sim.$(OBJEXT) \
 	layer.$(OBJEXT) matrix.$(OBJEXT) util_vector.$(OBJEXT) \
-	ini.$(OBJEXT) constants.$(OBJEXT) util.$(OBJEXT) sim.$(OBJEXT)
+	ini.$(OBJEXT) constants.$(OBJEXT) util.$(OBJEXT) sim.$(OBJEXT) \
+	io.$(OBJEXT)
 __top_builddir__bin_srm_sim_OBJECTS =  \
 	$(am___top_builddir__bin_srm_sim_OBJECTS)
 __top_builddir__bin_srm_sim_LDADD = $(LDADD)
@@ -155,8 +156,8 @@ top_srcdir = @top_srcdir@
 # what flags you want to pass to the C compiler & linker
 AM_CFLAGS = -Wall -std=c99 -O0 -g
 LDADD = -lactor
-__top_builddir__bin_srm_sim_SOURCES = ./srm_sim.c ./layer.c  ./matrix.c  ./util/util_vector.c ./util/ini.c ./templates.h ./layer.h ./matrix.h ./core.h ./util/util_vector.h ./util/ini.h ./sim.h constants.c util/util.c sim.c
-__top_builddir__bin_srm_sim_ut_SOURCES = ./layer.c ./srm_sim_ut.c ./matrix.c  ./util/util_vector.c ./util/ini.c ./templates.h ./layer.h ./matrix.h ./core.h ./util/util_vector.h ./util/ini.h ./sim.h ./constants.c util/util.c sim.c
+__top_builddir__bin_srm_sim_SOURCES = ./srm_sim.c ./layer.c  ./matrix.c  ./util/util_vector.c ./util/ini.c ./templates.h ./layer.h ./matrix.h ./core.h ./util/util_vector.h ./util/ini.h ./sim.h constants.c util/util.c sim.c io.c io.h
+__top_builddir__bin_srm_sim_ut_SOURCES = ./layer.c ./srm_sim_ut.c ./matrix.c  ./util/util_vector.c ./util/ini.c ./templates.h ./layer.h ./matrix.h ./core.h ./util/util_vector.h ./util/ini.h ./sim.h ./constants.c util/util.c sim.c io.c io.h
 all: all-am
 
 .SUFFIXES:
@@ -243,6 +244,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/constants.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ini.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/io.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/layer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/matrix.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sim.Po@am__quote@
