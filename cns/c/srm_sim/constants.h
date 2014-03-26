@@ -10,6 +10,8 @@
 
 typedef struct {
     double e0;
+    double e_exc;
+    double e_inh;
     double ts;
     double tm;
     double ta;
@@ -32,7 +34,7 @@ typedef struct {
     double net_edge_prob;
     double inhib_frac;
     
-    int net_neurons_for_input;
+    double input_edge_prob;
     int afferent_per_neuron;
     double tc;
     double mean_p_dur;

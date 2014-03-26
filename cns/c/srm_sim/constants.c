@@ -25,6 +25,12 @@ static int file_handler(void* user, const char* section, const char* name,
     if (MATCH("srm", "e0")) {
         c->e0 = atof(value);
     } else 
+    if (MATCH("srm", "e_exc")) {
+        c->e_exc = atof(value);
+    } else 
+     if (MATCH("srm", "e_inh")) {
+        c->e_inh = atof(value);
+    } else 
     if (MATCH("srm", "ts")) {
         c->ts = atof(value);
     } else 
@@ -76,8 +82,8 @@ static int file_handler(void* user, const char* section, const char* name,
     if (MATCH("net", "net_edge_prob")) {
         c->net_edge_prob = atof(value);
     } else 
-     if (MATCH("net", "net_neurons_for_input")) {
-        c->net_neurons_for_input = atoi(value);
+    if (MATCH("net", "input_edge_prob")) {
+        c->input_edge_prob = atof(value);
     } else 
     if (MATCH("net", "afferent_per_neuron")) {
         c->afferent_per_neuron = atoi(value);
@@ -120,6 +126,8 @@ void printConstants(Constants *c) {
     printf("dt: %f,\n", c->dt);
     printf("duration: %f,\n", c->duration);
     printf("e0: %f,\n", c->e0);
+    printf("e_exc: %f,\n", c->e_exc);
+    printf("e_inh: %f,\n", c->e_inh);
     printf("epochs: %d,\n", c->epochs);
     printf("gain_factor: %f,\n", c->gain_factor);
     printf("inhib_frac: %f,\n", c->inhib_frac);
@@ -127,7 +135,7 @@ void printConstants(Constants *c) {
     printf("mean_p_dur: %f,\n", c->mean_p_dur);
     printf("N: %d,\n", c->layers_size->array[0]);
     printf("net_edge_prob: %f,\n", c->net_edge_prob);
-    printf("net_neurons_for_input: %d,\n", c->net_neurons_for_input);
+    printf("input_edge_prob: %f,\n", c->input_edge_prob);
     printf("pr: %f,\n", c->pr);
     printf("seed: %d,\n", c->seed);
     printf("sim_dim: %f,\n", c->sim_dim);

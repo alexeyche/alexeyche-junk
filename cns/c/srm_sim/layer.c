@@ -104,7 +104,14 @@ void configureSRMLayer(SRMLayer *l, const indVector *inputIDs, Constants *c) {
         for(size_t nj=0; nj<l->N; nj++) {        
             if(ni != nj) {
                 if(c->net_edge_prob > getUnif()) {
-                    TEMPLATE(insertVector,ind)(conns, nj);
+                    TEMPLATE(insertVector,ind)(conns, l->ids[nj]);
+                }
+            }
+        }
+        if(inputIDs) {
+            for(size_t inp_i=0; inp_i<inputIDs->size; inp_i++) {        
+                if(c->input_edge_prob > getUnif()) {
+                    TEMPLATE(insertVector,ind)(conns, inputIDs->array[inp_i]);
                 }
             }
         }
@@ -124,11 +131,11 @@ void configureSRMLayer(SRMLayer *l, const indVector *inputIDs, Constants *c) {
             l->W[ni][syn_i] = start_weight;
             l->syn[ni][syn_i] = 0;
             
-            if(getSpecNeuron(l, &ni) == EXC) {
-                l->syn_spec[ni][syn_i] = c->e0;
+            if(getSpecNeuron(l, &l->ids[ni]) == EXC) {
+                l->syn_spec[ni][syn_i] = c->e_exc;
             } else 
-            if(getSpecNeuron(l, &ni) == INH) {
-                l->syn_spec[ni][syn_i] = -c->e0;
+            if(getSpecNeuron(l, &l->ids[ni]) == INH) {
+                l->syn_spec[ni][syn_i] = -c->e_inh;
             }
         }
     }

@@ -13,7 +13,7 @@ typedef struct {
 typedef struct {
     pSRMLayerVector *layers;
     
-    Net n;    
+    Net *n;    
 } Sim;
 
 Sim* createSim();

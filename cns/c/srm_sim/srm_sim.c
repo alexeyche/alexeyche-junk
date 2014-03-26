@@ -16,8 +16,8 @@ void *main_func(void *args) {
     printConstants(c);
 
     Sim *s = createSim();
-    printf("0net_size: %zu\n", s->n.net_size);
     configureSim(s, c);    
+    printSRMLayer(s->layers->array[0]);
 
     deleteSim(s);
     deleteConstants(c);

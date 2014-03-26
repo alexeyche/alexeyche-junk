@@ -2,9 +2,11 @@
 #include "sim.h"
 
 Sim* createSim() {
-   Sim *s = (Sim*) malloc(sizeof(Sim));
-   s->layers = TEMPLATE(createVector,pSRMLayer)(); 
-   s->n.net_size = 0;
+    Sim *s = (Sim*) malloc(sizeof(Sim));
+    s->n = (Net*) malloc(sizeof(Net));
+    s->layers = TEMPLATE(createVector,pSRMLayer)(); 
+    s->n->net_size = 0;
+    return(s);
 }
 
 
@@ -14,8 +16,6 @@ void appendLayerSim(Sim *s, SRMLayer *l) {
 
 void freeSimNet(Net *n) {
     if(n->net_size > 0) {
-        printf("net_size: %zu\n", n->net_size);
-
         for(size_t net_i=0; net_i < n->net_size; net_i++) {
             free(n->net[net_i]);
         }
@@ -28,30 +28,35 @@ void deleteSim(Sim *s) {
         deleteSRMLayer(s->layers->array[li]);
     }
     TEMPLATE(deleteVector,pSRMLayer)(s->layers);
-    freeSimNet(&s->n);
+    freeSimNet(s->n);
     free(s);
 }
 
 
 void configureSim(Sim *s, Constants *c) {
-    indVector *input_ids = TEMPLATE(createVector,ind)();
+    indVector *inputIDs = TEMPLATE(createVector,ind)();
     for(size_t inp_i=0; inp_i<c->M; inp_i++) {
-        TEMPLATE(insertVector,ind)(input_ids, inp_i);
+        TEMPLATE(insertVector,ind)(inputIDs, inp_i);
     }
-    freeSimNet(&s->n);
-    s->n.net_size += c->M;
+    freeSimNet(s->n);
+    s->n->net_size += c->M;
     
-    size_t neurons_idx = input_ids->size; // start from last input ID
+    size_t neurons_idx = inputIDs->size; // start from last input ID
     for(size_t li=0; li< c->layers_size->size; li++) {
         SRMLayer *l = createSRMLayer(c->layers_size->array[li], &neurons_idx);
+        if(li == 0) {
+            configureSRMLayer(l, inputIDs, c);
+        } else {
+            configureSRMLayer(l, NULL, c);
+        }
         appendLayerSim(s, l);
-        s->n.net_size += l->N;
+        s->n->net_size += l->N;
     }   
-    s->n.net = (double**) malloc(s->n.net_size * sizeof(double*));
-    s->n.net_lens = (size_t*) malloc(s->n.net_size * sizeof(size_t)); 
-    for(size_t net_i=0; net_i < s->n.net_size; net_i++) {
-        s->n.net_lens[net_i] = 0;
+    s->n->net = (double**) malloc(s->n->net_size * sizeof(double*));
+    s->n->net_lens = (size_t*) malloc(s->n->net_size * sizeof(size_t)); 
+    for(size_t net_i=0; net_i < s->n->net_size; net_i++) {
+        s->n->net_lens[net_i] = 0;
     }
     
-    TEMPLATE(deleteVector,ind)(input_ids);
+    TEMPLATE(deleteVector,ind)(inputIDs);
 }
