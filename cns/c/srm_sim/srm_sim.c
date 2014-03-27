@@ -5,6 +5,9 @@
 #include "sim.h"
 #include "io.h"
 
+
+
+
 void *main_func(void *args) {
     struct actor_main *main_s = (struct actor_main*)args;
 	
@@ -17,15 +20,12 @@ void *main_func(void *args) {
 
     Sim *s = createSim();
     configureSim(s, c);    
-    printSRMLayer(s->layers->array[0]);
 
-    pMatrixVector *ml = readMatrixList(c->input_spikes_filename); 
-    assert(ml);
-    readSpikesFromMatrix(s->net, ml->array[0]);
-    printSpikesList(s->net);
+//    printSRMLayer(s->layers->array[0]);
+//    printSpikesList(s->ns->net);
+//    printConnMap(s->ns);
+//    printInputSpikesQueue(s->ns);
     
-
-    TEMPLATE(deleteVector,pMatrix)(ml);
     deleteSim(s);
     deleteConstants(c);
 }

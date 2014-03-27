@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <core.h>
 #include <util/util_vector.h>
 #include <util/ini.h>
 
@@ -24,12 +25,15 @@ typedef struct {
     
     double gain_factor;
     double pr;
-
+    double __pr;
     double u_rest;
+
     double duration;
     double dt;
     double sim_dim;
     unsigned int seed;
+    bool determ;
+    bool learn;
 
     int M;
     indVector *layers_size; 
@@ -42,6 +46,7 @@ typedef struct {
     double mean_p_dur;
     
     double target_rate;
+    double __target_rate; // not to fill
     double target_rate_factor;
     double weight_per_neuron;
     double weight_decay_factor;

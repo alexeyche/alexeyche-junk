@@ -9,6 +9,8 @@ Constants* createConstants(const char *filename) {
         printf("Can't load %s\n", filename);
         return(NULL);
     }
+    c->__target_rate = c->target_rate/c->sim_dim;
+    c->__pr = c->pr/c->sim_dim;
     return(c);
 }
 void deleteConstants(Constants *c) {
@@ -79,6 +81,12 @@ static int file_handler(void* user, const char* section, const char* name,
     if (MATCH("sim", "seed")) {
         c->seed = atoi(value);
     } else 
+    if (MATCH("sim", "learn")) {
+        c->learn = strcmp(value, "true") == 0;
+    } else 
+    if (MATCH("sim", "determ")) {
+        c->determ = strcmp(value, "true") == 0;
+    } else 
     if (MATCH("net", "M")) {
         c->M = atoi(value);
     } else 
@@ -146,6 +154,8 @@ void printConstants(Constants *c) {
     printf("pr: %f,\n", c->pr);
     printf("seed: %d,\n", c->seed);
     printf("sim_dim: %f,\n", c->sim_dim);
+    printf("determ: %d,\n", c->determ);
+    printf("learn: %d,\n", c->learn);
     printf("ta: %f,\n", c->ta);
     printf("target_rate: %f,\n", c->target_rate);
     printf("target_rate_factor: %f,\n", c->target_rate_factor);

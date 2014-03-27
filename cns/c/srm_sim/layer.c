@@ -1,17 +1,10 @@
 
 #include "layer.h"
 
-#include <stddef.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <time.h>
-
-#include <util/util.h>
-#include <matrix.h>
-#include <util/util_vector.h>
 
 #include <templates_clean.h>
 #define T pSRMLayer
+#define DESTRUCT deleteSRMLayer
 #include <util/util_vector_tmpl.c>
 
 
@@ -21,7 +14,7 @@ SRMLayer* createSRMLayer(size_t N, size_t *glob_idx) {
     l->ids = (size_t*)malloc( l->N*sizeof(size_t));
     l->nt = (nspec_t*)malloc( l->N*sizeof(nspec_t));
     for(size_t ni=0; ni<l->N; ni++) {
-        l->ids[ni] = ++(*glob_idx);
+        l->ids[ni] = (*glob_idx)++;
     }
 
     l->W = (double**)malloc( l->N*sizeof(double*));
@@ -33,7 +26,39 @@ SRMLayer* createSRMLayer(size_t N, size_t *glob_idx) {
     for(size_t ni=0; ni<l->N; ni++) {
         l->nconn[ni] = 0;
     }
+    l->active_syn_ids = TEMPLATE(createVector,ind)();
+    l->a = (double*)malloc( l->N*sizeof(double));
+    l->B = (double*)malloc( l->N*sizeof(double));
+    l->C = (double**)malloc( l->N*sizeof(double*));
+    l->fired = (unsigned char*)malloc( l->N*sizeof(unsigned char));
+    l->pacc = (double*)malloc( l->N*sizeof(double));
     return(l);
+}
+
+void deleteSRMLayer(SRMLayer *l) {
+    for(size_t ni=0; ni<l->N; ni++) {
+        if(l->nconn[ni]>0) {
+            free(l->W[ni]);
+            free(l->syn[ni]);
+            free(l->syn_spec[ni]);
+            free(l->id_conns[ni]);
+            free(l->C[ni]);
+        }
+    }
+    free(l->ids);
+    free(l->nt);
+    free(l->id_conns);
+    free(l->nconn);
+    free(l->W);
+    free(l->syn);
+    free(l->syn_spec);
+    TEMPLATE(deleteVector,ind)(l->active_syn_ids);
+    free(l->a);
+    free(l->B);
+    free(l->C);
+    free(l->fired);
+    free(l->pacc);
+    free(l);
 }
 
 //void connectSRMLayer(SRMLayer *l, Matrix *conn_m, indVector *ids_conn, Constants *c) {
@@ -63,24 +88,7 @@ void printSRMLayer(SRMLayer *l) {
     }
 }
 
-void deleteSRMLayer(SRMLayer *l) {
-    for(size_t ni=0; ni<l->N; ni++) {
-        if(l->nconn[ni]>0) {
-            free(l->W[ni]);
-            free(l->syn[ni]);
-            free(l->syn_spec[ni]);
-            free(l->id_conns[ni]);
-        }
-    }
-    free(l->ids);
-    free(l->nt);
-    free(l->id_conns);
-    free(l->nconn);
-    free(l->W);
-    free(l->syn);
-    free(l->syn_spec);
-    free(l);
-}
+
 
 nspec_t getSpecNeuron(SRMLayer *l, const size_t *id) {
     for(size_t ni=0; ni<l->N; ni++) {
@@ -120,15 +128,21 @@ void configureSRMLayer(SRMLayer *l, const indVector *inputIDs, Constants *c) {
             l->W[ni] = (double*) malloc(l->nconn[ni]*sizeof(double));
             l->syn[ni] = (double*) malloc(l->nconn[ni]*sizeof(double));
             l->syn_spec[ni] = (double*) malloc(l->nconn[ni]*sizeof(double));
+            l->C[ni] = (double*) malloc(l->nconn[ni]*sizeof(double));
         }
         TEMPLATE(deleteVector,ind)(conns);
     }
     for(size_t ni=0; ni<l->N; ni++) {
         double start_weight = c->weight_per_neuron/l->nconn[ni];
+        l->a[ni] = 0;
+        l->B[ni] = 0;
+        l->fired[ni] = 0;
+        l->pacc[ni] = 0;
         for(size_t syn_i=0; syn_i<l->nconn[ni]; syn_i++) {
             l->W[ni][syn_i] = start_weight;
             l->syn[ni][syn_i] = 0;
-            
+            l->C[ni][syn_i] = 0;
+
             if(getSpecNeuron(l, &l->ids[ni]) == EXC) {
                 l->syn_spec[ni][syn_i] = c->e_exc;
             } else 
@@ -137,5 +151,45 @@ void configureSRMLayer(SRMLayer *l, const indVector *inputIDs, Constants *c) {
             }
         }
     }
+}
+
+#define SYN_ACT_TOL 0.001
+
+void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constants *c) {
+    double u = 0;
+    for(size_t act_i=0; act_i < l->active_syn_ids->size; act_i++) {
+        const size_t *syn_id = &l->active_syn_ids->array[act_i];
+        l->syn[ *id_to_sim ][ *syn_id ] -= l->syn[ *id_to_sim ][ *syn_id ]/c->tm;
+        l->syn[ *id_to_sim ][ *syn_id ] *= l->a[ *id_to_sim ];
+        u += l->W[ *id_to_sim ][ *syn_id ] * l->syn[ *id_to_sim ][ *syn_id ];
+        if( l->syn[ *id_to_sim ][ *syn_id ] < SYN_ACT_TOL ) {
+            TEMPLATE(removeVector,ind)(l->active_syn_ids, act_i);
+        }
+    }
+
+    if(!c->determ) {
+        double p = probf(&u, c) * c->dt;
+        if( p > getUnif() ) {
+            l->fired[ *id_to_sim ] = 1;
+            l->pacc[ *id_to_sim ] += 1;
+        }
+        if(c->learn) {
+            l->B[ *id_to_sim ] = B_calc( &l->fired[ *id_to_sim ], &p, &l->pacc[ *id_to_sim ], c);
+            for(size_t act_i=0; act_i < l->active_syn_ids->size; act_i++) {
+                const size_t *syn_id = &l->active_syn_ids->array[act_i];
+                l->C[ *id_to_sim ][ *syn_id ] += l->C[ *id_to_sim ][ *syn_id ]/c->tc + \
+                                                 C_calc( &l->fired[ *id_to_sim ], &p, &u, &l->syn[ *id_to_sim ][ *syn_id ], c);
+/*TODO:*/       double dw = c->added_lrate*( l->C[ *id_to_sim ][ *syn_id ]*l->B[ *id_to_sim ] -  \
+                                            c->weight_decay_factor * l->fired[ *id_to_sim ] * l->W[ *id_to_sim ][ *syn_id ] );
+                l->W[ *id_to_sim ][ *syn_id ] += dw;
+           }
+        }
+        l->pacc[ *id_to_sim ] -= l->pacc[ *id_to_sim ]/c->mean_p_dur; 
+    } else { 
+        if( u >= c->tr ) {
+            l->fired[ *id_to_sim ] = 1;
+        }
+    }
+
 }
 

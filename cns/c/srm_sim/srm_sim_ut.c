@@ -1,5 +1,6 @@
 
-#include "core.h"
+#include <matrix.h>
+#include <util/util_vector.h>
 
 void test_matrix() {
     Matrix *m = createMatrix(50, 25);
@@ -42,8 +43,33 @@ void test_matrix() {
 //    deleteSparseMatrix(sm);
 //}
 
+void test_vector(void) {
+    doubleVector *dv = TEMPLATE(createVector,double)();
+    for(size_t eli=0; eli < 100; eli++) {
+        TEMPLATE(insertVector,double)(dv, (double)eli);
+    }
+    printf("old size: %zu\n", dv->size);
+    TEMPLATE(removeVector,double)(dv, 10);
+    TEMPLATE(removeVector,double)(dv, 12);
+    TEMPLATE(removeVector,double)(dv, dv->size-1);
+    for(size_t eli=0; eli < dv->size; eli++) {
+        if((eli == 2)||(eli == 3)) {
+            TEMPLATE(removeVector,double)(dv, eli);
+        }
+        printf("%f, ", dv->array[eli]);
+    }
+    printf("new size: %zu\n", dv->size);
+//    TEMPLATE(removeVector,double)(dv, );
+    for(size_t eli=0; eli < dv->size; eli++) {
+        printf("%f, ", dv->array[eli]);
+    }
+    printf("\n");
+    TEMPLATE(deleteVector,double)(dv);
+}
+
 void main(void) {
     test_matrix();
 //    test_sparse_matrix();
+    test_vector();
 }
 

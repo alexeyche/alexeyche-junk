@@ -1,10 +1,11 @@
-sim.o: sim.c sim.h layer.h /usr/include/stdlib.h /usr/include/features.h \
+net_sim.o: net_sim.c net_sim.h spikes_list.h matrix.h \
+ /usr/lib/gcc/x86_64-linux-gnu/4.6.1/include/stddef.h \
+ /usr/include/stdlib.h /usr/include/features.h \
  /usr/include/x86_64-linux-gnu/bits/predefs.h \
  /usr/include/x86_64-linux-gnu/sys/cdefs.h \
  /usr/include/x86_64-linux-gnu/bits/wordsize.h \
  /usr/include/x86_64-linux-gnu/gnu/stubs.h \
  /usr/include/x86_64-linux-gnu/gnu/stubs-64.h \
- /usr/lib/gcc/x86_64-linux-gnu/4.6.1/include/stddef.h \
  /usr/include/x86_64-linux-gnu/bits/stdlib.h /usr/include/stdio.h \
  /usr/include/x86_64-linux-gnu/bits/types.h \
  /usr/include/x86_64-linux-gnu/bits/typesizes.h /usr/include/libio.h \
@@ -13,19 +14,20 @@ sim.o: sim.c sim.h layer.h /usr/include/stdlib.h /usr/include/features.h \
  /usr/include/x86_64-linux-gnu/bits/stdio_lim.h \
  /usr/include/x86_64-linux-gnu/bits/sys_errlist.h \
  /usr/include/x86_64-linux-gnu/bits/stdio.h \
- /usr/include/x86_64-linux-gnu/bits/stdio2.h /usr/include/time.h \
- /usr/include/x86_64-linux-gnu/bits/time.h constants.h \
+ /usr/include/x86_64-linux-gnu/bits/stdio2.h templates.h \
+ templates_clean.h util/util_vector_tmpl.h util/util_vector.h core.h \
+ /usr/local/include/libactor/actor.h /usr/local/include/libactor/types.h \
  /usr/include/string.h /usr/include/x86_64-linux-gnu/bits/string.h \
  /usr/include/x86_64-linux-gnu/bits/string2.h /usr/include/endian.h \
  /usr/include/x86_64-linux-gnu/bits/endian.h \
- /usr/include/x86_64-linux-gnu/bits/string3.h core.h \
- /usr/local/include/libactor/actor.h /usr/local/include/libactor/types.h \
- /usr/include/pthread.h /usr/include/sched.h \
+ /usr/include/x86_64-linux-gnu/bits/string3.h /usr/include/pthread.h \
+ /usr/include/sched.h /usr/include/time.h \
  /usr/include/x86_64-linux-gnu/bits/sched.h \
+ /usr/include/x86_64-linux-gnu/bits/time.h \
  /usr/include/x86_64-linux-gnu/bits/pthreadtypes.h \
  /usr/include/x86_64-linux-gnu/bits/setjmp.h /usr/include/assert.h \
- /usr/local/include/libactor/list.h util/util_vector.h templates.h \
- util/util_vector_tmpl.h util/ini.h neuron_funcs.h /usr/include/math.h \
+ /usr/local/include/libactor/list.h util/util_vector_tmpl.h layer.h \
+ constants.h util/ini.h neuron_funcs.h /usr/include/math.h \
  /usr/include/x86_64-linux-gnu/bits/huge_val.h \
  /usr/include/x86_64-linux-gnu/bits/huge_valf.h \
  /usr/include/x86_64-linux-gnu/bits/huge_vall.h \
@@ -34,12 +36,15 @@ sim.o: sim.c sim.h layer.h /usr/include/stdlib.h /usr/include/features.h \
  /usr/include/x86_64-linux-gnu/bits/mathdef.h \
  /usr/include/x86_64-linux-gnu/bits/mathcalls.h \
  /usr/include/x86_64-linux-gnu/bits/mathinline.h util/util.h \
- templates_clean.h util/util_vector_tmpl.h spikes_list.h matrix.h \
- net_sim.h
+ util/util_vector_tmpl.c
 
-sim.h:
+net_sim.h:
 
-layer.h:
+spikes_list.h:
+
+matrix.h:
+
+/usr/lib/gcc/x86_64-linux-gnu/4.6.1/include/stddef.h:
 
 /usr/include/stdlib.h:
 
@@ -54,8 +59,6 @@ layer.h:
 /usr/include/x86_64-linux-gnu/gnu/stubs.h:
 
 /usr/include/x86_64-linux-gnu/gnu/stubs-64.h:
-
-/usr/lib/gcc/x86_64-linux-gnu/4.6.1/include/stddef.h:
 
 /usr/include/x86_64-linux-gnu/bits/stdlib.h:
 
@@ -81,11 +84,19 @@ layer.h:
 
 /usr/include/x86_64-linux-gnu/bits/stdio2.h:
 
-/usr/include/time.h:
+templates.h:
 
-/usr/include/x86_64-linux-gnu/bits/time.h:
+templates_clean.h:
 
-constants.h:
+util/util_vector_tmpl.h:
+
+util/util_vector.h:
+
+core.h:
+
+/usr/local/include/libactor/actor.h:
+
+/usr/local/include/libactor/types.h:
 
 /usr/include/string.h:
 
@@ -99,17 +110,15 @@ constants.h:
 
 /usr/include/x86_64-linux-gnu/bits/string3.h:
 
-core.h:
-
-/usr/local/include/libactor/actor.h:
-
-/usr/local/include/libactor/types.h:
-
 /usr/include/pthread.h:
 
 /usr/include/sched.h:
 
+/usr/include/time.h:
+
 /usr/include/x86_64-linux-gnu/bits/sched.h:
+
+/usr/include/x86_64-linux-gnu/bits/time.h:
 
 /usr/include/x86_64-linux-gnu/bits/pthreadtypes.h:
 
@@ -119,11 +128,11 @@ core.h:
 
 /usr/local/include/libactor/list.h:
 
-util/util_vector.h:
-
-templates.h:
-
 util/util_vector_tmpl.h:
+
+layer.h:
+
+constants.h:
 
 util/ini.h:
 
@@ -149,12 +158,4 @@ neuron_funcs.h:
 
 util/util.h:
 
-templates_clean.h:
-
-util/util_vector_tmpl.h:
-
-spikes_list.h:
-
-matrix.h:
-
-net_sim.h:
+util/util_vector_tmpl.c:

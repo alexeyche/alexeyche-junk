@@ -2,22 +2,41 @@
 #define LAYER_H
 
 #include <stdlib.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <time.h>
 
-#include "constants.h"
-#include "core.h"
+
+
+#include <constants.h>
+#include <core.h>
+#include <util/util_vector.h>
+#include <neuron_funcs.h>
+#include <util/util.h>
+
 
 typedef enum {EXC, INH} nspec_t;
 
 typedef struct {
+    //consts
     size_t N;
     size_t *ids;
     nspec_t *nt;
 
+    // structure
     double **W;
-    double **syn;
-    double **syn_spec;
     size_t **id_conns;
     int *nconn;
+    
+    // vars 
+    double **syn;
+    double **syn_spec;
+    double *a;
+    double **C;
+    double *B;
+    indVector *active_syn_ids;
+    unsigned char *fired;
+    double *pacc;
 } SRMLayer;
 
 typedef SRMLayer* pSRMLayer;

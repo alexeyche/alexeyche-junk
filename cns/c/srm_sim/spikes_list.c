@@ -12,7 +12,7 @@ SpikesList* createSpikesList(size_t size_) {
 }
 
 void readSpikesFromMatrix(SpikesList *sl, Matrix *m) {
-    assert(m->nrow < sl->size);
+    assert(m->nrow <= sl->size);
     for(size_t i=0; i<m->nrow; i++) {
         for(size_t j=0; j<m->ncol; j++) {
             double el = getMatrixElement(m, i, j);
@@ -32,7 +32,7 @@ void deleteSpikesList(SpikesList *sl) {
 }
 
 void printSpikesList(SpikesList *sl) {
-    printf("SpikeList with %d size:\n", sl->size);
+    printf("SpikeList with %zu size:\n", sl->size);
     for(size_t si=0; si<sl->size; si++) {
         printf("%zu: ", si);
         for(size_t sp_i=0; sp_i < sl->list[si]->size; sp_i++) {
@@ -41,3 +41,11 @@ void printSpikesList(SpikesList *sl) {
         printf("\n");
     }
 }
+
+
+SpikesList* spikesMatrixToSpikesList(Matrix *m) {
+    SpikesList *sl = createSpikesList(m->nrow);
+    readSpikesFromMatrix(sl, m);    
+    return(sl);
+}
+
