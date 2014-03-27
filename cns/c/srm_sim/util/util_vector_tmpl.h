@@ -1,5 +1,6 @@
 #ifdef T
-  
+
+
 typedef struct {
   T *array;
   size_t alloc_size;

@@ -3,6 +3,7 @@
 
 #include <core.h>
 #include <templates.h>
+#include <string.h>
 
 #ifdef T
 #undef T

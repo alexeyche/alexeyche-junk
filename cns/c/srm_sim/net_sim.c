@@ -119,3 +119,11 @@ void printInputSpikesQueue(NetSim *ns) {
         printf("\n");
     }
 }
+
+bool doWeHaveSpike(NetSim *ns, SimRuntime *sr, const size_t *n_id) {
+    if(n_id>ns->size) printf("error in doWeHaveSpike\n");
+    SynSpike *ss = ns->input_spikes_queue[*n_id]->array[ sr->input_spikes_iter[n_id] ];
+    sr->input_spikes_iter[n_id] += 1;
+    
+}
+

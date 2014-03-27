@@ -53,6 +53,7 @@ void deleteSRMLayer(SRMLayer *l);
 void configureSRMLayer(SRMLayer *l, const indVector *inputIDs, Constants *c);
 nspec_t getSpecNeuron(SRMLayer *l, const size_t *id);
 
-//void connectSRMLayer(SRMLayer *l, Matrix *conn_m, indVector *ids_conn, Constants *c);
+void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constants *c);
+
 
 #endif

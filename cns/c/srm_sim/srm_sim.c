@@ -24,7 +24,7 @@ void *main_func(void *args) {
 //    printSRMLayer(s->layers->array[0]);
 //    printSpikesList(s->ns->net);
 //    printConnMap(s->ns);
-//    printInputSpikesQueue(s->ns);
+    printInputSpikesQueue(s->ns);
     
     deleteSim(s);
     deleteConstants(c);

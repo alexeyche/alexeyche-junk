@@ -30,7 +30,6 @@ pMatrixVector* readMatrixList(const char *filename) {
             if(type[it] == '\0') break;
             it++;
         }
-//        printf("%d, %d, %s \n", i,j, type); 
         
         if(strcmp(type, "double") == 0) {
             Matrix *m = createMatrix(i, j); 

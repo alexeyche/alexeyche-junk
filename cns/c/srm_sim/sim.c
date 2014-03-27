@@ -5,6 +5,7 @@ Sim* createSim() {
     Sim *s = (Sim*) malloc(sizeof(Sim));
     s->ns = createNetSim();
     s->layers = TEMPLATE(createVector,pSRMLayer)(); 
+    s->rt = createRuntime();
     return(s);
 }
 
@@ -17,10 +18,27 @@ void appendLayerSim(Sim *s, SRMLayer *l) {
 void deleteSim(Sim *s) {
     TEMPLATE(deleteVector,pSRMLayer)(s->layers);
     deleteNetSim(s->ns);
+    deleteRuntime(s->rt);
     free(s);
 }
 
+SimRuntime* createRuntime() {
+    SimRuntime *rt = (SimRuntime*) malloc(sizeof(SimRuntime));
+    rt->t = 0;
+    rt->input_spikes_iter = TEMPLATE(createVector,ind)();
+    return(rt);
+}
 
+void deleteRuntime(SimRuntime *sr) {
+    TEMPLATE(deleteVector,ind)(rt->input_spikes_iter);
+    free(rt);
+}
+
+void allocRuntime(SimRuntime *rt, size_t net_size) {
+    for(size_t inp_i=0; inp_i < net_size; inp_i++) {
+        TEMPLATE(insertVector,ind)(rt->input_spikes_iter, 0);
+    }
+}
 
 void configureSim(Sim *s, Constants *c) {
     indVector *inputIDs = TEMPLATE(createVector,ind)();
@@ -53,12 +71,27 @@ void configureSim(Sim *s, Constants *c) {
     SpikesList *inp_sl = spikesMatrixToSpikesList(inp_m);
     
     propagateInputSpikesNetSim(s->ns, inp_sl);
+
+    if(rt) {
+        deleteRuntime(s->rt);
+        s->rt = createRuntime();
+    }
+    allocRuntime(s->rt, s->ns->size);
     
-   
     deleteSpikesList(inp_sl); 
     TEMPLATE(deleteVector,pMatrix)(ml);
     TEMPLATE(deleteVector,ind)(inputIDs);
 }
 
 
+
+void simulate(Sim *s, Constants *c) {
+    for(size_t li=0; s->layers->size; li++) {
+        SRMLayer *l = s->layers->array[li];
+        for(size_t ni=0; ni < l->N; ni++) {
+
+            simulateSRMLayerNeuron(l, &ni, c);
+        }
+    }
+}
 
