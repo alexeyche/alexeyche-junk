@@ -3,19 +3,19 @@
 args <- commandArgs(trailingOnly = FALSE)
 if(length(grep("RStudio", args))>0) {
   verbose = TRUE
-  #dir='~/prog/sim/runs/testrstudio'
-  dir='~/my/sim/runs/testrstudio'
-  #data_dir = '~/prog/sim'
-  data_dir = '~/my/sim'
-  #setwd("~/prog/alexeyche-junk/cns/R/srm")
-  setwd("~/my/git/alexeyche-junk/cns/R/srm")
+  dir='~/prog/sim/runs/testrstudio'
+  #dir='~/my/sim/runs/testrstudio'
+  data_dir = '~/prog/sim'
+  #data_dir = '~/my/sim'
+  setwd("~/prog/alexeyche-junk/cns/R/srm")
+  #setwd("~/my/git/alexeyche-junk/cns/R/srm")
   #train_spikes = list("/home/alexeyche/my/sim/ucr_fb_spikes/train_spikes")
   #test_spikes  = list("/home/alexeyche/my/sim/ucr_fb_spikes/test_spikes")
   #train_spikes = list("/home/alexeyche/prog/sim/ucr_nengo_spikes/train_spikes")
   #test_spikes  = list("/home/alexeyche/prog/sim/ucr_nengo_spikes/test_spikes")
   source('constants.R')
-  model_file = "~/my/sim/runs/testrstudio/model"
-  #model_file = "~/prog/sim/runs/testrstudio/model"
+  #model_file = "~/my/sim/runs/testrstudio/model"
+  model_file = "~/prog/sim/runs/testrstudio/model"
 } else {
   if(length(args) == 5) {
     cat("Available options: \n")
