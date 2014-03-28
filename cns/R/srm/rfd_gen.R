@@ -11,9 +11,9 @@ T = seq(T0, Tmax, by=dt)
 Twhole = Tmax*100 # 50 min
 
 
-dir2save = "~/prog/sim/rfd_files"
-#dir2save = "~/my/sim/rfd_files"
-
+#dir2save = "~/prog/sim/rfd_files"
+dir2save = "~/my/sim/rfd_files"
+N=0
 net = list()
 for(i in 1:(M+N)) net[[i]] = numeric(0)
 ID_MAX=0
@@ -33,7 +33,7 @@ for(ep in 1:2) {
     }
     syn_fired = (gauss_rates(mu, 1:M)*dt)>runif(M)
     for(fi in which(syn_fired==TRUE)) {
-      net[[ gr1$ids[fi] ]] = c(net[[ gr1$ids[fi] ]], curt)
+      net[[ gr1$ids()[fi] ]] = c(net[[ gr1$ids()[fi] ]], curt)
     }
   }
   saveMatrixList(sprintf("%s/ep_%d_%4.1fsec", dir2save, ep, Tmax/sim_dim), list( list_to_matrix(net) ) )

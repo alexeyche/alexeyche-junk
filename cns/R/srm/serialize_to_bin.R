@@ -13,7 +13,7 @@ saveMatrixList <- function(baseName, mtxList) {
     for (m in mtxList) {
         writeBin(dim(m), con)
         writeBin(typeof(m), con)
-        writeBin(c(m), con) 
+        writeBin(c(m), con)
         flush(con)
 
         offset <- as.integer(seek(con))

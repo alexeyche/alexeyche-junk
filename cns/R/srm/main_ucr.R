@@ -106,6 +106,9 @@ source('serialize_to_bin.R')
 source('eval_funcs.R')
 source('kernel.R')
 source('eval_funcs.R')
+source('ucr_ts.R')
+source('gen_spikes.R')
+
 
 
 set.seed(seed_num)
