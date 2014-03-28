@@ -13,7 +13,9 @@
 #include <util/util_vector.h>
 #include <neuron_funcs.h>
 #include <util/util.h>
+#include <matrix.h>
 
+#define SYN_ACT_TOL 0.001 // value of synapse needed to delete 
 
 typedef enum {EXC, INH} nspec_t;
 
@@ -34,9 +36,18 @@ typedef struct {
     double *a;
     double **C;
     double *B;
-    indVector *active_syn_ids;
+    indVector **active_syn_ids;
     unsigned char *fired;
+    unsigned char **syn_fired;
     double *pacc;
+
+    //stat
+    bool saveStat;
+    doubleVector **stat_B;
+    doubleVector **stat_u;
+    doubleVector **stat_p;
+    doubleVector ***stat_W;
+    doubleVector ***stat_C;
 } SRMLayer;
 
 typedef SRMLayer* pSRMLayer;
@@ -47,13 +58,13 @@ typedef SRMLayer* pSRMLayer;
 #include <util/util_vector_tmpl.h>
 
 
-SRMLayer* createSRMLayer(size_t N, size_t *glob_idx);
+SRMLayer* createSRMLayer(size_t N, size_t *glob_idx, bool saveStat);
 void printSRMLayer(SRMLayer *l);
 void deleteSRMLayer(SRMLayer *l);
 void configureSRMLayer(SRMLayer *l, const indVector *inputIDs, Constants *c);
 nspec_t getSpecNeuron(SRMLayer *l, const size_t *id);
 
 void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constants *c);
-
+pMatrixVector* serializeSRMLayer(SRMLayer *l);
 
 #endif

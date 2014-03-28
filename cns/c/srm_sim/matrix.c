@@ -37,5 +37,24 @@ void printMatrix(Matrix *m) {
     }
 }
 
+Matrix* vectorArrayToMatrix(doubleVector **dv, size_t size) {
+    size_t col_max = 0;
+    for(size_t ri=0; ri< size; ri++) {
+        if(dv[ri]->size>col_max) {
+            col_max = dv[ri]->size;
+        }
+    }
+    Matrix *m = createMatrix(size, col_max);
+    for(size_t i=0; i<size; i++) {
+        for(size_t j=0; j<col_max; j++) {
+            if(j < dv[i]->size) {
+                setMatrixElement(m, i, j, dv[i]->array[j]);
+            } else {
+                setMatrixElement(m, i, j, 0);
+            }
+        }
+    }
+    return(m);        
+}
 
 
