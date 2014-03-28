@@ -7,6 +7,7 @@
 #include <string.h>
 
 #include <templates.h>
+#include <util/util_vector.h>
 
 typedef struct {
     double *vals;
@@ -26,6 +27,7 @@ void setMatrixElement(Matrix *m, size_t i, size_t j, double val);
 double getMatrixElement(Matrix *m, size_t i, size_t j);
 void deleteMatrix(Matrix *m);
 void printMatrix(Matrix *m);
+Matrix *vectorArrayToMatrix(doubleVector **dv, size_t size);
 
 
 #endif

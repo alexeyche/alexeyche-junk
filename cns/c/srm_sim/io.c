@@ -46,3 +46,40 @@ pMatrixVector* readMatrixList(const char *filename) {
 
     return(mlist);
 }
+
+
+void saveMatrixList(const char *filename, pMatrixVector *mv) {
+    FILE *f = fopen(filename, "wb");    
+    if(f == NULL) {
+        printf("Error in opening file %s\n", filename);
+        return;
+    }
+    size_t fi=strlen(filename)-1;
+    while( (fi >= 0) ) {
+        if( filename[fi] == '.' ) break;
+        fi--;
+    }
+    if(fi == 0) { 
+        printf("Need .bin format for matrix file\n");
+        return;
+    }
+    char *prefix = strndup(filename, fi);
+    char *idx_fname = strcat(prefix, ".idx");
+    FILE *f_idx = fopen(idx_fname, "wb");    
+
+    int null_pos = 0;
+    fwrite(&null_pos, sizeof(int), 1, f_idx);
+    const char *type_name = "double";
+    for(size_t mi=0; mi < mv->size; mi++) {
+        Matrix *m = mv->array[mi];        
+        fwrite(&m->nrow, sizeof(unsigned int), 1, f);
+        fwrite(&m->ncol, sizeof(unsigned int), 1, f);   
+        fwrite(type_name, sizeof(char), strlen(type_name)+1, f);
+        fwrite(m->vals, sizeof(double), m->nrow*m->ncol, f);
+        
+        int pos = ftell(f);
+        fwrite(&pos, sizeof(int), 1, f_idx);
+    }
+    fclose(f);
+    fclose(f_idx);
+}

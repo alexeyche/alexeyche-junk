@@ -1,9 +1,6 @@
 
 # it is include
 
-source('ucr_ts.R')
-source('gen_spikes.R')
-
 data = synth # synthetic control
 c(train_dataset, test_dataset) := read_ts_file(data, data_dir)
 elems = samples_from_dataset

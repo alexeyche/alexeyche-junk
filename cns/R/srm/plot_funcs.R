@@ -50,7 +50,7 @@ gray_plot <- function(data, lims = c(min(data),max(data)) ) {
 }
 
 Istat = NULL
-Wacc = vector("list",N)
+#Wacc = vector("list",N)
 lossAcc = NULL
 simAcc = NULL
 discrAcc = NULL

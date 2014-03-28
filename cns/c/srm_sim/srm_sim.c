@@ -1,3 +1,4 @@
+#define _POSIX_C_SOURCE 200809L
 
 #include "core.h"
 #include "arg_opt.h"
@@ -12,20 +13,51 @@ void *main_func(void *args) {
     struct actor_main *main_s = (struct actor_main*)args;
 	
 	ArgOptions a = parseOptions(main_s->argc, main_s->argv);
-    printf("args.jobs = %d \n", a.jobs); 	
-    printf("args.c = %s \n", a.const_filename); 	
-
+    bool saveStat = a.stat_file != NULL;
+    
     Constants *c = createConstants(a.const_filename);
     printConstants(c);
 
     Sim *s = createSim();
-    configureSim(s, c);    
-
-//    printSRMLayer(s->layers->array[0]);
+    if(a.model_file) {
+    
+    } else {
+        configureSim(s, c, saveStat);    
+    }
+    printSRMLayer(s->layers->array[0]);
 //    printSpikesList(s->ns->net);
 //    printConnMap(s->ns);
-    printInputSpikesQueue(s->ns);
+//    printInputSpikesQueue(s->ns);
+
+    while(s->rt->t <= s->rt->Tmax) 
+        simulate(s, c);
     
+    if(saveStat) {
+        pMatrixVector *mv = TEMPLATE(createVector,pMatrix)();
+        Matrix *mp = vectorArrayToMatrix(s->layers->array[0]->stat_p, s->layers->array[0]->N);
+        TEMPLATE(insertVector,pMatrix)(mv, mp);
+        Matrix *mu = vectorArrayToMatrix(s->layers->array[0]->stat_u, s->layers->array[0]->N);
+        TEMPLATE(insertVector,pMatrix)(mv, mu);
+        Matrix *mB = vectorArrayToMatrix(s->layers->array[0]->stat_B, s->layers->array[0]->N);
+        TEMPLATE(insertVector,pMatrix)(mv, mB);
+        for(size_t ni=0; ni < s->layers->array[0]->N; ni++) {
+            Matrix *mSyn = vectorArrayToMatrix(s->layers->array[0]->stat_W[ni], s->layers->array[0]->nconn[ni]);
+            TEMPLATE(insertVector,pMatrix)(mv, mSyn);
+        }
+        for(size_t ni=0; ni < s->layers->array[0]->N; ni++) {
+            Matrix *mC = vectorArrayToMatrix(s->layers->array[0]->stat_C[ni], s->layers->array[0]->nconn[ni]);
+            TEMPLATE(insertVector,pMatrix)(mv, mC);
+        }
+ 
+        saveMatrixList(a.stat_file, mv);
+            
+        TEMPLATE(deleteVector,pMatrix)(mv);
+    }
+    if(a.model_file) {
+        pMatrixVector *model = serializeSRMLayer(s->layers->array[0]);
+        saveMatrixList(a.model_file, model);
+        TEMPLATE(deleteVector,pMatrix)(model);
+    }
     deleteSim(s);
     deleteConstants(c);
 }

@@ -11,6 +11,7 @@
 typedef struct {
     indVector *input_spikes_iter;
     double t;
+    double Tmax;
 } SimRuntime;
 
 typedef struct {
@@ -23,9 +24,10 @@ typedef struct {
 Sim* createSim();
 void appendLayerSim(Sim *s, SRMLayer *l);
 void deleteSim(Sim *s);
-void configureSim(Sim *s, Constants *c);
+void configureSim(Sim *s, Constants *c, bool saveStat);
 SimRuntime* createRuntime();
 void deleteRuntime(SimRuntime *sr);
-
+void simulate(Sim *s, const Constants *c);
+const SynSpike* getInputSpike(NetSim *ns, SimRuntime *sr, const size_t *n_id, const Constants *c);
 
 #endif
