@@ -137,7 +137,7 @@ nspec_t getSpecNeuron(SRMLayer *l, const size_t *id) {
     printf("Error: Can't find neuron with id %zu\n", *id);
 }
 
-void configureSRMLayer(SRMLayer *l, const indVector *inputIDs, Constants *c, const char *model_filename) {
+void configureSRMLayer(SRMLayer *l, const indVector *inputIDs, Constants *c) {
     srand(c->seed);
     for(size_t ni=0; ni<l->N; ni++) {
         indVector *conns = TEMPLATE(createVector,ind)(0);
@@ -274,8 +274,8 @@ void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constant
     }
 }
 
-pMatrixVector* serializeSRMLayer(SRMLayer *l) {
-    pMatrixVector *ret = TEMPLATE(createVector,pMatrix)();
+void serializeSRMLayer(SRMLayer *l, const char *filename) {
+    pMatrixVector *data = TEMPLATE(createVector,pMatrix)();
     size_t max_conn_id = 0;
     for(size_t ni=0; ni< l->N; ni++) {
         for(size_t con_i=0; con_i < l->nconn[ni]; con_i++) {
@@ -286,6 +286,9 @@ pMatrixVector* serializeSRMLayer(SRMLayer *l) {
 
     }
     Matrix *W = createMatrix(l->N, max_conn_id+1);
+    Matrix *nt = createMatrix(l->N, 1);
+    Matrix *pacc = createMatrix(l->N, 1);
+    
     for(size_t i=0; i<W->nrow; i++) {
         for(size_t j=0; j<W->ncol; j++) {
             setMatrixElement(W, i, j, 0);
@@ -294,12 +297,23 @@ pMatrixVector* serializeSRMLayer(SRMLayer *l) {
     for(size_t ni=0; ni< l->N; ni++) {
         for(size_t con_i=0; con_i < l->nconn[ni]; con_i++) {
             setMatrixElement(W, ni, l->id_conns[ni][con_i], l->W[ni][con_i]);
+            setMatrixElement(syn_spec, ni, l->id_conns[ni][con_i], l->syn_spec[ni][con_i]);
         }
+        setMatrixElement(nt, ni, 1, l->nt[ni]);
+        setMatrixElement(pacc, ni, 1, l->pacc[ni]);
     }
-    TEMPLATE(insertVector,pMatrix)(ret, W);
-    return(ret);
+    
+    TEMPLATE(insertVector,pMatrix)(data, W);
+    TEMPLATE(insertVector,pMatrix)(data, nt);
+    TEMPLATE(insertVector,pMatrix)(data, pacc);
+
+    saveMatrixList(filename, data);
+    
+    TEMPLATE(deleteVector,pMatrix)(data);
 }
 
-void loadSRMLayerFromFile(const char *model_file) {
+void loadSRMLayerFromFile(SRMLayer *l, const char *model_file) {
+    pMatrixVector* data = readMatrixList(model_file);
+    Matrix *W = data->a
 }
 
