@@ -117,30 +117,17 @@ void simulate(Sim *s, const Constants *c) {
     for(size_t li=0; li<s->layers->size; li++) {
         SRMLayer *l = s->layers->array[li];
         for(size_t ni=0; ni < l->N; ni++) {
-//            printf("%f simulating %zu\n", s->rt->t, l->ids[ni]);
             while( (sp = getInputSpike(s->ns, s->rt, &l->ids[ni], c)) != NULL) {
-                if(l->syn[ni][ sp->syn_id ] < SYN_ACT_TOL) {
-//                    printf("inserting int act syns: %zu %zu %f\n", sp->n_id, sp->syn_id, sp->t);
-                    TEMPLATE(addValueLList,ind)(l->active_syn_ids[ni], sp->syn_id);
-                } 
-//                else printf("not inserting int act syns: %zu %zu %f because %f > %f\n", sp->n_id, sp->syn_id, sp->t, l->syn[ni][ sp->syn_id ] , SYN_ACT_TOL);
-
-                
-//                printf("setting synapse %zu act to e0\n", sp->syn_id);
-                l->syn[ni][ sp->syn_id ] += l->syn_spec[ni][ sp->syn_id ] * c->e0;
-                l->syn[ ni ][ sp->syn_id ] *= l->a[ ni ];
-                l->syn_fired[ni][ sp->syn_id ] = 1;
+                propagateSpikeSRMLayer(l, &ni, sp, c);
             }
             simulateSRMLayerNeuron(l, &ni, c);
             if(l->fired[ni] == 1) {
-                propagateSpike(s->ns, l->ids[ni], s->rt->t);
-                //printf("We have a spike in %zu at %f\n", l->ids[ni], s->rt->t);
+                propagateSpikeNetSim(s->ns, l->ids[ni], s->rt->t);
                 l->fired[ni] = 0;
             }
         }
     }
     s->rt->t += c->dt;
-//    if(s->rt->t > 1000) exit(1);
 }
 
 #define MATRIX_PER_LAYER 4

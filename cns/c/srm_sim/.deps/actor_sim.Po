@@ -1,12 +1,11 @@
-util_vector.o: util/util_vector.c util/util_vector.h core.h \
- /usr/lib/gcc/x86_64-linux-gnu/4.6.1/include/stddef.h \
- /usr/local/include/libactor/actor.h /usr/local/include/libactor/types.h \
- /usr/include/stdio.h /usr/include/features.h \
- /usr/include/x86_64-linux-gnu/bits/predefs.h \
+actor_sim.o: actor_sim.c /usr/local/include/libactor/actor.h \
+ /usr/local/include/libactor/types.h /usr/include/stdio.h \
+ /usr/include/features.h /usr/include/x86_64-linux-gnu/bits/predefs.h \
  /usr/include/x86_64-linux-gnu/sys/cdefs.h \
  /usr/include/x86_64-linux-gnu/bits/wordsize.h \
  /usr/include/x86_64-linux-gnu/gnu/stubs.h \
  /usr/include/x86_64-linux-gnu/gnu/stubs-64.h \
+ /usr/lib/gcc/x86_64-linux-gnu/4.6.1/include/stddef.h \
  /usr/include/x86_64-linux-gnu/bits/types.h \
  /usr/include/x86_64-linux-gnu/bits/typesizes.h /usr/include/libio.h \
  /usr/include/_G_config.h /usr/include/wchar.h \
@@ -32,14 +31,15 @@ util_vector.o: util/util_vector.c util/util_vector.h core.h \
  /usr/include/x86_64-linux-gnu/bits/string3.h /usr/include/pthread.h \
  /usr/include/sched.h /usr/include/x86_64-linux-gnu/bits/sched.h \
  /usr/include/x86_64-linux-gnu/bits/setjmp.h /usr/include/assert.h \
- /usr/local/include/libactor/list.h templates.h templates_clean.h \
- util/util_vector_tmpl.h util/util_vector_tmpl.c
-
-util/util_vector.h:
-
-core.h:
-
-/usr/lib/gcc/x86_64-linux-gnu/4.6.1/include/stddef.h:
+ /usr/local/include/libactor/list.h /usr/include/math.h \
+ /usr/include/x86_64-linux-gnu/bits/huge_val.h \
+ /usr/include/x86_64-linux-gnu/bits/huge_valf.h \
+ /usr/include/x86_64-linux-gnu/bits/huge_vall.h \
+ /usr/include/x86_64-linux-gnu/bits/inf.h \
+ /usr/include/x86_64-linux-gnu/bits/nan.h \
+ /usr/include/x86_64-linux-gnu/bits/mathdef.h \
+ /usr/include/x86_64-linux-gnu/bits/mathcalls.h \
+ /usr/include/x86_64-linux-gnu/bits/mathinline.h actor_sim.h
 
 /usr/local/include/libactor/actor.h:
 
@@ -58,6 +58,8 @@ core.h:
 /usr/include/x86_64-linux-gnu/gnu/stubs.h:
 
 /usr/include/x86_64-linux-gnu/gnu/stubs-64.h:
+
+/usr/lib/gcc/x86_64-linux-gnu/4.6.1/include/stddef.h:
 
 /usr/include/x86_64-linux-gnu/bits/types.h:
 
@@ -133,10 +135,22 @@ core.h:
 
 /usr/local/include/libactor/list.h:
 
-templates.h:
+/usr/include/math.h:
 
-templates_clean.h:
+/usr/include/x86_64-linux-gnu/bits/huge_val.h:
 
-util/util_vector_tmpl.h:
+/usr/include/x86_64-linux-gnu/bits/huge_valf.h:
 
-util/util_vector_tmpl.c:
+/usr/include/x86_64-linux-gnu/bits/huge_vall.h:
+
+/usr/include/x86_64-linux-gnu/bits/inf.h:
+
+/usr/include/x86_64-linux-gnu/bits/nan.h:
+
+/usr/include/x86_64-linux-gnu/bits/mathdef.h:
+
+/usr/include/x86_64-linux-gnu/bits/mathcalls.h:
+
+/usr/include/x86_64-linux-gnu/bits/mathinline.h:
+
+actor_sim.h:

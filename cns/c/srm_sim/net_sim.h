@@ -13,12 +13,6 @@ typedef struct {
 #define T Conn
 #include <util/util_vector_tmpl.h>
 
-typedef struct {
-    double t;
-    size_t n_id;
-    size_t syn_id;
-} SynSpike;
-
 #include <templates_clean.h>
 #define T SynSpike
 #include <util/util_vector_tmpl.h>
@@ -39,6 +33,6 @@ void deleteNetSim(NetSim *ns);
 void propagateInputSpikesNetSim(NetSim *ns, SpikesList *sl);
 void printInputSpikesQueue(NetSim *ns);
 void configureConnMapNetSim(NetSim *ns, pSRMLayerVector *l);
-void propagateSpike(NetSim *ns, size_t ni, double t);
+void propagateSpikeNetSim(NetSim *ns, size_t ni, double t);
 
 #endif

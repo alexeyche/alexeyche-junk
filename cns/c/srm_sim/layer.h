@@ -6,8 +6,6 @@
 #include <stdio.h>
 #include <time.h>
 
-
-
 #include <constants.h>
 #include <core.h>
 #include <util/util_vector.h>
@@ -59,6 +57,12 @@ typedef SRMLayer* pSRMLayer;
 #define DESTRUCT deleteSRMLayer
 #include <util/util_vector_tmpl.h>
 
+typedef struct {
+    double t;
+    size_t n_id;
+    size_t syn_id;
+} SynSpike;
+
 
 SRMLayer* createSRMLayer(size_t N, size_t *glob_idx, bool saveStat);
 void printSRMLayer(SRMLayer *l);
@@ -70,5 +74,6 @@ void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constant
 pMatrixVector* serializeSRMLayer(SRMLayer *l);
 void loadSRMLayer(SRMLayer *l, Constants *c, pMatrixVector *data);
 void toStartValues(SRMLayer *l, Constants *c);
+void propagateSpikeSRMLayer(SRMLayer *l, const size_t *ni, const SynSpike *sp, Constants *c);
 
 #endif

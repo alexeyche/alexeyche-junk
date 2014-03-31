@@ -224,6 +224,15 @@ void configureSRMLayer(SRMLayer *l, const indVector *inputIDs, Constants *c) {
     toStartValues(l, c); 
 }
 
+void propagateSpikeSRMLayer(SRMLayer *l, const size_t *ni, const SynSpike *sp, Constants *c) {
+    if(l->syn[*ni][ sp->syn_id ] < SYN_ACT_TOL) {
+        TEMPLATE(addValueLList,ind)(l->active_syn_ids[*ni], sp->syn_id);
+    } 
+    
+    l->syn[*ni][ sp->syn_id ] += l->syn_spec[*ni][ sp->syn_id ] * c->e0;
+    l->syn[*ni][ sp->syn_id ] *= l->a[*ni];
+    l->syn_fired[*ni][ sp->syn_id ] = 1;
+}
 
 void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constants *c) {
     assert( *id_to_sim < l->N);
@@ -247,13 +256,11 @@ void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constant
         double p = probf(&u, c) * c->dt;
         double coin = getUnif();
         if( p > coin ) {
-//            printf("%f > %f\n", p, coin);
             l->fired[ *id_to_sim ] = 1;
             l->pacc[ *id_to_sim ] += 1;
             l->a[ *id_to_sim ] = 0;
-//            printf("t: "); 
         }
-//        else printf("%f <= %f\n", p, coin);
+        
         if(c->learn) {
             l->B[ *id_to_sim ] = B_calc( &l->fired[ *id_to_sim ], &p, &l->pacc[ *id_to_sim ], c);
             //printf("active synapse1: \n");
@@ -276,10 +283,11 @@ void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constant
                 l->W[ *id_to_sim ][ *syn_id ] += dw;
 //                printf("nid: %zu, p: %f, u: %f, B: %.8f, pacc: %f, C: %f, lrate: %f, W: %f, dw: %.8f\n", *id_to_sim, p, u, l->B[ *id_to_sim ], l->pacc[ *id_to_sim ], l->C[ *id_to_sim ][ *syn_id ], lrate, l->W[ *id_to_sim ][ *syn_id ], dw);
                 if(l->saveStat) {
-                    TEMPLATE(insertVector,double)(l->stat_W[ *id_to_sim ][ con_i ], l->syn[ *id_to_sim ][ *syn_id ]); //l->W[ *id_to_sim ][ *syn_id ]);
+                    TEMPLATE(insertVector,double)(l->stat_W[ *id_to_sim ][ con_i ], l->W[ *id_to_sim ][ *syn_id ]);
                     TEMPLATE(insertVector,double)(l->stat_C[ *id_to_sim ][ con_i ], l->C[ *id_to_sim ][ *syn_id ]);
                 }
-                l->syn_fired[ *id_to_sim ][ *syn_id ] = 0; // not a good place for that but this is convinient
+                if(l->syn_fired[ *id_to_sim ][ *syn_id ] == 1)
+                    l->syn_fired[ *id_to_sim ][ *syn_id ] = 0; // not a good place for that but this is convinient
                 if( isnan(dw) ) { // || ((dC < 0) && (l->fired[ *id_to_sim ] == 1.0)) ) {
                     printf("\nFound bad value\n");
                     printf("nid: %zu, p: %f, u: %f, B: %f, pacc: %f, C: %f, lrate: %f, W: %f, dw: %f\n", *id_to_sim, p, u, l->B[ *id_to_sim ], l->pacc[ *id_to_sim ], l->C[ *id_to_sim ][ *syn_id ], lrate, l->W[ *id_to_sim ][ *syn_id ], dw);
