@@ -128,6 +128,7 @@ void simulate(Sim *s, const Constants *c) {
                 
 //                printf("setting synapse %zu act to e0\n", sp->syn_id);
                 l->syn[ni][ sp->syn_id ] += l->syn_spec[ni][ sp->syn_id ] * c->e0;
+                l->syn[ ni ][ sp->syn_id ] *= l->a[ ni ];
                 l->syn_fired[ni][ sp->syn_id ] = 1;
             }
             simulateSRMLayerNeuron(l, &ni, c);

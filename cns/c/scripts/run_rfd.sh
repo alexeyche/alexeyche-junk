@@ -27,8 +27,8 @@ DUR=0
 INP_NUM=1
 LAST_MODEL=
 COLLECT_STAT=yes
-#COLLECT_STAT=
-for EP in {1..3}; do
+COLLECT_STAT=
+for EP in {1..100}; do
     OUTPUT_SPIKES="$WORK_DIR/${EP}_output_spikes.bin"
     STAT_FILE="$WORK_DIR/${EP}_stat.bin"
     MODEL_FILE="$WORK_DIR/${EP}_model.bin"

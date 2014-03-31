@@ -232,10 +232,10 @@ void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constant
     //printf("active synapse0: ");
     //printf("act size: %zu\n", l->active_syn_ids[ *id_to_sim ]->size);
     indLNode *act_node;
-//    for(size_t con_i=0; con_i < l->nconn[ *id_to_sim ]; con_i++) {
-    while( (act_node = TEMPLATE(getNextLList,ind)(l->active_syn_ids[ *id_to_sim ]) ) != NULL ) {
-        const size_t *syn_id = &act_node->value;
-//        const size_t *syn_id = &con_i;
+    for(size_t con_i=0; con_i < l->nconn[ *id_to_sim ]; con_i++) {
+//    while( (act_node = TEMPLATE(getNextLList,ind)(l->active_syn_ids[ *id_to_sim ]) ) != NULL ) {
+//        const size_t *syn_id = &act_node->value;
+        const size_t *syn_id = &con_i;
         //printf("*syn_id = %zu, ", *syn_id);
         u += l->W[ *id_to_sim ][ *syn_id ] * l->syn[ *id_to_sim ][ *syn_id ];
         //printf("id: %zu  w: %f  act: %f |", *syn_id, l->W[ *id_to_sim ][ *syn_id ], l->syn[ *id_to_sim ][ *syn_id ]);
@@ -267,7 +267,7 @@ void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constant
 //                if(l->fired[ *id_to_sim ] == 1) {
 //                    printf("\n%zu:%f, \n", con_i, dC);
 //                }
-                l->C[ *id_to_sim ][ *syn_id ] += dC;
+                l->C[ *id_to_sim ][ *syn_id ] += -l->C[ *id_to_sim ][ con_i ]/c->tc + dC;
                 double lrate = rate_calc(&l->W[ *id_to_sim ][ *syn_id ]);
 /*TODO:*/       double dw = c->added_lrate*lrate*( l->C[ *id_to_sim ][ *syn_id ]*l->B[ *id_to_sim ] -  \
                                             c->weight_decay_factor * l->syn_fired[ *id_to_sim ][ *syn_id ] * l->W[ *id_to_sim ][ *syn_id ] );
@@ -297,7 +297,7 @@ void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constant
 //                    TEMPLATE(insertVector,double)(l->stat_C[ *id_to_sim ][ con_i ], l->C[ *id_to_sim ][ con_i ]);
                 }
                 //l->C[ *id_to_sim ][ con_i ] += -l->C[ *id_to_sim ][ con_i ]/c->tc ;
-                l->C[ *id_to_sim ][ con_i ] += -l->C[ *id_to_sim ][ con_i ]/c->tc;
+//                l->C[ *id_to_sim ][ con_i ] += -l->C[ *id_to_sim ][ con_i ]/c->tc;
             }
         }
         l->pacc[ *id_to_sim ] -= l->pacc[ *id_to_sim ]/c->mean_p_dur; 
@@ -313,14 +313,14 @@ void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constant
             l->fired[ *id_to_sim ] = 1;
         }
     }
-    while( (act_node = TEMPLATE(getNextLList,ind)(l->active_syn_ids[ *id_to_sim ]) ) != NULL ) {
-        const size_t *syn_id = &act_node->value;
-
+    for(size_t con_i=0; con_i < l->nconn[ *id_to_sim ]; con_i++) {
+//    while( (act_node = TEMPLATE(getNextLList,ind)(l->active_syn_ids[ *id_to_sim ]) ) != NULL ) {
+//        const size_t *syn_id = &act_node->value;
+        const size_t *syn_id = &con_i;
         l->syn[ *id_to_sim ][ *syn_id ] -= l->syn[ *id_to_sim ][ *syn_id ]/c->tm;
-        l->syn[ *id_to_sim ][ *syn_id ] *= l->a[ *id_to_sim ];
-        if( l->syn[ *id_to_sim ][ *syn_id ] < SYN_ACT_TOL ) {
-            TEMPLATE(dropNodeLList,ind)(l->active_syn_ids[ *id_to_sim ], act_node);
-        }
+//        if( l->syn[ *id_to_sim ][ *syn_id ] < SYN_ACT_TOL ) {
+//            TEMPLATE(dropNodeLList,ind)(l->active_syn_ids[ *id_to_sim ], act_node);
+//        }
     }
     l->a[ *id_to_sim ] += (1 - l->a[ *id_to_sim ])/c->ta;
 }

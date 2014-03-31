@@ -9,7 +9,7 @@ workdir="~/prog/sim/cprog/runs/rfd"
 
 
 input_file = "/home/alexeyche/prog/sim/rfd_files/ep_1_30.0sec"
-ep=3
+ep=50
 model_file = sprintf("%s/%d_model", workdir, ep)
 stat_file = sprintf("%s/%d_stat", workdir, ep)
 output_spikes = sprintf("%s/%d_output_spikes", workdir, ep)
@@ -26,19 +26,21 @@ if(file.exists(sprintf("%s.bin",stat_file))) {
     p = loadMatrix(stat_file, 1)
     u = loadMatrix(stat_file, 2)
     B = loadMatrix(stat_file, 3)
-    w1 = loadMatrix(stat_file, 3+1)
-    C1 = loadMatrix(stat_file, 3+10+1)
-    syn=80
-    par(mfrow=c(2,1))
-    spikes = net[[101]][net[[101]]<1000]
-    plot(spikes, rep(1,length(spikes)), xlim=c(0,1000) )
-    #plotl(C1[syn,1:1000])
-    plotl(w1[syn,1:1000])
+    syn=75
+    nid=1
+    w1 = loadMatrix(stat_file, 3+nid)
+    C1 = loadMatrix(stat_file, 3+10+nid)
+#     par(mfrow=c(3,1))
+#     spikes = net[[100+nid]][net[[100+nid]]<1000]
+#     plot(spikes, rep(1,length(spikes)), xlim=c(0,1000) )
+#     plotl(C1[syn,1:1000])
+#     plotl(w1[syn,1:1000])
+    #plotl(B[nid,1:1000])
 }
 
 W = loadMatrix(model_file,1)
 
-#gr_pl(t(W))
+gr_pl(t(W))
 
 N=10
 Wacc = vector("list",N)
@@ -56,4 +58,4 @@ for(ep in 3:200) {
     }
 }
 
-#gr_pl(t(Wacc[[1]]))
+gr_pl(t(Wacc[[1]]))

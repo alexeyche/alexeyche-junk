@@ -19,7 +19,7 @@ beta <- 20
 tr <- -50 # mV
 
 gain_factor = 12.5
-pr = 0.1
+pr = 1
 
 # srm
 u_rest <- -70 # mV
@@ -33,7 +33,7 @@ sim_dim = 1000
 
 # net cfg
 M = 100
-N = 100
+N = 10
 N2 = 0 #24
 net_edge_prob = 0.025
 net_edge_prob2 = 0.3
@@ -58,9 +58,9 @@ mean_p_dur = 60 * sim_dim
 
 target_rate = 5 # Hz
 target_rate_factor = 0.1
-weight_decay_factor = 0.02 #0.023 #0.026
+weight_decay_factor = 0.026 #0.023 #0.026
 
-added_lrate = 2
+added_lrate = 1
 epochs=100
 
 # postprocess
