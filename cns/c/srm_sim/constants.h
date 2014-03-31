@@ -49,6 +49,7 @@ typedef struct {
     double __target_rate; // not to fill
     double target_rate_factor;
     double weight_per_neuron;
+    double ws;
     double weight_decay_factor;
 
     double added_lrate;

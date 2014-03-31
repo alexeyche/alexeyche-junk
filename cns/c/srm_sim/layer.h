@@ -15,7 +15,8 @@
 #include <matrix.h>
 #include <io.h>
 
-#define SYN_ACT_TOL 0.00001 // value of synapse needed to delete 
+#define SYN_ACT_TOL 0.0001 // value of synapse needed to delete 
+#define LEARN_ACT_TOL 0.001 // value of synapse needed to delete 
 
 typedef enum {EXC, INH} nspec_t;
 
@@ -37,6 +38,7 @@ typedef struct {
     double **C;
     double *B;
     indLList **active_syn_ids;
+    indLList **learn_syn_ids;
     unsigned char *fired;
     unsigned char **syn_fired;
     double *pacc;
@@ -74,6 +76,6 @@ void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constant
 pMatrixVector* serializeSRMLayer(SRMLayer *l);
 void loadSRMLayer(SRMLayer *l, Constants *c, pMatrixVector *data);
 void toStartValues(SRMLayer *l, Constants *c);
-void propagateSpikeSRMLayer(SRMLayer *l, const size_t *ni, const SynSpike *sp, Constants *c);
+void propagateSpikeSRMLayer(SRMLayer *l, const size_t *ni, const SynSpike *sp, const Constants *c);
 
 #endif
