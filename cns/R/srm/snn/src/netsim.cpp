@@ -44,9 +44,10 @@ TSynSpikes NetSim::getSpikes(size_t ni, const double &t, const double &dt) {
     TSynSpikes ssp;        
     size_t c_id = ni-1;
     if (queue_of_input_spikes[c_id].size() > 0) {
-        //cout << "t  " << t << ": Found spikes at synapse " << queue_of_input_spikes[c_id][ input_spikes_iter(c_id) ].second << " of " << c_id << " at " << queue_of_input_spikes[c_id][ input_spikes_iter(c_id) ].first << "\n";
+//        cout << "t  " << t << ": Found spikes at synapse " << queue_of_input_spikes[c_id][ input_spikes_iter(c_id) ].syn_id << " of " << c_id << " at " << queue_of_input_spikes[c_id][ input_spikes_iter(c_id) ].t << "\n";
+//        cout << queue_of_input_spikes[c_id].size() << " " << input_spikes_iter(c_id) << " " << queue_of_input_spikes[c_id][ input_spikes_iter(c_id) ].t << "\n"; 
         while(    (queue_of_input_spikes[c_id].size()>input_spikes_iter(c_id) ) && 
-                ( (queue_of_input_spikes[c_id][ input_spikes_iter(c_id) ].t >= t) && (queue_of_input_spikes[c_id][ input_spikes_iter(c_id) ].t < t+dt) )
+                ( (queue_of_input_spikes[c_id][ input_spikes_iter(c_id) ].t >= t-0.01) && (queue_of_input_spikes[c_id][ input_spikes_iter(c_id) ].t < t+dt) )
              )
         {
             ssp.push_back(queue_of_input_spikes[c_id][ input_spikes_iter(c_id) ]);
@@ -54,7 +55,7 @@ TSynSpikes NetSim::getSpikes(size_t ni, const double &t, const double &dt) {
         }
     }
     if (queue_of_spikes[c_id].size() > 0) {
-        //cout << "t  " << t << ": Found spikes at synapse " << queue_of_spikes[c_id][ spikes_iter(c_id) ].second << " of " << c_id << " at " << queue_of_spikes[c_id][ spikes_iter(c_id) ].first << "\n";
+//        cout << "t  " << t << ": Found spikes at synapse " << queue_of_spikes[c_id][ spikes_iter(c_id) ].syn_id << " of " << c_id << " at " << queue_of_spikes[c_id][ spikes_iter(c_id) ].t << "\n";
         while(    (queue_of_spikes[c_id].size()>spikes_iter(c_id) ) && 
                 ( (queue_of_spikes[c_id][ spikes_iter(c_id) ].t >= t) && (queue_of_spikes[c_id][ spikes_iter(c_id) ].t < t+dt) )
              )

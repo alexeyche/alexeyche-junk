@@ -17,7 +17,7 @@ SRMLayerClass = setRefClass("SRMLayerClass", fields = c("obj", "prop", "nclass")
                              obj$axon_del <<- rexp(N, axon_delay_rate)*delay_dist_gain
                          } else {
                              obj$axon_del <<- rep(0, N)
-                         }
+                         }  
                          if( is.matrix(start_weight) ) {
                            start_w = start_weight
                          } else {
@@ -68,7 +68,7 @@ SRMLayerClass = setRefClass("SRMLayerClass", fields = c("obj", "prop", "nclass")
                            obj$id_conns[[ni]] <<- c(obj$id_conns[[ni]], ids_to_connect[conn_exists,ni])                           
                            obj$W[[ni]] <<- c(obj$W[[ni]], weight[conn_exists,ni])
                            obj$syn[[ni]] <<- rep(0, length(obj$W[[ni]]))
-                           inh = obj$id_conns[[i]] %in% inh_idxs
+                           inh = obj$id_conns[[ni]] %in% inh_idxs
                            obj$syn_spec[[ni]] <<- c(obj$syn_spec[[ni]], rep(1, length(conn_exists)))
                            if(any(inh)) {
                                obj$syn_spec[[ni]][inh] <<- rep(-1, length(obj$syn_spec[[ni]][inh]))

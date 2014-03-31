@@ -5,14 +5,14 @@ source('serialize_to_bin.R')
 library(snn)
 
 T0 = 0
-Tmax = 30000
+Tmax = 3000
 T = seq(T0, Tmax, by=dt) 
 
 Twhole = Tmax*100 # 50 min
 
 
-#dir2save = "~/prog/sim/rfd_files"
-dir2save = "~/my/sim/rfd_files"
+dir2save = "~/prog/sim/"
+#dir2save = "~/my/sim/rfd_files"
 N=0
 net = list()
 for(i in 1:(M+N)) net[[i]] = numeric(0)
@@ -25,7 +25,7 @@ gauss_rates = Vectorize(function(k,j) {
   ((vmax-v0)*exp(-0.01*( min( abs(j-k), 100-abs(j-k) ) )^2) + v0 )/sim_dim
 },"j")
 
-for(ep in 1:2) {
+for(ep in 1:1) {
   for(i in 1:(M+N)) net[[i]] = numeric(0)
   for(curt in T) {
     if(curt %% 200 == 0) {

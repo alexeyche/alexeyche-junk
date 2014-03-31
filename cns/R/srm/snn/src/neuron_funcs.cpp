@@ -5,7 +5,7 @@ using namespace Rcpp;
 #define LINEAR 1
 #define EXP 2
 
-#define PROB_FUNC EXP
+#define PROB_FUNC LINEAR
 
 double probf(const double &u, const List &c) {
 #if PROB_FUNC == LINEAR 
@@ -52,20 +52,21 @@ double B_calc(bool Yspike, double p, double pmean, const List &c) {
 }
 
 arma::vec ratecalc(const arma::vec &weights, const double &ws4) {
-    //arma::vec w4 = arma::pow(weights, 4);
-    arma::vec wr(weights.n_elem, arma::fill::zeros);
-    for(size_t wi=0; wi<weights.n_elem; wi++) {
-        if(weights(wi) > 0.5) {
-            wr(wi) = 0.04;
-        } else
-        if((weights(wi) < 0.5)&&(weights(wi) > 0.1)) {
-            wr(wi) = 0.01;
-        } else 
-        if((weights(wi) < 0.1)&&(weights(wi) > 0.01)) {
-            wr(wi) = 0.0001;
-        } 
-    }
-    return wr;
+    arma::vec w4 = arma::pow(weights, 4);
+    return 0.04*w4/(w4+0.0016);
+    //arma::vec wr(weights.n_elem, arma::fill::zeros);
+    //for(size_t wi=0; wi<weights.n_elem; wi++) {
+    //    if(weights(wi) > 0.5) {
+    //        wr(wi) = 0.04;
+    //    } else
+    //    if((weights(wi) < 0.5)&&(weights(wi) > 0.1)) {
+    //        wr(wi) = 0.01;
+    //    } else 
+    //    if((weights(wi) < 0.1)&&(weights(wi) > 0.01)) {
+    //        wr(wi) = 0.0001;
+    //    } 
+    //}
+    //return wr;
 }
 arma::vec new_ratecalc(const arma::vec &weights, const List &c) {
     return 0.04 * 1/( 1 + arma::exp(as<double>(c["ws"])-weights));
