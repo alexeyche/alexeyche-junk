@@ -1,8 +1,8 @@
-srm_sim.o: srm_sim.c core.h \
- /usr/lib/gcc/x86_64-linux-gnu/4.6.1/include/stddef.h \
+srm_sim.o: srm_sim.c /usr/include/stdc-predef.h \
+ /usr/include/x86_64-linux-gnu/bits/predefs.h core.h \
+ /usr/lib/gcc/x86_64-linux-gnu/4.8/include/stddef.h \
  /usr/local/include/libactor/actor.h /usr/local/include/libactor/types.h \
  /usr/include/stdio.h /usr/include/features.h \
- /usr/include/x86_64-linux-gnu/bits/predefs.h \
  /usr/include/x86_64-linux-gnu/sys/cdefs.h \
  /usr/include/x86_64-linux-gnu/bits/wordsize.h \
  /usr/include/x86_64-linux-gnu/gnu/stubs.h \
@@ -10,13 +10,14 @@ srm_sim.o: srm_sim.c core.h \
  /usr/include/x86_64-linux-gnu/bits/types.h \
  /usr/include/x86_64-linux-gnu/bits/typesizes.h /usr/include/libio.h \
  /usr/include/_G_config.h /usr/include/wchar.h \
- /usr/lib/gcc/x86_64-linux-gnu/4.6.1/include/stdarg.h \
+ /usr/lib/gcc/x86_64-linux-gnu/4.8/include/stdarg.h \
  /usr/include/x86_64-linux-gnu/bits/stdio_lim.h \
  /usr/include/x86_64-linux-gnu/bits/sys_errlist.h \
  /usr/include/x86_64-linux-gnu/bits/stdio.h \
  /usr/include/x86_64-linux-gnu/bits/stdio2.h /usr/include/stdlib.h \
  /usr/include/x86_64-linux-gnu/bits/waitflags.h \
  /usr/include/x86_64-linux-gnu/bits/waitstatus.h \
+ /usr/include/x86_64-linux-gnu/bits/stdlib-float.h \
  /usr/include/x86_64-linux-gnu/bits/stdlib.h /usr/include/string.h \
  /usr/include/xlocale.h /usr/include/x86_64-linux-gnu/bits/string.h \
  /usr/include/x86_64-linux-gnu/bits/string2.h /usr/include/endian.h \
@@ -29,7 +30,8 @@ srm_sim.o: srm_sim.c core.h \
  /usr/include/x86_64-linux-gnu/bits/setjmp.h /usr/include/assert.h \
  /usr/local/include/libactor/list.h arg_opt.h sim.h layer.h constants.h \
  core.h util/util_vector.h templates.h templates_clean.h \
- util/util_vector_tmpl.h util/ini.h neuron_funcs.h /usr/include/math.h \
+ util/util_vector_tmpl.h util/ini.h util/util_dlink_list.h \
+ util/util_dlink_list_tmpl.h neuron_funcs.h /usr/include/math.h \
  /usr/include/x86_64-linux-gnu/bits/huge_val.h \
  /usr/include/x86_64-linux-gnu/bits/huge_valf.h \
  /usr/include/x86_64-linux-gnu/bits/huge_vall.h \
@@ -38,11 +40,15 @@ srm_sim.o: srm_sim.c core.h \
  /usr/include/x86_64-linux-gnu/bits/mathdef.h \
  /usr/include/x86_64-linux-gnu/bits/mathcalls.h \
  /usr/include/x86_64-linux-gnu/bits/mathinline.h util/util.h matrix.h \
- util/util_vector_tmpl.h spikes_list.h net_sim.h io.h io.h
+ util/util_vector_tmpl.h io.h spikes_list.h net_sim.h io.h
+
+/usr/include/stdc-predef.h:
+
+/usr/include/x86_64-linux-gnu/bits/predefs.h:
 
 core.h:
 
-/usr/lib/gcc/x86_64-linux-gnu/4.6.1/include/stddef.h:
+/usr/lib/gcc/x86_64-linux-gnu/4.8/include/stddef.h:
 
 /usr/local/include/libactor/actor.h:
 
@@ -51,8 +57,6 @@ core.h:
 /usr/include/stdio.h:
 
 /usr/include/features.h:
-
-/usr/include/x86_64-linux-gnu/bits/predefs.h:
 
 /usr/include/x86_64-linux-gnu/sys/cdefs.h:
 
@@ -72,7 +76,7 @@ core.h:
 
 /usr/include/wchar.h:
 
-/usr/lib/gcc/x86_64-linux-gnu/4.6.1/include/stdarg.h:
+/usr/lib/gcc/x86_64-linux-gnu/4.8/include/stdarg.h:
 
 /usr/include/x86_64-linux-gnu/bits/stdio_lim.h:
 
@@ -87,6 +91,8 @@ core.h:
 /usr/include/x86_64-linux-gnu/bits/waitflags.h:
 
 /usr/include/x86_64-linux-gnu/bits/waitstatus.h:
+
+/usr/include/x86_64-linux-gnu/bits/stdlib-float.h:
 
 /usr/include/x86_64-linux-gnu/bits/stdlib.h:
 
@@ -142,6 +148,10 @@ util/util_vector_tmpl.h:
 
 util/ini.h:
 
+util/util_dlink_list.h:
+
+util/util_dlink_list_tmpl.h:
+
 neuron_funcs.h:
 
 /usr/include/math.h:
@@ -168,10 +178,10 @@ matrix.h:
 
 util/util_vector_tmpl.h:
 
+io.h:
+
 spikes_list.h:
 
 net_sim.h:
-
-io.h:
 
 io.h:

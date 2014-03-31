@@ -19,15 +19,19 @@ typedef struct {
     
     SimRuntime *rt;
     NetSim *ns;
+    size_t net_size;
 } Sim;
 
 Sim* createSim();
 void appendLayerSim(Sim *s, SRMLayer *l);
 void deleteSim(Sim *s);
-void configureSim(Sim *s, Constants *c, bool saveStat);
+void configureLayersSim(Sim *s, Constants *c, bool saveStat);
 SimRuntime* createRuntime();
 void deleteRuntime(SimRuntime *sr);
 void simulate(Sim *s, const Constants *c);
 const SynSpike* getInputSpike(NetSim *ns, SimRuntime *sr, const size_t *n_id, const Constants *c);
+void loadLayersFromFile(Sim *s, const char *model_fname, Constants *c, bool saveStat);
+void saveLayersToFile(Sim *s, const char *model_file);
+void configreNetSpikesSim(Sim *s, Constants *c);
 
 #endif

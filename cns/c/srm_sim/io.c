@@ -63,8 +63,14 @@ void saveMatrixList(const char *filename, pMatrixVector *mv) {
         printf("Need .bin format for matrix file\n");
         return;
     }
-    char *prefix = strndup(filename, fi);
-    char *idx_fname = strcat(prefix, ".idx");
+    const char *postfix = ".idx";
+    char *idx_fname = (char*)malloc(fi+strlen(postfix)+1);
+    strncpy(idx_fname, filename, fi);
+    for(size_t ci=0; ci<strlen(postfix); ci++) {
+        idx_fname[fi+ci] = postfix[ci];
+    }
+    idx_fname[fi+strlen(postfix)] = '\0';
+
     FILE *f_idx = fopen(idx_fname, "wb");    
 
     int null_pos = 0;
@@ -82,4 +88,5 @@ void saveMatrixList(const char *filename, pMatrixVector *mv) {
     }
     fclose(f);
     fclose(f_idx);
+    free(idx_fname);
 }

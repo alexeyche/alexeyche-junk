@@ -13,18 +13,34 @@ void *main_func(void *args) {
     struct actor_main *main_s = (struct actor_main*)args;
 	
 	ArgOptions a = parseOptions(main_s->argc, main_s->argv);
+//    printArgs(&a);
     bool saveStat = a.stat_file != NULL;
-    
     Constants *c = createConstants(a.const_filename);
-    printConstants(c);
-
-    Sim *s = createSim();
-    if(a.model_file) {
-    
-    } else {
-        configureSim(s, c, saveStat);    
+    srand(time(NULL));
+//    srand(c->seed);
+    if(a.learn == 0) {
+        c->learn = false;
+    } else
+    if(a.learn == 1) {
+        c->learn = true;
     }
-    printSRMLayer(s->layers->array[0]);
+    if(a.input_spikes_file) {
+        c->input_spikes_filename = strdup(a.input_spikes_file);
+    }
+//    printConstants(c);
+    Sim *s = createSim();
+    char *model_to_load = NULL;
+    if(a.model_file) model_to_load = strdup(a.model_file);
+    if(a.model_file_load) model_to_load = strdup(a.model_file_load); 
+    
+    if(model_to_load) {
+        loadLayersFromFile(s, model_to_load, c, saveStat);        
+    } else {
+        configureLayersSim(s, c, saveStat);    
+    }
+//    s->layers->array[0]->pacc[0] = 0.001;
+    configreNetSpikesSim(s, c);
+//    printSRMLayer(s->layers->array[0]);
 //    printSpikesList(s->ns->net);
 //    printConnMap(s->ns);
 //    printInputSpikesQueue(s->ns);
@@ -53,10 +69,21 @@ void *main_func(void *args) {
             
         TEMPLATE(deleteVector,pMatrix)(mv);
     }
-    if(a.model_file) {
-        pMatrixVector *model = serializeSRMLayer(s->layers->array[0]);
-        saveMatrixList(a.model_file, model);
-        TEMPLATE(deleteVector,pMatrix)(model);
+    char *model_to_save = NULL;
+    if(a.model_file) model_to_save = strdup(a.model_file);
+    if(a.model_file_save) model_to_save = strdup(a.model_file_save); 
+    
+    if(model_to_save) { 
+        saveLayersToFile(s, model_to_save);
+    }
+    if(a.output_spikes_file) {
+        Matrix *spikes = vectorArrayToMatrix(s->ns->net->list, s->ns->net->size);
+        pMatrixVector *mv = TEMPLATE(createVector,pMatrix)();
+        TEMPLATE(insertVector,pMatrix)(mv, spikes);
+
+        saveMatrixList(a.output_spikes_file, mv);
+
+        TEMPLATE(deleteVector,pMatrix)(mv);
     }
     deleteSim(s);
     deleteConstants(c);

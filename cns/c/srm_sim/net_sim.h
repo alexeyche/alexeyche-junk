@@ -39,6 +39,6 @@ void deleteNetSim(NetSim *ns);
 void propagateInputSpikesNetSim(NetSim *ns, SpikesList *sl);
 void printInputSpikesQueue(NetSim *ns);
 void configureConnMapNetSim(NetSim *ns, pSRMLayerVector *l);
-
+void propagateSpike(NetSim *ns, size_t ni, double t);
 
 #endif

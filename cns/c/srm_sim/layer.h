@@ -11,11 +11,13 @@
 #include <constants.h>
 #include <core.h>
 #include <util/util_vector.h>
+#include <util/util_dlink_list.h>
 #include <neuron_funcs.h>
 #include <util/util.h>
 #include <matrix.h>
+#include <io.h>
 
-#define SYN_ACT_TOL 0.001 // value of synapse needed to delete 
+#define SYN_ACT_TOL 0.00001 // value of synapse needed to delete 
 
 typedef enum {EXC, INH} nspec_t;
 
@@ -36,7 +38,7 @@ typedef struct {
     double *a;
     double **C;
     double *B;
-    indVector **active_syn_ids;
+    indLList **active_syn_ids;
     unsigned char *fired;
     unsigned char **syn_fired;
     double *pacc;
@@ -66,5 +68,7 @@ nspec_t getSpecNeuron(SRMLayer *l, const size_t *id);
 
 void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constants *c);
 pMatrixVector* serializeSRMLayer(SRMLayer *l);
+void loadSRMLayer(SRMLayer *l, Constants *c, pMatrixVector *data);
+void toStartValues(SRMLayer *l, Constants *c);
 
 #endif

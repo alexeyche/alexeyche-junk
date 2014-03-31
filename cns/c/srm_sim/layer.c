@@ -26,9 +26,9 @@ SRMLayer* createSRMLayer(size_t N, size_t *glob_idx, bool saveStat) {
     for(size_t ni=0; ni<l->N; ni++) {
         l->nconn[ni] = 0;
     }
-    l->active_syn_ids = (indVector**) malloc( l->N*sizeof(indVector*));
+    l->active_syn_ids = (indLList**) malloc( l->N*sizeof(indLList*));
     for(size_t ni=0; ni<l->N; ni++) {
-        l->active_syn_ids[ni] = TEMPLATE(createVector,ind)();
+        l->active_syn_ids[ni] = TEMPLATE(createLList,ind)();
     }
     
     l->a = (double*)malloc( l->N*sizeof(double));
@@ -56,7 +56,6 @@ SRMLayer* createSRMLayer(size_t N, size_t *glob_idx, bool saveStat) {
 void deleteSRMLayer(SRMLayer *l) {
     for(size_t ni=0; ni<l->N; ni++) {
         if(l->nconn[ni]>0) {
-            printf("ni == %zu\n", ni);
             free(l->W[ni]);
             free(l->syn[ni]);
             free(l->syn_spec[ni]);
@@ -64,11 +63,11 @@ void deleteSRMLayer(SRMLayer *l) {
             free(l->C[ni]);
             free(l->syn_fired[ni]);
         }
+        TEMPLATE(deleteLList,ind)(l->active_syn_ids[ni]);
         if(l->saveStat) {
             TEMPLATE(deleteVector,double)(l->stat_u[ni]);
             TEMPLATE(deleteVector,double)(l->stat_p[ni]);
             TEMPLATE(deleteVector,double)(l->stat_B[ni]);
-            TEMPLATE(deleteVector,ind)(l->active_syn_ids[ni]);
             for(size_t con_i=0; con_i < l->nconn[ni]; con_i++) {
                 TEMPLATE(deleteVector,double)(l->stat_W[ni][con_i]);
                 TEMPLATE(deleteVector,double)(l->stat_C[ni][con_i]);
@@ -137,8 +136,64 @@ nspec_t getSpecNeuron(SRMLayer *l, const size_t *id) {
     printf("Error: Can't find neuron with id %zu\n", *id);
 }
 
+void allocSynData(SRMLayer *l, size_t ni) {
+    l->id_conns[ni] = (size_t*) malloc(l->nconn[ni]*sizeof(size_t));
+    l->W[ni] = (double*) malloc(l->nconn[ni]*sizeof(double));
+    l->syn[ni] = (double*) malloc(l->nconn[ni]*sizeof(double));
+    l->syn_spec[ni] = (double*) malloc(l->nconn[ni]*sizeof(double));
+    l->C[ni] = (double*) malloc(l->nconn[ni]*sizeof(double));
+    l->syn_fired[ni] = (unsigned char*) malloc(l->nconn[ni]*sizeof(unsigned char));
+    if(l->saveStat) {
+        l->stat_W[ni] = (doubleVector**) malloc( l->nconn[ni]*sizeof(doubleVector*));
+        l->stat_C[ni] = (doubleVector**) malloc( l->nconn[ni]*sizeof(doubleVector*));
+        for(size_t syn_i=0; syn_i < l->nconn[ni]; syn_i++) {
+            l->stat_W[ni][syn_i] = TEMPLATE(createVector,double)();
+            l->stat_C[ni][syn_i] = TEMPLATE(createVector,double)();
+        }
+    }
+}
+
+void deallocSynData(SRMLayer *l, size_t ni) {
+    free(l->id_conns[ni]);
+    free(l->W[ni]);
+    free(l->syn[ni]);
+    free(l->syn_spec[ni]);
+    free(l->C[ni]);
+    free(l->syn_fired[ni]);
+    if(l->saveStat) {
+        for(size_t syn_i=0; syn_i < l->nconn[ni]; syn_i++) {
+            TEMPLATE(deleteVector,double)(l->stat_W[ni][syn_i]);
+            TEMPLATE(deleteVector,double)(l->stat_C[ni][syn_i]);
+        }
+        free(l->stat_W[ni]);
+        free(l->stat_C[ni]);
+    }
+}
+
+void toStartValues(SRMLayer *l, Constants *c) {
+    for(size_t ni=0; ni<l->N; ni++) {
+        double start_weight = c->weight_per_neuron/l->nconn[ni];
+        l->a[ni] = 1;
+        l->B[ni] = 0;
+        l->fired[ni] = 0;
+        l->pacc[ni] = 0;
+        for(size_t syn_i=0; syn_i<l->nconn[ni]; syn_i++) {
+            l->W[ni][syn_i] = start_weight;
+            l->syn[ni][syn_i] = 0;
+            l->C[ni][syn_i] = 0;
+            l->syn_fired[ni][syn_i] = 0;
+            if(getSpecNeuron(l, &l->ids[ni]) == EXC) {
+                l->syn_spec[ni][syn_i] = c->e_exc;
+            } else 
+            if(getSpecNeuron(l, &l->ids[ni]) == INH) {
+                l->syn_spec[ni][syn_i] = -c->e_inh;
+            }
+        }
+    }        
+}
+
+
 void configureSRMLayer(SRMLayer *l, const indVector *inputIDs, Constants *c) {
-    srand(c->seed);
     for(size_t ni=0; ni<l->N; ni++) {
         indVector *conns = TEMPLATE(createVector,ind)(0);
         l->nt[ni] = EXC;
@@ -161,103 +216,89 @@ void configureSRMLayer(SRMLayer *l, const indVector *inputIDs, Constants *c) {
         }
         l->nconn[ni] = conns->size; 
         if(l->nconn[ni]>0) {
-            l->id_conns[ni] = (size_t*) malloc(l->nconn[ni]*sizeof(size_t));
+            allocSynData(l, ni);
             memcpy(l->id_conns[ni], conns->array, l->nconn[ni]*sizeof(size_t));
-            l->W[ni] = (double*) malloc(l->nconn[ni]*sizeof(double));
-            l->syn[ni] = (double*) malloc(l->nconn[ni]*sizeof(double));
-            l->syn_spec[ni] = (double*) malloc(l->nconn[ni]*sizeof(double));
-            l->C[ni] = (double*) malloc(l->nconn[ni]*sizeof(double));
-            l->syn_fired[ni] = (unsigned char*) malloc(l->nconn[ni]*sizeof(unsigned char));
         }
         TEMPLATE(deleteVector,ind)(conns);
     }
-    for(size_t ni=0; ni<l->N; ni++) {
-        double start_weight = c->weight_per_neuron/l->nconn[ni];
-        l->a[ni] = 1;
-        l->B[ni] = 0;
-        l->fired[ni] = 0;
-        l->pacc[ni] = 0;
-        if(l->saveStat) {
-            l->stat_W[ni] = (doubleVector**) malloc( l->nconn[ni]*sizeof(doubleVector*));
-            l->stat_C[ni] = (doubleVector**) malloc( l->nconn[ni]*sizeof(doubleVector*));
-        }
-        for(size_t syn_i=0; syn_i<l->nconn[ni]; syn_i++) {
-            l->W[ni][syn_i] = start_weight;
-            l->syn[ni][syn_i] = 0;
-            l->C[ni][syn_i] = 0;
-            l->syn_fired[ni][syn_i] = 0;
-            if(getSpecNeuron(l, &l->ids[ni]) == EXC) {
-                l->syn_spec[ni][syn_i] = c->e_exc;
-            } else 
-            if(getSpecNeuron(l, &l->ids[ni]) == INH) {
-                l->syn_spec[ni][syn_i] = -c->e_inh;
-            }
-            if(l->saveStat) {
-                l->stat_W[ni][syn_i] = TEMPLATE(createVector,double)();
-                l->stat_C[ni][syn_i] = TEMPLATE(createVector,double)();
-            }
-        }
-    }
+    toStartValues(l, c); 
 }
 
 
 void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constants *c) {
     assert( *id_to_sim < l->N);
     double u = c->u_rest;
-//    printf("active synapse0: ");
-    for(size_t act_i=0; act_i < l->active_syn_ids[ *id_to_sim ]->size; act_i++) {
-//        printf("act size: %zu\n", l->active_syn_ids[ni]->size);
-        const size_t *syn_id = &l->active_syn_ids[ *id_to_sim ]->array[act_i];
-        l->syn[ *id_to_sim ][ *syn_id ] -= l->syn[ *id_to_sim ][ *syn_id ]/c->tm;
-        l->syn[ *id_to_sim ][ *syn_id ] *= l->a[ *id_to_sim ];
-        
+    //printf("id_to_sim: %d\n", *id_to_sim);
+    //printf("active synapse0: ");
+    //printf("act size: %zu\n", l->active_syn_ids[ *id_to_sim ]->size);
+    indLNode *act_node;
+//    for(size_t con_i=0; con_i < l->nconn[ *id_to_sim ]; con_i++) {
+    while( (act_node = TEMPLATE(getNextLList,ind)(l->active_syn_ids[ *id_to_sim ]) ) != NULL ) {
+        const size_t *syn_id = &act_node->value;
+//        const size_t *syn_id = &con_i;
+        //printf("*syn_id = %zu, ", *syn_id);
         u += l->W[ *id_to_sim ][ *syn_id ] * l->syn[ *id_to_sim ][ *syn_id ];
-//        printf("id: %zu  w: %f  act: %f |", *syn_id, l->W[ *id_to_sim ][ *syn_id ], l->syn[ *id_to_sim ][ *syn_id ]);
-        if( l->syn[ *id_to_sim ][ *syn_id ] < SYN_ACT_TOL ) {
-            TEMPLATE(removeVector,ind)(l->active_syn_ids[ *id_to_sim ], act_i);
-        }
+        //printf("id: %zu  w: %f  act: %f |", *syn_id, l->W[ *id_to_sim ][ *syn_id ], l->syn[ *id_to_sim ][ *syn_id ]);
+        
     }
-//    printf("\n");
-//    printf("u: %f\n", u);
-    l->a[ *id_to_sim ] += (1 - l->a[ *id_to_sim ])/c->ta;
+    //printf("\n");
+    //printf("u: %f\n", u);
     if(!c->determ) {
         double p = probf(&u, c) * c->dt;
         double coin = getUnif();
         if( p > coin ) {
-            printf("%f > %f\n", p, coin);
+//            printf("%f > %f\n", p, coin);
             l->fired[ *id_to_sim ] = 1;
             l->pacc[ *id_to_sim ] += 1;
             l->a[ *id_to_sim ] = 0;
+//            printf("t: "); 
         }
 //        else printf("%f <= %f\n", p, coin);
-        
         if(c->learn) {
             l->B[ *id_to_sim ] = B_calc( &l->fired[ *id_to_sim ], &p, &l->pacc[ *id_to_sim ], c);
-//            printf("active synapse1: ");
-            for(size_t act_i=0; act_i < l->active_syn_ids[ *id_to_sim ]->size; act_i++) {
-                const size_t *syn_id = &l->active_syn_ids[ *id_to_sim ]->array[act_i];
+            //printf("active synapse1: \n");
+            //printf("act size: %zu\n", l->active_syn_ids[ *id_to_sim ]->size);
+            for(size_t con_i=0; con_i < l->nconn[ *id_to_sim ]; con_i++) {
+//            while( (act_node = TEMPLATE(getNextLList,ind)(l->active_syn_ids[ *id_to_sim ]) ) != NULL ) {
+//                const size_t *syn_id = &act_node->value;
+                const size_t *syn_id = &con_i;
                 assert( *syn_id < l->nconn[ *id_to_sim ]);
-                l->C[ *id_to_sim ][ *syn_id ] += C_calc( &l->fired[ *id_to_sim ], &p, &u, &l->syn[ *id_to_sim ][ *syn_id ], c);
-/*TODO:*/       double dw = c->added_lrate*rate_calc(&l->W[ *id_to_sim ][ *syn_id ])*( l->C[ *id_to_sim ][ *syn_id ]*l->B[ *id_to_sim ] -  \
+                double dC = C_calc( &l->fired[ *id_to_sim ], &p, &u, &l->syn[ *id_to_sim ][ *syn_id ], c);
+//                if(l->fired[ *id_to_sim ] == 1) {
+//                    printf("\n%zu:%f, \n", con_i, dC);
+//                }
+                l->C[ *id_to_sim ][ *syn_id ] += dC;
+                double lrate = rate_calc(&l->W[ *id_to_sim ][ *syn_id ]);
+/*TODO:*/       double dw = c->added_lrate*lrate*( l->C[ *id_to_sim ][ *syn_id ]*l->B[ *id_to_sim ] -  \
                                             c->weight_decay_factor * l->syn_fired[ *id_to_sim ][ *syn_id ] * l->W[ *id_to_sim ][ *syn_id ] );
                 
 //                printf("id: %zu  w: %f  act: %f dw: %f C: %f|", *syn_id, l->W[ *id_to_sim ][ *syn_id ], l->syn[ *id_to_sim ][ *syn_id ], dw, l->C[ *id_to_sim ][ *syn_id ]);
-                if( isnan(dw) ) {
-                    printf("\nFound nan value\n");
-                    printf("nid: %zu, p: %f, u: %f, B: %f, pacc: %f\n", *id_to_sim, p, u, l->B[ *id_to_sim ], l->pacc[ *id_to_sim ]);
+                l->W[ *id_to_sim ][ *syn_id ] += dw;
+//                printf("nid: %zu, p: %f, u: %f, B: %.8f, pacc: %f, C: %f, lrate: %f, W: %f, dw: %.8f\n", *id_to_sim, p, u, l->B[ *id_to_sim ], l->pacc[ *id_to_sim ], l->C[ *id_to_sim ][ *syn_id ], lrate, l->W[ *id_to_sim ][ *syn_id ], dw);
+                if(l->saveStat) {
+                    TEMPLATE(insertVector,double)(l->stat_W[ *id_to_sim ][ con_i ], l->syn[ *id_to_sim ][ *syn_id ]); //l->W[ *id_to_sim ][ *syn_id ]);
+                    TEMPLATE(insertVector,double)(l->stat_C[ *id_to_sim ][ con_i ], l->C[ *id_to_sim ][ *syn_id ]);
+                }
+                l->syn_fired[ *id_to_sim ][ *syn_id ] = 0; // not a good place for that but this is convinient
+                if( isnan(dw) ) { // || ((dC < 0) && (l->fired[ *id_to_sim ] == 1.0)) ) {
+                    printf("\nFound bad value\n");
+                    printf("nid: %zu, p: %f, u: %f, B: %f, pacc: %f, C: %f, lrate: %f, W: %f, dw: %f\n", *id_to_sim, p, u, l->B[ *id_to_sim ], l->pacc[ *id_to_sim ], l->C[ *id_to_sim ][ *syn_id ], lrate, l->W[ *id_to_sim ][ *syn_id ], dw);
+                    printf("C params: Yspike: %d, synapse: %f, dC: %f, p': %f\n", l->fired[ *id_to_sim],l->syn[ *id_to_sim ][ *syn_id ], dC, pstroke(&u,c));
                     exit(1);
                 }
-                l->W[ *id_to_sim ][ *syn_id ] += dw;
-                l->syn_fired[ *id_to_sim ][ *syn_id ] = 0; // not a good place for that but this is convinient
+ 
            }
 //           printf("\n");
         }
-        for(size_t con_i=0; con_i < l->nconn[ *id_to_sim ]; con_i++) {
-            if(l->saveStat) {
-                TEMPLATE(insertVector,double)(l->stat_W[ *id_to_sim ][ con_i ], l->W[ *id_to_sim ][ con_i ]);
-                TEMPLATE(insertVector,double)(l->stat_C[ *id_to_sim ][ con_i ], l->C[ *id_to_sim ][ con_i ]);
+        if((c->learn)||(l->saveStat)) {
+            for(size_t con_i=0; con_i < l->nconn[ *id_to_sim ]; con_i++) {
+                if(l->saveStat) {
+//                    TEMPLATE(insertVector,double)(l->stat_W[ *id_to_sim ][ con_i ], l->W[ *id_to_sim ][ con_i ]);
+//                    TEMPLATE(insertVector,double)(l->stat_C[ *id_to_sim ][ con_i ], l->C[ *id_to_sim ][ con_i ]);
+                }
+                //l->C[ *id_to_sim ][ con_i ] += -l->C[ *id_to_sim ][ con_i ]/c->tc ;
+                l->C[ *id_to_sim ][ con_i ] += -l->C[ *id_to_sim ][ con_i ]/c->tc;
             }
-            l->C[ *id_to_sim ][ con_i ] += -l->C[ *id_to_sim ][ con_i ]/c->tc;
         }
         l->pacc[ *id_to_sim ] -= l->pacc[ *id_to_sim ]/c->mean_p_dur; 
 
@@ -272,9 +313,19 @@ void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constant
             l->fired[ *id_to_sim ] = 1;
         }
     }
+    while( (act_node = TEMPLATE(getNextLList,ind)(l->active_syn_ids[ *id_to_sim ]) ) != NULL ) {
+        const size_t *syn_id = &act_node->value;
+
+        l->syn[ *id_to_sim ][ *syn_id ] -= l->syn[ *id_to_sim ][ *syn_id ]/c->tm;
+        l->syn[ *id_to_sim ][ *syn_id ] *= l->a[ *id_to_sim ];
+        if( l->syn[ *id_to_sim ][ *syn_id ] < SYN_ACT_TOL ) {
+            TEMPLATE(dropNodeLList,ind)(l->active_syn_ids[ *id_to_sim ], act_node);
+        }
+    }
+    l->a[ *id_to_sim ] += (1 - l->a[ *id_to_sim ])/c->ta;
 }
 
-void serializeSRMLayer(SRMLayer *l, const char *filename) {
+pMatrixVector* serializeSRMLayer(SRMLayer *l) {
     pMatrixVector *data = TEMPLATE(createVector,pMatrix)();
     size_t max_conn_id = 0;
     for(size_t ni=0; ni< l->N; ni++) {
@@ -288,6 +339,7 @@ void serializeSRMLayer(SRMLayer *l, const char *filename) {
     Matrix *W = createMatrix(l->N, max_conn_id+1);
     Matrix *nt = createMatrix(l->N, 1);
     Matrix *pacc = createMatrix(l->N, 1);
+    Matrix *ids = createMatrix(l->N, 1);
     
     for(size_t i=0; i<W->nrow; i++) {
         for(size_t j=0; j<W->ncol; j++) {
@@ -297,23 +349,65 @@ void serializeSRMLayer(SRMLayer *l, const char *filename) {
     for(size_t ni=0; ni< l->N; ni++) {
         for(size_t con_i=0; con_i < l->nconn[ni]; con_i++) {
             setMatrixElement(W, ni, l->id_conns[ni][con_i], l->W[ni][con_i]);
-            setMatrixElement(syn_spec, ni, l->id_conns[ni][con_i], l->syn_spec[ni][con_i]);
         }
-        setMatrixElement(nt, ni, 1, l->nt[ni]);
-        setMatrixElement(pacc, ni, 1, l->pacc[ni]);
+        setMatrixElement(nt, ni, 0, l->nt[ni]);
+        setMatrixElement(pacc, ni, 0, l->pacc[ni]);
+        setMatrixElement(ids, ni, 0, l->ids[ni]);
     }
     
     TEMPLATE(insertVector,pMatrix)(data, W);
     TEMPLATE(insertVector,pMatrix)(data, nt);
     TEMPLATE(insertVector,pMatrix)(data, pacc);
-
-    saveMatrixList(filename, data);
+    TEMPLATE(insertVector,pMatrix)(data, ids);
     
-    TEMPLATE(deleteVector,pMatrix)(data);
+    return(data);
 }
 
-void loadSRMLayerFromFile(SRMLayer *l, const char *model_file) {
-    pMatrixVector* data = readMatrixList(model_file);
-    Matrix *W = data->a
+void loadSRMLayer(SRMLayer *l, Constants *c, pMatrixVector *data) {
+    Matrix *W = data->array[0];
+    Matrix *nt = data->array[1];
+    Matrix *pacc = data->array[2];
+    Matrix *ids = data->array[3];
+    assert(l->N == W->nrow);
+
+    doubleVector **W_vals = (doubleVector**) malloc( W->nrow * sizeof(doubleVector*));
+    indVector **id_conns_vals = (indVector**) malloc( W->nrow * sizeof(indVector*));
+    for(size_t i=0; i<W->nrow; i++) {  // shape form and get the values
+        W_vals[i] = TEMPLATE(createVector,double)();
+        id_conns_vals[i] = TEMPLATE(createVector,ind)();
+        for(size_t j=0; j<W->ncol; j++) {
+            double w_ij = getMatrixElement(W, i, j);
+            if(w_ij>0) {
+                TEMPLATE(insertVector,double)(W_vals[i], w_ij);
+                TEMPLATE(insertVector,ind)(id_conns_vals[i], j);
+            }
+        }
+        if(l->nconn[i] > 0) {
+            deallocSynData(l, i);
+        }
+        l->nconn[i] = W_vals[i]->size;
+        allocSynData(l, i);
+        if(getMatrixElement(nt, i, 0) == 0) {
+            l->nt[i] = EXC;
+        } else 
+        if(getMatrixElement(nt, i, 0) == 1.0) {
+            l->nt[i] = INH;
+        } else {
+            printf("Error in neuron type\n");
+            exit(1);
+        }
+        l->ids[i] = getMatrixElement(ids, i, 0);    
+    }
+    toStartValues(l, c);
+    for(size_t ni=0; ni<l->N; ni++) {  // apply values
+        memcpy(l->W[ni], W_vals[ni]->array, sizeof(double)*W_vals[ni]->size);
+        memcpy(l->id_conns[ni], id_conns_vals[ni]->array, sizeof(size_t)*id_conns_vals[ni]->size);
+        l->pacc[ni] = getMatrixElement(pacc, ni, 0);
+        
+        TEMPLATE(deleteVector,double)(W_vals[ni]);
+        TEMPLATE(deleteVector,ind)(id_conns_vals[ni]);
+    }
+    free(W_vals);
+    free(id_conns_vals);
 }
 

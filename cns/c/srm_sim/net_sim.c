@@ -120,6 +120,8 @@ void printInputSpikesQueue(NetSim *ns) {
     }
 }
 
-
+void propagateSpike(NetSim *ns, size_t ni, double t) {
+    TEMPLATE(insertVector,double)(ns->net->list[ni], t);
+}
 
 

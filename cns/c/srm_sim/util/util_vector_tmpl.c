@@ -28,9 +28,10 @@ void TEMPLATE(deleteVector,T)(TVEC(T) *a) {
   a->alloc_size = a->size = 0;
 }
 
-void TEMPLATE(removeVector,T)(TVEC(T) *a, size_t index) {
-    if(index<0 && index >= a->size) return;
-    memmove(&a->array[index], &a->array[index+1], a->size);
-    a->size--;
+void TEMPLATE(deleteVectorNoDestroy,T)(TVEC(T) *a) {
+  free(a->array);
+  a->array = NULL;
+  a->alloc_size = a->size = 0;
 }
+
 

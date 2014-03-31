@@ -11,6 +11,6 @@ typedef struct {
 TVEC(T)* TEMPLATE(createVector,T)(); //size_t initialSize);
 void TEMPLATE(insertVector,T)(TVEC(T) *a, T element);
 void TEMPLATE(deleteVector,T)(TVEC(T) *a);
-void TEMPLATE(removeVector,T)(TVEC(T) *a, size_t index);
+void TEMPLATE(deleteVectorNoDestroy,T)(TVEC(T) *a);
 
 #endif

@@ -1,6 +1,7 @@
 
 #include <matrix.h>
 #include <util/util_vector.h>
+#include <util/util_dlink_list.h>
 
 void test_matrix() {
     Matrix *m = createMatrix(50, 25);
@@ -49,12 +50,12 @@ void test_vector(void) {
         TEMPLATE(insertVector,double)(dv, (double)eli);
     }
     printf("old size: %zu\n", dv->size);
-    TEMPLATE(removeVector,double)(dv, 10);
-    TEMPLATE(removeVector,double)(dv, 12);
-    TEMPLATE(removeVector,double)(dv, dv->size-1);
+//    TEMPLATE(removeVector,double)(dv, 10);
+//    TEMPLATE(removeVector,double)(dv, 12);
+//    TEMPLATE(removeVector,double)(dv, dv->size-1);
     for(size_t eli=0; eli < dv->size; eli++) {
         if((eli == 2)||(eli == 3)) {
-            TEMPLATE(removeVector,double)(dv, eli);
+//            TEMPLATE(removeVector,double)(dv, eli);
         }
         printf("%f, ", dv->array[eli]);
     }
@@ -67,9 +68,37 @@ void test_vector(void) {
     TEMPLATE(deleteVector,double)(dv);
 }
 
-void main(void) {
-    test_matrix();
-//    test_sparse_matrix();
-    test_vector();
+void test_dllist() {
+    doubleLList *l = TEMPLATE(createLList,double)();
+    for(size_t i=0; i<100; i++) {
+        TEMPLATE(addValueLList,double)(l, i);
+    }
+    printf("size: %zu\n", l->size);
+    doubleLNode *n;
+    size_t i=0;
+    while( (n = TEMPLATE(getNextLList,double)(l)) != NULL) {
+        if((i==0) || (i == 10) || (i == 20) || (i==97)) {
+            TEMPLATE(dropNodeLList,double)(l, n);
+        } else {
+            printf("n->value: %f, ", n->value);
+        }
+        i++;
+    }
+    TEMPLATE(addValueLList,double)(l, 100);
+    i=0;
+    while( (n = TEMPLATE(getNextLList,double)(l)) != NULL) {
+        TEMPLATE(dropNodeLList,double)(l, n);
+    }
+    printf("\n");
+    printf("final size: %zu\n", l->size);
+    TEMPLATE(deleteLList,double)(l);
 }
+
+void main(void) {
+//    test_matrix();
+//    test_sparse_matrix();
+//   test_vector();
+    test_dllist();
+}
+
 
