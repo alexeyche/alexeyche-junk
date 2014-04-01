@@ -39,7 +39,9 @@ actor_sim.o: actor_sim.c /usr/local/include/libactor/actor.h \
  /usr/include/x86_64-linux-gnu/bits/nan.h \
  /usr/include/x86_64-linux-gnu/bits/mathdef.h \
  /usr/include/x86_64-linux-gnu/bits/mathcalls.h \
- /usr/include/x86_64-linux-gnu/bits/mathinline.h actor_sim.h
+ /usr/include/x86_64-linux-gnu/bits/mathinline.h util/util.h \
+ util/util_vector.h core.h templates.h templates_clean.h \
+ util/util_vector_tmpl.h actor_sim.h
 
 /usr/local/include/libactor/actor.h:
 
@@ -152,5 +154,17 @@ actor_sim.o: actor_sim.c /usr/local/include/libactor/actor.h \
 /usr/include/x86_64-linux-gnu/bits/mathcalls.h:
 
 /usr/include/x86_64-linux-gnu/bits/mathinline.h:
+
+util/util.h:
+
+util/util_vector.h:
+
+core.h:
+
+templates.h:
+
+templates_clean.h:
+
+util/util_vector_tmpl.h:
 
 actor_sim.h:

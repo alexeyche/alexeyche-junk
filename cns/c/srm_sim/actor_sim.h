@@ -1,8 +1,6 @@
 #ifndef ACTOR_SIM_H
 #define ACTOR_SIM_H
 
-typedef enum { false, true } bool;
-
 typedef struct {
     double t;
 } Tick;
@@ -24,7 +22,8 @@ typedef struct {
 enum {
 	CALC_DONE_MSG = 100,
     TICK_MSG = 101,
-    EXIT_MSG = 102
+    EXIT_MSG = 102,
+    SPIKE_MSG = 103
 };
 
 

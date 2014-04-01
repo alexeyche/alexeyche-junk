@@ -1,11 +1,13 @@
 
 #include <libactor/actor.h>
 #include <math.h>
+#include <util/util.h>
+#include <util/util_vector.h>
 
 #include "actor_sim.h"
 
-#define NUM_ACTORS 1
-#define TMAX 5000
+#define NUM_ACTORS 4
+#define TMAX 1000
 
 double calc_func(double i) {
     double p = fmod(i, 10);
@@ -17,6 +19,10 @@ double calc_func(double i) {
     return(a);
 }
 
+#define RATE 0.1
+#define QUANT 2
+#define DT 1
+
 void* run_sim(void *args) {
     ActorSim *act = (ActorSim*)args;
 	actor_msg_t *msg;
@@ -26,10 +32,13 @@ void* run_sim(void *args) {
 		msg = actor_receive();
         if(msg->type == TICK_MSG) {
     		tk = (Tick*)msg->data;
-            double val=calc_func(tk->t);
-//            if(fmod(tk->t,100) == 0) {
-//                printf("ticking %f %d\n", val, act->id);
-//            }
+            for(size_t t=0; t<QUANT; t+=DT) {
+                if( RATE * DT > getUnif() ) {
+                    double t_spike = tk->t+t;
+//                    printf("We have a spike at %f in %d\n", tk->t+t,act->id);
+                    actor_send_msg(msg->sender, SPIKE_MSG, (void*)&t_spike, sizeof(double));
+                }
+            }
             actor_send_msg(msg->sender, CALC_DONE_MSG, NULL, 0);
         } else
         if(msg->type == EXIT_MSG) {
@@ -52,7 +61,7 @@ void* disp_run(void *args) {
 
 
     double t = 0;
-
+    doubleVector *v = TEMPLATE(createVector,double)();
     while(t<TMAX) {
         Tick tk;
         tk.t = t;
@@ -65,15 +74,23 @@ void* disp_run(void *args) {
             msg = actor_receive();
             if(msg->type == CALC_DONE_MSG) {
                 nanswers+=1;
+            } else 
+            if(msg->type == SPIKE_MSG) {
+                TEMPLATE(insertVector,double)(v, *(double*)msg->data);
             }
             arelease(msg);
         }
-        t+=1;
+        t+=QUANT;
     }
     for(size_t ai=0; ai<n; ai++) {
         actor_send_msg(actors[ai].act_id, EXIT_MSG, NULL, 0);
     }
-
+    printf("We had spikes:\n");
+    for(size_t sp_i=0; sp_i<v->size; sp_i++) {
+        printf("%f, ", v->array[sp_i]);
+    }
+    printf("\n");
+    TEMPLATE(deleteVector,double)(v);
     free(actors);
     return 0;
 }
