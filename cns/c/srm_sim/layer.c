@@ -280,7 +280,7 @@ void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constant
                 if(l->syn_fired[ *id_to_sim ][ *syn_id ] == 1)
                     l->syn_fired[ *id_to_sim ][ *syn_id ] = 0; // not a good place for that but this is convinient
 
-                if( (l->C[ *id_to_sim ][ *syn_id ] < LEARN_ACT_TOL ) && (l->C[ *id_to_sim ][ *syn_id ] > -LEARN_ACT_TOL ) ) {
+                if( (l->C[ *id_to_sim ][ *syn_id ] < LEARN_ACT_TOL ) && (l->C[ *id_to_sim ][ *syn_id ] > -LEARN_ACT_TOL ) && (dC < LEARN_ACT_TOL ) && (dC > -LEARN_ACT_TOL ) ) {
                     TEMPLATE(dropNodeLList,ind)(l->learn_syn_ids[ *id_to_sim ], act_node);
                 }
                 if( isnan(dw) ) { 
@@ -304,6 +304,10 @@ void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constant
     } else { 
         if( u >= c->tr ) {
             l->fired[ *id_to_sim ] = 1;
+            l->a[ *id_to_sim ] = 0;
+        }
+        if(l->saveStat) {
+            TEMPLATE(insertVector,double)(l->stat_u[ *id_to_sim ], u);
         }
     }
 

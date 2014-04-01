@@ -16,6 +16,7 @@ typedef struct {
     const char *model_file_load;
     const char *output_spikes_file;
     const char *input_spikes_file;
+    int seed;
     char learn;
 } ArgOptions;
 
@@ -28,6 +29,7 @@ void printArgs(const ArgOptions *a) {
     printf("a->model_file_load = %s\n", a->model_file_load);
     printf("a->output_spikes_file = %s\n", a->output_spikes_file);
     printf("a->input_spikes_file = %s\n", a->input_spikes_file);
+    printf("a->seed = %d\n", a->seed);
 }
 
 void usage(void) {
@@ -39,6 +41,7 @@ void usage(void) {
     printf("\t-i - file for input spikes\n");
     printf("\t-o - file for output spikes\n");
     printf("\t-l - yes/no to learn\n");
+    printf("\t-seed - integer seed\n");
     printf("\t-? - print this message\n");
     exit(8);
 }
@@ -54,6 +57,7 @@ ArgOptions parseOptions(int argc, char **argv) {
     args.output_spikes_file = NULL;
     args.input_spikes_file = NULL;
     args.learn = -1;
+    args.seed = time(NULL);
     if(argc == 1) usage();
     while ((argc > 1) && (argv[1][0] == '-')) {
         if(strcmp(argv[1], "-m") == 0) {                
@@ -120,19 +124,24 @@ ArgOptions parseOptions(int argc, char **argv) {
             args.stat_file = strdup(argv[2]);
             ++argv; --argc;
         } else 
-        if(strcmp(argv[1], "-l") == 0) {                
+        if(strcmp(argv[1], "-seed") == 0) {                
             if(argc == 2) { 
-                printf("No options for -l (yes/no)\n");
+                printf("No options for -s\n");
                 usage();
             }
+            args.seed = atoi(argv[2]);
+            ++argv; --argc;
+        } else 
+        if(strcmp(argv[1], "-l") == 0) {                
+            args.learn = 1;
+            if(argc == 2) { 
+                args.learn = 1;
+            } else
             if(strcmp(argv[2], "yes") == 0) {
                 args.learn = 1;
             } else 
             if(strcmp(argv[2], "no") == 0) {
                 args.learn = 0;
-            } else {
-                printf("Wrong learn options %s. Need yes or no.\n", argv[2]);
-                usage();
             }
             ++argv; --argc;
         } else

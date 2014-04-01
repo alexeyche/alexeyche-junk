@@ -16,7 +16,7 @@
 #include <io.h>
 
 #define SYN_ACT_TOL 0.0001 // value of synapse needed to delete 
-#define LEARN_ACT_TOL 0.001 // value of synapse needed to delete 
+#define LEARN_ACT_TOL 0.0001 // value of synapse needed to delete 
 
 typedef enum {EXC, INH} nspec_t;
 

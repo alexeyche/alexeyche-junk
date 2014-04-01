@@ -16,8 +16,7 @@ void *main_func(void *args) {
 //    printArgs(&a);
     bool saveStat = a.stat_file != NULL;
     Constants *c = createConstants(a.const_filename);
-    srand(time(NULL));
-//    srand(c->seed);
+    srand(a.seed);
     if(a.learn == 0) {
         c->learn = false;
     } else
@@ -42,7 +41,7 @@ void *main_func(void *args) {
     configreNetSpikesSim(s, c);
 //    printSRMLayer(s->layers->array[0]);
 //    printSpikesList(s->ns->net);
-    printConnMap(s->ns);
+//    printConnMap(s->ns);
 //    printInputSpikesQueue(s->ns);
 
     while(s->rt->t <= s->rt->Tmax) 
