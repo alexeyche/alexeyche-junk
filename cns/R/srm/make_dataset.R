@@ -27,16 +27,6 @@ for(ds in test_dataset) {
 }
 #gr_pl(1000*sapply(patterns, function(x) sapply(x$data, length))/duration)
 
-patterns = patterns[sample(1:length(patterns))]
-
-train_net_ev = NetClass$new(patterns, list(neurons), duration)
-test_net_ev = NetClass$new(test_patterns, list(neurons), duration)
-
-train_net_mean_p = NetClass$new(patterns, list(neurons), duration)
-train_net_mean_p$replicate(mean_p_dur)
-
-train_net = NetClass$new(patterns, list(neurons), duration)
-train_net$replicate(train_net_ev$Tmax*1)
 
 #patterns[[1]] = list(data=lapply(seq(1,300,length.out=100), function(id) id), label=1)
 #patterns[[2]] = list(data=lapply(seq(300,1,length.out=100), function(id) id), label=2)

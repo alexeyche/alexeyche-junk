@@ -4,21 +4,39 @@ source('../serialize_to_bin.R')
 source('../util.R')
 source('../plot_funcs.R')
 
+get_const = function(const_name) {
+    system(sprintf("egrep -o '%s[ ]*=[ ]*[\\/_.a-zA-Z0-9]+' %s | cut -d '=' -f 2 | tr -d ' '", const_name, const_ini), intern=TRUE)
+}
+
+
+
 library(snn)
-workdir="~/prog/sim/cprog/runs/rfd"
+workdir="/home/alexeyche/prog/sim/runs/test_run"
+
+ep=1
+ep_str=""
+if(ep>0) {
+    ep_str = sprintf("%d_",ep)
+}
+model_file = sprintf("%s/%smodel", workdir, ep_str)
+stat_file = sprintf("%s/%sstat", workdir, ep_str)
+output_spikes = sprintf("%s/%soutput_spikes", workdir, ep_str)
+const_ini = sprintf("%s/constants.ini", workdir)
 
 
-input_file = "/home/alexeyche/prog/sim/rfd_files/ep_1_30.0sec"
-ep=50
-model_file = sprintf("%s/%d_model", workdir, ep)
-stat_file = sprintf("%s/%d_stat", workdir, ep)
-output_spikes = sprintf("%s/%d_output_spikes", workdir, ep)
+N = as.integer(get_const("N"))
 
 #sp = loadMatrix(input_file,1)
 sp = loadMatrix(output_spikes,1)
 net = blank_net(nrow(sp))
 for(i in 1:length(net)) {
-    net[[i]] = sp[i, sp[i,]>0]
+    spike_elems = which(sp[i,]>0)
+    if(length(spike_elems)>0) {
+        if(sp[i,1] == 0) {
+            spikes_elems = c(1, spike_elems)
+        }
+    }
+    net[[i]] = sp[i, spike_elems]
 }
 plot_rastl(net,T0=0,Tmax=1000)
 
@@ -27,9 +45,9 @@ if(file.exists(sprintf("%s.bin",stat_file))) {
     u = loadMatrix(stat_file, 2)
     B = loadMatrix(stat_file, 3)
     syn=75
-    nid=1
-    w1 = loadMatrix(stat_file, 3+nid)
-    C1 = loadMatrix(stat_file, 3+10+nid)
+    nid=2
+    dWn = loadMatrix(stat_file, 3+nid)
+    Cn = loadMatrix(stat_file, 3+N+nid)
 #     par(mfrow=c(3,1))
 #     spikes = net[[100+nid]][net[[100+nid]]<1000]
 #     plot(spikes, rep(1,length(spikes)), xlim=c(0,1000) )
@@ -42,20 +60,19 @@ W = loadMatrix(model_file,1)
 
 gr_pl(t(W))
 
-N=10
-Wacc = vector("list",N)
-pacc = vector("list",N)
-for(ep in 3:200) {
-    model_file = sprintf("%s/%d_model", workdir, ep)
-    if(file.exists(sprintf("%s.bin",model_file))) {
-        W = loadMatrix(model_file,1)
-        pmean = loadMatrix(model_file,3)
-        for(ni in 1:N) {
-            Wacc[[ni]] = cbind(Wacc[[ni]], W[ni,])    
-            pacc[[ni]] = c(pacc[[ni]], c(pmean[ni,]))
-        }
-        
-    }
-}
-
-gr_pl(t(Wacc[[1]]))
+# Wacc = vector("list",N)
+# pacc = vector("list",N)
+# for(ep in 3:200) {
+#     model_file = sprintf("%s/%d_model", workdir, ep)
+#     if(file.exists(sprintf("%s.bin",model_file))) {
+#         W = loadMatrix(model_file,1)
+#         pmean = loadMatrix(model_file,3)
+#         for(ni in 1:N) {
+#             Wacc[[ni]] = cbind(Wacc[[ni]], W[ni,])    
+#             pacc[[ni]] = c(pacc[[ni]], c(pmean[ni,]))
+#         }
+#         
+#     }
+# }
+# 
+# gr_pl(t(Wacc[[1]]))
