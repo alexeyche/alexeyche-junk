@@ -19,7 +19,7 @@ void deleteConstants(Constants *c) {
     free(c);
 }
 
-static int file_handler(void* user, const char* section, const char* name,
+int file_handler(void* user, const char* section, const char* name,
                    const char* value)
 {
     Constants* c = (Constants*)user;

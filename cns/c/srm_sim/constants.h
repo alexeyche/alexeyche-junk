@@ -56,7 +56,9 @@ typedef struct {
     int epochs;
 } Constants;
 
-static int file_handler(void* user, const char* section, const char* name, const char* value);
+int file_handler(void* user, const char* section, const char* name,
+                   const char* value);
+
 Constants* createConstants(const char *filename);
 void printConstants(Constants *c); 
 void deleteConstants(Constants *c);

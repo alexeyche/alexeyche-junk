@@ -10,6 +10,7 @@
 
 typedef struct {
     indVector *input_spikes_iter;
+    indVector *spikes_iter;
     double t;
     double Tmax;
 } SimRuntime;

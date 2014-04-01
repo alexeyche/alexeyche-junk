@@ -23,6 +23,7 @@ typedef struct {
     ConnVector **conn_map;
     SpikesList *net;    
     SynSpikeVector **input_spikes_queue;
+    SynSpikeVector **spikes_queue;
     size_t size;
 } NetSim;
 
@@ -33,6 +34,6 @@ void deleteNetSim(NetSim *ns);
 void propagateInputSpikesNetSim(NetSim *ns, SpikesList *sl);
 void printInputSpikesQueue(NetSim *ns);
 void configureConnMapNetSim(NetSim *ns, pSRMLayerVector *l);
-void propagateSpikeNetSim(NetSim *ns, size_t ni, double t);
+void propagateSpikeNetSim(NetSim *ns, const size_t *ni, const double *t);
 
 #endif

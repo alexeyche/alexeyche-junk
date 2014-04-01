@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 
 SRM_SIM="../bin/srm_sim"
-WORK_DIR=~/prog/sim/cprog/runs/rfd
+#WORK_DIR=~/prog/sim/cprog/runs/rfd
+WORK_DIR=~/my/sim/cprog/runs/rfd
+RFD_DIR=/home/alexeyche/my/sim/rfd_files
+
 mkdir -p $WORK_DIR
 
 rm -rf $WORK_DIR/*
@@ -45,7 +48,7 @@ for EP in {1..100}; do
     if [ "$COLLECT_STAT" == "yes" ]; then
         STAT_OPT=" -s $STAT_FILE"
     fi        
-    INPUT_FILE="/home/alexeyche/prog/sim/rfd_files/ep_${INP_NUM}_30.0sec.bin"
+    INPUT_FILE="$RFD_DIR/ep_${INP_NUM}_30.0sec.bin"
     $SRM_SIM -c $CONST_INI -o $OUTPUT_SPIKES -l $LEARN -ms $MODEL_FILE  -i $INPUT_FILE $STAT_OPT $MODEL_TO_LOAD_OPT &> $OUTPUT_FILE
 
     echo "epoch $EP done"

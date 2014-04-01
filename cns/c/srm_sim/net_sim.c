@@ -23,9 +23,11 @@ void deallocNetSim(NetSim *ns) {
     for(size_t sp_i=0; sp_i < ns->size; sp_i++) { 
         TEMPLATE(deleteVector,Conn)(ns->conn_map[sp_i]);
         TEMPLATE(deleteVector,SynSpike)(ns->input_spikes_queue[sp_i]);
+        TEMPLATE(deleteVector,SynSpike)(ns->spikes_queue[sp_i]);
     }
     free(ns->conn_map);
     free(ns->input_spikes_queue);
+    free(ns->spikes_queue);
     ns->size = 0;
 }
 
@@ -39,9 +41,11 @@ void allocNetSim(NetSim *ns, size_t net_size) {
     ns->net = createSpikesList(net_size);
     ns->conn_map = (ConnVector**) malloc( net_size*sizeof(ConnVector*));
     ns->input_spikes_queue = (SynSpikeVector**) malloc(  net_size*sizeof(SynSpikeVector*));
+    ns->spikes_queue = (SynSpikeVector**) malloc(  net_size*sizeof(SynSpikeVector*));
     for(size_t sp_i=0; sp_i < net_size; sp_i++) {
         ns->conn_map[sp_i] = TEMPLATE(createVector,Conn)();
         ns->input_spikes_queue[sp_i] = TEMPLATE(createVector,SynSpike)();
+        ns->spikes_queue[sp_i] = TEMPLATE(createVector,SynSpike)();
     }
 }
 
@@ -120,8 +124,30 @@ void printInputSpikesQueue(NetSim *ns) {
     }
 }
 
-void propagateSpikeNetSim(NetSim *ns, size_t ni, double t) {
-    TEMPLATE(insertVector,double)(ns->net->list[ni], t);
+#define SORT_LIM 30
+#define MINIMAL_DELAY 1
+void propagateSpikeNetSim(NetSim *ns, const size_t *ni, const double *t) {
+    TEMPLATE(insertVector,double)(ns->net->list[*ni], *t);
+    for(size_t con_i=0; con_i < ns->conn_map[*ni]->size; con_i++) {
+        SynSpike sp;        
+        sp.n_id = *ni;
+        sp.syn_id = ns->conn_map[*ni]->array[con_i].syn_id;
+        sp.t = *t + MINIMAL_DELAY;
+        TEMPLATE(insertVector,SynSpike)(ns->spikes_queue[ ns->conn_map[*ni]->array[con_i].n_id ], sp);
+        size_t size_to_sort = ns->spikes_queue[*ni]->size;
+        size_t offset = 0;
+        if(size_to_sort > SORT_LIM) {
+            size_to_sort = SORT_LIM;
+            offset = ns->spikes_queue[*ni]->size-size_to_sort;
+        }
+        qsort(ns->spikes_queue[*ni]->array+offset, size_to_sort, sizeof(SynSpike), compSynSpike);
+//        printf("queue of %zu: ", ns->conn_map[*ni]->array[con_i].n_id);
+//        for(size_t i=0; i<ns->spikes_queue[ ns->conn_map[*ni]->array[con_i].n_id ]->size; i++) {
+//            printf("%f:%zu ", ns->spikes_queue[ ns->conn_map[*ni]->array[con_i].n_id ]->array[i].t,  \
+//                              ns->spikes_queue[ ns->conn_map[*ni]->array[con_i].n_id ]->array[i].syn_id);
+//        }
+//        printf("\n");
+    }
 }
 
 

@@ -42,7 +42,7 @@ void *main_func(void *args) {
     configreNetSpikesSim(s, c);
 //    printSRMLayer(s->layers->array[0]);
 //    printSpikesList(s->ns->net);
-//    printConnMap(s->ns);
+    printConnMap(s->ns);
 //    printInputSpikesQueue(s->ns);
 
     while(s->rt->t <= s->rt->Tmax) 
