@@ -5,7 +5,7 @@ CWD=$(dirname $CWD_SCR)
 
 
 function usage {
-    echo "$0 -w WORK_DIR -i INPUT_FILE"
+    echo "$0 -w WORK_DIR -i INPUT_FILE -s yes/no -l yes/no -e 1[:100] -d 60000"
 }
 
 

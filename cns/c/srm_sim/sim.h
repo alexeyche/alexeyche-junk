@@ -9,6 +9,13 @@
 #include <io.h>
 #include <pthread.h>
 
+#ifndef max
+    #define max( a, b ) ( ((a) > (b)) ? (a) : (b) )
+#endif
+
+#ifndef min
+    #define min( a, b ) ( ((a) < (b)) ? (a) : (b) )
+#endif
 #define P( condition ) {if( (condition) != 0 ) { printf( "\n FAILURE in %s, line %d\n", __FILE__, __LINE__ );exit( 1 );}}
 
 pthread_barrier_t barrier;
@@ -16,13 +23,12 @@ pthread_barrier_t barrier;
 typedef struct {
     indVector *input_spikes_iter;
     indVector *spikes_iter;
-    double t;
     double Tmax;
 } SimRuntime;
 
 typedef struct {
-    const size_t *layer_id;
-    const size_t *n_id;
+    size_t layer_id;
+    size_t n_id;
 } NeuronAddress;
 
 typedef struct {
@@ -40,21 +46,27 @@ typedef struct {
 
 typedef struct {
     Sim *s;
-    int thread_id;
+    size_t thread_id;
 } SimWorker;
 
 Sim* createSim();
 void appendLayerSim(Sim *s, SRMLayer *l);
+// configure
 void deleteSim(Sim *s);
 void configureLayersSim(Sim *s, Constants *c, bool saveStat);
 SimRuntime* createRuntime();
 void deleteRuntime(SimRuntime *sr);
-void simulateNeuron(const double *t, const NeuronAddress *na, Sim *s, const Constants *c);
-const SynSpike* getInputSpike(NetSim *ns, SimRuntime *sr, const size_t *n_id, const Constants *c);
+void configreNetSpikesSim(Sim *s, Constants *c);
+void configureSimAttr(Sim *s);
+
+// serialize
 void loadLayersFromFile(Sim *s, const char *model_fname, Constants *c, bool saveStat);
 void saveLayersToFile(Sim *s, const char *model_file);
-void configreNetSpikesSim(Sim *s, Constants *c);
 
-void simRun(SimWorker *sw);
+// run
+void runSim(Sim *s);
+void simulateNeuron(Sim *s, const size_t *layer_id, const size_t *n_id, const double *t,  const Constants *c);
+const SynSpike* getInputSpike(const double *t, const size_t *n_id, NetSim *ns, SimRuntime *sr, const Constants *c);
+void* simRunRoutine(void *args);
 
 #endif

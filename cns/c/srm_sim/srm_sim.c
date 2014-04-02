@@ -28,7 +28,7 @@ void *main_func(void *args) {
         c->input_spikes_filename = strdup(a.input_spikes_file);
     }
 //    printConstants(c);
-    assert(a.jobs == 0);
+    assert(a.jobs != 0);
     Sim *s = createSim(a.jobs);
     
     char *model_to_load = NULL;
@@ -40,7 +40,6 @@ void *main_func(void *args) {
     } else {
         configureLayersSim(s, c, saveStat);    
     }
-//    s->layers->array[0]->pacc[0] = 0.001;
     configreNetSpikesSim(s, c);
 //    printSRMLayer(s->layers->array[0]);
 //    printSpikesList(s->ns->net);
