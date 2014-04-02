@@ -9,6 +9,7 @@ typedef struct {
     double t;
     actor_id act_id;
     int id;
+    double *glob_t;
 } ActorSim;
 
 typedef struct {

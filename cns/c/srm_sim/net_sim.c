@@ -133,14 +133,15 @@ void propagateSpikeNetSim(NetSim *ns, const size_t *ni, const double *t) {
         sp.n_id = *ni;
         sp.syn_id = ns->conn_map[*ni]->array[con_i].syn_id;
         sp.t = *t + MINIMAL_DELAY;
-        TEMPLATE(insertVector,SynSpike)(ns->spikes_queue[ ns->conn_map[*ni]->array[con_i].n_id ], sp);
-        size_t size_to_sort = ns->spikes_queue[*ni]->size;
+        const size_t *naffect = &ns->conn_map[*ni]->array[con_i].n_id;
+        TEMPLATE(insertVector,SynSpike)(ns->spikes_queue[ *naffect ], sp);
+        size_t size_to_sort = ns->spikes_queue[*naffect]->size;
         size_t offset = 0;
         if(size_to_sort > SORT_LIM) {
             size_to_sort = SORT_LIM;
-            offset = ns->spikes_queue[*ni]->size-size_to_sort;
+            offset = ns->spikes_queue[*naffect]->size-size_to_sort;
         }
-        qsort(ns->spikes_queue[*ni]->array+offset, size_to_sort, sizeof(SynSpike), compSynSpike);
+        qsort(ns->spikes_queue[*naffect]->array+offset, size_to_sort, sizeof(SynSpike), compSynSpike);
 //        printf("queue of %zu: ", ns->conn_map[*ni]->array[con_i].n_id);
 //        for(size_t i=0; i<ns->spikes_queue[ ns->conn_map[*ni]->array[con_i].n_id ]->size; i++) {
 //            printf("%f:%zu ", ns->spikes_queue[ ns->conn_map[*ni]->array[con_i].n_id ]->array[i].t,  \

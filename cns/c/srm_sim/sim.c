@@ -1,11 +1,12 @@
 
 #include "sim.h"
 
-Sim* createSim() {
+Sim* createSim(size_t nthreads) {
     Sim *s = (Sim*) malloc(sizeof(Sim));
     s->ns = createNetSim();
     s->layers = TEMPLATE(createVector,pSRMLayer)(); 
     s->rt = createRuntime();
+    s->nthreads = nthreads;
     return(s);
 }
 
@@ -73,20 +74,21 @@ void configreNetSpikesSim(Sim *s, Constants *c) {
 }
 
 void configureLayersSim(Sim *s, Constants *c, bool saveStat) {
+    s->c = c;
     indVector *inputIDs = TEMPLATE(createVector,ind)();
     for(size_t inp_i=0; inp_i<c->M; inp_i++) {
         TEMPLATE(insertVector,ind)(inputIDs, inp_i);
     }
     
-    size_t net_size = c->M; 
+    size_t net_size = s->c->M; 
 
     size_t neurons_idx = inputIDs->size; // start from last input ID
-    for(size_t li=0; li< c->layers_size->size; li++) {
+    for(size_t li=0; li< s->c->layers_size->size; li++) {
         SRMLayer *l = createSRMLayer(c->layers_size->array[li], &neurons_idx, saveStat);
         if(li == 0) {
-            configureSRMLayer(l, inputIDs, c);
+            configureSRMLayer(l, inputIDs, s->c);
         } else {
-            configureSRMLayer(l, NULL, c);
+            configureSRMLayer(l, NULL, s->c);
         }
         appendLayerSim(s, l);
         net_size += l->N;
@@ -95,15 +97,15 @@ void configureLayersSim(Sim *s, Constants *c, bool saveStat) {
     TEMPLATE(deleteVector,ind)(inputIDs);
 }
 
-const SynSpike* getInputSpike(NetSim *ns, SimRuntime *sr, const size_t *n_id, const Constants *c) {
+const SynSpike* getInputSpike(const double *t, const size_t *n_id, NetSim *ns, SimRuntime *sr, const Constants *c) {
     size_t *spike_it = &sr->input_spikes_iter->array[ *n_id ];
     if(*spike_it < ns->input_spikes_queue[ *n_id ]->size) {
         const SynSpike *sp = &ns->input_spikes_queue[ *n_id ]->array[ *spike_it ];
-        if(sp->t < sr->t) {
-            printf("We missing an input spike %f in %zu at %f. Something wrong. Need sorted queue\n", sp->t, *n_id, sr->t);
+        if(sp->t < *t) {
+            printf("We missing an input spike %f in %zu at %f. Something wrong. Need sorted queue\n", sp->t, *n_id, *t);
             exit(1);
         }
-        if(sp->t < sr->t+c->dt) {
+        if(sp->t < *t+c->dt) {
            *spike_it += 1; 
            return(sp);
         }
@@ -111,11 +113,11 @@ const SynSpike* getInputSpike(NetSim *ns, SimRuntime *sr, const size_t *n_id, co
     spike_it = &sr->spikes_iter->array[ *n_id ];
     if(*spike_it < ns->spikes_queue[ *n_id ]->size) {
         const SynSpike *sp = &ns->spikes_queue[ *n_id ]->array[ *spike_it ]; 
-        if(sp->t < sr->t) {
-            printf("We missing a net spike %f in %zu at %f. Something wrong. Need sorted queue\n", sp->t, *n_id, sr->t);
+        if(sp->t < *t) {
+            printf("We missing a net spike %f in %zu at %f. Something wrong. Need sorted queue\n", sp->t, *n_id, *t);
             exit(1);
         }
-        if(sp->t <= sr->t+c->dt) {
+        if(sp->t <= *t+c->dt) {
            *spike_it += 1; 
            return(sp);
         }    
@@ -123,24 +125,58 @@ const SynSpike* getInputSpike(NetSim *ns, SimRuntime *sr, const size_t *n_id, co
     return(NULL);
 }
 
-void simulate(Sim *s, const Constants *c) {
-    const SynSpike *sp;
-//    printf("sim %f\n", s->rt->t);
-    for(size_t li=0; li<s->layers->size; li++) {
-        SRMLayer *l = s->layers->array[li];
-        for(size_t ni=0; ni < l->N; ni++) {
-            while( (sp = getInputSpike(s->ns, s->rt, &l->ids[ni], c)) != NULL) {
-                propagateSpikeSRMLayer(l, &ni, sp, c);
-            }
-            simulateSRMLayerNeuron(l, &ni, c);
-            if(l->fired[ni] == 1) {
-//                printf("we have spike at %zu\n", ni);
-                propagateSpikeNetSim(s->ns, &l->ids[ni], &s->rt->t);
-                l->fired[ni] = 0;
-            }
+
+
+void runSim(Sim *s) {
+    configureSimAttr(s);
+    
+    pthread_t *threads = (pthread_t *) malloc( s->nthreads * sizeof( pthread_t ) );
+    SimWorker *workers = (SimWorker*) malloc( s->nthreads * sizeof(SimWorker) );
+    for(size_t ti=0; ti < s->nthreads; ti++) {
+        workers[ti]->thread_id;
+        workers[ti]->s = s;
+    }
+    
+    pthread_attr_t attr;
+    P( pthread_attr_init( &attr ) );
+    P( pthread_barrier_init( &barrier, NULL, s->nthreads ) );
+    for( int i = 1; i < s->nthreads; i++ )  {
+        P( pthread_create( &threads[i], &attr, simRunRoutine,  &workers[i]) );
+    }
+
+    free(workers);
+    free(threads);
+}
+
+void* simRunRoutine(void *args) {
+    SimWorker *sw = (SimWorker*)args;
+    Sim *s = sw->s;
+    int thread_id = *(int*)sw->thread_id;
+
+    int neuron_per_thread = (s->num_neurons + s->nthreads - 1) / s->nthreads;
+    int first = min(  thread_id    * neuron_per_thread, n );
+    int last  = min( (thread_id+1) * neuron_per_thread, n );
+
+    for(double t=0; t< sw->s->rt->Tmax; t+=sw->c->dt) {
+        for(size_t na_i=first; na_i<last; na_i++) {
+            simulateNeuron(&t, s->na[na_i]->layer_id, s->na[na_i]->n_id, s, sw->c);
+            pthread_barrier_wait( &barrier );
         }
     }
-    s->rt->t += c->dt;
+    return(NULL);
+}
+
+void simulateNeuron(const double *t, const size_t *layer_id, const size_t *n_id, Sim *s, const Constants *c) {
+    SynSpike *sp;
+    SRMLayer *l = s->layers->array[*layer_id];
+    while( (sp = getInputSpike(t, &l->ids[*n_id], s->ns, s->rt,  c)) != NULL) {
+        propagateSpikeSRMLayer(l, n_id, sp, c);
+    }
+    simulateSRMLayerNeuron(l, n_id, c);
+    if(l->fired[*n_id] == 1) {
+        propagateSpikeNetSim(s->ns, &l->ids[*n_id], t);
+        l->fired[*n_id] = 0;
+    }
 }
 
 #define MATRIX_PER_LAYER 4

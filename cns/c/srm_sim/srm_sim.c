@@ -1,5 +1,6 @@
 #define _POSIX_C_SOURCE 200809L
 
+
 #include "core.h"
 #include "arg_opt.h"
 
@@ -27,7 +28,9 @@ void *main_func(void *args) {
         c->input_spikes_filename = strdup(a.input_spikes_file);
     }
 //    printConstants(c);
-    Sim *s = createSim();
+    assert(a.jobs == 0);
+    Sim *s = createSim(a.jobs);
+    
     char *model_to_load = NULL;
     if(a.model_file) model_to_load = strdup(a.model_file);
     if(a.model_file_load) model_to_load = strdup(a.model_file_load); 
@@ -43,9 +46,7 @@ void *main_func(void *args) {
 //    printSpikesList(s->ns->net);
 //    printConnMap(s->ns);
 //    printInputSpikesQueue(s->ns);
-
-    while(s->rt->t <= s->rt->Tmax) 
-        simulate(s, c);
+    runSim(s);
     
     if(saveStat) {
         pMatrixVector *mv = TEMPLATE(createVector,pMatrix)();
