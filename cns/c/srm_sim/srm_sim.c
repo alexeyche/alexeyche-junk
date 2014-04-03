@@ -10,10 +10,9 @@
 
 
 
-void *main_func(void *args) {
-    struct actor_main *main_s = (struct actor_main*)args;
+int main(int argc, char **argv) {
 	
-	ArgOptions a = parseOptions(main_s->argc, main_s->argv);
+	ArgOptions a = parseOptions(argc, argv);
 //    printArgs(&a);
     bool saveStat = a.stat_file != NULL;
     Constants *c = createConstants(a.const_filename);
@@ -27,7 +26,7 @@ void *main_func(void *args) {
     if(a.input_spikes_file) {
         c->input_spikes_filename = strdup(a.input_spikes_file);
     }
-//    printConstants(c);
+    printConstants(c);
     assert(a.jobs != 0);
     Sim *s = createSim(a.jobs);
     
@@ -87,5 +86,3 @@ void *main_func(void *args) {
     deleteSim(s);
     deleteConstants(c);
 }
-
-DECLARE_ACTOR_MAIN(main_func)

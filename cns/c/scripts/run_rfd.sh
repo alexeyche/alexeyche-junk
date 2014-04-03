@@ -23,6 +23,8 @@ function get_const {
 INPUT_FILE=`get_const input_spikes_filename`
 MEAN_P_DUR=`get_const mean_p_dur`
 EPOCHS=`get_const epochs`
+JOBS=1
+#JOBS=8
 
 
 DUR=0
@@ -30,8 +32,8 @@ DUR=0
 INP_NUM=1
 LAST_MODEL=
 COLLECT_STAT=yes
-COLLECT_STAT=
-for EP in {1..100}; do
+#COLLECT_STAT=
+for EP in {1..30}; do
     OUTPUT_SPIKES="$WORK_DIR/${EP}_output_spikes.bin"
     STAT_FILE="$WORK_DIR/${EP}_stat.bin"
     MODEL_FILE="$WORK_DIR/${EP}_model.bin"
@@ -49,7 +51,7 @@ for EP in {1..100}; do
         STAT_OPT=" -s $STAT_FILE"
     fi        
     INPUT_FILE="$RFD_DIR/ep_${INP_NUM}_30.0sec.bin"
-    $SRM_SIM -c $CONST_INI -o $OUTPUT_SPIKES -l $LEARN -ms $MODEL_FILE  -i $INPUT_FILE $STAT_OPT $MODEL_TO_LOAD_OPT &> $OUTPUT_FILE
+    $SRM_SIM -c $CONST_INI -o $OUTPUT_SPIKES -l $LEARN -ms $MODEL_FILE  -i $INPUT_FILE -j $JOBS $STAT_OPT $MODEL_TO_LOAD_OPT &> $OUTPUT_FILE
 
     echo "epoch $EP done"
     DUR=$((DUR+DURATION_OF_INPUT))

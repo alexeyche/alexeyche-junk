@@ -65,8 +65,8 @@ void saveLayersToFile(Sim *s, const char *model_file);
 
 // run
 void runSim(Sim *s);
-void simulateNeuron(Sim *s, const size_t *layer_id, const size_t *n_id, const double *t,  const Constants *c);
-const SynSpike* getInputSpike(const double *t, const size_t *n_id, NetSim *ns, SimRuntime *sr, const Constants *c);
+void simulateNeuron(Sim *s, const size_t *layer_id, const size_t *n_id, double t,  const Constants *c);
+const SynSpike* getInputSpike(double t, const size_t *n_id, NetSim *ns, SimRuntime *sr, const Constants *c);
 void* simRunRoutine(void *args);
 
 #endif

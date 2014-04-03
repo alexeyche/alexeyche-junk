@@ -1,15 +1,15 @@
 
 #include "sim.h"
 
-const SynSpike* getInputSpike(const double *t, const size_t *n_id, NetSim *ns, SimRuntime *sr, const Constants *c) {
+const SynSpike* getInputSpike(double t, const size_t *n_id, NetSim *ns, SimRuntime *sr, const Constants *c) {
     size_t *spike_it = &sr->input_spikes_iter->array[ *n_id ];
     if(*spike_it < ns->input_spikes_queue[ *n_id ]->size) {
         const SynSpike *sp = &ns->input_spikes_queue[ *n_id ]->array[ *spike_it ];
-        if(sp->t < *t) {
-            printf("We missing an input spike %f in %zu at %f. Something wrong. Need sorted queue\n", sp->t, *n_id, *t);
+        if(sp->t < t) {
+            printf("We missing an input spike %f in %zu at %f. Something wrong. Need sorted queue\n", sp->t, *n_id, t);
             exit(1);
         }
-        if(sp->t < *t+c->dt) {
+        if(sp->t < t+c->dt) {
            *spike_it += 1; 
            return(sp);
         }
@@ -17,11 +17,11 @@ const SynSpike* getInputSpike(const double *t, const size_t *n_id, NetSim *ns, S
     spike_it = &sr->spikes_iter->array[ *n_id ];
     if(*spike_it < ns->spikes_queue[ *n_id ]->size) {
         const SynSpike *sp = &ns->spikes_queue[ *n_id ]->array[ *spike_it ]; 
-        if(sp->t < *t) {
-            printf("We missing a net spike %f in %zu at %f. Something wrong. Need sorted queue\n", sp->t, *n_id, *t);
+        if(sp->t < t) {
+            printf("We missing a net spike %f in %zu at %f. Something wrong. Need sorted queue\n", sp->t, *n_id, t);
             exit(1);
         }
-        if(sp->t <= *t+c->dt) {
+        if(sp->t <= t+c->dt) {
            *spike_it += 1; 
            return(sp);
         }    
@@ -61,22 +61,21 @@ void* simRunRoutine(void *args) {
     int first = min(  sw->thread_id    * neuron_per_thread, s->num_neurons );
     int last  = min( (sw->thread_id+1) * neuron_per_thread, s->num_neurons );
 
-    //printf("Tmax: %f\n", s->rt->Tmax);
+    s->rt->Tmax += 100;
     for(double t=0; t< s->rt->Tmax; t+=s->c->dt) {
-        //printf("sim: %f\n", t);
         for(size_t na_i=first; na_i<last; na_i++) {
-            //printf("neuron %zu\n",na_i);
-            simulateNeuron(s, &s->na[na_i].layer_id, &s->na[na_i].n_id, &t, s->c);
+            simulateNeuron(s, &s->na[na_i].layer_id, &s->na[na_i].n_id, t, s->c);
         }
-        pthread_barrier_wait( &barrier );
+//        pthread_barrier_wait( &barrier );
     }
     return(NULL);
 }
 
-void simulateNeuron(Sim *s, const size_t *layer_id, const size_t *n_id, const double *t,  const Constants *c) {
+void simulateNeuron(Sim *s, const size_t *layer_id, const size_t *n_id, double t,  const Constants *c) {
     const SynSpike *sp;
     SRMLayer *l = s->layers->array[*layer_id];
     while( (sp = getInputSpike(t, &l->ids[*n_id], s->ns, s->rt,  c)) != NULL) {
+//        printf("got input spike on %zu:%zu at %f in syn %zu (%f)\n", *layer_id, *n_id, t, sp->syn_id, sp->t);
         propagateSpikeSRMLayer(l, n_id, sp, c);
     }
     simulateSRMLayerNeuron(l, n_id, c);

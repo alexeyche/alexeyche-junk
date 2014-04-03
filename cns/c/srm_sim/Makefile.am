@@ -1,7 +1,7 @@
 # what flags you want to pass to the C compiler & linker
 AM_CFLAGS = -Wall -std=gnu99 -O0 -g -pthread
 #CFLAGS=
-LDADD= -lactor -lm
+LDADD= -lm
 
 # this lists the binaries to produce, the (non-PHONY, binary) targets in
 # the previous manual Makefile
