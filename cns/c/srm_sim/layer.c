@@ -232,9 +232,9 @@ void propagateSpikeSRMLayer(SRMLayer *l, const size_t *ni, const SynSpike *sp, c
     if(l->syn[*ni][ sp->syn_id ] < SYN_ACT_TOL) {
         TEMPLATE(addValueLList,ind)(l->active_syn_ids[*ni], sp->syn_id);
     } 
-//    if( (l->C[ *ni ][ sp->syn_id ] < LEARN_ACT_TOL ) && (l->C[ *ni ][ sp->syn_id ] > -LEARN_ACT_TOL ) ) {
-//        TEMPLATE(addValueLList,ind)(l->learn_syn_ids[*ni], sp->syn_id);
-//    }
+    if( (l->C[ *ni ][ sp->syn_id ] < LEARN_ACT_TOL ) && (l->C[ *ni ][ sp->syn_id ] > -LEARN_ACT_TOL ) ) {
+        TEMPLATE(addValueLList,ind)(l->learn_syn_ids[*ni], sp->syn_id);
+    }
     
     l->syn[*ni][ sp->syn_id ] += l->syn_spec[*ni][ sp->syn_id ] * c->e0;
     l->syn[*ni][ sp->syn_id ] *= l->a[*ni];
@@ -261,10 +261,10 @@ void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constant
         
         if(c->learn) {
             l->B[ *id_to_sim ] = B_calc( &l->fired[ *id_to_sim ], &p, &l->pacc[ *id_to_sim ], c);
-//            while( (act_node = TEMPLATE(getNextLList,ind)(l->learn_syn_ids[ *id_to_sim ]) ) != NULL ) {
-            for(size_t con_i=0; con_i < l->nconn[ *id_to_sim ]; con_i++) {
-                const size_t *syn_id = &con_i;
-//                const size_t *syn_id = &act_node->value;
+            while( (act_node = TEMPLATE(getNextLList,ind)(l->learn_syn_ids[ *id_to_sim ]) ) != NULL ) {
+//            for(size_t con_i=0; con_i < l->nconn[ *id_to_sim ]; con_i++) {
+//                const size_t *syn_id = &con_i;
+                const size_t *syn_id = &act_node->value;
 //                if( (l->C[ *id_to_sim ][ *syn_id ] == 0) && (l->syn[ *id_to_sim ][ *syn_id ] == 0) ) continue;
                 double dC = C_calc( &l->fired[ *id_to_sim ], &p, &u, &l->syn[ *id_to_sim ][ *syn_id ], c);
                 l->C[ *id_to_sim ][ *syn_id ] += -l->C[ *id_to_sim ][ *syn_id ]/c->tc + dC;
@@ -273,21 +273,22 @@ void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constant
 /*TODO:*/       double dw = c->added_lrate*lrate*( l->C[ *id_to_sim ][ *syn_id ]*l->B[ *id_to_sim ] -  \
                                             c->weight_decay_factor * l->syn_fired[ *id_to_sim ][ *syn_id ] * l->W[ *id_to_sim ][ *syn_id ] );
                 
-//                printf("lrate: %f\n", lrate);
-//                printf("dw %.8f C %f B %f\n", dw, l->C[ *id_to_sim ][ *syn_id ], l->B[ *id_to_sim ]); 
                 l->W[ *id_to_sim ][ *syn_id ] += dw;
+                
                 if(l->saveStat) {
-//                    TEMPLATE(insertVector,double)(l->stat_W[ *id_to_sim ][ *syn_id ], l->syn[ *id_to_sim ][ *syn_id ]);
-
                     TEMPLATE(insertVector,double)(l->stat_W[ *id_to_sim ][ *syn_id ], l->W[ *id_to_sim ][ *syn_id ]);
                     TEMPLATE(insertVector,double)(l->stat_C[ *id_to_sim ][ *syn_id ], l->C[ *id_to_sim ][ *syn_id ]);
                 }
                 if(l->syn_fired[ *id_to_sim ][ *syn_id ] == 1) {
-                    l->syn_fired[ *id_to_sim ][ *syn_id ] = 0; // not a good place for that but this is convinient
+                    l->syn[ *id_to_sim ][ *syn_id ] *= l->a[*id_to_sim];
+                    l->syn_fired[ *id_to_sim ][ *syn_id ] = 0; 
                 }
-//                if( (l->C[ *id_to_sim ][ *syn_id ] < LEARN_ACT_TOL ) && (l->C[ *id_to_sim ][ *syn_id ] > -LEARN_ACT_TOL ) && (dC < LEARN_ACT_TOL ) && (dC > -LEARN_ACT_TOL ) ) {
-//                    TEMPLATE(dropNodeLList,ind)(l->learn_syn_ids[ *id_to_sim ], act_node);
-//                }
+                
+                if( (l->C[ *id_to_sim ][ *syn_id ] < LEARN_ACT_TOL ) && (l->C[ *id_to_sim ][ *syn_id ] > -LEARN_ACT_TOL ) && 
+                    (dC < LEARN_ACT_TOL ) && (dC > -LEARN_ACT_TOL ) ) {
+
+                    TEMPLATE(dropNodeLList,ind)(l->learn_syn_ids[ *id_to_sim ], act_node);
+                }
                 if( isnan(dw) ) { 
                     printf("\nFound bad value\n");
                     printf("nid: %zu, p: %f, u: %f, B: %f, pacc: %f, C: %f, lrate: %f, W: %f, dw: %f\n", *id_to_sim, p, u, l->B[ *id_to_sim ], l->pacc[ *id_to_sim ], l->C[ *id_to_sim ][ *syn_id ], lrate, l->W[ *id_to_sim ][ *syn_id ], dw);
