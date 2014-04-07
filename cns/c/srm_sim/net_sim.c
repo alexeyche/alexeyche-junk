@@ -126,16 +126,16 @@ void printInputSpikesQueue(NetSim *ns) {
 
 #define SORT_LIM 30
 #define MINIMAL_DELAY 1
-pthread_mutex_t net_lock = PTHREAD_MUTEX_INITIALIZER;
+
 void propagateSpikeNetSim(NetSim *ns, const size_t *ni, double t) {
     TEMPLATE(insertVector,double)(ns->net->list[*ni], t);
-//    pthread_mutex_lock(&net_lock);
     for(size_t con_i=0; con_i < ns->conn_map[*ni]->size; con_i++) {
         SynSpike sp;        
         sp.n_id = *ni;
         sp.syn_id = ns->conn_map[*ni]->array[con_i].syn_id;
         sp.t = t + MINIMAL_DELAY;
         size_t naffect = ns->conn_map[*ni]->array[con_i].n_id;
+        pthread_spin_lock(&spinlocks[naffect]);
         TEMPLATE(insertVector,SynSpike)(ns->spikes_queue[ naffect ], sp);
         size_t size_to_sort = ns->spikes_queue[naffect]->size;
         size_t offset = 0;
@@ -143,15 +143,24 @@ void propagateSpikeNetSim(NetSim *ns, const size_t *ni, double t) {
             size_to_sort = SORT_LIM;
             offset = ns->spikes_queue[naffect]->size-size_to_sort;
         }
-//        qsort(ns->spikes_queue[*naffect]->array+offset, size_to_sort, sizeof(SynSpike), compSynSpike);
+//        printf("t: %f\n", t);
+//        printf("queue of %zu before sort: ", ns->conn_map[*ni]->array[con_i].n_id);
+//        for(size_t i=0; i<ns->spikes_queue[ ns->conn_map[*ni]->array[con_i].n_id ]->size; i++) {
+//            printf("%f:%zu ", ns->spikes_queue[ ns->conn_map[*ni]->array[con_i].n_id ]->array[i].t,  \
+//                              ns->spikes_queue[ ns->conn_map[*ni]->array[con_i].n_id ]->array[i].syn_id);
+//        }
+//        printf("\n");
+
+        qsort(ns->spikes_queue[naffect]->array+offset, size_to_sort, sizeof(SynSpike), compSynSpike);
 //        printf("queue of %zu: ", ns->conn_map[*ni]->array[con_i].n_id);
 //        for(size_t i=0; i<ns->spikes_queue[ ns->conn_map[*ni]->array[con_i].n_id ]->size; i++) {
 //            printf("%f:%zu ", ns->spikes_queue[ ns->conn_map[*ni]->array[con_i].n_id ]->array[i].t,  \
 //                              ns->spikes_queue[ ns->conn_map[*ni]->array[con_i].n_id ]->array[i].syn_id);
 //        }
 //        printf("\n");
+//        printf("======================\n");
+        pthread_spin_unlock(&spinlocks[naffect]);
     }
-//    pthread_mutex_unlock(&net_lock);
 }
 
 

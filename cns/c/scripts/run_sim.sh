@@ -5,7 +5,7 @@ CWD=$(dirname $CWD_SCR)
 
 
 function usage {
-    echo "$0 -w WORK_DIR -i INPUT_FILE -s yes/no -l yes/no -e 1[:100] -d 60000"
+    echo "$0 -w WORK_DIR -s -l -e 1[:100] -d 60000 INPUT_FILE1 [INPUT_FILE2]"
 }
 
 
@@ -17,30 +17,28 @@ WORK_DIR=
 STAT_SAVE="no"
 EPOCH=
 LEARN="no"
-
-readopt='getopts $opts opt;rc=$?;[ $rc$opt == 0? ]&&exit 1;[ $rc == 0 ]||{ shift $[OPTIND-1];false; }'
-
-opts=i:w:hsle:d:
+JOBS=8
 
 # Enumerating options
-while eval $readopt
-do
+while getopts "j:w:hsle:d:" opt; do
     case "$opt" in
         w) WORK_DIR=${OPTARG} ;;
-        i) INPUT_FILES=${OPTARG} ;;
         s) STAT_SAVE="yes" ;;
         l) LEARN="yes" ;;
         e) EPOCH=${OPTARG} ;; 
+        j) JOBS=${OPTARG} ;;
         d) DURATION_OF_INPUT_FILE=${OPTARG} ;;
         h) usage && exit 0 ;;
         *) usage && exit 1 ;;
     esac
 done    
+shift $(( OPTIND - 1 ))
+INPUT_FILES=${@}    
 
 [ -z "$WORK_DIR" -o -z "$INPUT_FILES" ] && usage && exit 1
 INPUT_FILES_DIR=$(echo $INPUT_FILES | xargs dirname | sort | uniq)
 INPUT_FILES_BN=$(for f in $INPUT_FILES; do basename $f; done | sort -n)
-MAX_INPUT_FILES=$(echo $INPUT_FILES | wc -l)
+MAX_INPUT_FILES=$(echo $INPUT_FILES | wc -w)
 
 [ -d "$WORK_DIR" ] && rm -rf $WORK_DIR/*
 [ ! -d "$WORK_DIR" ] && mkdir -p $WORK_DIR
@@ -85,7 +83,7 @@ for EP in $EPOCHS; do
         STAT_OPT="-s $WORK_DIR/${EPOCH_SFX}stat.bin"
     fi    
     INPUT_FILE=$INPUT_FILES_DIR/$(echo $INPUT_FILES_BN | cut -d ' ' -f $INP_ITER)
-    $SRM_SIM -c $WORK_DIR/constants.ini -i $INPUT_FILE -o $OUTPUT_SPIKES $STAT_OPT -l $LEARN $MODEL_TO_LOAD_OPT -ms $MODEL_FILE -l $LEARN &> $OUTPUT_FILE
+    $SRM_SIM -c $WORK_DIR/constants.ini -i $INPUT_FILE -o $OUTPUT_SPIKES $STAT_OPT -l $LEARN $MODEL_TO_LOAD_OPT -ms $MODEL_FILE -l $LEARN -j $JOBS &> $OUTPUT_FILE
     INP_ITER=$((INP_ITER+1))
     if [ $INP_ITER -gt $MAX_INPUT_FILES ]; then
         INP_ITER=1

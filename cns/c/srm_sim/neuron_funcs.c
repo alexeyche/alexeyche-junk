@@ -31,7 +31,7 @@ double pstroke(const double *u, const Constants *c) {
 double B_calc(const unsigned char *Yspike, const double *p, const double *pmean, const Constants *c) {
     if( *pmean == 0 ) return(0);
     double pmean_w = *pmean/c->mean_p_dur;
-    printf("pmean_w %f, 1part: %f, 2part: %f\n", pmean_w, ( *Yspike * log( *p/pmean_w) - (*p - pmean_w)), c->target_rate_factor * ( *Yspike * log( pmean_w/c->__target_rate) - (pmean_w - c->__target_rate) ));
+//    printf("pmean_w %f, 1part: %f, 2part: %f\n", pmean_w, ( *Yspike * log( *p/pmean_w) - (*p - pmean_w)), c->target_rate_factor * ( *Yspike * log( pmean_w/c->__target_rate) - (pmean_w - c->__target_rate) ));
     return (( *Yspike * log( *p/pmean_w) - (*p - pmean_w)) - c->target_rate_factor * ( *Yspike * log( pmean_w/c->__target_rate) - (pmean_w - c->__target_rate) ));
 
 }
@@ -44,26 +44,25 @@ double C_calc(const unsigned char *Yspike, const double *p, const double *u, con
 
 
 double rate_calc(const double *w, const Constants *c) {
-    return(0.02);
-//    double norm_w = *w/c->ws;
+    double norm_w = *w/(2*c->ws);
 //    double w4 = pow(*w, 4);
 //    return( 0.04*(w4/(w4+0.0016)) );
-//    if( norm_w > 1) {
-//        return(0.04);
-//    } else
-//    if( norm_w < 0) {
-//        return(0.0);
-//    } else {
-//        double k,b;
-//        if(norm_w > 0.5) {
-//            k = 0.06; b = -0.020;
-//        } else
-//        if(norm_w > 0.25) {
-//            k = 0.03; b = -0.005;
-//        } else {
-//            k = 0.01; b = 0;
-//        }
-////        printf("x: %f y: %f\n", norm_w, norm_w*k+b);
-//        return(norm_w*k+b);
-//    }        
+    if( norm_w > 1) {
+        return(0.04);
+    } else
+    if( norm_w < 0) {
+        return(0.0);
+    } else {
+        double k,b;
+        if(norm_w > 0.5) {
+            k = 0.06; b = -0.020;
+        } else
+        if(norm_w > 0.25) {
+            k = 0.03; b = -0.005;
+        } else {
+            k = 0.01; b = 0;
+        }
+//        printf("x: %f y: %f\n", norm_w, norm_w*k+b);
+        return(norm_w*k+b);
+    }        
 }

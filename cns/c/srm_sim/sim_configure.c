@@ -36,7 +36,7 @@ void configreNetSpikesSim(Sim *s, Constants *c) {
     configureConnMapNetSim(s->ns, s->layers); 
 
     pMatrixVector *ml = readMatrixList(c->input_spikes_filename);
-    assert(ml && ml->size == 1);
+    assert(ml && ml->size >= 1);
     Matrix *inp_m = ml->array[0];
     SpikesList *inp_sl = spikesMatrixToSpikesList(inp_m);
     propagateInputSpikesNetSim(s->ns, inp_sl);

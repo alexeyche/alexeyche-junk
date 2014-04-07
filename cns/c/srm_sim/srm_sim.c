@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
     if(a.input_spikes_file) {
         c->input_spikes_filename = strdup(a.input_spikes_file);
     }
-    printConstants(c);
+//    printConstants(c);
     assert(a.jobs != 0);
     Sim *s = createSim(a.jobs);
     

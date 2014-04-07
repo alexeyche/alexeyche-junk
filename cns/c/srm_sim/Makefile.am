@@ -1,4 +1,5 @@
 # what flags you want to pass to the C compiler & linker
+CFLAGS=
 AM_CFLAGS = -Wall -std=gnu99 -O0 -g -pthread
 #CFLAGS=
 LDADD= -lm

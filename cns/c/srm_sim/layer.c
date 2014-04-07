@@ -256,7 +256,7 @@ void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constant
             l->fired[ *id_to_sim ] = 1;
             l->pacc[ *id_to_sim ] += 1;
             l->a[ *id_to_sim ] = 0;
-            printf("spike %zu! p: %f, pacc: %f\n", *id_to_sim, p, l->pacc[ *id_to_sim ]);
+//            printf("spike %zu! p: %f, pacc: %f\n", *id_to_sim, p, l->pacc[ *id_to_sim ]);
         }
         
         if(c->learn) {
@@ -279,10 +279,7 @@ void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constant
                     TEMPLATE(insertVector,double)(l->stat_W[ *id_to_sim ][ *syn_id ], l->W[ *id_to_sim ][ *syn_id ]);
                     TEMPLATE(insertVector,double)(l->stat_C[ *id_to_sim ][ *syn_id ], l->C[ *id_to_sim ][ *syn_id ]);
                 }
-                if(l->syn_fired[ *id_to_sim ][ *syn_id ] == 1) {
-                    l->syn[ *id_to_sim ][ *syn_id ] *= l->a[*id_to_sim];
-                    l->syn_fired[ *id_to_sim ][ *syn_id ] = 0; 
-                }
+                
                 
                 if( (l->C[ *id_to_sim ][ *syn_id ] < LEARN_ACT_TOL ) && (l->C[ *id_to_sim ][ *syn_id ] > -LEARN_ACT_TOL ) && 
                     (dC < LEARN_ACT_TOL ) && (dC > -LEARN_ACT_TOL ) ) {
@@ -322,6 +319,10 @@ void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constant
         l->syn[ *id_to_sim ][ *syn_id ] -= l->syn[ *id_to_sim ][ *syn_id ]/c->tm;
         if( l->syn[ *id_to_sim ][ *syn_id ] < SYN_ACT_TOL ) {
             TEMPLATE(dropNodeLList,ind)(l->active_syn_ids[ *id_to_sim ], act_node);
+        }
+        if(l->syn_fired[ *id_to_sim ][ *syn_id ] == 1) {
+            l->syn[ *id_to_sim ][ *syn_id ] *= l->a[*id_to_sim];
+            l->syn_fired[ *id_to_sim ][ *syn_id ] = 0; 
         }
     }
     l->a[ *id_to_sim ] += (1 - l->a[ *id_to_sim ])/c->ta;

@@ -14,6 +14,7 @@ const SynSpike* getInputSpike(double t, const size_t *n_id, NetSim *ns, SimRunti
            return(sp);
         }
     }
+    pthread_spin_lock(&spinlocks[*n_id]);
     spike_it = &sr->spikes_iter->array[ *n_id ];
     if(*spike_it < ns->spikes_queue[ *n_id ]->size) {
         const SynSpike *sp = &ns->spikes_queue[ *n_id ]->array[ *spike_it ]; 
@@ -23,9 +24,11 @@ const SynSpike* getInputSpike(double t, const size_t *n_id, NetSim *ns, SimRunti
         }
         if(sp->t <= t+c->dt) {
            *spike_it += 1; 
+           pthread_spin_unlock(&spinlocks[*n_id]);
            return(sp);
         }    
     }
+    pthread_spin_unlock(&spinlocks[*n_id]);
     return(NULL);
 }
 
@@ -33,6 +36,11 @@ const SynSpike* getInputSpike(double t, const size_t *n_id, NetSim *ns, SimRunti
 
 void runSim(Sim *s) {
     configureSimAttr(s);
+    
+    spinlocks = (pthread_spinlock_t*)malloc( s->net_size * sizeof(pthread_spinlock_t));
+    for(size_t ni=0; ni<s->net_size; ni++) {
+        pthread_spin_init(&spinlocks[ni], 0); // net sim spinlock
+    }
     
     pthread_t *threads = (pthread_t *) malloc( s->nthreads * sizeof( pthread_t ) );
     SimWorker *workers = (SimWorker*) malloc( s->nthreads * sizeof(SimWorker) );
@@ -51,6 +59,9 @@ void runSim(Sim *s) {
 
     free(workers);
     free(threads);
+    for(size_t ni=0; ni<s->net_size; ni++) {
+        pthread_spin_destroy(&spinlocks[ni]);
+    }
 }
 
 void* simRunRoutine(void *args) {
@@ -66,7 +77,7 @@ void* simRunRoutine(void *args) {
         for(size_t na_i=first; na_i<last; na_i++) {
             simulateNeuron(s, &s->na[na_i].layer_id, &s->na[na_i].n_id, t, s->c);
         }
-//        pthread_barrier_wait( &barrier );
+        pthread_barrier_wait( &barrier );
     }
     return(NULL);
 }

@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 
 SRM_SIM="../bin/srm_sim"
-#WORK_DIR=~/prog/sim/cprog/runs/rfd
-WORK_DIR=~/my/sim/cprog/runs/rfd
-RFD_DIR=/home/alexeyche/my/sim/rfd_files
+WORK_DIR=~/prog/sim/runs/rfd
+#WORK_DIR=~/my/sim/cprog/runs/rfd
+RFD_DIR=/home/alexeyche/prog/sim/rfd_files
+#RFD_DIR=/home/alexeyche/my/sim/rfd_files
 
 mkdir -p $WORK_DIR
 
@@ -23,7 +24,7 @@ function get_const {
 INPUT_FILE=`get_const input_spikes_filename`
 MEAN_P_DUR=`get_const mean_p_dur`
 EPOCHS=`get_const epochs`
-JOBS=4
+JOBS=8
 
 
 DUR=0
