@@ -5,7 +5,7 @@ CWD=$(dirname $CWD_SCR)
 
 
 function usage {
-    echo "$0 -w WORK_DIR -s -l -e 1[:100] -d 60000 INPUT_FILE1 [INPUT_FILE2]"
+    echo "$0 -w WORK_DIR -s -l -e EPOCHS -d 60000 INPUT_FILE1 [INPUT_FILE2]"
 }
 
 
@@ -36,27 +36,41 @@ shift $(( OPTIND - 1 ))
 INPUT_FILES=${@}    
 
 [ -z "$WORK_DIR" -o -z "$INPUT_FILES" ] && usage && exit 1
-INPUT_FILES_DIR=$(echo $INPUT_FILES | xargs dirname | sort | uniq)
+INPUT_FILES_DIR=$(for f in $INPUT_FILES; do dirname $f; done | sort -n | uniq)
 INPUT_FILES_BN=$(for f in $INPUT_FILES; do basename $f; done | sort -n)
 MAX_INPUT_FILES=$(echo $INPUT_FILES | wc -w)
 
-[ -d "$WORK_DIR" ] && rm -rf $WORK_DIR/*
-[ ! -d "$WORK_DIR" ] && mkdir -p $WORK_DIR
-cp ../srm_sim/constants.ini $WORK_DIR
+DUR=0
+MIN_EP=1
+MAX_EP=$EPOCH
+
+if [ -d "$WORK_DIR" ]; then
+    LAST_EP=$(find $WORK_DIR -maxdepth 1 -type f -name "?*_*"  -exec basename {} \; | cut -d '_' -f 1 | sort -nr | uniq | head -n 1)
+    RESP="xxx"
+    while true; do
+        if [ "$RESP" == "y" ]; then
+            DUR=$((DURATION_OF_INPUT_FILE*MIN_EP))
+            MIN_EP=$((LAST_EP+1))
+            MAX_EP=$((LAST_EP+EPOCH))
+            break
+        elif [ "$RESP" == "n" ]; then
+            rm -rf $WORK_DIR/*
+            cp ../srm_sim/constants.ini $WORK_DIR
+            break
+        else 
+            read -p "$(basename $WORK_DIR) already exists and $LAST_EP epochs was done here. Continue learning? (y/n): " RESP
+        fi        
+    done        
+else 
+    mkdir -p $WORK_DIR
+    cp ../srm_sim/constants.ini $WORK_DIR
+fi   
 
 function get_const {
     egrep -o "^$1.*=[ ]*[\/_.a-zA-Z0-9]+" $WORK_DIR/constants.ini | awk -F'=' '{ print $2}' | tr -d ' '
 }
 
-MIN_EP=1
-MAX_EP=1
-if [ ! -z "$EPOCH" ]; then
-    MIN_EP=$(echo $EPOCH | cut -d ':' -f 1)
-    MAX_EP=$(echo $EPOCH | cut -d ':' -f 2)
-fi    
-
 MEAN_P_DUR=$(get_const mean_p_dur)
-DUR=0
 
 INP_ITER=1
 EPOCHS=$(seq $MIN_EP $MAX_EP)

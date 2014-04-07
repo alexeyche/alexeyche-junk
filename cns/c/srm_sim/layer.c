@@ -328,6 +328,26 @@ void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constant
     l->a[ *id_to_sim ] += (1 - l->a[ *id_to_sim ])/c->ta;
 }
 
+
+void resetSRMLayerNeuron(SRMLayer *l, const size_t *ni) {
+    l->a[ *ni ] = 1;
+    l->B[ *ni ] = 0;
+    l->fired[ *ni ] = 0;
+    for(size_t con_i=0; con_i < l->nconn[ *ni ]; con_i++) {
+        l->C[ *ni ][con_i] = 0;
+        l->syn[ *ni ][con_i] = 0;
+        l->syn_fired[ *ni ][con_i] = 0;
+    }
+    indLNode *act_node = NULL;
+    while( (act_node = TEMPLATE(getNextLList,ind)(l->active_syn_ids[ *ni ]) ) != NULL ) {
+       TEMPLATE(dropNodeLList,ind)(l->active_syn_ids[ *ni], act_node);
+    }
+    act_node = NULL;
+    while( (act_node = TEMPLATE(getNextLList,ind)(l->learn_syn_ids[ *ni ]) ) != NULL ) {
+       TEMPLATE(dropNodeLList,ind)(l->learn_syn_ids[*ni], act_node);
+    }
+}
+
 pMatrixVector* serializeSRMLayer(SRMLayer *l) {
     pMatrixVector *data = TEMPLATE(createVector,pMatrix)();
     size_t max_conn_id = 0;

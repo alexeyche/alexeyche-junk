@@ -12,12 +12,15 @@ SimRuntime* createRuntime() {
     SimRuntime *rt = (SimRuntime*) malloc(sizeof(SimRuntime));
     rt->input_spikes_iter = TEMPLATE(createVector,ind)();
     rt->spikes_iter = TEMPLATE(createVector,ind)();
+    rt->reset_timeline = TEMPLATE(createVector,double)();
+    rt->timeline_iter = 0;
     return(rt);
 }
 
 void deleteRuntime(SimRuntime *sr) {
     TEMPLATE(deleteVector,ind)(sr->input_spikes_iter);
     TEMPLATE(deleteVector,ind)(sr->spikes_iter);
+    TEMPLATE(deleteVector,double)(sr->reset_timeline);
     free(sr);
 }
 
@@ -34,18 +37,19 @@ void configreNetSpikesSim(Sim *s, Constants *c) {
     allocNetSim(s->ns, s->net_size);
     
     configureConnMapNetSim(s->ns, s->layers); 
-
-    pMatrixVector *ml = readMatrixList(c->input_spikes_filename);
-    assert(ml && ml->size >= 1);
-    Matrix *inp_m = ml->array[0];
-    SpikesList *inp_sl = spikesMatrixToSpikesList(inp_m);
-    propagateInputSpikesNetSim(s->ns, inp_sl);
-
     if(s->rt) {
         deleteRuntime(s->rt);
         s->rt = createRuntime();
     }
     allocRuntime(s->rt, s->ns->size);
+
+    pMatrixVector *ml = readMatrixList(c->input_spikes_filename);
+    assert(ml && ml->size >= 2);
+    
+    Matrix *inp_m = ml->array[0];
+    SpikesList *inp_sl = spikesMatrixToSpikesList(inp_m);
+    propagateInputSpikesNetSim(s->ns, inp_sl);
+
     double Tmax = 0;
     for(size_t ni=0; ni<s->ns->net->size; ni++) {
         if(s->ns->net->list[ni]->array[ s->ns->net->list[ni]->size-1 ]> Tmax) {
@@ -54,6 +58,12 @@ void configreNetSpikesSim(Sim *s, Constants *c) {
     }   
     s->rt->Tmax = Tmax + 100;
     deleteSpikesList(inp_sl); 
+    
+    Matrix *timeline_m = ml->array[1];
+    for(size_t ri=0; ri<timeline_m->nrow*timeline_m->ncol; ri++) {
+        TEMPLATE(insertVector,double)(s->rt->reset_timeline, timeline_m->vals[ri]);
+    }
+    
     TEMPLATE(deleteVector,pMatrix)(ml);
 }
 

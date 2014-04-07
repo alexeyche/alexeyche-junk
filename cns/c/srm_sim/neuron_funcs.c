@@ -4,7 +4,7 @@
 #define LINEAR 1
 #define EXP 2
 
-#define PROB_FUNC LINEAR
+#define PROB_FUNC EXP
 
 
 double probf( const double *u, const Constants *c) {

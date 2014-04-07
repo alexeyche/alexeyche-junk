@@ -77,5 +77,6 @@ pMatrixVector* serializeSRMLayer(SRMLayer *l);
 void loadSRMLayer(SRMLayer *l, Constants *c, pMatrixVector *data);
 void toStartValues(SRMLayer *l, Constants *c);
 void propagateSpikeSRMLayer(SRMLayer *l, const size_t *ni, const SynSpike *sp, const Constants *c);
+void resetSRMLayerNeuron(SRMLayer *l, const size_t *ni);
 
 #endif

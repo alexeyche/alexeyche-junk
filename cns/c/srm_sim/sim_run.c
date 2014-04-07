@@ -72,12 +72,28 @@ void* simRunRoutine(void *args) {
     int first = min(  sw->thread_id    * neuron_per_thread, s->num_neurons );
     int last  = min( (sw->thread_id+1) * neuron_per_thread, s->num_neurons );
 
-    s->rt->Tmax += 100;
     for(double t=0; t< s->rt->Tmax; t+=s->c->dt) {
         for(size_t na_i=first; na_i<last; na_i++) {
             simulateNeuron(s, &s->na[na_i].layer_id, &s->na[na_i].n_id, t, s->c);
         }
+        bool we_did_reset = false;
+        if(s->rt->reset_timeline->size > s->rt->timeline_iter) {
+            if(s->rt->reset_timeline->array[ s->rt->timeline_iter ] <= t) {
+                we_did_reset = true;
+                for(size_t na_i=first; na_i<last; na_i++) {
+                    SRMLayer *l = s->layers->array[s->na[na_i].layer_id];
+                    resetSRMLayerNeuron(l, &s->na[na_i].n_id);
+                }
+
+            }
+        }
         pthread_barrier_wait( &barrier );
+        if(we_did_reset) {
+            if(sw->thread_id == 0) {
+                ++s->rt->timeline_iter;
+            }
+            pthread_barrier_wait( &barrier );
+        }
     }
     return(NULL);
 }
