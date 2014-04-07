@@ -1,7 +1,8 @@
 #!/usr/bin/RScript
 
 library(snn)
-setwd("~/prog/alexeyche-junk/cns/R/srm/cprog")
+#setwd("~/prog/alexeyche-junk/cns/R/srm/cprog")
+setwd("~/my/git/alexeyche-junk/cns/R/srm/cprog")
 
 source('../ucr_ts.R')
 source('../gen_spikes.R')
@@ -9,12 +10,12 @@ source('../serialize_to_bin.R')
 source('../plot_funcs.R')
 
 
-ucr_spikes_dir = "/home/alexeyche/prog/sim/ucr_spikes"
-data_dir = '~/prog/sim'
-#data_dir = '~/my/sim'
+#ucr_spikes_dir = "/home/alexeyche/prog/sim/ucr_spikes"
+ucr_spikes_dir = "/home/alexeyche/my/sim/ucr_spikes"
+#data_dir = '~/prog/sim'
+data_dir = '~/my/sim'
 
 
-N = 10
 M = 100
 mean_p_dur = 60000
 
@@ -38,7 +39,7 @@ for(ep in 1:epochs) {
                          samples_from_dataset,
                          length(unique(train_net$labels)), 
                          duration)
-    saveMatrixList(spike_file, list(list_to_matrix(train_net$net), matrix(train_net$labels), matrix(train_net$timeline)))
+    saveMatrixList(spike_file, list(list_to_matrix(train_net$net), matrix(train_net$timeline), matrix(train_net$labels) ))
 }
 
 test_net = NetClass$new(test_patterns, duration)
@@ -49,6 +50,7 @@ spike_file = sprintf("%s/test/ucr_%selems_%sclasses_%sdur",
                      length(unique(train_net$labels)), 
                      duration)
 saveMatrixList(spike_file, list(list_to_matrix(test_net$net), 
-                                matrix(test_net$labels), 
-                                matrix(test_net$timeline))
+                                matrix(test_net$timeline),
+                                matrix(test_net$labels)
+                                )
                )

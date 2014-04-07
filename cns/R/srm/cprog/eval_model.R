@@ -1,19 +1,23 @@
 
-setwd("~/prog/alexeyche-junk/cns/R/srm/cprog")
+#setwd("~/prog/alexeyche-junk/cns/R/srm/cprog")
+setwd("~/my/git/alexeyche-junk/cns/R/srm/cprog")
 library(snn)
 
 source('../eval_funcs.R')
 source('../ucr_ts.R')
 source('../plot_funcs.R')
 
-ucr_spikes_dir = "/home/alexeyche/prog/sim/ucr_spikes"
-gitdir = "/home/alexeyche/prog/alexeyche-junk"
-rundir = "/home/alexeyche/prog/sim/runs"
+#ucr_spikes_dir = "/home/alexeyche/prog/sim/ucr_spikes"
+ucr_spikes_dir = "/home/alexeyche/my/sim/ucr_spikes"
+#gitdir = "/home/alexeyche/prog/alexeyche-junk"
+gitdir = "/home/alexeyche/my/git/alexeyche-junk"
+#rundir = "/home/alexeyche/prog/sim/runs"
+rundir = "/home/alexeyche/my/sim/runs"
 #runname="test_run"
 #runname = "n50_no_conn"
 #runname = "n50_conn_3"
-runname = "n50_conn_big"
-ep = 200
+runname = "n100_exp"
+ep = 199
 
 srm_sim_exec = sprintf("%s/cns/c/bin/srm_sim", gitdir)
 
@@ -28,11 +32,11 @@ Nids=(M+1):(M+N)
 
 
 input_file = sprintf("%s/train/1_ucr_20elems_3classes_1000dur", ucr_spikes_dir)
-labels = c(loadMatrix(input_file,2))
-timeline = c(loadMatrix(input_file,3))
+timeline = c(loadMatrix(input_file,2))
+labels = c(loadMatrix(input_file,3))
 test_input_file =  sprintf("%s/test/ucr_20elems_3classes_1000dur", ucr_spikes_dir)
-test_labels = c(loadMatrix(test_input_file,2))
-test_timeline = c(loadMatrix(test_input_file,3))
+test_timeline = c(loadMatrix(test_input_file,2))
+test_labels = c(loadMatrix(test_input_file,3))
 duration = timeline[2]-timeline[1]
 
 evaldir = sprintf("%s/eval", workdir)
@@ -45,7 +49,7 @@ model_file = sprintf("%s/%s_model", workdir, ep)
 
 ################
 
-tresholds = seq(-65, -50, length.out=10)
+tresholds = seq(-65, -55, length.out=10)
 sigmas = seq(0.1,10, length.out=10)
 #tresholds = c(-60)
 #sigmas = c(1)

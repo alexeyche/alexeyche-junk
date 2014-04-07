@@ -1,5 +1,6 @@
 #!/usr/bin/RScript
-setwd("~/prog/alexeyche-junk/cns/R/srm/cprog")
+#setwd("~/prog/alexeyche-junk/cns/R/srm/cprog")
+setwd("~/my/git/alexeyche-junk/cns/R/srm/cprog")
 source('../serialize_to_bin.R')
 source('../util.R')
 
@@ -8,13 +9,20 @@ source('../plot_funcs.R')
 
 library(snn)
 
-rundir="/home/alexeyche/prog/sim/runs"
+#rundir="/home/alexeyche/prog/sim/runs"
+rundir="/home/alexeyche/my/sim/runs"
 #runname = "test_run"
 #runname = "n50_no_conn"
 #runname = "n50_conn_3"
-runname = "n50_conn_big"
-ep=200
+#runname = "n50_conn_big"
+runname = "n100_exp"
 
+
+for(ep in 1:200) {
+    output_spikes = sprintf("%s/%s_output_spikes.bin", workdir, ep)
+    if(!file.exists(output_spikes)) { ep=ep-1; break }
+}
+#ep=1
 workdir=sprintf("%s/%s", rundir, runname)
 #workdir="/home/alexeyche/prog/sim/runs/rfd"
 
@@ -43,7 +51,7 @@ for(i in 1:length(net)) {
     }
     net[[i]] = sp[i, spike_elems]
 }
-plot_rastl(net,T0=0,Tmax=2000)
+p1 = plot_rastl(net,T0=0,Tmax=2000)
 
 if(file.exists(sprintf("%s.bin",stat_file))) {
     p = loadMatrix(stat_file, 1)
@@ -63,8 +71,10 @@ if(file.exists(sprintf("%s.bin",stat_file))) {
 
 W = loadMatrix(model_file,1)
 
-gr_pl(t(W))
+p2 = levelplot(t(W), col.regions=colorRampPalette(c("black", "white")))
 
+print(p1, position=c(0, 0.5, 1, 1), more=TRUE)
+print(p2, position=c(0, 0, 1, 0.5))
 # Wacc = vector("list",N)
 # pacc = vector("list",N)
 # for(ep in 3:200) {
