@@ -43,6 +43,19 @@ simCubeCC = function(responces, duration, sigma) {
     return(Ksim)
 }
 
+simCube = function(responces, duration, sigma) {
+    Ksim = array(0, dim=c(length(responces[[1]]$data), length(responces), length(responces)))
+    for(ri in 1:length(responces)) {
+        for(rj in 1:length(responces)) {
+            if(ri!=rj) {
+                Ksim[,ri,rj] = kernelCrossEntropy(responces[[ri]], responces[[rj]], kernel_options)$data/length(responces[[ri]]$data)
+            }
+        }
+    }
+    return(Ksim)
+}
+
+
 eval = function(train_net_ev, test_net_ev, sim,  kernel_sigma) {
     if(train_net_ev$duration != test_net_ev$duration) {
         cat("Error!\n")

@@ -115,3 +115,24 @@ loadModelFromFile = function(n, model_file) {
   }
   
 }
+
+getSpikesFromMatrix = function(sp) {
+    net = blank_net(nrow(sp))
+    for(i in 1:length(net)) {
+        spike_elems = which(sp[i,]>0)
+        if(length(spike_elems)>0) {
+            if(sp[i,1] == 0) {
+                spikes_elems = c(1, spike_elems)
+            }
+        }
+        net[[i]] = sp[i, spike_elems]
+    }
+    return(net)
+}
+
+get_const = function(const_name) {
+    system(sprintf("egrep -o '%s[ ]*=[ ]*[\\/_.a-zA-Z0-9]+' %s | cut -d '=' -f 2 | tr -d ' '", const_name, const_ini), intern=TRUE)
+}
+patch_const = function(const_ini, param, new_val) {
+    system( sprintf("sed -i -e 's:%s[ ]*=.*:%s = %s:g' %s", param, param, new_val, const_ini))
+}

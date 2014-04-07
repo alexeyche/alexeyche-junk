@@ -2,18 +2,23 @@
 setwd("~/prog/alexeyche-junk/cns/R/srm/cprog")
 source('../serialize_to_bin.R')
 source('../util.R')
+
 source('../plot_funcs.R')
-
-get_const = function(const_name) {
-    system(sprintf("egrep -o '%s[ ]*=[ ]*[\\/_.a-zA-Z0-9]+' %s | cut -d '=' -f 2 | tr -d ' '", const_name, const_ini), intern=TRUE)
-}
-
 
 
 library(snn)
-workdir="/home/alexeyche/prog/sim/runs/test_run"
 
-ep=1
+rundir="/home/alexeyche/prog/sim/runs"
+#runname = "test_run"
+#runname = "n50_no_conn"
+#runname = "n50_conn_3"
+runname = "n50_conn_big"
+ep=200
+
+workdir=sprintf("%s/%s", rundir, runname)
+#workdir="/home/alexeyche/prog/sim/runs/rfd"
+
+
 ep_str=""
 if(ep>0) {
     ep_str = sprintf("%d_",ep)
@@ -38,7 +43,7 @@ for(i in 1:length(net)) {
     }
     net[[i]] = sp[i, spike_elems]
 }
-plot_rastl(net,T0=0,Tmax=1000)
+plot_rastl(net,T0=0,Tmax=2000)
 
 if(file.exists(sprintf("%s.bin",stat_file))) {
     p = loadMatrix(stat_file, 1)
@@ -75,4 +80,4 @@ gr_pl(t(W))
 #     }
 # }
 # 
-# gr_pl(t(Wacc[[1]]))
+# gr_pl(t(Wacc[[2]]))

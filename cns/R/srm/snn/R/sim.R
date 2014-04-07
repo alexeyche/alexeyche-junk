@@ -1,14 +1,12 @@
 
 
-NetClass = setRefClass("NetClass", fields = list(net="list", timeline="vector", labels="vector", M="vector", Tmax="vector", duration="vector", n_ids="vector"), 
+NetClass = setRefClass("NetClass", fields = list(net="list", timeline="vector", labels="vector", M="vector", Tmax="vector", duration="vector"), 
                                     methods = list(
-                                    initialize = function(patterns, neurons_list, duration) {
+                                    initialize = function(patterns, duration) {
                                         timeline <<- numeric(0)
                                         Tcur = 0
-                                        n_ids <<- sapply(neurons_list, function(x) x$ids())
                                         M <<- length(patterns[[1]]$data)
-                                        N = sum(sapply(neurons_list, function(x) x$len()))
-                                        net <<- blank_net(M+N)
+                                        net <<- blank_net(M)
                                         for(p in patterns) {
                                             if(length(p$data) != M) {
                                                 cat("Non homogenious patterns discovered. Error\n")
@@ -24,10 +22,7 @@ NetClass = setRefClass("NetClass", fields = list(net="list", timeline="vector", 
                                         }
                                         Tmax <<- Tcur
                                         duration <<- duration
-                                    },
-                                    getResponces = function() {
-                                        return( decomposePatterns(.self$net[.self$n_ids], .self$timeline, .self$labels) )
-                                    },
+                                    },                                    
                                     replicate = function(Tmax) {
                                         repl_net = blank_net(.self$M)
                                         repl_timeline = NULL
