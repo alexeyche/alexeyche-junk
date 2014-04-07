@@ -317,12 +317,12 @@ void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constant
     while( (act_node = TEMPLATE(getNextLList,ind)(l->active_syn_ids[ *id_to_sim ]) ) != NULL ) {
         const size_t *syn_id = &act_node->value;
         l->syn[ *id_to_sim ][ *syn_id ] -= l->syn[ *id_to_sim ][ *syn_id ]/c->tm;
-        if( l->syn[ *id_to_sim ][ *syn_id ] < SYN_ACT_TOL ) {
-            TEMPLATE(dropNodeLList,ind)(l->active_syn_ids[ *id_to_sim ], act_node);
-        }
         if(l->syn_fired[ *id_to_sim ][ *syn_id ] == 1) {
             l->syn[ *id_to_sim ][ *syn_id ] *= l->a[*id_to_sim];
             l->syn_fired[ *id_to_sim ][ *syn_id ] = 0; 
+        }
+        if( l->syn[ *id_to_sim ][ *syn_id ] < SYN_ACT_TOL ) {
+            TEMPLATE(dropNodeLList,ind)(l->active_syn_ids[ *id_to_sim ], act_node);
         }
     }
     l->a[ *id_to_sim ] += (1 - l->a[ *id_to_sim ])/c->ta;
