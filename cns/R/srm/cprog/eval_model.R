@@ -17,7 +17,7 @@ rundir = "/home/alexeyche/my/sim/runs"
 #runname = "n50_no_conn"
 #runname = "n50_conn_3"
 runname = "n100_exp"
-ep = 199
+ep = 150
 
 srm_sim_exec = sprintf("%s/cns/c/bin/srm_sim", gitdir)
 
@@ -49,7 +49,7 @@ model_file = sprintf("%s/%s_model", workdir, ep)
 
 ################
 
-tresholds = seq(-65, -55, length.out=10)
+tresholds = seq(-65, -40, by=2.5)
 sigmas = seq(0.1,10, length.out=10)
 #tresholds = c(-60)
 #sigmas = c(1)
@@ -101,7 +101,7 @@ for(tr_i in 1:length(tresholds)) {
         c(r, confm_data) := ucr_test(train_resp, test_resp, cross_corr_alg, FALSE)
         
         rates[tr_i, sigma_i] = r
-        cat("tr: ", tr, "sigma: ", kernel_sigma, "\n")
+        cat("tr: ", tr, "sigma: ", kernel_sigma, " rate: ", r, "\n")
     }
 }
 

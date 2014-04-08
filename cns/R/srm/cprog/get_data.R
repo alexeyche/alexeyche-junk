@@ -15,15 +15,15 @@ rundir="/home/alexeyche/my/sim/runs"
 #runname = "n50_no_conn"
 #runname = "n50_conn_3"
 #runname = "n50_conn_big"
-runname = "n100_exp"
+runname = "n100_exp_no_conn"
+workdir=sprintf("%s/%s", rundir, runname)
 
-
-for(ep in 1:200) {
+for(ep in 1:300) {
     output_spikes = sprintf("%s/%s_output_spikes.bin", workdir, ep)
     if(!file.exists(output_spikes)) { ep=ep-1; break }
 }
-#ep=1
-workdir=sprintf("%s/%s", rundir, runname)
+#ep=2
+
 #workdir="/home/alexeyche/prog/sim/runs/rfd"
 
 
@@ -90,4 +90,4 @@ print(p2, position=c(0, 0, 1, 0.5))
 #     }
 # }
 # 
-# gr_pl(t(Wacc[[2]]))
+# gr_pl(t(Wacc[[1]]))
