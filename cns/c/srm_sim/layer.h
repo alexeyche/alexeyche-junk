@@ -18,6 +18,9 @@
 #define SYN_ACT_TOL 0.0001 // value of synapse needed to delete 
 #define LEARN_ACT_TOL 0.0001 // value of synapse needed to delete 
 
+#define PRESYNAPTIC 1
+#define POSTSYNAPTIC 2
+
 typedef enum {EXC, INH} nspec_t;
 
 typedef struct {
@@ -42,7 +45,8 @@ typedef struct {
     unsigned char *fired;
     unsigned char **syn_fired;
     double *pacc;
-
+    double *axon_del;
+    
     //stat
     bool saveStat;
     doubleVector **stat_B;

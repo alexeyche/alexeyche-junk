@@ -4,6 +4,6 @@
 #include <stdlib.h>
 
 double getUnif();
-
+double getExp(double rate);
 
 #endif

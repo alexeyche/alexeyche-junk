@@ -36,6 +36,7 @@ SRMLayer* createSRMLayer(size_t N, size_t *glob_idx, bool saveStat) {
     l->a = (double*)malloc( l->N*sizeof(double));
     l->B = (double*)malloc( l->N*sizeof(double));
     l->C = (double**)malloc( l->N*sizeof(double*));
+    l->axon_del = (double*)malloc( l->N*sizeof(double));
     l->fired = (unsigned char*)malloc( l->N*sizeof(unsigned char));
     l->pacc = (double*)malloc( l->N*sizeof(double));
     l->syn_fired = (unsigned char**)malloc( l->N*sizeof(unsigned char*));
@@ -92,6 +93,7 @@ void deleteSRMLayer(SRMLayer *l) {
     free(l->fired);
     free(l->syn_fired);
     free(l->pacc);
+    free(l->axon_del);
     if(l->saveStat) {    
         free(l->stat_u);
         free(l->stat_p);
@@ -181,6 +183,7 @@ void toStartValues(SRMLayer *l, Constants *c) {
         l->B[ni] = 0;
         l->fired[ni] = 0;
         l->pacc[ni] = 0;
+        l->axon_del[ni] = 0;
         for(size_t syn_i=0; syn_i<l->nconn[ni]; syn_i++) {
             l->W[ni][syn_i] = start_weight;
             l->syn[ni][syn_i] = 0;
@@ -226,6 +229,11 @@ void configureSRMLayer(SRMLayer *l, const indVector *inputIDs, Constants *c) {
         TEMPLATE(deleteVector,ind)(conns);
     }
     toStartValues(l, c); 
+    if(c->axonal_delays_rate > 0) {
+        for(size_t ni=0; ni<l->N; ni++) {
+            l->axon_del[ni] = c->axonal_delays_gain*getExp(c->axonal_delays_rate);
+        }
+    }
 }
 
 void propagateSpikeSRMLayer(SRMLayer *l, const size_t *ni, const SynSpike *sp, const Constants *c) {
@@ -241,6 +249,7 @@ void propagateSpikeSRMLayer(SRMLayer *l, const size_t *ni, const SynSpike *sp, c
     l->syn_fired[*ni][ sp->syn_id ] = 1;
 }
 
+#define RATE_NORM PRESYNAPTIC
 void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constants *c) {
     double u = c->u_rest;
 
@@ -270,9 +279,14 @@ void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constant
                 l->C[ *id_to_sim ][ *syn_id ] += -l->C[ *id_to_sim ][ *syn_id ]/c->tc + dC;
 //                printf("dC: %f C: %f, params: %d %f %f %f\n", dC, l->C[ *id_to_sim ][ *syn_id ], l->fired[ *id_to_sim ], p, u, l->syn[ *id_to_sim ][ *syn_id ]);
                 double lrate = rate_calc(&l->W[ *id_to_sim ][ *syn_id ], c);
-/*TODO:*/       double dw = c->added_lrate*lrate*( l->C[ *id_to_sim ][ *syn_id ]*l->B[ *id_to_sim ] -  \
-                                            c->weight_decay_factor * l->syn_fired[ *id_to_sim ][ *syn_id ] * l->W[ *id_to_sim ][ *syn_id ] );
                 
+#if RATE_NORM == PRESYNAPTIC
+                double dw = c->added_lrate*lrate*( l->C[ *id_to_sim ][ *syn_id ]*l->B[ *id_to_sim ] -  \
+                                            c->weight_decay_factor * l->syn_fired[ *id_to_sim ][ *syn_id ] * l->W[ *id_to_sim ][ *syn_id ] );
+#elif RATE_NORM == POSTSYNAPTIC                
+                double dw = c->added_lrate*lrate*( l->C[ *id_to_sim ][ *syn_id ]*l->B[ *id_to_sim ] -  \
+                                            3*c->weight_decay_factor * l->fired[ *id_to_sim ] * l->W[ *id_to_sim ][ *syn_id ] );
+#endif               
                 l->W[ *id_to_sim ][ *syn_id ] += dw;
                 
                 if(l->saveStat) {
@@ -363,7 +377,8 @@ pMatrixVector* serializeSRMLayer(SRMLayer *l) {
     Matrix *nt = createMatrix(l->N, 1);
     Matrix *pacc = createMatrix(l->N, 1);
     Matrix *ids = createMatrix(l->N, 1);
-    
+    Matrix *axon_del = createMatrix(l->N, 1);
+   
     for(size_t i=0; i<W->nrow; i++) {
         for(size_t j=0; j<W->ncol; j++) {
             setMatrixElement(W, i, j, 0);
@@ -376,13 +391,15 @@ pMatrixVector* serializeSRMLayer(SRMLayer *l) {
         setMatrixElement(nt, ni, 0, l->nt[ni]);
         setMatrixElement(pacc, ni, 0, l->pacc[ni]);
         setMatrixElement(ids, ni, 0, l->ids[ni]);
+        setMatrixElement(axon_del, ni, 0, l->axon_del[ni]);
     }
     
     TEMPLATE(insertVector,pMatrix)(data, W);
     TEMPLATE(insertVector,pMatrix)(data, nt);
     TEMPLATE(insertVector,pMatrix)(data, pacc);
     TEMPLATE(insertVector,pMatrix)(data, ids);
-    
+    TEMPLATE(insertVector,pMatrix)(data, axon_del);
+   
     return(data);
 }
 
@@ -391,6 +408,7 @@ void loadSRMLayer(SRMLayer *l, Constants *c, pMatrixVector *data) {
     Matrix *nt = data->array[1];
     Matrix *pacc = data->array[2];
     Matrix *ids = data->array[3];
+    Matrix *axon_del = data->array[4];
     assert(l->N == W->nrow);
 
     doubleVector **W_vals = (doubleVector**) malloc( W->nrow * sizeof(doubleVector*));
@@ -426,7 +444,8 @@ void loadSRMLayer(SRMLayer *l, Constants *c, pMatrixVector *data) {
         memcpy(l->W[ni], W_vals[ni]->array, sizeof(double)*W_vals[ni]->size);
         memcpy(l->id_conns[ni], id_conns_vals[ni]->array, sizeof(size_t)*id_conns_vals[ni]->size);
         l->pacc[ni] = getMatrixElement(pacc, ni, 0);
-        
+        l->axon_del[ni] = getMatrixElement(axon_del, ni, 0);
+
         TEMPLATE(deleteVector,double)(W_vals[ni]);
         TEMPLATE(deleteVector,ind)(id_conns_vals[ni]);
     }
