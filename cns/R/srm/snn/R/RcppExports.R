@@ -29,6 +29,10 @@ decomposePatterns <- function(patt_net, timeline, labels) {
     .Call('snn_decomposePatterns', PACKAGE = 'snn', patt_net, timeline, labels)
 }
 
+histKernel <- function(d, kernel_options) {
+    .Call('snn_histKernel', PACKAGE = 'snn', d, kernel_options)
+}
+
 kernelVanRossumDist <- function(d1, d2, kernel_options) {
     .Call('snn_kernelVanRossumDist', PACKAGE = 'snn', d1, d2, kernel_options)
 }

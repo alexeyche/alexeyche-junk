@@ -121,6 +121,22 @@ BEGIN_RCPP
     return __sexp_result;
 END_RCPP
 }
+// histKernel
+SEXP histKernel(List d, const List kernel_options);
+RcppExport SEXP snn_histKernel(SEXP dSEXP, SEXP kernel_optionsSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< List >::type d(dSEXP );
+        Rcpp::traits::input_parameter< const List >::type kernel_options(kernel_optionsSEXP );
+        SEXP __result = histKernel(d, kernel_options);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}
 // kernelVanRossumDist
 SEXP kernelVanRossumDist(List d1, List d2, const List kernel_options);
 RcppExport SEXP snn_kernelVanRossumDist(SEXP d1SEXP, SEXP d2SEXP, SEXP kernel_optionsSEXP) {

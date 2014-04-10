@@ -1,23 +1,23 @@
 
-setwd("~/prog/alexeyche-junk/cns/R/srm/cprog")
-#setwd("~/my/git/alexeyche-junk/cns/R/srm/cprog")
+#setwd("~/prog/alexeyche-junk/cns/R/srm/cprog")
+setwd("~/my/git/alexeyche-junk/cns/R/srm/cprog")
 library(snn)
 
 source('../eval_funcs.R')
 source('../ucr_ts.R')
 source('../plot_funcs.R')
 
-ucr_spikes_dir = "/home/alexeyche/prog/sim/ucr_spikes"
-#ucr_spikes_dir = "/home/alexeyche/my/sim/ucr_spikes"
-gitdir = "/home/alexeyche/prog/alexeyche-junk"
-#gitdir = "/home/alexeyche/my/git/alexeyche-junk"
-rundir = "/home/alexeyche/prog/sim/runs"
-#rundir = "/home/alexeyche/my/sim/runs"
+#ucr_spikes_dir = "/home/alexeyche/prog/sim/ucr_spikes"
+ucr_spikes_dir = "/home/alexeyche/my/sim/ucr_spikes"
+#gitdir = "/home/alexeyche/prog/alexeyche-junk"
+gitdir = "/home/alexeyche/my/git/alexeyche-junk"
+#rundir = "/home/alexeyche/prog/sim/runs"
+rundir = "/home/alexeyche/my/sim/runs"
 #runname="test_run"
 #runname = "n50_no_conn"
 #runname = "n50_conn_3"
-runname = "n100_exp_more_conn_ax"
-ep = 50
+runname = "n100_exp2"
+ep = 280
 
 srm_sim_exec = sprintf("%s/cns/c/bin/srm_sim", gitdir)
 
@@ -32,11 +32,11 @@ Nids=(M+1):(M+N)
 
 
 input_file = sprintf("%s/train/1_ucr_20elems_3classes_1000dur", ucr_spikes_dir)
-timeline = c(loadMatrix(input_file,3))
-labels = c(loadMatrix(input_file,2))
+timeline = c(loadMatrix(input_file,2))
+labels = c(loadMatrix(input_file,3))
 test_input_file =  sprintf("%s/test/ucr_20elems_3classes_1000dur", ucr_spikes_dir)
-test_timeline = c(loadMatrix(test_input_file,3))
-test_labels = c(loadMatrix(test_input_file,2))
+test_timeline = c(loadMatrix(test_input_file,2))
+test_labels = c(loadMatrix(test_input_file,3))
 duration = timeline[2]-timeline[1]
 
 evaldir = sprintf("%s/eval", workdir)
@@ -51,10 +51,11 @@ model_file = sprintf("%s/%s_model", workdir, ep)
 
 tresholds = seq(-65, -40, by=2.5)
 sigmas = seq(0.1,10, length.out=10)
+kernel_param = seq(10, 200, by=10)
 #tresholds = c(-60)
 #sigmas = c(1)
 
-rates = matrix(0, nrow=length(tresholds), ncol=length(sigmas))
+rates = matrix(0, nrow=length(tresholds), ncol=length(kernel_param))
 
 for(tr_i in 1:length(tresholds)) {
     tr = tresholds[tr_i]
@@ -85,23 +86,25 @@ for(tr_i in 1:length(tresholds)) {
 }
 
 for(tr_i in 1:length(tresholds)) {
-    for(sigma_i in 1:length(sigmas)) {
+    for(param_i in 1:length(kernel_param)) {
         tr = tresholds[tr_i]
-        kernel_sigma = sigmas[sigma_i]
+        Tbr = kernel_param[param_i]
         output_file = sprintf("%s/%s_output_spikes", evalepdir, tr_i)
         test_output_file = sprintf("%s/%s_test_output_spikes", evalepdir, tr_i)
         
-        kernel_options = list(T0=0,Tmax=duration, quad=256, sigma=kernel_sigma, tR=1)
         train_net = getSpikesFromMatrix(loadMatrix(output_file,1))
         test_net = getSpikesFromMatrix(loadMatrix(test_output_file,1))
         
         train_resp = decomposePatterns(train_net[Nids], timeline, labels)
         test_resp = decomposePatterns(test_net[Nids], test_timeline, test_labels)
         
-        c(r, confm_data) := ucr_test(train_resp, test_resp, cross_corr_alg, FALSE)
+        train_resp_k = lapply(train_resp, function(d) histKernel(d, list(Tmax=duration, Tbr=Tbr)))
+        test_resp_k = lapply(test_resp, function(d) histKernel(d, list(Tmax=duration, Tbr=Tbr)))
         
-        rates[tr_i, sigma_i] = r
-        cat("tr: ", tr, "sigma: ", kernel_sigma, " rate: ", r, "\n")
+        c(r, confm_data) := ucr_test(train_resp_k, test_resp_k, eucl_dist_alg, FALSE)
+        
+        rates[tr_i, param_i] = r
+        cat("tr: ", tr, "Tbr: ", Tbr, " rate: ", r, "\n")
     }
 }
 

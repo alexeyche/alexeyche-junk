@@ -217,6 +217,23 @@ SEXP decomposePatterns(List patt_net, NumericVector timeline, NumericVector labe
     return nets_l;
 }
 
+// [[Rcpp::export]]
+SEXP histKernel(List d, const List kernel_options) {
+    List data = d["data"];
+    const double Tbr =  as<double>(kernel_options["Tbr"]); 
+    const double Tmax =  as<double>(kernel_options["Tmax"]); 
+    arma::mat h(data.size(), ceil(Tmax/Tbr), arma::fill::zeros); 
+    
+    for(size_t ni=0; ni < data.size(); ni++) {
+        NumericVector sp = data[ni];
+        for(size_t sp_i=0; sp_i< sp.size(); sp_i++) {
+            int index = int(sp[sp_i]/Tbr); 
+            h(ni, index) += 1/Tbr;
+        }
+    }
+    return List::create(Named("data") = h, Named("label") = d["label"]);
+}
+
 arma::vec integrand_kernel_van_rossum(const arma::vec &t, void *int_data) {
     TIntDataVCorr *d = (TIntDataVCorr*)int_data;
     arma::vec out(d->data1.size(), arma::fill::zeros);
