@@ -105,6 +105,9 @@ int file_handler(void* user, const char* section, const char* name,
     if (MATCH("net", "ws")) {
         c->ws = atof(value);
     } else 
+    if (MATCH("net", "weight_var")) {
+        c->weight_var = atof(value);
+    } else 
     if (MATCH("net", "weight_per_neuron")) {
         c->weight_per_neuron = atof(value);
     } else 
@@ -176,6 +179,7 @@ void printConstants(Constants *c) {
     printf("ts: %f,\n", c->ts);
     printf("u_rest: %f,\n", c->u_rest);
     printf("weight_decay_factor: %f,\n", c->weight_decay_factor);
+    printf("weight_var: %f,\n", c->weight_var);
     printf("weight_per_neuron: %f,\n", c->weight_per_neuron);
     printf("ws: %f,\n", c->ws);
 }

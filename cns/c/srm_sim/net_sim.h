@@ -3,6 +3,7 @@
 
 #include <spikes_list.h>
 #include <layer.h>
+#include <sim_runtime.h>
 
 typedef struct {
     size_t n_id;
@@ -36,6 +37,6 @@ void deleteNetSim(NetSim *ns);
 void propagateInputSpikesNetSim(NetSim *ns, SpikesList *sl);
 void printInputSpikesQueue(NetSim *ns);
 void configureConnMapNetSim(NetSim *ns, pSRMLayerVector *l);
-void propagateSpikeNetSim(NetSim *ns, const size_t *ni, double t);
+void propagateSpikeNetSim(NetSim *ns, SimRuntime *rt, const size_t *ni, double t);
 
 #endif

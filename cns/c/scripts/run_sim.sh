@@ -75,6 +75,7 @@ MEAN_P_DUR=$(get_const mean_p_dur)
 INP_ITER=1
 EPOCHS=$(seq $MIN_EP $MAX_EP)
 for EP in $EPOCHS; do
+    echo "epoch $EP"
     EPOCH_SFX=
     MODEL_TO_LOAD_OPT=
     if [ ! -z "$EPOCH" ]; then

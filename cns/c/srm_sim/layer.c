@@ -178,7 +178,7 @@ void deallocSynData(SRMLayer *l, size_t ni) {
 
 void toStartValues(SRMLayer *l, Constants *c) {
     for(size_t ni=0; ni<l->N; ni++) {
-        double start_weight = c->weight_per_neuron/l->nconn[ni];
+        double start_weight = c->weight_var * getNorm() + c->weight_per_neuron/l->nconn[ni];
         l->a[ni] = 1;
         l->B[ni] = 0;
         l->fired[ni] = 0;
@@ -285,7 +285,7 @@ void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constant
                                             c->weight_decay_factor * l->syn_fired[ *id_to_sim ][ *syn_id ] * l->W[ *id_to_sim ][ *syn_id ] );
 #elif RATE_NORM == POSTSYNAPTIC                
                 double dw = c->added_lrate*lrate*( l->C[ *id_to_sim ][ *syn_id ]*l->B[ *id_to_sim ] -  \
-                                            3*c->weight_decay_factor * l->fired[ *id_to_sim ] * l->W[ *id_to_sim ][ *syn_id ] );
+                                            c->weight_decay_factor * (l->fired[ *id_to_sim ] + l->syn_fired[ *id_to_sim ][ *syn_id ]) * l->W[ *id_to_sim ][ *syn_id ] );
 #endif               
                 l->W[ *id_to_sim ][ *syn_id ] += dw;
                 

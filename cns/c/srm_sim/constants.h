@@ -53,6 +53,7 @@ typedef struct {
     double weight_per_neuron;
     double ws;
     double weight_decay_factor;
+    double weight_var;
 
     double added_lrate;
     int epochs;

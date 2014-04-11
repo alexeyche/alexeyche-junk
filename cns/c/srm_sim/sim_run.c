@@ -1,12 +1,20 @@
 
 #include "sim.h"
 
+void resetQueue(NetSim *ns, SimRuntime *sr, const size_t *n_id) {
+    size_t *spike_it = &sr->spikes_iter->array[ *n_id ];
+    while(*spike_it < ns->spikes_queue[ *n_id ]->size) {
+        *spike_it = *spike_it + 1;
+    }
+}
+
+
 const SynSpike* getInputSpike(double t, const size_t *n_id, NetSim *ns, SimRuntime *sr, const Constants *c) {
     size_t *spike_it = &sr->input_spikes_iter->array[ *n_id ];
     if(*spike_it < ns->input_spikes_queue[ *n_id ]->size) {
         const SynSpike *sp = &ns->input_spikes_queue[ *n_id ]->array[ *spike_it ];
-        if(sp->t < t) {
-            printf("We missing an input spike %f in %zu at %f. Something wrong. Need sorted queue\n", sp->t, *n_id, t);
+        if(fabs(sp->t - t) < 0) {
+            printf("We missing an input spike %f in %zu at %f. Something wrong (%f). Need sorted queue\n", sp->t, *n_id, t, fabs(sp->t - t));
             exit(1);
         }
         if(sp->t < t+c->dt) {
@@ -14,21 +22,18 @@ const SynSpike* getInputSpike(double t, const size_t *n_id, NetSim *ns, SimRunti
            return(sp);
         }
     }
-    pthread_spin_lock(&spinlocks[*n_id]);
     spike_it = &sr->spikes_iter->array[ *n_id ];
     if(*spike_it < ns->spikes_queue[ *n_id ]->size) {
         const SynSpike *sp = &ns->spikes_queue[ *n_id ]->array[ *spike_it ]; 
-        if(sp->t < t) {
-            printf("We missing a net spike %f in %zu at %f. Something wrong. Need sorted queue\n", sp->t, *n_id, t);
+        if(fabs(sp->t - t) < 0) {
+            printf("We missing a net spike %f in %zu at %f. Something wrong(%f). Need sorted queue\n", sp->t, *n_id, t, fabs(sp->t - t));
             exit(1);
         }
         if(sp->t <= t+c->dt) {
            *spike_it += 1; 
-           pthread_spin_unlock(&spinlocks[*n_id]);
            return(sp);
         }    
     }
-    pthread_spin_unlock(&spinlocks[*n_id]);
     return(NULL);
 }
 
@@ -83,6 +88,7 @@ void* simRunRoutine(void *args) {
                 for(size_t na_i=first; na_i<last; na_i++) {
                     SRMLayer *l = s->layers->array[s->na[na_i].layer_id];
                     resetSRMLayerNeuron(l, &s->na[na_i].n_id);
+                    resetQueue(s->ns, s->rt, &l->ids[s->na[na_i].n_id]);
                 }
 
             }
@@ -107,7 +113,7 @@ void simulateNeuron(Sim *s, const size_t *layer_id, const size_t *n_id, double t
     }
     simulateSRMLayerNeuron(l, n_id, c);
     if(l->fired[*n_id] == 1) {
-        propagateSpikeNetSim(s->ns, &l->ids[*n_id], t + l->axon_del[*n_id]);
+        propagateSpikeNetSim(s->ns, s->rt, &l->ids[*n_id], t + l->axon_del[*n_id]);
         l->fired[*n_id] = 0;
     }
 }

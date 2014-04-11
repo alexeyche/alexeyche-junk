@@ -1,6 +1,6 @@
 #!/usr/bin/RScript
-#setwd("~/prog/alexeyche-junk/cns/R/srm/cprog")
-setwd("~/my/git/alexeyche-junk/cns/R/srm/cprog")
+setwd("~/prog/alexeyche-junk/cns/R/srm/cprog")
+#setwd("~/my/git/alexeyche-junk/cns/R/srm/cprog")
 source('../serialize_to_bin.R')
 source('../util.R')
 
@@ -9,20 +9,20 @@ source('../plot_funcs.R')
 
 library(snn)
 
-#rundir="/home/alexeyche/prog/sim/runs"
-rundir="/home/alexeyche/my/sim/runs"
+rundir="/home/alexeyche/prog/sim/runs"
+#rundir="/home/alexeyche/my/sim/runs"
 #runname = "test_run"
 #runname = "n50_no_conn"
 #runname = "n50_conn_3"
 #runname = "n50_conn_big"
-runname = "n100_exp_more_conn"
+runname = "n100_exp2_ax"
 workdir=sprintf("%s/%s", rundir, runname)
 
 for(ep in 1:300) {
     output_spikes = sprintf("%s/%s_output_spikes.bin", workdir, ep)
     if(!file.exists(output_spikes)) { ep=ep-1; break }
 }
-#ep=20
+#ep=1
 
 #workdir="/home/alexeyche/prog/sim/runs/rfd"
 

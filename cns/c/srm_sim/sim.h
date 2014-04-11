@@ -7,6 +7,8 @@
 #include <net_sim.h>
 #include <matrix.h>
 #include <io.h>
+#include <sim_runtime.h>
+
 #include <pthread.h>
 
 #ifndef max
@@ -19,16 +21,6 @@
 #define P( condition ) {if( (condition) != 0 ) { printf( "\n FAILURE in %s, line %d\n", __FILE__, __LINE__ );exit( 1 );}}
 
 pthread_barrier_t barrier;
-
-typedef struct {
-    indVector *input_spikes_iter;
-    indVector *spikes_iter;
-    
-    doubleVector *reset_timeline;
-    size_t timeline_iter;
-    
-    double Tmax;
-} SimRuntime;
 
 typedef struct {
     size_t layer_id;
@@ -72,5 +64,6 @@ void runSim(Sim *s);
 void simulateNeuron(Sim *s, const size_t *layer_id, const size_t *n_id, double t,  const Constants *c);
 const SynSpike* getInputSpike(double t, const size_t *n_id, NetSim *ns, SimRuntime *sr, const Constants *c);
 void* simRunRoutine(void *args);
+void resetQueue(NetSim *ns, SimRuntime *rt, const size_t *ni);
 
 #endif
