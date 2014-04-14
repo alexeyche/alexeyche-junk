@@ -17,12 +17,17 @@ typedef struct {
     double e_inh;
     double ts;
     double tm;
-    double ta;
+    double tsr;
     
     double alpha;
     double beta;
+    double u_tr;
+    double r0;
     double tr;
-    
+    double ta;
+    double qr;
+    double qa;
+
     double gain_factor;
     double pr;
     double __pr;

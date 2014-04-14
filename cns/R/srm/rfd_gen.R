@@ -1,18 +1,20 @@
 
-source('constants.R')
-source('serialize_to_bin.R')
+#source('constants.R')
+#source('serialize_to_bin.R')
 
 library(snn)
 
 T0 = 0
-Tmax = 3000
+Tmax = 30000
+dt=1
+M=100
+sim_dim=1000
 T = seq(T0, Tmax, by=dt) 
 
 Twhole = Tmax*100 # 50 min
 
 
-dir2save = "~/prog/sim/"
-#dir2save = "~/my/sim/rfd_files"
+dir2save = "~/prog/sim/rfd_files"
 N=0
 net = list()
 for(i in 1:(M+N)) net[[i]] = numeric(0)
@@ -25,7 +27,7 @@ gauss_rates = Vectorize(function(k,j) {
   ((vmax-v0)*exp(-0.01*( min( abs(j-k), 100-abs(j-k) ) )^2) + v0 )/sim_dim
 },"j")
 
-for(ep in 1:1) {
+for(ep in 1:100) {
   for(i in 1:(M+N)) net[[i]] = numeric(0)
   for(curt in T) {
     if(curt %% 200 == 0) {
@@ -36,5 +38,11 @@ for(ep in 1:1) {
       net[[ gr1$ids()[fi] ]] = c(net[[ gr1$ids()[fi] ]], curt)
     }
   }
-  saveMatrixList(sprintf("%s/ep_%d_%4.1fsec", dir2save, ep, Tmax/sim_dim), list( list_to_matrix(net) ) )
+  spike_file = sprintf("%s/ep_%d_%4.1fsec", dir2save, ep, Tmax/sim_dim)
+  saveMatrixList(spike_file, list(list_to_matrix(net), 
+                                  matrix(Tmax),
+                                  matrix(0))
+  )
+  
+  
 }

@@ -15,16 +15,16 @@ rundir="/home/alexeyche/prog/sim/runs"
 #runname = "n50_no_conn"
 #runname = "n50_conn_3"
 #runname = "n50_conn_big"
-runname = "n100_exp2_ax"
+runname = "n500"
 workdir=sprintf("%s/%s", rundir, runname)
+
+#workdir="/home/alexeyche/prog/sim/runs/rfd"
 
 for(ep in 1:300) {
     output_spikes = sprintf("%s/%s_output_spikes.bin", workdir, ep)
     if(!file.exists(output_spikes)) { ep=ep-1; break }
 }
 #ep=1
-
-#workdir="/home/alexeyche/prog/sim/runs/rfd"
 
 
 ep_str=""
@@ -57,16 +57,16 @@ if(file.exists(sprintf("%s.bin",stat_file))) {
     p = loadMatrix(stat_file, 1)
     u = loadMatrix(stat_file, 2)
     B = loadMatrix(stat_file, 3)
-    syn=75
+    syn=1
     nid=2
     dWn = loadMatrix(stat_file, 3+nid)
     Cn = loadMatrix(stat_file, 3+N+nid)
-#     par(mfrow=c(3,1))
-#     spikes = net[[100+nid]][net[[100+nid]]<1000]
-#     plot(spikes, rep(1,length(spikes)), xlim=c(0,1000) )
-#     plotl(C1[syn,1:1000])
-#     plotl(w1[syn,1:1000])
-    #plotl(B[nid,1:1000])
+    par(mfrow=c(4,1))
+    spikes = net[[100+nid]][net[[100+nid]]<1000]
+    plot(spikes, rep(1,length(spikes)), xlim=c(0,1000) )
+    plotl(Cn[syn,1:1000])
+    plotl(dWn[syn,1:1000])
+    plotl(B[nid,1:1000])
 }
 
 W = loadMatrix(model_file,1)

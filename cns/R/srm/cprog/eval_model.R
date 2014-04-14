@@ -16,8 +16,8 @@ rundir = "/home/alexeyche/prog/sim/runs"
 #runname="test_run"
 #runname = "n50_no_conn"
 #runname = "n50_conn_3"
-runname = "n100_exp2_ax"
-ep = 100
+runname = "n100_new"
+ep = 18
 
 srm_sim_exec = sprintf("%s/cns/c/bin/srm_sim", gitdir)
 
@@ -49,7 +49,8 @@ model_file = sprintf("%s/%s_model", workdir, ep)
 
 ################
 
-tresholds = seq(-65, -40, by=2.5)
+#tresholds = seq(-65, -40, by=2.5)
+tresholds = seq(5, 20, by=2.5)
 sigmas = seq(0.1,10, length.out=10)
 kernel_param = seq(10, 200, by=10)
 #tresholds = c(-60)

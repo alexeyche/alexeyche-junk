@@ -2,7 +2,7 @@
 
 #include "sim.h"
 
-#define MATRIX_PER_LAYER 5
+#define MATRIX_PER_LAYER 6
 void loadLayersFromFile(Sim *s, const char *model_fname, Constants *c, bool saveStat) {
     s->c = c;
     pMatrixVector* data = readMatrixList(model_fname);

@@ -1,8 +1,8 @@
 #!/usr/bin/RScript
 
 library(snn)
-#setwd("~/prog/alexeyche-junk/cns/R/srm/cprog")
-setwd("~/my/git/alexeyche-junk/cns/R/srm/cprog")
+setwd("~/prog/alexeyche-junk/cns/R/srm/cprog")
+#setwd("~/my/git/alexeyche-junk/cns/R/srm/cprog")
 
 source('../ucr_ts.R')
 source('../gen_spikes.R')
@@ -10,10 +10,10 @@ source('../serialize_to_bin.R')
 source('../plot_funcs.R')
 
 
-#ucr_spikes_dir = "/home/alexeyche/prog/sim/ucr_spikes"
-ucr_spikes_dir = "/home/alexeyche/my/sim/ucr_spikes"
-#data_dir = '~/prog/sim'
-data_dir = '~/my/sim'
+ucr_spikes_dir = "/home/alexeyche/prog/sim/ucr_spikes"
+#ucr_spikes_dir = "/home/alexeyche/my/sim/ucr_spikes"
+-data_dir = '~/prog/sim'
+#data_dir = '~/my/sim'
 
 
 M = 100
