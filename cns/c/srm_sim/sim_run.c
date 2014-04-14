@@ -2,10 +2,13 @@
 #include "sim.h"
 
 void resetQueue(NetSim *ns, SimRuntime *sr, const size_t *n_id) {
-    size_t *spike_it = &sr->spikes_iter->array[ *n_id ];
-    while(*spike_it < ns->spikes_queue[ *n_id ]->size) {
-        *spike_it = *spike_it + 1;
-    }
+//    size_t *spike_it = &sr->spikes_iter->array[ *n_id ];
+//    while(*spike_it < ns->spikes_queue[ *n_id ]->size) {
+//        *spike_it = *spike_it + 1;
+//    }
+    sr->spikes_iter->array[ *n_id ] = 0;
+    TEMPLATE(deleteVector,SynSpike)(ns->spikes_queue[ *n_id ]);
+    TEMPLATE(createVector,SynSpike)(ns->spikes_queue[ *n_id ]);
 }
 
 
