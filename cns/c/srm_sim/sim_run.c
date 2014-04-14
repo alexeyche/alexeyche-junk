@@ -13,8 +13,8 @@ const SynSpike* getInputSpike(double t, const size_t *n_id, NetSim *ns, SimRunti
     size_t *spike_it = &sr->input_spikes_iter->array[ *n_id ];
     if(*spike_it < ns->input_spikes_queue[ *n_id ]->size) {
         const SynSpike *sp = &ns->input_spikes_queue[ *n_id ]->array[ *spike_it ];
-        if(fabs(sp->t - t) < 0) {
-            printf("We missing an input spike %f in %zu at %f. Something wrong (%f). Need sorted queue\n", sp->t, *n_id, t, fabs(sp->t - t));
+        if(sp->t - t < 0) {
+            printf("We missing an input spike %f in %zu at %f. Something wrong (%f). Need sorted queue\n", sp->t, *n_id, t, sp->t - t);
             exit(1);
         }
         if(sp->t < t+c->dt) {
@@ -23,17 +23,20 @@ const SynSpike* getInputSpike(double t, const size_t *n_id, NetSim *ns, SimRunti
         }
     }
     spike_it = &sr->spikes_iter->array[ *n_id ];
+    pthread_spin_lock(&spinlocks[ *n_id ]);
     if(*spike_it < ns->spikes_queue[ *n_id ]->size) {
         const SynSpike *sp = &ns->spikes_queue[ *n_id ]->array[ *spike_it ]; 
-        if(fabs(sp->t - t) < 0) {
-            printf("We missing a net spike %f in %zu at %f. Something wrong(%f). Need sorted queue\n", sp->t, *n_id, t, fabs(sp->t - t));
+        if(sp->t - t < 0) {
+            printf("We missing a net spike %f in %zu at %f. Something wrong(%f). Need sorted queue\n", sp->t, *n_id, t, sp->t - t);
             exit(1);
         }
         if(sp->t <= t+c->dt) {
            *spike_it += 1; 
+           pthread_spin_unlock(&spinlocks[*n_id]);
            return(sp);
         }    
     }
+    pthread_spin_unlock(&spinlocks[*n_id]);
     return(NULL);
 }
 

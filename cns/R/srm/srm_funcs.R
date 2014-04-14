@@ -66,3 +66,17 @@ a_suppr = Vectorize(function(s) {
   return(1- exp(-s/ta))
 })
 
+g0=1
+r0=9.25
+beta=100
+u_tr=15
+
+g2 = Vectorize(function(u) {
+    g0+r0*log(1+exp(beta*(u-u_tr)))
+})
+
+u=seq(0,100, length.out=1000)
+plot(g2(u),type="l")
+
+
+

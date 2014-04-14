@@ -11,6 +11,13 @@ Constants* createConstants(const char *filename) {
     }
     c->__target_rate = c->target_rate/c->sim_dim;
     c->__pr = c->pr/c->sim_dim;
+    if(c->determ) {
+        c->beta = 1000;
+    }
+    if((c->determ)&&(c->learn)) {
+        printf("Can't learn anything in determenistic mode\n");
+        exit(1);
+    }
     return(c);
 }
 void deleteConstants(Constants *c) {
@@ -45,8 +52,11 @@ int file_handler(void* user, const char* section, const char* name,
     if (MATCH("srm", "tm")) {
         c->tm = atof(value);
     } else 
-    if (MATCH("srm", "ta")) {
-        c->ta = atof(value);
+    if (MATCH("srm", "tsr")) {
+        c->tsr = atof(value);
+    } else 
+    if (MATCH("srm", "r0")) {
+        c->r0 = atof(value);
     } else 
     if (MATCH("srm", "alpha")) {
         c->alpha = atof(value);
@@ -54,8 +64,8 @@ int file_handler(void* user, const char* section, const char* name,
     if (MATCH("srm", "beta")) {
         c->beta = atof(value);
     } else 
-    if (MATCH("srm", "tr")) {
-        c->tr = atof(value);
+    if (MATCH("srm", "u_tr")) {
+        c->u_tr = atof(value);
     } else 
     if (MATCH("srm", "gain_factor")) {
         c->gain_factor = atof(value);
@@ -65,6 +75,18 @@ int file_handler(void* user, const char* section, const char* name,
     } else 
     if (MATCH("srm", "u_rest")) {
         c->u_rest = atof(value);
+    } else 
+    if (MATCH("srm", "ta")) {
+        c->ta = atof(value);
+    } else 
+    if (MATCH("srm", "tr")) {
+        c->tr = atof(value);
+    } else 
+    if (MATCH("srm", "qa")) {
+        c->qa = atof(value);
+    } else 
+    if (MATCH("srm", "qr")) {
+        c->qr = atof(value);
     } else 
     if (MATCH("sim", "dt")) {
         c->dt = atof(value);
@@ -170,12 +192,17 @@ void printConstants(Constants *c) {
     printf("sim_dim: %f,\n", c->sim_dim);
     printf("determ: %d,\n", c->determ);
     printf("learn: %d,\n", c->learn);
-    printf("ta: %f,\n", c->ta);
+    printf("r0: %f,\n", c->r0);
+    printf("tsr: %f,\n", c->tsr);
     printf("target_rate: %f,\n", c->target_rate);
     printf("target_rate_factor: %f,\n", c->target_rate_factor);
     printf("tc: %f,\n", c->tc);
     printf("tm: %f,\n", c->tm);
+    printf("ta: %f,\n", c->ta);
     printf("tr: %f,\n", c->tr);
+    printf("qa: %f,\n", c->qa);
+    printf("qr: %f,\n", c->qr);
+    printf("u_tr: %f,\n", c->u_tr);
     printf("ts: %f,\n", c->ts);
     printf("u_rest: %f,\n", c->u_rest);
     printf("weight_decay_factor: %f,\n", c->weight_decay_factor);

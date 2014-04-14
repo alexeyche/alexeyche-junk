@@ -34,6 +34,8 @@ SRMLayer* createSRMLayer(size_t N, size_t *glob_idx, bool saveStat) {
     }
     
     l->a = (double*)malloc( l->N*sizeof(double));
+    l->gr = (double*)malloc( l->N*sizeof(double));
+    l->ga = (double*)malloc( l->N*sizeof(double));
     l->B = (double*)malloc( l->N*sizeof(double));
     l->C = (double**)malloc( l->N*sizeof(double*));
     l->axon_del = (double*)malloc( l->N*sizeof(double));
@@ -87,6 +89,8 @@ void deleteSRMLayer(SRMLayer *l) {
     free(l->syn_spec);
     free(l->active_syn_ids);
     free(l->learn_syn_ids);
+    free(l->ga);
+    free(l->gr);
     free(l->a);
     free(l->B);
     free(l->C);
@@ -180,6 +184,8 @@ void toStartValues(SRMLayer *l, Constants *c) {
     for(size_t ni=0; ni<l->N; ni++) {
         double start_weight = c->weight_var * getNorm() + c->weight_per_neuron/l->nconn[ni];
         l->a[ni] = 1;
+        l->ga[ni] = 0;
+        l->gr[ni] = 0;
         l->B[ni] = 0;
         l->fired[ni] = 0;
         l->pacc[ni] = 0;
@@ -245,11 +251,12 @@ void propagateSpikeSRMLayer(SRMLayer *l, const size_t *ni, const SynSpike *sp, c
     }
     
     l->syn[*ni][ sp->syn_id ] += l->syn_spec[*ni][ sp->syn_id ] * c->e0;
+#if BACKPROP_POT == 1    
     l->syn[*ni][ sp->syn_id ] *= l->a[*ni];
+#endif
     l->syn_fired[*ni][ sp->syn_id ] = 1;
 }
 
-#define RATE_NORM PRESYNAPTIC
 void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constants *c) {
     double u = c->u_rest;
 
@@ -258,88 +265,105 @@ void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constant
         const size_t *syn_id = &act_node->value;
         u += l->W[ *id_to_sim ][ *syn_id ] * l->syn[ *id_to_sim ][ *syn_id ];
     }
-    if(!c->determ) {
-        double p = probf(&u, c) * c->dt;
-        double coin = getUnif();
-        if( p > coin ) {
-            l->fired[ *id_to_sim ] = 1;
-            l->pacc[ *id_to_sim ] += 1;
-            l->a[ *id_to_sim ] = 0;
-//            printf("spike %zu! p: %f, pacc: %f\n", *id_to_sim, p, l->pacc[ *id_to_sim ]);
-        }
-        
-        if(c->learn) {
-            l->B[ *id_to_sim ] = B_calc( &l->fired[ *id_to_sim ], &p, &l->pacc[ *id_to_sim ], c);
-            while( (act_node = TEMPLATE(getNextLList,ind)(l->learn_syn_ids[ *id_to_sim ]) ) != NULL ) {
+
+    double p = probf(&u, c) * c->dt;
+    double M = 1;
+#if (SFA == 1) && (REFR == 1)
+    M = exp(-( l->gr[ *id_to_sim] + l->ga[ *id_to_sim ] ));
+#elif SFA == 1
+    M = exp(-( l->ga[ *id_to_sim ] ));
+#elif REFR == 1        
+    M = exp(-( l->gr[ *id_to_sim ] ));
+#endif        
+    p = p*M;
+    double coin = getUnif();
+    if( p > coin ) {
+        l->fired[ *id_to_sim ] = 1;
+        l->pacc[ *id_to_sim ] += 1;
+#if BACKPROP_POT == 1    
+        l->a[ *id_to_sim ] = 0;
+#endif            
+#if REFR == 1
+        l->gr[ *id_to_sim ] += c->qr;
+#endif
+#if SFA == 1
+        l->ga[ *id_to_sim ] += c->qa;
+#endif            
+//            printf("spike %zu! p: %f, pacc: %f, ga: %f, gr: %f\n", *id_to_sim, p, l->pacc[ *id_to_sim ], l->ga[ *id_to_sim ],l->gr[ *id_to_sim ]);
+    }
+    
+    if(c->learn) {
+        l->B[ *id_to_sim ] = B_calc( &l->fired[ *id_to_sim ], &p, &l->pacc[ *id_to_sim ], c);
+        while( (act_node = TEMPLATE(getNextLList,ind)(l->learn_syn_ids[ *id_to_sim ]) ) != NULL ) {
 //            for(size_t con_i=0; con_i < l->nconn[ *id_to_sim ]; con_i++) {
 //                const size_t *syn_id = &con_i;
-                const size_t *syn_id = &act_node->value;
+            const size_t *syn_id = &act_node->value;
 //                if( (l->C[ *id_to_sim ][ *syn_id ] == 0) && (l->syn[ *id_to_sim ][ *syn_id ] == 0) ) continue;
-                double dC = C_calc( &l->fired[ *id_to_sim ], &p, &u, &l->syn[ *id_to_sim ][ *syn_id ], c);
-                l->C[ *id_to_sim ][ *syn_id ] += -l->C[ *id_to_sim ][ *syn_id ]/c->tc + dC;
-//                printf("dC: %f C: %f, params: %d %f %f %f\n", dC, l->C[ *id_to_sim ][ *syn_id ], l->fired[ *id_to_sim ], p, u, l->syn[ *id_to_sim ][ *syn_id ]);
-                double lrate = rate_calc(&l->W[ *id_to_sim ][ *syn_id ], c);
-                
+            double dC = C_calc( &l->fired[ *id_to_sim ], &p, &u, &M, &l->syn[ *id_to_sim ][ *syn_id ], c);
+            l->C[ *id_to_sim ][ *syn_id ] += -l->C[ *id_to_sim ][ *syn_id ]/c->tc + dC;
+//                printf("dC: %f C: %f, params: %d %f %f %f %f\n", dC, l->C[ *id_to_sim ][ *syn_id ], l->fired[ *id_to_sim ], p, u, l->syn[ *id_to_sim ][ *syn_id ], M);
+            double lrate = rate_calc(&l->W[ *id_to_sim ][ *syn_id ], c);
+            
 #if RATE_NORM == PRESYNAPTIC
-                double dw = c->added_lrate*lrate*( l->C[ *id_to_sim ][ *syn_id ]*l->B[ *id_to_sim ] -  \
-                                            c->weight_decay_factor * l->syn_fired[ *id_to_sim ][ *syn_id ] * l->W[ *id_to_sim ][ *syn_id ] );
+            double dw = c->added_lrate*lrate*( l->C[ *id_to_sim ][ *syn_id ]*l->B[ *id_to_sim ] -  \
+                                        c->weight_decay_factor * l->syn_fired[ *id_to_sim ][ *syn_id ] * l->W[ *id_to_sim ][ *syn_id ] );
 #elif RATE_NORM == POSTSYNAPTIC                
-                double dw = c->added_lrate*lrate*( l->C[ *id_to_sim ][ *syn_id ]*l->B[ *id_to_sim ] -  \
-                                            c->weight_decay_factor * (l->fired[ *id_to_sim ] + l->syn_fired[ *id_to_sim ][ *syn_id ]) * l->W[ *id_to_sim ][ *syn_id ] );
+            double dw = c->added_lrate*lrate*( l->C[ *id_to_sim ][ *syn_id ]*l->B[ *id_to_sim ] -  \
+                                        c->weight_decay_factor * (l->fired[ *id_to_sim ] + l->syn_fired[ *id_to_sim ][ *syn_id ]) * l->W[ *id_to_sim ][ *syn_id ] );
 #endif               
-                l->W[ *id_to_sim ][ *syn_id ] += dw;
-                
-                if(l->saveStat) {
-                    TEMPLATE(insertVector,double)(l->stat_W[ *id_to_sim ][ *syn_id ], l->W[ *id_to_sim ][ *syn_id ]);
-                    TEMPLATE(insertVector,double)(l->stat_C[ *id_to_sim ][ *syn_id ], l->C[ *id_to_sim ][ *syn_id ]);
-                }
-                
-                
-                if( (l->C[ *id_to_sim ][ *syn_id ] < LEARN_ACT_TOL ) && (l->C[ *id_to_sim ][ *syn_id ] > -LEARN_ACT_TOL ) && 
-                    (dC < LEARN_ACT_TOL ) && (dC > -LEARN_ACT_TOL ) ) {
+            l->W[ *id_to_sim ][ *syn_id ] += dw;
+            
+            
+            if( (l->C[ *id_to_sim ][ *syn_id ] < LEARN_ACT_TOL ) && (l->C[ *id_to_sim ][ *syn_id ] > -LEARN_ACT_TOL ) && 
+                (dC < LEARN_ACT_TOL ) && (dC > -LEARN_ACT_TOL ) ) {
 
-                    TEMPLATE(dropNodeLList,ind)(l->learn_syn_ids[ *id_to_sim ], act_node);
-                }
-                if( isnan(dw) ) { 
-                    printf("\nFound bad value\n");
-                    printf("nid: %zu, p: %f, u: %f, B: %f, pacc: %f, C: %f, lrate: %f, W: %f, dw: %f\n", *id_to_sim, p, u, l->B[ *id_to_sim ], l->pacc[ *id_to_sim ], l->C[ *id_to_sim ][ *syn_id ], lrate, l->W[ *id_to_sim ][ *syn_id ], dw);
-                    printf("C params: Yspike: %d, synapse: %f, dC: %f, p': %f\n", l->fired[ *id_to_sim],l->syn[ *id_to_sim ][ *syn_id ], dC, pstroke(&u,c));
-                    exit(1);
-                }
- 
-           }
-        }
+                TEMPLATE(dropNodeLList,ind)(l->learn_syn_ids[ *id_to_sim ], act_node);
+            }
+            if( isnan(dw) ) { 
+                printf("\nFound bad value\n");
+                printf("nid: %zu, p: %f, u: %f, B: %f, pacc: %f, C: %f, lrate: %f, W: %f, dw: %f\n", *id_to_sim, p, u, l->B[ *id_to_sim ], l->pacc[ *id_to_sim ], l->C[ *id_to_sim ][ *syn_id ], lrate, l->W[ *id_to_sim ][ *syn_id ], dw);
+                printf("C params: Yspike: %d, synapse: %f, dC: %f, p': %f\n", l->fired[ *id_to_sim],l->syn[ *id_to_sim ][ *syn_id ], dC, pstroke(&u,c));
+                exit(1);
+            }
 
-        l->pacc[ *id_to_sim ] -= l->pacc[ *id_to_sim ]/c->mean_p_dur; 
+       }
+    }
 
-        if(l->saveStat) {
-            TEMPLATE(insertVector,double)(l->stat_p[ *id_to_sim ], p);
-            TEMPLATE(insertVector,double)(l->stat_u[ *id_to_sim ], u);
-            TEMPLATE(insertVector,double)(l->stat_B[ *id_to_sim ], l->B[ *id_to_sim ]);
-        }
+    l->pacc[ *id_to_sim ] -= l->pacc[ *id_to_sim ]/c->mean_p_dur; 
 
-    } else { 
-        if( u >= c->tr ) {
-            l->fired[ *id_to_sim ] = 1;
-            l->a[ *id_to_sim ] = 0;
-        }
-        if(l->saveStat) {
-            TEMPLATE(insertVector,double)(l->stat_u[ *id_to_sim ], u);
+    if(l->saveStat) {
+        TEMPLATE(insertVector,double)(l->stat_p[ *id_to_sim ], p);
+        TEMPLATE(insertVector,double)(l->stat_u[ *id_to_sim ], u);
+        TEMPLATE(insertVector,double)(l->stat_B[ *id_to_sim ], l->B[ *id_to_sim ]);
+        for(size_t con_i=0; con_i<l->nconn[ *id_to_sim ]; con_i++) {
+            TEMPLATE(insertVector,double)(l->stat_W[ *id_to_sim ][ con_i ], l->syn[ *id_to_sim ][ con_i ]); //l->W[ *id_to_sim ][ con_i ]);
+            TEMPLATE(insertVector,double)(l->stat_C[ *id_to_sim ][ con_i ], l->C[ *id_to_sim ][ con_i ]);
         }
     }
+
 
     while( (act_node = TEMPLATE(getNextLList,ind)(l->active_syn_ids[ *id_to_sim ]) ) != NULL ) {
         const size_t *syn_id = &act_node->value;
         l->syn[ *id_to_sim ][ *syn_id ] -= l->syn[ *id_to_sim ][ *syn_id ]/c->tm;
         if(l->syn_fired[ *id_to_sim ][ *syn_id ] == 1) {
+#if BACKPROP_POT == 1    
             l->syn[ *id_to_sim ][ *syn_id ] *= l->a[*id_to_sim];
+#endif
             l->syn_fired[ *id_to_sim ][ *syn_id ] = 0; 
         }
         if( l->syn[ *id_to_sim ][ *syn_id ] < SYN_ACT_TOL ) {
             TEMPLATE(dropNodeLList,ind)(l->active_syn_ids[ *id_to_sim ], act_node);
         }
     }
-    l->a[ *id_to_sim ] += (1 - l->a[ *id_to_sim ])/c->ta;
+#if BACKPROP_POT == 1    
+    l->a[ *id_to_sim ] += (1 - l->a[ *id_to_sim ])/c->tsr;
+#endif    
+#if REFR == 1
+    l->gr[ *id_to_sim ] += -l->gr[ *id_to_sim ]/c->tr;
+#endif    
+#if SFA == 1
+    l->ga[ *id_to_sim ] += -l->ga[ *id_to_sim ]/c->ta;
+#endif
 }
 
 
@@ -347,6 +371,7 @@ void resetSRMLayerNeuron(SRMLayer *l, const size_t *ni) {
     l->a[ *ni ] = 1;
     l->B[ *ni ] = 0;
     l->fired[ *ni ] = 0;
+    l->gr[ *ni ] = 0;
     for(size_t con_i=0; con_i < l->nconn[ *ni ]; con_i++) {
         l->C[ *ni ][con_i] = 0;
         l->syn[ *ni ][con_i] = 0;
@@ -354,7 +379,7 @@ void resetSRMLayerNeuron(SRMLayer *l, const size_t *ni) {
     }
     indLNode *act_node = NULL;
     while( (act_node = TEMPLATE(getNextLList,ind)(l->active_syn_ids[ *ni ]) ) != NULL ) {
-       TEMPLATE(dropNodeLList,ind)(l->active_syn_ids[ *ni], act_node);
+       TEMPLATE(dropNodeLList,ind)(l->active_syn_ids[*ni], act_node);
     }
     act_node = NULL;
     while( (act_node = TEMPLATE(getNextLList,ind)(l->learn_syn_ids[ *ni ]) ) != NULL ) {
@@ -378,6 +403,7 @@ pMatrixVector* serializeSRMLayer(SRMLayer *l) {
     Matrix *pacc = createMatrix(l->N, 1);
     Matrix *ids = createMatrix(l->N, 1);
     Matrix *axon_del = createMatrix(l->N, 1);
+    Matrix *ga = createMatrix(l->N, 1);
    
     for(size_t i=0; i<W->nrow; i++) {
         for(size_t j=0; j<W->ncol; j++) {
@@ -392,6 +418,7 @@ pMatrixVector* serializeSRMLayer(SRMLayer *l) {
         setMatrixElement(pacc, ni, 0, l->pacc[ni]);
         setMatrixElement(ids, ni, 0, l->ids[ni]);
         setMatrixElement(axon_del, ni, 0, l->axon_del[ni]);
+        setMatrixElement(ga, ni, 0, l->ga[ni]);
     }
     
     TEMPLATE(insertVector,pMatrix)(data, W);
@@ -399,7 +426,8 @@ pMatrixVector* serializeSRMLayer(SRMLayer *l) {
     TEMPLATE(insertVector,pMatrix)(data, pacc);
     TEMPLATE(insertVector,pMatrix)(data, ids);
     TEMPLATE(insertVector,pMatrix)(data, axon_del);
-   
+    TEMPLATE(insertVector,pMatrix)(data, ga);
+  
     return(data);
 }
 
@@ -409,6 +437,7 @@ void loadSRMLayer(SRMLayer *l, Constants *c, pMatrixVector *data) {
     Matrix *pacc = data->array[2];
     Matrix *ids = data->array[3];
     Matrix *axon_del = data->array[4];
+    Matrix *ga = data->array[5];
     assert(l->N == W->nrow);
 
     doubleVector **W_vals = (doubleVector**) malloc( W->nrow * sizeof(doubleVector*));
@@ -445,6 +474,7 @@ void loadSRMLayer(SRMLayer *l, Constants *c, pMatrixVector *data) {
         memcpy(l->id_conns[ni], id_conns_vals[ni]->array, sizeof(size_t)*id_conns_vals[ni]->size);
         l->pacc[ni] = getMatrixElement(pacc, ni, 0);
         l->axon_del[ni] = getMatrixElement(axon_del, ni, 0);
+        l->ga[ni] = getMatrixElement(ga, ni, 0);
 
         TEMPLATE(deleteVector,double)(W_vals[ni]);
         TEMPLATE(deleteVector,ind)(id_conns_vals[ni]);

@@ -16,7 +16,7 @@ void readSpikesFromMatrix(SpikesList *sl, Matrix *m) {
     for(size_t i=0; i<m->nrow; i++) {
         for(size_t j=0; j<m->ncol; j++) {
             double el = getMatrixElement(m, i, j);
-            if ( (el == 0) && (! ((m->ncol>j) && (getMatrixElement(m,i,j+1) > 0)) ) ) break;
+            if ( (el == 0) && ((m->ncol == j+1) || ((m->ncol>(j+1)) && (getMatrixElement(m,i,j+1) == 0)) ) ) break;
             TEMPLATE(insertVector,double)(sl->list[i], el);
         }
     }

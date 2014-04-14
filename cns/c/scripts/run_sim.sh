@@ -8,6 +8,7 @@ function usage {
     echo "$0 -w WORK_DIR -s -l -e EPOCHS -d 60000 INPUT_FILE1 [INPUT_FILE2]"
 }
 
+ulimit -c unlimited
 
 pushd $CWD &> /dev/null
 SRM_SIM="../bin/srm_sim"
@@ -99,6 +100,10 @@ for EP in $EPOCHS; do
     fi    
     INPUT_FILE=$INPUT_FILES_DIR/$(echo $INPUT_FILES_BN | cut -d ' ' -f $INP_ITER)
     $SRM_SIM -c $WORK_DIR/constants.ini -i $INPUT_FILE -o $OUTPUT_SPIKES $STAT_OPT $MODEL_TO_LOAD_OPT -ms $MODEL_FILE -l $LEARN -j $JOBS &> $OUTPUT_FILE
+    if [ "$?" -ne 0 ]; then
+        echo "Not null exit code ($?)"
+        exit $?
+    fi        
     INP_ITER=$((INP_ITER+1))
     if [ $INP_ITER -gt $MAX_INPUT_FILES ]; then
         INP_ITER=1
