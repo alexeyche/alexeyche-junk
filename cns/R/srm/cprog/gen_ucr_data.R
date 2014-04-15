@@ -12,11 +12,11 @@ source('../plot_funcs.R')
 
 ucr_spikes_dir = "/home/alexeyche/prog/sim/ucr_spikes"
 #ucr_spikes_dir = "/home/alexeyche/my/sim/ucr_spikes"
--data_dir = '~/prog/sim'
+data_dir = '~/prog/sim'
 #data_dir = '~/my/sim'
 
 
-M = 100
+M = 20
 mean_p_dur = 60000
 
 duration = 1000
