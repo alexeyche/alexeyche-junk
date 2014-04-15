@@ -82,11 +82,17 @@ int file_handler(void* user, const char* section, const char* name,
     if (MATCH("srm", "tr")) {
         c->tr = atof(value);
     } else 
+    if (MATCH("srm", "tb")) {
+        c->tb = atof(value);
+    } else     
     if (MATCH("srm", "qa")) {
         c->qa = atof(value);
     } else 
     if (MATCH("srm", "qr")) {
         c->qr = atof(value);
+    } else 
+    if (MATCH("srm", "qb")) {
+        c->qb = atof(value);
     } else 
     if (MATCH("sim", "dt")) {
         c->dt = atof(value);
@@ -200,8 +206,10 @@ void printConstants(Constants *c) {
     printf("tm: %f,\n", c->tm);
     printf("ta: %f,\n", c->ta);
     printf("tr: %f,\n", c->tr);
+    printf("tb: %f,\n", c->tb);
     printf("qa: %f,\n", c->qa);
     printf("qr: %f,\n", c->qr);
+    printf("qb: %f,\n", c->qb);
     printf("u_tr: %f,\n", c->u_tr);
     printf("ts: %f,\n", c->ts);
     printf("u_rest: %f,\n", c->u_rest);
