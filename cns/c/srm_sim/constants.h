@@ -23,11 +23,15 @@ typedef struct {
     double beta;
     double u_tr;
     double r0;
+    
     double tr;
     double ta;
+    double tb;
+    
     double qr;
     double qa;
-
+    double qb;
+    
     double gain_factor;
     double pr;
     double __pr;

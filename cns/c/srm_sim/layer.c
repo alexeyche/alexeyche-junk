@@ -36,6 +36,7 @@ SRMLayer* createSRMLayer(size_t N, size_t *glob_idx, bool saveStat) {
     l->a = (double*)malloc( l->N*sizeof(double));
     l->gr = (double*)malloc( l->N*sizeof(double));
     l->ga = (double*)malloc( l->N*sizeof(double));
+    l->gb = (double*)malloc( l->N*sizeof(double));
     l->B = (double*)malloc( l->N*sizeof(double));
     l->C = (double**)malloc( l->N*sizeof(double*));
     l->axon_del = (double*)malloc( l->N*sizeof(double));
@@ -91,6 +92,7 @@ void deleteSRMLayer(SRMLayer *l) {
     free(l->learn_syn_ids);
     free(l->ga);
     free(l->gr);
+    free(l->gb);
     free(l->a);
     free(l->B);
     free(l->C);
@@ -186,6 +188,7 @@ void toStartValues(SRMLayer *l, Constants *c) {
         l->a[ni] = 1;
         l->ga[ni] = 0;
         l->gr[ni] = 0;
+        l->gb[ni] = 0;
         l->B[ni] = 0;
         l->fired[ni] = 0;
         l->pacc[ni] = 0;
@@ -275,6 +278,11 @@ void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constant
 #elif REFR == 1        
     M = exp(-( l->gr[ *id_to_sim ] ));
 #endif        
+#if FS_INH == 1
+    if(l->nt[ *id_to_sim ] == INH) {
+        M = M*exp( -( l->gb[ *id_to_sim ] ) );
+    }
+#endif    
     p = p*M;
     double coin = getUnif();
     if( p > coin ) {
@@ -289,6 +297,11 @@ void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constant
 #if SFA == 1
         l->ga[ *id_to_sim ] += c->qa;
 #endif            
+#if FS_INH == 1
+        if(l->nt[ *id_to_sim ] == INH) {
+            l->gb[ *id_to_sim ] += c->qb;
+        }
+#endif
 //            printf("spike %zu! p: %f, pacc: %f, ga: %f, gr: %f\n", *id_to_sim, p, l->pacc[ *id_to_sim ], l->ga[ *id_to_sim ],l->gr[ *id_to_sim ]);
     }
     
@@ -363,6 +376,11 @@ void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constant
 #endif    
 #if SFA == 1
     l->ga[ *id_to_sim ] += -l->ga[ *id_to_sim ]/c->ta;
+#endif
+#if FS_INH == 1
+    if(l->nt[ *id_to_sim ] == INH) {
+       l->gb[ *id_to_sim ] += -l->gb[ *id_to_sim ]/c->tb;
+    }
 #endif
 }
 

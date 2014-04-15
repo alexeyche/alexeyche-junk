@@ -25,7 +25,7 @@
 #define BACKPROP_POT 0
 #define SFA 1
 #define REFR 1
-
+#define FS_INH 1
 
 typedef enum {EXC, INH} nspec_t;
 
@@ -54,6 +54,7 @@ typedef struct {
     double *axon_del;
     double *gr;
     double *ga;
+    double *gb;
 
     //stat
     bool saveStat;
