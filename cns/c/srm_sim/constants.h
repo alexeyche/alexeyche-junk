@@ -61,6 +61,8 @@ typedef struct {
     double target_rate_factor;
     double weight_per_neuron;
     double ws;
+    double aw;
+    double wmax;
     double weight_decay_factor;
     double weight_var;
 

@@ -5,8 +5,11 @@
 #define EXP 2
 #define EXP2 3
 
-#define PROB_FUNC EXP2
+#define B_HARD 1
+#define B_SOFT 2
 
+#define PROB_FUNC EXP2
+#define WEIGHT_BOUND B_HARD
 
 inline double probf( const double *u, const Constants *c) {
 #if PROB_FUNC == LINEAR 
@@ -48,6 +51,17 @@ inline double B_calc(const unsigned char *Yspike, const double *p, const double 
 inline double C_calc(const unsigned char *Yspike, const double *p, const double *u, const double *M, const double *syn, const Constants *c) {
     double pstr = pstroke(u, c);
     return ( pstr/(*p/ *M) ) * ( *Yspike - *p ) * (*syn);
+}
+
+inline double bound_grad(const double *w, const double *dw, const Constants *c) {
+#if WEIGHT_BOUND == B_SOFT   
+    if(*dw > 0) return(*dw);
+    return( (1 - 1/(1+c->aw*(*w/c->ws)) + (1/(1+c->aw))*(*w/c->ws)) * *dw );
+#elif WEIGHT_BOUND == B_HARD
+    if( *w > c->wmax) return(0);
+    if( *w < 0 ) return(0);      
+    return(*dw);
+#endif   
 }
 
 

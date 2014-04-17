@@ -8,7 +8,7 @@ void resetQueue(NetSim *ns, SimRuntime *sr, const size_t *n_id) {
 //    }
     sr->spikes_iter->array[ *n_id ] = 0;
     TEMPLATE(deleteVector,SynSpike)(ns->spikes_queue[ *n_id ]);
-    TEMPLATE(createVector,SynSpike)(ns->spikes_queue[ *n_id ]);
+    ns->spikes_queue[ *n_id ] = TEMPLATE(createVector,SynSpike)();
 }
 
 
