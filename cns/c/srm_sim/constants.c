@@ -133,6 +133,12 @@ int file_handler(void* user, const char* section, const char* name,
     if (MATCH("net", "ws")) {
         c->ws = atof(value);
     } else 
+    if (MATCH("net", "wmax")) {
+        c->wmax = atof(value);
+    } else 
+    if (MATCH("net", "aw")) {
+        c->aw = atof(value);
+    } else 
     if (MATCH("net", "weight_var")) {
         c->weight_var = atof(value);
     } else 
@@ -178,6 +184,7 @@ void printConstants(Constants *c) {
     printf("alpha: %f,\n", c->alpha);
     printf("axonal_delays_rate: %f,\n", c->axonal_delays_rate);
     printf("axonal_delays_gain: %f,\n", c->axonal_delays_gain);
+    printf("aw: %f,\n", c->aw);
     printf("beta: %f,\n", c->beta);
     printf("dt: %f,\n", c->dt);
     printf("duration: %f,\n", c->duration);
@@ -217,4 +224,5 @@ void printConstants(Constants *c) {
     printf("weight_var: %f,\n", c->weight_var);
     printf("weight_per_neuron: %f,\n", c->weight_per_neuron);
     printf("ws: %f,\n", c->ws);
+    printf("wmax: %f,\n", c->wmax);
 }

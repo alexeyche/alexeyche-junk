@@ -135,7 +135,7 @@ void propagateSpikeNetSim(NetSim *ns, SimRuntime *rt, const size_t *ni, double t
         sp.syn_id = ns->conn_map[*ni]->array[con_i].syn_id;
         sp.t = t + MINIMAL_DELAY;
         size_t naffect = ns->conn_map[*ni]->array[con_i].n_id;
-        printf("net spike at %f in %zu\n", sp.t, naffect);
+//        printf("net spike at %f in %zu\n", sp.t, naffect);
         pthread_spin_lock(&spinlocks[naffect]);
         TEMPLATE(insertVector,SynSpike)(ns->spikes_queue[ naffect ], sp);
 //        size_t size_to_sort = ns->spikes_queue[naffect]->size;

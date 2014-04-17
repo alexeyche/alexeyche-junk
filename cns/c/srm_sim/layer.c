@@ -273,20 +273,9 @@ void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constant
     double M = 1;
 #if (SFA == 1) && (REFR == 1) && (FS_INH == 1)
     M = exp(-( l->gr[ *id_to_sim] + l->ga[ *id_to_sim ] + l->gb[ *id_to_sim ] ));
-#else 
-
-#if SFA == 1
-    M = M*exp(-( l->ga[ *id_to_sim ] ));
-#endif
-#if REFR == 1        
-    M = M*exp(-( l->gr[ *id_to_sim ] ));
-#endif        
-#if FS_INH == 1
-    M = M*exp( -( l->gb[ *id_to_sim ] ) );
+//    printf("id: %zu, inh: %d, M: %f,  ga: %f, gr: %f, gb: %f\n", *id_to_sim, l->nt[ *id_to_sim ], M, l->ga[ *id_to_sim ],l->gr[ *id_to_sim ], l->gb[ *id_to_sim ]);
 #endif    
-
-#endif    
-    
+    double p_old = p; 
     p = p*M;
     double coin = getUnif();
     if( p > coin ) {
@@ -302,11 +291,11 @@ void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constant
         l->ga[ *id_to_sim ] += c->qa;
 #endif            
 #if FS_INH == 1
-        if(l->nt[ *id_to_sim ] == INH) {
+        if((l->nt[ *id_to_sim ] == INH)&&(l->gb[ *id_to_sim ] > -1)) {
             l->gb[ *id_to_sim ] += c->qb;
         }
 #endif
-//            printf("spike %zu! p: %f, pacc: %f, ga: %f, gr: %f\n", *id_to_sim, p, l->pacc[ *id_to_sim ], l->ga[ *id_to_sim ],l->gr[ *id_to_sim ]);
+//        printf("spike %zu! p: %f, p_old: %f, pacc: %f, ga: %f, gr: %f, gb: %f\n", *id_to_sim, p, p_old, l->pacc[ *id_to_sim ], l->ga[ *id_to_sim ],l->gr[ *id_to_sim ], l->gb[ *id_to_sim ]);
     }
     
     if(c->learn) {
@@ -319,15 +308,15 @@ void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constant
             double dC = C_calc( &l->fired[ *id_to_sim ], &p, &u, &M, &l->syn[ *id_to_sim ][ *syn_id ], c);
             l->C[ *id_to_sim ][ *syn_id ] += -l->C[ *id_to_sim ][ *syn_id ]/c->tc + dC;
 //                printf("dC: %f C: %f, params: %d %f %f %f %f\n", dC, l->C[ *id_to_sim ][ *syn_id ], l->fired[ *id_to_sim ], p, u, l->syn[ *id_to_sim ][ *syn_id ], M);
-            double lrate = rate_calc(&l->W[ *id_to_sim ][ *syn_id ], c);
             
 #if RATE_NORM == PRESYNAPTIC
-            double dw = c->added_lrate*lrate*( l->C[ *id_to_sim ][ *syn_id ]*l->B[ *id_to_sim ] -  \
+            double dw = c->added_lrate*( l->C[ *id_to_sim ][ *syn_id ]*l->B[ *id_to_sim ] -  \
                                         c->weight_decay_factor * l->syn_fired[ *id_to_sim ][ *syn_id ] * l->W[ *id_to_sim ][ *syn_id ] );
 #elif RATE_NORM == POSTSYNAPTIC                
-            double dw = c->added_lrate*lrate*( l->C[ *id_to_sim ][ *syn_id ]*l->B[ *id_to_sim ] -  \
+            double dw = c->added_lrate*( l->C[ *id_to_sim ][ *syn_id ]*l->B[ *id_to_sim ] -  \
                                         c->weight_decay_factor * (l->fired[ *id_to_sim ] + l->syn_fired[ *id_to_sim ][ *syn_id ]) * l->W[ *id_to_sim ][ *syn_id ] );
 #endif               
+            dw = bound_grad(&l->W[ *id_to_sim ][ *syn_id ], &dw, c);
             l->W[ *id_to_sim ][ *syn_id ] += dw;
             
             
@@ -338,7 +327,7 @@ void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constant
             }
             if( isnan(dw) ) { 
                 printf("\nFound bad value\n");
-                printf("nid: %zu, p: %f, u: %f, B: %f, pacc: %f, C: %f, lrate: %f, W: %f, dw: %f\n", *id_to_sim, p, u, l->B[ *id_to_sim ], l->pacc[ *id_to_sim ], l->C[ *id_to_sim ][ *syn_id ], lrate, l->W[ *id_to_sim ][ *syn_id ], dw);
+                printf("nid: %zu, p: %f, u: %f, B: %f, pacc: %f, C: %f, W: %f, dw: %f\n", *id_to_sim, p, u, l->B[ *id_to_sim ], l->pacc[ *id_to_sim ], l->C[ *id_to_sim ][ *syn_id ], l->W[ *id_to_sim ][ *syn_id ], dw);
                 printf("C params: Yspike: %d, synapse: %f, dC: %f, p': %f\n", l->fired[ *id_to_sim],l->syn[ *id_to_sim ][ *syn_id ], dC, pstroke(&u,c));
                 exit(1);
             }
