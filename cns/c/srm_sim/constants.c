@@ -13,6 +13,7 @@ Constants* createConstants(const char *filename) {
     c->__pr = c->pr/c->sim_dim;
     if(c->determ) {
         c->beta = 1000;
+//        c->r0 = 1000;
     }
     if((c->determ)&&(c->learn)) {
         printf("Can't learn anything in determenistic mode\n");
