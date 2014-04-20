@@ -10,23 +10,25 @@ source('../serialize_to_bin.R')
 source('../plot_funcs.R')
 
 
-ucr_spikes_dir = "/home/alexeyche/prog/sim/ucr_spikes"
+#ucr_spikes_dir = "/home/alexeyche/prog/sim/ucr_spikes"
+ucr_spikes_dir = "/home/alexeyche/prog/sim/ucr_spikes_full"
+
 #ucr_spikes_dir = "/home/alexeyche/my/sim/ucr_spikes"
 data_dir = '~/prog/sim'
 #data_dir = '~/my/sim'
 
 
-M = 20
+M = 100
 mean_p_dur = 60000
 
 duration = 1000
 dt = 1
 duration = 1000
-samples_from_dataset = 20
+samples_from_dataset = 50
 epochs = 100
 
 source('../make_dataset.R')
-
+dir.create(sprintf("%s/train", ucr_spikes_dir))
 for(ep in 1:epochs) {
     patterns = patterns[sample(1:length(patterns))]
     

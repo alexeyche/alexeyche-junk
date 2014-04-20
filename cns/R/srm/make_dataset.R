@@ -4,10 +4,10 @@
 data = synth # synthetic control
 c(train_dataset, test_dataset) := read_ts_file(data, data_dir)
 elems = samples_from_dataset
-train_dataset = train_dataset[ c(sample(1:50, elems), sample(51:100, elems), sample(101:150,elems) )] #,
-#                                sample(151:200, elems), sample(201:250,elems), sample(251:300,elems))] # cut
-test_dataset = test_dataset[c(sample(1:50, elems), sample(51:100, elems), sample(101:150, elems) )]
-#sample(151:200, elems), sample(201:250,elems), sample(251:300, elems))]
+train_dataset = train_dataset[ c(sample(1:50, elems), sample(51:100, elems), sample(101:150,elems),
+                                sample(151:200, elems), sample(201:250,elems), sample(251:300,elems))] # cut
+test_dataset = test_dataset[c(sample(1:50, elems), sample(51:100, elems), sample(101:150, elems),
+                                sample(151:200, elems), sample(201:250,elems), sample(251:300, elems))]
 
 #train_dataset[[1]]$label=1
 #train_dataset[[2]] = list(data = -train_dataset[[1]]$data, label=2)
