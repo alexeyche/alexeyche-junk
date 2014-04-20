@@ -46,7 +46,7 @@ MIN_EP=1
 MAX_EP=$EPOCH
 
 if [ -d "$WORK_DIR" ]; then
-    LAST_EP=$(find $WORK_DIR -maxdepth 1 -type f -name "?*_*"  -exec basename {} \; | cut -d '_' -f 1 | sort -nr | uniq | head -n 1)
+    LAST_EP=$(find $WORK_DIR -maxdepth 1 -type f -name "?*_*.bin"  -exec basename {} \; | cut -d '_' -f 1 | sort -nr | uniq | head -n 1)
     RESP="xxx"
     while true; do
         if [ "$RESP" == "y" ]; then

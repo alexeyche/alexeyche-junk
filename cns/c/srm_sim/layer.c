@@ -271,11 +271,19 @@ void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constant
 
     double p = probf(&u, c) * c->dt;
     double M = 1;
-#if (SFA == 1) && (REFR == 1) && (FS_INH == 1)
-    M = exp(-( l->gr[ *id_to_sim] + l->ga[ *id_to_sim ] + l->gb[ *id_to_sim ] ));
-//    printf("id: %zu, inh: %d, M: %f,  ga: %f, gr: %f, gb: %f\n", *id_to_sim, l->nt[ *id_to_sim ], M, l->ga[ *id_to_sim ],l->gr[ *id_to_sim ], l->gb[ *id_to_sim ]);
+    double val=0;
+#if SFA == 1
+    val += l->ga[ *id_to_sim ];
+#endif 
+#if REFR == 1
+    val += l->gr[ *id_to_sim ];
 #endif    
-    double p_old = p; 
+#if FS_INH == 1
+    val += l->gb[ *id_to_sim ];
+#endif
+#if (SFA == 1) || (REFR == 1) || (FS_INH == 1)
+    M = exp(-val);       
+#endif
     p = p*M;
     double coin = getUnif();
     if( p > coin ) {

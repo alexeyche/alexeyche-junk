@@ -68,7 +68,7 @@ a_suppr = Vectorize(function(s) {
 
 g0=1
 r0=9.25
-beta=100
+beta=0.5
 u_tr=15
 
 g2 = Vectorize(function(u) {
@@ -76,7 +76,7 @@ g2 = Vectorize(function(u) {
 })
 
 u=seq(0,100, length.out=1000)
-plot(g2(u),type="l")
+plot(g2(u),type="l", xlim=c(0,200), ylim=c(0,10), lwd=5)
 
 
 
