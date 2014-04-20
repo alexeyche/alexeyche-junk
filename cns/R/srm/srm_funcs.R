@@ -76,7 +76,7 @@ g2 = Vectorize(function(u) {
 })
 
 u=seq(0,100, length.out=1000)
-plot(g2(u),type="l", xlim=c(0,200), ylim=c(0,10), lwd=5)
+plot(u, g2(u),type="l", xlim=c(0,20), ylim=c(0,20), lwd=2.5, las=1)
 
 
 
