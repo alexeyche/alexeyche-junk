@@ -15,7 +15,7 @@ rundir="/home/alexeyche/prog/sim/runs"
 #runname = "n50_no_conn"
 #runname = "n50_conn_3"
 #runname = "n50_conn_big"
-runname = "n100_full2"
+runname = "n100_full.1"
 workdir=sprintf("%s/%s", rundir, runname)
 
 #workdir="/home/alexeyche/prog/sim/runs/rfd"
@@ -51,7 +51,7 @@ for(i in 1:length(net)) {
     }
     net[[i]] = sp[i, spike_elems]
 }
-p1 = plot_rastl(net,T0=0,Tmax=2000)
+p1 = plot_rastl(net[101:200],T0=0,Tmax=1000)
 
 if(file.exists(sprintf("%s.bin",stat_file))) {
     p = loadMatrix(stat_file, 1)
