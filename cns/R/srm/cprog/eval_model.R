@@ -1,5 +1,7 @@
 args <- commandArgs(trailingOnly = FALSE)
 epoch_opt = substring( args[grep("--epoch=", args)], 9)
+runname_opt = substring( args[grep("--run-name=", args)], 12)
+
 
 setwd("~/prog/alexeyche-junk/cns/R/srm/cprog")
 #setwd("~/my/git/alexeyche-junk/cns/R/srm/cprog")
@@ -18,10 +20,13 @@ rundir = "/home/alexeyche/prog/sim/runs"
 #runname="test_run"
 #runname = "n50_no_conn"
 #runname = "n50_conn_3"
-runname = "n100_full"
+runname = "n100_full.1"
 ep = 20
 if(length(epoch_opt) > 0) {
     ep = epoch_opt
+}
+if(length(runname_opt) > 0) {
+    runname = runname_opt
 }
 
 srm_sim_exec = sprintf("%s/cns/c/bin/srm_sim", gitdir)
@@ -75,23 +80,24 @@ for(tr_i in 1:length(tresholds)) {
     
     output_file = sprintf("%s/%s_output_spikes", evalepdir, tr_i)
     test_output_file = sprintf("%s/%s_test_output_spikes", evalepdir, tr_i)
-    
-    system(    sprintf("%s -c %s -i %s.bin -o %s.bin -l no -ml %s.bin -j %s", 
-                       srm_sim_exec, 
-                       run_const_ini, 
-                       input_file, 
-                       output_file,
-                       model_file,
-                       jobs)
-    )
-    system(    sprintf("%s -c %s -i %s.bin -o %s.bin -l no -ml %s.bin -j %s", 
-                       srm_sim_exec, 
-                       run_const_ini, 
-                       test_input_file, 
-                       test_output_file,
-                       model_file,
-                       jobs)
-    )
+    if(!file.exists(sprintf("%s.bin", output_file))) {
+        system(    sprintf("%s -c %s -i %s.bin -o %s.bin -l no -ml %s.bin -j %s", 
+                           srm_sim_exec, 
+                           run_const_ini, 
+                           input_file, 
+                           output_file,
+                           model_file,
+                           jobs)
+        )
+        system(    sprintf("%s -c %s -i %s.bin -o %s.bin -l no -ml %s.bin -j %s", 
+                           srm_sim_exec, 
+                           run_const_ini, 
+                           test_input_file, 
+                           test_output_file,
+                           model_file,
+                           jobs)
+        )
+    }
 }
 
 conf_matrices = list()
@@ -123,9 +129,8 @@ for(tr_i in 1:length(tresholds)) {
         cat("tr: ", tr, "Tbr: ", Tbr, " rate: ", r, "\n")
     }
 }
-inds = which(rates == min(rates), arr.ind=TRUE)
 
 saveMatrixList(sprintf("%s/eval_output", evalepdir) ,
-               list(rates, matrix(tresholds), matrix(sigmas), conf_matrices[[ inds[,1] ]][[ inds[,2] ]]) )
-gr_pl(t(rates))
-#print(confm)
+               list(rates, matrix(tresholds), matrix(kernel_param)))
+
+

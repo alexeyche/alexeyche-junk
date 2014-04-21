@@ -18,7 +18,7 @@ data_dir = '~/prog/sim'
 #data_dir = '~/my/sim'
 
 
-M = 100
+M = 10
 mean_p_dur = 60000
 
 duration = 1000
