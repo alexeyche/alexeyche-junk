@@ -15,7 +15,7 @@ rundir="/home/alexeyche/prog/sim/runs"
 #runname = "n50_no_conn"
 #runname = "n50_conn_3"
 #runname = "n50_conn_big"
-runname = "n100_full.1"
+runname = "n100_full.2"
 workdir=sprintf("%s/%s", rundir, runname)
 
 #workdir="/home/alexeyche/prog/sim/runs/rfd"
