@@ -13,7 +13,8 @@ plot_rastl <- function(raster, lab="",T0=0, Tmax=Inf) {
     x <- c(x, rast)
     y <- c(y, rep(i, length(rast)))
   }
-  return(xyplot(y~x,list(x=x, y=y), main=lab, xlim=c(T0, max(x))))
+  #plot(x,y, col="black", lwd=2.5, las=1)
+  return(xyplot(y~x,list(x=x, y=y), main=lab, xlim=c(T0, max(x)), col="black", lwd=2.5))
 }
 
 plot_dwt = function(mx) { 
