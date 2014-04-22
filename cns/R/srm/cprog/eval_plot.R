@@ -5,7 +5,8 @@ setwd("~/prog/alexeyche-junk/cns/R/srm/cprog")
 library(snn)
 
 rundir="/home/alexeyche/prog/sim/runs"
-names = c("n100_full", "n100_full.1")
+names = c("n100_full", "n100_full.1", "n100_full.2")
+
 
 rates = NULL
 maxep = 33
@@ -40,6 +41,7 @@ x = 1:13*2-1
 CI.up = m+dev
 CI.dn = m-dev
 x=1:maxep
-plot(m~x, cex=1.5,ylim=c(0,0.2), xlab='Эпоха',ylab='Рейтинг ошибки', main='',col='blue',pch=16, , las=1)
+plot(m~x, cex=1.5,ylim=c(0,0.2),yaxp=c(0,0.20,10), xlab='Эпоха',ylab='Рейтинг ошибки', main='',col='blue',pch=16, , las=1)
 arrows(x,CI.dn,x,CI.up,code=3,length=0.2,angle=90,col='red')
+abline(h=0.12, col="black")
 #legend("bottomleft",paste(names,": S.E=",data$se),ncol=6,text.width=1)

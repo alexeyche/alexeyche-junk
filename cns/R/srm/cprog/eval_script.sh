@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-names="n100_full n100_full.1 n100_full2 n100_full2.1"
+names="n100_full n100_full.1 n100_full.2"
 
 runpath="/home/alexeyche/prog/sim/runs"
 
