@@ -55,6 +55,9 @@ typedef struct {
     double mean_p_dur;
     double axonal_delays_rate;
     double axonal_delays_gain;
+    double syn_delays_rate;
+    double syn_delays_gain;
+
 
     double target_rate;
     double __target_rate; // not to fill

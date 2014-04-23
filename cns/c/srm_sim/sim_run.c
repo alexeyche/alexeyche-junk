@@ -119,7 +119,7 @@ void simulateNeuron(Sim *s, const size_t *layer_id, const size_t *n_id, double t
     }
     simulateSRMLayerNeuron(l, n_id, c);
     if(l->fired[*n_id] == 1) {
-        propagateSpikeNetSim(s->ns, s->rt, &l->ids[*n_id], t + l->axon_del[*n_id]);
+        propagateSpikeNetSim(s, l, &l->ids[*n_id], t + l->axon_del[*n_id]);
         l->fired[*n_id] = 0;
     }
 }

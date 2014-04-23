@@ -149,6 +149,12 @@ int file_handler(void* user, const char* section, const char* name,
     if (MATCH("net", "inhib_frac")) {
         c->inhib_frac = atof(value);
     } else 
+    if (MATCH("net", "syn_delays_gain")) {
+        c->syn_delays_gain = atof(value);
+    } else 
+    if (MATCH("net", "syn_delays_rate")) {
+        c->syn_delays_rate = atof(value);
+    } else 
     if (MATCH("net", "axonal_delays_gain")) {
         c->axonal_delays_gain = atof(value);
     } else 
@@ -183,7 +189,9 @@ void printConstants(Constants *c) {
     printf("added_lrate: %f,\n", c->added_lrate);
     printf("afferent_per_neuron: %d,\n", c->afferent_per_neuron);
     printf("alpha: %f,\n", c->alpha);
-    printf("axonal_delays_rate: %f,\n", c->axonal_delays_rate);
+    printf("syn_delays_rate: %f,\n", c->syn_delays_rate);
+    printf("syn_delays_gain: %f,\n", c->syn_delays_gain);
+    printf("syn_delays_rate: %f,\n", c->syn_delays_rate);
     printf("axonal_delays_gain: %f,\n", c->axonal_delays_gain);
     printf("aw: %f,\n", c->aw);
     printf("beta: %f,\n", c->beta);

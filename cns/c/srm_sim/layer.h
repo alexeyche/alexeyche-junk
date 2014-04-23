@@ -52,6 +52,7 @@ typedef struct {
     unsigned char **syn_fired;
     double *pacc;
     double *axon_del;
+    double **syn_del;
     double *gr;
     double *ga;
     double *gb;
@@ -91,5 +92,7 @@ void loadSRMLayer(SRMLayer *l, Constants *c, pMatrixVector *data);
 void toStartValues(SRMLayer *l, Constants *c);
 void propagateSpikeSRMLayer(SRMLayer *l, const size_t *ni, const SynSpike *sp, const Constants *c);
 void resetSRMLayerNeuron(SRMLayer *l, const size_t *ni);
+double getSynDelay(SRMLayer *l, const size_t *id, const size_t *syn_id);
+bool isNeuronHere(SRMLayer *l, const size_t *id);
 
 #endif
