@@ -40,6 +40,7 @@ SRMLayer* createSRMLayer(size_t N, size_t *glob_idx, bool saveStat) {
     l->B = (double*)malloc( l->N*sizeof(double));
     l->C = (double**)malloc( l->N*sizeof(double*));
     l->axon_del = (double*)malloc( l->N*sizeof(double));
+    l->syn_del = (double**)malloc( l->N*sizeof(double));
     l->fired = (unsigned char*)malloc( l->N*sizeof(unsigned char));
     l->pacc = (double*)malloc( l->N*sizeof(double));
     l->syn_fired = (unsigned char**)malloc( l->N*sizeof(unsigned char*));
@@ -148,6 +149,29 @@ nspec_t getSpecNeuron(SRMLayer *l, const size_t *id) {
     printf("Error: Can't find neuron with id %zu\n", *id);
 }
 
+bool isNeuronHere(SRMLayer *l, const size_t *id) {
+    for(size_t ni=0; ni<l->N; ni++) {
+        if( l->ids[ni] == *id ) {
+            return(true);
+        }
+    }
+    return(false);
+}
+
+double getSynDelay(SRMLayer *l, const size_t *id, const size_t *syn_id) {
+    for(size_t ni=0; ni<l->N; ni++) {
+        if( l->ids[ni] == *id ) {
+            if(*syn_id >= l->nconn[ni]) {
+                printf("id: %zu syn_id: %zu\n", *id, *syn_id);
+            }
+            assert(*syn_id < l->nconn[ni]);
+            return(l->syn_del[ni][*syn_id]);
+        }
+    }
+    printf("Error: Can't find neuron with id %zu\n", *id);
+
+}
+
 void allocSynData(SRMLayer *l, size_t ni) {
     l->id_conns[ni] = (size_t*) malloc(l->nconn[ni]*sizeof(size_t));
     l->W[ni] = (double*) malloc(l->nconn[ni]*sizeof(double));
@@ -155,6 +179,7 @@ void allocSynData(SRMLayer *l, size_t ni) {
     l->syn_spec[ni] = (double*) malloc(l->nconn[ni]*sizeof(double));
     l->C[ni] = (double*) malloc(l->nconn[ni]*sizeof(double));
     l->syn_fired[ni] = (unsigned char*) malloc(l->nconn[ni]*sizeof(unsigned char));
+    l->syn_del[ni] = (double*) malloc(l->nconn[ni]*sizeof(double));
     if(l->saveStat) {
         l->stat_W[ni] = (doubleVector**) malloc( l->nconn[ni]*sizeof(doubleVector*));
         l->stat_C[ni] = (doubleVector**) malloc( l->nconn[ni]*sizeof(doubleVector*));
@@ -172,6 +197,7 @@ void deallocSynData(SRMLayer *l, size_t ni) {
     free(l->syn_spec[ni]);
     free(l->C[ni]);
     free(l->syn_fired[ni]);
+    free(l->syn_del[ni]);
     if(l->saveStat) {
         for(size_t syn_i=0; syn_i < l->nconn[ni]; syn_i++) {
             TEMPLATE(deleteVector,double)(l->stat_W[ni][syn_i]);
@@ -198,6 +224,7 @@ void toStartValues(SRMLayer *l, Constants *c) {
             l->syn[ni][syn_i] = 0;
             l->C[ni][syn_i] = 0;
             l->syn_fired[ni][syn_i] = 0;
+            l->syn_del[ni][syn_i] = 0;
             if(getSpecNeuron(l, &l->ids[ni]) == EXC) {
                 l->syn_spec[ni][syn_i] = c->e_exc;
             } else 
@@ -241,6 +268,9 @@ void configureSRMLayer(SRMLayer *l, const indVector *inputIDs, Constants *c) {
     if(c->axonal_delays_rate > 0) {
         for(size_t ni=0; ni<l->N; ni++) {
             l->axon_del[ni] = c->axonal_delays_gain*getExp(c->axonal_delays_rate);
+            for(size_t syn_i=0; syn_i<l->nconn[ni]; syn_i++) {
+                l->syn_del[ni][syn_i] = c->syn_delays_gain*getExp(c->syn_delays_rate);
+            }
         }
     }
 }

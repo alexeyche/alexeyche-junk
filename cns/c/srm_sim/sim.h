@@ -4,7 +4,6 @@
 #include <layer.h>
 #include <constants.h>
 #include <spikes_list.h>
-#include <net_sim.h>
 #include <matrix.h>
 #include <io.h>
 #include <sim_runtime.h>
@@ -19,6 +18,35 @@
     #define min( a, b ) ( ((a) < (b)) ? (a) : (b) )
 #endif
 #define P( condition ) {if( (condition) != 0 ) { printf( "\n FAILURE in %s, line %d\n", __FILE__, __LINE__ );exit( 1 );}}
+
+
+// Net sim
+
+typedef struct {
+    size_t n_id;
+    size_t syn_id;
+} Conn;
+
+#include <templates_clean.h>
+#define T Conn
+#include <util/util_vector_tmpl.h>
+
+#include <templates_clean.h>
+#define T SynSpike
+#include <util/util_vector_tmpl.h>
+
+
+pthread_spinlock_t *spinlocks;
+
+typedef struct {
+    ConnVector **conn_map;
+    SpikesList *net;    
+    SynSpikeVector **input_spikes_queue;
+    SynSpikeVector **spikes_queue;
+    size_t size;
+} NetSim;
+
+
 
 pthread_barrier_t barrier;
 
@@ -45,6 +73,18 @@ typedef struct {
     size_t thread_id;
 } SimWorker;
 
+
+
+NetSim* createNetSim();
+void deallocNetSim(NetSim *ns);
+void allocNetSim(NetSim *ns, size_t net_size);
+void deleteNetSim(NetSim *ns);
+void propagateInputSpikesNetSim(Sim *s, SpikesList *sl);
+void printInputSpikesQueue(NetSim *ns);
+void configureConnMapNetSim(NetSim *ns, pSRMLayerVector *l);
+void propagateSpikeNetSim(Sim *s, SRMLayer *l, const size_t *ni, double t);
+
+
 Sim* createSim();
 void appendLayerSim(Sim *s, SRMLayer *l);
 // configure
@@ -65,5 +105,7 @@ void simulateNeuron(Sim *s, const size_t *layer_id, const size_t *n_id, double t
 const SynSpike* getInputSpike(double t, const size_t *n_id, NetSim *ns, SimRuntime *sr, const Constants *c);
 void* simRunRoutine(void *args);
 void resetQueue(NetSim *ns, SimRuntime *rt, const size_t *ni);
+
+
 
 #endif

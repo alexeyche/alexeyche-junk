@@ -48,7 +48,7 @@ void configreNetSpikesSim(Sim *s, Constants *c) {
     
     Matrix *inp_m = ml->array[0];
     SpikesList *inp_sl = spikesMatrixToSpikesList(inp_m);
-    propagateInputSpikesNetSim(s->ns, inp_sl);
+    propagateInputSpikesNetSim(s, inp_sl);
 
     double Tmax = 0;
     for(size_t ni=0; ni<s->ns->net->size; ni++) {
