@@ -452,16 +452,20 @@ pMatrixVector* serializeSRMLayer(SRMLayer *l) {
     Matrix *pacc = createMatrix(l->N, 1);
     Matrix *ids = createMatrix(l->N, 1);
     Matrix *axon_del = createMatrix(l->N, 1);
+    Matrix *syn_del = createMatrix(l->N, max_conn_id+1);
     Matrix *ga = createMatrix(l->N, 1);
    
     for(size_t i=0; i<W->nrow; i++) {
         for(size_t j=0; j<W->ncol; j++) {
             setMatrixElement(W, i, j, 0);
+            setMatrixElement(syn_del, i, j, 0);
         }
     }
     for(size_t ni=0; ni< l->N; ni++) {
         for(size_t con_i=0; con_i < l->nconn[ni]; con_i++) {
             setMatrixElement(W, ni, l->id_conns[ni][con_i], l->W[ni][con_i]);
+            setMatrixElement(syn_del, ni, l->id_conns[ni][con_i], l->syn_del[ni][con_i]);
+        
         }
         setMatrixElement(nt, ni, 0, l->nt[ni]);
         setMatrixElement(pacc, ni, 0, l->pacc[ni]);
@@ -475,6 +479,7 @@ pMatrixVector* serializeSRMLayer(SRMLayer *l) {
     TEMPLATE(insertVector,pMatrix)(data, pacc);
     TEMPLATE(insertVector,pMatrix)(data, ids);
     TEMPLATE(insertVector,pMatrix)(data, axon_del);
+    TEMPLATE(insertVector,pMatrix)(data, syn_del);
     TEMPLATE(insertVector,pMatrix)(data, ga);
   
     return(data);
@@ -486,18 +491,23 @@ void loadSRMLayer(SRMLayer *l, Constants *c, pMatrixVector *data) {
     Matrix *pacc = data->array[2];
     Matrix *ids = data->array[3];
     Matrix *axon_del = data->array[4];
-    Matrix *ga = data->array[5];
+    Matrix *syn_del = data->array[5];
+    Matrix *ga = data->array[6];
     assert(l->N == W->nrow);
 
     doubleVector **W_vals = (doubleVector**) malloc( W->nrow * sizeof(doubleVector*));
+    doubleVector **syn_del_vals = (doubleVector**) malloc( syn_del->nrow * sizeof(doubleVector*));
     indVector **id_conns_vals = (indVector**) malloc( W->nrow * sizeof(indVector*));
     for(size_t i=0; i<W->nrow; i++) {  // shape form and get the values
         W_vals[i] = TEMPLATE(createVector,double)();
+        syn_del_vals[i] = TEMPLATE(createVector,double)();
         id_conns_vals[i] = TEMPLATE(createVector,ind)();
         for(size_t j=0; j<W->ncol; j++) {
             double w_ij = getMatrixElement(W, i, j);
+            double syn_del_ij = getMatrixElement(syn_del, i, j);
             if(w_ij>0) {
                 TEMPLATE(insertVector,double)(W_vals[i], w_ij);
+                TEMPLATE(insertVector,double)(syn_del_vals[i], syn_del_ij);
                 TEMPLATE(insertVector,ind)(id_conns_vals[i], j);
             }
         }
@@ -521,13 +531,16 @@ void loadSRMLayer(SRMLayer *l, Constants *c, pMatrixVector *data) {
     for(size_t ni=0; ni<l->N; ni++) {  // apply values
         memcpy(l->W[ni], W_vals[ni]->array, sizeof(double)*W_vals[ni]->size);
         memcpy(l->id_conns[ni], id_conns_vals[ni]->array, sizeof(size_t)*id_conns_vals[ni]->size);
+        memcpy(l->syn_del[ni], syn_del_vals[ni]->array, sizeof(double)*syn_del_vals[ni]->size);
         l->pacc[ni] = getMatrixElement(pacc, ni, 0);
         l->axon_del[ni] = getMatrixElement(axon_del, ni, 0);
         l->ga[ni] = getMatrixElement(ga, ni, 0);
 
         TEMPLATE(deleteVector,double)(W_vals[ni]);
+        TEMPLATE(deleteVector,double)(syn_del_vals[ni]);
         TEMPLATE(deleteVector,ind)(id_conns_vals[ni]);
     }
+    free(syn_del_vals);
     free(W_vals);
     free(id_conns_vals);
 }

@@ -10,27 +10,18 @@ void deleteSim(Sim *s) {
 
 SimRuntime* createRuntime() {
     SimRuntime *rt = (SimRuntime*) malloc(sizeof(SimRuntime));
-    rt->input_spikes_iter = TEMPLATE(createVector,ind)();
-    rt->spikes_iter = TEMPLATE(createVector,ind)();
     rt->reset_timeline = TEMPLATE(createVector,double)();
     rt->timeline_iter = 0;
     return(rt);
 }
 
 void deleteRuntime(SimRuntime *sr) {
-    TEMPLATE(deleteVector,ind)(sr->input_spikes_iter);
-    TEMPLATE(deleteVector,ind)(sr->spikes_iter);
     TEMPLATE(deleteVector,double)(sr->reset_timeline);
     free(sr);
 }
 
 
-void allocRuntime(SimRuntime *rt, size_t net_size) {
-    for(size_t inp_i=0; inp_i < net_size; inp_i++) {
-        TEMPLATE(insertVector,ind)(rt->input_spikes_iter, 0);
-        TEMPLATE(insertVector,ind)(rt->spikes_iter, 0);
-    }
-}
+
 
 void configreNetSpikesSim(Sim *s, Constants *c) {
     // filling receiver-oriented connection map
@@ -41,7 +32,6 @@ void configreNetSpikesSim(Sim *s, Constants *c) {
         deleteRuntime(s->rt);
         s->rt = createRuntime();
     }
-    allocRuntime(s->rt, s->ns->size);
 
     pMatrixVector *ml = readMatrixList(c->input_spikes_filename);
     assert(ml && ml->size >= 2);
