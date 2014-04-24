@@ -23,6 +23,16 @@ TNAME(T,LNode)* TEMPLATE(getNextLList,T)(TNAME(T,LList) *a) {
     return(a->current);
 }
 
+TNAME(T,LNode)* TEMPLATE(getPrevLList,T)(TNAME(T,LList) *a) {
+    if(a->size == 0) return(NULL);
+    if(a->current == NULL) {
+        a->current = a->last;
+    } else {
+        a->current = a->current->prev;
+    }
+    return(a->current);
+}
+
 void TEMPLATE(addValueLList,T)(TNAME(T,LList) *a, T value) {
     TNAME(T,LNode) *an = (TNAME(T,LNode)*) malloc(sizeof(TNAME(T,LNode)));
     if(!an) {
@@ -40,6 +50,43 @@ void TEMPLATE(addValueLList,T)(TNAME(T,LList) *a, T value) {
         an->prev = a->last;
         a->last = an;
         a->last->next = NULL;
+    }
+    ++a->size;
+}
+
+void TEMPLATE(insertAfterLList,T)(TNAME(T,LList) *a, TNAME(T,LNode) *n, T value) {
+    TNAME(T,LNode) *an = (TNAME(T,LNode)*) malloc(sizeof(TNAME(T,LNode)));
+    if(!an) {
+        printf("malloc failed\n");
+        exit(1);
+    }
+    an->value = value;
+    if(n == NULL) { //adding in first place
+        if(a->size == 0) {
+            a->first = an;
+            a->last = an;
+            an->next = NULL;
+            an->prev = NULL;
+        } else {
+            a->first->prev= an;
+            an->next = a->first;
+            a->first = an;
+            a->first->prev = NULL;
+        }
+    } else {
+        if(n->next == NULL) { // adding in last place
+            a->last->next = an;
+            an->prev = a->last;
+            a->last = an;
+            a->last->next = NULL;
+        } else {
+            // adding in middle
+            TNAME(T,LNode) *n_acc = n->next;
+            n->next = an;
+            an->prev = n;
+            an->next = n_acc;
+            n_acc->prev = an;
+        }
     }
     ++a->size;
 }

@@ -19,10 +19,11 @@ typedef struct {
 TNAME(T,LList)* TEMPLATE(createLList,T)();
 TNAME(T,LNode)* TEMPLATE(getFirstLList,T)(TNAME(T,LList) *a);
 TNAME(T,LNode)* TEMPLATE(getNextLList,T)(TNAME(T,LList) *a);
+TNAME(T,LNode)* TEMPLATE(getPrevLList,T)(TNAME(T,LList) *a);
 void TEMPLATE(addValueLList,T)(TNAME(T,LList) *a, T value);
 void TEMPLATE(dropNodeLList,T)(TNAME(T,LList) *a, TNAME(T,LNode) *a_curr);
 void TEMPLATE(deleteLList,T)(TNAME(T,LList) *a);
-
+void TEMPLATE(insertAfterLList,T)(TNAME(T,LList) *a, TNAME(T,LNode) *n, T value);
 
 
 #endif

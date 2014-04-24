@@ -6,7 +6,6 @@
 #include <spikes_list.h>
 #include <matrix.h>
 #include <io.h>
-#include <sim_runtime.h>
 
 #include <pthread.h>
 
@@ -19,32 +18,8 @@
 #endif
 #define P( condition ) {if( (condition) != 0 ) { printf( "\n FAILURE in %s, line %d\n", __FILE__, __LINE__ );exit( 1 );}}
 
-
-// Net sim
-
-typedef struct {
-    size_t n_id;
-    size_t syn_id;
-} Conn;
-
-#include <templates_clean.h>
-#define T Conn
-#include <util/util_vector_tmpl.h>
-
-#include <templates_clean.h>
-#define T SynSpike
-#include <util/util_vector_tmpl.h>
-
-
-pthread_spinlock_t *spinlocks;
-
-typedef struct {
-    ConnVector **conn_map;
-    SpikesList *net;    
-    SynSpikeVector **input_spikes_queue;
-    SynSpikeVector **spikes_queue;
-    size_t size;
-} NetSim;
+#include <sim_runtime.h>
+#include <sim_netsim.h>
 
 
 
@@ -104,7 +79,6 @@ void runSim(Sim *s);
 void simulateNeuron(Sim *s, const size_t *layer_id, const size_t *n_id, double t,  const Constants *c);
 const SynSpike* getInputSpike(double t, const size_t *n_id, NetSim *ns, SimRuntime *sr, const Constants *c);
 void* simRunRoutine(void *args);
-void resetQueue(NetSim *ns, SimRuntime *rt, const size_t *ni);
 
 
 

@@ -38,8 +38,9 @@ sim_netsim.o: sim_netsim.c sim.h layer.h /usr/include/stdlib.h \
  /usr/include/x86_64-linux-gnu/bits/nan.h \
  /usr/include/x86_64-linux-gnu/bits/mathdef.h \
  /usr/include/x86_64-linux-gnu/bits/mathcalls.h util/util.h matrix.h \
- util/util_vector_tmpl.h io.h spikes_list.h sim_runtime.h \
- util/util_vector_tmpl.c
+ util/util_vector_tmpl.h io.h spikes_list.h sim_runtime.h sim_netsim.h \
+ util/util_dlink_list_tmpl.h util/util_vector_tmpl.c \
+ util/util_dlink_list_tmpl.c
 
 sim.h:
 
@@ -175,4 +176,10 @@ spikes_list.h:
 
 sim_runtime.h:
 
+sim_netsim.h:
+
+util/util_dlink_list_tmpl.h:
+
 util/util_vector_tmpl.c:
+
+util/util_dlink_list_tmpl.c:

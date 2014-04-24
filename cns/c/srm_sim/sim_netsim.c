@@ -9,6 +9,10 @@
 #define T SynSpike
 #include <util/util_vector_tmpl.c>
 
+#include <templates_clean.h>
+#define T SynSpike
+#include <util/util_dlink_list_tmpl.c>
+
 
 
 
@@ -22,8 +26,8 @@ void deallocNetSim(NetSim *ns) {
     deleteSpikesList(ns->net);
     for(size_t sp_i=0; sp_i < ns->size; sp_i++) { 
         TEMPLATE(deleteVector,Conn)(ns->conn_map[sp_i]);
-        TEMPLATE(deleteVector,SynSpike)(ns->input_spikes_queue[sp_i]);
-        TEMPLATE(deleteVector,SynSpike)(ns->spikes_queue[sp_i]);
+        TEMPLATE(deleteLList,SynSpike)(ns->input_spikes_queue[sp_i]);
+        TEMPLATE(deleteLList,SynSpike)(ns->spikes_queue[sp_i]);
     }
     free(ns->conn_map);
     free(ns->input_spikes_queue);
@@ -40,12 +44,12 @@ void allocNetSim(NetSim *ns, size_t net_size) {
     ns->size = net_size;
     ns->net = createSpikesList(net_size);
     ns->conn_map = (ConnVector**) malloc( net_size*sizeof(ConnVector*));
-    ns->input_spikes_queue = (SynSpikeVector**) malloc(  net_size*sizeof(SynSpikeVector*));
-    ns->spikes_queue = (SynSpikeVector**) malloc(  net_size*sizeof(SynSpikeVector*));
+    ns->input_spikes_queue = (SynSpikeLList**) malloc(  net_size*sizeof(SynSpikeLList*));
+    ns->spikes_queue = (SynSpikeLList**) malloc(  net_size*sizeof(SynSpikeLList*));
     for(size_t sp_i=0; sp_i < net_size; sp_i++) {
         ns->conn_map[sp_i] = TEMPLATE(createVector,Conn)();
-        ns->input_spikes_queue[sp_i] = TEMPLATE(createVector,SynSpike)();
-        ns->spikes_queue[sp_i] = TEMPLATE(createVector,SynSpike)();
+        ns->input_spikes_queue[sp_i] = TEMPLATE(createLList,SynSpike)();
+        ns->spikes_queue[sp_i] = TEMPLATE(createLList,SynSpike)();
     }
 }
 
@@ -81,6 +85,11 @@ int compSynSpike( const void *elem1, const void *elem2 ) {
 void propagateInputSpikesNetSim(Sim *s, SpikesList *sl) {
     NetSim *ns = s->ns;
     assert(ns->size >= sl->size);
+    SynSpikeVector **input_spikes = (SynSpikeVector**) malloc( ns->size * sizeof(SynSpikeVector*));
+    for(size_t ni=0; ni< ns->size; ni++) {
+        input_spikes[ni] = TEMPLATE(createVector,SynSpike)();
+    }
+    
     for(size_t ni=0; ni< sl->size; ni++) {
         for(size_t con_i=0; con_i < ns->conn_map[ni]->size; con_i++) {
             SRMLayer *l = NULL;
@@ -96,13 +105,20 @@ void propagateInputSpikesNetSim(Sim *s, SpikesList *sl) {
                 sp.syn_id = ns->conn_map[ni]->array[con_i].syn_id;
                 assert(l);
                 sp.t = sl->list[ni]->array[sp_i] + getSynDelay(l, &sp.n_id, &sp.syn_id);
-                TEMPLATE(insertVector,SynSpike)(ns->input_spikes_queue[ ns->conn_map[ni]->array[con_i].n_id ], sp);
+                TEMPLATE(insertVector,SynSpike)(input_spikes[ ns->conn_map[ni]->array[con_i].n_id ], sp);
             }
         }
     }
+    
     for(size_t ni=0; ni< ns->size; ni++) {
-        qsort(ns->input_spikes_queue[ni]->array, ns->input_spikes_queue[ni]->size, sizeof(SynSpike), compSynSpike);
+        qsort(input_spikes[ni]->array, input_spikes[ni]->size, sizeof(SynSpike), compSynSpike);
+        for(size_t sp_i=0; sp_i < input_spikes[ni]->size; sp_i++) {
+            TEMPLATE(addValueLList,SynSpike)(ns->input_spikes_queue[ni], input_spikes[ni]->array[sp_i]);
+        }
+        TEMPLATE(deleteVector,SynSpike)(input_spikes[ni]);
     }
+    free(input_spikes);
+    
     for(size_t ni=0; ni< sl->size; ni++) {
         for(size_t sp_i=0; sp_i < sl->list[ni]->size; sp_i++) {
             TEMPLATE(insertVector,double)(ns->net->list[ni], sl->list[ni]->array[sp_i]);
@@ -125,10 +141,12 @@ void printConnMap(NetSim *ns) {
 void printInputSpikesQueue(NetSim *ns) {
     for(size_t ni=0; ni<ns->size; ni++) {
         printf("%zu: ", ni);
-        for(size_t inp_i=0; inp_i < ns->input_spikes_queue[ni]->size; inp_i++) {
-            const SynSpike *ss = &ns->input_spikes_queue[ni]->array[inp_i];
-            printf("%f:%zu:%zu, ", ss->t, ss->n_id, ss->syn_id);
-        }
+        SynSpikeLNode *current_node = ns->input_spikes_queue[ ni ]->current;
+        SynSpikeLNode *spike_node;
+        while( (spike_node = TEMPLATE(getNextLList,SynSpike)(ns->input_spikes_queue[ ni ]) ) != NULL ) {
+            printf("%zu:%zu:%3.3f ", spike_node->value.n_id, spike_node->value.syn_id, spike_node->value.t);
+        } 
+        ns->input_spikes_queue[ ni ]->current = current_node;
         printf("\n");
     }
 }
@@ -138,42 +156,34 @@ void printInputSpikesQueue(NetSim *ns) {
 
 void propagateSpikeNetSim(Sim *s, SRMLayer *l, const size_t *ni, double t) {
     NetSim *ns = s->ns;
-    SimRuntime *rt = s->rt;
     TEMPLATE(insertVector,double)(ns->net->list[*ni], t);
 
     for(size_t con_i=0; con_i < ns->conn_map[*ni]->size; con_i++) {
         SynSpike sp;        
         sp.n_id = *ni;
         sp.syn_id = ns->conn_map[*ni]->array[con_i].syn_id;
-        sp.t = t + MINIMAL_DELAY + getSynDelay(l, &sp.n_id,  &sp.syn_id);
-        size_t naffect = ns->conn_map[*ni]->array[con_i].n_id;
+        sp.t = t + MINIMAL_DELAY + getSynDelay(l, &ns->conn_map[*ni]->array[con_i].n_id,  &sp.syn_id);
 //        printf("net spike at %f in %zu\n", sp.t, naffect);
+        size_t naffect = ns->conn_map[*ni]->array[con_i].n_id;
         pthread_spin_lock(&spinlocks[naffect]);
-        TEMPLATE(insertVector,SynSpike)(ns->spikes_queue[ naffect ], sp);
-//        size_t size_to_sort = ns->spikes_queue[naffect]->size;
-//        size_t offset = 0;
-        //if(size_to_sort > SORT_LIM) {
-        //    size_to_sort = SORT_LIM;
-        //    offset = ns->spikes_queue[naffect]->size-size_to_sort;
-        //    printf("t: %f\n", t);
-        //    printf("queue of %zu before sort: ", ns->conn_map[*ni]->array[con_i].n_id);
-        //    for(size_t i=0; i<ns->spikes_queue[ ns->conn_map[*ni]->array[con_i].n_id ]->size; i++) {
-        //        printf("%f:%zu ", ns->spikes_queue[ ns->conn_map[*ni]->array[con_i].n_id ]->array[i].t,  \
-        //                          ns->spikes_queue[ ns->conn_map[*ni]->array[con_i].n_id ]->array[i].syn_id);
-        //    }
-        //    printf("\n");
-        //}
         
-        qsort(ns->spikes_queue[naffect]->array, ns->spikes_queue[naffect]->size, sizeof(SynSpike), compSynSpike);
-//        if(ns->spikes_queue[naffect]->size>SORT_LIM) {
-//            printf("queue of %zu: ", ns->conn_map[*ni]->array[con_i].n_id);
-//            for(size_t i=0; i<ns->spikes_queue[ ns->conn_map[*ni]->array[con_i].n_id ]->size; i++) {
-//                printf("%f:%zu ", ns->spikes_queue[ ns->conn_map[*ni]->array[con_i].n_id ]->array[i].t,  \
-//                                  ns->spikes_queue[ ns->conn_map[*ni]->array[con_i].n_id ]->array[i].syn_id);
-//            }
-//            printf("\n");
-//            printf("======================\n");
-//        }
+        SynSpikeLNode *current_node = ns->spikes_queue[ naffect ]->current;
+
+        SynSpikeLNode *spike_node;
+        while( (spike_node = TEMPLATE(getPrevLList,SynSpike)(ns->spikes_queue[ naffect ]) ) != NULL ) {
+            if(spike_node->value.t<sp.t) {
+                break;
+            }
+        }
+        TEMPLATE(insertAfterLList,SynSpike)(ns->spikes_queue[ naffect ], spike_node, sp); 
+
+        ns->spikes_queue[ naffect ]->current = NULL;
+        while( (spike_node = TEMPLATE(getNextLList,SynSpike)(ns->spikes_queue[ naffect ]) ) != NULL ) {
+            printf("%zu:%zu:%3.3f ", spike_node->value.n_id, spike_node->value.syn_id, spike_node->value.t);
+        } 
+        printf("\n");
+
+        ns->spikes_queue[ naffect ]->current = current_node;
         pthread_spin_unlock(&spinlocks[naffect]);
     }
 }
