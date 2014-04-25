@@ -5,37 +5,26 @@
 
 
 const SynSpike* getInputSpike(double t, const size_t *n_id, NetSim *ns, SimRuntime *sr, const Constants *c) {
-    if(ns->input_spikes_queue[ *n_id ]->size > 0) {
-        if(ns->input_spikes_queue[ *n_id ]->current == NULL) {
-            ns->input_spikes_queue[ *n_id ]->current == ns->input_spikes_queue[ *n_id ]->first;
-        }
-        SynSpike *sp = &ns->input_spikes_queue[ *n_id ]->current->value;
+    if(ns->input_spikes_queue[ *n_id ]->current != NULL) {
+        const SynSpike *sp = &ns->input_spikes_queue[ *n_id ]->current->value;
         if(sp->t - t < 0) {
             printf("We missing an input spike %f in %zu at %f. Something wrong (%f). Need sorted queue\n", sp->t, *n_id, t, sp->t - t);
             exit(1);
         }
         if(sp->t <= t+c->dt) {
-            if(ns->input_spikes_queue[ *n_id ]->current->next != NULL) {
-                ns->input_spikes_queue[ *n_id ]->current = ns->input_spikes_queue[ *n_id ]->current->next;
-            }
+            ns->input_spikes_queue[ *n_id ]->current = ns->input_spikes_queue[ *n_id ]->current->next;
             return(sp);
         }
-
     }
     pthread_spin_lock(&spinlocks[ *n_id ]);
-    if(ns->spikes_queue[ *n_id ]->size > 0) {
-        if(ns->spikes_queue[ *n_id ]->current == NULL) {
-            ns->spikes_queue[ *n_id ]->current == ns->spikes_queue[ *n_id ]->first;
-        }
-        SynSpike *sp = &ns->spikes_queue[ *n_id ]->current->value;
+    if(ns->spikes_queue[ *n_id ]->current != NULL) {
+        const SynSpike *sp = &ns->spikes_queue[ *n_id ]->current->value;
         if(sp->t - t < 0) {
-            printf("We missing an input spike %f in %zu at %f. Something wrong (%f). Need sorted queue\n", sp->t, *n_id, t, sp->t - t);
+            printf("We missing net spike %f in %zu at %f. Something wrong (%f). Need sorted queue\n", sp->t, *n_id, t, sp->t - t);
             exit(1);
         }
         if(sp->t <= t+c->dt) {
-            if(ns->spikes_queue[ *n_id ]->current->next != NULL) {
-                ns->spikes_queue[ *n_id ]->current = ns->spikes_queue[ *n_id ]->current->next;
-            }
+            ns->spikes_queue[ *n_id ]->current = ns->spikes_queue[ *n_id ]->current->next;
             pthread_spin_unlock(&spinlocks[*n_id]);
             return(sp);
         }
@@ -85,6 +74,7 @@ void* simRunRoutine(void *args) {
     int last  = min( (sw->thread_id+1) * neuron_per_thread, s->num_neurons );
 
     for(double t=0; t< s->rt->Tmax; t+=s->c->dt) {
+//        printf("%3.3f\n", t);
         for(size_t na_i=first; na_i<last; na_i++) {
             simulateNeuron(s, &s->na[na_i].layer_id, &s->na[na_i].n_id, t, s->c);
         }

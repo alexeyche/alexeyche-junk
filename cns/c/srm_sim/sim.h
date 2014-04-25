@@ -1,6 +1,8 @@
 #ifndef SIM_H
 #define SIM_H
 
+#include <stddef.h>
+
 #include <layer.h>
 #include <constants.h>
 #include <spikes_list.h>
