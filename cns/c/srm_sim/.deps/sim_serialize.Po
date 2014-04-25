@@ -1,10 +1,11 @@
-sim_serialize.o: sim_serialize.c sim.h layer.h /usr/include/stdlib.h \
- /usr/include/features.h /usr/include/x86_64-linux-gnu/bits/predefs.h \
+sim_serialize.o: sim_serialize.c sim.h \
+ /usr/lib/gcc/x86_64-linux-gnu/4.6.1/include/stddef.h layer.h \
+ /usr/include/stdlib.h /usr/include/features.h \
+ /usr/include/x86_64-linux-gnu/bits/predefs.h \
  /usr/include/x86_64-linux-gnu/sys/cdefs.h \
  /usr/include/x86_64-linux-gnu/bits/wordsize.h \
  /usr/include/x86_64-linux-gnu/gnu/stubs.h \
  /usr/include/x86_64-linux-gnu/gnu/stubs-64.h \
- /usr/lib/gcc/x86_64-linux-gnu/4.6.1/include/stddef.h \
  /usr/include/x86_64-linux-gnu/bits/waitflags.h \
  /usr/include/x86_64-linux-gnu/bits/waitstatus.h /usr/include/endian.h \
  /usr/include/x86_64-linux-gnu/bits/endian.h \
@@ -43,6 +44,8 @@ sim_serialize.o: sim_serialize.c sim.h layer.h /usr/include/stdlib.h \
 
 sim.h:
 
+/usr/lib/gcc/x86_64-linux-gnu/4.6.1/include/stddef.h:
+
 layer.h:
 
 /usr/include/stdlib.h:
@@ -58,8 +61,6 @@ layer.h:
 /usr/include/x86_64-linux-gnu/gnu/stubs.h:
 
 /usr/include/x86_64-linux-gnu/gnu/stubs-64.h:
-
-/usr/lib/gcc/x86_64-linux-gnu/4.6.1/include/stddef.h:
 
 /usr/include/x86_64-linux-gnu/bits/waitflags.h:
 

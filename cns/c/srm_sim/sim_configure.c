@@ -42,8 +42,10 @@ void configreNetSpikesSim(Sim *s, Constants *c) {
 
     double Tmax = 0;
     for(size_t ni=0; ni<s->ns->net->size; ni++) {
-        if(s->ns->net->list[ni]->array[ s->ns->net->list[ni]->size-1 ]> Tmax) {
-            Tmax = s->ns->net->list[ni]->array[ s->ns->net->list[ni]->size-1 ];
+        if(s->ns->net->list[ni]->size>0) {
+            if(s->ns->net->list[ni]->array[ s->ns->net->list[ni]->size-1 ]> Tmax) {
+                Tmax = s->ns->net->list[ni]->array[ s->ns->net->list[ni]->size-1 ];
+            }
         }
     }   
     s->rt->Tmax = Tmax + 100;
