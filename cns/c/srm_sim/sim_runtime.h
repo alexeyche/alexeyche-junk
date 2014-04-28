@@ -5,6 +5,7 @@
 
 typedef struct {
     doubleVector *reset_timeline;
+    indVector *pattern_classes;
     size_t timeline_iter;
     
     double Tmax;

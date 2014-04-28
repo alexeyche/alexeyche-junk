@@ -11,6 +11,7 @@ void deleteSim(Sim *s) {
 SimRuntime* createRuntime() {
     SimRuntime *rt = (SimRuntime*) malloc(sizeof(SimRuntime));
     rt->reset_timeline = TEMPLATE(createVector,double)();
+    rt->pattern_classes = TEMPLATE(createVector,ind)();
     rt->timeline_iter = 0;
     return(rt);
 }
@@ -55,6 +56,10 @@ void configureNetSpikesSim(Sim *s, Constants *c) {
     for(size_t ri=0; ri<timeline_m->nrow*timeline_m->ncol; ri++) {
         TEMPLATE(insertVector,double)(s->rt->reset_timeline, timeline_m->vals[ri]);
     }
+    Matrix *classes_m = ml->array[2];
+    for(size_t ri=0; ri<classes_m->nrow*classes_m->ncol; ri++) {
+        TEMPLATE(insertVector,ind)(s->rt->pattern_classes, classes_m->vals[ri]);
+    }
     
     TEMPLATE(deleteVector,pMatrix)(ml);
 }
@@ -75,6 +80,7 @@ void configureLayersSim(Sim *s, Constants *c, bool saveStat) {
         appendLayerSim(s, l);
         net_size += l->N;
     }   
+
     s->net_size = net_size;
     indVector *inp = NULL;
     indVector *outp = NULL;
@@ -121,8 +127,8 @@ void configureSynapses(Sim *s, Constants *c) {
             size_t n_id = l->ids[ni];
             for(size_t cons_i=0; cons_i < s->ns->conn_map[n_id]->size; cons_i++) {
                 Conn con = s->ns->conn_map[n_id]->array[cons_i];
-                size_t li_cons = getLayerIdOfNeuron(s, con.n_id);
-                SRMLayer *l_cons = s->layers->array[li_cons];
+                
+                SRMLayer *l_cons = s->layers->array[con.l_id];
                 if(l->nt[ni] == EXC) {
                     setSynapseSpeciality(l_cons, con.n_id, con.syn_id, c->e_exc);
                 } else 

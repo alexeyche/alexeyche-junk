@@ -72,10 +72,10 @@ void* simRunRoutine(void *args) {
     int neuron_per_thread = (s->num_neurons + s->nthreads - 1) / s->nthreads;
     int first = min(  sw->thread_id    * neuron_per_thread, s->num_neurons );
     int last  = min( (sw->thread_id+1) * neuron_per_thread, s->num_neurons );
-
+   
     for(double t=0; t< s->rt->Tmax; t+=s->c->dt) {
-//        printf("%3.3f\n", t);
         for(size_t na_i=first; na_i<last; na_i++) {
+//            if((c->target_neurons) && (s->na[na_i].layer_id == c->layers_size->size-1) && (s->na[na_i].n_id == s->rt->pattern_classes[ s->rt->timeline_iter ]))
             simulateNeuron(s, &s->na[na_i].layer_id, &s->na[na_i].n_id, t, s->c);
         }
         bool we_did_reset = false;

@@ -58,7 +58,8 @@ typedef struct {
     double *gr;
     double *ga;
     double *gb;
-
+    
+    double *p_set;
     //stat
     bool saveStat;
     doubleVector **stat_B;
@@ -86,7 +87,6 @@ SRMLayer* createSRMLayer(size_t N, size_t *glob_idx, bool saveStat);
 void printSRMLayer(SRMLayer *l);
 void deleteSRMLayer(SRMLayer *l);
 void configureSRMLayer(SRMLayer *l, const indVector *inputIDs, const indVector *outputIDs, Constants *c);
-nspec_t getSpecNeuron(SRMLayer *l, const size_t *id);
 
 void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constants *c);
 pMatrixVector* serializeSRMLayer(SRMLayer *l);
@@ -95,7 +95,6 @@ void toStartValues(SRMLayer *l, Constants *c);
 void propagateSpikeSRMLayer(SRMLayer *l, const size_t *ni, const SynSpike *sp, const Constants *c);
 void resetSRMLayerNeuron(SRMLayer *l, const size_t *ni);
 double getSynDelay(SRMLayer *l, const size_t *id, const size_t *syn_id);
-bool isNeuronHere(SRMLayer *l, const size_t *id);
 void setSynapseSpeciality(SRMLayer *l, size_t n_id, size_t syn_id, double spec);
 size_t getLocalNeuronId(SRMLayer *l, const size_t *glob_id);
 
