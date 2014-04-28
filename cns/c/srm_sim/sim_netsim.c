@@ -66,7 +66,8 @@ void configureConnMapNetSim(NetSim *ns, pSRMLayerVector *l) {
         for(size_t ni=0; ni < l->array[li]->N; ni++) {
             for(size_t con_i=0; con_i < l->array[li]->nconn[ni]; con_i++) {
                 Conn conseq;
-                conseq.n_id = l->array[li]->ids[ni];
+                conseq.l_id = li;
+                conseq.n_id = ni;
                 conseq.syn_id = con_i;
                 TEMPLATE(insertVector,Conn)( ns->conn_map[ l->array[li]->id_conns[ni][con_i] ], conseq); 
             }
@@ -92,7 +93,7 @@ void propagateInputSpikesNetSim(Sim *s, SpikesList *sl) {
     
     for(size_t ni=0; ni< sl->size; ni++) {
         for(size_t con_i=0; con_i < ns->conn_map[ni]->size; con_i++) {
-            SRMLayer *l = s->layers->array[ getLayerIdOfNeuron(s, ns->conn_map[ni]->array[con_i].n_id) ];
+            SRMLayer *l = s->layers->array[ ns->conn_map[ni]->array[con_i].l_id ];
             
             for(size_t sp_i=0; sp_i < sl->list[ni]->size; sp_i++) {
                 SynSpike sp;
@@ -100,7 +101,7 @@ void propagateInputSpikesNetSim(Sim *s, SpikesList *sl) {
                 sp.syn_id = ns->conn_map[ni]->array[con_i].syn_id;
                 assert(l);
                 sp.t = sl->list[ni]->array[sp_i] + getSynDelay(l, &ns->conn_map[ni]->array[con_i].n_id, &sp.syn_id);
-                TEMPLATE(insertVector,SynSpike)(input_spikes[ ns->conn_map[ni]->array[con_i].n_id ], sp);
+                TEMPLATE(insertVector,SynSpike)(input_spikes[ getGlobalId(l, &ns->conn_map[ni]->array[con_i].n_id) ], sp);
             }
         }
     }
@@ -128,7 +129,7 @@ void printConnMap(NetSim *ns) {
     for(size_t ni=0; ni<ns->size; ni++) {
         printf("%zu: ", ni);
         for(size_t con_i=0; con_i < ns->conn_map[ni]->size; con_i++) {
-            printf("%zu:%zu, ", ns->conn_map[ni]->array[con_i].n_id, ns->conn_map[ni]->array[con_i].syn_id);
+            printf("%zu:%zu:%zu, ", ns->conn_map[ni]->array[con_i].l_id, ns->conn_map[ni]->array[con_i].n_id, ns->conn_map[ni]->array[con_i].syn_id);
         }
         printf("\n");
     }
@@ -159,10 +160,10 @@ void propagateSpikeNetSim(Sim *s, SRMLayer *l, const size_t *ni, double t) {
         sp.n_id = *ni;
         sp.syn_id = ns->conn_map[*ni]->array[con_i].syn_id;
 
-        SRMLayer *l_cons = s->layers->array[ getLayerIdOfNeuron(s, ns->conn_map[*ni]->array[con_i].n_id) ];
+        SRMLayer *l_cons = s->layers->array[ ns->conn_map[*ni]->array[con_i].l_id ];
         sp.t = t + MINIMAL_DELAY + getSynDelay(l_cons, &ns->conn_map[*ni]->array[con_i].n_id,  &sp.syn_id);
-//        printf("net spike at %f in %zu\n", sp.t, naffect);
-        size_t naffect = ns->conn_map[*ni]->array[con_i].n_id;
+        
+        size_t naffect = getGlobalId(l_cons, &ns->conn_map[*ni]->array[con_i].n_id);
         pthread_spin_lock(&spinlocks[naffect]);
         
 //        SynSpikeLNode *current_node = ns->spikes_queue[ naffect ]->current;

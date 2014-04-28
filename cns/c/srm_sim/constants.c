@@ -11,6 +11,7 @@ Constants* createConstants(const char *filename) {
     c->inhib_frac= TEMPLATE(createVector,double)();
     c->weight_per_neuron= TEMPLATE(createVector,double)();
     c->wmax = TEMPLATE(createVector,double)();
+    c->weight_decay_factor = TEMPLATE(createVector,double)();
     if (ini_parse(filename, file_handler, c) < 0) {
         printf("Can't load %s\n", filename);
         return(NULL);
@@ -35,6 +36,7 @@ void deleteConstants(Constants *c) {
     TEMPLATE(deleteVector,double)(c->inhib_frac);
     TEMPLATE(deleteVector,double)(c->weight_per_neuron);
     TEMPLATE(deleteVector,double)(c->wmax);
+    TEMPLATE(deleteVector,double)(c->weight_decay_factor);
     free(c->input_spikes_filename);
     free(c);
 }
@@ -146,6 +148,9 @@ int file_handler(void* user, const char* section, const char* name,
     if (MATCH("sim", "determ")) {
         c->determ = strcmp(value, "true") == 0;
     } else 
+    if (MATCH("sim", "target_neurons")) {
+        c->target_neurons = strcmp(value, "true") == 0;
+    } else 
     if (MATCH("net", "M")) {
         c->M = atoi(value);
     } else 
@@ -204,15 +209,20 @@ int file_handler(void* user, const char* section, const char* name,
         c->target_rate_factor = atof(value);
     } else 
     if (MATCH("learn", "weight_decay_factor")) {
-        c->weight_decay_factor = atof(value);
+        fillDoubleVector(c->weight_decay_factor, value);
     } else 
     if (MATCH("learn", "added_lrate")) {
         c->added_lrate = atof(value);
+    } else 
+    if (MATCH("learn", "p_set")) {
+        c->p_set = atof(value);
     } else {
         return(0);
     } 
     return(1);
 }
+
+
 
 // for i in `sed -ne '11,44p' ./srm_sim/constants.h | cut -d ' ' -f6  | sort | uniq  | tr -d ';'`; do  echo "printf(\"$i: %f,\n\", c->$i);"; done
 void printConstants(Constants *c) {
@@ -231,13 +241,13 @@ void printConstants(Constants *c) {
     printf("e_inh: %f,\n", c->e_inh);
     printf("epochs: %d,\n", c->epochs);
     printf("gain_factor: %f,\n", c->gain_factor);
-    printf("inhib_frac: %f,\n", c->inhib_frac);
+    printf("inhib_frac: ");   printDoubleVector(c->inhib_frac);
     printf("M: %d,\n", c->M);
     printf("mean_p_dur: %f,\n", c->mean_p_dur);
-    printf("N: %d,\n", c->layers_size->array[0]);
-    printf("net_edge_prob: %f,\n", c->net_edge_prob->array[0]);
-    printf("input_edge_prob: %f,\n", c->input_edge_prob->array[0]);
-    printf("output_edge_prob: %f,\n", c->output_edge_prob->array[0]);
+    printf("N: "); printIndVector(c->layers_size);
+    printf("net_edge_prob: ");   printDoubleVector(c->net_edge_prob);
+    printf("input_edge_prob: ");   printDoubleVector(c->input_edge_prob);
+    printf("output_edge_prob: ");   printDoubleVector(c->output_edge_prob);
     printf("input_spikes_filename: %s,\n", c->input_spikes_filename);
     printf("pr: %f,\n", c->pr);
     printf("seed: %d,\n", c->seed);
@@ -248,6 +258,7 @@ void printConstants(Constants *c) {
     printf("tsr: %f,\n", c->tsr);
     printf("target_rate: %f,\n", c->target_rate);
     printf("target_rate_factor: %f,\n", c->target_rate_factor);
+    printf("target_neurons: %d,\n", c->target_neurons);
     printf("tc: %f,\n", c->tc);
     printf("tm: %f,\n", c->tm);
     printf("ta: %f,\n", c->ta);
@@ -259,9 +270,9 @@ void printConstants(Constants *c) {
     printf("u_tr: %f,\n", c->u_tr);
     printf("ts: %f,\n", c->ts);
     printf("u_rest: %f,\n", c->u_rest);
-    printf("weight_decay_factor: %f,\n", c->weight_decay_factor);
+    printf("weight_decay_factor: ");   printDoubleVector(c->weight_decay_factor);
     printf("weight_var: %f,\n", c->weight_var);
-    printf("weight_per_neuron: %f,\n", c->weight_per_neuron->array[0]);
+    printf("weight_per_neuron: ");   printDoubleVector(c->weight_per_neuron);
     printf("ws: %f,\n", c->ws);
-    printf("wmax: %f,\n", c->wmax);
+    printf("wmax: ");   printDoubleVector(c->wmax);
 }

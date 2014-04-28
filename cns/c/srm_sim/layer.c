@@ -151,16 +151,7 @@ void printSRMLayer(SRMLayer *l) {
 
 
 
-nspec_t getSpecNeuron(SRMLayer *l, const size_t *id) {
-    size_t local_id = getLocalNeuronId(l, id);
-    return(l->nt[local_id]);
-}
 
-bool isNeuronHere(SRMLayer *l, const size_t *id) {
-    int local_id = *id - l->ids[0];
-    if((local_id<0)||(local_id>=l->N)) return(false);
-    return(true);
-}
 
 size_t getLocalNeuronId(SRMLayer *l, const size_t *glob_id) {
     int local_id = *glob_id - l->ids[0];
@@ -168,19 +159,18 @@ size_t getLocalNeuronId(SRMLayer *l, const size_t *glob_id) {
     return(local_id);
 }
 
-double getSynDelay(SRMLayer *l, const size_t *id, const size_t *syn_id) {
-    size_t local_id = getLocalNeuronId(l, id);
-    if(*syn_id >= l->nconn[local_id]) {
-        printf("id: %zu syn_id: %zu\n", *id, *syn_id);
-    }
-    assert(*syn_id < l->nconn[local_id]);
-    return(l->syn_del[local_id][*syn_id]);
+const size_t getGlobalId(SRMLayer *l, const size_t *ni) {
+    return(l->ids[*ni]);
+}
+
+double getSynDelay(SRMLayer *l, const size_t *ni, const size_t *syn_id) {
+    assert(*syn_id < l->nconn[*ni]);
+    return(l->syn_del[*ni][*syn_id]);
 
 }
 
-void setSynapseSpeciality(SRMLayer *l, size_t n_id, size_t syn_id, double spec) {
-    size_t local_id = getLocalNeuronId(l, &n_id);
-    l->syn_spec[local_id][syn_id] = spec;
+void setSynapseSpeciality(SRMLayer *l, size_t ni, size_t syn_id, double spec) {
+    l->syn_spec[ni][syn_id] = spec;
 }
 
 void allocSynData(SRMLayer *l, size_t ni) {
@@ -241,6 +231,9 @@ void toStartValues(SRMLayer *l, Constants *c) {
     }        
 }
 
+double layerConstD(SRMLayer *l, doubleVector *v) {
+    return( v->array[ l->id ]);
+}
 
 void configureSRMLayer(SRMLayer *l, const indVector *inputIDs, const indVector *outputIDs, Constants *c) {
     for(size_t ni=0; ni<l->N; ni++) {
@@ -362,12 +355,16 @@ void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constant
             
 #if RATE_NORM == PRESYNAPTIC
             double dw = c->added_lrate*( l->C[ *id_to_sim ][ *syn_id ]*l->B[ *id_to_sim ] -  \
-                                        c->weight_decay_factor * l->syn_fired[ *id_to_sim ][ *syn_id ] * l->W[ *id_to_sim ][ *syn_id ] );
+                                        layerConstD(l, c->weight_decay_factor) * l->syn_fired[ *id_to_sim ][ *syn_id ] * l->W[ *id_to_sim ][ *syn_id ] );
 #elif RATE_NORM == POSTSYNAPTIC                
             double dw = c->added_lrate*( l->C[ *id_to_sim ][ *syn_id ]*l->B[ *id_to_sim ] -  \
-                                        c->weight_decay_factor * (l->fired[ *id_to_sim ] + l->syn_fired[ *id_to_sim ][ *syn_id ]) * l->W[ *id_to_sim ][ *syn_id ] );
+                                        layerConstD(l, c->weight_decay_factor) * (l->fired[ *id_to_sim ] + l->syn_fired[ *id_to_sim ][ *syn_id ]) * l->W[ *id_to_sim ][ *syn_id ] );
 #endif               
-            dw = bound_grad(&l->W[ *id_to_sim ][ *syn_id ], &dw, &c->wmax[l->id], c);
+            double wmax = layerConstD(l, c->wmax);
+            dw = bound_grad(&l->W[ *id_to_sim ][ *syn_id ], &dw, &wmax, c);
+            if((l->id == 1) || (l->W[ *id_to_sim ][ *syn_id ] > wmax)) {
+                printf("%f %f %f\n", wmax, dw, l->W[ *id_to_sim ][ *syn_id ]);
+            }
             l->W[ *id_to_sim ][ *syn_id ] += dw;
             
             

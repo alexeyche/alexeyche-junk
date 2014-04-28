@@ -11,7 +11,15 @@
 
 void printDoubleVector(doubleVector *dv) {
     for(size_t el_i=0; el_i < dv->size; el_i++) {
-        printf("%f, ", dv->array[el_i]);    
+        printf("%3.3f, ", dv->array[el_i]);    
     }
     printf("\n");
 }
+
+void printIndVector(indVector *v) {
+    for(size_t i=0; i<v->size; i++) {
+        printf("%zu, ", v->array[i]);
+    }
+    printf("\n");
+}
+

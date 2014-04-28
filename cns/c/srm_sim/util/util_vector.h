@@ -14,5 +14,6 @@
 #include "util_vector_tmpl.h"
 
 void printDoubleVector(doubleVector *dv);
+void printIndVector(indVector *v);
 
 #endif

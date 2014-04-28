@@ -43,7 +43,8 @@ typedef struct {
     unsigned int seed;
     bool determ;
     bool learn;
-
+    bool target_neurons;
+    
     int M;
     indVector *layers_size; 
     doubleVector *net_edge_prob;
@@ -52,6 +53,7 @@ typedef struct {
     doubleVector *inhib_frac;
     doubleVector *weight_per_neuron;
     doubleVector *wmax;
+    doubleVector *weight_decay_factor;
 
     double tc;
     double mean_p_dur;
@@ -66,11 +68,11 @@ typedef struct {
     double target_rate_factor;
     double ws;
     double aw;
-    double weight_decay_factor;
     double weight_var;
 
     double added_lrate;
     int epochs;
+    double p_set;
 } Constants;
 
 int file_handler(void* user, const char* section, const char* name,
