@@ -13,6 +13,7 @@ Sim* createSim(size_t nthreads) {
 
 void appendLayerSim(Sim *s, SRMLayer *l) {
     TEMPLATE(insertVector,pSRMLayer)(s->layers, l);
+    l->id = s->layers->size - 1;
 }
 
 

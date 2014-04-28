@@ -5,6 +5,7 @@
 // Net sim
 
 typedef struct {
+    size_t l_id;
     size_t n_id;
     size_t syn_id;
 } Conn;

@@ -53,12 +53,12 @@ inline double C_calc(const unsigned char *Yspike, const double *p, const double 
     return ( pstr/(*p/ *M) ) * ( *Yspike - *p ) * (*syn);
 }
 
-inline double bound_grad(const double *w, const double *dw, const Constants *c) {
+inline double bound_grad(const double *w, const double *dw, const double *wmax, const Constants *c) {
 #if WEIGHT_BOUND == B_SOFT   
     if(*dw > 0) return(*dw);
     return( (1 - 1/(1+c->aw*(*w/c->ws)) + (1/(1+c->aw))*(*w/c->ws)) * *dw );
 #elif WEIGHT_BOUND == B_HARD
-    if( *w > c->wmax) return(0);
+    if( *w > *wmax) return(0);
     if( *w < 0 ) return(0);      
     return(*dw);
 #endif   

@@ -34,4 +34,10 @@ void TEMPLATE(deleteVectorNoDestroy,T)(TVEC(T) *a) {
   a->alloc_size = a->size = 0;
 }
 
-
+TVEC(T)* TEMPLATE(copyFromArray,T)(T *a, size_t size) {
+    TVEC(T) *v = TEMPLATE(createVector,T)();
+    for(size_t eli=0; eli<size; eli++) {
+        TEMPLATE(insertVector,T)(v, a[eli]);
+    }
+    return(v);
+}    

@@ -65,12 +65,14 @@ void propagateSpikeNetSim(Sim *s, SRMLayer *l, const size_t *ni, double t);
 Sim* createSim();
 void appendLayerSim(Sim *s, SRMLayer *l);
 // configure
+size_t getLayerIdOfNeuron(Sim *s, size_t n_id);
 void deleteSim(Sim *s);
 void configureLayersSim(Sim *s, Constants *c, bool saveStat);
 SimRuntime* createRuntime();
 void deleteRuntime(SimRuntime *sr);
-void configreNetSpikesSim(Sim *s, Constants *c);
+void configureNetSpikesSim(Sim *s, Constants *c);
 void configureSimAttr(Sim *s);
+void configureSynapses(Sim *s, Constants *c);
 
 // serialize
 void loadLayersFromFile(Sim *s, const char *model_fname, Constants *c, bool saveStat);

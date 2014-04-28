@@ -5,6 +5,12 @@
 Constants* createConstants(const char *filename) {
     Constants *c = (Constants*)malloc(sizeof(Constants));
     c->layers_size = TEMPLATE(createVector,ind)();
+    c->net_edge_prob = TEMPLATE(createVector,double)();
+    c->input_edge_prob= TEMPLATE(createVector,double)();
+    c->output_edge_prob = TEMPLATE(createVector,double)();
+    c->inhib_frac= TEMPLATE(createVector,double)();
+    c->weight_per_neuron= TEMPLATE(createVector,double)();
+    c->wmax = TEMPLATE(createVector,double)();
     if (ini_parse(filename, file_handler, c) < 0) {
         printf("Can't load %s\n", filename);
         return(NULL);
@@ -23,8 +29,32 @@ Constants* createConstants(const char *filename) {
 }
 void deleteConstants(Constants *c) {
     TEMPLATE(deleteVector,ind)(c->layers_size);
+    TEMPLATE(deleteVector,double)(c->net_edge_prob);
+    TEMPLATE(deleteVector,double)(c->input_edge_prob);
+    TEMPLATE(deleteVector,double)(c->output_edge_prob);
+    TEMPLATE(deleteVector,double)(c->inhib_frac);
+    TEMPLATE(deleteVector,double)(c->weight_per_neuron);
+    TEMPLATE(deleteVector,double)(c->wmax);
     free(c->input_spikes_filename);
     free(c);
+}
+
+void fillIndVector(indVector *v, const char *vals) {
+    char *token;
+    char *string = strdup(vals);
+    while ((token = strsep(&string, " ")) != NULL) {
+        TEMPLATE(insertVector,ind)(v, atoi(token));
+    }
+    free(string);
+}
+
+void fillDoubleVector(doubleVector *v, const char *vals) {
+    char *token;
+    char *string = strdup(vals);
+    while ((token = strsep(&string, " ")) != NULL) {
+        TEMPLATE(insertVector,double)(v, atof(token));
+    }
+    free(string);
 }
 
 int file_handler(void* user, const char* section, const char* name,
@@ -120,34 +150,34 @@ int file_handler(void* user, const char* section, const char* name,
         c->M = atoi(value);
     } else 
     if (MATCH("net", "N")) {
-        TEMPLATE(insertVector,ind)(c->layers_size, atoi(value));
+        fillIndVector(c->layers_size, value);
     } else 
     if (MATCH("net", "net_edge_prob")) {
-        c->net_edge_prob = atof(value);
+        fillDoubleVector(c->net_edge_prob, value);
     } else 
     if (MATCH("net", "input_edge_prob")) {
-        c->input_edge_prob = atof(value);
+        fillDoubleVector(c->input_edge_prob, value);
     } else 
-    if (MATCH("net", "afferent_per_neuron")) {
-        c->afferent_per_neuron = atoi(value);
+    if (MATCH("net", "output_edge_prob")) {
+        fillDoubleVector(c->output_edge_prob, value);
     } else 
+    if (MATCH("net", "weight_per_neuron")) {
+        fillDoubleVector(c->weight_per_neuron, value);
+    } else 
+    if (MATCH("net", "inhib_frac")) {
+        fillDoubleVector(c->inhib_frac, value);
+    } else
     if (MATCH("net", "ws")) {
         c->ws = atof(value);
     } else 
     if (MATCH("net", "wmax")) {
-        c->wmax = atof(value);
+        fillDoubleVector(c->wmax, value);
     } else 
     if (MATCH("net", "aw")) {
         c->aw = atof(value);
     } else 
     if (MATCH("net", "weight_var")) {
         c->weight_var = atof(value);
-    } else 
-    if (MATCH("net", "weight_per_neuron")) {
-        c->weight_per_neuron = atof(value);
-    } else 
-    if (MATCH("net", "inhib_frac")) {
-        c->inhib_frac = atof(value);
     } else 
     if (MATCH("net", "syn_delays_gain")) {
         c->syn_delays_gain = atof(value);
@@ -187,7 +217,6 @@ int file_handler(void* user, const char* section, const char* name,
 // for i in `sed -ne '11,44p' ./srm_sim/constants.h | cut -d ' ' -f6  | sort | uniq  | tr -d ';'`; do  echo "printf(\"$i: %f,\n\", c->$i);"; done
 void printConstants(Constants *c) {
     printf("added_lrate: %f,\n", c->added_lrate);
-    printf("afferent_per_neuron: %d,\n", c->afferent_per_neuron);
     printf("alpha: %f,\n", c->alpha);
     printf("syn_delays_rate: %f,\n", c->syn_delays_rate);
     printf("syn_delays_gain: %f,\n", c->syn_delays_gain);
@@ -206,8 +235,9 @@ void printConstants(Constants *c) {
     printf("M: %d,\n", c->M);
     printf("mean_p_dur: %f,\n", c->mean_p_dur);
     printf("N: %d,\n", c->layers_size->array[0]);
-    printf("net_edge_prob: %f,\n", c->net_edge_prob);
-    printf("input_edge_prob: %f,\n", c->input_edge_prob);
+    printf("net_edge_prob: %f,\n", c->net_edge_prob->array[0]);
+    printf("input_edge_prob: %f,\n", c->input_edge_prob->array[0]);
+    printf("output_edge_prob: %f,\n", c->output_edge_prob->array[0]);
     printf("input_spikes_filename: %s,\n", c->input_spikes_filename);
     printf("pr: %f,\n", c->pr);
     printf("seed: %d,\n", c->seed);
@@ -231,7 +261,7 @@ void printConstants(Constants *c) {
     printf("u_rest: %f,\n", c->u_rest);
     printf("weight_decay_factor: %f,\n", c->weight_decay_factor);
     printf("weight_var: %f,\n", c->weight_var);
-    printf("weight_per_neuron: %f,\n", c->weight_per_neuron);
+    printf("weight_per_neuron: %f,\n", c->weight_per_neuron->array[0]);
     printf("ws: %f,\n", c->ws);
     printf("wmax: %f,\n", c->wmax);
 }
