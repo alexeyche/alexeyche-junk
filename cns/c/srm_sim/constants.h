@@ -46,11 +46,13 @@ typedef struct {
 
     int M;
     indVector *layers_size; 
-    double net_edge_prob;
-    double inhib_frac;
-    
-    double input_edge_prob;
-    int afferent_per_neuron;
+    doubleVector *net_edge_prob;
+    doubleVector *input_edge_prob;
+    doubleVector *output_edge_prob;
+    doubleVector *inhib_frac;
+    doubleVector *weight_per_neuron;
+    doubleVector *wmax;
+
     double tc;
     double mean_p_dur;
     double axonal_delays_rate;
@@ -62,10 +64,8 @@ typedef struct {
     double target_rate;
     double __target_rate; // not to fill
     double target_rate_factor;
-    double weight_per_neuron;
     double ws;
     double aw;
-    double wmax;
     double weight_decay_factor;
     double weight_var;
 
@@ -79,7 +79,7 @@ int file_handler(void* user, const char* section, const char* name,
 Constants* createConstants(const char *filename);
 void printConstants(Constants *c); 
 void deleteConstants(Constants *c);
-
-
+void fillIndVector(indVector *v, const char *vals);
+void fillDoubleVector(doubleVector *v, const char *vals);
 
 #endif

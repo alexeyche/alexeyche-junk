@@ -91,6 +91,14 @@ void TEMPLATE(insertAfterLList,T)(TNAME(T,LList) *a, TNAME(T,LNode) *n, T value)
     ++a->size;
 }
 
+void TEMPLATE(insertBeforeLList,T)(TNAME(T,LList) *a, TNAME(T,LNode) *n, T value) {
+    if(n) {
+        TEMPLATE(insertAfterLList,T)(a, n->prev, value);
+    } else {
+        TEMPLATE(addValueLList,T)(a, value);
+    }
+}
+
 void TEMPLATE(dropNodeLList,T)(TNAME(T,LList) *a, TNAME(T,LNode) *a_curr) {
     if(a->size == 0) { 
         printf("Error in dropNode. Dropping in empty list\n");

@@ -132,7 +132,18 @@ void printSRMLayer(SRMLayer *l) {
         }
         printf("connected with: ");
         for(size_t syn_i=0; syn_i<l->nconn[ni]; syn_i++) {
-            printf("%zu:%f,", l->id_conns[ni][syn_i], l->W[ni][syn_i]);
+            char *spec;
+            if(l->syn_spec[ni][syn_i] > 0) {
+                spec = strdup("exc");
+            } else 
+            if(l->syn_spec[ni][syn_i] < 0) {
+                spec = strdup("inh");
+            } else {
+                printf("Something wrong!\n");
+                assert(0);
+            }
+            printf("%zu:%f (%s),", l->id_conns[ni][syn_i], l->W[ni][syn_i], spec);
+            free(spec);
         }
         printf("\n");
     }
@@ -141,35 +152,35 @@ void printSRMLayer(SRMLayer *l) {
 
 
 nspec_t getSpecNeuron(SRMLayer *l, const size_t *id) {
-    for(size_t ni=0; ni<l->N; ni++) {
-        if( l->ids[ni] == *id ) {
-            return(l->nt[ni]);
-        }
-    }
-    printf("Error: Can't find neuron with id %zu\n", *id);
+    size_t local_id = getLocalNeuronId(l, id);
+    return(l->nt[local_id]);
 }
 
 bool isNeuronHere(SRMLayer *l, const size_t *id) {
-    for(size_t ni=0; ni<l->N; ni++) {
-        if( l->ids[ni] == *id ) {
-            return(true);
-        }
-    }
-    return(false);
+    int local_id = *id - l->ids[0];
+    if((local_id<0)||(local_id>=l->N)) return(false);
+    return(true);
+}
+
+size_t getLocalNeuronId(SRMLayer *l, const size_t *glob_id) {
+    int local_id = *glob_id - l->ids[0];
+    if((local_id<0)||(local_id>=l->N)) printf("Error: Can't find neuron with id %zu\n", *glob_id);
+    return(local_id);
 }
 
 double getSynDelay(SRMLayer *l, const size_t *id, const size_t *syn_id) {
-    for(size_t ni=0; ni<l->N; ni++) {
-        if( l->ids[ni] == *id ) {
-            if(*syn_id >= l->nconn[ni]) {
-                printf("id: %zu syn_id: %zu\n", *id, *syn_id);
-            }
-            assert(*syn_id < l->nconn[ni]);
-            return(l->syn_del[ni][*syn_id]);
-        }
+    size_t local_id = getLocalNeuronId(l, id);
+    if(*syn_id >= l->nconn[local_id]) {
+        printf("id: %zu syn_id: %zu\n", *id, *syn_id);
     }
-    printf("Error: Can't find neuron with id %zu\n", *id);
+    assert(*syn_id < l->nconn[local_id]);
+    return(l->syn_del[local_id][*syn_id]);
 
+}
+
+void setSynapseSpeciality(SRMLayer *l, size_t n_id, size_t syn_id, double spec) {
+    size_t local_id = getLocalNeuronId(l, &n_id);
+    l->syn_spec[local_id][syn_id] = spec;
 }
 
 void allocSynData(SRMLayer *l, size_t ni) {
@@ -210,7 +221,7 @@ void deallocSynData(SRMLayer *l, size_t ni) {
 
 void toStartValues(SRMLayer *l, Constants *c) {
     for(size_t ni=0; ni<l->N; ni++) {
-        double start_weight = c->weight_var * getNorm() + c->weight_per_neuron/l->nconn[ni];
+        double start_weight = c->weight_var * getNorm() + c->weight_per_neuron->array[l->id]/l->nconn[ni];
         l->a[ni] = 1;
         l->ga[ni] = 0;
         l->gr[ni] = 0;
@@ -225,35 +236,37 @@ void toStartValues(SRMLayer *l, Constants *c) {
             l->C[ni][syn_i] = 0;
             l->syn_fired[ni][syn_i] = 0;
             l->syn_del[ni][syn_i] = 0;
-            if(getSpecNeuron(l, &l->ids[ni]) == EXC) {
-                l->syn_spec[ni][syn_i] = c->e_exc;
-            } else 
-            if(getSpecNeuron(l, &l->ids[ni]) == INH) {
-                l->syn_spec[ni][syn_i] = -c->e_inh;
-            }
+            l->syn_spec[ni][syn_i] = c->e_exc;
         }
     }        
 }
 
 
-void configureSRMLayer(SRMLayer *l, const indVector *inputIDs, Constants *c) {
+void configureSRMLayer(SRMLayer *l, const indVector *inputIDs, const indVector *outputIDs, Constants *c) {
     for(size_t ni=0; ni<l->N; ni++) {
         indVector *conns = TEMPLATE(createVector,ind)(0);
         l->nt[ni] = EXC;
-        if (c->inhib_frac > getUnif()) {
+        if (c->inhib_frac->array[l->id] > getUnif()) {
             l->nt[ni] = INH;
         }
         for(size_t nj=0; nj<l->N; nj++) {        
             if(ni != nj) {
-                if(c->net_edge_prob > getUnif()) {
+                if(c->net_edge_prob->array[l->id] > getUnif()) {
                     TEMPLATE(insertVector,ind)(conns, l->ids[nj]);
                 }
             }
         }
         if(inputIDs) {
             for(size_t inp_i=0; inp_i<inputIDs->size; inp_i++) {        
-                if(c->input_edge_prob > getUnif()) {
+                if(c->input_edge_prob->array[l->id] > getUnif()) {
                     TEMPLATE(insertVector,ind)(conns, inputIDs->array[inp_i]);
+                }
+            }
+        }
+        if(outputIDs) {
+            for(size_t outp_i=0; outp_i<outputIDs->size; outp_i++) {        
+                if(c->output_edge_prob->array[l->id] > getUnif()) {
+                    TEMPLATE(insertVector,ind)(conns, outputIDs->array[outp_i]);
                 }
             }
         }
@@ -354,7 +367,7 @@ void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constant
             double dw = c->added_lrate*( l->C[ *id_to_sim ][ *syn_id ]*l->B[ *id_to_sim ] -  \
                                         c->weight_decay_factor * (l->fired[ *id_to_sim ] + l->syn_fired[ *id_to_sim ][ *syn_id ]) * l->W[ *id_to_sim ][ *syn_id ] );
 #endif               
-            dw = bound_grad(&l->W[ *id_to_sim ][ *syn_id ], &dw, c);
+            dw = bound_grad(&l->W[ *id_to_sim ][ *syn_id ], &dw, &c->wmax[l->id], c);
             l->W[ *id_to_sim ][ *syn_id ] += dw;
             
             

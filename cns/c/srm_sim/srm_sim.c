@@ -39,8 +39,11 @@ int main(int argc, char **argv) {
     } else {
         configureLayersSim(s, c, saveStat);    
     }
-    configreNetSpikesSim(s, c);
+
+    configureNetSpikesSim(s, c);
+    configureSynapses(s, c);
 //    printSRMLayer(s->layers->array[0]);
+//    printSRMLayer(s->layers->array[1]);
 //    printSpikesList(s->ns->net);
 //    printConnMap(s->ns);
 //    printInputSpikesQueue(s->ns);
@@ -48,21 +51,23 @@ int main(int argc, char **argv) {
     
     if(saveStat) {
         pMatrixVector *mv = TEMPLATE(createVector,pMatrix)();
-        Matrix *mp = vectorArrayToMatrix(s->layers->array[0]->stat_p, s->layers->array[0]->N);
-        TEMPLATE(insertVector,pMatrix)(mv, mp);
-        Matrix *mu = vectorArrayToMatrix(s->layers->array[0]->stat_u, s->layers->array[0]->N);
-        TEMPLATE(insertVector,pMatrix)(mv, mu);
-        Matrix *mB = vectorArrayToMatrix(s->layers->array[0]->stat_B, s->layers->array[0]->N);
-        TEMPLATE(insertVector,pMatrix)(mv, mB);
-        for(size_t ni=0; ni < s->layers->array[0]->N; ni++) {
-            Matrix *mSyn = vectorArrayToMatrix(s->layers->array[0]->stat_W[ni], s->layers->array[0]->nconn[ni]);
-            TEMPLATE(insertVector,pMatrix)(mv, mSyn);
-        }
-        for(size_t ni=0; ni < s->layers->array[0]->N; ni++) {
-            Matrix *mC = vectorArrayToMatrix(s->layers->array[0]->stat_C[ni], s->layers->array[0]->nconn[ni]);
-            TEMPLATE(insertVector,pMatrix)(mv, mC);
-        }
- 
+        for(size_t li=0; li < s->layers->size; li++) {
+            Matrix *mp = vectorArrayToMatrix(s->layers->array[li]->stat_p, s->layers->array[li]->N);
+            TEMPLATE(insertVector,pMatrix)(mv, mp);
+            Matrix *mu = vectorArrayToMatrix(s->layers->array[li]->stat_u, s->layers->array[li]->N);
+            TEMPLATE(insertVector,pMatrix)(mv, mu);
+            Matrix *mB = vectorArrayToMatrix(s->layers->array[li]->stat_B, s->layers->array[li]->N);
+            TEMPLATE(insertVector,pMatrix)(mv, mB);
+            for(size_t ni=0; ni < s->layers->array[li]->N; ni++) {
+                Matrix *mSyn = vectorArrayToMatrix(s->layers->array[li]->stat_W[ni], s->layers->array[li]->nconn[ni]);
+                TEMPLATE(insertVector,pMatrix)(mv, mSyn);
+            }
+            for(size_t ni=0; ni < s->layers->array[li]->N; ni++) {
+                Matrix *mC = vectorArrayToMatrix(s->layers->array[li]->stat_C[ni], s->layers->array[li]->nconn[ni]);
+                TEMPLATE(insertVector,pMatrix)(mv, mC);
+            }
+        }            
+     
         saveMatrixList(a.stat_file, mv);
             
         TEMPLATE(deleteVector,pMatrix)(mv);

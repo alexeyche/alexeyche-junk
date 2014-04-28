@@ -15,8 +15,8 @@ void loadLayersFromFile(Sim *s, const char *model_fname, Constants *c, bool save
         }
         size_t neurons_idx = s->c->M;
         SRMLayer *l = createSRMLayer(s->c->layers_size->array[li], &neurons_idx, saveStat);
-        loadSRMLayer(l, s->c, data_layer);
         appendLayerSim(s, l);
+        loadSRMLayer(l, s->c, data_layer);
         TEMPLATE(deleteVectorNoDestroy,pMatrix)(data_layer);
         net_size += l->N;
     }

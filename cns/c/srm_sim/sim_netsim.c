@@ -92,12 +92,7 @@ void propagateInputSpikesNetSim(Sim *s, SpikesList *sl) {
     
     for(size_t ni=0; ni< sl->size; ni++) {
         for(size_t con_i=0; con_i < ns->conn_map[ni]->size; con_i++) {
-            SRMLayer *l = NULL;
-            for(size_t li=0; li<s->layers->size; li++) {
-                if(isNeuronHere(s->layers->array[li], &ns->conn_map[ni]->array[con_i].n_id)) {
-                    l = s->layers->array[li];
-                }
-            }
+            SRMLayer *l = s->layers->array[ getLayerIdOfNeuron(s, ns->conn_map[ni]->array[con_i].n_id) ];
             
             for(size_t sp_i=0; sp_i < sl->list[ni]->size; sp_i++) {
                 SynSpike sp;
@@ -163,34 +158,51 @@ void propagateSpikeNetSim(Sim *s, SRMLayer *l, const size_t *ni, double t) {
         SynSpike sp;        
         sp.n_id = *ni;
         sp.syn_id = ns->conn_map[*ni]->array[con_i].syn_id;
-        sp.t = t + MINIMAL_DELAY + getSynDelay(l, &ns->conn_map[*ni]->array[con_i].n_id,  &sp.syn_id);
+
+        SRMLayer *l_cons = s->layers->array[ getLayerIdOfNeuron(s, ns->conn_map[*ni]->array[con_i].n_id) ];
+        sp.t = t + MINIMAL_DELAY + getSynDelay(l_cons, &ns->conn_map[*ni]->array[con_i].n_id,  &sp.syn_id);
 //        printf("net spike at %f in %zu\n", sp.t, naffect);
         size_t naffect = ns->conn_map[*ni]->array[con_i].n_id;
         pthread_spin_lock(&spinlocks[naffect]);
         
-        SynSpikeLNode *current_node = ns->spikes_queue[ naffect ]->current;
+//        SynSpikeLNode *current_node = ns->spikes_queue[ naffect ]->current;
 
-        SynSpikeLNode *spike_node;
-        ns->spikes_queue[ naffect ]->current = NULL;
-        while( (spike_node = TEMPLATE(getPrevLList,SynSpike)(ns->spikes_queue[ naffect ]) ) != NULL ) {
-            if(spike_node->value.t<sp.t) {
-                break;
+//        SynSpikeLNode *spike_node;
+//        ns->spikes_queue[ naffect ]->current = NULL;
+//        while( (spike_node = TEMPLATE(getPrevLList,SynSpike)(ns->spikes_queue[ naffect ]) ) != NULL ) {
+//            if(spike_node->value.t<sp.t) {
+//                break;
+//            }
+//        }
+//        TEMPLATE(insertAfterLList,SynSpike)(ns->spikes_queue[ naffect ], spike_node, sp); 
+
+        SynSpikeLNode *spike_node = ns->spikes_queue[ naffect ]->current;
+        if(spike_node) {
+            while(spike_node->value.t<sp.t) {
+               spike_node = spike_node->next; 
+               if(spike_node == NULL) break;
             }
         }
-        TEMPLATE(insertAfterLList,SynSpike)(ns->spikes_queue[ naffect ], spike_node, sp); 
-
+        TEMPLATE(insertBeforeLList,SynSpike)(ns->spikes_queue[ naffect ], spike_node, sp); 
+        if(ns->spikes_queue[ naffect ]->current == NULL) {
+            ns->spikes_queue[ naffect ]->current = ns->spikes_queue[ naffect ]->last;
+        }
+        
+//        SynSpikeLNode *current_node = ns->spikes_queue[ naffect ]->current;
 //        ns->spikes_queue[ naffect ]->current = NULL;
 //        printf("%zu: ", naffect);
 //        while( (spike_node = TEMPLATE(getNextLList,SynSpike)(ns->spikes_queue[ naffect ]) ) != NULL ) {
 //            printf("%zu:%zu:%3.3f |", spike_node->value.n_id, spike_node->value.syn_id, spike_node->value.t);
 //        } 
 //        printf("\n");
+//        ns->spikes_queue[ naffect ]->current = current_node;
 
-        if(current_node) {
-            ns->spikes_queue[ naffect ]->current = current_node;
-        } else {
-            ns->spikes_queue[ naffect ]->current = ns->spikes_queue[ naffect ]->last;
-        }
+
+//        if(current_node) {
+//            ns->spikes_queue[ naffect ]->current = current_node;
+//        } else {
+//            ns->spikes_queue[ naffect ]->current = ns->spikes_queue[ naffect ]->last;
+//        }
         pthread_spin_unlock(&spinlocks[naffect]);
     }
 }

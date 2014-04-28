@@ -24,6 +24,6 @@ void TEMPLATE(addValueLList,T)(TNAME(T,LList) *a, T value);
 void TEMPLATE(dropNodeLList,T)(TNAME(T,LList) *a, TNAME(T,LNode) *a_curr);
 void TEMPLATE(deleteLList,T)(TNAME(T,LList) *a);
 void TEMPLATE(insertAfterLList,T)(TNAME(T,LList) *a, TNAME(T,LNode) *n, T value);
-
+void TEMPLATE(insertBeforeLList,T)(TNAME(T,LList) *a, TNAME(T,LNode) *n, T value);
 
 #endif

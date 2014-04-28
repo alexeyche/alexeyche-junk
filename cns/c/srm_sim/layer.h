@@ -30,7 +30,9 @@
 typedef enum {EXC, INH} nspec_t;
 
 typedef struct {
+    size_t id;
     //consts
+
     size_t N;
     size_t *ids;
     nspec_t *nt;
@@ -83,7 +85,7 @@ typedef struct {
 SRMLayer* createSRMLayer(size_t N, size_t *glob_idx, bool saveStat);
 void printSRMLayer(SRMLayer *l);
 void deleteSRMLayer(SRMLayer *l);
-void configureSRMLayer(SRMLayer *l, const indVector *inputIDs, Constants *c);
+void configureSRMLayer(SRMLayer *l, const indVector *inputIDs, const indVector *outputIDs, Constants *c);
 nspec_t getSpecNeuron(SRMLayer *l, const size_t *id);
 
 void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constants *c);
@@ -94,5 +96,7 @@ void propagateSpikeSRMLayer(SRMLayer *l, const size_t *ni, const SynSpike *sp, c
 void resetSRMLayerNeuron(SRMLayer *l, const size_t *ni);
 double getSynDelay(SRMLayer *l, const size_t *id, const size_t *syn_id);
 bool isNeuronHere(SRMLayer *l, const size_t *id);
+void setSynapseSpeciality(SRMLayer *l, size_t n_id, size_t syn_id, double spec);
+size_t getLocalNeuronId(SRMLayer *l, const size_t *glob_id);
 
 #endif
