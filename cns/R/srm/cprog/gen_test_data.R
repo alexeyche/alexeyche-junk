@@ -32,8 +32,11 @@ sf="~/prog/sim/test_stat"
 p =loadMatrix(sf, 1)
 u =loadMatrix(sf, 2)
 B =loadMatrix(sf, 3)
-W1 = loadMatrix(sf, 4)
+W1 = loadMatrix(sf, 3+1)
 C1 = loadMatrix(sf, 3+10+1)
+
+p2 = loadMatrix(sf, 3+10+10+1)
+C2 = loadMatrix(sf, 3+10+10+3+10+1)
 
 plotl(p[1,])
 

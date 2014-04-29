@@ -131,7 +131,15 @@ getSpikesFromMatrix = function(sp) {
 }
 
 get_const = function(const_name) {
-    system(sprintf("egrep -o '%s[ ]*=[ ]*[\\/_.a-zA-Z0-9]+' %s | cut -d '=' -f 2 | tr -d ' '", const_name, const_ini), intern=TRUE)
+    s = system(sprintf("egrep -o '%s[ ]*=[ ]*[ \\/_.a-zA-Z0-9]+' %s | cut -d '=' -f 2 ", const_name, const_ini), intern=TRUE)
+    s_arr = strsplit(s, " ")[[1]]
+    s_out = NULL
+    for(s_el in s_arr) {
+        if(s_el != "") {
+            s_out =c(s_out, s_el)
+        }
+    }
+    return(s_out)
 }
 patch_const = function(const_ini, param, new_val) {
     system( sprintf("sed -i -e 's:%s[ ]*=.*:%s = %s:g' %s", param, param, new_val, const_ini))

@@ -11,21 +11,22 @@ source('../plot_funcs.R')
 
 
 #ucr_spikes_dir = "/home/alexeyche/prog/sim/ucr_spikes"
-ucr_spikes_dir = "/home/alexeyche/prog/sim/ucr_spikes_full"
+#ucr_spikes_dir = "/home/alexeyche/prog/sim/ucr_spikes_full"
+ucr_spikes_dir = "/home/alexeyche/prog/sim/ucr_spikes_mini"
 
 #ucr_spikes_dir = "/home/alexeyche/my/sim/ucr_spikes"
 data_dir = '~/prog/sim'
 #data_dir = '~/my/sim'
 
 
-M = 10
+M = 100
 mean_p_dur = 60000
 
 duration = 1000
 dt = 1
 duration = 1000
-samples_from_dataset = 50
-epochs = 100
+samples_from_dataset = 10
+epochs = 10
 
 source('../make_dataset.R')
 dir.create(sprintf("%s/train", ucr_spikes_dir))

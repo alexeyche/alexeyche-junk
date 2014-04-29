@@ -20,8 +20,8 @@ rundir = "/home/alexeyche/prog/sim/runs"
 #runname="test_run"
 #runname = "n50_no_conn"
 #runname = "n50_conn_3"
-runname = "n100_full.1"
-ep = 20
+runname = "n100_beta_0.75"
+ep = 14
 if(length(epoch_opt) > 0) {
     ep = epoch_opt
 }
@@ -60,7 +60,7 @@ model_file = sprintf("%s/%s_model", workdir, ep)
 ################
 
 #tresholds = seq(-65, -40, by=2.5)
-tresholds = seq(5, 20, by=2.5)
+tresholds = seq(10, 20, by=2.5)
 #tresholds = c(12)
 sigmas = seq(0.1,10, length.out=10)
 kernel_param = seq(10, 200, by=10)

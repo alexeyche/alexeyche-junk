@@ -15,7 +15,8 @@ rundir="/home/alexeyche/prog/sim/runs"
 #runname = "n50_no_conn"
 #runname = "n50_conn_3"
 #runname = "n50_conn_big"
-runname = "n100_full.2"
+#runname = "n100_beta_0.75"
+runname = "2layers100x100"
 workdir=sprintf("%s/%s", rundir, runname)
 
 #workdir="/home/alexeyche/prog/sim/runs/rfd"
@@ -24,7 +25,7 @@ for(ep in 1:300) {
     output_spikes = sprintf("%s/%s_output_spikes.bin", workdir, ep)
     if(!file.exists(output_spikes)) { ep=ep-1; break }
 }
-#ep=20
+#ep=3
 
 
 ep_str=""
@@ -38,6 +39,7 @@ const_ini = sprintf("%s/constants.ini", workdir)
 
 
 N = as.integer(get_const("N"))
+M = as.integer(get_const("M"))
 
 #sp = loadMatrix(input_file,1)
 sp = loadMatrix(output_spikes,1)
@@ -51,7 +53,7 @@ for(i in 1:length(net)) {
     }
     net[[i]] = sp[i, spike_elems]
 }
-p1 = plot_rastl(net[101:200],T0=0,Tmax=1000)
+p1 = plot_rastl(net[(M+1):(M+sum(N))],T0=0,Tmax=2000)
 
 if(file.exists(sprintf("%s.bin",stat_file))) {
     p = loadMatrix(stat_file, 1)
@@ -68,13 +70,23 @@ if(file.exists(sprintf("%s.bin",stat_file))) {
     plotl(dWn[syn,1:1000])
     plotl(B[nid,1:1000])
 }
-
-W = loadMatrix(model_file,1)
-
-p2 = levelplot(t(W), col.regions=colorRampPalette(c("black", "white")))
+matrix_per_layer = 7
+Wnorm = W = NULL
+for(Ni in 1:length(N)) {
+    Wlayer = loadMatrix(model_file,(Ni-1)*matrix_per_layer+1)
+    if(Ni==2) {
+        Wlayer=Wlayer[, 101:300]
+    }
+    Wnorm = rbind(Wnorm, Wlayer/max(Wlayer))
+    W = rbind(W, Wlayer)
+}
+p2 = levelplot(t(Wnorm), col.regions=colorRampPalette(c("black", "white")))
 
 print(p1, position=c(0, 0.5, 1, 1), more=TRUE)
 print(p2, position=c(0, 0, 1, 0.5))
+
+#hist(W[101:200,])
+
 # Wacc = vector("list",N)
 # pacc = vector("list",N)
 # for(ep in 3:200) {
