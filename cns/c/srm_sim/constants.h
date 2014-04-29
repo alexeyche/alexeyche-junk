@@ -70,7 +70,7 @@ typedef struct {
     double aw;
     double weight_var;
 
-    double added_lrate;
+    doubleVector *added_lrate;
     int epochs;
     double p_set;
 } Constants;

@@ -354,17 +354,14 @@ void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constant
 //                printf("dC: %f C: %f, params: %d %f %f %f %f\n", dC, l->C[ *id_to_sim ][ *syn_id ], l->fired[ *id_to_sim ], p, u, l->syn[ *id_to_sim ][ *syn_id ], M);
             
 #if RATE_NORM == PRESYNAPTIC
-            double dw = c->added_lrate*( l->C[ *id_to_sim ][ *syn_id ]*l->B[ *id_to_sim ] -  \
+            double dw = layerConstD(l, c->added_lrate)*( l->C[ *id_to_sim ][ *syn_id ]*l->B[ *id_to_sim ] -  \
                                         layerConstD(l, c->weight_decay_factor) * l->syn_fired[ *id_to_sim ][ *syn_id ] * l->W[ *id_to_sim ][ *syn_id ] );
 #elif RATE_NORM == POSTSYNAPTIC                
-            double dw = c->added_lrate*( l->C[ *id_to_sim ][ *syn_id ]*l->B[ *id_to_sim ] -  \
+            double dw = layerConstD(l, c->added_lrate)*( l->C[ *id_to_sim ][ *syn_id ]*l->B[ *id_to_sim ] -  \
                                         layerConstD(l, c->weight_decay_factor) * (l->fired[ *id_to_sim ] + l->syn_fired[ *id_to_sim ][ *syn_id ]) * l->W[ *id_to_sim ][ *syn_id ] );
 #endif               
             double wmax = layerConstD(l, c->wmax);
             dw = bound_grad(&l->W[ *id_to_sim ][ *syn_id ], &dw, &wmax, c);
-            if((l->id == 1) || (l->W[ *id_to_sim ][ *syn_id ] > wmax)) {
-                printf("%f %f %f\n", wmax, dw, l->W[ *id_to_sim ][ *syn_id ]);
-            }
             l->W[ *id_to_sim ][ *syn_id ] += dw;
             
             

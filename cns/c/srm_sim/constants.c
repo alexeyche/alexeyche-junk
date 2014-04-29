@@ -12,6 +12,7 @@ Constants* createConstants(const char *filename) {
     c->weight_per_neuron= TEMPLATE(createVector,double)();
     c->wmax = TEMPLATE(createVector,double)();
     c->weight_decay_factor = TEMPLATE(createVector,double)();
+    c->added_lrate = TEMPLATE(createVector,double)();
     if (ini_parse(filename, file_handler, c) < 0) {
         printf("Can't load %s\n", filename);
         return(NULL);
@@ -37,6 +38,7 @@ void deleteConstants(Constants *c) {
     TEMPLATE(deleteVector,double)(c->weight_per_neuron);
     TEMPLATE(deleteVector,double)(c->wmax);
     TEMPLATE(deleteVector,double)(c->weight_decay_factor);
+    TEMPLATE(deleteVector,double)(c->added_lrate);
     free(c->input_spikes_filename);
     free(c);
 }
@@ -212,7 +214,7 @@ int file_handler(void* user, const char* section, const char* name,
         fillDoubleVector(c->weight_decay_factor, value);
     } else 
     if (MATCH("learn", "added_lrate")) {
-        c->added_lrate = atof(value);
+        fillDoubleVector(c->added_lrate, value);
     } else 
     if (MATCH("learn", "p_set")) {
         c->p_set = atof(value);
@@ -226,7 +228,7 @@ int file_handler(void* user, const char* section, const char* name,
 
 // for i in `sed -ne '11,44p' ./srm_sim/constants.h | cut -d ' ' -f6  | sort | uniq  | tr -d ';'`; do  echo "printf(\"$i: %f,\n\", c->$i);"; done
 void printConstants(Constants *c) {
-    printf("added_lrate: %f,\n", c->added_lrate);
+    printf("added_lrate: "); printDoubleVector(c->added_lrate);
     printf("alpha: %f,\n", c->alpha);
     printf("syn_delays_rate: %f,\n", c->syn_delays_rate);
     printf("syn_delays_gain: %f,\n", c->syn_delays_gain);
