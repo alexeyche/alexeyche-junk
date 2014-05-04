@@ -2,11 +2,13 @@
 
 NetClass = setRefClass("NetClass", fields = list(net="list", timeline="vector", labels="vector", M="vector", Tmax="vector", duration="vector"), 
                                     methods = list(
-                                    initialize = function(patterns, duration) {
+                                    initialize = function(patterns, duration, gap=200, dt=1) {
                                         timeline <<- numeric(0)
                                         Tcur = 0
                                         M <<- length(patterns[[1]]$data)
                                         net <<- blank_net(M)
+                                        m = rowMeans(sapply(patterns, function(x) sapply(x$data, length)))/1000
+                                        m = m/2
                                         for(p in patterns) {
                                             if(length(p$data) != M) {
                                                 cat("Non homogenious patterns discovered. Error\n")
@@ -17,6 +19,13 @@ NetClass = setRefClass("NetClass", fields = list(net="list", timeline="vector", 
                                                 net[[id]] <<- c(net[[id]], sp)
                                             }))
                                             Tcur = Tcur + duration
+                                            for(t_gap in seq(0,gap, by=dt)) {
+                                                syn_fired = (m*dt)>runif(M)
+                                                for(fi in which(syn_fired==TRUE)) {
+                                                    net[[ fi ]] <<- c(net[[ fi ]], t_gap+Tcur)
+                                                }
+                                            }
+                                            Tcur = Tcur + gap
                                             timeline <<- c(timeline, Tcur)
                                             labels <<- c(labels, p$label)
                                         }

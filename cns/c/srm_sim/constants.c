@@ -47,6 +47,7 @@ void fillIndVector(indVector *v, const char *vals) {
     char *token;
     char *string = strdup(vals);
     while ((token = strsep(&string, " ")) != NULL) {
+
         TEMPLATE(insertVector,ind)(v, atoi(token));
     }
     free(string);

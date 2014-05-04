@@ -166,17 +166,6 @@ void propagateSpikeNetSim(Sim *s, SRMLayer *l, const size_t *ni, double t) {
         size_t naffect = getGlobalId(l_cons, &ns->conn_map[*ni]->array[con_i].n_id);
         pthread_spin_lock(&spinlocks[naffect]);
         
-//        SynSpikeLNode *current_node = ns->spikes_queue[ naffect ]->current;
-
-//        SynSpikeLNode *spike_node;
-//        ns->spikes_queue[ naffect ]->current = NULL;
-//        while( (spike_node = TEMPLATE(getPrevLList,SynSpike)(ns->spikes_queue[ naffect ]) ) != NULL ) {
-//            if(spike_node->value.t<sp.t) {
-//                break;
-//            }
-//        }
-//        TEMPLATE(insertAfterLList,SynSpike)(ns->spikes_queue[ naffect ], spike_node, sp); 
-
         SynSpikeLNode *spike_node = ns->spikes_queue[ naffect ]->current;
         if(spike_node) {
             while(spike_node->value.t<sp.t) {
@@ -198,12 +187,6 @@ void propagateSpikeNetSim(Sim *s, SRMLayer *l, const size_t *ni, double t) {
 //        printf("\n");
 //        ns->spikes_queue[ naffect ]->current = current_node;
 
-
-//        if(current_node) {
-//            ns->spikes_queue[ naffect ]->current = current_node;
-//        } else {
-//            ns->spikes_queue[ naffect ]->current = ns->spikes_queue[ naffect ]->last;
-//        }
         pthread_spin_unlock(&spinlocks[naffect]);
     }
 }
