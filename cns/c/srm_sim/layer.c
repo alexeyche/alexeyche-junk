@@ -315,7 +315,9 @@ void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constant
     val += l->gr[ *id_to_sim ];
 #endif    
 #if FS_INH == 1
-    val += l->gb[ *id_to_sim ];
+    if (l->nt[ *id_to_sim ] == INH) {
+        val += l->gb[ *id_to_sim ];
+    }
 #endif
 #if (SFA == 1) || (REFR == 1) || (FS_INH == 1)
     M = exp(-val);       
@@ -335,7 +337,7 @@ void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constant
         l->ga[ *id_to_sim ] += c->qa;
 #endif            
 #if FS_INH == 1
-        if((l->nt[ *id_to_sim ] == INH)&&(l->gb[ *id_to_sim ] > -1)) {
+        if((l->nt[ *id_to_sim ] == INH)&&(l->gb[ *id_to_sim ] >= 0)) {
             l->gb[ *id_to_sim ] += c->qb;
         }
 #endif
@@ -428,6 +430,7 @@ void resetSRMLayerNeuron(SRMLayer *l, const size_t *ni) {
     l->B[ *ni ] = 0;
     l->fired[ *ni ] = 0;
     l->gr[ *ni ] = 0;
+    l->gb[ *ni ] = 0;
     for(size_t con_i=0; con_i < l->nconn[ *ni ]; con_i++) {
         l->C[ *ni ][con_i] = 0;
         l->syn[ *ni ][con_i] = 0;
@@ -455,6 +458,7 @@ pMatrixVector* serializeSRMLayer(SRMLayer *l) {
 
     }
     Matrix *W = createMatrix(l->N, max_conn_id+1);
+    Matrix *conns = createMatrix(l->N, max_conn_id+1);
     Matrix *nt = createMatrix(l->N, 1);
     Matrix *pacc = createMatrix(l->N, 1);
     Matrix *ids = createMatrix(l->N, 1);
@@ -466,13 +470,14 @@ pMatrixVector* serializeSRMLayer(SRMLayer *l) {
         for(size_t j=0; j<W->ncol; j++) {
             setMatrixElement(W, i, j, 0);
             setMatrixElement(syn_del, i, j, 0);
+            setMatrixElement(conns, i, j, 0);
         }
     }
     for(size_t ni=0; ni< l->N; ni++) {
         for(size_t con_i=0; con_i < l->nconn[ni]; con_i++) {
             setMatrixElement(W, ni, l->id_conns[ni][con_i], l->W[ni][con_i]);
             setMatrixElement(syn_del, ni, l->id_conns[ni][con_i], l->syn_del[ni][con_i]);
-        
+            setMatrixElement(conns, ni, l->id_conns[ni][con_i], 1);
         }
         setMatrixElement(nt, ni, 0, l->nt[ni]);
         setMatrixElement(pacc, ni, 0, l->pacc[ni]);
@@ -482,6 +487,7 @@ pMatrixVector* serializeSRMLayer(SRMLayer *l) {
     }
     
     TEMPLATE(insertVector,pMatrix)(data, W);
+    TEMPLATE(insertVector,pMatrix)(data, conns);
     TEMPLATE(insertVector,pMatrix)(data, nt);
     TEMPLATE(insertVector,pMatrix)(data, pacc);
     TEMPLATE(insertVector,pMatrix)(data, ids);
@@ -494,12 +500,13 @@ pMatrixVector* serializeSRMLayer(SRMLayer *l) {
 
 void loadSRMLayer(SRMLayer *l, Constants *c, pMatrixVector *data) {
     Matrix *W = data->array[0];
-    Matrix *nt = data->array[1];
-    Matrix *pacc = data->array[2];
-    Matrix *ids = data->array[3];
-    Matrix *axon_del = data->array[4];
-    Matrix *syn_del = data->array[5];
-    Matrix *ga = data->array[6];
+    Matrix *conns = data->array[1];
+    Matrix *nt = data->array[2];
+    Matrix *pacc = data->array[3];
+    Matrix *ids = data->array[4];
+    Matrix *axon_del = data->array[5];
+    Matrix *syn_del = data->array[6];
+    Matrix *ga = data->array[7];
     assert(l->N == W->nrow);
 
     doubleVector **W_vals = (doubleVector**) malloc( W->nrow * sizeof(doubleVector*));
@@ -512,7 +519,8 @@ void loadSRMLayer(SRMLayer *l, Constants *c, pMatrixVector *data) {
         for(size_t j=0; j<W->ncol; j++) {
             double w_ij = getMatrixElement(W, i, j);
             double syn_del_ij = getMatrixElement(syn_del, i, j);
-            if(w_ij>0) {
+            double conn_ij = getMatrixElement(conns, i, j);
+            if(conn_ij>0) {
                 TEMPLATE(insertVector,double)(W_vals[i], w_ij);
                 TEMPLATE(insertVector,double)(syn_del_vals[i], syn_del_ij);
                 TEMPLATE(insertVector,ind)(id_conns_vals[i], j);

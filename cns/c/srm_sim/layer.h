@@ -25,7 +25,7 @@
 #define BACKPROP_POT 0
 #define SFA 1
 #define REFR 1
-#define FS_INH 1
+#define FS_INH 0
 
 typedef enum {EXC, INH} nspec_t;
 
@@ -97,5 +97,6 @@ void resetSRMLayerNeuron(SRMLayer *l, const size_t *ni);
 double getSynDelay(SRMLayer *l, const size_t *id, const size_t *syn_id);
 void setSynapseSpeciality(SRMLayer *l, size_t n_id, size_t syn_id, double spec);
 size_t getLocalNeuronId(SRMLayer *l, const size_t *glob_id);
+const size_t getGlobalId(SRMLayer *l, const size_t *ni);
 
 #endif
