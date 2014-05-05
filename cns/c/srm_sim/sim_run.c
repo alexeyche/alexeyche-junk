@@ -78,24 +78,24 @@ void* simRunRoutine(void *args) {
 //            if((c->target_neurons) && (s->na[na_i].layer_id == c->layers_size->size-1) && (s->na[na_i].n_id == s->rt->pattern_classes[ s->rt->timeline_iter ]))
             simulateNeuron(s, &s->na[na_i].layer_id, &s->na[na_i].n_id, t, s->c);
         }
-        //bool we_did_reset = false;
-        //if(s->rt->reset_timeline->size > s->rt->timeline_iter) {
-        //    if(s->rt->reset_timeline->array[ s->rt->timeline_iter ] <= t) {
-        //        we_did_reset = true;
-        //        for(size_t na_i=first; na_i<last; na_i++) {
-        //            SRMLayer *l = s->layers->array[s->na[na_i].layer_id];
-        //            resetSRMLayerNeuron(l, &s->na[na_i].n_id);
-        //        }
+        bool we_did_reset = false;
+        if(s->rt->reset_timeline->size > s->rt->timeline_iter) {
+            if(s->rt->reset_timeline->array[ s->rt->timeline_iter ] <= t) {
+                we_did_reset = true;
+                for(size_t na_i=first; na_i<last; na_i++) {
+                    SRMLayer *l = s->layers->array[s->na[na_i].layer_id];
+                    resetSRMLayerNeuron(l, &s->na[na_i].n_id);
+                }
 
-        //    }
-        //}
+            }
+        }
         pthread_barrier_wait( &barrier );
-        //if(we_did_reset) {
-        //    if(sw->thread_id == 0) {
-        //        ++s->rt->timeline_iter;
-        //    }
-        //    pthread_barrier_wait( &barrier );
-        //}
+        if(we_did_reset) {
+            if(sw->thread_id == 0) {
+                ++s->rt->timeline_iter;
+            }
+            pthread_barrier_wait( &barrier );
+        }
     }
     return(NULL);
 }

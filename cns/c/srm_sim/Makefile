@@ -50,7 +50,7 @@ am___top_builddir__bin_srm_sim_OBJECTS = srm_sim.$(OBJEXT) \
 	io.$(OBJEXT) spikes_list.$(OBJEXT) sim_netsim.$(OBJEXT) \
 	neuron_funcs.$(OBJEXT) util_dlink_list.$(OBJEXT) \
 	sim_run.$(OBJEXT) sim_configure.$(OBJEXT) \
-	sim_serialize.$(OBJEXT)
+	sim_serialize.$(OBJEXT) learn.$(OBJEXT)
 __top_builddir__bin_srm_sim_OBJECTS =  \
 	$(am___top_builddir__bin_srm_sim_OBJECTS)
 __top_builddir__bin_srm_sim_LDADD = $(LDADD)
@@ -160,7 +160,7 @@ top_srcdir = ..
 AM_CFLAGS = -Wall -std=gnu99 -O0 -pg  -pthread
 #CFLAGS=
 LDADD = -lm
-__top_builddir__bin_srm_sim_SOURCES = ./srm_sim.c ./layer.c  ./matrix.c  ./util/util_vector.c ./util/ini.c ./templates.h ./layer.h ./matrix.h ./core.h ./util/util_vector.h ./util/ini.h ./sim.h constants.c util/util.c sim.c io.c io.h spikes_list.c spikes_list.h sim_netsim.c neuron_funcs.c ./util/util_dlink_list.c ./util/util_dlink_list.h sim_run.c sim_configure.c sim_serialize.c 
+__top_builddir__bin_srm_sim_SOURCES = ./srm_sim.c ./layer.c  ./matrix.c  ./util/util_vector.c ./util/ini.c ./templates.h ./layer.h ./matrix.h ./core.h ./util/util_vector.h ./util/ini.h ./sim.h constants.c util/util.c sim.c io.c io.h spikes_list.c spikes_list.h sim_netsim.c neuron_funcs.c ./util/util_dlink_list.c ./util/util_dlink_list.h sim_run.c sim_configure.c sim_serialize.c learn.c
 all: all-am
 
 .SUFFIXES:
@@ -249,6 +249,7 @@ include ./$(DEPDIR)/constants.Po
 include ./$(DEPDIR)/ini.Po
 include ./$(DEPDIR)/io.Po
 include ./$(DEPDIR)/layer.Po
+include ./$(DEPDIR)/learn.Po
 include ./$(DEPDIR)/matrix.Po
 include ./$(DEPDIR)/neuron_funcs.Po
 include ./$(DEPDIR)/sim.Po

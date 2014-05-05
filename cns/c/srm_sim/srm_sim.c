@@ -52,18 +52,22 @@ int main(int argc, char **argv) {
     if(saveStat) {
         pMatrixVector *mv = TEMPLATE(createVector,pMatrix)();
         for(size_t li=0; li < s->layers->size; li++) {
-            Matrix *mp = vectorArrayToMatrix(s->layers->array[li]->stat_p, s->layers->array[li]->N);
+            SRMLayer *l = s->layers->array[li];
+            Matrix *mp = vectorArrayToMatrix(l->stat_p, l->N);
             TEMPLATE(insertVector,pMatrix)(mv, mp);
-            Matrix *mu = vectorArrayToMatrix(s->layers->array[li]->stat_u, s->layers->array[li]->N);
+            Matrix *mu = vectorArrayToMatrix(l->stat_u, l->N);
             TEMPLATE(insertVector,pMatrix)(mv, mu);
-            Matrix *mB = vectorArrayToMatrix(s->layers->array[li]->stat_B, s->layers->array[li]->N);
+            
+            TOptimalSTDP *ls = (TOptimalSTDP*)l->ls_t;
+            Matrix *mB = vectorArrayToMatrix(ls->stat_B, l->N);
             TEMPLATE(insertVector,pMatrix)(mv, mB);
+            
             for(size_t ni=0; ni < s->layers->array[li]->N; ni++) {
-                Matrix *mSyn = vectorArrayToMatrix(s->layers->array[li]->stat_W[ni], s->layers->array[li]->nconn[ni]);
+                Matrix *mSyn = vectorArrayToMatrix(l->stat_W[ni], l->nconn[ni]);
                 TEMPLATE(insertVector,pMatrix)(mv, mSyn);
             }
             for(size_t ni=0; ni < s->layers->array[li]->N; ni++) {
-                Matrix *mC = vectorArrayToMatrix(s->layers->array[li]->stat_C[ni], s->layers->array[li]->nconn[ni]);
+                Matrix *mC = vectorArrayToMatrix(ls->stat_C[ni], l->nconn[ni]);
                 TEMPLATE(insertVector,pMatrix)(mv, mC);
             }
         }            
