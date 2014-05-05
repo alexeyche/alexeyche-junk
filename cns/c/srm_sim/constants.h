@@ -8,6 +8,7 @@
 #include <util/util_vector.h>
 #include <util/ini.h>
 
+typedef enum { EOptimalSTDP } learning_rule_t;
 
 typedef struct {
     char *input_spikes_filename;
@@ -73,6 +74,8 @@ typedef struct {
     doubleVector *added_lrate;
     int epochs;
     double p_set;
+    
+    learning_rule_t learning_rule;
 } Constants;
 
 int file_handler(void* user, const char* section, const char* name,

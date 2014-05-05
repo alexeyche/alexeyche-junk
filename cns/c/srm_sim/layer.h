@@ -14,14 +14,10 @@
 #include <util/util.h>
 #include <matrix.h>
 #include <io.h>
+#include <learn.h>
 
 #define SYN_ACT_TOL 0.0001 // value of synapse needed to delete 
-#define LEARN_ACT_TOL 0.00001 // value of synapse needed to delete 
 
-#define PRESYNAPTIC 1
-#define POSTSYNAPTIC 2
-
-#define RATE_NORM PRESYNAPTIC
 #define BACKPROP_POT 0
 #define SFA 1
 #define REFR 1
@@ -29,7 +25,9 @@
 
 typedef enum {EXC, INH} nspec_t;
 
-typedef struct {
+struct learn_t;
+
+struct SRMLayer {
     size_t id;
     //consts
 
@@ -46,10 +44,10 @@ typedef struct {
     double **syn;
     double **syn_spec;
     double *a;
-    double **C;
-    double *B;
+
+    struct learn_t *ls_t;
+    
     indLList **active_syn_ids;
-    indLList **learn_syn_ids;
     unsigned char *fired;
     unsigned char **syn_fired;
     double *pacc;
@@ -62,13 +60,13 @@ typedef struct {
     double *p_set;
     //stat
     bool saveStat;
-    doubleVector **stat_B;
     doubleVector **stat_u;
     doubleVector **stat_p;
     doubleVector ***stat_W;
-    doubleVector ***stat_C;
-} SRMLayer;
+};
 
+
+typedef struct SRMLayer SRMLayer;
 typedef SRMLayer* pSRMLayer;
 
 #include <templates_clean.h>
@@ -76,11 +74,12 @@ typedef SRMLayer* pSRMLayer;
 #define DESTRUCT deleteSRMLayer
 #include <util/util_vector_tmpl.h>
 
-typedef struct {
+typedef struct SynSpike {
     double t;
     size_t n_id;
     size_t syn_id;
 } SynSpike;
+
 
 
 SRMLayer* createSRMLayer(size_t N, size_t *glob_idx, bool saveStat);
@@ -98,5 +97,6 @@ double getSynDelay(SRMLayer *l, const size_t *id, const size_t *syn_id);
 void setSynapseSpeciality(SRMLayer *l, size_t n_id, size_t syn_id, double spec);
 size_t getLocalNeuronId(SRMLayer *l, const size_t *glob_id);
 const size_t getGlobalId(SRMLayer *l, const size_t *ni);
+double layerConstD(SRMLayer *l, doubleVector *v);
 
 #endif

@@ -13,7 +13,7 @@ rundir="/home/alexeyche/prog/sim/runs"
 #rundir="/home/alexeyche/my/sim/runs"
 #runname = "test_conn2l"
 #runname = "test_conn2l_no_depr"
-runname = "cont_2l"
+runname = "2layers"
 workdir=sprintf("%s/%s", rundir, runname)
 
 #workdir="/home/alexeyche/prog/sim/runs/rfd"

@@ -217,6 +217,14 @@ int file_handler(void* user, const char* section, const char* name,
     if (MATCH("learn", "added_lrate")) {
         fillDoubleVector(c->added_lrate, value);
     } else 
+    if (MATCH("learn", "learning_rule")) {
+        if(strcmp(value, "OptimalSTDP") == 0) {
+            c->learning_rule = EOptimalSTDP;
+        } else {
+            printf("Can't find learning rule %s\n", value);
+            exit(1);
+        }
+    } else 
     if (MATCH("learn", "p_set")) {
         c->p_set = atof(value);
     } else {
