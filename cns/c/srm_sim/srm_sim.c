@@ -23,9 +23,6 @@ int main(int argc, char **argv) {
     if(a.learn == 1) {
         c->learn = true;
     }
-    if(a.input_spikes_file) {
-        c->input_spikes_filename = strdup(a.input_spikes_file);
-    }
 //    printConstants(c);
     assert(a.jobs != 0);
     Sim *s = createSim(a.jobs);
@@ -40,7 +37,7 @@ int main(int argc, char **argv) {
         configureLayersSim(s, c, saveStat);    
     }
 
-    configureNetSpikesSim(s, c);
+    configureNetSpikesSim(s, a.input_spikes_file, c);
     configureSynapses(s, c);
 //    printSRMLayer(s->layers->array[0]);
 //    printSRMLayer(s->layers->array[1]);
@@ -49,6 +46,10 @@ int main(int argc, char **argv) {
 //    printInputSpikesQueue(s->ns);
     runSim(s);
     
+    if(a.input_port>0) {
+        
+    }
+
     if(saveStat) {
         pMatrixVector *mv = TEMPLATE(createVector,pMatrix)();
         for(size_t li=0; li < s->layers->size; li++) {

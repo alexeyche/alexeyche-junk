@@ -16,6 +16,8 @@ typedef struct {
     const char *model_file_load;
     const char *output_spikes_file;
     const char *input_spikes_file;
+    int input_port;
+    int output_port;
     int seed;
     char learn;
 } ArgOptions;
@@ -30,6 +32,8 @@ void printArgs(const ArgOptions *a) {
     printf("a->output_spikes_file = %s\n", a->output_spikes_file);
     printf("a->input_spikes_file = %s\n", a->input_spikes_file);
     printf("a->seed = %d\n", a->seed);
+    printf("a->input_port = %d\n", a->input_port);
+    printf("a->output_port = %d\n", a->output_port);
 }
 
 void usage(void) {
@@ -42,6 +46,8 @@ void usage(void) {
     printf("\t-o - file for output spikes\n");
     printf("\t-l - yes/no to learn\n");
     printf("\t-seed - integer seed\n");
+    printf("\t-ip - port for input spikes\n");
+    printf("\t-op - port for output spikes\n");
     printf("\t-? - print this message\n");
     exit(8);
 }
@@ -58,6 +64,8 @@ ArgOptions parseOptions(int argc, char **argv) {
     args.input_spikes_file = NULL;
     args.learn = -1;
     args.seed = time(NULL);
+    args.input_port = -1;
+    args.output_port = -1;
     if(argc == 1) usage();
     while ((argc > 1) && (argv[1][0] == '-')) {
         if(strcmp(argv[1], "-m") == 0) {                
@@ -74,6 +82,22 @@ ArgOptions parseOptions(int argc, char **argv) {
                 usage();
             }
             args.input_spikes_file = strdup(argv[2]);
+            ++argv; --argc;
+        } else
+        if(strcmp(argv[1], "-ip") == 0) {                
+            if(argc == 2) { 
+                printf("No options for -ip\n");
+                usage();
+            }
+            args.input_port = atoi(argv[2]);
+            ++argv; --argc;
+        } else
+        if(strcmp(argv[1], "-op") == 0) {                
+            if(argc == 2) { 
+                printf("No options for -op\n");
+                usage();
+            }
+            args.output_port = atoi(argv[2]);
             ++argv; --argc;
         } else
         if(strcmp(argv[1], "-o") == 0) {                
@@ -166,7 +190,14 @@ ArgOptions parseOptions(int argc, char **argv) {
         printf("Doubling in options. Choose model for save or for load or for both of them\n");
         usage();
     }
-
+    if((args.input_spikes_file == NULL) && (args.input_port < 0)) {
+        printf("Need something on input\n");
+        usage();
+    }
+    if((args.output_spikes_file == NULL) && (args.output_port < 0)) {
+        printf("Need something on output\n");
+        usage();
+    }
     return(args);
 }
 

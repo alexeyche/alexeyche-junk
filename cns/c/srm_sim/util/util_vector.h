@@ -13,6 +13,11 @@
 #define T ind
 #include "util_vector_tmpl.h"
 
+#include <templates_clean.h>
+#define T uchar
+#include "util_vector_tmpl.h"
+
+
 void printDoubleVector(doubleVector *dv);
 void printIndVector(indVector *v);
 

@@ -70,10 +70,10 @@ void trainWeightsStep_TOptimalSTDP(learn_t *ls_t, const double *u, const double 
 //                printf("dC: %f C: %f, params: %d %f %f %f %f\n", dC, l->C[ *ni ][ *syn_id ], l->fired[ *ni ], p, u, l->syn[ *ni ][ *syn_id ], M);
         
 #if RATE_NORM == PRESYNAPTIC
-        double dw = layerConstD(l, c->added_lrate)*( ls->C[ *ni ][ *syn_id ]*ls->B[ *ni ] -  \
+        double dw = layerConstD(l, c->lrate)*( ls->C[ *ni ][ *syn_id ]*ls->B[ *ni ] -  \
                                     layerConstD(l, c->weight_decay_factor) * l->syn_fired[ *ni ][ *syn_id ] * l->W[ *ni ][ *syn_id ] );
 #elif RATE_NORM == POSTSYNAPTIC                
-        double dw = layerConstD(l, c->added_lrate)*( l->C[ *ni ][ *syn_id ]*l->B[ *ni ] -  \
+        double dw = layerConstD(l, c->added)*( l->C[ *ni ][ *syn_id ]*l->B[ *ni ] -  \
                                     layerConstD(l, c->weight_decay_factor) * (l->fired[ *ni ] + l->syn_fired[ *ni ][ *syn_id ]) * l->W[ *ni ][ *syn_id ] );
 #endif               
         double wmax = layerConstD(l, c->wmax);

@@ -11,8 +11,6 @@
 typedef enum { EOptimalSTDP } learning_rule_t;
 
 typedef struct {
-    char *input_spikes_filename;
-    
     double e0;
     double e_exc;
     double e_inh;
@@ -71,7 +69,7 @@ typedef struct {
     double aw;
     double weight_var;
 
-    doubleVector *added_lrate;
+    doubleVector *lrate;
     int epochs;
     double p_set;
     
