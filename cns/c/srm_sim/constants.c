@@ -12,7 +12,7 @@ Constants* createConstants(const char *filename) {
     c->weight_per_neuron= TEMPLATE(createVector,double)();
     c->wmax = TEMPLATE(createVector,double)();
     c->weight_decay_factor = TEMPLATE(createVector,double)();
-    c->added_lrate = TEMPLATE(createVector,double)();
+    c->lrate = TEMPLATE(createVector,double)();
     if (ini_parse(filename, file_handler, c) < 0) {
         printf("Can't load %s\n", filename);
         return(NULL);
@@ -38,8 +38,7 @@ void deleteConstants(Constants *c) {
     TEMPLATE(deleteVector,double)(c->weight_per_neuron);
     TEMPLATE(deleteVector,double)(c->wmax);
     TEMPLATE(deleteVector,double)(c->weight_decay_factor);
-    TEMPLATE(deleteVector,double)(c->added_lrate);
-    free(c->input_spikes_filename);
+    TEMPLATE(deleteVector,double)(c->lrate);
     free(c);
 }
 
@@ -68,11 +67,6 @@ int file_handler(void* user, const char* section, const char* name,
     Constants* c = (Constants*)user;
 
     #define MATCH(s, n) strcmp(section, s) == 0 && strcmp(name, n) == 0
-    if (MATCH("input", "input_spikes_filename")) {
-        c->input_spikes_filename = (char*)malloc(strlen(value) +1);
-        assert(c->input_spikes_filename);
-        strcpy(c->input_spikes_filename, value);
-    } else 
     if (MATCH("srm", "e0")) {
         c->e0 = atof(value);
     } else 
@@ -199,23 +193,23 @@ int file_handler(void* user, const char* section, const char* name,
     if (MATCH("net", "axonal_delays_rate")) {
         c->axonal_delays_rate = atof(value);
     } else 
-    if (MATCH("learn", "tc")) {
+    if (MATCH("optimal stdp parameters", "tc")) {
         c->tc = atof(value);
     } else 
-    if (MATCH("learn", "mean_p_dur")) {
+    if (MATCH("optimal stdp parameters", "mean_p_dur")) {
         c->mean_p_dur = atof(value);
     } else 
-    if (MATCH("learn", "target_rate")) {
+    if (MATCH("optimal stdp parameters", "target_rate")) {
         c->target_rate = atof(value);
     } else 
-     if (MATCH("learn", "target_rate_factor")) {
+     if (MATCH("optimal stdp parameters", "target_rate_factor")) {
         c->target_rate_factor = atof(value);
     } else 
-    if (MATCH("learn", "weight_decay_factor")) {
+    if (MATCH("optimal stdp parameters", "weight_decay_factor")) {
         fillDoubleVector(c->weight_decay_factor, value);
     } else 
-    if (MATCH("learn", "added_lrate")) {
-        fillDoubleVector(c->added_lrate, value);
+    if (MATCH("learn", "lrate")) {
+        fillDoubleVector(c->lrate, value);
     } else 
     if (MATCH("learn", "learning_rule")) {
         if(strcmp(value, "OptimalSTDP") == 0) {
@@ -237,7 +231,7 @@ int file_handler(void* user, const char* section, const char* name,
 
 // for i in `sed -ne '11,44p' ./srm_sim/constants.h | cut -d ' ' -f6  | sort | uniq  | tr -d ';'`; do  echo "printf(\"$i: %f,\n\", c->$i);"; done
 void printConstants(Constants *c) {
-    printf("added_lrate: "); printDoubleVector(c->added_lrate);
+    printf("lrate: "); printDoubleVector(c->lrate);
     printf("alpha: %f,\n", c->alpha);
     printf("syn_delays_rate: %f,\n", c->syn_delays_rate);
     printf("syn_delays_gain: %f,\n", c->syn_delays_gain);
@@ -259,7 +253,6 @@ void printConstants(Constants *c) {
     printf("net_edge_prob: ");   printDoubleVector(c->net_edge_prob);
     printf("input_edge_prob: ");   printDoubleVector(c->input_edge_prob);
     printf("output_edge_prob: ");   printDoubleVector(c->output_edge_prob);
-    printf("input_spikes_filename: %s,\n", c->input_spikes_filename);
     printf("pr: %f,\n", c->pr);
     printf("seed: %d,\n", c->seed);
     printf("sim_dim: %f,\n", c->sim_dim);

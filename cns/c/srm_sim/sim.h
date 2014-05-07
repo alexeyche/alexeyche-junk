@@ -5,8 +5,8 @@
 
 #include <layer.h>
 #include <constants.h>
-#include <spikes_list.h>
-#include <matrix.h>
+#include <util/spikes_list.h>
+#include <util/matrix.h>
 #include <io.h>
 
 #include <pthread.h>

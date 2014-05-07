@@ -8,11 +8,13 @@
 
 #include <constants.h>
 #include <core.h>
+
 #include <util/util_vector.h>
 #include <util/util_dlink_list.h>
-#include <neuron_funcs.h>
 #include <util/util.h>
-#include <matrix.h>
+#include <util/matrix.h>
+
+#include <neuron_funcs.h>
 #include <io.h>
 #include <learn.h>
 

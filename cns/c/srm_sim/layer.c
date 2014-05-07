@@ -282,22 +282,7 @@ void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constant
     }
 
     double p = probf(&u, c) * c->dt;
-    double M = 1;
-    double val=0;
-#if SFA == 1
-    val += l->ga[ *id_to_sim ];
-#endif 
-#if REFR == 1
-    val += l->gr[ *id_to_sim ];
-#endif    
-#if FS_INH == 1
-    if (l->nt[ *id_to_sim ] == INH) {
-        val += l->gb[ *id_to_sim ];
-    }
-#endif
-#if (SFA == 1) || (REFR == 1) || (FS_INH == 1)
-    M = exp(-val);       
-#endif
+    double M = exp(-( l->ga[ *id_to_sim ] + l->gr[ *id_to_sim ] + l->gb[ *id_to_sim ]));
     p = p*M;
     double coin = getUnif();
     if( p > coin ) {
@@ -324,7 +309,6 @@ void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constant
         l->ls_t->trainWeightsStep(l->ls_t, &u, &p, &M, id_to_sim, c);
     }
 
-    l->pacc[ *id_to_sim ] -= l->pacc[ *id_to_sim ]/c->mean_p_dur; 
 
     if(l->saveStat) {
         TEMPLATE(insertVector,double)(l->stat_p[ *id_to_sim ], p);
@@ -348,6 +332,9 @@ void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constant
             TEMPLATE(dropNodeLList,ind)(l->active_syn_ids[ *id_to_sim ], act_node);
         }
     }
+
+    l->pacc[ *id_to_sim ] -= l->pacc[ *id_to_sim ]/c->mean_p_dur; 
+
 #if BACKPROP_POT == 1    
     l->a[ *id_to_sim ] += (1 - l->a[ *id_to_sim ])/c->tsr;
 #endif    

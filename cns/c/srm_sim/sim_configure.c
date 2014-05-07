@@ -13,6 +13,7 @@ SimRuntime* createRuntime() {
     rt->reset_timeline = TEMPLATE(createVector,double)();
     rt->pattern_classes = TEMPLATE(createVector,ind)();
     rt->timeline_iter = 0;
+    rt->Tmax = 0;
     return(rt);
 }
 
@@ -24,7 +25,7 @@ void deleteRuntime(SimRuntime *sr) {
 
 
 
-void configureNetSpikesSim(Sim *s, Constants *c) {
+void configureNetSpikesSim(Sim *s, const char *input_spikes_filename, Constants *c) {
     // filling receiver-oriented connection map
     allocNetSim(s->ns, s->net_size);
     
@@ -34,34 +35,36 @@ void configureNetSpikesSim(Sim *s, Constants *c) {
         s->rt = createRuntime();
     }
 
-    pMatrixVector *ml = readMatrixList(c->input_spikes_filename);
-    assert(ml && ml->size >= 2);
+    if(input_spikes_filename) {
+        pMatrixVector *ml = readMatrixList(input_spikes_filename);
+        assert(ml && ml->size >= 2);
     
-    Matrix *inp_m = ml->array[0];
-    SpikesList *inp_sl = spikesMatrixToSpikesList(inp_m);
-    propagateInputSpikesNetSim(s, inp_sl);
+        Matrix *inp_m = ml->array[0];
+        SpikesList *inp_sl = spikesMatrixToSpikesList(inp_m);
+        propagateInputSpikesNetSim(s, inp_sl);
 
-    double Tmax = 0;
-    for(size_t ni=0; ni<s->ns->net->size; ni++) {
-        if(s->ns->net->list[ni]->size>0) {
-            if(s->ns->net->list[ni]->array[ s->ns->net->list[ni]->size-1 ]> Tmax) {
-                Tmax = s->ns->net->list[ni]->array[ s->ns->net->list[ni]->size-1 ];
+        double Tmax = 0;
+        for(size_t ni=0; ni<s->ns->net->size; ni++) {
+            if(s->ns->net->list[ni]->size>0) {
+                if(s->ns->net->list[ni]->array[ s->ns->net->list[ni]->size-1 ]> Tmax) {
+                    Tmax = s->ns->net->list[ni]->array[ s->ns->net->list[ni]->size-1 ];
+                }
             }
+        }   
+        s->rt->Tmax = Tmax + 100;
+        deleteSpikesList(inp_sl); 
+    
+        Matrix *timeline_m = ml->array[1];
+        for(size_t ri=0; ri<timeline_m->nrow*timeline_m->ncol; ri++) {
+            TEMPLATE(insertVector,double)(s->rt->reset_timeline, timeline_m->vals[ri]);
         }
-    }   
-    s->rt->Tmax = Tmax + 100;
-    deleteSpikesList(inp_sl); 
+        Matrix *classes_m = ml->array[2];
+        for(size_t ri=0; ri<classes_m->nrow*classes_m->ncol; ri++) {
+            TEMPLATE(insertVector,ind)(s->rt->pattern_classes, classes_m->vals[ri]);
+        }
     
-    Matrix *timeline_m = ml->array[1];
-    for(size_t ri=0; ri<timeline_m->nrow*timeline_m->ncol; ri++) {
-        TEMPLATE(insertVector,double)(s->rt->reset_timeline, timeline_m->vals[ri]);
+        TEMPLATE(deleteVector,pMatrix)(ml);
     }
-    Matrix *classes_m = ml->array[2];
-    for(size_t ri=0; ri<classes_m->nrow*classes_m->ncol; ri++) {
-        TEMPLATE(insertVector,ind)(s->rt->pattern_classes, classes_m->vals[ri]);
-    }
-    
-    TEMPLATE(deleteVector,pMatrix)(ml);
 }
 
 void configureLayersSim(Sim *s, Constants *c, bool saveStat) {

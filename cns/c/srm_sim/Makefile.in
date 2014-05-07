@@ -44,18 +44,19 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am___top_builddir__bin_srm_sim_OBJECTS = srm_sim.$(OBJEXT) \
-	layer.$(OBJEXT) matrix.$(OBJEXT) util_vector.$(OBJEXT) \
-	ini.$(OBJEXT) constants.$(OBJEXT) util.$(OBJEXT) sim.$(OBJEXT) \
-	io.$(OBJEXT) spikes_list.$(OBJEXT) sim_netsim.$(OBJEXT) \
-	neuron_funcs.$(OBJEXT) util_dlink_list.$(OBJEXT) \
-	sim_run.$(OBJEXT) sim_configure.$(OBJEXT) \
-	sim_serialize.$(OBJEXT) learn.$(OBJEXT)
+am__dirstamp = $(am__leading_dot)dirstamp
+am___top_builddir__bin_srm_sim_OBJECTS = util/matrix.$(OBJEXT) \
+	util/util_vector.$(OBJEXT) ./util/ini.$(OBJEXT) \
+	util/util.$(OBJEXT) util/spikes_list.$(OBJEXT) \
+	sim_netsim.$(OBJEXT) neuron_funcs.$(OBJEXT) \
+	./util/util_dlink_list.$(OBJEXT) constants.$(OBJEXT) \
+	sim_run.$(OBJEXT) sim.$(OBJEXT) io.$(OBJEXT) \
+	sim_configure.$(OBJEXT) sim_serialize.$(OBJEXT) \
+	./layer.$(OBJEXT) learn.$(OBJEXT) srm_sim.$(OBJEXT)
 __top_builddir__bin_srm_sim_OBJECTS =  \
 	$(am___top_builddir__bin_srm_sim_OBJECTS)
 __top_builddir__bin_srm_sim_LDADD = $(LDADD)
 __top_builddir__bin_srm_sim_DEPENDENCIES =
-am__dirstamp = $(am__leading_dot)dirstamp
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -77,9 +78,7 @@ AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
-
-# what flags you want to pass to the C compiler & linker
-CFLAGS = 
+CFLAGS = @CFLAGS@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CYGPATH_W = @CYGPATH_W@
@@ -157,10 +156,12 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
+
+# what flags you want to pass to the C compiler & linker
 AM_CFLAGS = -Wall -std=gnu99 -O0 -pg  -pthread
 #CFLAGS=
 LDADD = -lm
-__top_builddir__bin_srm_sim_SOURCES = ./srm_sim.c ./layer.c  ./matrix.c  ./util/util_vector.c ./util/ini.c ./templates.h ./layer.h ./matrix.h ./core.h ./util/util_vector.h ./util/ini.h ./sim.h constants.c util/util.c sim.c io.c io.h spikes_list.c spikes_list.h sim_netsim.c neuron_funcs.c ./util/util_dlink_list.c ./util/util_dlink_list.h sim_run.c sim_configure.c sim_serialize.c learn.c
+__top_builddir__bin_srm_sim_SOURCES = util/matrix.c util/util_vector.c ./util/ini.c ./util/matrix.h util/util.c util/spikes_list.c sim_netsim.c neuron_funcs.c ./util/util_dlink_list.c constants.c sim_run.c sim.c io.c  sim_configure.c sim_serialize.c ./layer.c learn.c srm_sim.c 
 all: all-am
 
 .SUFFIXES:
@@ -232,6 +233,31 @@ uninstall-binPROGRAMS:
 
 clean-binPROGRAMS:
 	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
+util/$(am__dirstamp):
+	@$(MKDIR_P) util
+	@: > util/$(am__dirstamp)
+util/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) util/$(DEPDIR)
+	@: > util/$(DEPDIR)/$(am__dirstamp)
+util/matrix.$(OBJEXT): util/$(am__dirstamp) \
+	util/$(DEPDIR)/$(am__dirstamp)
+util/util_vector.$(OBJEXT): util/$(am__dirstamp) \
+	util/$(DEPDIR)/$(am__dirstamp)
+./util/ini.$(OBJEXT): util/$(am__dirstamp) \
+	util/$(DEPDIR)/$(am__dirstamp)
+util/util.$(OBJEXT): util/$(am__dirstamp) \
+	util/$(DEPDIR)/$(am__dirstamp)
+util/spikes_list.$(OBJEXT): util/$(am__dirstamp) \
+	util/$(DEPDIR)/$(am__dirstamp)
+./util/util_dlink_list.$(OBJEXT): util/$(am__dirstamp) \
+	util/$(DEPDIR)/$(am__dirstamp)
+./$(am__dirstamp):
+	@$(MKDIR_P) .
+	@: > ./$(am__dirstamp)
+$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) ./$(DEPDIR)
+	@: > $(DEPDIR)/$(am__dirstamp)
+./layer.$(OBJEXT): ./$(am__dirstamp) $(DEPDIR)/$(am__dirstamp)
 $(top_builddir)/bin/$(am__dirstamp):
 	@$(MKDIR_P) $(top_builddir)/bin
 	@: > $(top_builddir)/bin/$(am__dirstamp)
@@ -241,139 +267,50 @@ $(top_builddir)/bin/srm_sim$(EXEEXT): $(__top_builddir__bin_srm_sim_OBJECTS) $(_
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
+	-rm -f ./layer.$(OBJEXT)
+	-rm -f ./util/ini.$(OBJEXT)
+	-rm -f ./util/util_dlink_list.$(OBJEXT)
+	-rm -f util/matrix.$(OBJEXT)
+	-rm -f util/spikes_list.$(OBJEXT)
+	-rm -f util/util.$(OBJEXT)
+	-rm -f util/util_vector.$(OBJEXT)
 
 distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/constants.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ini.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/io.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/layer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/learn.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/matrix.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/neuron_funcs.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sim.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sim_configure.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sim_netsim.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sim_run.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sim_serialize.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/spikes_list.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/srm_sim.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/util.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/util_dlink_list.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/util_vector.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./util/$(DEPDIR)/ini.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./util/$(DEPDIR)/util_dlink_list.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@util/$(DEPDIR)/matrix.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@util/$(DEPDIR)/spikes_list.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@util/$(DEPDIR)/util.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@util/$(DEPDIR)/util_vector.Po@am__quote@
 
 .c.o:
-@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@am__fastdepCC_TRUE@	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
+@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
+@am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c $<
+@am__fastdepCC_FALSE@	$(COMPILE) -c -o $@ $<
 
 .c.obj:
-@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@am__fastdepCC_TRUE@	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
+@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ `$(CYGPATH_W) '$<'` &&\
+@am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c `$(CYGPATH_W) '$<'`
-
-srm_sim.o: ./srm_sim.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT srm_sim.o -MD -MP -MF $(DEPDIR)/srm_sim.Tpo -c -o srm_sim.o `test -f './srm_sim.c' || echo '$(srcdir)/'`./srm_sim.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/srm_sim.Tpo $(DEPDIR)/srm_sim.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='./srm_sim.c' object='srm_sim.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o srm_sim.o `test -f './srm_sim.c' || echo '$(srcdir)/'`./srm_sim.c
-
-srm_sim.obj: ./srm_sim.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT srm_sim.obj -MD -MP -MF $(DEPDIR)/srm_sim.Tpo -c -o srm_sim.obj `if test -f './srm_sim.c'; then $(CYGPATH_W) './srm_sim.c'; else $(CYGPATH_W) '$(srcdir)/./srm_sim.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/srm_sim.Tpo $(DEPDIR)/srm_sim.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='./srm_sim.c' object='srm_sim.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o srm_sim.obj `if test -f './srm_sim.c'; then $(CYGPATH_W) './srm_sim.c'; else $(CYGPATH_W) '$(srcdir)/./srm_sim.c'; fi`
-
-layer.o: ./layer.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT layer.o -MD -MP -MF $(DEPDIR)/layer.Tpo -c -o layer.o `test -f './layer.c' || echo '$(srcdir)/'`./layer.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/layer.Tpo $(DEPDIR)/layer.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='./layer.c' object='layer.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o layer.o `test -f './layer.c' || echo '$(srcdir)/'`./layer.c
-
-layer.obj: ./layer.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT layer.obj -MD -MP -MF $(DEPDIR)/layer.Tpo -c -o layer.obj `if test -f './layer.c'; then $(CYGPATH_W) './layer.c'; else $(CYGPATH_W) '$(srcdir)/./layer.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/layer.Tpo $(DEPDIR)/layer.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='./layer.c' object='layer.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o layer.obj `if test -f './layer.c'; then $(CYGPATH_W) './layer.c'; else $(CYGPATH_W) '$(srcdir)/./layer.c'; fi`
-
-matrix.o: ./matrix.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT matrix.o -MD -MP -MF $(DEPDIR)/matrix.Tpo -c -o matrix.o `test -f './matrix.c' || echo '$(srcdir)/'`./matrix.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/matrix.Tpo $(DEPDIR)/matrix.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='./matrix.c' object='matrix.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o matrix.o `test -f './matrix.c' || echo '$(srcdir)/'`./matrix.c
-
-matrix.obj: ./matrix.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT matrix.obj -MD -MP -MF $(DEPDIR)/matrix.Tpo -c -o matrix.obj `if test -f './matrix.c'; then $(CYGPATH_W) './matrix.c'; else $(CYGPATH_W) '$(srcdir)/./matrix.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/matrix.Tpo $(DEPDIR)/matrix.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='./matrix.c' object='matrix.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o matrix.obj `if test -f './matrix.c'; then $(CYGPATH_W) './matrix.c'; else $(CYGPATH_W) '$(srcdir)/./matrix.c'; fi`
-
-util_vector.o: ./util/util_vector.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT util_vector.o -MD -MP -MF $(DEPDIR)/util_vector.Tpo -c -o util_vector.o `test -f './util/util_vector.c' || echo '$(srcdir)/'`./util/util_vector.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/util_vector.Tpo $(DEPDIR)/util_vector.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='./util/util_vector.c' object='util_vector.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o util_vector.o `test -f './util/util_vector.c' || echo '$(srcdir)/'`./util/util_vector.c
-
-util_vector.obj: ./util/util_vector.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT util_vector.obj -MD -MP -MF $(DEPDIR)/util_vector.Tpo -c -o util_vector.obj `if test -f './util/util_vector.c'; then $(CYGPATH_W) './util/util_vector.c'; else $(CYGPATH_W) '$(srcdir)/./util/util_vector.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/util_vector.Tpo $(DEPDIR)/util_vector.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='./util/util_vector.c' object='util_vector.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o util_vector.obj `if test -f './util/util_vector.c'; then $(CYGPATH_W) './util/util_vector.c'; else $(CYGPATH_W) '$(srcdir)/./util/util_vector.c'; fi`
-
-ini.o: ./util/ini.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ini.o -MD -MP -MF $(DEPDIR)/ini.Tpo -c -o ini.o `test -f './util/ini.c' || echo '$(srcdir)/'`./util/ini.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/ini.Tpo $(DEPDIR)/ini.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='./util/ini.c' object='ini.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ini.o `test -f './util/ini.c' || echo '$(srcdir)/'`./util/ini.c
-
-ini.obj: ./util/ini.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ini.obj -MD -MP -MF $(DEPDIR)/ini.Tpo -c -o ini.obj `if test -f './util/ini.c'; then $(CYGPATH_W) './util/ini.c'; else $(CYGPATH_W) '$(srcdir)/./util/ini.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/ini.Tpo $(DEPDIR)/ini.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='./util/ini.c' object='ini.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ini.obj `if test -f './util/ini.c'; then $(CYGPATH_W) './util/ini.c'; else $(CYGPATH_W) '$(srcdir)/./util/ini.c'; fi`
-
-util.o: util/util.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT util.o -MD -MP -MF $(DEPDIR)/util.Tpo -c -o util.o `test -f 'util/util.c' || echo '$(srcdir)/'`util/util.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/util.Tpo $(DEPDIR)/util.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='util/util.c' object='util.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o util.o `test -f 'util/util.c' || echo '$(srcdir)/'`util/util.c
-
-util.obj: util/util.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT util.obj -MD -MP -MF $(DEPDIR)/util.Tpo -c -o util.obj `if test -f 'util/util.c'; then $(CYGPATH_W) 'util/util.c'; else $(CYGPATH_W) '$(srcdir)/util/util.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/util.Tpo $(DEPDIR)/util.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='util/util.c' object='util.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o util.obj `if test -f 'util/util.c'; then $(CYGPATH_W) 'util/util.c'; else $(CYGPATH_W) '$(srcdir)/util/util.c'; fi`
-
-util_dlink_list.o: ./util/util_dlink_list.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT util_dlink_list.o -MD -MP -MF $(DEPDIR)/util_dlink_list.Tpo -c -o util_dlink_list.o `test -f './util/util_dlink_list.c' || echo '$(srcdir)/'`./util/util_dlink_list.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/util_dlink_list.Tpo $(DEPDIR)/util_dlink_list.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='./util/util_dlink_list.c' object='util_dlink_list.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o util_dlink_list.o `test -f './util/util_dlink_list.c' || echo '$(srcdir)/'`./util/util_dlink_list.c
-
-util_dlink_list.obj: ./util/util_dlink_list.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT util_dlink_list.obj -MD -MP -MF $(DEPDIR)/util_dlink_list.Tpo -c -o util_dlink_list.obj `if test -f './util/util_dlink_list.c'; then $(CYGPATH_W) './util/util_dlink_list.c'; else $(CYGPATH_W) '$(srcdir)/./util/util_dlink_list.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/util_dlink_list.Tpo $(DEPDIR)/util_dlink_list.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='./util/util_dlink_list.c' object='util_dlink_list.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o util_dlink_list.obj `if test -f './util/util_dlink_list.c'; then $(CYGPATH_W) './util/util_dlink_list.c'; else $(CYGPATH_W) '$(srcdir)/./util/util_dlink_list.c'; fi`
+@am__fastdepCC_FALSE@	$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
@@ -485,6 +422,10 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
+	-rm -f ./$(am__dirstamp)
+	-rm -f util/$(DEPDIR)/$(am__dirstamp)
+	-rm -f util/$(am__dirstamp)
+	-test -z "$(DEPDIR)/$(am__dirstamp)" || rm -f $(DEPDIR)/$(am__dirstamp)
 	-test -z "$(top_builddir)/bin/$(am__dirstamp)" || rm -f $(top_builddir)/bin/$(am__dirstamp)
 
 maintainer-clean-generic:
@@ -495,7 +436,7 @@ clean: clean-am
 clean-am: clean-binPROGRAMS clean-generic mostlyclean-am
 
 distclean: distclean-am
-	-rm -rf ./$(DEPDIR)
+	-rm -rf ./$(DEPDIR) ./util/$(DEPDIR) util/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -541,7 +482,7 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-	-rm -rf ./$(DEPDIR)
+	-rm -rf ./$(DEPDIR) ./util/$(DEPDIR) util/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

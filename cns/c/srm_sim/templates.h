@@ -7,6 +7,7 @@
 #define TEMPLATE(X,Y) CAT(X,Y)
 
 typedef size_t ind;
+typedef unsigned char uchar;
 
 #define TVEC(T) TNAME(T,Vector)
 

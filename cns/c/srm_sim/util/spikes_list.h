@@ -1,7 +1,7 @@
 #ifndef SPIKES_LIST_H
 #define SPIKES_LIST_H
 
-#include <matrix.h>
+#include <util/matrix.h>
 #include <util/util_vector.h>
 
 // SpikesList :
