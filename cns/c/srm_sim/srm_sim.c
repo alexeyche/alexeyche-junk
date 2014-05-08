@@ -47,7 +47,7 @@ int main(int argc, char **argv) {
     runSim(s);
     
     if(a.input_port>0) {
-        
+        printf("Not implemented\n");        
     }
 
     if(saveStat) {
