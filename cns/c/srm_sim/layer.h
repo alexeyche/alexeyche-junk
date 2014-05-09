@@ -65,6 +65,7 @@ struct SRMLayer {
     doubleVector **stat_u;
     doubleVector **stat_p;
     doubleVector ***stat_W;
+    doubleVector ***stat_syn;
 };
 
 
@@ -92,7 +93,7 @@ void configureSRMLayer(SRMLayer *l, const indVector *inputIDs, const indVector *
 void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constants *c);
 pMatrixVector* serializeSRMLayer(SRMLayer *l);
 void loadSRMLayer(SRMLayer *l, Constants *c, pMatrixVector *data);
-void toStartValues(SRMLayer *l, Constants *c);
+void toStartValuesSRMLayer(SRMLayer *l, Constants *c);
 void propagateSpikeSRMLayer(SRMLayer *l, const size_t *ni, const SynSpike *sp, const Constants *c);
 void resetSRMLayerNeuron(SRMLayer *l, const size_t *ni);
 double getSynDelay(SRMLayer *l, const size_t *id, const size_t *syn_id);

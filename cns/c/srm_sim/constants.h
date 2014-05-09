@@ -11,6 +11,17 @@
 typedef enum { EOptimalSTDP } learning_rule_t;
 
 typedef struct {
+    double C;
+    double gL;
+    double EL;
+    double Vtr;
+    double slope;
+    double tau_w; 
+    double a;
+    double b;
+} AdExConstants;
+
+typedef struct {
     double e0;
     double e_exc;
     double e_inh;
@@ -74,6 +85,7 @@ typedef struct {
     double p_set;
     
     learning_rule_t learning_rule;
+    AdExConstants adex;
 } Constants;
 
 int file_handler(void* user, const char* section, const char* name,

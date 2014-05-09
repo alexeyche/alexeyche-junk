@@ -22,7 +22,7 @@ TOptimalSTDP* init_TOptimalSTDP(SRMLayer *l) {
             ls->stat_B[ni] = TEMPLATE(createVector,double)();
             ls->stat_C[ni] = (doubleVector**) malloc( l->nconn[ni]*sizeof(doubleVector*));
             for(size_t con_i=0; con_i < l->nconn[ni]; con_i++) {
-                TEMPLATE(createVector,double)(ls->stat_C[ni][con_i]);
+                ls->stat_C[ni][con_i] = TEMPLATE(createVector,double)();
             }
         }
     }
@@ -81,7 +81,7 @@ void trainWeightsStep_TOptimalSTDP(learn_t *ls_t, const double *u, const double 
         l->W[ *ni ][ *syn_id ] += dw;
         
         if( (ls->C[ *ni ][ *syn_id ] < LEARN_ACT_TOL ) && (ls->C[ *ni ][ *syn_id ] > -LEARN_ACT_TOL ) && 
-            (dC < LEARN_ACT_TOL ) && (dC > -LEARN_ACT_TOL ) ) {
+                                                          (dC < LEARN_ACT_TOL ) && (dC > -LEARN_ACT_TOL ) ) {
 
             TEMPLATE(dropNodeLList,ind)(ls->learn_syn_ids[ *ni ], act_node);
         }
