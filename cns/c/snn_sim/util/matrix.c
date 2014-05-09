@@ -57,4 +57,12 @@ Matrix* vectorArrayToMatrix(doubleVector **dv, size_t size) {
     return(m);        
 }
 
-
+Matrix *copyMatrix(Matrix *m) {
+    Matrix *out = createMatrix(m->nrow, m->ncol);
+    for(size_t i=0; i<m->nrow; i++) {
+        for(size_t j=0; j<m->ncol; j++) {
+            setMatrixElement(out, i, j, getMatrixElement(m, i, j));
+        } 
+    }
+    return(out);
+}

@@ -12,7 +12,7 @@
 
 int main(int argc, char **argv) {
 	
-	ArgOptions a = parseOptions(argc, argv);
+	ArgOptionsSim a = parseSimOptions(argc, argv);
 //    printArgs(&a);
     bool saveStat = a.stat_file != NULL;
     Constants *c = createConstants(a.const_filename);

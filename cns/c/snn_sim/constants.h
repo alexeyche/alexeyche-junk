@@ -85,7 +85,7 @@ typedef struct {
     double p_set;
     
     learning_rule_t learning_rule;
-    AdExConstants adex;
+    AdExConstants *adex;
 } Constants;
 
 int file_handler(void* user, const char* section, const char* name,
