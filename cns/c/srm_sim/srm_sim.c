@@ -61,15 +61,20 @@ int main(int argc, char **argv) {
             
             TOptimalSTDP *ls = (TOptimalSTDP*)l->ls_t;
             Matrix *mB = vectorArrayToMatrix(ls->stat_B, l->N);
+
             TEMPLATE(insertVector,pMatrix)(mv, mB);
             
-            for(size_t ni=0; ni < s->layers->array[li]->N; ni++) {
-                Matrix *mSyn = vectorArrayToMatrix(l->stat_W[ni], l->nconn[ni]);
+            for(size_t ni=0; ni < l->N; ni++) {
+                Matrix *mSyn = vectorArrayToMatrix(l->stat_syn[ni], l->nconn[ni]);
                 TEMPLATE(insertVector,pMatrix)(mv, mSyn);
             }
-            for(size_t ni=0; ni < s->layers->array[li]->N; ni++) {
+            for(size_t ni=0; ni < l->N; ni++) {
                 Matrix *mC = vectorArrayToMatrix(ls->stat_C[ni], l->nconn[ni]);
                 TEMPLATE(insertVector,pMatrix)(mv, mC);
+            }
+            for(size_t ni=0; ni < l->N; ni++) {
+                Matrix *mdW = vectorArrayToMatrix(l->stat_W[ni], l->nconn[ni]);
+                TEMPLATE(insertVector,pMatrix)(mv, mdW);
             }
         }            
      

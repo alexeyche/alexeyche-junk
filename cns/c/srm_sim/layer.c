@@ -44,6 +44,7 @@ SRMLayer* createSRMLayer(size_t N, size_t *glob_idx, bool saveStat) {
         l->stat_u = (doubleVector**) malloc( l->N*sizeof(doubleVector*));
         l->stat_p = (doubleVector**) malloc( l->N*sizeof(doubleVector*));
         l->stat_W = (doubleVector***) malloc( l->N*sizeof(doubleVector**));
+        l->stat_syn = (doubleVector***) malloc( l->N*sizeof(doubleVector**));
         for(size_t ni=0; ni<l->N; ni++) {
             l->stat_u[ni] = TEMPLATE(createVector,double)();
             l->stat_p[ni] = TEMPLATE(createVector,double)();
@@ -68,6 +69,7 @@ void deleteSRMLayer(SRMLayer *l) {
             TEMPLATE(deleteVector,double)(l->stat_p[ni]);
             for(size_t con_i=0; con_i < l->nconn[ni]; con_i++) {
                 TEMPLATE(deleteVector,double)(l->stat_W[ni][con_i]);
+                TEMPLATE(deleteVector,double)(l->stat_syn[ni][con_i]);
             }
         }
     }
@@ -94,6 +96,7 @@ void deleteSRMLayer(SRMLayer *l) {
         free(l->stat_u);
         free(l->stat_p);
         free(l->stat_W);
+        free(l->stat_syn);
     }
     free(l);
 }
@@ -170,15 +173,17 @@ void allocSynData(SRMLayer *l) {
         l->syn_del[ni] = (double*) malloc(l->nconn[ni]*sizeof(double));
         if(l->saveStat) {
             l->stat_W[ni] = (doubleVector**) malloc( l->nconn[ni]*sizeof(doubleVector*));
+            l->stat_syn[ni] = (doubleVector**) malloc( l->nconn[ni]*sizeof(doubleVector*));
             for(size_t syn_i=0; syn_i < l->nconn[ni]; syn_i++) {
                 l->stat_W[ni][syn_i] = TEMPLATE(createVector,double)();
+                l->stat_syn[ni][syn_i] = TEMPLATE(createVector,double)();
             }
         }
     }        
 }
 
 
-void toStartValues(SRMLayer *l, Constants *c) {
+void toStartValuesSRMLayer(SRMLayer *l, Constants *c) {
     for(size_t ni=0; ni<l->N; ni++) {
         double start_weight = c->weight_var * getNorm() + c->weight_per_neuron->array[l->id]/l->nconn[ni];
         l->a[ni] = 1;
@@ -242,7 +247,7 @@ void configureSRMLayer(SRMLayer *l, const indVector *inputIDs, const indVector *
     }
     
     // start values assignment 
-    toStartValues(l, c); 
+    toStartValuesSRMLayer(l, c); 
     for(size_t ni=0; ni<l->N; ni++) {
         if(l->nconn[ni]>0) {
             memcpy(l->id_conns[ni], layer_conns[ni]->array, l->nconn[ni]*sizeof(size_t));
@@ -314,7 +319,8 @@ void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constant
         TEMPLATE(insertVector,double)(l->stat_p[ *id_to_sim ], p);
         TEMPLATE(insertVector,double)(l->stat_u[ *id_to_sim ], u);
         for(size_t con_i=0; con_i<l->nconn[ *id_to_sim ]; con_i++) {
-            TEMPLATE(insertVector,double)(l->stat_W[ *id_to_sim ][ con_i ], l->syn[ *id_to_sim ][ con_i ]); //l->W[ *id_to_sim ][ con_i ]);
+            TEMPLATE(insertVector,double)(l->stat_W[ *id_to_sim ][ con_i ], l->W[ *id_to_sim ][ con_i ]);
+            TEMPLATE(insertVector,double)(l->stat_syn[ *id_to_sim ][ con_i ], l->syn[ *id_to_sim ][ con_i ]);
         }
     }
 
@@ -468,7 +474,7 @@ void loadSRMLayer(SRMLayer *l, Constants *c, pMatrixVector *data) {
         l->ls_t = (learn_t*)init_TOptimalSTDP(l);
     }
  
-    toStartValues(l, c);
+    toStartValuesSRMLayer(l, c);
     for(size_t ni=0; ni<l->N; ni++) {  // apply values
         memcpy(l->W[ni], W_vals[ni]->array, sizeof(double)*W_vals[ni]->size);
         memcpy(l->id_conns[ni], id_conns_vals[ni]->array, sizeof(size_t)*id_conns_vals[ni]->size);

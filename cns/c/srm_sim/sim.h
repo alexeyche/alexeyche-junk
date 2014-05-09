@@ -70,7 +70,7 @@ void deleteSim(Sim *s);
 void configureLayersSim(Sim *s, Constants *c, bool saveStat);
 SimRuntime* createRuntime();
 void deleteRuntime(SimRuntime *sr);
-void configureNetSpikesSim(Sim *s, Constants *c);
+void configureNetSpikesSim(Sim *s, const char *input_spikes_filename, Constants *c);
 void configureSimAttr(Sim *s);
 void configureSynapses(Sim *s, Constants *c);
 
