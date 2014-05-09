@@ -76,8 +76,9 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-bin_PROGRAMS = $(top_builddir)/bin/srm_sim$(EXEEXT)
-subdir = srm_sim
+bin_PROGRAMS = $(top_builddir)/bin/snn_sim$(EXEEXT) \
+	$(top_builddir)/bin/snn_prep$(EXEEXT)
+subdir = snn_sim
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/depcomp
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -90,18 +91,27 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am__dirstamp = $(am__leading_dot)dirstamp
-am___top_builddir__bin_srm_sim_OBJECTS = util/matrix.$(OBJEXT) \
+am___top_builddir__bin_snn_prep_OBJECTS = util/matrix.$(OBJEXT) \
 	util/util_vector.$(OBJEXT) ./util/ini.$(OBJEXT) \
 	util/util.$(OBJEXT) util/spikes_list.$(OBJEXT) \
-	sim_netsim.$(OBJEXT) neuron_funcs.$(OBJEXT) \
-	./util/util_dlink_list.$(OBJEXT) constants.$(OBJEXT) \
-	sim_run.$(OBJEXT) sim.$(OBJEXT) io.$(OBJEXT) \
-	sim_configure.$(OBJEXT) sim_serialize.$(OBJEXT) \
-	./layer.$(OBJEXT) learn.$(OBJEXT) srm_sim.$(OBJEXT)
-__top_builddir__bin_srm_sim_OBJECTS =  \
-	$(am___top_builddir__bin_srm_sim_OBJECTS)
-__top_builddir__bin_srm_sim_LDADD = $(LDADD)
-__top_builddir__bin_srm_sim_DEPENDENCIES =
+	constants.$(OBJEXT) io.$(OBJEXT) adex_layer.$(OBJEXT) \
+	snn_prep.$(OBJEXT)
+__top_builddir__bin_snn_prep_OBJECTS =  \
+	$(am___top_builddir__bin_snn_prep_OBJECTS)
+__top_builddir__bin_snn_prep_LDADD = $(LDADD)
+__top_builddir__bin_snn_prep_DEPENDENCIES =
+am___top_builddir__bin_snn_sim_OBJECTS = util/matrix.$(OBJEXT) \
+	util/util_vector.$(OBJEXT) ./util/ini.$(OBJEXT) \
+	util/util.$(OBJEXT) util/spikes_list.$(OBJEXT) \
+	./util/util_dlink_list.$(OBJEXT) sim_netsim.$(OBJEXT) \
+	neuron_funcs.$(OBJEXT) constants.$(OBJEXT) sim_run.$(OBJEXT) \
+	sim.$(OBJEXT) io.$(OBJEXT) sim_configure.$(OBJEXT) \
+	sim_serialize.$(OBJEXT) ./layer.$(OBJEXT) learn.$(OBJEXT) \
+	snn_sim.$(OBJEXT)
+__top_builddir__bin_snn_sim_OBJECTS =  \
+	$(am___top_builddir__bin_snn_sim_OBJECTS)
+__top_builddir__bin_snn_sim_LDADD = $(LDADD)
+__top_builddir__bin_snn_sim_DEPENDENCIES =
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -130,8 +140,10 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(__top_builddir__bin_srm_sim_SOURCES)
-DIST_SOURCES = $(__top_builddir__bin_srm_sim_SOURCES)
+SOURCES = $(__top_builddir__bin_snn_prep_SOURCES) \
+	$(__top_builddir__bin_snn_sim_SOURCES)
+DIST_SOURCES = $(__top_builddir__bin_snn_prep_SOURCES) \
+	$(__top_builddir__bin_snn_sim_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -249,7 +261,9 @@ top_srcdir = @top_srcdir@
 AM_CFLAGS = -Wall -std=gnu99 -O0 -pg  -pthread
 #CFLAGS=
 LDADD = -lm
-__top_builddir__bin_srm_sim_SOURCES = util/matrix.c util/util_vector.c ./util/ini.c ./util/matrix.h util/util.c util/spikes_list.c sim_netsim.c neuron_funcs.c ./util/util_dlink_list.c constants.c sim_run.c sim.c io.c  sim_configure.c sim_serialize.c ./layer.c learn.c srm_sim.c 
+__top_builddir__bin_snn_sim_SOURCES = util/matrix.c util/util_vector.c ./util/ini.c ./util/matrix.h util/util.c util/spikes_list.c ./util/util_dlink_list.c sim_netsim.c neuron_funcs.c  constants.c sim_run.c sim.c io.c  sim_configure.c sim_serialize.c ./layer.c learn.c snn_sim.c 
+#_top_builddir__bin_srm_sim_ut_SOURCES = ./srm_sim_ut.c ./layer.c  ./matrix.c  ./util/util_vector.c ./util/ini.c ./templates.h ./layer.h ./matrix.h ./core.h ./util/util_vector.h ./util/ini.h ./sim.h constants.c util/util.c sim.c io.c io.h spikes_list.c spikes_list.h sim_netsim.c neuron_funcs.c ./util/util_dlink_list.c ./util/util_dlink_list.h sim_run.c sim_configure.c sim_serialize.c 
+__top_builddir__bin_snn_prep_SOURCES = util/matrix.c util/util_vector.c ./util/ini.c ./util/matrix.h util/util.c util/spikes_list.c  constants.c io.c adex_layer.c snn_prep.c
 all: all-am
 
 .SUFFIXES:
@@ -263,9 +277,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu srm_sim/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign snn_sim/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu srm_sim/Makefile
+	  $(AUTOMAKE) --foreign snn_sim/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -342,6 +356,13 @@ util/util.$(OBJEXT): util/$(am__dirstamp) \
 	util/$(DEPDIR)/$(am__dirstamp)
 util/spikes_list.$(OBJEXT): util/$(am__dirstamp) \
 	util/$(DEPDIR)/$(am__dirstamp)
+$(top_builddir)/bin/$(am__dirstamp):
+	@$(MKDIR_P) $(top_builddir)/bin
+	@: > $(top_builddir)/bin/$(am__dirstamp)
+
+$(top_builddir)/bin/snn_prep$(EXEEXT): $(__top_builddir__bin_snn_prep_OBJECTS) $(__top_builddir__bin_snn_prep_DEPENDENCIES) $(EXTRA___top_builddir__bin_snn_prep_DEPENDENCIES) $(top_builddir)/bin/$(am__dirstamp)
+	@rm -f $(top_builddir)/bin/snn_prep$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(__top_builddir__bin_snn_prep_OBJECTS) $(__top_builddir__bin_snn_prep_LDADD) $(LIBS)
 ./util/util_dlink_list.$(OBJEXT): util/$(am__dirstamp) \
 	util/$(DEPDIR)/$(am__dirstamp)
 ./$(am__dirstamp):
@@ -351,13 +372,10 @@ $(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) ./$(DEPDIR)
 	@: > $(DEPDIR)/$(am__dirstamp)
 ./layer.$(OBJEXT): ./$(am__dirstamp) $(DEPDIR)/$(am__dirstamp)
-$(top_builddir)/bin/$(am__dirstamp):
-	@$(MKDIR_P) $(top_builddir)/bin
-	@: > $(top_builddir)/bin/$(am__dirstamp)
 
-$(top_builddir)/bin/srm_sim$(EXEEXT): $(__top_builddir__bin_srm_sim_OBJECTS) $(__top_builddir__bin_srm_sim_DEPENDENCIES) $(EXTRA___top_builddir__bin_srm_sim_DEPENDENCIES) $(top_builddir)/bin/$(am__dirstamp)
-	@rm -f $(top_builddir)/bin/srm_sim$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(__top_builddir__bin_srm_sim_OBJECTS) $(__top_builddir__bin_srm_sim_LDADD) $(LIBS)
+$(top_builddir)/bin/snn_sim$(EXEEXT): $(__top_builddir__bin_snn_sim_OBJECTS) $(__top_builddir__bin_snn_sim_DEPENDENCIES) $(EXTRA___top_builddir__bin_snn_sim_DEPENDENCIES) $(top_builddir)/bin/$(am__dirstamp)
+	@rm -f $(top_builddir)/bin/snn_sim$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(__top_builddir__bin_snn_sim_OBJECTS) $(__top_builddir__bin_snn_sim_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -368,6 +386,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/adex_layer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/constants.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/io.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/layer.Po@am__quote@
@@ -378,7 +397,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sim_netsim.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sim_run.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sim_serialize.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/srm_sim.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/snn_prep.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/snn_sim.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./util/$(DEPDIR)/ini.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./util/$(DEPDIR)/util_dlink_list.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@util/$(DEPDIR)/matrix.Po@am__quote@
@@ -611,7 +631,6 @@ uninstall-am: uninstall-binPROGRAMS
 	ps ps-am tags tags-am uninstall uninstall-am \
 	uninstall-binPROGRAMS
 
-#_top_builddir__bin_srm_sim_ut_SOURCES = ./srm_sim_ut.c ./layer.c  ./matrix.c  ./util/util_vector.c ./util/ini.c ./templates.h ./layer.h ./matrix.h ./core.h ./util/util_vector.h ./util/ini.h ./sim.h constants.c util/util.c sim.c io.c io.h spikes_list.c spikes_list.h sim_netsim.c neuron_funcs.c ./util/util_dlink_list.c ./util/util_dlink_list.h sim_run.c sim_configure.c sim_serialize.c 
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

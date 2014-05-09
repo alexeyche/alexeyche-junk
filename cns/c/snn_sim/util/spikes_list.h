@@ -18,5 +18,4 @@ void deleteSpikesList(SpikesList *sl);
 void printSpikesList(SpikesList *sl);
 SpikesList* spikesMatrixToSpikesList(Matrix *m);
 
-
 #endif

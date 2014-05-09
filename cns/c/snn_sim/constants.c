@@ -13,7 +13,7 @@ Constants* createConstants(const char *filename) {
     c->wmax = TEMPLATE(createVector,double)();
     c->weight_decay_factor = TEMPLATE(createVector,double)();
     c->lrate = TEMPLATE(createVector,double)();
-    c->adex = (AdExConstants) malloc( sizeof(AdExConstants) );
+    c->adex = (AdExConstants*) malloc( sizeof(AdExConstants) );
     if (ini_parse(filename, file_handler, c) < 0) {
         printf("Can't load %s\n", filename);
         return(NULL);
@@ -223,28 +223,28 @@ int file_handler(void* user, const char* section, const char* name,
     } else 
     if (MATCH("learn", "p_set")) {
         c->p_set = atof(value);
-    } else {
+    } else 
     if (MATCH("adex neuron", "C")) {
         c->adex->C = atof(value);
-    } else {
+    } else 
     if (MATCH("adex neuron", "gL")) {
         c->adex->gL = atof(value);
-    } else {
+    } else 
     if (MATCH("adex neuron", "EL")) {
         c->adex->EL = atof(value);
-    } else {
+    } else 
     if (MATCH("adex neuron", "Vtr")) {
         c->adex->Vtr = atof(value);
-    } else {
-    if (MATCH("adex neuron", "slope")) {
+    } else 
+    if (MATCH("adex neuron", "slope")) { 
         c->adex->slope = atof(value);
-    } else {
+    } else 
     if (MATCH("adex neuron", "tau_w")) {
         c->adex->tau_w = atof(value);
-    } else {
+    } else 
     if (MATCH("adex neuron", "a")) {
         c->adex->a = atof(value);
-    } else {
+    } else 
     if (MATCH("adex neuron", "b")) {
         c->adex->b = atof(value);
     } else {
