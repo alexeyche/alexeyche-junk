@@ -11,9 +11,8 @@ library(snn)
 
 rundir="/home/alexeyche/prog/sim/runs"
 #rundir="/home/alexeyche/my/sim/runs"
-#runname = "test_conn2l"
-#runname = "test_conn2l_no_depr"
-runname = "2layers"
+#runname = "bci_test"
+runname = "ucr_stdp"
 workdir=sprintf("%s/%s", rundir, runname)
 
 #workdir="/home/alexeyche/prog/sim/runs/rfd"
@@ -37,6 +36,7 @@ const_ini = sprintf("%s/constants.ini", workdir)
 
 N = as.integer(get_const("N"))
 M = as.integer(get_const("M"))
+lrule = get_const("learning_rule")
 
 #sp = loadMatrix(input_file,1)
 sp = loadMatrix(output_spikes,1)
@@ -52,23 +52,42 @@ for(i in 1:length(net)) {
 }
 
 Ti=0
-Trange=5000
+Trange=3000
 p1 = plot_rastl(net[(M-M+1):(M+sum(N))],T0=Ti*Trange,Tmax=(Ti+1)*Trange)
 
 if(file.exists(sprintf("%s.bin",stat_file))) {
-    p = loadMatrix(stat_file, 1)
     u = loadMatrix(stat_file, 2)
-    B = loadMatrix(stat_file, 3)
-    syn=1
+    p = loadMatrix(stat_file, 1)
+    syn=4
     nid=2
-    dWn = loadMatrix(stat_file, 3+nid)
-    Cn = loadMatrix(stat_file, 3+N+nid)
-    par(mfrow=c(4,1))
-    spikes = net[[100+nid]][net[[100+nid]]<1000]
-    plot(spikes, rep(1,length(spikes)), xlim=c(0,1000) )
-    plotl(Cn[syn,1:1000])
-    plotl(dWn[syn,1:1000])
-    plotl(B[nid,1:1000])
+    Tplot=1:3000
+    
+    if(lrule == "OptimalSTDP") {
+        B = loadMatrix(stat_file, 3)
+        Cn = loadMatrix(stat_file, 3+nid)
+        syns = loadMatrix(stat_file, 3+N+nid)
+        dWn = loadMatrix(stat_file, 3+2*N+nid)
+        par(mfrow=c(4,1))
+        spikes = net[[M+nid]][net[[M+nid]]<max(Tplot)]
+        plot(spikes, rep(1,length(spikes)), xlim=c(min(Tplot),max(Tplot)) )
+        plotl(syns[syn,Tplot])
+        plotl(Cn[syn,Tplot])
+        plotl(dWn[syn,Tplot])
+    }
+    if(lrule == "ResourceSTDP") {
+        res = loadMatrix(stat_file, 3)
+        y_tr = loadMatrix(stat_file, 4)
+        x_tr = loadMatrix(stat_file, 4+nid)
+        syns = loadMatrix(stat_file, 4+N+nid)
+        dWn = loadMatrix(stat_file, 4+2*N+nid)
+        par(mfrow=c(4,1))
+        spikes = net[[M+nid]][net[[M+nid]]<max(Tplot)]
+        plotl(y_tr[nid,Tplot])
+        plotl(x_tr[syn,Tplot])
+        plotl(res[nid,Tplot])
+        plotl(dWn[syn,Tplot])
+    }
+    #plotl(B[nid,1:1000])
 }
 
 matrix_per_layer = 8
