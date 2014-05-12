@@ -48,8 +48,13 @@ layer.o: layer.c /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/bits/mathdef.h \
  /usr/include/x86_64-linux-gnu/bits/mathcalls.h \
  /usr/include/x86_64-linux-gnu/bits/mathinline.h util/matrix.h \
+<<<<<<< HEAD:cns/c/snn_sim/.deps/layer.Po
  util/util_vector_tmpl.h neuron_funcs.h io.h learn.h learn_optim.h \
  learn_stdp.h util/util_vector_tmpl.c
+=======
+ util/util_vector_tmpl.h neuron_funcs.h io.h learn.h \
+ util/util_vector_tmpl.c
+>>>>>>> 318e8ea01391cb34992d34a456f378d5952f3290:cns/c/snn_sim/.deps/layer.Po
 
 /usr/include/stdc-predef.h:
 
@@ -203,8 +208,11 @@ io.h:
 
 learn.h:
 
+<<<<<<< HEAD:cns/c/snn_sim/.deps/layer.Po
 learn_optim.h:
 
 learn_stdp.h:
 
+=======
+>>>>>>> 318e8ea01391cb34992d34a456f378d5952f3290:cns/c/snn_sim/.deps/layer.Po
 util/util_vector_tmpl.c:

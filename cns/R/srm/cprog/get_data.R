@@ -11,8 +11,14 @@ library(snn)
 
 rundir="/home/alexeyche/prog/sim/runs"
 #rundir="/home/alexeyche/my/sim/runs"
+<<<<<<< HEAD
 #runname = "bci_test"
 runname = "ucr_stdp"
+=======
+#runname = "test_conn2l"
+#runname = "test_conn2l_no_depr"
+runname = "2layers"
+>>>>>>> 318e8ea01391cb34992d34a456f378d5952f3290
 workdir=sprintf("%s/%s", rundir, runname)
 
 #workdir="/home/alexeyche/prog/sim/runs/rfd"
@@ -36,7 +42,10 @@ const_ini = sprintf("%s/constants.ini", workdir)
 
 N = as.integer(get_const("N"))
 M = as.integer(get_const("M"))
+<<<<<<< HEAD
 lrule = get_const("learning_rule")
+=======
+>>>>>>> 318e8ea01391cb34992d34a456f378d5952f3290
 
 #sp = loadMatrix(input_file,1)
 sp = loadMatrix(output_spikes,1)
@@ -52,11 +61,16 @@ for(i in 1:length(net)) {
 }
 
 Ti=0
+<<<<<<< HEAD
 Trange=3000
+=======
+Trange=5000
+>>>>>>> 318e8ea01391cb34992d34a456f378d5952f3290
 p1 = plot_rastl(net[(M-M+1):(M+sum(N))],T0=Ti*Trange,Tmax=(Ti+1)*Trange)
 
 if(file.exists(sprintf("%s.bin",stat_file))) {
     u = loadMatrix(stat_file, 2)
+<<<<<<< HEAD
     p = loadMatrix(stat_file, 1)
     syn=4
     nid=2
@@ -98,6 +112,29 @@ for(Ni in 1:length(N)) {
     W = rbind(W, Wlayer)
 }
 
+=======
+    B = loadMatrix(stat_file, 3)
+    syn=1
+    nid=2
+    dWn = loadMatrix(stat_file, 3+nid)
+    Cn = loadMatrix(stat_file, 3+N+nid)
+    par(mfrow=c(4,1))
+    spikes = net[[100+nid]][net[[100+nid]]<1000]
+    plot(spikes, rep(1,length(spikes)), xlim=c(0,1000) )
+    plotl(Cn[syn,1:1000])
+    plotl(dWn[syn,1:1000])
+    plotl(B[nid,1:1000])
+}
+
+matrix_per_layer = 8
+Wnorm = W = NULL
+for(Ni in 1:length(N)) {
+    Wlayer = loadMatrix(model_file,(Ni-1)*matrix_per_layer+1)
+    Wnorm = rbind(Wnorm, Wlayer/max(Wlayer))
+    W = rbind(W, Wlayer)
+}
+
+>>>>>>> 318e8ea01391cb34992d34a456f378d5952f3290
 Wnorm = W
 p2 = levelplot(t(Wnorm), col.regions=colorRampPalette(c("black", "white")))
 

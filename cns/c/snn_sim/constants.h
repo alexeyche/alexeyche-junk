@@ -8,7 +8,11 @@
 #include <util/util_vector.h>
 #include <util/ini.h>
 
+<<<<<<< HEAD:cns/c/snn_sim/constants.h
 typedef enum { EOptimalSTDP, EResourceSTDP } learning_rule_t;
+=======
+typedef enum { EOptimalSTDP } learning_rule_t;
+>>>>>>> 318e8ea01391cb34992d34a456f378d5952f3290:cns/c/snn_sim/constants.h
 
 typedef struct {
     double C;
@@ -20,6 +24,7 @@ typedef struct {
     double a;
     double b;
 } AdExConstants;
+<<<<<<< HEAD:cns/c/snn_sim/constants.h
 
 typedef struct {
     double Aplus;
@@ -28,6 +33,8 @@ typedef struct {
     double tau_minus;
     double tau_res;
 } ResourceSTDPConstants;
+=======
+>>>>>>> 318e8ea01391cb34992d34a456f378d5952f3290:cns/c/snn_sim/constants.h
 
 typedef struct {
     double e0;
@@ -94,7 +101,10 @@ typedef struct {
     
     learning_rule_t learning_rule;
     AdExConstants *adex;
+<<<<<<< HEAD:cns/c/snn_sim/constants.h
     ResourceSTDPConstants *res_stdp;
+=======
+>>>>>>> 318e8ea01391cb34992d34a456f378d5952f3290:cns/c/snn_sim/constants.h
 } Constants;
 
 int file_handler(void* user, const char* section, const char* name,

@@ -10,10 +10,19 @@
 int main(int argc, char **argv) {
     ArgOptionsPrep a = parsePrepOptions(argc, argv);
     Constants *c = createConstants(a.const_filename);
+<<<<<<< HEAD
+=======
+
+    pMatrixVector* ts_data = readMatrixList(a.input_file);
+    Matrix *ts = ts_data->array[0];
+    size_t N = ts->nrow;
+    size_t nsamples = ts->ncol;
+>>>>>>> 318e8ea01391cb34992d34a456f378d5952f3290
     bool saveStat = false;
     if(a.stat_file) {
         saveStat = true;
     }
+<<<<<<< HEAD
 
     pMatrixVector* ts_data = readMatrixList(a.input_file);
     pMatrixVector *out_data = TEMPLATE(createVector,pMatrix)();
@@ -46,6 +55,29 @@ int main(int argc, char **argv) {
     TEMPLATE(insertVector,pMatrix)(out_data, spikes);    
     Matrix *timeline_m = vectorArrayToMatrix(&timeline, 1);
     TEMPLATE(insertVector,pMatrix)(out_data, timeline_m);    
+=======
+    AdExLayer *l = createAdExLayer(N, saveStat);
+    SpikesList *net = createSpikesList(N);
+    size_t j;
+    double t;
+    for(t=0, j = 0; t < nsamples*c->dt; t+= c->dt, j++) {
+        for(size_t ni=0; ni < l->N; ni++) {
+            double I = getMatrixElement(ts, ni, j);
+            propagateCurrentAdExLayer(l, &ni, &I);
+            simulateAdExLayerNeuron(l, &ni, c);
+            if(l->fired[ni] == 1) {
+                TEMPLATE(insertVector,double)(net->list[ni], t);
+                l->fired[ni] = 0;
+            }
+        }
+    }
+    pMatrixVector *out_data = TEMPLATE(createVector,pMatrix)();
+    Matrix *spikes = vectorArrayToMatrix(net->list, net->size);
+    TEMPLATE(insertVector,pMatrix)(out_data, spikes);
+//    TEMPLATE(insertVector,pMatrix)(out_data, copyMatrix(ts_data->array[1]));
+//    TEMPLATE(insertVector,pMatrix)(out_data, copyMatrix(ts_data->array[2]));
+
+>>>>>>> 318e8ea01391cb34992d34a456f378d5952f3290
     saveMatrixList(a.output_file, out_data);
 
     if(l->saveStat) {
@@ -60,7 +92,10 @@ int main(int argc, char **argv) {
         TEMPLATE(deleteVector,pMatrix)(stat_data);
     }
 
+<<<<<<< HEAD
     TEMPLATE(deleteVector,double)(timeline);
+=======
+>>>>>>> 318e8ea01391cb34992d34a456f378d5952f3290
     deleteAdExLayer(l);
     deleteSpikesList(net);
     deleteConstants(c);

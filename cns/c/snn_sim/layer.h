@@ -17,15 +17,22 @@
 #include <neuron_funcs.h>
 #include <io.h>
 #include <learn.h>
+<<<<<<< HEAD:cns/c/snn_sim/layer.h
 #include <learn_optim.h>
 #include <learn_stdp.h>
+=======
+>>>>>>> 318e8ea01391cb34992d34a456f378d5952f3290:cns/c/snn_sim/layer.h
 
 #define SYN_ACT_TOL 0.0001 // value of synapse needed to delete 
 
 #define BACKPROP_POT 0
 #define SFA 1
 #define REFR 1
+<<<<<<< HEAD:cns/c/snn_sim/layer.h
 #define FS_INH 1
+=======
+#define FS_INH 0
+>>>>>>> 318e8ea01391cb34992d34a456f378d5952f3290:cns/c/snn_sim/layer.h
 
 typedef enum {EXC, INH} nspec_t;
 

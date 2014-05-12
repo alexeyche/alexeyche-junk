@@ -244,10 +244,14 @@ void configureSRMLayer(SRMLayer *l, const indVector *inputIDs, const indVector *
     // configure learning part 
     if( c->learning_rule == EOptimalSTDP) {
         l->ls_t = (learn_t*)init_TOptimalSTDP(l);
+<<<<<<< HEAD:cns/c/snn_sim/layer.c
     } else
     if( c->learning_rule == EResourceSTDP) {
         l->ls_t = (learn_t*)init_TResourceSTDP(l);
     } 
+=======
+    }
+>>>>>>> 318e8ea01391cb34992d34a456f378d5952f3290:cns/c/snn_sim/layer.c
     
     // start values assignment 
     toStartValuesSRMLayer(l, c); 
@@ -475,10 +479,14 @@ void loadSRMLayer(SRMLayer *l, Constants *c, pMatrixVector *data) {
     // configure learning part 
     if( c->learning_rule == EOptimalSTDP) {
         l->ls_t = (learn_t*)init_TOptimalSTDP(l);
+<<<<<<< HEAD:cns/c/snn_sim/layer.c
     } else
     if( c->learning_rule == EResourceSTDP) {
         l->ls_t = (learn_t*)init_TResourceSTDP(l);
     } 
+=======
+    }
+>>>>>>> 318e8ea01391cb34992d34a456f378d5952f3290:cns/c/snn_sim/layer.c
  
     toStartValuesSRMLayer(l, c);
     for(size_t ni=0; ni<l->N; ni++) {  // apply values

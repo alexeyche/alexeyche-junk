@@ -106,8 +106,13 @@ am___top_builddir__bin_snn_sim_OBJECTS = util/matrix.$(OBJEXT) \
 	./util/util_dlink_list.$(OBJEXT) sim_netsim.$(OBJEXT) \
 	neuron_funcs.$(OBJEXT) constants.$(OBJEXT) sim_run.$(OBJEXT) \
 	sim.$(OBJEXT) io.$(OBJEXT) sim_configure.$(OBJEXT) \
+<<<<<<< HEAD:cns/c/snn_sim/Makefile.in
 	sim_serialize.$(OBJEXT) ./layer.$(OBJEXT) \
 	learn_optim.$(OBJEXT) learn_stdp.$(OBJEXT) snn_sim.$(OBJEXT)
+=======
+	sim_serialize.$(OBJEXT) ./layer.$(OBJEXT) learn.$(OBJEXT) \
+	snn_sim.$(OBJEXT)
+>>>>>>> 318e8ea01391cb34992d34a456f378d5952f3290:cns/c/snn_sim/Makefile.in
 __top_builddir__bin_snn_sim_OBJECTS =  \
 	$(am___top_builddir__bin_snn_sim_OBJECTS)
 __top_builddir__bin_snn_sim_LDADD = $(LDADD)
@@ -261,7 +266,11 @@ top_srcdir = @top_srcdir@
 AM_CFLAGS = -Wall -std=gnu99 -O0 -pg  -pthread
 #CFLAGS=
 LDADD = -lm
+<<<<<<< HEAD:cns/c/snn_sim/Makefile.in
 __top_builddir__bin_snn_sim_SOURCES = util/matrix.c util/util_vector.c ./util/ini.c ./util/matrix.h util/util.c util/spikes_list.c ./util/util_dlink_list.c sim_netsim.c neuron_funcs.c  constants.c sim_run.c sim.c io.c  sim_configure.c sim_serialize.c ./layer.c learn_optim.c learn_stdp.c snn_sim.c 
+=======
+__top_builddir__bin_snn_sim_SOURCES = util/matrix.c util/util_vector.c ./util/ini.c ./util/matrix.h util/util.c util/spikes_list.c ./util/util_dlink_list.c sim_netsim.c neuron_funcs.c  constants.c sim_run.c sim.c io.c  sim_configure.c sim_serialize.c ./layer.c learn.c snn_sim.c 
+>>>>>>> 318e8ea01391cb34992d34a456f378d5952f3290:cns/c/snn_sim/Makefile.in
 #_top_builddir__bin_srm_sim_ut_SOURCES = ./srm_sim_ut.c ./layer.c  ./matrix.c  ./util/util_vector.c ./util/ini.c ./templates.h ./layer.h ./matrix.h ./core.h ./util/util_vector.h ./util/ini.h ./sim.h constants.c util/util.c sim.c io.c io.h spikes_list.c spikes_list.h sim_netsim.c neuron_funcs.c ./util/util_dlink_list.c ./util/util_dlink_list.h sim_run.c sim_configure.c sim_serialize.c 
 __top_builddir__bin_snn_prep_SOURCES = util/matrix.c util/util_vector.c ./util/ini.c ./util/matrix.h util/util.c util/spikes_list.c  constants.c io.c adex_layer.c snn_prep.c
 all: all-am
@@ -390,8 +399,12 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/constants.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/io.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/layer.Po@am__quote@
+<<<<<<< HEAD:cns/c/snn_sim/Makefile.in
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/learn_optim.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/learn_stdp.Po@am__quote@
+=======
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/learn.Po@am__quote@
+>>>>>>> 318e8ea01391cb34992d34a456f378d5952f3290:cns/c/snn_sim/Makefile.in
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/neuron_funcs.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sim.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sim_configure.Po@am__quote@

@@ -28,4 +28,25 @@ struct learn_t {
 typedef struct learn_t learn_t;
 
 
+<<<<<<< HEAD
+=======
+typedef struct {
+    learn_t base;
+    
+    indLList **learn_syn_ids;
+    double **C;
+    double *B;
+
+    doubleVector **stat_B;
+    doubleVector ***stat_C;
+} TOptimalSTDP;
+
+TOptimalSTDP* init_TOptimalSTDP(struct SRMLayer *l);
+void toStartValues_TOptimalSTDP(learn_t *ls_t);
+void propagateSynSpike_TOptimalSTDP(learn_t *ls_t, const size_t *ni, const struct SynSpike *sp, const Constants *c);
+void trainWeightsStep_TOptimalSTDP(learn_t *ls_t, const double *u, const double *p, const double *M, const size_t *ni, const Constants *c);
+void resetValues_TOptimalSTDP(learn_t *ls_t, const size_t *ni);
+void free_TOptimalSTDP(learn_t *ls_t);
+
+>>>>>>> 318e8ea01391cb34992d34a456f378d5952f3290
 #endif
