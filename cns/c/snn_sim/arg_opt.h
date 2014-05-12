@@ -16,6 +16,7 @@ typedef struct {
     const char *model_file_load;
     const char *output_spikes_file;
     const char *input_spikes_file;
+    double Tmax;
     int input_port;
     int output_port;
     int seed;
@@ -35,6 +36,7 @@ void printArgs(const ArgOptionsSim *a) {
     printf("a->seed = %d\n", a->seed);
     printf("a->input_port = %d\n", a->input_port);
     printf("a->output_port = %d\n", a->output_port);
+    printf("a->Tmax = %f\n", a->Tmax);
 }
 
 void usageSim(void) {
@@ -46,6 +48,7 @@ void usageSim(void) {
     printf("\t-i - file for input spikes\n");
     printf("\t-o - file for output spikes\n");
     printf("\t-l - yes/no to learn\n");
+    printf("\t-T - run sim till that simtime value\n");
     printf("\t-seed - integer seed\n");
     printf("\t-ip - port for input spikes\n");
     printf("\t-op - port for output spikes\n");
@@ -69,8 +72,17 @@ ArgOptionsSim parseSimOptions(int argc, char **argv) {
     args.seed = time(NULL);
     args.input_port = -1;
     args.output_port = -1;
+    args.Tmax = 0;
     if(argc == 1) usageSim();
     while ((argc > 1) && (argv[1][0] == '-')) {
+        if(strcmp(argv[1], "-T") == 0) {                
+            if(argc == 2) { 
+                printf("No options for -T\n");
+                usageSim();
+            }
+            args.Tmax = atof(argv[2]);
+            ++argv; --argc;
+        } else
         if(strcmp(argv[1], "-m") == 0) {                
             if(argc == 2) { 
                 printf("No options for -m\n");

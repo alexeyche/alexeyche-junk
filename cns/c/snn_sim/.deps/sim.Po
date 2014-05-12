@@ -48,8 +48,9 @@ sim.o: sim.c /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/bits/mathdef.h \
  /usr/include/x86_64-linux-gnu/bits/mathcalls.h \
  /usr/include/x86_64-linux-gnu/bits/mathinline.h util/matrix.h \
- util/util_vector_tmpl.h neuron_funcs.h io.h learn.h util/spikes_list.h \
- sim_runtime.h sim_netsim.h util/util_dlink_list_tmpl.h
+ util/util_vector_tmpl.h neuron_funcs.h io.h learn.h learn_optim.h \
+ learn_stdp.h util/spikes_list.h sim_runtime.h sim_netsim.h \
+ util/util_dlink_list_tmpl.h
 
 /usr/include/stdc-predef.h:
 
@@ -204,6 +205,10 @@ neuron_funcs.h:
 io.h:
 
 learn.h:
+
+learn_optim.h:
+
+learn_stdp.h:
 
 util/spikes_list.h:
 

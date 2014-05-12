@@ -48,8 +48,8 @@ layer.o: layer.c /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/bits/mathdef.h \
  /usr/include/x86_64-linux-gnu/bits/mathcalls.h \
  /usr/include/x86_64-linux-gnu/bits/mathinline.h util/matrix.h \
- util/util_vector_tmpl.h neuron_funcs.h io.h learn.h \
- util/util_vector_tmpl.c
+ util/util_vector_tmpl.h neuron_funcs.h io.h learn.h learn_optim.h \
+ learn_stdp.h util/util_vector_tmpl.c
 
 /usr/include/stdc-predef.h:
 
@@ -202,5 +202,9 @@ neuron_funcs.h:
 io.h:
 
 learn.h:
+
+learn_optim.h:
+
+learn_stdp.h:
 
 util/util_vector_tmpl.c:

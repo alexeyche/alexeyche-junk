@@ -14,6 +14,7 @@ Constants* createConstants(const char *filename) {
     c->weight_decay_factor = TEMPLATE(createVector,double)();
     c->lrate = TEMPLATE(createVector,double)();
     c->adex = (AdExConstants*) malloc( sizeof(AdExConstants) );
+    c->res_stdp = (ResourceSTDPConstants*) malloc( sizeof(ResourceSTDPConstants) );
     if (ini_parse(filename, file_handler, c) < 0) {
         printf("Can't load %s\n", filename);
         return(NULL);
@@ -41,6 +42,7 @@ void deleteConstants(Constants *c) {
     TEMPLATE(deleteVector,double)(c->weight_decay_factor);
     TEMPLATE(deleteVector,double)(c->lrate);
     free(c->adex);
+    free(c->res_stdp);
     free(c);
 }
 
@@ -195,19 +197,34 @@ int file_handler(void* user, const char* section, const char* name,
     if (MATCH("net", "axonal_delays_rate")) {
         c->axonal_delays_rate = atof(value);
     } else 
-    if (MATCH("optimal stdp parameters", "tc")) {
+    if (MATCH("optimal stdp", "tc")) {
         c->tc = atof(value);
     } else 
-    if (MATCH("optimal stdp parameters", "mean_p_dur")) {
+    if (MATCH("optimal stdp", "mean_p_dur")) {
         c->mean_p_dur = atof(value);
     } else 
-    if (MATCH("optimal stdp parameters", "target_rate")) {
+    if (MATCH("optimal stdp", "target_rate")) {
         c->target_rate = atof(value);
     } else 
-     if (MATCH("optimal stdp parameters", "target_rate_factor")) {
+    if (MATCH("optimal stdp", "target_rate_factor")) {
         c->target_rate_factor = atof(value);
     } else 
-    if (MATCH("optimal stdp parameters", "weight_decay_factor")) {
+    if (MATCH("resource stdp", "A+")) {
+        c->res_stdp->Aplus = atof(value);
+    } else 
+    if (MATCH("resource stdp", "A-")) {
+        c->res_stdp->Aminus = atof(value);
+    } else 
+    if (MATCH("resource stdp", "tau+")) {
+        c->res_stdp->tau_plus = atof(value);
+    } else 
+    if (MATCH("resource stdp", "tau-")) {
+        c->res_stdp->tau_minus = atof(value);
+    } else 
+    if (MATCH("resource stdp", "tau_res")) {
+        c->res_stdp->tau_res = atof(value);
+    } else 
+    if (MATCH("optimal stdp", "weight_decay_factor")) {
         fillDoubleVector(c->weight_decay_factor, value);
     } else 
     if (MATCH("learn", "lrate")) {
@@ -216,6 +233,9 @@ int file_handler(void* user, const char* section, const char* name,
     if (MATCH("learn", "learning_rule")) {
         if(strcmp(value, "OptimalSTDP") == 0) {
             c->learning_rule = EOptimalSTDP;
+        } else 
+        if(strcmp(value, "ResourceSTDP") == 0) {
+            c->learning_rule = EResourceSTDP;
         } else {
             printf("Can't find learning rule %s\n", value);
             exit(1);

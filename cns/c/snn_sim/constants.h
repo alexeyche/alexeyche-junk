@@ -8,7 +8,7 @@
 #include <util/util_vector.h>
 #include <util/ini.h>
 
-typedef enum { EOptimalSTDP } learning_rule_t;
+typedef enum { EOptimalSTDP, EResourceSTDP } learning_rule_t;
 
 typedef struct {
     double C;
@@ -20,6 +20,14 @@ typedef struct {
     double a;
     double b;
 } AdExConstants;
+
+typedef struct {
+    double Aplus;
+    double Aminus;
+    double tau_plus;
+    double tau_minus;
+    double tau_res;
+} ResourceSTDPConstants;
 
 typedef struct {
     double e0;
@@ -86,6 +94,7 @@ typedef struct {
     
     learning_rule_t learning_rule;
     AdExConstants *adex;
+    ResourceSTDPConstants *res_stdp;
 } Constants;
 
 int file_handler(void* user, const char* section, const char* name,

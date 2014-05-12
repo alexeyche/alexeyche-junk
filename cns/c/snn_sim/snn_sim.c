@@ -9,7 +9,6 @@
 
 
 
-
 int main(int argc, char **argv) {
 	
 	ArgOptionsSim a = parseSimOptions(argc, argv);
@@ -38,12 +37,16 @@ int main(int argc, char **argv) {
     }
 
     configureNetSpikesSim(s, a.input_spikes_file, c);
+
     configureSynapses(s, c);
 //    printSRMLayer(s->layers->array[0]);
 //    printSRMLayer(s->layers->array[1]);
 //    printSpikesList(s->ns->net);
 //    printConnMap(s->ns);
 //    printInputSpikesQueue(s->ns);
+    if(a.Tmax > 0) {
+        s->rt->Tmax = a.Tmax;
+    }
     runSim(s);
     
     if(a.input_port>0) {
@@ -59,19 +62,34 @@ int main(int argc, char **argv) {
             Matrix *mu = vectorArrayToMatrix(l->stat_u, l->N);
             TEMPLATE(insertVector,pMatrix)(mv, mu);
             
-            TOptimalSTDP *ls = (TOptimalSTDP*)l->ls_t;
-            Matrix *mB = vectorArrayToMatrix(ls->stat_B, l->N);
+            if(c->learning_rule == EOptimalSTDP) {
+                TOptimalSTDP *ls = (TOptimalSTDP*)l->ls_t;
+                Matrix *mB = vectorArrayToMatrix(ls->stat_B, l->N);
+                TEMPLATE(insertVector,pMatrix)(mv, mB);
 
-            TEMPLATE(insertVector,pMatrix)(mv, mB);
-            
+                for(size_t ni=0; ni < l->N; ni++) {
+                    Matrix *mC = vectorArrayToMatrix(ls->stat_C[ni], l->nconn[ni]);
+                    TEMPLATE(insertVector,pMatrix)(mv, mC);
+                }
+            } else
+            if(c->learning_rule == EResourceSTDP) {
+                TResourceSTDP *ls = (TResourceSTDP*)l->ls_t;
+                Matrix *m_res = vectorArrayToMatrix(ls->stat_res, l->N);
+                TEMPLATE(insertVector,pMatrix)(mv, m_res);
+
+                Matrix *m_y_tr = vectorArrayToMatrix(ls->stat_y_tr, l->N);
+                TEMPLATE(insertVector,pMatrix)(mv, m_y_tr);
+
+                for(size_t ni=0; ni < l->N; ni++) {
+                    Matrix *m_x_tr = vectorArrayToMatrix(ls->stat_x_tr[ni], l->nconn[ni]);
+                    TEMPLATE(insertVector,pMatrix)(mv, m_x_tr);
+                }
+            }
             for(size_t ni=0; ni < l->N; ni++) {
                 Matrix *mSyn = vectorArrayToMatrix(l->stat_syn[ni], l->nconn[ni]);
                 TEMPLATE(insertVector,pMatrix)(mv, mSyn);
             }
-            for(size_t ni=0; ni < l->N; ni++) {
-                Matrix *mC = vectorArrayToMatrix(ls->stat_C[ni], l->nconn[ni]);
-                TEMPLATE(insertVector,pMatrix)(mv, mC);
-            }
+            
             for(size_t ni=0; ni < l->N; ni++) {
                 Matrix *mdW = vectorArrayToMatrix(l->stat_W[ni], l->nconn[ni]);
                 TEMPLATE(insertVector,pMatrix)(mv, mdW);

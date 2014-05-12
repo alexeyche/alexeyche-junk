@@ -17,13 +17,15 @@
 #include <neuron_funcs.h>
 #include <io.h>
 #include <learn.h>
+#include <learn_optim.h>
+#include <learn_stdp.h>
 
 #define SYN_ACT_TOL 0.0001 // value of synapse needed to delete 
 
 #define BACKPROP_POT 0
 #define SFA 1
 #define REFR 1
-#define FS_INH 0
+#define FS_INH 1
 
 typedef enum {EXC, INH} nspec_t;
 

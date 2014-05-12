@@ -58,10 +58,10 @@ void configureNetSpikesSim(Sim *s, const char *input_spikes_filename, Constants 
         for(size_t ri=0; ri<timeline_m->nrow*timeline_m->ncol; ri++) {
             TEMPLATE(insertVector,double)(s->rt->reset_timeline, timeline_m->vals[ri]);
         }
-        Matrix *classes_m = ml->array[2];
-        for(size_t ri=0; ri<classes_m->nrow*classes_m->ncol; ri++) {
-            TEMPLATE(insertVector,ind)(s->rt->pattern_classes, classes_m->vals[ri]);
-        }
+        //Matrix *classes_m = ml->array[2];
+        //for(size_t ri=0; ri<classes_m->nrow*classes_m->ncol; ri++) {
+        //    TEMPLATE(insertVector,ind)(s->rt->pattern_classes, classes_m->vals[ri]);
+        //}
     
         TEMPLATE(deleteVector,pMatrix)(ml);
     }

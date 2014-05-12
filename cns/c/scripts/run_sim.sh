@@ -5,13 +5,13 @@ CWD=$(dirname $CWD_SCR)
 
 
 function usage {
-    echo "$0 -w WORK_DIR -s -l -e EPOCHS -d 60000 INPUT_FILE1 [INPUT_FILE2]"
+    echo "$0 -w WORK_DIR -s -l -e EPOCHS INPUT_FILE1 [INPUT_FILE2]"
 }
 
 ulimit -c unlimited
 
 pushd $CWD &> /dev/null
-SRM_SIM="../bin/srm_sim"
+SRM_SIM="../bin/snn_sim"
 
 INPUT_FILES=
 WORK_DIR=
@@ -21,14 +21,13 @@ LEARN="no"
 JOBS=8
 
 # Enumerating options
-while getopts "j:w:hsle:d:" opt; do
+while getopts "j:w:hsle:" opt; do
     case "$opt" in
         w) WORK_DIR=${OPTARG} ;;
         s) STAT_SAVE="yes" ;;
         l) LEARN="yes" ;;
         e) EPOCH=${OPTARG} ;; 
         j) JOBS=${OPTARG} ;;
-        d) DURATION_OF_INPUT_FILE=${OPTARG} ;;
         h) usage && exit 0 ;;
         *) usage && exit 1 ;;
     esac
@@ -41,7 +40,6 @@ INPUT_FILES_DIR=$(for f in $INPUT_FILES; do dirname $f; done | sort -n | uniq)
 INPUT_FILES_BN=$(for f in $INPUT_FILES; do basename $f; done | sort -n)
 MAX_INPUT_FILES=$(echo $INPUT_FILES | wc -w)
 
-DUR=0
 MIN_EP=1
 MAX_EP=$EPOCH
 
@@ -50,13 +48,12 @@ if [ -d "$WORK_DIR" ]; then
     RESP="xxx"
     while true; do
         if [ "$RESP" == "y" ]; then
-            DUR=$((DURATION_OF_INPUT_FILE*MIN_EP))
             MIN_EP=$((LAST_EP+1))
             MAX_EP=$((LAST_EP+EPOCH))
             break
         elif [ "$RESP" == "n" ]; then
             rm -rf $WORK_DIR/*
-            cp ../srm_sim/constants.ini $WORK_DIR
+            cp ../snn_sim/constants.ini $WORK_DIR
             break
         else 
             read -p "$(basename $WORK_DIR) already exists and $LAST_EP epochs was done here. Continue learning? (y/n): " RESP
@@ -64,7 +61,7 @@ if [ -d "$WORK_DIR" ]; then
     done        
 else 
     mkdir -p $WORK_DIR
-    cp ../srm_sim/constants.ini $WORK_DIR
+    cp ../snn_sim/constants.ini $WORK_DIR
 fi   
 
 function get_const {
@@ -72,6 +69,7 @@ function get_const {
 }
 
 MEAN_P_DUR=$(get_const mean_p_dur)
+LEARNING_RULE=$(get_const learning_rule)
 
 INP_ITER=1
 EPOCHS=$(seq $MIN_EP $MAX_EP)
@@ -87,8 +85,10 @@ for EP in $EPOCHS; do
         fi        
     fi    
     LEARN=yes
-    if [ $DUR -lt $MEAN_P_DUR ]; then
+    TMAX_OPT=
+    if [ $EP -eq 1 ] && [ "$LEARNING_RULE" == "OptimalSTDP" ]; then
         LEARN=no
+        TMAX_OPT=" -T $MEAN_P_DUR"
     fi        
 
     OUTPUT_SPIKES=$WORK_DIR/${EPOCH_SFX}output_spikes.bin
@@ -99,7 +99,7 @@ for EP in $EPOCHS; do
         STAT_OPT="-s $WORK_DIR/${EPOCH_SFX}stat.bin"
     fi    
     INPUT_FILE=$INPUT_FILES_DIR/$(echo $INPUT_FILES_BN | cut -d ' ' -f $INP_ITER)
-    $SRM_SIM -c $WORK_DIR/constants.ini -i $INPUT_FILE -o $OUTPUT_SPIKES $STAT_OPT $MODEL_TO_LOAD_OPT -ms $MODEL_FILE -l $LEARN -j $JOBS &> $OUTPUT_FILE
+    $SRM_SIM -c $WORK_DIR/constants.ini -i $INPUT_FILE -o $OUTPUT_SPIKES $STAT_OPT $MODEL_TO_LOAD_OPT -ms $MODEL_FILE -l $LEARN -j $JOBS $TMAX_OPT &> $OUTPUT_FILE
     if [ "$?" -ne 0 ]; then
         echo "Not null exit code ($?)"
         exit $?
@@ -108,7 +108,6 @@ for EP in $EPOCHS; do
     if [ $INP_ITER -gt $MAX_INPUT_FILES ]; then
         INP_ITER=1
     fi        
-    DUR=$((DUR+DURATION_OF_INPUT_FILE))
 done
 
 
