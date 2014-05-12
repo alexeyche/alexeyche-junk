@@ -2,18 +2,18 @@
 #define UTIL_VECTOR_H
 
 #include <core.h>
-#include <templates.h>
+#include <util/templates.h>
 #include <string.h>
 
-#include <templates_clean.h>
+#include <util/templates_clean.h>
 #define T double
 #include "util_vector_tmpl.h"
 
-#include <templates_clean.h>
+#include <util/templates_clean.h>
 #define T ind
 #include "util_vector_tmpl.h"
 
-#include <templates_clean.h>
+#include <util/templates_clean.h>
 #define T uchar
 #include "util_vector_tmpl.h"
 

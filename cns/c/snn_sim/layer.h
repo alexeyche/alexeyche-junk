@@ -15,24 +15,17 @@
 #include <util/matrix.h>
 
 #include <neuron_funcs.h>
-#include <io.h>
+#include <util/io.h>
 #include <learn.h>
-<<<<<<< HEAD:cns/c/snn_sim/layer.h
-#include <learn_optim.h>
-#include <learn_stdp.h>
-=======
->>>>>>> 318e8ea01391cb34992d34a456f378d5952f3290:cns/c/snn_sim/layer.h
+#include <learn/optim.h>
+#include <learn/res_stdp.h>
 
 #define SYN_ACT_TOL 0.0001 // value of synapse needed to delete 
 
 #define BACKPROP_POT 0
 #define SFA 1
 #define REFR 1
-<<<<<<< HEAD:cns/c/snn_sim/layer.h
-#define FS_INH 1
-=======
 #define FS_INH 0
->>>>>>> 318e8ea01391cb34992d34a456f378d5952f3290:cns/c/snn_sim/layer.h
 
 typedef enum {EXC, INH} nspec_t;
 
@@ -70,9 +63,10 @@ struct SRMLayer {
     
     double *p_set;
     //stat
-    bool saveStat;
+    unsigned char statLevel;
     doubleVector **stat_u;
     doubleVector **stat_p;
+    doubleVector **stat_fired;
     doubleVector ***stat_W;
     doubleVector ***stat_syn;
 };
@@ -81,7 +75,7 @@ struct SRMLayer {
 typedef struct SRMLayer SRMLayer;
 typedef SRMLayer* pSRMLayer;
 
-#include <templates_clean.h>
+#include <util/templates_clean.h>
 #define T pSRMLayer
 #define DESTRUCT deleteSRMLayer
 #include <util/util_vector_tmpl.h>
@@ -94,7 +88,7 @@ typedef struct SynSpike {
 
 
 
-SRMLayer* createSRMLayer(size_t N, size_t *glob_idx, bool saveStat);
+SRMLayer* createSRMLayer(size_t N, size_t *glob_idx, unsigned char statLevel);
 void printSRMLayer(SRMLayer *l);
 void deleteSRMLayer(SRMLayer *l);
 void configureSRMLayer(SRMLayer *l, const indVector *inputIDs, const indVector *outputIDs, Constants *c);

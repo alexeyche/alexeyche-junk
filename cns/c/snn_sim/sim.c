@@ -1,5 +1,5 @@
 
-#include "sim.h"
+#include <sim.h>
 
 Sim* createSim(size_t nthreads) {
     Sim *s = (Sim*) malloc(sizeof(Sim));

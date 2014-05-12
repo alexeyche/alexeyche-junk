@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <templates.h>
+#include <util/templates.h>
 #include <util/util_vector.h>
 
 typedef struct {
@@ -17,7 +17,7 @@ typedef struct {
 
 typedef Matrix* pMatrix;
 
-#include <templates_clean.h>
+#include <util/templates_clean.h>
 #define T pMatrix
 #define DESTRUCT deleteMatrix
 #include <util/util_vector_tmpl.h>

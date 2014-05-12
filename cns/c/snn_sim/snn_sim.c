@@ -1,11 +1,11 @@
 #define _POSIX_C_SOURCE 200809L
 
 
-#include "core.h"
-#include "arg_opt.h"
+#include <core.h>
+#include <args/sim_opts.h>
 
-#include "sim.h"
-#include "io.h"
+#include <sim.h>
+#include <util/io.h>
 
 
 
@@ -31,10 +31,17 @@ int main(int argc, char **argv) {
     if(a.model_file) model_to_load = strdup(a.model_file);
     if(a.model_file_load) model_to_load = strdup(a.model_file_load); 
     
+    unsigned char statLevel = 0;
+    if(saveStat) {
+        statLevel = 2;
+        if(a.reducedStat) {
+            statLevel = 1;
+        }
+    }        
     if(model_to_load) {
-        loadLayersFromFile(s, model_to_load, c, saveStat);        
+        loadLayersFromFile(s, model_to_load, c, statLevel);
     } else {
-        configureLayersSim(s, c, saveStat);    
+        configureLayersSim(s, c, statLevel);
     }
 
     configureNetSpikesSim(s, a.input_spikes_file, c);
@@ -50,31 +57,35 @@ int main(int argc, char **argv) {
         printf("Not implemented\n");        
     }
 
-    if(saveStat) {
+    if(statLevel > 0) {
         pMatrixVector *mv = TEMPLATE(createVector,pMatrix)();
         for(size_t li=0; li < s->layers->size; li++) {
             SRMLayer *l = s->layers->array[li];
             Matrix *mp = vectorArrayToMatrix(l->stat_p, l->N);
             TEMPLATE(insertVector,pMatrix)(mv, mp);
-            Matrix *mu = vectorArrayToMatrix(l->stat_u, l->N);
-            TEMPLATE(insertVector,pMatrix)(mv, mu);
-            
-            TOptimalSTDP *ls = (TOptimalSTDP*)l->ls_t;
-            Matrix *mB = vectorArrayToMatrix(ls->stat_B, l->N);
+            Matrix *mf = vectorArrayToMatrix(l->stat_fired, l->N);
+            TEMPLATE(insertVector,pMatrix)(mv, mf);
+            if(statLevel > 1) {
+                Matrix *mu = vectorArrayToMatrix(l->stat_u, l->N);
+                TEMPLATE(insertVector,pMatrix)(mv, mu);
+                
+                TOptimalSTDP *ls = (TOptimalSTDP*)l->ls_t;
+                Matrix *mB = vectorArrayToMatrix(ls->stat_B, l->N);
 
-            TEMPLATE(insertVector,pMatrix)(mv, mB);
-            
-            for(size_t ni=0; ni < l->N; ni++) {
-                Matrix *mSyn = vectorArrayToMatrix(l->stat_syn[ni], l->nconn[ni]);
-                TEMPLATE(insertVector,pMatrix)(mv, mSyn);
-            }
-            for(size_t ni=0; ni < l->N; ni++) {
-                Matrix *mC = vectorArrayToMatrix(ls->stat_C[ni], l->nconn[ni]);
-                TEMPLATE(insertVector,pMatrix)(mv, mC);
-            }
-            for(size_t ni=0; ni < l->N; ni++) {
-                Matrix *mdW = vectorArrayToMatrix(l->stat_W[ni], l->nconn[ni]);
-                TEMPLATE(insertVector,pMatrix)(mv, mdW);
+                TEMPLATE(insertVector,pMatrix)(mv, mB);
+                
+                for(size_t ni=0; ni < l->N; ni++) {
+                    Matrix *mSyn = vectorArrayToMatrix(l->stat_syn[ni], l->nconn[ni]);
+                    TEMPLATE(insertVector,pMatrix)(mv, mSyn);
+                }
+                for(size_t ni=0; ni < l->N; ni++) {
+                    Matrix *mC = vectorArrayToMatrix(ls->stat_C[ni], l->nconn[ni]);
+                    TEMPLATE(insertVector,pMatrix)(mv, mC);
+                }
+                for(size_t ni=0; ni < l->N; ni++) {
+                    Matrix *mdW = vectorArrayToMatrix(l->stat_W[ni], l->nconn[ni]);
+                    TEMPLATE(insertVector,pMatrix)(mv, mdW);
+                }
             }
         }            
      
@@ -90,9 +101,16 @@ int main(int argc, char **argv) {
         saveLayersToFile(s, model_to_save);
     }
     if(a.output_spikes_file) {
-        Matrix *spikes = vectorArrayToMatrix(s->ns->net->list, s->ns->net->size);
         pMatrixVector *mv = TEMPLATE(createVector,pMatrix)();
+        
+        Matrix *spikes = vectorArrayToMatrix(s->ns->net->list, s->ns->net->size);
         TEMPLATE(insertVector,pMatrix)(mv, spikes);
+        
+        Matrix *timeline = vectorArrayToMatrix(&s->rt->reset_timeline, 1);
+        TEMPLATE(insertVector,pMatrix)(mv, timeline);
+
+        Matrix *classes  = vectorArrayToMatrix(&s->rt->pattern_classes, 1);
+        TEMPLATE(insertVector,pMatrix)(mv, classes);
 
         saveMatrixList(a.output_spikes_file, mv);
 

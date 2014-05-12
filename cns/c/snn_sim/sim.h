@@ -7,7 +7,7 @@
 #include <constants.h>
 #include <util/spikes_list.h>
 #include <util/matrix.h>
-#include <io.h>
+#include <util/io.h>
 
 #include <pthread.h>
 
@@ -20,8 +20,8 @@
 #endif
 #define P( condition ) {if( (condition) != 0 ) { printf( "\n FAILURE in %s, line %d\n", __FILE__, __LINE__ );exit( 1 );}}
 
-#include <sim_runtime.h>
-#include <sim_netsim.h>
+#include <sim/runtime.h>
+#include <sim/netsim.h>
 
 
 
@@ -67,7 +67,7 @@ void appendLayerSim(Sim *s, SRMLayer *l);
 // configure
 size_t getLayerIdOfNeuron(Sim *s, size_t n_id);
 void deleteSim(Sim *s);
-void configureLayersSim(Sim *s, Constants *c, bool saveStat);
+void configureLayersSim(Sim *s, Constants *c, unsigned char statLevel);
 SimRuntime* createRuntime();
 void deleteRuntime(SimRuntime *sr);
 void configureNetSpikesSim(Sim *s, const char *input_spikes_filename, Constants *c);
@@ -75,7 +75,7 @@ void configureSimAttr(Sim *s);
 void configureSynapses(Sim *s, Constants *c);
 
 // serialize
-void loadLayersFromFile(Sim *s, const char *model_fname, Constants *c, bool saveStat);
+void loadLayersFromFile(Sim *s, const char *model_fname, Constants *c, unsigned char statLevel);
 void saveLayersToFile(Sim *s, const char *model_file);
 
 // run

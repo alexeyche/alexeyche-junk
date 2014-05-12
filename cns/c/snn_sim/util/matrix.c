@@ -1,7 +1,7 @@
 
 #include "matrix.h"
 
-#include <templates_clean.h>
+#include <util/templates_clean.h>
 #define T pMatrix
 #define DESTRUCT deleteMatrix
 #include <util/util_vector_tmpl.c>

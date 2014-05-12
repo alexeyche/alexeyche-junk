@@ -14,10 +14,7 @@ Constants* createConstants(const char *filename) {
     c->weight_decay_factor = TEMPLATE(createVector,double)();
     c->lrate = TEMPLATE(createVector,double)();
     c->adex = (AdExConstants*) malloc( sizeof(AdExConstants) );
-<<<<<<< HEAD
     c->res_stdp = (ResourceSTDPConstants*) malloc( sizeof(ResourceSTDPConstants) );
-=======
->>>>>>> 318e8ea01391cb34992d34a456f378d5952f3290
     if (ini_parse(filename, file_handler, c) < 0) {
         printf("Can't load %s\n", filename);
         return(NULL);
@@ -45,10 +42,7 @@ void deleteConstants(Constants *c) {
     TEMPLATE(deleteVector,double)(c->weight_decay_factor);
     TEMPLATE(deleteVector,double)(c->lrate);
     free(c->adex);
-<<<<<<< HEAD
     free(c->res_stdp);
-=======
->>>>>>> 318e8ea01391cb34992d34a456f378d5952f3290
     free(c);
 }
 
@@ -77,61 +71,61 @@ int file_handler(void* user, const char* section, const char* name,
     Constants* c = (Constants*)user;
 
     #define MATCH(s, n) strcmp(section, s) == 0 && strcmp(name, n) == 0
-    if (MATCH("srm", "e0")) {
+    if (MATCH("srm neuron", "e0")) {
         c->e0 = atof(value);
     } else 
-    if (MATCH("srm", "e_exc")) {
+    if (MATCH("srm neuron", "e_exc")) {
         c->e_exc = atof(value);
     } else 
-     if (MATCH("srm", "e_inh")) {
+     if (MATCH("srm neuron", "e_inh")) {
         c->e_inh = atof(value);
     } else 
-    if (MATCH("srm", "ts")) {
+    if (MATCH("srm neuron", "ts")) {
         c->ts = atof(value);
     } else 
-    if (MATCH("srm", "tm")) {
+    if (MATCH("srm neuron", "tm")) {
         c->tm = atof(value);
     } else 
-    if (MATCH("srm", "tsr")) {
+    if (MATCH("srm neuron", "tsr")) {
         c->tsr = atof(value);
     } else 
-    if (MATCH("srm", "r0")) {
+    if (MATCH("srm neuron", "r0")) {
         c->r0 = atof(value);
     } else 
-    if (MATCH("srm", "alpha")) {
+    if (MATCH("srm neuron", "alpha")) {
         c->alpha = atof(value);
     } else 
-    if (MATCH("srm", "beta")) {
+    if (MATCH("srm neuron", "beta")) {
         c->beta = atof(value);
     } else 
-    if (MATCH("srm", "u_tr")) {
+    if (MATCH("srm neuron", "u_tr")) {
         c->u_tr = atof(value);
     } else 
-    if (MATCH("srm", "gain_factor")) {
+    if (MATCH("srm neuron", "gain_factor")) {
         c->gain_factor = atof(value);
     } else 
-    if (MATCH("srm", "pr")) {
+    if (MATCH("srm neuron", "pr")) {
         c->pr = atof(value);
     } else 
-    if (MATCH("srm", "u_rest")) {
+    if (MATCH("srm neuron", "u_rest")) {
         c->u_rest = atof(value);
     } else 
-    if (MATCH("srm", "ta")) {
+    if (MATCH("srm neuron", "ta")) {
         c->ta = atof(value);
     } else 
-    if (MATCH("srm", "tr")) {
+    if (MATCH("srm neuron", "tr")) {
         c->tr = atof(value);
     } else 
-    if (MATCH("srm", "tb")) {
+    if (MATCH("srm neuron", "tb")) {
         c->tb = atof(value);
     } else     
-    if (MATCH("srm", "qa")) {
+    if (MATCH("srm neuron", "qa")) {
         c->qa = atof(value);
     } else 
-    if (MATCH("srm", "qr")) {
+    if (MATCH("srm neuron", "qr")) {
         c->qr = atof(value);
     } else 
-    if (MATCH("srm", "qb")) {
+    if (MATCH("srm neuron", "qb")) {
         c->qb = atof(value);
     } else 
     if (MATCH("sim", "dt")) {
@@ -203,7 +197,6 @@ int file_handler(void* user, const char* section, const char* name,
     if (MATCH("net", "axonal_delays_rate")) {
         c->axonal_delays_rate = atof(value);
     } else 
-<<<<<<< HEAD
     if (MATCH("optimal stdp", "tc")) {
         c->tc = atof(value);
     } else 
@@ -232,21 +225,6 @@ int file_handler(void* user, const char* section, const char* name,
         c->res_stdp->tau_res = atof(value);
     } else 
     if (MATCH("optimal stdp", "weight_decay_factor")) {
-=======
-    if (MATCH("optimal stdp parameters", "tc")) {
-        c->tc = atof(value);
-    } else 
-    if (MATCH("optimal stdp parameters", "mean_p_dur")) {
-        c->mean_p_dur = atof(value);
-    } else 
-    if (MATCH("optimal stdp parameters", "target_rate")) {
-        c->target_rate = atof(value);
-    } else 
-     if (MATCH("optimal stdp parameters", "target_rate_factor")) {
-        c->target_rate_factor = atof(value);
-    } else 
-    if (MATCH("optimal stdp parameters", "weight_decay_factor")) {
->>>>>>> 318e8ea01391cb34992d34a456f378d5952f3290
         fillDoubleVector(c->weight_decay_factor, value);
     } else 
     if (MATCH("learn", "lrate")) {
@@ -255,12 +233,9 @@ int file_handler(void* user, const char* section, const char* name,
     if (MATCH("learn", "learning_rule")) {
         if(strcmp(value, "OptimalSTDP") == 0) {
             c->learning_rule = EOptimalSTDP;
-<<<<<<< HEAD
         } else 
         if(strcmp(value, "ResourceSTDP") == 0) {
             c->learning_rule = EResourceSTDP;
-=======
->>>>>>> 318e8ea01391cb34992d34a456f378d5952f3290
         } else {
             printf("Can't find learning rule %s\n", value);
             exit(1);

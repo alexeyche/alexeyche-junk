@@ -1,12 +1,12 @@
 
 #include "layer.h"
 
-#include <templates_clean.h>
+#include <util/templates_clean.h>
 #define T pSRMLayer
 #define DESTRUCT deleteSRMLayer
 #include <util/util_vector_tmpl.c>
 
-SRMLayer* createSRMLayer(size_t N, size_t *glob_idx, bool saveStat) {
+SRMLayer* createSRMLayer(size_t N, size_t *glob_idx, unsigned char statLevel) {
     SRMLayer *l = (SRMLayer*)malloc(sizeof(SRMLayer));
     l->N = N;
     l->ids = (size_t*)malloc( l->N*sizeof(size_t));
@@ -39,15 +39,22 @@ SRMLayer* createSRMLayer(size_t N, size_t *glob_idx, bool saveStat) {
     l->fired = (unsigned char*)malloc( l->N*sizeof(unsigned char));
     l->pacc = (double*)malloc( l->N*sizeof(double));
     l->syn_fired = (unsigned char**)malloc( l->N*sizeof(unsigned char*));
-    l->saveStat = saveStat;
-    if(l->saveStat) {
-        l->stat_u = (doubleVector**) malloc( l->N*sizeof(doubleVector*));
+    l->statLevel = statLevel;
+    if(l->statLevel > 0) {
         l->stat_p = (doubleVector**) malloc( l->N*sizeof(doubleVector*));
-        l->stat_W = (doubleVector***) malloc( l->N*sizeof(doubleVector**));
-        l->stat_syn = (doubleVector***) malloc( l->N*sizeof(doubleVector**));
+        l->stat_fired = (doubleVector**) malloc( l->N*sizeof(doubleVector*));
         for(size_t ni=0; ni<l->N; ni++) {
-            l->stat_u[ni] = TEMPLATE(createVector,double)();
             l->stat_p[ni] = TEMPLATE(createVector,double)();
+            l->stat_fired[ni] = TEMPLATE(createVector,double)(); 
+
+        }
+        if(l->statLevel > 1) {
+            l->stat_u = (doubleVector**) malloc( l->N*sizeof(doubleVector*));
+            l->stat_W = (doubleVector***) malloc( l->N*sizeof(doubleVector**));
+            l->stat_syn = (doubleVector***) malloc( l->N*sizeof(doubleVector**));
+            for(size_t ni=0; ni<l->N; ni++) {
+                l->stat_u[ni] = TEMPLATE(createVector,double)();
+            }
         }
     }
     l->ls_t = NULL;
@@ -64,13 +71,16 @@ void deleteSRMLayer(SRMLayer *l) {
             free(l->syn_fired[ni]);
         }
         TEMPLATE(deleteLList,ind)(l->active_syn_ids[ni]);
-        if(l->saveStat) {
-            TEMPLATE(deleteVector,double)(l->stat_u[ni]);
+        if(l->statLevel > 0) {
             TEMPLATE(deleteVector,double)(l->stat_p[ni]);
-            for(size_t con_i=0; con_i < l->nconn[ni]; con_i++) {
-                TEMPLATE(deleteVector,double)(l->stat_W[ni][con_i]);
-                TEMPLATE(deleteVector,double)(l->stat_syn[ni][con_i]);
-            }
+            TEMPLATE(deleteVector,double)(l->stat_fired[ni]);
+            if(l->statLevel > 1) {
+                TEMPLATE(deleteVector,double)(l->stat_u[ni]);
+                for(size_t con_i=0; con_i < l->nconn[ni]; con_i++) {
+                    TEMPLATE(deleteVector,double)(l->stat_W[ni][con_i]);
+                    TEMPLATE(deleteVector,double)(l->stat_syn[ni][con_i]);
+                }
+            }                
         }
     }
     if(l->ls_t)
@@ -92,11 +102,14 @@ void deleteSRMLayer(SRMLayer *l) {
     free(l->syn_fired);
     free(l->pacc);
     free(l->axon_del);
-    if(l->saveStat) {    
-        free(l->stat_u);
+    if(l->statLevel >0) {    
         free(l->stat_p);
-        free(l->stat_W);
-        free(l->stat_syn);
+        free(l->stat_fired);
+        if(l->statLevel > 1) {        
+            free(l->stat_u);
+            free(l->stat_W);
+            free(l->stat_syn);
+        }            
     }
     free(l);
 }
@@ -159,6 +172,7 @@ double getSynDelay(SRMLayer *l, const size_t *ni, const size_t *syn_id) {
 
 }
 
+
 void setSynapseSpeciality(SRMLayer *l, size_t ni, size_t syn_id, double spec) {
     l->syn_spec[ni][syn_id] = spec;
 }
@@ -171,7 +185,7 @@ void allocSynData(SRMLayer *l) {
         l->syn_spec[ni] = (double*) malloc(l->nconn[ni]*sizeof(double));
         l->syn_fired[ni] = (unsigned char*) malloc(l->nconn[ni]*sizeof(unsigned char));
         l->syn_del[ni] = (double*) malloc(l->nconn[ni]*sizeof(double));
-        if(l->saveStat) {
+        if(l->statLevel > 1) {
             l->stat_W[ni] = (doubleVector**) malloc( l->nconn[ni]*sizeof(doubleVector*));
             l->stat_syn[ni] = (doubleVector**) malloc( l->nconn[ni]*sizeof(doubleVector*));
             for(size_t syn_i=0; syn_i < l->nconn[ni]; syn_i++) {
@@ -244,14 +258,10 @@ void configureSRMLayer(SRMLayer *l, const indVector *inputIDs, const indVector *
     // configure learning part 
     if( c->learning_rule == EOptimalSTDP) {
         l->ls_t = (learn_t*)init_TOptimalSTDP(l);
-<<<<<<< HEAD:cns/c/snn_sim/layer.c
     } else
     if( c->learning_rule == EResourceSTDP) {
         l->ls_t = (learn_t*)init_TResourceSTDP(l);
     } 
-=======
-    }
->>>>>>> 318e8ea01391cb34992d34a456f378d5952f3290:cns/c/snn_sim/layer.c
     
     // start values assignment 
     toStartValuesSRMLayer(l, c); 
@@ -322,13 +332,16 @@ void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constant
     }
 
 
-    if(l->saveStat) {
+    if(l->statLevel>0) {
         TEMPLATE(insertVector,double)(l->stat_p[ *id_to_sim ], p);
-        TEMPLATE(insertVector,double)(l->stat_u[ *id_to_sim ], u);
-        for(size_t con_i=0; con_i<l->nconn[ *id_to_sim ]; con_i++) {
-            TEMPLATE(insertVector,double)(l->stat_W[ *id_to_sim ][ con_i ], l->W[ *id_to_sim ][ con_i ]);
-            TEMPLATE(insertVector,double)(l->stat_syn[ *id_to_sim ][ con_i ], l->syn[ *id_to_sim ][ con_i ]);
-        }
+        TEMPLATE(insertVector,double)(l->stat_fired[ *id_to_sim ], l->fired[ *id_to_sim ]);
+        if(l->statLevel>1) {
+            TEMPLATE(insertVector,double)(l->stat_u[ *id_to_sim ], u);
+            for(size_t con_i=0; con_i<l->nconn[ *id_to_sim ]; con_i++) {
+                TEMPLATE(insertVector,double)(l->stat_W[ *id_to_sim ][ con_i ], l->W[ *id_to_sim ][ con_i ]);
+                TEMPLATE(insertVector,double)(l->stat_syn[ *id_to_sim ][ con_i ], l->syn[ *id_to_sim ][ con_i ]);
+            }
+        }            
     }
 
 
@@ -479,14 +492,10 @@ void loadSRMLayer(SRMLayer *l, Constants *c, pMatrixVector *data) {
     // configure learning part 
     if( c->learning_rule == EOptimalSTDP) {
         l->ls_t = (learn_t*)init_TOptimalSTDP(l);
-<<<<<<< HEAD:cns/c/snn_sim/layer.c
     } else
     if( c->learning_rule == EResourceSTDP) {
         l->ls_t = (learn_t*)init_TResourceSTDP(l);
     } 
-=======
-    }
->>>>>>> 318e8ea01391cb34992d34a456f378d5952f3290:cns/c/snn_sim/layer.c
  
     toStartValuesSRMLayer(l, c);
     for(size_t ni=0; ni<l->N; ni++) {  // apply values

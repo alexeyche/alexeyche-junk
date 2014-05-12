@@ -18,7 +18,7 @@ WORK_DIR=
 STAT_SAVE="no"
 EPOCH=
 LEARN="no"
-JOBS=8
+JOBS=$(cat /proc/cpuinfo | grep processor | wc -l)
 
 # Enumerating options
 while getopts "j:w:hsle:" opt; do
@@ -99,11 +99,7 @@ for EP in $EPOCHS; do
         STAT_OPT="-s $WORK_DIR/${EPOCH_SFX}stat.bin"
     fi    
     INPUT_FILE=$INPUT_FILES_DIR/$(echo $INPUT_FILES_BN | cut -d ' ' -f $INP_ITER)
-<<<<<<< HEAD
     $SRM_SIM -c $WORK_DIR/constants.ini -i $INPUT_FILE -o $OUTPUT_SPIKES $STAT_OPT $MODEL_TO_LOAD_OPT -ms $MODEL_FILE -l $LEARN -j $JOBS $TMAX_OPT &> $OUTPUT_FILE
-=======
-    $SRM_SIM -c $WORK_DIR/constants.ini -i $INPUT_FILE -o $OUTPUT_SPIKES $STAT_OPT $MODEL_TO_LOAD_OPT -ms $MODEL_FILE -l $LEARN -j $JOBS &> $OUTPUT_FILE
->>>>>>> 318e8ea01391cb34992d34a456f378d5952f3290
     if [ "$?" -ne 0 ]; then
         echo "Not null exit code ($?)"
         exit $?

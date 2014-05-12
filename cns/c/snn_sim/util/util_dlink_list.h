@@ -3,14 +3,14 @@
 
 
 #include <core.h>
-#include <templates.h>
+#include <util/templates.h>
 #include <string.h>
 
-#include <templates_clean.h>
+#include <util/templates_clean.h>
 #define T double
 #include "util_dlink_list_tmpl.h"
 
-#include <templates_clean.h>
+#include <util/templates_clean.h>
 #define T ind 
 #include "util_dlink_list_tmpl.h"
 
