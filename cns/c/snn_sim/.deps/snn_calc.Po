@@ -34,7 +34,15 @@ snn_calc.o: snn_calc.c core.h \
  /usr/include/x86_64-linux-gnu/bits/setjmp.h /usr/include/assert.h \
  /usr/local/include/libactor/list.h args/calc_opts.h util/io.h \
  util/matrix.h util/templates.h util/util_vector.h util/templates_clean.h \
- util/util_vector_tmpl.h util/util_vector_tmpl.h
+ util/util_vector_tmpl.h util/util_vector_tmpl.h /usr/include/math.h \
+ /usr/include/x86_64-linux-gnu/bits/huge_val.h \
+ /usr/include/x86_64-linux-gnu/bits/huge_valf.h \
+ /usr/include/x86_64-linux-gnu/bits/huge_vall.h \
+ /usr/include/x86_64-linux-gnu/bits/inf.h \
+ /usr/include/x86_64-linux-gnu/bits/nan.h \
+ /usr/include/x86_64-linux-gnu/bits/mathdef.h \
+ /usr/include/x86_64-linux-gnu/bits/mathcalls.h \
+ /usr/include/x86_64-linux-gnu/bits/mathinline.h calc.h
 
 core.h:
 
@@ -147,3 +155,23 @@ util/templates_clean.h:
 util/util_vector_tmpl.h:
 
 util/util_vector_tmpl.h:
+
+/usr/include/math.h:
+
+/usr/include/x86_64-linux-gnu/bits/huge_val.h:
+
+/usr/include/x86_64-linux-gnu/bits/huge_valf.h:
+
+/usr/include/x86_64-linux-gnu/bits/huge_vall.h:
+
+/usr/include/x86_64-linux-gnu/bits/inf.h:
+
+/usr/include/x86_64-linux-gnu/bits/nan.h:
+
+/usr/include/x86_64-linux-gnu/bits/mathdef.h:
+
+/usr/include/x86_64-linux-gnu/bits/mathcalls.h:
+
+/usr/include/x86_64-linux-gnu/bits/mathinline.h:
+
+calc.h:
