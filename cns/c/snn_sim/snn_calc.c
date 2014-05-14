@@ -18,7 +18,13 @@ int main(int argc, char **argv) {
      
     Matrix *probs = stats->array[0];
     Matrix *fired = stats->array[1];
-    Matrix **out = (Matrix**)malloc(sizeof(Matrix*) * fired->nrow);
+    Matrix **out_full = NULL;
+    bool fullOut = false;
+    if(a.output_file_full) {
+        out_full = (Matrix**)malloc(sizeof(Matrix*) * fired->nrow);
+        fullOut = true;
+    }
+    Matrix *out = createMatrix(fired->nrow, 3);
 
     Matrix *classes = stats->array[2];
     assert(classes->ncol == (fired->ncol - fired->ncol % (int)a.dur)/a.dur);    
@@ -42,17 +48,22 @@ int main(int argc, char **argv) {
     //    printf("%zu %d %f\n", classes_indices->array[ci], uniq_classes->array[classes_indices->array[ci]], getMatrixElement(classes, 0, ci));
     //}
     
-    calcRun(fired, probs, out, uniq_classes, classes_indices, a.dur, a.jobs);
+    calcRun(fired, probs, out, out_full, uniq_classes, classes_indices, a.dur, a.jobs, fullOut);
     
-    pMatrixVector *out_list = TEMPLATE(createVector,pMatrix)();
-    for(size_t ni=0; ni < fired->nrow; ni++) {
-        TEMPLATE(insertVector,pMatrix)(out_list, out[ni]);
+    if(fullOut) {
+        pMatrixVector *out_listf = TEMPLATE(createVector,pMatrix)();
+        for(size_t ni=0; ni < fired->nrow; ni++) {
+            TEMPLATE(insertVector,pMatrix)(out_listf, out_full[ni]);
+        }
+        saveMatrixList(a.output_file_full, out_listf);
     }
+    pMatrixVector *out_list = TEMPLATE(createVector,pMatrix)();
+    TEMPLATE(insertVector,pMatrix)(out_list, out);
     saveMatrixList(a.output_file, out_list);
      
     TEMPLATE(deleteVector,pMatrix)(out_list);
     
-    free(out);
+//    free(out);
     TEMPLATE(deleteVector,pMatrix)(stats);
     return(0);
 }    

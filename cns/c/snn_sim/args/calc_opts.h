@@ -11,6 +11,7 @@ typedef struct {
     int jobs;
     const char *stat_file;
     const char *output_file;
+    const char *output_file_full;
     double dur;
 } ArgOptionsCalc;
 
@@ -19,6 +20,7 @@ void usageCalc(void) {
     printf("\t-j - number of parallel jobs\n");
     printf("\t-s - file for stat file with probabilites and spikes\n");
     printf("\t-o - output file\n");
+    printf("\t-f - output file (full version)\n");
     printf("\t-d - duration of series\n");
     printf("\t-? - print this message\n");
     exit(8);
@@ -31,8 +33,17 @@ ArgOptionsCalc parseCalcOptions(int argc, char **argv) {
     args.stat_file = NULL;
     args.dur = 0;
     args.output_file = NULL;
+    args.output_file_full = NULL;
     if(argc == 1) usageCalc();
     while ((argc > 1) && (argv[1][0] == '-')) {
+        if(strcmp(argv[1], "-f") == 0) {                
+             if(argc == 2) { 
+                printf("No options for -f\n");
+                usageCalc();
+            }
+            args.output_file_full = strdup(argv[2]);
+            ++argv; --argc;
+        } else 
         if(strcmp(argv[1], "-o") == 0) {                
              if(argc == 2) { 
                 printf("No options for -o\n");

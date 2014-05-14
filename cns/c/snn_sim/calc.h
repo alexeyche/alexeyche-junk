@@ -21,16 +21,18 @@ pthread_barrier_t barrier;
 typedef struct CalcWorker {
     Matrix *probs;
     Matrix *fired;
-    Matrix **out;
+    Matrix *out;
+    Matrix **out_full;
     intVector *uniqClasses;
     indVector *classesIndices;
 
     double dur;
     size_t thread_id;
     size_t nthreads;
+    bool fullOut;
 } CalcWorker;
 
 void* calcRoutine(void *args);
-void calcRun(Matrix *fired, Matrix *probs, Matrix **out, intVector *uniqClasses, indVector *classesIndices, double dur, size_t jobs);
+void calcRun(Matrix *fired, Matrix *probs, Matrix *out, Matrix **out_full, intVector *uniqClasses, indVector *classesIndices, double dur, size_t jobs, bool fullOut);
 
 #endif
