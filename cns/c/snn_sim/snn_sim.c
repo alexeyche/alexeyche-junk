@@ -34,7 +34,7 @@ int main(int argc, char **argv) {
     unsigned char statLevel = 0;
     if(saveStat) {
         statLevel = 2;
-        if(a.reducedStat) {
+        if(a.calcStat) {
             statLevel = 1;
         }
     }        
@@ -63,8 +63,12 @@ int main(int argc, char **argv) {
             SRMLayer *l = s->layers->array[li];
             Matrix *mp = vectorArrayToMatrix(l->stat_p, l->N);
             TEMPLATE(insertVector,pMatrix)(mv, mp);
-            Matrix *mf = vectorArrayToMatrix(l->stat_fired, l->N);
-            TEMPLATE(insertVector,pMatrix)(mv, mf);
+            if(a.calcStat) {
+                Matrix *mf = vectorArrayToMatrix(l->stat_fired, l->N);
+                TEMPLATE(insertVector,pMatrix)(mv, mf);
+                Matrix *m_patt_classes = vectorArrayToMatrix(&s->rt->pattern_classes, 1);
+                TEMPLATE(insertVector,pMatrix)(mv, m_patt_classes);
+            }
             if(statLevel > 1) {
                 Matrix *mu = vectorArrayToMatrix(l->stat_u, l->N);
                 TEMPLATE(insertVector,pMatrix)(mv, mu);

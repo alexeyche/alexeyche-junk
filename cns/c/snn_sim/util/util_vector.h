@@ -14,6 +14,10 @@
 #include "util_vector_tmpl.h"
 
 #include <util/templates_clean.h>
+#define T int
+#include "util_vector_tmpl.h"
+
+#include <util/templates_clean.h>
 #define T uchar
 #include "util_vector_tmpl.h"
 

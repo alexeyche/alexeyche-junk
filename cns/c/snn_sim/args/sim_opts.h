@@ -21,7 +21,7 @@ typedef struct {
     int output_port;
     int seed;
     char learn;
-    bool reducedStat;
+    bool calcStat;
 } ArgOptionsSim;
 
 
@@ -38,14 +38,14 @@ void printArgs(const ArgOptionsSim *a) {
     printf("a->input_port = %d\n", a->input_port);
     printf("a->output_port = %d\n", a->output_port);
     printf("a->Tmax = %f\n", a->Tmax);
-    printf("a->reducedStat = %d\n", a->reducedStat);
+    printf("a->calcStat = %d\n", a->calcStat);
 }
 
 void usageSim(void) {
     printf("Usage: \n");
     printf("\t-c - constants ini filename\n");
     printf("\t-j - number of parallel jobs\n");
-    printf("\t-s(p) - stat file, or reduced version of stat file (only p)\n");
+    printf("\t-s(c) - stat file, or special version of stat file for calc\n");
     printf("\t-m(s|l) - model file for save and load or save or load\n");
     printf("\t-i - file for input spikes\n");
     printf("\t-o - file for output spikes\n");
@@ -75,7 +75,7 @@ ArgOptionsSim parseSimOptions(int argc, char **argv) {
     args.input_port = -1;
     args.output_port = -1;
     args.Tmax = 0;
-    args.reducedStat = false;
+    args.calcStat = false;
     if(argc == 1) usageSim();
     while ((argc > 1) && (argv[1][0] == '-')) {
         if(strcmp(argv[1], "-T") == 0) {                
@@ -166,13 +166,13 @@ ArgOptionsSim parseSimOptions(int argc, char **argv) {
             args.stat_file = strdup(argv[2]);
             ++argv; --argc;
         } else 
-        if(strcmp(argv[1], "-sp") == 0) {                
+        if(strcmp(argv[1], "-sc") == 0) {                
              if(argc == 2) { 
-                printf("No options for -sp\n");
+                printf("No options for -sc\n");
                 usageSim();
             }
             args.stat_file = strdup(argv[2]);
-            args.reducedStat = true;
+            args.calcStat = true;
             ++argv; --argc;
         } else 
         if(strcmp(argv[1], "-seed") == 0) {                
