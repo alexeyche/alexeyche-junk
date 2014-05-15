@@ -46,6 +46,9 @@ int main(int argc, char **argv) {
 
     configureNetSpikesSim(s, a.input_spikes_file, c);
     configureSynapses(s, c);
+    if(a.Tmax > 0) {
+        s->rt->Tmax = a.Tmax;
+    }
 //    printSRMLayer(s->layers->array[0]);
 //    printSRMLayer(s->layers->array[1]);
 //    printSpikesList(s->ns->net);
