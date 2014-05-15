@@ -64,13 +64,22 @@ int main(int argc, char **argv) {
         pMatrixVector *mv = TEMPLATE(createVector,pMatrix)();
         for(size_t li=0; li < s->layers->size; li++) {
             SRMLayer *l = s->layers->array[li];
-            Matrix *mp = vectorArrayToMatrix(l->stat_p, l->N);
-            TEMPLATE(insertVector,pMatrix)(mv, mp);
             if(a.calcStat) {
+                indVector *active_neurons = TEMPLATE(createVector,ind)();
+                for(size_t ni=0; ni<l->N; ni++) {
+                    if(l->pacc[ni] >= 10) {
+                        TEMPLATE(insertVector,ind)(active_neurons, ni);
+                    }
+                }
+                Matrix *mp = vectorArrayToMatrix(l->stat_p, l->N);
+                TEMPLATE(insertVector,pMatrix)(mv, mp);
                 Matrix *mf = vectorArrayToMatrix(l->stat_fired, l->N);
                 TEMPLATE(insertVector,pMatrix)(mv, mf);
                 Matrix *m_patt_classes = vectorArrayToMatrix(&s->rt->pattern_classes, 1);
                 TEMPLATE(insertVector,pMatrix)(mv, m_patt_classes);
+            } else {
+                Matrix *mp = vectorArrayToMatrix(l->stat_p, l->N);
+                TEMPLATE(insertVector,pMatrix)(mv, mp);
             }
             if(statLevel > 1) {
                 Matrix *mu = vectorArrayToMatrix(l->stat_u, l->N);
