@@ -67,13 +67,21 @@ int main(int argc, char **argv) {
             if(a.calcStat) {
                 indVector *active_neurons = TEMPLATE(createVector,ind)();
                 for(size_t ni=0; ni<l->N; ni++) {
-                    if(l->pacc[ni] >= 10) {
+                    if(l->pacc[ni] >= 20) {
                         TEMPLATE(insertVector,ind)(active_neurons, ni);
                     }
                 }
-                Matrix *mp = vectorArrayToMatrix(l->stat_p, l->N);
+                assert(l->N > 0);
+                Matrix *mp = createMatrix(active_neurons->size, l->stat_p[0]->size);
+                Matrix *mf = createMatrix(active_neurons->size, l->stat_fired[0]->size);
+                assert(mp->ncol == mf->ncol);
+                for(size_t ni=0; ni < active_neurons->size; ni++) {
+                    for(size_t el_i=0; el_i < mp->ncol; el_i++) {
+                        setMatrixElement(mp, ni, el_i, l->stat_p[ active_neurons->array[ni] ]->array[ el_i] );
+                        setMatrixElement(mf, ni, el_i, l->stat_fired[ active_neurons->array[ni] ]->array[ el_i] );
+                    }
+                }
                 TEMPLATE(insertVector,pMatrix)(mv, mp);
-                Matrix *mf = vectorArrayToMatrix(l->stat_fired, l->N);
                 TEMPLATE(insertVector,pMatrix)(mv, mf);
                 Matrix *m_patt_classes = vectorArrayToMatrix(&s->rt->pattern_classes, 1);
                 TEMPLATE(insertVector,pMatrix)(mv, m_patt_classes);
