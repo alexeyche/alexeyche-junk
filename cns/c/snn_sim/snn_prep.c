@@ -17,10 +17,13 @@ int main(int argc, char **argv) {
     }
 
     pMatrixVector* ts_data = readMatrixList(a.input_file);
+    pMatrixVector* ts_labels = readMatrixList(a.input_labels_file);
+    assert(ts_labels->size == 1);
+    assert(ts_labels->array[0]->nrow == ts_data->size);
+
     pMatrixVector *out_data = TEMPLATE(createVector,pMatrix)();
     assert(ts_data->size > 0);
     size_t N = ts_data->array[0]->nrow;
-    size_t nsamples = ts_data->array[0]->ncol;
 
     SpikesList *net = createSpikesList(N);
     double t = 0;
@@ -28,6 +31,7 @@ int main(int argc, char **argv) {
     AdExLayer *l = createAdExLayer(N, saveStat);
     for(size_t ts_i=0; ts_i < ts_data->size; ts_i++) {
         Matrix *ts = ts_data->array[ts_i];
+        size_t nsamples = ts->ncol;
         toStartValuesAdExLayer(l, c);
         size_t j;
         for(j = 0; t < (ts_i+1)*nsamples*c->dt; t+= c->dt, j++) {
@@ -47,6 +51,8 @@ int main(int argc, char **argv) {
     TEMPLATE(insertVector,pMatrix)(out_data, spikes);    
     Matrix *timeline_m = vectorArrayToMatrix(&timeline, 1);
     TEMPLATE(insertVector,pMatrix)(out_data, timeline_m);    
+    Matrix *classes = copyMatrix(ts_labels->array[0]);
+    TEMPLATE(insertVector,pMatrix)(out_data, classes);    
 
     saveMatrixList(a.output_file, out_data);
 

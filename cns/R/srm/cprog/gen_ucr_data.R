@@ -1,61 +1,70 @@
-#!/usr/bin/RScript
-
 library(snn)
 setwd("~/prog/alexeyche-junk/cns/R/srm/cprog")
-#setwd("~/my/git/alexeyche-junk/cns/R/srm/cprog")
 
 source('../ucr_ts.R')
-source('../gen_spikes.R')
-source('../serialize_to_bin.R')
-source('../plot_funcs.R')
+source('../interpolate_ts.R')
 
-
-#ucr_spikes_dir = "/home/alexeyche/prog/sim/ucr_spikes"
-#ucr_spikes_dir = "/home/alexeyche/prog/sim/ucr_spikes_full"
-ucr_spikes_dir = "/home/alexeyche/prog/sim/ucr_spikes_mini_cont"
-
-#ucr_spikes_dir = "/home/alexeyche/my/sim/ucr_spikes"
 data_dir = '~/prog/sim'
-#data_dir = '~/my/sim'
 
 
-M = 100
-mean_p_dur = 60000
+samples_from_dataset = 25
+sample_size = 1000
 
-duration = 1000
-dt = 1
-duration = 1000
-samples_from_dataset = 10
-epochs = 100
-
-
-
-source('../make_dataset.R')
-dir.create(sprintf("%s/train", ucr_spikes_dir))
-for(ep in 1:epochs) {
-    patterns = patterns[sample(1:length(patterns))]
-    
-    train_net = NetClass$new(patterns, duration, gap=500, dt=1)
-    
-    dir.create(sprintf("%s/train", ucr_spikes_dir))
-    spike_file = sprintf("%s/train/%s_ucr_%selems_%sclasses_%sdur", 
-                         ucr_spikes_dir, 
-                         ep, 
-                         samples_from_dataset,
-                         length(unique(train_net$labels)), 
-                         duration)
-    saveMatrixList(spike_file, list(list_to_matrix(train_net$net), matrix(train_net$timeline), matrix(train_net$labels) ))
+data = synth # synthetic control
+if(!file.exists(sprintf("%s/ts/%s/%s_TRAIN_%s", data_dir,data,data,sample_size))) {
+    c(train_dataset, test_dataset) := read_ts_file(data, NA, data_dir)
+    train_dataset_inter = matrix(0, length(train_dataset), sample_size+1)
+    test_dataset_inter = matrix(0, length(test_dataset), sample_size+1)
+    for(i in 1:length(train_dataset)) {
+        inter_ts = interpolate_ts(train_dataset[[i]]$data, sample_size)
+        train_dataset_inter[i, ] = c(train_dataset[[i]]$label,inter_ts)
+    }
+    for(i in 1:length(test_dataset)) {
+        inter_ts = interpolate_ts(test_dataset[[i]]$data, sample_size)
+        test_dataset_inter[i, ] = c(test_dataset[[i]]$label,inter_ts)
+    }
+    fname = sprintf("%s/ts/%s/%s_TRAIN_%s", data_dir,data,data,sample_size)
+    write.table(train_dataset_inter,file=fname,sep=" ", col.names = F, row.names = F, append=F)
+    fname = sprintf("%s/ts/%s/%s_TEST_%s", data_dir,data,data,sample_size)
+    write.table(test_dataset_inter,file=fname,sep=" ", col.names = F, row.names = F)
 }
 
-test_net = NetClass$new(test_patterns, duration)
-dir.create(sprintf("%s/test", ucr_spikes_dir))
-spike_file = sprintf("%s/test/ucr_%selems_%sclasses_%sdur", 
-                     ucr_spikes_dir, 
-                     samples_from_dataset,
-                     length(unique(train_net$labels)), 
-                     duration)
-saveMatrixList(spike_file, list(list_to_matrix(test_net$net), 
-                                matrix(test_net$timeline),
-                                matrix(test_net$labels)
-                                )
-               )
+c(train_dataset, test_dataset) := read_ts_file(data, sample_size,data_dir)
+elems = samples_from_dataset
+train_dataset = train_dataset[ c(sample(1:50, elems), sample(51:100, elems), sample(101:150,elems),
+                                sample(151:200, elems), sample(201:250,elems), sample(251:300,elems))] # cut
+test_dataset = test_dataset[c(sample(1:50, elems), sample(51:100, elems), sample(101:150, elems),
+                                sample(151:200, elems), sample(201:250,elems), sample(251:300, elems))]
+train_dataset_cut = list()
+test_dataset_cut = list()
+M=100
+sigma= 0.25
+gain = 5
+max_area = max(sapply(train_dataset, function(x) max(x$data)))
+min_area = min(sapply(train_dataset, function(x) min(x$data)))
+centers = seq(min_area, max_area, length.out=M)
+
+receptive_fields = function(ts, centers, sigma) {
+    ts_cut = matrix(NA, nrow=length(centers), ncol=length(ts))
+    for(ni in 1:nrow(ts_cut)) {
+        center = centers[ni]
+        ts_cut[ni, ] = gain*exp(-abs(center-ts)^2/sigma)
+    }
+    return(ts_cut)
+}
+
+for(i in 1:length(train_dataset)) {
+    ts = train_dataset[[i]]$data
+    train_dataset_cut[[i]] = receptive_fields(ts, centers, sigma)
+}
+
+for(i in 1:length(test_dataset)) {
+    ts = test_dataset[[i]]$data
+    test_dataset_cut[[i]] = receptive_fields(ts, centers, sigma)
+}
+saveMatrixList(sprintf("%s/spikes/ucr/prep_data/train", data_dir), train_dataset_cut)
+saveMatrixList(sprintf("%s/spikes/ucr/prep_data/train_labels",data_dir), list(matrix(sapply(train_dataset, function(x) x$label))))
+saveMatrixList(sprintf("%s/spikes/ucr/prep_data/test", data_dir), test_dataset_cut)
+saveMatrixList(sprintf("%s/spikes/ucr/prep_data/test_labels",data_dir), list(matrix(sapply(test_dataset, function(x) x$label))))
+
+#gr_pl(t(ts_cut))

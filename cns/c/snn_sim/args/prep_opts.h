@@ -12,6 +12,7 @@ typedef struct {
     int jobs;
     const char *const_filename;
     const char *input_file;
+    const char *input_labels_file;
     const char *output_file;
     const char *stat_file;
 } ArgOptionsPrep;
@@ -20,7 +21,8 @@ typedef struct {
 void usagePrep(void) {
     printf("Usage: \n");
     printf("\t-c - constants ini filename\n");
-    printf("\t-i - file for file\n");
+    printf("\t-i - file for input ts\n");
+    printf("\t-il - file for labels in input file\n");
     printf("\t-o - file for output spikes\n");
     printf("\t-s - file for statistics\n");
     printf("\t-? - print this message\n");
@@ -33,6 +35,7 @@ ArgOptionsPrep parsePrepOptions(int argc, char **argv) {
     args.const_filename = NULL;
     args.input_file = NULL;
     args.output_file = NULL;
+    args.input_labels_file = NULL;
     args.stat_file = NULL;
     if(argc == 1) usagePrep();
     while ((argc > 1) && (argv[1][0] == '-')) {
@@ -50,6 +53,14 @@ ArgOptionsPrep parsePrepOptions(int argc, char **argv) {
                 usagePrep();
             }
             args.output_file = strdup(argv[2]);
+            ++argv; --argc;
+        } else
+        if(strcmp(argv[1], "-il") == 0) {                
+            if(argc == 2) { 
+                printf("No options for -i\n");
+                usagePrep();
+            }
+            args.input_labels_file = strdup(argv[2]);
             ++argv; --argc;
         } else
         if(strcmp(argv[1], "-i") == 0) {                
@@ -88,6 +99,10 @@ ArgOptionsPrep parsePrepOptions(int argc, char **argv) {
     }
     if(args.const_filename == NULL) {
         printf("Need const file name\n");
+        usagePrep();
+    }
+    if(args.input_labels_file  == NULL) {
+        printf("Need input file name\n");
         usagePrep();
     }
     if(args.input_file  == NULL) {

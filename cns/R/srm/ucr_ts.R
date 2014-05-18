@@ -1,6 +1,6 @@
 
 
-read_ts_file <- function(ts_name, dir=dir) {
+read_ts_file <- function(ts_name, sample_size, dir=dir) {
   process_datamatrix <- function(m) {
     l = ncol(m)
     out = list()
@@ -9,8 +9,13 @@ read_ts_file <- function(ts_name, dir=dir) {
     }  
     return(out)
   }
-  ts_file_train = sprintf("%s/ts/%s/%s_TRAIN",dir, ts_name, ts_name)
-  ts_file_test = sprintf("%s/ts/%s/%s_TEST",dir, ts_name, ts_name)
+  if(!is.na(sample_size)) {
+    ts_file_train = sprintf("%s/ts/%s/%s_TRAIN_%s",dir, ts_name, ts_name, sample_size)
+    ts_file_test = sprintf("%s/ts/%s/%s_TEST_%s",dir, ts_name, ts_name, sample_size)
+  } else {
+      ts_file_train = sprintf("%s/ts/%s/%s_TRAIN",dir, ts_name, ts_name)
+      ts_file_test = sprintf("%s/ts/%s/%s_TEST",dir, ts_name, ts_name)
+  }
   nlines_train = as.numeric(system(sprintf("grep -c ^ %s", ts_file_train), intern=TRUE))
   nlines_test = as.numeric(system(sprintf("grep -c ^ %s", ts_file_test), intern=TRUE))
   ts_train = scan(ts_file_train)
