@@ -15,6 +15,7 @@ Constants* createConstants(const char *filename) {
     c->lrate = TEMPLATE(createVector,double)();
     c->adex = (AdExConstants*) malloc( sizeof(AdExConstants) );
     c->res_stdp = (ResourceSTDPConstants*) malloc( sizeof(ResourceSTDPConstants) );
+    c->preproc = (PreprocessConstants*) malloc( sizeof(PreprocessConstants) );
     if (ini_parse(filename, file_handler, c) < 0) {
         printf("Can't load %s\n", filename);
         return(NULL);
@@ -43,6 +44,7 @@ void deleteConstants(Constants *c) {
     TEMPLATE(deleteVector,double)(c->lrate);
     free(c->adex);
     free(c->res_stdp);
+    free(c->preproc);
     free(c);
 }
 
@@ -71,6 +73,12 @@ int file_handler(void* user, const char* section, const char* name,
     Constants* c = (Constants*)user;
 
     #define MATCH(s, n) strcmp(section, s) == 0 && strcmp(name, n) == 0
+    if (MATCH("preprocess", "gain")) {
+        c->preproc->gain = atof(value);
+    } else 
+    if (MATCH("preprocess", "sigma")) {
+        c->preproc->sigma = atof(value);
+    } else 
     if (MATCH("srm neuron", "e0")) {
         c->e0 = atof(value);
     } else 

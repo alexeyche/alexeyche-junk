@@ -16,6 +16,24 @@ Matrix *createMatrix(size_t nr, size_t nc) {
     return(m);
 }
 
+Matrix *createZeroMatrix(size_t nr, size_t nc) {
+    Matrix *m = createMatrix(nr,nc);
+    for(size_t i=0; i<nr; i++) {
+        for(size_t j=0; j<nc; j++) {
+            setMatrixElement(m, i, j, 0.0);
+        }
+    }
+    return(m);
+}
+
+void transposeMatrix(Matrix *m) {
+    for(size_t i=0; i<m->nrow; i++) {
+        for(size_t j=0; j<m->nrow; j++) {
+            setMatrixElement(m, i, j, getMatrixElement(m, j, i));
+        }
+    }
+}
+
 void deleteMatrix(Matrix *m) {
     free(m->vals);
     free(m);

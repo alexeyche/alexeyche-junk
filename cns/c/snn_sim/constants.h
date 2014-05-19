@@ -30,6 +30,11 @@ typedef struct {
 } ResourceSTDPConstants;
 
 typedef struct {
+    double gain;
+    double sigma;
+} PreprocessConstants;
+
+typedef struct {
     double e0;
     double e_exc;
     double e_inh;
@@ -95,6 +100,7 @@ typedef struct {
     learning_rule_t learning_rule;
     AdExConstants *adex;
     ResourceSTDPConstants *res_stdp;
+    PreprocessConstants *preproc;
 } Constants;
 
 int file_handler(void* user, const char* section, const char* name,

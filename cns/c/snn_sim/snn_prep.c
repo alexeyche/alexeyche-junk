@@ -7,6 +7,8 @@
 #include <util/spikes_list.h>
 #include <util/io.h>
 
+#include <prep/prepare_ts.h>
+
 int main(int argc, char **argv) {
     ArgOptionsPrep a = parsePrepOptions(argc, argv);
     Constants *c = createConstants(a.const_filename);
@@ -20,17 +22,19 @@ int main(int argc, char **argv) {
     pMatrixVector* ts_labels = readMatrixList(a.input_labels_file);
     assert(ts_labels->size == 1);
     assert(ts_labels->array[0]->nrow == ts_data->size);
-
+    
     pMatrixVector *out_data = TEMPLATE(createVector,pMatrix)();
     assert(ts_data->size > 0);
     size_t N = ts_data->array[0]->nrow;
+
+    pMatrixVector *ts_data_pr = processTimeSeriesSet(ts_data, c);    
 
     SpikesList *net = createSpikesList(N);
     double t = 0;
     doubleVector *timeline = TEMPLATE(createVector,double)();
     AdExLayer *l = createAdExLayer(N, saveStat);
-    for(size_t ts_i=0; ts_i < ts_data->size; ts_i++) {
-        Matrix *ts = ts_data->array[ts_i];
+    for(size_t ts_i=0; ts_i < ts_data_pr->size; ts_i++) {
+        Matrix *ts = ts_data_pr->array[ts_i];
         size_t nsamples = ts->ncol;
         toStartValuesAdExLayer(l, c);
         size_t j;
@@ -50,6 +54,7 @@ int main(int argc, char **argv) {
     Matrix *spikes = vectorArrayToMatrix(net->list, net->size);
     TEMPLATE(insertVector,pMatrix)(out_data, spikes);    
     Matrix *timeline_m = vectorArrayToMatrix(&timeline, 1);
+    transposeMatrix(timeline_m);
     TEMPLATE(insertVector,pMatrix)(out_data, timeline_m);    
     Matrix *classes = copyMatrix(ts_labels->array[0]);
     TEMPLATE(insertVector,pMatrix)(out_data, classes);    
@@ -58,10 +63,14 @@ int main(int argc, char **argv) {
 
     if(l->saveStat) {
         pMatrixVector *stat_data = TEMPLATE(createVector,pMatrix)();
+        for(size_t i=0; i<ts_data_pr->size; i++) {
+            TEMPLATE(insertVector,pMatrix)(stat_data, copyMatrix(ts_data_pr->array[i]));
+        }        
         Matrix *Vs = vectorArrayToMatrix(l->stat_V, l->N);
         TEMPLATE(insertVector,pMatrix)(stat_data, Vs);
         Matrix *ws = vectorArrayToMatrix(l->stat_w, l->N);
         TEMPLATE(insertVector,pMatrix)(stat_data, ws);
+
 
         saveMatrixList(a.stat_file, stat_data);
 
@@ -73,6 +82,7 @@ int main(int argc, char **argv) {
     deleteSpikesList(net);
     deleteConstants(c);
     TEMPLATE(deleteVector,pMatrix)(out_data);
+    TEMPLATE(deleteVector,pMatrix)(ts_data_pr);
     TEMPLATE(deleteVector,pMatrix)(ts_data);
     return(0);
 }

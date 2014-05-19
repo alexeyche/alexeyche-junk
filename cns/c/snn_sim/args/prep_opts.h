@@ -15,6 +15,7 @@ typedef struct {
     const char *input_labels_file;
     const char *output_file;
     const char *stat_file;
+    bool raw;
 } ArgOptionsPrep;
 
 
@@ -25,6 +26,7 @@ void usagePrep(void) {
     printf("\t-il - file for labels in input file\n");
     printf("\t-o - file for output spikes\n");
     printf("\t-s - file for statistics\n");
+    printf("\t-r - raw format of input time series file\n");
     printf("\t-? - print this message\n");
     exit(8);
 }
@@ -37,8 +39,12 @@ ArgOptionsPrep parsePrepOptions(int argc, char **argv) {
     args.output_file = NULL;
     args.input_labels_file = NULL;
     args.stat_file = NULL;
+    args.raw = false;
     if(argc == 1) usagePrep();
     while ((argc > 1) && (argv[1][0] == '-')) {
+        if(strcmp(argv[1], "-r") == 0) {                
+            args.raw = true;
+        } else
         if(strcmp(argv[1], "-s") == 0) {                
             if(argc == 2) { 
                 printf("No options for -s\n");
