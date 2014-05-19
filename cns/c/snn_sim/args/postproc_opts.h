@@ -49,16 +49,16 @@ ArgOptionsPostProc parsePostProcOptions(int argc, char **argv) {
              }
              fillKernelRange(kernel_range, argv[2]);
              ++argv; --argc;
-        } else {            
-        if(strcmp(argv[1], "-d") == 0) {                
+        } else             
+        if(strcmp(argv[1], "-d") == 0) {
              if(argc == 2) { 
                  printf("No options for -d\n");
                  usagePostProc();
              }
              args.dur = atof(argv[2]);
              ++argv; --argc;
-        } else {            
-            if(strcmp(argv[1], "-i") == 0) {                
+        } else             
+        if(strcmp(argv[1], "-i") == 0) {
             if(argc == 2) { 
                 printf("No options for -i\n");
                 usagePostProc();

@@ -32,7 +32,10 @@ snn_postproc.o: snn_postproc.c core.h \
  /usr/include/x86_64-linux-gnu/bits/string3.h /usr/include/pthread.h \
  /usr/include/sched.h /usr/include/x86_64-linux-gnu/bits/sched.h \
  /usr/include/x86_64-linux-gnu/bits/setjmp.h /usr/include/assert.h \
- /usr/local/include/libactor/list.h args/postproc_opts.h
+ /usr/local/include/libactor/list.h args/postproc_opts.h \
+ util/util_vector.h util/templates.h util/templates_clean.h \
+ util/util_vector_tmpl.h util/matrix.h util/util_vector_tmpl.h util/io.h \
+ util/spikes_list.h
 
 core.h:
 
@@ -131,3 +134,19 @@ core.h:
 /usr/local/include/libactor/list.h:
 
 args/postproc_opts.h:
+
+util/util_vector.h:
+
+util/templates.h:
+
+util/templates_clean.h:
+
+util/util_vector_tmpl.h:
+
+util/matrix.h:
+
+util/util_vector_tmpl.h:
+
+util/io.h:
+
+util/spikes_list.h:
