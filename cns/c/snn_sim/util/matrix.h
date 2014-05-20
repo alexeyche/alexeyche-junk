@@ -32,4 +32,6 @@ void printMatrix(Matrix *m);
 Matrix *vectorArrayToMatrix(doubleVector **dv, size_t size);
 void transposeMatrix(Matrix *m);
 
+void incMatrixElement(Matrix *m, size_t i, size_t j, double inc);
+
 #endif

@@ -25,14 +25,13 @@ int main(int argc, char **argv) {
     
     pMatrixVector *out_data = TEMPLATE(createVector,pMatrix)();
     assert(ts_data->size > 0);
-    size_t N = ts_data->array[0]->nrow;
 
     pMatrixVector *ts_data_pr = processTimeSeriesSet(ts_data, c);    
 
-    SpikesList *net = createSpikesList(N);
+    SpikesList *net = createSpikesList(c->M);
     double t = 0;
     doubleVector *timeline = TEMPLATE(createVector,double)();
-    AdExLayer *l = createAdExLayer(N, saveStat);
+    AdExLayer *l = createAdExLayer(c->M, saveStat);
     for(size_t ts_i=0; ts_i < ts_data_pr->size; ts_i++) {
         Matrix *ts = ts_data_pr->array[ts_i];
         size_t nsamples = ts->ncol;

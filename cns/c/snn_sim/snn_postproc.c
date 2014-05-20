@@ -6,51 +6,120 @@
 #include <util/spikes_list.h>
 #include <util/matrix.h>
 
+#include <postproc.h>
+
+
+
 int main(int argc, char **argv) {
     ArgOptionsPostProc a = parsePostProcOptions(argc, argv);
-    pMatrixVector *input_struct = readMatrixList(a.input_spikes);
+//train data    
+    pMatrixVector *input_train_struct = readMatrixList(a.input_train_spikes);
     
-    assert(input_struct->size > 3);
+    assert(input_train_struct->size == 3);
     
-    Matrix *spikes_m = input_struct->array[0];
-    SpikesList *spikes = spikesMatrixToSpikesList(spikes_m);
-    Matrix *timeline_m = input_struct->array[1];
-    Matrix *classes_m = input_struct->array[2];
-    doubleVector *timeline = TEMPLATE(copyFromArray,double)(timeline_m->vals, timeline_m->nrow*timeline_m->ncol);
+    Matrix *spikes_train_m = input_train_struct->array[0];
+    SpikesList *spikes_train = spikesMatrixToSpikesList(spikes_train_m);
+    Matrix *timeline_train_m = input_train_struct->array[1];
+    Matrix *classes_train_m = input_train_struct->array[2];
+    doubleVector *classes_train = TEMPLATE(copyFromArray,double)(classes_train_m->vals, classes_train_m->nrow*classes_train_m->ncol);
+    doubleVector *timeline_train = TEMPLATE(copyFromArray,double)(timeline_train_m->vals, timeline_train_m->nrow*timeline_train_m->ncol);
+//test data    
+    pMatrixVector *input_test_struct = readMatrixList(a.input_test_spikes);
+    
+    assert(input_test_struct->size == 3);
+    
+    Matrix *spikes_test_m = input_test_struct->array[0];
+    SpikesList *spikes_test = spikesMatrixToSpikesList(spikes_test_m);
+    Matrix *timeline_test_m = input_test_struct->array[1];
+    Matrix *classes_test_m = input_test_struct->array[2];
+    doubleVector *classes_test = TEMPLATE(copyFromArray,double)(classes_test_m->vals, classes_test_m->nrow*classes_test_m->ncol);
+    doubleVector *timeline_test = TEMPLATE(copyFromArray,double)(timeline_test_m->vals, timeline_test_m->nrow*timeline_test_m->ncol);    
+// classes    
+    intVector *uniq_classes = TEMPLATE(createVector,int)();
+    indVector *classes_indices_train = TEMPLATE(createVector,ind)(); 
+    indVector *classes_indices_test = TEMPLATE(createVector,ind)(); 
 
-    double ksize = a.kernel_values->array[0];
-
-    pMatrixVector *hists = TEMPLATE(createVector,pMatrix)();
-    double t;
-    size_t i;
-
-    size_t spike_indices[spikes->size];
-    for(size_t ni=0; ni < spikes->size; ni++) {
-        spike_indices[ni] = 0;
-    }
-    double spike_per_cell = 1.0/ksize;
-
-    for(t=0, i=0; t < timeline->size * a.dur; t+=a.dur, i++) {
-        Matrix *hist = createZeroMatrix(spikes->size, a.dur / ksize);
-        for(size_t ni=0; ni < spikes->size; ni++) {
-            if(spike_indices[ni] < spikes->list[ni]->size) {
-                double sp_t = spikes->list[ni]->array[ spike_indices[ni] ];
-                while((sp_t > t)&&(sp_t <= t+a.dur)) {
-                    size_t hist_index = (sp_t -t)*ksize;
-                    double v = getMatrixElement(hist, ni, hist_index);
-                    setMatrixElement(hist, ni, hist_index, v + spike_per_cell);
-                    spike_indices[ni] += 1;
-                    if(spike_indices[ni] >= spikes->list[ni]->size) break;
-                }
+    for(size_t i=0; i<classes_train->size; i++) {
+        int index = -1;
+        for(size_t ci=0; ci < uniq_classes->size; ci++) {
+            if(uniq_classes->array[ci] == (int)classes_train->array[i]) {
+                index = ci;
             }
         }
-        TEMPLATE(insertVector,pMatrix)(hists, hist);
+        if((index<0) || (uniq_classes->size == 0)) {
+            TEMPLATE(insertVector,int)(uniq_classes, (int)classes_train->array[i]);
+        }
+        if(index<0) index = uniq_classes->size-1;
+        TEMPLATE(insertVector,ind)(classes_indices_train, index);
     }
-    
-    TEMPLATE(deleteVector,double)(timeline);
+    for(size_t i=0; i<classes_test->size; i++) {
+        int index = -1;
+        for(size_t ci=0; ci < uniq_classes->size; ci++) {
+            if(uniq_classes->array[ci] == (int)classes_test->array[i]) {
+                index = ci;
+            }
+        }
+        assert(index >= 0);
+        TEMPLATE(insertVector,ind)(classes_indices_test, index);
+    }
+    pMatrixVector *stat = TEMPLATE(createVector,pMatrix)();
+// kernel calc    
+    double max_NMI = DBL_MIN;
+    for(size_t ki=0; ki < a.kernel_values->size; ki++) {    
+        double ksize = a.kernel_values->array[ki];
+//        printf("Calc for ksize == %f ... \n", ksize);
+    // train hists
+        pMatrixVector *hists_train = calcHists(spikes_train, timeline_train, a.dur, ksize);
+        assert(hists_train->size == classes_train->size);
+    // test hists
+        pMatrixVector *hists_test = calcHists(spikes_test, timeline_test, a.dur, ksize);
+        assert(hists_test->size == classes_test->size);
+        
+    //=================
+//        TEMPLATE(deleteVector,pMatrix)(hists_train);
+//        TEMPLATE(deleteVector,pMatrix)(hists_test);
+//    
+//        hists_test = readMatrixList("/home/alexeyche/prog/sim/ts/synthetic_control/synthetic_control_TEST_1000.bin");
+//        hists_train = readMatrixList("/home/alexeyche/prog/sim/ts/synthetic_control/synthetic_control_TRAIN_1000.bin");
+    //================    
+        ClassificationStat s = getClassificationStat(hists_train, classes_indices_train, hists_test, classes_indices_test, uniq_classes, a.jobs);
+//        printf("rate: %f\n", s.rate); 
+//        for(size_t i=0; i < s.confM->nrow; i++) {
+//            for(size_t j=0; j < s.confM->ncol; j++) {
+//                printf("%1.1f ", getMatrixElement(s.confM, i, j));
+//            }
+//            printf("\n");
+//        }
+//        printf("NMI: %f\n", s.NMI);
+        if(a.output_file) {
+            TEMPLATE(insertVector,pMatrix)(stat, copyMatrix(s.confM));
+            Matrix *r = createMatrix(1,1);
+            setMatrixElement(r, 0, 0, s.rate);
+            TEMPLATE(insertVector,pMatrix)(stat, r);
+
+            Matrix *i = createMatrix(1,1);
+            setMatrixElement(i, 0, 0, s.NMI);
+            TEMPLATE(insertVector,pMatrix)(stat, i);
+        }
+        if(max_NMI < s.NMI) {
+            max_NMI = s.NMI;
+        }
+        deleteMatrix(s.confM);
+        TEMPLATE(deleteVector,pMatrix)(hists_train);
+        TEMPLATE(deleteVector,pMatrix)(hists_test);
+    }
+    if(a.output_file) {
+        saveMatrixList(a.output_file, stat);
+    }
+    TEMPLATE(deleteVector,pMatrix)(stat);    printf("%f\n", max_NMI);
+    TEMPLATE(deleteVector,double)(timeline_train);
+    TEMPLATE(deleteVector,double)(timeline_test);
+
     TEMPLATE(deleteVector,double)(a.kernel_values);
-    TEMPLATE(deleteVector,pMatrix)(input_struct);
-    deleteSpikesList(spikes);
+    TEMPLATE(deleteVector,pMatrix)(input_train_struct);
+    TEMPLATE(deleteVector,pMatrix)(input_test_struct);
+    deleteSpikesList(spikes_train);
+    deleteSpikesList(spikes_test);
     return(0);
 }
  

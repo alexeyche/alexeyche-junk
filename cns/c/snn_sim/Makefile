@@ -59,7 +59,7 @@ __top_builddir__bin_snn_calc_DEPENDENCIES =
 am___top_builddir__bin_snn_postproc_OBJECTS = util/matrix.$(OBJEXT) \
 	util/util_vector.$(OBJEXT) ./util/ini.$(OBJEXT) \
 	util/util.$(OBJEXT) util/spikes_list.$(OBJEXT) \
-	util/io.$(OBJEXT) snn_postproc.$(OBJEXT)
+	util/io.$(OBJEXT) postproc.$(OBJEXT) snn_postproc.$(OBJEXT)
 __top_builddir__bin_snn_postproc_OBJECTS =  \
 	$(am___top_builddir__bin_snn_postproc_OBJECTS)
 __top_builddir__bin_snn_postproc_LDADD = $(LDADD)
@@ -113,7 +113,7 @@ AUTOMAKE = ${SHELL} /home/alexeyche/my/git/alexeyche-junk/cns/c/missing --run au
 AWK = gawk
 CC = gcc
 CCDEPMODE = depmode=gcc3
-CFLAGS = -g -O2
+CFLAGS = 
 CPP = gcc -E
 CPPFLAGS = 
 CYGPATH_W = echo
@@ -193,13 +193,12 @@ top_builddir = ..
 top_srcdir = ..
 
 # what flags you want to pass to the C compiler & linker
-AM_CFLAGS = -Wall -std=gnu99 -O0 -pg  -pthread
-#CFLAGS=
+AM_CFLAGS = -Wall -std=gnu99 -pthread -O3 # -O0 -pg  
 LDADD = -lm
 __top_builddir__bin_snn_sim_SOURCES = util/matrix.c util/util_vector.c ./util/ini.c ./util/matrix.h util/util.c util/spikes_list.c ./util/util_dlink_list.c sim/netsim.c neuron_funcs.c  constants.c sim/run.c sim.c util/io.c  sim/configure.c sim/serialize.c ./layer.c learn/optim.c learn/res_stdp.c snn_sim.c 
 __top_builddir__bin_snn_prep_SOURCES = util/matrix.c util/util_vector.c ./util/ini.c ./util/matrix.h util/util.c util/spikes_list.c  constants.c util/io.c layer/adex.c prep/prepare_ts.c snn_prep.c 
 __top_builddir__bin_snn_calc_SOURCES = util/matrix.c util/util_vector.c ./util/ini.c ./util/matrix.h util/util.c util/spikes_list.c  util/io.c snn_calc.c calc.c
-__top_builddir__bin_snn_postproc_SOURCES = util/matrix.c util/util_vector.c ./util/ini.c ./util/matrix.h util/util.c util/spikes_list.c  util/io.c snn_postproc.c
+__top_builddir__bin_snn_postproc_SOURCES = util/matrix.c util/util_vector.c ./util/ini.c ./util/matrix.h util/util.c util/spikes_list.c  util/io.c postproc.c snn_postproc.c
 all: all-am
 
 .SUFFIXES:
@@ -378,6 +377,7 @@ include ./$(DEPDIR)/calc.Po
 include ./$(DEPDIR)/constants.Po
 include ./$(DEPDIR)/layer.Po
 include ./$(DEPDIR)/neuron_funcs.Po
+include ./$(DEPDIR)/postproc.Po
 include ./$(DEPDIR)/sim.Po
 include ./$(DEPDIR)/snn_calc.Po
 include ./$(DEPDIR)/snn_postproc.Po

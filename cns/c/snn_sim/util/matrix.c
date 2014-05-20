@@ -84,3 +84,8 @@ Matrix *copyMatrix(Matrix *m) {
     }
     return(out);
 }
+
+void incMatrixElement(Matrix *m, size_t i, size_t j, double inc) {
+    double v = getMatrixElement(m, i, j);
+    setMatrixElement(m, i, j, v+inc);
+}

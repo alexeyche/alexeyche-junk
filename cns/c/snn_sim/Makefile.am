@@ -1,6 +1,6 @@
 # what flags you want to pass to the C compiler & linker
-AM_CFLAGS = -Wall -std=gnu99 -O0 -pg  -pthread
-#CFLAGS=
+AM_CFLAGS = -Wall -std=gnu99 -pthread -O3 # -O0 -pg  
+CFLAGS=
 LDADD= -lm
 
 # this lists the binaries to produce, the (non-PHONY, binary) targets in
@@ -12,4 +12,4 @@ bin_PROGRAMS = $(top_builddir)/bin/snn_sim $(top_builddir)/bin/snn_prep $(top_bu
 __top_builddir__bin_snn_sim_SOURCES = util/matrix.c util/util_vector.c ./util/ini.c ./util/matrix.h util/util.c util/spikes_list.c ./util/util_dlink_list.c sim/netsim.c neuron_funcs.c  constants.c sim/run.c sim.c util/io.c  sim/configure.c sim/serialize.c ./layer.c learn/optim.c learn/res_stdp.c snn_sim.c 
 __top_builddir__bin_snn_prep_SOURCES = util/matrix.c util/util_vector.c ./util/ini.c ./util/matrix.h util/util.c util/spikes_list.c  constants.c util/io.c layer/adex.c prep/prepare_ts.c snn_prep.c 
 __top_builddir__bin_snn_calc_SOURCES = util/matrix.c util/util_vector.c ./util/ini.c ./util/matrix.h util/util.c util/spikes_list.c  util/io.c snn_calc.c calc.c
-__top_builddir__bin_snn_postproc_SOURCES = util/matrix.c util/util_vector.c ./util/ini.c ./util/matrix.h util/util.c util/spikes_list.c  util/io.c snn_postproc.c
+__top_builddir__bin_snn_postproc_SOURCES = util/matrix.c util/util_vector.c ./util/ini.c ./util/matrix.h util/util.c util/spikes_list.c  util/io.c postproc.c snn_postproc.c

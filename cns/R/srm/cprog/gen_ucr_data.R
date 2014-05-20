@@ -8,7 +8,7 @@ data_dir = '~/prog/sim'
 
 
 samples_from_dataset = 25
-sample_size = 1000
+sample_size = 60
 
 data = synth # synthetic control
 if(!file.exists(sprintf("%s/ts/%s/%s_TRAIN_%s", data_dir,data,data,sample_size))) {

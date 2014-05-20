@@ -10,16 +10,22 @@
 
 
 typedef struct {
-    const char *input_spikes;
+    const char *input_train_spikes;
+    const char *input_test_spikes;
     double dur;
     doubleVector *kernel_values;
+    const char *output_file;
+    int jobs;
 } ArgOptionsPostProc;
 
 void usagePostProc(void) {
     printf("Usage: \n");
-    printf("\t-i - input file with spikes\n");
+    printf("\t-i - input file with train spikes\n");
+    printf("\t-t - input file with test spikes\n");
+    printf("\t-o - output file with stat\n");
     printf("\t-d - duration of series\n");
     printf("\t-k - kernel range for postprocess (start:delta:end)\n");
+    printf("\t-j - jobs\n");
     printf("\t-? - print this message\n");
     exit(8);
 }
@@ -38,10 +44,37 @@ ArgOptionsPostProc parsePostProcOptions(int argc, char **argv) {
     doubleVector *kernel_range = TEMPLATE(createVector,double)();
 
     args.kernel_values = TEMPLATE(createVector,double)();
-    args.input_spikes = NULL;
+    args.input_train_spikes = NULL;
+    args.input_test_spikes = NULL;
     args.dur = 0;
+    args.output_file = NULL;
+    args.jobs = 1;
     if(argc == 1) usagePostProc();
     while ((argc > 1) && (argv[1][0] == '-')) {
+        if(strcmp(argv[1], "-j") == 0) {                
+             if(argc == 2) { 
+                 printf("No options for -o\n");
+                 usagePostProc();
+             }
+             args.jobs = atoi(argv[2]);
+             ++argv; --argc;
+        } else             
+        if(strcmp(argv[1], "-t") == 0) {                
+             if(argc == 2) { 
+                 printf("No options for -o\n");
+                 usagePostProc();
+             }
+             args.input_test_spikes = strdup(argv[2]);
+             ++argv; --argc;
+        } else             
+        if(strcmp(argv[1], "-o") == 0) {                
+             if(argc == 2) { 
+                 printf("No options for -o\n");
+                 usagePostProc();
+             }
+             args.output_file = strdup(argv[2]);
+             ++argv; --argc;
+        } else             
         if(strcmp(argv[1], "-k") == 0) {                
              if(argc == 2) { 
                  printf("No options for -k\n");
@@ -63,7 +96,7 @@ ArgOptionsPostProc parsePostProcOptions(int argc, char **argv) {
                 printf("No options for -i\n");
                 usagePostProc();
             }
-            args.input_spikes = strdup(argv[2]);
+            args.input_train_spikes = strdup(argv[2]);
             ++argv; --argc;
         } else {            
             printf("Wrong Argument: %s\n", argv[1]);
@@ -71,8 +104,12 @@ ArgOptionsPostProc parsePostProcOptions(int argc, char **argv) {
         }
         ++argv; --argc;
     }
-    if(!args.input_spikes) {
-        printf("Need input spikes file\n");
+    if(!args.input_train_spikes) {
+        printf("Need input train spikes file\n");
+        usagePostProc();
+    }
+    if(!args.input_test_spikes) {
+        printf("Need input test spikes file\n");
         usagePostProc();
     }
     if(args.dur <= 0) {
@@ -83,7 +120,11 @@ ArgOptionsPostProc parsePostProcOptions(int argc, char **argv) {
         printf("Kernels range is inappropriate\n");
         usagePostProc();
     }
-    for(double k=kernel_range->array[0]; k < kernel_range->array[2]; k+=kernel_range->array[1]) { 
+    if(args.jobs < 0) {
+        printf("Jobs number is inappropriate\n");
+        usagePostProc();
+    }
+    for(double k=kernel_range->array[0]; k <= kernel_range->array[2]; k+=kernel_range->array[1]) { 
         TEMPLATE(insertVector,double)(args.kernel_values, k);
     }
     return(args);

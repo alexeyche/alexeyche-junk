@@ -1,0 +1,58 @@
+language: PYTHON
+name:     "best_code"
+
+variable {
+ name: "C"
+ type: FLOAT
+ size: 1
+ min:  100 
+ max:  300
+}
+
+variable {
+ name: "gL"
+ type: FLOAT
+ size: 1
+ min:  10
+ max:  100
+}
+
+variable {
+ name: "Vtr"
+ type: FLOAT
+ size: 1
+ min:  -70
+ max:  -25
+}
+
+variable {
+ name: "slope"
+ type: FLOAT
+ size: 1
+ min:  0.01
+ max:  10
+}
+
+variable {
+ name: "tau_w"
+ type: FLOAT
+ size: 1
+ min:  10
+ max:  1000
+}
+
+variable {
+ name: "a"
+ type: FLOAT
+ size: 1
+ min:  0
+ max:  100
+}
+
+variable {
+ name: "b"
+ type: FLOAT
+ size: 1
+ min:  0.01
+ max:  500
+}
