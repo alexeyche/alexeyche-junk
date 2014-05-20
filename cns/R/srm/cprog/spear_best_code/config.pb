@@ -5,7 +5,7 @@ variable {
  name: "C"
  type: FLOAT
  size: 1
- min:  100 
+ min:  50 
  max:  300
 }
 
@@ -13,7 +13,7 @@ variable {
  name: "gL"
  type: FLOAT
  size: 1
- min:  10
+ min:  1
  max:  100
 }
 
@@ -21,7 +21,7 @@ variable {
  name: "Vtr"
  type: FLOAT
  size: 1
- min:  -70
+ min:  -51
  max:  -25
 }
 
@@ -37,7 +37,7 @@ variable {
  name: "tau_w"
  type: FLOAT
  size: 1
- min:  10
+ min:  0
  max:  1000
 }
 
@@ -53,6 +53,6 @@ variable {
  name: "b"
  type: FLOAT
  size: 1
- min:  0.01
+ min:  0.001
  max:  500
 }

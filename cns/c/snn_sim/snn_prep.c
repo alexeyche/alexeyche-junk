@@ -37,7 +37,7 @@ int main(int argc, char **argv) {
         size_t nsamples = ts->ncol;
         toStartValuesAdExLayer(l, c);
         size_t j;
-        for(j = 0; t < (ts_i+1)*nsamples*c->dt; t+= c->dt, j++) {
+        for(j = 0; t < (ts_i+1)*nsamples*c->preproc->dt; t+= c->preproc->dt, j++) {
             for(size_t ni=0; ni < l->N; ni++) {
                 double I = getMatrixElement(ts, ni, j);
                 propagateCurrentAdExLayer(l, &ni, &I);

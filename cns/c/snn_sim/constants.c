@@ -79,6 +79,9 @@ int file_handler(void* user, const char* section, const char* name,
     if (MATCH("preprocess", "sigma")) {
         c->preproc->sigma = atof(value);
     } else 
+    if (MATCH("preprocess", "dt")) {
+        c->preproc->dt = atof(value);
+    } else 
     if (MATCH("srm neuron", "e0")) {
         c->e0 = atof(value);
     } else 

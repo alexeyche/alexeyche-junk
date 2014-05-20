@@ -12,7 +12,6 @@
 typedef struct {
     const char *input_train_spikes;
     const char *input_test_spikes;
-    double dur;
     doubleVector *kernel_values;
     const char *output_file;
     int jobs;
@@ -23,7 +22,6 @@ void usagePostProc(void) {
     printf("\t-i - input file with train spikes\n");
     printf("\t-t - input file with test spikes\n");
     printf("\t-o - output file with stat\n");
-    printf("\t-d - duration of series\n");
     printf("\t-k - kernel range for postprocess (start:delta:end)\n");
     printf("\t-j - jobs\n");
     printf("\t-? - print this message\n");
@@ -46,7 +44,6 @@ ArgOptionsPostProc parsePostProcOptions(int argc, char **argv) {
     args.kernel_values = TEMPLATE(createVector,double)();
     args.input_train_spikes = NULL;
     args.input_test_spikes = NULL;
-    args.dur = 0;
     args.output_file = NULL;
     args.jobs = 1;
     if(argc == 1) usagePostProc();
@@ -83,14 +80,6 @@ ArgOptionsPostProc parsePostProcOptions(int argc, char **argv) {
              fillKernelRange(kernel_range, argv[2]);
              ++argv; --argc;
         } else             
-        if(strcmp(argv[1], "-d") == 0) {
-             if(argc == 2) { 
-                 printf("No options for -d\n");
-                 usagePostProc();
-             }
-             args.dur = atof(argv[2]);
-             ++argv; --argc;
-        } else             
         if(strcmp(argv[1], "-i") == 0) {
             if(argc == 2) { 
                 printf("No options for -i\n");
@@ -110,10 +99,6 @@ ArgOptionsPostProc parsePostProcOptions(int argc, char **argv) {
     }
     if(!args.input_test_spikes) {
         printf("Need input test spikes file\n");
-        usagePostProc();
-    }
-    if(args.dur <= 0) {
-        printf("Need normal value for duration of series (>0)\n");
         usagePostProc();
     }
     if(kernel_range->size != 3) {

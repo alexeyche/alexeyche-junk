@@ -23,6 +23,7 @@ int main(int argc, char **argv) {
     Matrix *classes_train_m = input_train_struct->array[2];
     doubleVector *classes_train = TEMPLATE(copyFromArray,double)(classes_train_m->vals, classes_train_m->nrow*classes_train_m->ncol);
     doubleVector *timeline_train = TEMPLATE(copyFromArray,double)(timeline_train_m->vals, timeline_train_m->nrow*timeline_train_m->ncol);
+    double dur = timeline_train->array[1] - timeline_train->array[0];
 //test data    
     pMatrixVector *input_test_struct = readMatrixList(a.input_test_spikes);
     
@@ -69,10 +70,10 @@ int main(int argc, char **argv) {
         double ksize = a.kernel_values->array[ki];
 //        printf("Calc for ksize == %f ... \n", ksize);
     // train hists
-        pMatrixVector *hists_train = calcHists(spikes_train, timeline_train, a.dur, ksize);
+        pMatrixVector *hists_train = calcHists(spikes_train, timeline_train, dur, ksize);
         assert(hists_train->size == classes_train->size);
     // test hists
-        pMatrixVector *hists_test = calcHists(spikes_test, timeline_test, a.dur, ksize);
+        pMatrixVector *hists_test = calcHists(spikes_test, timeline_test, dur, ksize);
         assert(hists_test->size == classes_test->size);
         
     //=================

@@ -12,9 +12,11 @@ else
     CONST=$WORKDIR/constants.ini
 fi
 
+SAMPLE_SIZE=200
+
 pushd $CWD &> /dev/null
 
-../bin/snn_prep -c $CONST -i $SIMDIR/ts/synthetic_control/synthetic_control_TRAIN_1000.bin -il $SIMDIR/ts/synthetic_control/synthetic_control_TRAIN_1000_labels.bin -o $WORKDIR/train_spikes.bin
-../bin/snn_prep -c $CONST -i $SIMDIR/ts/synthetic_control/synthetic_control_TEST_1000.bin -il $SIMDIR/ts/synthetic_control/synthetic_control_TEST_1000_labels.bin -o $WORKDIR/test_spikes.bin
+../bin/snn_prep -c $CONST -i $SIMDIR/ts/synthetic_control/synthetic_control_TRAIN_${SAMPLE_SIZE}.bin -il $SIMDIR/ts/synthetic_control/synthetic_control_TRAIN_${SAMPLE_SIZE}_labels.bin -o $WORKDIR/train_spikes.bin
+../bin/snn_prep -c $CONST -i $SIMDIR/ts/synthetic_control/synthetic_control_TEST_${SAMPLE_SIZE}.bin -il $SIMDIR/ts/synthetic_control/synthetic_control_TEST_${SAMPLE_SIZE}_labels.bin -o $WORKDIR/test_spikes.bin
 
 popd &> /dev/null

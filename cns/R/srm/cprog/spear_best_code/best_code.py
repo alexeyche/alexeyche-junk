@@ -12,7 +12,8 @@ snndir = "/home/alexeyche/prog/alexeyche-junk/cns/c"
 rundir = "/home/alexeyche/prog/sim/prep_runs"
 
 prep_cmd = "WORKDIR=%(workdir)s %(snndir)s/scripts/prep_data.sh"
-eval_cmd = "%(snndir)s/bin/snn_postproc -i %(workdir)s/train_spikes.bin -t %(workdir)s/test_spikes.bin -d 1000 -k 10:1:10 -j 4 -o %(workdir)s/output_stat.bin"
+#eval_cmd = "%(snndir)s/bin/snn_postproc -i %(workdir)s/train_spikes.bin -t %(workdir)s/test_spikes.bin -d 1000 -k 10:1:10 -j 4 -o %(workdir)s/output_stat.bin"
+eval_cmd = "%(snndir)s/bin/snn_postproc -i %(workdir)s/train_spikes.bin -t %(workdir)s/test_spikes.bin -k 5:1:5 -j 8 -o %(workdir)s/output_stat.bin"
 
 def run(d):
     p = subprocess.Popen(prep_cmd % d, stdout=subprocess.PIPE, shell=True) 

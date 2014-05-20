@@ -32,6 +32,7 @@ typedef struct {
 typedef struct {
     double gain;
     double sigma;
+    double dt;
 } PreprocessConstants;
 
 typedef struct {
