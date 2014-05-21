@@ -2,11 +2,19 @@ language: PYTHON
 name:     "best_code"
 
 variable {
+ name: "dt"
+ type: FLOAT
+ size: 1
+ min:  2
+ max:  10
+}
+
+variable {
  name: "C"
  type: FLOAT
  size: 1
  min:  50 
- max:  300
+ max:  400
 }
 
 variable {

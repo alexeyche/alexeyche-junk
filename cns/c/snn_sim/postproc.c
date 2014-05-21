@@ -12,7 +12,7 @@ pMatrixVector *calcHists(SpikesList *spikes, doubleVector *timeline, double ts_d
     }
     double spike_per_cell = 1.0/ksize;
 
-    for(t=0, i=0; t < timeline->size * ts_dur; t+=ts_dur, i++) {
+    for(t=0, i=0; fabs(timeline->size * ts_dur-t) > 0.00001; t+=ts_dur, i++) {
         size_t ncols = ceil(ts_dur / ksize);
 //        printf("%zu\n", ncols);
         Matrix *hist = createZeroMatrix(spikes->size, ncols);
