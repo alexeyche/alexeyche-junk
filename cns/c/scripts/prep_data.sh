@@ -12,7 +12,7 @@ else
     CONST=$WORKDIR/constants.ini
 fi
 if [ -z $SAMPLE_SIZE ]; then
-    SAMPLE_SIZE=1000
+    SAMPLE_SIZE=60
 fi
 
 pushd $CWD &> /dev/null

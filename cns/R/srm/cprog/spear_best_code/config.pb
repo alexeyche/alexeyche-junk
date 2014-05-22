@@ -2,11 +2,11 @@ language: PYTHON
 name:     "best_code"
 
 variable {
- name: "dt"
+ name: "sigma"
  type: FLOAT
  size: 1
- min:  2
- max:  10
+ min:  0.01
+ max:  5
 }
 
 variable {
