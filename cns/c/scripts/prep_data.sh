@@ -15,9 +15,11 @@ if [ -z $SAMPLE_SIZE ]; then
     SAMPLE_SIZE=60
 fi
 
+ADDEDNAME="_sel"
+
 pushd $CWD &> /dev/null
 
-../bin/snn_prep -c $CONST -i $SIMDIR/ts/synthetic_control/synthetic_control_TRAIN_${SAMPLE_SIZE}.bin -il $SIMDIR/ts/synthetic_control/synthetic_control_TRAIN_${SAMPLE_SIZE}_labels.bin -o $WORKDIR/train_spikes.bin
-../bin/snn_prep -c $CONST -i $SIMDIR/ts/synthetic_control/synthetic_control_TEST_${SAMPLE_SIZE}.bin -il $SIMDIR/ts/synthetic_control/synthetic_control_TEST_${SAMPLE_SIZE}_labels.bin -o $WORKDIR/test_spikes.bin
+../bin/snn_prep -c $CONST -i $SIMDIR/ts/synthetic_control/synthetic_control_TRAIN_${SAMPLE_SIZE}${ADDEDNAME}.bin -il $SIMDIR/ts/synthetic_control/synthetic_control_TRAIN_${SAMPLE_SIZE}${ADDEDNAME}_labels.bin -o $WORKDIR/train_spikes.bin
+../bin/snn_prep -c $CONST -i $SIMDIR/ts/synthetic_control/synthetic_control_TEST_${SAMPLE_SIZE}${ADDEDNAME}.bin -il $SIMDIR/ts/synthetic_control/synthetic_control_TEST_${SAMPLE_SIZE}${ADDEDNAME}_labels.bin -o $WORKDIR/test_spikes.bin
 
 popd &> /dev/null

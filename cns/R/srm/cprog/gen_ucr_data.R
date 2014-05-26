@@ -6,12 +6,17 @@ source('../interpolate_ts.R')
 
 data_dir = '~/prog/sim'
 
+samples_per_class = 50
 
-samples_from_dataset = 25
-sample_size = 200
+samples_from_dataset = 10
+sample_size = 60
+selected_classes = c(2, 4)
 
 data = synth # synthetic control
-if(!file.exists(sprintf("%s/ts/%s/%s_TRAIN_%s", data_dir,data,data,sample_size))) {
+
+train_fname = sprintf("%s/ts/%s/%s_TRAIN_%s", data_dir,data,data,sample_size)
+test_fname = sprintf("%s/ts/%s/%s_TEST_%s", data_dir,data,data,sample_size)
+if(!file.exists(train_fname)) {
     c(train_dataset, test_dataset) := read_ts_file(data, NA, data_dir)
     train_dataset_inter = matrix(0, length(train_dataset), sample_size+1)
     test_dataset_inter = matrix(0, length(test_dataset), sample_size+1)
@@ -27,17 +32,30 @@ if(!file.exists(sprintf("%s/ts/%s/%s_TRAIN_%s", data_dir,data,data,sample_size))
         test_dataset_inter[i, ] = c(test_dataset[[i]]$label,inter_ts)
         test_dataset_inter_bin[[i]] = matrix(inter_ts, nrow=1, ncol=length(inter_ts))
     }
-    fname = sprintf("%s/ts/%s/%s_TRAIN_%s", data_dir,data,data,sample_size)
     write.table(train_dataset_inter,file=fname,sep=" ", col.names = F, row.names = F, append=F)
-    saveMatrixList(fname, train_dataset_inter_bin)
-    saveMatrixList(sprintf("%s_labels", fname), list(matrix(sapply(train_dataset, function(x) x$label))) )
+    saveMatrixList(train_fname, train_dataset_inter_bin)
+    saveMatrixList(sprintf("%s_labels", train_fname), list(matrix(sapply(train_dataset, function(x) x$label))) )
 
-    fname = sprintf("%s/ts/%s/%s_TEST_%s", data_dir,data,data,sample_size)
     write.table(test_dataset_inter,file=fname,sep=" ", col.names = F, row.names = F)
-    saveMatrixList(fname, test_dataset_inter_bin)
-    saveMatrixList(sprintf("%s_labels", fname), list(matrix(sapply(test_dataset, function(x) x$label))) )
+    saveMatrixList(test_fname, test_dataset_inter_bin)
+    saveMatrixList(sprintf("%s_labels", test_fname), list(matrix(sapply(test_dataset, function(x) x$label))) )
 }
 
+for(fname in c(train_fname, test_fname)) {
+    data_labels = c(loadMatrix(sprintf("%s_labels", fname), 1))
+
+    data_selected = list()
+    data_labels_selected = c()
+    for(cl in selected_classes) {
+        for(i in 1:samples_from_dataset) {    
+            m = loadMatrix(fname, (cl-1)*samples_per_class+i)
+            data_selected[[ length(data_selected)+1 ]] = m
+            data_labels_selected = c(data_labels_selected, data_labels[ (cl-1)*samples_per_class+i ])
+        }           
+    }
+    saveMatrixList(sprintf("%s_sel", fname), data_selected)
+    saveMatrixList(sprintf("%s_sel_labels", fname), list(matrix(data_labels_selected)))
+}
 #c(train_dataset, test_dataset) := read_ts_file(data, sample_size,data_dir)
 #elems = samples_from_dataset
 #train_dataset = train_dataset[ c(sample(1:50, elems), sample(51:100, elems), sample(101:150,elems),

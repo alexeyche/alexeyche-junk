@@ -10,7 +10,7 @@ source('../plot_funcs.R')
 library(snn)
 
 rundir="/home/alexeyche/prog/sim/runs"
-runname = "n100_again"
+runname = "2classes_0"
 workdir=sprintf("%s/%s", rundir, runname)
 
 #workdir="/home/alexeyche/prog/sim/runs/rfd"
@@ -19,7 +19,7 @@ for(ep in 1:300) {
     output_spikes = sprintf("%s/%s_output_spikes.bin", workdir, ep)
     if(!file.exists(output_spikes)) { ep=ep-1; break }
 }
-#ep=
+#ep=40
 
 
 ep_str=""

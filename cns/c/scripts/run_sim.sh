@@ -18,15 +18,17 @@ WORK_DIR=
 STAT_SAVE="no"
 EPOCH=
 LEARN="no"
+AUTO="no"
 JOBS=$(cat /proc/cpuinfo | grep processor | wc -l)
 
 # Enumerating options
-while getopts "j:w:hsle:" opt; do
+while getopts "j:w:hsle:a" opt; do
     case "$opt" in
         w) WORK_DIR=${OPTARG} ;;
         s) STAT_SAVE="yes" ;;
         l) LEARN="yes" ;;
         e) EPOCH=${OPTARG} ;; 
+        a) AUTO="yes" ;; 
         j) JOBS=${OPTARG} ;;
         h) usage && exit 0 ;;
         *) usage && exit 1 ;;
@@ -43,26 +45,28 @@ MAX_INPUT_FILES=$(echo $INPUT_FILES | wc -w)
 MIN_EP=1
 MAX_EP=$EPOCH
 
-if [ -d "$WORK_DIR" ]; then
-    LAST_EP=$(find $WORK_DIR -maxdepth 1 -type f -name "?*_*.bin"  -exec basename {} \; | cut -d '_' -f 1 | sort -nr | uniq | head -n 1)
-    RESP="xxx"
-    while true; do
-        if [ "$RESP" == "y" ]; then
-            MIN_EP=$((LAST_EP+1))
-            MAX_EP=$((LAST_EP+EPOCH))
-            break
-        elif [ "$RESP" == "n" ]; then
-            rm -rf $WORK_DIR/*
-            cp ../snn_sim/constants.ini $WORK_DIR
-            break
-        else 
-            read -p "$(basename $WORK_DIR) already exists and $LAST_EP epochs was done here. Continue learning? (y/n): " RESP
-        fi        
-    done        
-else 
-    mkdir -p $WORK_DIR
-    cp ../snn_sim/constants.ini $WORK_DIR
-fi   
+if [ "$AUTO" == "no" ]; then
+    if [ -d "$WORK_DIR" ]; then
+        LAST_EP=$(find $WORK_DIR -maxdepth 1 -type f -name "?*_*.bin"  -exec basename {} \; | cut -d '_' -f 1 | sort -nr | uniq | head -n 1)
+        RESP="xxx"
+        while true; do
+            if [ "$RESP" == "y" ]; then
+                MIN_EP=$((LAST_EP+1))
+                MAX_EP=$((LAST_EP+EPOCH))
+                break
+            elif [ "$RESP" == "n" ]; then
+                rm -rf $WORK_DIR/*
+                cp ../snn_sim/constants.ini $WORK_DIR
+                break
+            else 
+                read -p "$(basename $WORK_DIR) already exists and $LAST_EP epochs was done here. Continue learning? (y/n): " RESP
+            fi        
+        done        
+    else 
+        mkdir -p $WORK_DIR
+        cp ../snn_sim/constants.ini $WORK_DIR
+    fi   
+fi
 
 function get_const {
     egrep -o "^$1.*=[ ]*[\/_.a-zA-Z0-9]+" $WORK_DIR/constants.ini | awk -F'=' '{ print $2}' | tr -d ' '

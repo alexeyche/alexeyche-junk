@@ -13,6 +13,7 @@ typedef struct {
     const char *output_file;
     const char *output_file_full;
     double dur;
+    bool printMI;
 } ArgOptionsCalc;
 
 void usageCalc(void) {
@@ -22,6 +23,7 @@ void usageCalc(void) {
     printf("\t-o - output file\n");
     printf("\t-f - output file (full version)\n");
     printf("\t-d - duration of series\n");
+    printf("\t-p - print mean MI\n");
     printf("\t-? - print this message\n");
     exit(8);
 }
@@ -34,8 +36,12 @@ ArgOptionsCalc parseCalcOptions(int argc, char **argv) {
     args.dur = 0;
     args.output_file = NULL;
     args.output_file_full = NULL;
+    args.printMI = false;
     if(argc == 1) usageCalc();
     while ((argc > 1) && (argv[1][0] == '-')) {
+        if(strcmp(argv[1], "-p") == 0) {                
+            args.printMI = true;
+        } else 
         if(strcmp(argv[1], "-f") == 0) {                
              if(argc == 2) { 
                 printf("No options for -f\n");

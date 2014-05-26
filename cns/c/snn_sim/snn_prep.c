@@ -6,6 +6,7 @@
 
 #include <util/spikes_list.h>
 #include <util/io.h>
+#include <util/util.h>
 
 #include <prep/prepare_ts.h>
 
@@ -27,13 +28,19 @@ int main(int argc, char **argv) {
     assert(ts_data->size > 0);
 
     pMatrixVector *ts_data_pr = processTimeSeriesSet(ts_data, c);    
-
+    indVector *ts_indices = TEMPLATE(createVector,ind)();
+    for(size_t ti=0; ti< ts_data_pr->size; ti++) {
+        TEMPLATE(insertVector,ind)(ts_indices, ti);    
+    }
+    shuffleIndVector(ts_indices);
+    
     SpikesList *net = createSpikesList(c->M);
+    doubleVector *ts_labels_current = TEMPLATE(createVector,double)();
     double t = 0;
     doubleVector *timeline = TEMPLATE(createVector,double)();
     AdExLayer *l = createAdExLayer(c->M, saveStat);
-    for(size_t ts_i=0; ts_i < ts_data_pr->size; ts_i++) {
-        Matrix *ts = ts_data_pr->array[ts_i];
+    for(size_t ts_i=0; ts_i < ts_indices->size; ts_i++) {
+        Matrix *ts = ts_data_pr->array[ ts_indices->array[ts_i] ];
         size_t nsamples = ts->ncol;
         toStartValuesAdExLayer(l, c);
         size_t j;
@@ -49,13 +56,17 @@ int main(int argc, char **argv) {
             }
         }
         TEMPLATE(insertVector,double)(timeline, t);
+        TEMPLATE(insertVector,double)(ts_labels_current, getMatrixElement(ts_labels->array[0], ts_indices->array[ts_i], 0) );
     }
     Matrix *spikes = vectorArrayToMatrix(net->list, net->size);
     TEMPLATE(insertVector,pMatrix)(out_data, spikes);    
+    
     Matrix *timeline_m = vectorArrayToMatrix(&timeline, 1);
     transposeMatrix(timeline_m);
     TEMPLATE(insertVector,pMatrix)(out_data, timeline_m);    
-    Matrix *classes = copyMatrix(ts_labels->array[0]);
+    
+    Matrix *classes = vectorArrayToMatrix(&ts_labels_current, 1);
+    transposeMatrix(classes);
     TEMPLATE(insertVector,pMatrix)(out_data, classes);    
 
     saveMatrixList(a.output_file, out_data);

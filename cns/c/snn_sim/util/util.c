@@ -1,7 +1,6 @@
 
 #include <util/util.h>
 
-
 double normal_distr_var = -1;
 
 double getUnif() {
@@ -26,4 +25,20 @@ double getNorm() {
         return(ret);        
     }
 }
+
+void swapInd(size_t *l, size_t *r) {
+    size_t temp = *r;
+    *r = *l;
+    *l = temp;
+}
+
+void shuffleIndVector(indVector *v) {
+    for(int i=(v->size-1); i>0; i--) {
+        int j = rand() % (i+1);
+        swapInd(&v->array[i], &v->array[j]);
+    }
+}
+
+
+
 

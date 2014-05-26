@@ -57,6 +57,14 @@ int main(int argc, char **argv) {
         }
         saveMatrixList(a.output_file_full, out_listf);
     }
+    if(a.printMI) {
+        double misum = 0.0;
+        for(size_t i=0; i<out->nrow; i++) {
+            double mi = getMatrixElement(out, i, 2);
+            misum += mi;
+        }
+        printf("%f\n", misum/out->nrow);
+    }
     pMatrixVector *out_list = TEMPLATE(createVector,pMatrix)();
     TEMPLATE(insertVector,pMatrix)(out_list, out);
     saveMatrixList(a.output_file, out_list);
