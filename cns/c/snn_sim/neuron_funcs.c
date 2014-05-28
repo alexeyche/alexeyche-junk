@@ -40,7 +40,7 @@ inline double pstroke(const double *u, const Constants *c) {
 
 
 inline double B_calc(const unsigned char *Yspike, const double *p, const double *pmean, const Constants *c) {
-    if( *pmean == 0 ) return(0);
+    if( fabs(*pmean - 0.0) < 0.0000001 ) return(0);
     double pmean_w = *pmean/c->mean_p_dur;
 //    printf("pmean_w %f, 1part: %f, 2part: %f\n", pmean_w, ( *Yspike * log( *p/pmean_w) - (*p - pmean_w)), c->target_rate_factor * ( *Yspike * log( pmean_w/c->__target_rate) - (pmean_w - c->__target_rate) ));
     return (( *Yspike * log( *p/pmean_w) - (*p - pmean_w)) - c->target_rate_factor * ( *Yspike * log( pmean_w/c->__target_rate) - (pmean_w - c->__target_rate) ));

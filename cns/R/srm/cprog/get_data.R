@@ -10,7 +10,7 @@ source('../plot_funcs.R')
 library(snn)
 
 rundir="/home/alexeyche/prog/sim/runs"
-runname = "2classes_0"
+runname = "test_run_new"
 workdir=sprintf("%s/%s", rundir, runname)
 
 #workdir="/home/alexeyche/prog/sim/runs/rfd"
