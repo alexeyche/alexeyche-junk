@@ -15,7 +15,7 @@ snndir = "/home/alexeyche/prog/alexeyche-junk/cns/c"
 rundir = "/home/alexeyche/prog/sim/runs"
 train_spikes = "/home/alexeyche/prog/sim/spikes/ucr/train_spikes.bin"
 calc_spikes = "/home/alexeyche/prog/sim/spikes/ucr/calc_spikes.bin"
-epochs = 15
+epochs = 20
 ts_dur = 600
 num_classes = 2
 
