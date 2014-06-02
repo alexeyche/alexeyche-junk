@@ -14,6 +14,7 @@ int main(int argc, char **argv) {
     ArgOptionsPrep a = parsePrepOptions(argc, argv);
     Constants *c = createConstants(a.const_filename);
 
+    
     bool saveStat = false;
     if(a.stat_file) {
         saveStat = true;
@@ -32,6 +33,7 @@ int main(int argc, char **argv) {
     for(size_t ti=0; ti< ts_data_pr->size; ti++) {
         TEMPLATE(insertVector,ind)(ts_indices, ti);    
     }
+    srand(time(NULL));
     shuffleIndVector(ts_indices);
     
     SpikesList *net = createSpikesList(c->M);
