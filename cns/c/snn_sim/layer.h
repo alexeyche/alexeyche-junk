@@ -69,6 +69,8 @@ struct SRMLayer {
     doubleVector **stat_fired;
     doubleVector ***stat_W;
     doubleVector ***stat_syn;
+    double **stat_pre_t;
+    double *stat_post_t;
 };
 
 

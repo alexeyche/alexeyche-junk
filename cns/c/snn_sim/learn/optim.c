@@ -94,6 +94,8 @@ void trainWeightsStep_TOptimalSTDP(learn_t *ls_t, const double *u, const double 
 
    }
    if(l->statLevel>1) {
+        if(l->fired[ *ni ] == 1) {
+        }
         TEMPLATE(insertVector,double)(ls->stat_B[ *ni ], ls->B[ *ni ]);
         for(size_t con_i=0; con_i<l->nconn[ *ni ]; con_i++) {
             TEMPLATE(insertVector,double)(ls->stat_C[ *ni ][ con_i ], ls->C[ *ni ][ con_i ]);
