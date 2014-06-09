@@ -15,7 +15,7 @@ if [ -z $SAMPLE_SIZE ]; then
     SAMPLE_SIZE=60
 fi
 
-#ADDEDNAME="_sel"
+ADDEDNAME="_sel"
 
 pushd $CWD &> /dev/null
 

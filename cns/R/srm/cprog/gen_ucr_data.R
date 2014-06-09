@@ -8,7 +8,7 @@ data_dir = '~/prog/sim'
 
 samples_per_class = 50
 
-samples_from_dataset = 20
+samples_from_dataset = 10
 sample_size = 60
 selected_classes = c(1,2,3,4)
 

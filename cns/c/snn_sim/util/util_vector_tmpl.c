@@ -1,6 +1,8 @@
 
 #define INIT_SIZE 10
 
+
+
 TVEC(T)* TEMPLATE(createVector,T)() {
     TVEC(T) *a = (TVEC(T)*)malloc(sizeof(TVEC(T)));
     a->array = (T*)malloc(INIT_SIZE * sizeof(T));
@@ -41,3 +43,5 @@ TVEC(T)* TEMPLATE(copyFromArray,T)(T *a, size_t size) {
     }
     return(v);
 }    
+
+

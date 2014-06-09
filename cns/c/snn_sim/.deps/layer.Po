@@ -49,7 +49,9 @@ layer.o: layer.c /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/bits/mathcalls.h \
  /usr/include/x86_64-linux-gnu/bits/mathinline.h util/matrix.h \
  util/util_vector_tmpl.h neuron_funcs.h util/io.h learn.h learn/optim.h \
- learn/res_stdp.h util/util_vector_tmpl.c
+ learn/res_stdp.h util/util_vector_tmpl.c sim.h layer.h \
+ util/spikes_list.h sim/runtime.h sim/netsim.h \
+ util/util_dlink_list_tmpl.h
 
 /usr/include/stdc-predef.h:
 
@@ -208,3 +210,15 @@ learn/optim.h:
 learn/res_stdp.h:
 
 util/util_vector_tmpl.c:
+
+sim.h:
+
+layer.h:
+
+util/spikes_list.h:
+
+sim/runtime.h:
+
+sim/netsim.h:
+
+util/util_dlink_list_tmpl.h:

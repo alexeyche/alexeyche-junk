@@ -238,6 +238,27 @@ int file_handler(void* user, const char* section, const char* name,
     if (MATCH("optimal stdp", "weight_decay_factor")) {
         fillDoubleVector(c->weight_decay_factor, value);
     } else 
+    if (MATCH("learn", "reinforcement")) {
+        c->reinforcement = strcmp(value, "true") == 0;
+    } else 
+    if (MATCH("learn", "reward_baseline")) {
+        c->reward_baseline = atof(value);
+    } else 
+    if (MATCH("learn", "reward_ltp")) {
+        c->reward_ltp = atof(value);
+    } else 
+    if (MATCH("learn", "tel")) {
+        c->tel = atof(value);
+    } else 
+    if (MATCH("learn", "reward_ltd")) {
+        c->reward_ltd = atof(value);
+    } else 
+    if (MATCH("learn", "lrate")) {
+        fillDoubleVector(c->lrate, value);
+    } else 
+    if (MATCH("learn", "lrate")) {
+        fillDoubleVector(c->lrate, value);
+    } else 
     if (MATCH("learn", "lrate")) {
         fillDoubleVector(c->lrate, value);
     } else 

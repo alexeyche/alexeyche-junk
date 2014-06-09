@@ -69,8 +69,6 @@ struct SRMLayer {
     doubleVector **stat_fired;
     doubleVector ***stat_W;
     doubleVector ***stat_syn;
-    double **stat_pre_t;
-    double *stat_post_t;
 };
 
 
@@ -95,7 +93,7 @@ void printSRMLayer(SRMLayer *l);
 void deleteSRMLayer(SRMLayer *l);
 void configureSRMLayer(SRMLayer *l, const indVector *inputIDs, const indVector *outputIDs, Constants *c);
 
-void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constants *c);
+void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const struct Sim *s);
 pMatrixVector* serializeSRMLayer(SRMLayer *l);
 void loadSRMLayer(SRMLayer *l, Constants *c, pMatrixVector *data);
 void toStartValuesSRMLayer(SRMLayer *l, Constants *c);

@@ -1,17 +1,15 @@
 
 #include <sim.h>
 
-void deleteSim(Sim *s) {
-    TEMPLATE(deleteVector,pSRMLayer)(s->layers);
-    deleteNetSim(s->ns);
-    deleteRuntime(s->rt);
-    free(s);
-}
+
 
 SimRuntime* createRuntime() {
     SimRuntime *rt = (SimRuntime*) malloc(sizeof(SimRuntime));
     rt->reset_timeline = TEMPLATE(createVector,double)();
-    rt->pattern_classes = TEMPLATE(createVector,ind)();
+    rt->pattern_classes = TEMPLATE(createVector,double)();
+    rt->uniq_classes = TEMPLATE(createVector,int)();
+    rt->classes_indices_train = TEMPLATE(createVector,ind)(); 
+
     rt->timeline_iter = 0;
     rt->Tmax = 0;
     return(rt);
@@ -19,10 +17,10 @@ SimRuntime* createRuntime() {
 
 void deleteRuntime(SimRuntime *sr) {
     TEMPLATE(deleteVector,double)(sr->reset_timeline);
+    TEMPLATE(deleteVector,int)(sr->uniq_classes);
+    TEMPLATE(deleteVector,ind)(sr->classes_indices_train);
     free(sr);
 }
-
-
 
 
 void configureNetSpikesSim(Sim *s, const char *input_spikes_filename, Constants *c) {
@@ -159,3 +157,36 @@ void configureSimAttr(Sim *s) {
         }
     }
 }
+
+void configureRewardModulation(Sim *s) {
+    for(size_t i=0; i<s->rt->pattern_classes->size; i++) {
+        int index = -1;
+        for(size_t ci=0; ci < s->rt->uniq_classes->size; ci++) {
+            if(s->rt->uniq_classes->array[ci] == (int)s->rt->pattern_classes->array[i]) {
+                index = ci;
+            }
+        }
+        if((index<0) || (s->rt->uniq_classes->size == 0)) {
+            TEMPLATE(insertVector,int)(s->rt->uniq_classes, (int)s->rt->pattern_classes->array[i]);
+        }
+    }
+
+    sortIntVector(s->rt->uniq_classes);
+
+    for(size_t i=0; i<s->rt->pattern_classes->size; i++) {
+        int index = -1;
+        for(size_t ci=0; ci < s->rt->uniq_classes->size; ci++) {
+            if(s->rt->uniq_classes->array[ci] == (int)s->rt->pattern_classes->array[i]) {
+                index = ci;
+            }
+        }
+        assert(index >= 0);
+        TEMPLATE(insertVector,ind)(s->rt->classes_indices_train, index);
+    } 
+    if(s->layers->array[ s->layers->size-1 ]->N % s->rt->uniq_classes->size != 0) {
+        printf("Need last layer be a delimiter of number of unique classes in input train spikes\n");
+        exit(1);
+    }
+
+}
+

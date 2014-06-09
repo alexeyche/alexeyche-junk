@@ -15,13 +15,14 @@
 
 struct SRMLayer;
 struct SynSpike;
+struct Sim;
 
 struct learn_t {
     struct SRMLayer *l;
     
     void (*toStartValues)(struct learn_t *);
     void (*propagateSynSpike)(struct learn_t *, const size_t *, const struct SynSpike *, const Constants *);
-    void (*trainWeightsStep)(struct learn_t *, const double *, const double *, const double *, const size_t *, const Constants *);
+    void (*trainWeightsStep)(struct learn_t *, const double *, const double *, const double *, const size_t *, const struct Sim *);
     void (*resetValues)(struct learn_t *, const size_t *);
     void (*free)(struct learn_t *);
 };

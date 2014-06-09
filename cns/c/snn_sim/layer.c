@@ -6,6 +6,8 @@
 #define DESTRUCT deleteSRMLayer
 #include <util/util_vector_tmpl.c>
 
+#include <sim.h>
+
 SRMLayer* createSRMLayer(size_t N, size_t *glob_idx, unsigned char statLevel) {
     SRMLayer *l = (SRMLayer*)malloc(sizeof(SRMLayer));
     l->N = N;
@@ -294,7 +296,8 @@ void propagateSpikeSRMLayer(SRMLayer *l, const size_t *ni, const SynSpike *sp, c
     l->ls_t->propagateSynSpike(l->ls_t, ni, sp, c);
 }
 
-void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constants *c) {
+void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Sim *s) {
+    const Constants *c = s->c;
     double u = c->u_rest;
 
     indLNode *act_node;
@@ -328,7 +331,7 @@ void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constant
     }
     
     if(c->learn) {
-        l->ls_t->trainWeightsStep(l->ls_t, &u, &p, &M, id_to_sim, c);
+        l->ls_t->trainWeightsStep(l->ls_t, &u, &p, &M, id_to_sim, s);
     }
 
 

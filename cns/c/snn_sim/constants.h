@@ -102,6 +102,11 @@ typedef struct {
     AdExConstants *adex;
     ResourceSTDPConstants *res_stdp;
     PreprocessConstants *preproc;
+    bool reinforcement;
+    double reward_ltd;
+    double reward_ltp;
+    double reward_baseline;
+    double tel;
 } Constants;
 
 int file_handler(void* user, const char* section, const char* name,

@@ -25,6 +25,7 @@
 
 
 
+
 pthread_barrier_t barrier;
 
 typedef struct {
@@ -32,10 +33,12 @@ typedef struct {
     size_t n_id;
 } NeuronAddress;
 
-typedef struct {
+struct Sim {
     pSRMLayerVector *layers;
     Constants *c;
-    
+    double global_reward;
+    doubleVector *stat_global_reward;
+
     SimRuntime *rt;
     NetSim *ns;
     size_t net_size;
@@ -43,13 +46,16 @@ typedef struct {
     size_t nthreads;
     NeuronAddress *na;
     size_t num_neurons;
-} Sim;
+
+    unsigned char stat_level;
+};
+
+typedef struct Sim Sim;
 
 typedef struct {
     Sim *s;
     size_t thread_id;
 } SimWorker;
-
 
 
 NetSim* createNetSim();
@@ -62,7 +68,7 @@ void configureConnMapNetSim(NetSim *ns, pSRMLayerVector *l);
 void propagateSpikeNetSim(Sim *s, SRMLayer *l, const size_t *ni, double t);
 
 
-Sim* createSim();
+Sim* createSim(size_t nthreads, unsigned char stat_level, Constants *c);
 void appendLayerSim(Sim *s, SRMLayer *l);
 // configure
 size_t getLayerIdOfNeuron(Sim *s, size_t n_id);
@@ -83,7 +89,7 @@ void runSim(Sim *s);
 void simulateNeuron(Sim *s, const size_t *layer_id, const size_t *n_id, double t,  const Constants *c);
 const SynSpike* getInputSpike(double t, const size_t *n_id, NetSim *ns, SimRuntime *sr, const Constants *c);
 void* simRunRoutine(void *args);
-
+void configureRewardModulation(Sim *s);
 
 
 #endif
