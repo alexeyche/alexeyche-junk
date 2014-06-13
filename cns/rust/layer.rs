@@ -9,16 +9,16 @@ struct Neuron {
 
 impl Neuron {
     fn new() -> Neuron {
-        Neuron { x : vec!{}, y : 0.0, fired : false, syn_fired : vec!{} }
+        Neuron { x : vec!{}, y : 0.0, fired : false, syn_fired : vec!{}, id : 0 }
     }
 }
 
-struct Layer {
+pub struct Layer {
     neurons : Vec<Neuron>,
 }
 
 impl Layer {
-    fn new(N: uint) -> Layer {
+    pub fn new(N: uint) -> Layer {
        let mut l = Layer { neurons : vec!{} };
        for i in range(0u, N) {
            l.neurons.push( Neuron::new() );
@@ -28,6 +28,3 @@ impl Layer {
 }
 
 
-fn main() {
-    let l = Layer::new(10);        
-}
