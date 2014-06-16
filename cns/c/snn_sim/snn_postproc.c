@@ -113,7 +113,8 @@ int main(int argc, char **argv) {
     if(a.output_file) {
         saveMatrixList(a.output_file, stat);
     }
-    TEMPLATE(deleteVector,pMatrix)(stat);    printf("%f\n", max_NMI);
+    printf("%f\n", max_NMI);
+    TEMPLATE(deleteVector,pMatrix)(stat);    
     TEMPLATE(deleteVector,double)(timeline_train);
     TEMPLATE(deleteVector,double)(timeline_test);
 
