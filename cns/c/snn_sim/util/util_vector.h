@@ -24,5 +24,13 @@
 
 void printDoubleVector(doubleVector *dv);
 void printIndVector(indVector *v);
+int int_compare (const void * a, const void * b);
+int double_compare(const void * a, const void * b);
+int ind_compare(const void * a, const void * b);
+void sortDoubleVector(doubleVector *v);
+void sortIntVector(intVector *v);
+void sortIndVector(indVector *v);
+
+
 
 #endif

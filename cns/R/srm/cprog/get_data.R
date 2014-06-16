@@ -10,15 +10,16 @@ source('../plot_funcs.R')
 library(snn)
 
 rundir="/home/alexeyche/prog/sim/runs"
+#rundir="/home/alexeyche/prog/sim/spear_runs"
 runname = "test_run"
 workdir=sprintf("%s/%s", rundir, runname)
 
 
-for(ep in 1:300) {
+for(ep in 1:1000) {
     output_spikes = sprintf("%s/%s_output_spikes.bin", workdir, ep)
     if(!file.exists(output_spikes)) { ep=ep-1; break }
 }
-#ep=40
+#ep=1
 
 
 ep_str=""
@@ -53,45 +54,65 @@ Trange=3000
 p1 = plot_rastl(net[(M-M+1):(M+sum(N))],T0=Ti*Trange,Tmax=(Ti+1)*Trange)
 
 if(file.exists(sprintf("%s.bin",stat_file))) {
-    u = loadMatrix(stat_file, 2)
-    p = loadMatrix(stat_file, 1)
-    syn=4
-    nid=2
-    Tplot=1:3000
-    
-    if(lrule == "OptimalSTDP") {
-        B = loadMatrix(stat_file, 3)
-        Cn = loadMatrix(stat_file, 3+nid)
-        syns = loadMatrix(stat_file, 3+N+nid)
-        dWn = loadMatrix(stat_file, 3+2*N+nid)
-        par(mfrow=c(4,1))
-        spikes = net[[M+nid]][net[[M+nid]]<max(Tplot)]
-        plot(spikes, rep(1,length(spikes)), xlim=c(min(Tplot),max(Tplot)) )
-        plotl(syns[syn,Tplot])
-        plotl(Cn[syn,Tplot])
-        plotl(dWn[syn,Tplot])
+    if(get_const("reinforcement") == "true") {
+        rew_all = c()
+        for(ep in 1:1000) {
+            stat_file = sprintf("%s/%d_stat", workdir, ep)
+            if(file.exists(sprintf("%s.bin",stat_file))) {
+                rew = loadMatrix(stat_file, 1)                
+                rew_all = c(rew_all, mean(rew[1,]))
+            } else {
+                break
+            }
+        }
+        if(!is.nan(rew_all)) {
+            plot(rew_all,type="l")
+        }
+    } else {
+        u = loadMatrix(stat_file, 2)
+        p = loadMatrix(stat_file, 1)
+        syn=56
+        nid=2
+        Tplot=1:3000
+        
+        if(lrule == "OptimalSTDP") {
+            B = loadMatrix(stat_file, 3)
+            syns = loadMatrix(stat_file, 3+nid)
+            Cn = loadMatrix(stat_file, 3+N+nid)
+            dWn = loadMatrix(stat_file, 3+2*N+nid)
+            par(mfrow=c(4,1))
+            spikes = net[[M+nid]][net[[M+nid]]<max(Tplot)]
+            plot(spikes, rep(1,length(spikes)), xlim=c(min(Tplot),max(Tplot)) )
+            plotl(syns[syn,Tplot])
+            plotl(Cn[syn,Tplot])
+            plotl(dWn[syn,Tplot])
+        }
+        if(lrule == "ResourceSTDP") {
+            res = loadMatrix(stat_file, 3)
+            y_tr = loadMatrix(stat_file, 4)
+            x_tr = loadMatrix(stat_file, 4+nid)
+            syns = loadMatrix(stat_file, 4+N+nid)
+            dWn = loadMatrix(stat_file, 4+2*N+nid)
+            par(mfrow=c(4,1))
+            spikes = net[[M+nid]][net[[M+nid]]<max(Tplot)]
+            plotl(y_tr[nid,Tplot])
+            plotl(x_tr[syn,Tplot])
+            plotl(res[nid,Tplot])
+            plotl(dWn[syn,Tplot])
+        }
     }
-    if(lrule == "ResourceSTDP") {
-        res = loadMatrix(stat_file, 3)
-        y_tr = loadMatrix(stat_file, 4)
-        x_tr = loadMatrix(stat_file, 4+nid)
-        syns = loadMatrix(stat_file, 4+N+nid)
-        dWn = loadMatrix(stat_file, 4+2*N+nid)
-        par(mfrow=c(4,1))
-        spikes = net[[M+nid]][net[[M+nid]]<max(Tplot)]
-        plotl(y_tr[nid,Tplot])
-        plotl(x_tr[syn,Tplot])
-        plotl(res[nid,Tplot])
-        plotl(dWn[syn,Tplot])
-    }
-    #plotl(B[nid,1:1000])
 }
 
 matrix_per_layer = 8
 Wnorm = W = NULL
+max_row = sum(sum(N)+M)
 for(Ni in 1:length(N)) {
     Wlayer = loadMatrix(model_file,(Ni-1)*matrix_per_layer+1)
+    if(ncol(Wlayer)<max_row) {
+        Wlayer = cbind(Wlayer, matrix(0, nrow=nrow(Wlayer), ncol=(max_row-ncol(Wlayer))))
+    }
     Wnorm = rbind(Wnorm, Wlayer/max(Wlayer))
+    
     W = rbind(W, Wlayer)
 }
 

@@ -1,6 +1,5 @@
 
-# it is include
-
+data_dir = "~/prog/sim"
 data = synth # synthetic control
 c(train_dataset, test_dataset) := read_ts_file(data, data_dir)
 elems = samples_from_dataset

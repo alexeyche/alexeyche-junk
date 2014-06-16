@@ -2,6 +2,7 @@
 
 #include "res_stdp.h"
 #include <layer.h>
+#include <sim.h>
 
 TResourceSTDP* init_TResourceSTDP(struct SRMLayer *l) {
     TResourceSTDP *ls = (TResourceSTDP*) malloc( sizeof(TResourceSTDP) );    
@@ -15,7 +16,10 @@ TResourceSTDP* init_TResourceSTDP(struct SRMLayer *l) {
         ls->stat_y_tr = (doubleVector**) malloc( l->N * sizeof(doubleVector*) );
         ls->stat_res = (doubleVector**) malloc( l->N * sizeof(doubleVector*) );
     }
+    ls->eligibility_trace = (double**) malloc( l->N * sizeof(double));
+    ls->reward = (double*) malloc( l->N * sizeof(double));
     for(size_t ni=0; ni < l->N; ni++) {
+        ls->eligibility_trace[ni] = (double*) malloc( l->nconn[ni] * sizeof(double) );
         ls->x_tr[ni] = (double*) malloc( l->nconn[ni] * sizeof(double) );
         ls->learn_syn_ids[ni] = TEMPLATE(createLList,ind)();
         if(l->statLevel>1) {
@@ -42,7 +46,9 @@ void toStartValues_TResourceSTDP(learn_t *ls_t) {
     for(size_t ni=0; ni<l->N; ni++) {
         ls->y_tr[ni] = 0;
         ls->res[ni] = 1;
+        ls->reward[ni] = 0.0;
         for(size_t con_i=0; con_i<l->nconn[ni]; con_i++) {
+            ls->eligibility_trace[ni][con_i] = 0.0;
             ls->x_tr[ni][con_i] = 0;
         }
     }
@@ -54,6 +60,15 @@ void propagateSynSpike_TResourceSTDP(learn_t *ls_t, const size_t *ni, const stru
     TEMPLATE(addValueLList,ind)(ls->learn_syn_ids[*ni], sp->syn_id);
 }
 
+float fastsqrt(float val) {
+    long tmp = *(long *)&val;
+    tmp -= 127L<<23; /* Remove IEEE bias from exponent (-2^23) */
+    /* tmp is now an appoximation to logbase2(val) */
+    tmp = tmp >> 1; /* divide by 2 */
+    tmp += 127L<<23; /* restore the IEEE bias from the exponent (+2^23) */
+    return *(float *)&tmp;
+}
+
 void consumeResource(double *res, const double *dw, const Constants *c) {
     double dr = sqrt(fabs(*dw)/max(c->res_stdp->Aplus, c->res_stdp->Aminus));
     *res -= dr; 
@@ -62,10 +77,11 @@ void consumeResource(double *res, const double *dw, const Constants *c) {
     }
 }
 
-void trainWeightsStep_TResourceSTDP(learn_t *ls_t, const double *u, const double *p, const double *M, const size_t *ni, const Constants *c) {
+void trainWeightsStep_TResourceSTDP(learn_t *ls_t, const double *u, const double *p, const double *M, const size_t *ni, const Sim *s) {
     TResourceSTDP *ls = (TResourceSTDP*)ls_t;
     SRMLayer *l = ls->base.l;
-    
+    const Constants *c = s->c; 
+
     if(l->fired[*ni] == 1) {
         ls->y_tr[*ni] += 1;
     }
@@ -83,12 +99,33 @@ void trainWeightsStep_TResourceSTDP(learn_t *ls_t, const double *u, const double
         double wmax = layerConstD(l, c->wmax);
         dw = bound_grad(&l->W[*ni][*syn_id], &dw, &wmax, c);
         dw = dw * ls->res[*ni] * layerConstD(l, c->lrate);
-        l->W[*ni][*syn_id] += c->dt * dw;
+        if(c->reinforcement) {
+            ls->eligibility_trace[*ni][*syn_id] += dw;
+            if(l->id == s->layers->size -1) {
+                if((l->fired[ *ni ] == 1)&&(s->rt->timeline_iter <  s->rt->classes_indices_train->size)) {
+                    if(floor(*ni/ (l->N/s->rt->uniq_classes->size)) ==  s->rt->classes_indices_train->array[ s->rt->timeline_iter ]) {
+                        ls->reward[ *ni ] = c->reward_ltp;
+                    } else {
+                        ls->reward[ *ni ] = c->reward_ltd;
+                    }
+                } else {
+                    ls->reward[*ni] = c->reward_baseline;
+                }
+            } else {
+                ls->reward[*ni] = s->global_reward;
+            }
+            l->W[*ni][*syn_id] += c->dt * dw * ls->reward[*ni];
+        } else {
+            l->W[*ni][*syn_id] += c->dt * dw;
+        }
         consumeResource(&ls->res[*ni], &dw, c);
 
         // melting
         ls->x_tr[*ni][*syn_id] += -c->dt * ls->x_tr[*ni][*syn_id] / c->res_stdp->tau_plus;
-        if(ls->x_tr[*ni][*syn_id] <= SYN_ACT_TOL) {
+        if(c->reinforcement) {
+            ls->eligibility_trace[*ni][*syn_id] += - c->dt * ls->eligibility_trace[*ni][*syn_id] / c->tel;
+        }
+        if((ls->x_tr[*ni][*syn_id] <= SYN_ACT_TOL)&&( (c->reinforcement)&&((ls->eligibility_trace[*ni][*syn_id]<=SYN_ACT_TOL)&&(ls->eligibility_trace[*ni][*syn_id]>=-SYN_ACT_TOL)))) {
             TEMPLATE(dropNodeLList,ind)(ls->learn_syn_ids[ *ni ], act_node);
         }
     }
@@ -111,6 +148,8 @@ void resetValues_TResourceSTDP(learn_t *ls_t, const size_t *ni) {
     ls->y_tr[*ni] = 0;
     ls->res[*ni] = 1;
     for(size_t con_i=0; con_i<l->nconn[*ni]; con_i++) {
+        ls->eligibility_trace[*ni][con_i] = 0.0;
+        ls->reward[*ni] = 0.0;
         ls->x_tr[*ni][con_i] = 0;
     }
     indLNode *act_node = NULL;

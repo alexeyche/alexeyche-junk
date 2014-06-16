@@ -52,12 +52,13 @@ int main(int argc, char **argv) {
                 propagateCurrentAdExLayer(l, &ni, &I);
                 simulateAdExLayerNeuron(l, &ni, c);
                 if(l->fired[ni] == 1) {
-                    TEMPLATE(insertVector,double)(net->list[ni], t);
+                    TEMPLATE(insertVector,double)(net->list[ni], c->preproc->mult*t);
                     l->fired[ni] = 0;
                 }
             }
         }
-        TEMPLATE(insertVector,double)(timeline, t);
+        t += 250/c->preproc->mult;
+        TEMPLATE(insertVector,double)(timeline, c->preproc->mult*t);
         TEMPLATE(insertVector,double)(ts_labels_current, getMatrixElement(ts_labels->array[0], ts_indices->array[ts_i], 0) );
     }
     Matrix *spikes = vectorArrayToMatrix(net->list, net->size);

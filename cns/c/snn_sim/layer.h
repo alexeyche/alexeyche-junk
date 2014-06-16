@@ -22,9 +22,9 @@
 
 #define SYN_ACT_TOL 0.0001 // value of synapse needed to delete 
 
-#define BACKPROP_POT 0
-#define SFA 1
-#define REFR 1
+#define BACKPROP_POT 1
+#define SFA 0
+#define REFR 0
 #define FS_INH 0
 
 typedef enum {EXC, INH} nspec_t;
@@ -93,7 +93,7 @@ void printSRMLayer(SRMLayer *l);
 void deleteSRMLayer(SRMLayer *l);
 void configureSRMLayer(SRMLayer *l, const indVector *inputIDs, const indVector *outputIDs, Constants *c);
 
-void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constants *c);
+void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const struct Sim *s, const double *t);
 pMatrixVector* serializeSRMLayer(SRMLayer *l);
 void loadSRMLayer(SRMLayer *l, Constants *c, pMatrixVector *data);
 void toStartValuesSRMLayer(SRMLayer *l, Constants *c);

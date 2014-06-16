@@ -16,6 +16,9 @@ Constants* createConstants(const char *filename) {
     c->adex = (AdExConstants*) malloc( sizeof(AdExConstants) );
     c->res_stdp = (ResourceSTDPConstants*) malloc( sizeof(ResourceSTDPConstants) );
     c->preproc = (PreprocessConstants*) malloc( sizeof(PreprocessConstants) );
+    c->pacemaker = (PacemakerConstants*) malloc( sizeof(PacemakerConstants) );
+    c->pacemaker->net_layer_ids = TEMPLATE(createVector,ind)();
+
     if (ini_parse(filename, file_handler, c) < 0) {
         printf("Can't load %s\n", filename);
         return(NULL);
@@ -73,6 +76,9 @@ int file_handler(void* user, const char* section, const char* name,
     Constants* c = (Constants*)user;
 
     #define MATCH(s, n) strcmp(section, s) == 0 && strcmp(name, n) == 0
+    if (MATCH("preprocess", "mult")) {
+        c->preproc->mult = atof(value);
+    } else 
     if (MATCH("preprocess", "gain")) {
         c->preproc->gain = atof(value);
     } else 
@@ -238,6 +244,30 @@ int file_handler(void* user, const char* section, const char* name,
     if (MATCH("optimal stdp", "weight_decay_factor")) {
         fillDoubleVector(c->weight_decay_factor, value);
     } else 
+    if (MATCH("learn", "reinforcement")) {
+        c->reinforcement = strcmp(value, "true") == 0;
+    } else 
+    if (MATCH("learn", "reward_baseline")) {
+        c->reward_baseline = atof(value);
+    } else 
+    if (MATCH("learn", "trew")) {
+        c->trew = atof(value);
+    } else 
+    if (MATCH("learn", "reward_ltp")) {
+        c->reward_ltp = atof(value);
+    } else 
+    if (MATCH("learn", "tel")) {
+        c->tel = atof(value);
+    } else 
+    if (MATCH("learn", "reward_ltd")) {
+        c->reward_ltd = atof(value);
+    } else 
+    if (MATCH("learn", "lrate")) {
+        fillDoubleVector(c->lrate, value);
+    } else 
+    if (MATCH("learn", "lrate")) {
+        fillDoubleVector(c->lrate, value);
+    } else 
     if (MATCH("learn", "lrate")) {
         fillDoubleVector(c->lrate, value);
     } else 
@@ -278,6 +308,21 @@ int file_handler(void* user, const char* section, const char* name,
     } else 
     if (MATCH("adex neuron", "b")) {
         c->adex->b = atof(value);
+    } else
+    if (MATCH("pacemaker", "amplitude")) {
+        c->pacemaker->amplitude = atof(value);
+    } else 
+    if (MATCH("pacemaker", "cumulative_period_delta")) {
+        c->pacemaker->cumulative_period_delta = atof(value);
+    } else 
+    if (MATCH("pacemaker", "frequency")) {
+        c->pacemaker->frequency = atof(value);
+    } else 
+    if (MATCH("pacemaker", "net_layer_ids")) {
+        fillIndVector(c->pacemaker->net_layer_ids, value);
+    } else 
+    if (MATCH("pacemaker", "pacemaker_on")) {
+        c->pacemaker->pacemaker_on = strcmp(value, "true") == 0;
     } else {
         return(0);
     } 

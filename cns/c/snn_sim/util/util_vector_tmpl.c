@@ -1,6 +1,8 @@
 
 #define INIT_SIZE 10
 
+
+
 TVEC(T)* TEMPLATE(createVector,T)() {
     TVEC(T) *a = (TVEC(T)*)malloc(sizeof(TVEC(T)));
     a->array = (T*)malloc(INIT_SIZE * sizeof(T));
@@ -41,3 +43,12 @@ TVEC(T)* TEMPLATE(copyFromArray,T)(T *a, size_t size) {
     }
     return(v);
 }    
+TVEC(T)* TEMPLATE(copyVector,T)(TVEC(T) *oldv) {
+    TVEC(T) *v = TEMPLATE(createVector,T)();
+    for(size_t eli=0; eli<oldv->size; eli++) {
+        TEMPLATE(insertVector,T)(v, oldv->array[eli]);
+    }
+    return(v);
+
+}
+

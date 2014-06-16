@@ -47,7 +47,8 @@ learn/res_stdp.o: learn/res_stdp.c /usr/include/stdc-predef.h \
  util/templates_clean.h util/util_vector_tmpl.h util/ini.h \
  util/util_dlink_list.h util/util_dlink_list_tmpl.h layer.h util/util.h \
  util/matrix.h util/util_vector_tmpl.h util/io.h learn/optim.h \
- learn/res_stdp.h
+ learn/res_stdp.h sim.h util/spikes_list.h sim/runtime.h sim/netsim.h \
+ util/util_dlink_list_tmpl.h
 
 /usr/include/stdc-predef.h:
 
@@ -206,3 +207,13 @@ util/io.h:
 learn/optim.h:
 
 learn/res_stdp.h:
+
+sim.h:
+
+util/spikes_list.h:
+
+sim/runtime.h:
+
+sim/netsim.h:
+
+util/util_dlink_list_tmpl.h:

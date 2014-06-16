@@ -22,6 +22,7 @@ typedef struct {
     int seed;
     char learn;
     bool calcStat;
+    unsigned char statLevel;
 } ArgOptionsSim;
 
 
@@ -39,6 +40,7 @@ void printArgs(const ArgOptionsSim *a) {
     printf("a->output_port = %d\n", a->output_port);
     printf("a->Tmax = %f\n", a->Tmax);
     printf("a->calcStat = %d\n", a->calcStat);
+    printf("a->statLevel = %d\n", a->statLevel);
 }
 
 void usageSim(void) {
@@ -55,6 +57,7 @@ void usageSim(void) {
     printf("\t-ip - port for input spikes\n");
     printf("\t-op - port for output spikes\n");
     printf("\t-? - print this message\n");
+    printf("\t--stat-level - (0 - NO STAT, 1 - REWARD STAT, 2 - FULL STAT)\n");
     exit(8);
 }
 
@@ -76,8 +79,17 @@ ArgOptionsSim parseSimOptions(int argc, char **argv) {
     args.output_port = -1;
     args.Tmax = 0;
     args.calcStat = false;
+    args.statLevel = 0;
     if(argc == 1) usageSim();
     while ((argc > 1) && (argv[1][0] == '-')) {
+        if(strcmp(argv[1], "--stat-level") == 0) {                
+            if(argc == 2) { 
+                printf("No options for --stat-level\n");
+                usageSim();
+            }
+            args.statLevel = atoi(argv[2]);
+            ++argv; --argc;
+        } else
         if(strcmp(argv[1], "-T") == 0) {                
             if(argc == 2) { 
                 printf("No options for -T\n");

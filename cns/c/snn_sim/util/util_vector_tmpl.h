@@ -13,5 +13,6 @@ void TEMPLATE(insertVector,T)(TVEC(T) *a, T element);
 void TEMPLATE(deleteVector,T)(TVEC(T) *a);
 void TEMPLATE(deleteVectorNoDestroy,T)(TVEC(T) *a);
 TVEC(T)* TEMPLATE(copyFromArray,T)(T *a, size_t size);
+TVEC(T)* TEMPLATE(copyVector,T)(TVEC(T) *v);
 
 #endif

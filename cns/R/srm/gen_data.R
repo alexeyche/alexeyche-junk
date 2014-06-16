@@ -8,24 +8,24 @@ ornstein_uhlenbeck <- function(T, n, nu,lambda,sigma,x0){
   }
   return(x);
 }
-#path <- "/home/alexeyche/prog/sim"
-path <- "/home/alexeyche/my/sim"
+path <- "/home/alexeyche/prog/sim/ts"
+#path <- "/home/alexeyche/my/sim"
 gen_ou <- function() {
     set.seed(8)
     d1 <- ornstein_uhlenbeck(10,999, 0.2, 1, 0.007, 0.15)
     d2 <- ornstein_uhlenbeck(10,999, 0.19, 0.5, 0.01, 0.15)
     d3 <- ornstein_uhlenbeck(10,999, 0.15, 0.5, 0.01, 0.21)
-    write.table(d1, path + "/stimuli/d1.csv", sep=",", col.names=F, row.names=F) 
-    write.table(d2, path + "/stimuli/d2.csv", sep=",", col.names=F, row.names=F)
-    write.table(d3, path + "/stimuli/d3.csv", sep=",", col.names=F, row.names=F)  
+    write.table(d1, sprintf("%s/ou_test/d1.csv",path), sep=",", col.names=F, row.names=F) 
+    write.table(d2, sprintf("%s/ou_test/d2.csv",path), sep=",", col.names=F, row.names=F)
+    write.table(d3, sprintf("%s/ou_test/d3.csv",path), sep=",", col.names=F, row.names=F)  
     for(i in 1:10) {
         set.seed(i+10)
         d1c <- ornstein_uhlenbeck(10,999, 0.2, 1, 0.007, 0.15)
         d2c <- ornstein_uhlenbeck(10,999, 0.19, 0.5, 0.01, 0.15)
         d3c <- ornstein_uhlenbeck(10,999, 0.15, 0.5, 0.01, 0.21)
-        write.table(d1c, paste(path+"/stimuli/d1_",i,".csv",sep=""), sep=",", col.names=F, row.names=F) 
-        write.table(d2c, paste(path+"/stimuli/d2_",i,".csv",sep=""), sep=",", col.names=F, row.names=F)
-        write.table(d3c, paste(path+"/stimuli/d3_",i,".csv",sep=""), sep=",", col.names=F, row.names=F) 
+        write.table(d1c, paste(path,"/ou_test/d1_",i,".csv",sep=""), sep=",", col.names=F, row.names=F) 
+        write.table(d2c, paste(path,"/ou_test/d2_",i,".csv",sep=""), sep=",", col.names=F, row.names=F)
+        write.table(d3c, paste(path,"/ou_test/d3_",i,".csv",sep=""), sep=",", col.names=F, row.names=F) 
     }
     
     plot(d1, type="l", col="blue")

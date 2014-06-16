@@ -73,18 +73,19 @@ genSpikePattern = function(M, rawdata, pattDur, simdt, lambda=4, hb=NULL, lb=NUL
   if(is.null(hb)) hb <- max(rawdata)
   if(is.null(lb)) lb <- min(rawdata)
   
-
-  patt_dt <- 0
-  approx_data = rep(NA, pattDur/simdt)                                      
-  for(ri in 1:length(rawdata)) {
-    patt_dt <- patt_dt + pattDur/length(rawdata)
-    ct = ceiling(signif(patt_dt/simdt, digits=5))                                        
-    approx_data[ct] = rawdata[ri]
-  }
-  
-  approx_data = na.approx(approx_data)
-  approx_data = approx_data[!is.na(approx_data)]
-  
+# 
+#   patt_dt <- 0
+#   approx_data = rep(NA, pattDur/simdt)                                      
+#   for(ri in 1:length(rawdata)) {
+#     patt_dt <- patt_dt + pattDur/length(rawdata)
+#     ct = ceiling(signif(patt_dt/simdt, digits=5))                                        
+#     approx_data[ct] = rawdata[ri]
+#   }
+#   
+#   approx_data = na.approx(approx_data)
+#   approx_data = approx_data[!is.na(approx_data)]
+#   
+  approx_data = rawdata
   gen_spikes = blank_net(M)
                                    
   neurons_rate = rep(0, M)                                      

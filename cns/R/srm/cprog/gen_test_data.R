@@ -4,23 +4,51 @@ library(snn)
 setwd("~/prog/alexeyche-junk/cns/R/srm/cprog")
 #setwd("~/my/git/alexeyche-junk/cns/R/srm/cprog")
 
-source('../ucr_ts.R')
-source('../gen_spikes.R')
-source('../serialize_to_bin.R')
-source('../plot_funcs.R')
 
 
 spike_file = "/home/alexeyche/prog/sim/test_spikes"
 
-net=blank_net(10)
+N=100
 
-net[[1]] = c(1, 5, 10)
-net[[5]] = c(4,8)
-net[[10]] =c(2)
+gen_pattern = function(f, dur, N, len=1000, del=50) {
+    net=blank_net(N)
+    for(t in seq(0,dur,length.out=len)) {
+        i = as.integer(99*(1+f(t/del))/2)+1
+        net[[i]] = c(net[[i]], t) 
+    }
+    return(net)
+}
+fun1 = function(x) {
+    return(cos(x))
+}
+fun2 = function(x) {
+    return(-cos(x))
+}
+patt_dur = 5000
+p1 = gen_pattern(fun1, patt_dur, N)
+p2 = gen_pattern(fun2, patt_dur, N)
+
+patt_nums = 100
+net = blank_net(N)
+patts = list(p1, p2)
+glob_t = 0
+classes = c()
+timeline = c()
+for(i in 1:patt_nums) {
+    p_id = sample(length(patts),1)
+    for(ni in 1:N) {
+        net[[ni]] = c(net[[ni]], patts[[p_id]][[ni]] + glob_t)
+    }
+    glob_t = glob_t + patt_dur
+    timeline = c(timeline, glob_t)
+    classes = c(classes, as.double(p_id))
+}
+
+plot_rastl(p1)
 
 saveMatrixList(spike_file, list(list_to_matrix(net), 
-                                matrix(c(100)),
-                                matrix(c(1))
+                                matrix(timeline),
+                                matrix(classes)
 )
 )
 

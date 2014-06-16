@@ -14,7 +14,7 @@ variable {
  type: FLOAT
  size: 1
  min:  50.0
- max:  200.0
+ max:  600.0
 }
 
 variable {

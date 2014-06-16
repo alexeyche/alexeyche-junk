@@ -18,6 +18,8 @@ typedef struct {
     double **x_tr;
     double *y_tr;
     double *res;
+    double **eligibility_trace;
+    double *reward;
 
     doubleVector ***stat_x_tr;
     doubleVector **stat_y_tr;
@@ -27,7 +29,7 @@ typedef struct {
 TResourceSTDP* init_TResourceSTDP(struct SRMLayer *l);
 void toStartValues_TResourceSTDP(learn_t *ls_t);
 void propagateSynSpike_TResourceSTDP(learn_t *ls_t, const size_t *ni, const struct SynSpike *sp, const Constants *c);
-void trainWeightsStep_TResourceSTDP(learn_t *ls_t, const double *u, const double *p, const double *M, const size_t *ni, const Constants *c);
+void trainWeightsStep_TResourceSTDP(learn_t *ls_t, const double *u, const double *p, const double *M, const size_t *ni, const struct Sim *s);
 void resetValues_TResourceSTDP(learn_t *ls_t, const size_t *ni);
 void free_TResourceSTDP(learn_t *ls_t);
 

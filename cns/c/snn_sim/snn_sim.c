@@ -25,19 +25,20 @@ int main(int argc, char **argv) {
     }
 //    printConstants(c);
     assert(a.jobs != 0);
-    Sim *s = createSim(a.jobs);
+    unsigned char statLevel = 0;
+    if(saveStat) {
+        statLevel = a.statLevel;
+        if(a.calcStat) {
+            statLevel = 1;
+        }
+    }        
+    Sim *s = createSim(a.jobs, statLevel, c);
     
     char *model_to_load = NULL;
     if(a.model_file) model_to_load = strdup(a.model_file);
     if(a.model_file_load) model_to_load = strdup(a.model_file_load); 
     
-    unsigned char statLevel = 0;
-    if(saveStat) {
-        statLevel = 2;
-        if(a.calcStat) {
-            statLevel = 1;
-        }
-    }        
+
     if(model_to_load) {
         loadLayersFromFile(s, model_to_load, c, statLevel);
     } else {
@@ -62,6 +63,10 @@ int main(int argc, char **argv) {
 
     if(statLevel > 0) {
         pMatrixVector *mv = TEMPLATE(createVector,pMatrix)();
+        if((c->reinforcement)&&(!a.calcStat)) {
+            Matrix *m_stat_glob_rew = vectorArrayToMatrix(&s->stat_global_reward, 1);
+            TEMPLATE(insertVector,pMatrix)(mv, m_stat_glob_rew);
+        }
         for(size_t li=0; li < s->layers->size; li++) {
             SRMLayer *l = s->layers->array[li];
             if(a.calcStat) {

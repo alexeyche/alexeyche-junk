@@ -12,6 +12,7 @@ from numpy import log2
 
 jobs = multiprocessing.cpu_count()
 snndir = "/home/alexeyche/prog/alexeyche-junk/cns/c"
+<<<<<<< HEAD
 rundir = "/home/alexeyche/prog/sim/runs"
 train_spikes = "/home/alexeyche/prog/sim/spikes/ucr/*_train_spikes.bin"
 test_spikes = "/home/alexeyche/prog/sim/spikes/ucr/test_spikes.bin"
@@ -20,16 +21,28 @@ epochs = 10
 run_sim_cmd = "%(snndir)s/scripts/run_sim.sh -w %(workdir)s -e %(epochs)s -l -a %(train_spikes)s &> %(workdir)s/run_sim.log"
 run_sim_calc_cmd = "%(snndir)s/bin/snn_sim -ml %(workdir)s/%(epochs)s_model.bin -l no  -c %(workdir)s/constants.ini -i %(test_spikes)s -j %(jobs)s -o %(workdir)s/test_spikes.bin"
 postproc_cmd = "%(snndir)s/bin/snn_postproc -i %(workdir)s/%(epochs)s_output_spikes.bin -t %(workdir)s/test_spikes.bin -o %(workdir)s/postproc_out.bin -k 5:5:50 -j %(jobs)s"
+=======
+rundir = "/home/alexeyche/prog/sim/spear_runs"
+train_spikes = "/home/alexeyche/prog/sim/spikes/ucr/*_train_spikes.bin"
+test_spikes = "/home/alexeyche/prog/sim/spikes/ucr/test_spikes.bin"
+epochs = 20
+
+run_sim_cmd = "%(snndir)s/scripts/run_sim.sh -w %(workdir)s -e %(epochs)s -l -a -v %(test_spikes)s %(train_spikes)s &> %(workdir)s/run_sim.log"
+>>>>>>> 42993710894bc2e5bea949dfdc32ab2951a8b0a3
 
 def run(d):
     try:
         p = subprocess.Popen(run_sim_cmd % d, stdout=subprocess.PIPE, shell=True) 
         sin, _ = p.communicate()
+<<<<<<< HEAD
         p = subprocess.Popen(run_sim_calc_cmd % d, stdout=subprocess.PIPE, shell=True) 
         sin, _ = p.communicate()
         p = subprocess.Popen(postproc_cmd % d, stdout=subprocess.PIPE, shell=True) 
         sin, _ = p.communicate()
         return -float(sin.split()[-1].rstrip("\n"))
+=======
+        return 1-float(sin.split()[-1].rstrip("\n"))
+>>>>>>> 42993710894bc2e5bea949dfdc32ab2951a8b0a3
     except:
         return 100
 
@@ -79,9 +92,13 @@ def main(job_id, params):
     l = run(  
               { 
                   'train_spikes' : train_spikes,
+                  'test_spikes' : test_spikes,
                   'workdir' : workdir,
                   'snndir' : snndir,
+<<<<<<< HEAD
                   'test_spikes' : test_spikes,
+=======
+>>>>>>> 42993710894bc2e5bea949dfdc32ab2951a8b0a3
                   'epochs' : epochs,
                   'jobs' : jobs,
               }
@@ -90,4 +107,8 @@ def main(job_id, params):
 
 
 if __name__ == '__main__':
+<<<<<<< HEAD
     patch_and_copy_const("/home/alexeyche/my/git/sim/runs/0", { 'net_edge_prob' : 0.5 } )
+=======
+    print patch_and_copy_const("/home/alexeyche/prog/sim/spear_runs/0", { "net_edge_prob" : 1 })
+>>>>>>> 42993710894bc2e5bea949dfdc32ab2951a8b0a3

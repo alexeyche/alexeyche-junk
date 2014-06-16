@@ -6,6 +6,8 @@
 #define DESTRUCT deleteSRMLayer
 #include <util/util_vector_tmpl.c>
 
+#include <sim.h>
+
 SRMLayer* createSRMLayer(size_t N, size_t *glob_idx, unsigned char statLevel) {
     SRMLayer *l = (SRMLayer*)malloc(sizeof(SRMLayer));
     l->N = N;
@@ -294,12 +296,18 @@ void propagateSpikeSRMLayer(SRMLayer *l, const size_t *ni, const SynSpike *sp, c
     l->ls_t->propagateSynSpike(l->ls_t, ni, sp, c);
 }
 
-void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constants *c) {
+void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Sim *s, const double *t) {
+    const Constants *c = s->c;
     double u = c->u_rest;
-
+    if((l->id == 0)&&(c->pacemaker->pacemaker_on)) {
+        double u_p = c->pacemaker->amplitude + c->pacemaker->amplitude * sin(2*PI*c->pacemaker->frequency * *t/1000 - l->ids[*id_to_sim] * c->pacemaker->cumulative_period_delta/1000);
+//        printf("t: %f, id %zu u_p %f cum %f\n", *t, *id_to_sim, u_p, l->ids[*id_to_sim] * c->pacemaker->cumulative_period_delta);
+        u += u_p;
+    }
     indLNode *act_node;
     while( (act_node = TEMPLATE(getNextLList,ind)(l->active_syn_ids[ *id_to_sim ]) ) != NULL ) {
         const size_t *syn_id = &act_node->value;
+
         u += l->W[ *id_to_sim ][ *syn_id ] * l->syn[ *id_to_sim ][ *syn_id ];
     }
 
@@ -328,7 +336,7 @@ void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constant
     }
     
     if(c->learn) {
-        l->ls_t->trainWeightsStep(l->ls_t, &u, &p, &M, id_to_sim, c);
+        l->ls_t->trainWeightsStep(l->ls_t, &u, &p, &M, id_to_sim, s);
     }
 
 
@@ -354,7 +362,7 @@ void simulateSRMLayerNeuron(SRMLayer *l, const size_t *id_to_sim, const Constant
 #endif
             l->syn_fired[ *id_to_sim ][ *syn_id ] = 0; 
         }
-        if( l->syn[ *id_to_sim ][ *syn_id ] < SYN_ACT_TOL ) {
+        if( ( l->syn[ *id_to_sim ][ *syn_id ] < SYN_ACT_TOL ) && ( l->syn[ *id_to_sim ][ *syn_id ] > -SYN_ACT_TOL )){
             TEMPLATE(dropNodeLList,ind)(l->active_syn_ids[ *id_to_sim ], act_node);
         }
     }

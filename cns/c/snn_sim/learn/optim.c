@@ -3,6 +3,7 @@
 #include "optim.h"
 
 #include <layer.h>
+#include <sim.h>
 
 TOptimalSTDP* init_TOptimalSTDP(SRMLayer *l) {
     TOptimalSTDP *ls = (TOptimalSTDP*) malloc( sizeof(TOptimalSTDP));
@@ -15,9 +16,11 @@ TOptimalSTDP* init_TOptimalSTDP(SRMLayer *l) {
         ls->stat_B = (doubleVector**) malloc( l->N*sizeof(doubleVector*));
         ls->stat_C = (doubleVector***) malloc( l->N*sizeof(doubleVector**));
     }
+    ls->eligibility_trace = (double*) malloc( l->N*sizeof(double));
     for(size_t ni=0; ni<l->N; ni++) {
         ls->learn_syn_ids[ni] = TEMPLATE(createLList,ind)();
         ls->C[ni] = (double*) malloc(l->nconn[ni]*sizeof(double));
+        ls->eligibility_trace[ni] = 0;
         if(l->statLevel>1) {
             ls->stat_B[ni] = TEMPLATE(createVector,double)();
             ls->stat_C[ni] = (doubleVector**) malloc( l->nconn[ni]*sizeof(doubleVector*));
@@ -54,18 +57,38 @@ void propagateSynSpike_TOptimalSTDP(learn_t *ls_t, const size_t *ni, const SynSp
     }
 }
 
-void trainWeightsStep_TOptimalSTDP(learn_t *ls_t, const double *u, const double *p, const double *M, const size_t *ni, const Constants *c) {
+void trainWeightsStep_TOptimalSTDP(learn_t *ls_t, const double *u, const double *p, const double *M, const size_t *ni, const Sim *s) {
     TOptimalSTDP *ls = (TOptimalSTDP*)ls_t;
     SRMLayer *l = ls->base.l; 
+    const Constants *c = s->c;
 
-    ls->B[ *ni ] = B_calc( &l->fired[ *ni ], p, &l->pacc[ *ni ], c);
+    if (c->reinforcement) {
+        if(l->id == s->layers->size -1) {
+            if((l->fired[ *ni ] == 1)&&(s->rt->timeline_iter <  s->rt->classes_indices_train->size)) {
+                if(floor(*ni/ (l->N/s->rt->uniq_classes->size)) ==  s->rt->classes_indices_train->array[ s->rt->timeline_iter ]) {
+    //                printf("%zu got spike ltp (class %zu)\n", *ni, s->rt->classes_indices_train->array[ s->rt->timeline_iter ]);
+                    ls->B[ *ni ] = c->reward_ltp;
+                } else {
+    //                printf("%zu got spike ltd (class %zu)\n", *ni, s->rt->classes_indices_train->array[ s->rt->timeline_iter ]);
+                    ls->B[ *ni ] = c->reward_ltd;
+                }
+            } else {
+                ls->B[ *ni ] = c->reward_baseline;
+            }
+        } else {
+            ls->B[ *ni ] = s->global_reward - s->mean_global_reward/c->trew;
+        }
+    } else {
+//        printf("%zu unsup\n", *ni);
+        ls->B[ *ni ] = B_calc( &l->fired[ *ni ], p, &l->pacc[ *ni ], c);
+    }
     indLNode *act_node = NULL;
     while( (act_node = TEMPLATE(getNextLList,ind)(ls->learn_syn_ids[ *ni ]) ) != NULL ) {
 //            for(size_t con_i=0; con_i < l->nconn[ *ni ]; con_i++) {
 //                const size_t *syn_id = &con_i;
         const size_t *syn_id = &act_node->value;
 //                if( (l->C[ *ni ][ *syn_id ] == 0) && (l->syn[ *ni ][ *syn_id ] == 0) ) continue;
-        double dC = C_calc( &l->fired[ *ni ], p, u, M, &l->syn[ *ni ][ *syn_id ], c);
+        double dC = C_calc( &l->fired[ *ni ], p, u, M, &l->syn[ *ni ][ *syn_id ], c); // * l->syn_spec[ *ni ][ *syn_id ];
         ls->C[ *ni ][ *syn_id ] += -ls->C[ *ni ][ *syn_id ]/c->tc + dC;
 //                printf("dC: %f C: %f, params: %d %f %f %f %f\n", dC, l->C[ *ni ][ *syn_id ], l->fired[ *ni ], p, u, l->syn[ *ni ][ *syn_id ], M);
         
@@ -78,7 +101,12 @@ void trainWeightsStep_TOptimalSTDP(learn_t *ls_t, const double *u, const double 
 #endif               
         double wmax = layerConstD(l, c->wmax);
         dw = bound_grad(&l->W[ *ni ][ *syn_id ], &dw, &wmax, c);
-        l->W[ *ni ][ *syn_id ] += dw;
+        if(l->syn_spec[*ni][*syn_id]>0) {
+          l->W[ *ni ][ *syn_id ] += dw;
+        } else {
+            l->W[ *ni ][ *syn_id ] += dw*0.1;
+        }
+
         
         if( (ls->C[ *ni ][ *syn_id ] < LEARN_ACT_TOL ) && (ls->C[ *ni ][ *syn_id ] > -LEARN_ACT_TOL ) && 
                                                           (dC < LEARN_ACT_TOL ) && (dC > -LEARN_ACT_TOL ) ) {

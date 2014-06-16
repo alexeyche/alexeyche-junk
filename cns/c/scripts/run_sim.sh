@@ -5,13 +5,14 @@ CWD=$(dirname $CWD_SCR)
 
 
 function usage {
-    echo "$0 -w WORK_DIR -s -l -e EPOCHS INPUT_FILE1 [INPUT_FILE2]"
+    echo "$0 -w WORK_DIR -s -l -e EPOCHS -v TEST_SPIKES.BIN INPUT_FILE1 [INPUT_FILE2]"
 }
 
 ulimit -c unlimited
 
 pushd $CWD &> /dev/null
-SRM_SIM="../bin/snn_sim"
+SNN_SIM="../bin/snn_sim"
+SNN_POSTPROC="../bin/snn_postproc"
 
 INPUT_FILES=
 WORK_DIR=
@@ -19,10 +20,11 @@ STAT_SAVE="no"
 EPOCH=
 LEARN="no"
 AUTO="no"
+EVALUATE=
 JOBS=$(cat /proc/cpuinfo | grep processor | wc -l)
 
 # Enumerating options
-while getopts "j:w:hsle:a" opt; do
+while getopts "j:w:hsle:av:" opt; do
     case "$opt" in
         w) WORK_DIR=${OPTARG} ;;
         s) STAT_SAVE="yes" ;;
@@ -30,6 +32,7 @@ while getopts "j:w:hsle:a" opt; do
         e) EPOCH=${OPTARG} ;; 
         a) AUTO="yes" ;; 
         j) JOBS=${OPTARG} ;;
+        v) EVALUATE=${OPTARG} ;; 
         h) usage && exit 0 ;;
         *) usage && exit 1 ;;
     esac
@@ -74,6 +77,7 @@ function get_const {
 
 MEAN_P_DUR=$(get_const mean_p_dur)
 LEARNING_RULE=$(get_const learning_rule)
+REINFORCEMENT=$(get_const reinforcement)
 
 INP_ITER=1
 EPOCHS=$(seq $MIN_EP $MAX_EP)
@@ -101,9 +105,11 @@ for EP in $EPOCHS; do
     STAT_OPT=
     if [ "$STAT_SAVE" == "yes" ]; then
         STAT_OPT="-s $WORK_DIR/${EPOCH_SFX}stat.bin"
+    elif [[ "$REINFORCEMENT" =~ "true" ]]; then
+        STAT_OPT="--stat-level 1 -s $WORK_DIR/${EPOCH_SFX}stat.bin"
     fi    
     INPUT_FILE=$INPUT_FILES_DIR/$(echo $INPUT_FILES_BN | cut -d ' ' -f $INP_ITER)
-    $SRM_SIM -c $WORK_DIR/constants.ini -i $INPUT_FILE -o $OUTPUT_SPIKES $STAT_OPT $MODEL_TO_LOAD_OPT -ms $MODEL_FILE -l $LEARN -j $JOBS $TMAX_OPT &> $OUTPUT_FILE
+    $SNN_SIM -c $WORK_DIR/constants.ini -i $INPUT_FILE -o $OUTPUT_SPIKES $STAT_OPT $MODEL_TO_LOAD_OPT -ms $MODEL_FILE -l $LEARN -j $JOBS $TMAX_OPT &> $OUTPUT_FILE
     if [ "$?" -ne 0 ]; then
         echo "Not null exit code ($?)"
         exit $?
@@ -112,7 +118,12 @@ for EP in $EPOCHS; do
     if [ $INP_ITER -gt $MAX_INPUT_FILES ]; then
         INP_ITER=1
     fi        
+    LAST_EP=$EP
 done
 
+if [ -n "$EVALUATE" ]; then
+    INPUT_FILE=$INPUT_FILES_DIR/$(echo $INPUT_FILES_BN | cut -d ' ' -f 1)
+    ./eval_model.sh -m $WORK_DIR/${LAST_EP}_model.bin -e $EVALUATE -t $INPUT_FILE
+fi    
 
 popd &> /dev/null
