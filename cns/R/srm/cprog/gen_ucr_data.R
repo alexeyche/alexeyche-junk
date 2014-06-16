@@ -8,15 +8,17 @@ data_dir = '~/prog/sim'
 
 samples_per_class = 50
 
-samples_from_dataset = 10
-sample_size = 60
-selected_classes = c(1,2,3,4)
+samples_from_dataset = 50
+sample_size = 1000
+#sample_size = 1024
+selected_classes = c(1,2,3,4,5,6)
 
 data = synth # synthetic control
+#data = starlight_curves
 
 train_fname = sprintf("%s/ts/%s/%s_TRAIN_%s", data_dir,data,data,sample_size)
 test_fname = sprintf("%s/ts/%s/%s_TEST_%s", data_dir,data,data,sample_size)
-if(!file.exists(train_fname)) {
+if(!file.exists(sprintf("%s.bin", train_fname))) {
     c(train_dataset, test_dataset) := read_ts_file(data, NA, data_dir)
     train_dataset_inter = matrix(0, length(train_dataset), sample_size+1)
     test_dataset_inter = matrix(0, length(test_dataset), sample_size+1)
@@ -32,18 +34,31 @@ if(!file.exists(train_fname)) {
         test_dataset_inter[i, ] = c(test_dataset[[i]]$label,inter_ts)
         test_dataset_inter_bin[[i]] = matrix(inter_ts, nrow=1, ncol=length(inter_ts))
     }
-    write.table(train_dataset_inter,file=fname,sep=" ", col.names = F, row.names = F, append=F)
+    #write.table(train_dataset_inter,file=fname,sep=" ", col.names = F, row.names = F, append=F)
     saveMatrixList(train_fname, train_dataset_inter_bin)
     saveMatrixList(sprintf("%s_labels", train_fname), list(matrix(sapply(train_dataset, function(x) x$label))) )
 
-    write.table(test_dataset_inter,file=fname,sep=" ", col.names = F, row.names = F)
+    #write.table(test_dataset_inter,file=fname,sep=" ", col.names = F, row.names = F)
     saveMatrixList(test_fname, test_dataset_inter_bin)
     saveMatrixList(sprintf("%s_labels", test_fname), list(matrix(sapply(test_dataset, function(x) x$label))) )
 }
 
+train_dataset = list()
+test_dataset = list()
+# train_labels = c(loadMatrix(sprintf("%s_labels", train_fname),1))
+# for(i in 1:length(train_labels)) {
+#     train_dataset[[i]] = list(data=loadMatrix(train_fname, i), label=train_labels[i])
+#     if(i>100) break
+# }
+# test_labels = c(loadMatrix(sprintf("%s_labels", test_fname),1))
+# for(i in 1:length(test_labels)) {
+#     test_dataset[[i]] = list(data=loadMatrix(test_fname, i), label=test_labels[i])
+#     if(i>100) break
+# }
+fiter=0
 for(fname in c(train_fname, test_fname)) {
     data_labels = c(loadMatrix(sprintf("%s_labels", fname), 1))
-
+    iter=1
     data_selected = list()
     data_labels_selected = c()
     for(cl in selected_classes) {
@@ -51,11 +66,55 @@ for(fname in c(train_fname, test_fname)) {
             m = loadMatrix(fname, (cl-1)*samples_per_class+i)
             data_selected[[ length(data_selected)+1 ]] = m
             data_labels_selected = c(data_labels_selected, data_labels[ (cl-1)*samples_per_class+i ])
+            if(fiter==0) {
+                train_dataset[[iter]] = list(data=m, label=data_labels[ (cl-1)*samples_per_class+i ])
+            } else {
+                test_dataset[[iter]] = list(data=m, label=data_labels[ (cl-1)*samples_per_class+i ])
+            }
+            iter=iter+1
         }           
     }
     saveMatrixList(sprintf("%s_sel", fname), data_selected)
     saveMatrixList(sprintf("%s_sel_labels", fname), list(matrix(data_labels_selected)))
+    fiter=fiter+1
 }
+
+source('../gen_spikes.R')    
+patterns = list()
+dt=1
+duration=1000
+M=100
+for(ds in train_dataset) {
+    p = genSpikePattern(M, ds$data, duration, dt, lambda=25)
+    p = lapply(p, function(sp) sp*1)
+    patterns[[length(patterns)+1]] = list(data=p, label=ds$label)
+}
+
+test_patterns = list()
+it=0
+for(ds in test_dataset) {
+    p = genSpikePattern(M, ds$data, duration, dt, lambda=25)
+    p = lapply(p, function(sp) sp*1)
+    test_patterns[[length(test_patterns)+1]] = list(data=p, label=ds$label)
+    cat("iter number: ", it, "\n")
+    it=it+1
+}
+
+duration=1000
+gap=0
+spikes_dir = "~/prog/sim/spikes/ucr"
+for(ep in 1:10) {
+    ntrain = NetClass(patterns[sample(length(patterns), length(patterns))], duration, gap=gap)
+    saveMatrixList(sprintf("%s/%s_train_spikes",spikes_dir,ep), list(list_to_matrix(ntrain$net), 
+                                                                     as.matrix(ntrain$timeline),
+                                                                     as.matrix(ntrain$labels)))    
+}
+ntest = NetClass(test_patterns[sample(length(test_patterns), length(test_patterns))], duration, gap=gap)
+saveMatrixList(sprintf("%s/test_spikes",spikes_dir), list(list_to_matrix(ntest$net), 
+                                                                 as.matrix(ntest$timeline),
+                                                                 as.matrix(ntest$labels)))    
+
+
 #c(train_dataset, test_dataset) := read_ts_file(data, sample_size,data_dir)
 #elems = samples_from_dataset
 #train_dataset = train_dataset[ c(sample(1:50, elems), sample(51:100, elems), sample(101:150,elems),

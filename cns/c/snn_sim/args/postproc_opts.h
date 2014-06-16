@@ -15,6 +15,7 @@ typedef struct {
     doubleVector *kernel_values;
     const char *output_file;
     int jobs;
+    int ignore_first_neurons;
 } ArgOptionsPostProc;
 
 void usagePostProc(void) {
@@ -24,6 +25,7 @@ void usagePostProc(void) {
     printf("\t-o - output file with stat\n");
     printf("\t-k - kernel range for postprocess (start:delta:end)\n");
     printf("\t-j - jobs\n");
+    printf("\t--ignore-first-neurons - number neurons to ingore\n");
     printf("\t-? - print this message\n");
     exit(8);
 }
@@ -46,8 +48,17 @@ ArgOptionsPostProc parsePostProcOptions(int argc, char **argv) {
     args.input_test_spikes = NULL;
     args.output_file = NULL;
     args.jobs = 1;
+    args.ignore_first_neurons = 0;
     if(argc == 1) usagePostProc();
     while ((argc > 1) && (argv[1][0] == '-')) {
+        if(strcmp(argv[1], "--ignore-first-neurons") == 0) {                
+             if(argc == 2) { 
+                 printf("No options for --ignore-first-neurons\n");
+                 usagePostProc();
+             }
+             args.ignore_first_neurons = atoi(argv[2]);
+             ++argv; --argc;
+        } else 
         if(strcmp(argv[1], "-j") == 0) {                
              if(argc == 2) { 
                  printf("No options for -o\n");

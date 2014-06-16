@@ -32,14 +32,15 @@ pMatrixVector* readMatrixList(const char *filename) {
         }
         
         if(strcmp(type, "double") == 0) {
-            Matrix *m = createMatrix(i, j); 
-            if(fread(m->vals, sizeof(double), i*j, f) != i*j) {
-                printf("Error while reading matrix in matrix list file %s\n", filename);
-                break;
-            }
-            TEMPLATE(insertVector,pMatrix)(mlist, m);
+          Matrix *m = createMatrix(i, j); 
+          if(fread(m->vals, sizeof(double), i*j, f) != i*j) {
+              printf("Error while reading matrix in matrix list file %s\n", filename);
+              break;
+          }
+          TEMPLATE(insertVector,pMatrix)(mlist, m);
         } else {
             printf("Found errors in input file %s\n", filename);        
+            break;
         }
     }
     fclose(f);

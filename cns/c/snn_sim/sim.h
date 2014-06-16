@@ -37,6 +37,7 @@ struct Sim {
     pSRMLayerVector *layers;
     Constants *c;
     double global_reward;
+    double mean_global_reward;
     doubleVector *stat_global_reward;
 
     SimRuntime *rt;

@@ -201,7 +201,7 @@ AUTOMAKE = ${SHELL} /home/alexeyche/prog/alexeyche-junk/cns/c/missing automake-1
 AWK = gawk
 CC = gcc
 CCDEPMODE = depmode=gcc3
-#AM_CFLAGS = -Wall -std=gnu99 -pthread -O0 -g  
+#AM_CFLAGS = -Wall -std=gnu99 -pthread -O0 -pg  
 CFLAGS = 
 CPP = gcc -E
 CPPFLAGS = 

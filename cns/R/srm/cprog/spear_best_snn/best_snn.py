@@ -12,26 +12,18 @@ from numpy import log2
 
 jobs = multiprocessing.cpu_count()
 snndir = "/home/alexeyche/prog/alexeyche-junk/cns/c"
-rundir = "/home/alexeyche/prog/sim/runs"
-train_spikes = "/home/alexeyche/prog/sim/spikes/ucr/train_spikes.bin"
-calc_spikes = "/home/alexeyche/prog/sim/spikes/ucr/calc_spikes.bin"
+rundir = "/home/alexeyche/prog/sim/spear_runs"
+train_spikes = "/home/alexeyche/prog/sim/spikes/ucr/*_train_spikes.bin"
+test_spikes = "/home/alexeyche/prog/sim/spikes/ucr/test_spikes.bin"
 epochs = 20
-ts_dur = 600
-num_classes = 2
 
-run_sim_cmd = "%(snndir)s/scripts/run_sim.sh -w %(workdir)s -e %(epochs)s -l -a %(train_spikes)s &> %(workdir)s/run_sim.log"
-run_sim_calc_cmd = "%(snndir)s/bin/snn_sim -ml %(workdir)s/%(epochs)s_model.bin -l no -sc  %(workdir)s/stat_calc.bin -c %(workdir)s/constants.ini -i %(calc_spikes)s -j %(jobs)s -o %(workdir)s/calc_output_spikes.bin"
-calc_cmd = "%(snndir)s/bin/snn_calc -j %(jobs)s -s %(workdir)s/stat_calc.bin -o %(workdir)s/calc.bin -d %(ts_dur)s -p"
+run_sim_cmd = "%(snndir)s/scripts/run_sim.sh -w %(workdir)s -e %(epochs)s -l -a -v %(test_spikes)s %(train_spikes)s &> %(workdir)s/run_sim.log"
 
 def run(d):
     try:
         p = subprocess.Popen(run_sim_cmd % d, stdout=subprocess.PIPE, shell=True) 
         sin, _ = p.communicate()
-        p = subprocess.Popen(run_sim_calc_cmd % d, stdout=subprocess.PIPE, shell=True) 
-        sin, _ = p.communicate()
-        p = subprocess.Popen(calc_cmd % d, stdout=subprocess.PIPE, shell=True) 
-        sin, _ = p.communicate()
-        return log2(num_classes)-float(sin.split()[-1].rstrip("\n"))
+        return 1-float(sin.split()[-1].rstrip("\n"))
     except:
         return 100
 
@@ -44,7 +36,7 @@ const_fields_to_patch = [ "optimal stdp", "net", "srm neuron" ]
 def patch_and_copy_const(workdir, params):
     def patch_line(l, params):
         for k in params:
-            if re.match("^[\S]+ %s" % k, l): 
+            if re.match("^[\S]*%s" % k, l): 
                 l_spl = l.split(";")
                 if k == "dt":
                     l = "%s = %3.1f" % (k, float(params[k]))
@@ -81,11 +73,10 @@ def main(job_id, params):
     l = run(  
               { 
                   'train_spikes' : train_spikes,
+                  'test_spikes' : test_spikes,
                   'workdir' : workdir,
                   'snndir' : snndir,
-                  'calc_spikes' : calc_spikes,
                   'epochs' : epochs,
-                  'ts_dur' : ts_dur,
                   'jobs' : jobs,
               }
            )
@@ -93,4 +84,4 @@ def main(job_id, params):
 
 
 if __name__ == '__main__':
-    print main(2, { 'net_edge_prob' : [ 0.2 ], })
+    print patch_and_copy_const("/home/alexeyche/prog/sim/spear_runs/0", { "net_edge_prob" : 1 })

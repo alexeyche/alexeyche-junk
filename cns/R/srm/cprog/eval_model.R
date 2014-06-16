@@ -12,7 +12,7 @@ source('../ucr_ts.R')
 source('../plot_funcs.R')
 
 #ucr_spikes_dir = "/home/alexeyche/prog/sim/ucr_spikes_full"
-ucr_spikes_dir = "/home/alexeyche/prog/sim/ucr_spikes"
+ucr_spikes_dir = "/home/alexeyche/prog/sim/spikes/ucr"
 gitdir = "/home/alexeyche/prog/alexeyche-junk"
 #gitdir = "/home/alexeyche/my/git/alexeyche-junk"
 rundir = "/home/alexeyche/prog/sim/runs"
@@ -20,8 +20,8 @@ rundir = "/home/alexeyche/prog/sim/runs"
 #runname="test_run"
 #runname = "n50_no_conn"
 #runname = "n50_conn_3"
-runname = "test_conn_finh"
-ep = 60
+runname = "test_run"
+ep = 11
 if(length(epoch_opt) > 0) {
     ep = epoch_opt
 }
@@ -29,7 +29,7 @@ if(length(runname_opt) > 0) {
     runname = runname_opt
 }
 
-srm_sim_exec = sprintf("%s/cns/c/bin/srm_sim", gitdir)
+srm_sim_exec = sprintf("%s/cns/c/bin/snn_sim", gitdir)
 jobs = 8
 
 workdir = sprintf("%s/%s", rundir, runname)
@@ -42,12 +42,12 @@ Nids=(M+1):(M+N)
 
 
 #input_file = sprintf("%s/train/1_ucr_50elems_6classes_1000dur", ucr_spikes_dir)
-input_file = sprintf("%s/train/1_ucr_20elems_3classes_1000dur", ucr_spikes_dir)
+input_file = sprintf("%s/1_train_spikes", ucr_spikes_dir)
 
 timeline = c(loadMatrix(input_file,2))
 labels = c(loadMatrix(input_file,3))
 #test_input_file =  sprintf("%s/test/ucr_50elems_6classes_1000dur", ucr_spikes_dir)
-test_input_file =  sprintf("%s/test/ucr_20elems_3classes_1000dur", ucr_spikes_dir)
+test_input_file =  sprintf("%s/test_spikes", ucr_spikes_dir)
 test_timeline = c(loadMatrix(test_input_file,2))
 test_labels = c(loadMatrix(test_input_file,3))
 duration = timeline[2]-timeline[1]

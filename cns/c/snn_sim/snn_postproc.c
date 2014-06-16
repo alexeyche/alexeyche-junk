@@ -8,7 +8,17 @@
 
 #include <postproc.h>
 
-
+SpikesList* cutSpikesList(SpikesList *sl, int number_to_cut_from_head) {
+    int new_size = sl->size - number_to_cut_from_head;
+    assert(new_size>0);
+    SpikesList *new_sl = createSpikesList(new_size);
+    for(size_t i = number_to_cut_from_head, j=0; i<sl->size; i++, j++) {
+        TEMPLATE(deleteVector,double)(new_sl->list[j]);
+        new_sl->list[j] = TEMPLATE(copyVector,double)(sl->list[i]);
+    }
+    deleteSpikesList(sl);
+    return(new_sl);
+}
 
 int main(int argc, char **argv) {
     ArgOptionsPostProc a = parsePostProcOptions(argc, argv);
@@ -19,6 +29,9 @@ int main(int argc, char **argv) {
     
     Matrix *spikes_train_m = input_train_struct->array[0];
     SpikesList *spikes_train = spikesMatrixToSpikesList(spikes_train_m);
+    if(a.ignore_first_neurons>0) {
+        spikes_train = cutSpikesList(spikes_train, a.ignore_first_neurons);
+    }
     Matrix *timeline_train_m = input_train_struct->array[1];
     Matrix *classes_train_m = input_train_struct->array[2];
     doubleVector *classes_train = TEMPLATE(copyFromArray,double)(classes_train_m->vals, classes_train_m->nrow*classes_train_m->ncol);
@@ -31,6 +44,9 @@ int main(int argc, char **argv) {
     
     Matrix *spikes_test_m = input_test_struct->array[0];
     SpikesList *spikes_test = spikesMatrixToSpikesList(spikes_test_m);
+    if(a.ignore_first_neurons>0) {
+        spikes_test = cutSpikesList(spikes_test, a.ignore_first_neurons);
+    }
     Matrix *timeline_test_m = input_test_struct->array[1];
     Matrix *classes_test_m = input_test_struct->array[2];
     doubleVector *classes_test = TEMPLATE(copyFromArray,double)(classes_test_m->vals, classes_test_m->nrow*classes_test_m->ncol);

@@ -8,6 +8,7 @@ Sim* createSim(size_t nthreads, unsigned char stat_level, Constants *c) {
     s->rt = createRuntime();
     s->nthreads = nthreads;
     s->global_reward = 0;
+    s->mean_global_reward = 0;
     s->stat_level = stat_level;
     if(s->stat_level > 0) {
         s->stat_global_reward = TEMPLATE(createVector,double)();

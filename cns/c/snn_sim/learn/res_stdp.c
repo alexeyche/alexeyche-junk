@@ -60,6 +60,15 @@ void propagateSynSpike_TResourceSTDP(learn_t *ls_t, const size_t *ni, const stru
     TEMPLATE(addValueLList,ind)(ls->learn_syn_ids[*ni], sp->syn_id);
 }
 
+float fastsqrt(float val) {
+    long tmp = *(long *)&val;
+    tmp -= 127L<<23; /* Remove IEEE bias from exponent (-2^23) */
+    /* tmp is now an appoximation to logbase2(val) */
+    tmp = tmp >> 1; /* divide by 2 */
+    tmp += 127L<<23; /* restore the IEEE bias from the exponent (+2^23) */
+    return *(float *)&tmp;
+}
+
 void consumeResource(double *res, const double *dw, const Constants *c) {
     double dr = sqrt(fabs(*dw)/max(c->res_stdp->Aplus, c->res_stdp->Aminus));
     *res -= dr; 

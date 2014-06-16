@@ -111,4 +111,4 @@ test = function() {
 synth = "synthetic_control"
 ecg = "ECG200"
 face = "FaceAll"
-
+starlight_curves = "StarLightCurves"

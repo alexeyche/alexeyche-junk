@@ -10,6 +10,7 @@ source('../plot_funcs.R')
 library(snn)
 
 rundir="/home/alexeyche/prog/sim/runs"
+#rundir="/home/alexeyche/prog/sim/spear_runs"
 runname = "test_run"
 workdir=sprintf("%s/%s", rundir, runname)
 
@@ -64,18 +65,20 @@ if(file.exists(sprintf("%s.bin",stat_file))) {
                 break
             }
         }
-        plot(rew_all,type="l")
+        if(!is.nan(rew_all)) {
+            plot(rew_all,type="l")
+        }
     } else {
-        u = loadMatrix(stat_file, 1)
-        p = loadMatrix(stat_file, 2)
-        syn=4
+        u = loadMatrix(stat_file, 2)
+        p = loadMatrix(stat_file, 1)
+        syn=56
         nid=2
         Tplot=1:3000
         
         if(lrule == "OptimalSTDP") {
             B = loadMatrix(stat_file, 3)
-            Cn = loadMatrix(stat_file, 3+nid)
-            syns = loadMatrix(stat_file, 3+N+nid)
+            syns = loadMatrix(stat_file, 3+nid)
+            Cn = loadMatrix(stat_file, 3+N+nid)
             dWn = loadMatrix(stat_file, 3+2*N+nid)
             par(mfrow=c(4,1))
             spikes = net[[M+nid]][net[[M+nid]]<max(Tplot)]

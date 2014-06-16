@@ -1,6 +1,7 @@
 
 use getopts::{optopt,optflag,getopts,OptGroup,usage,short_usage};
 use std::os;
+use std::str;
 
 #[deriving(Eq, Show, PartialEq)]
 enum Err {
@@ -8,15 +9,14 @@ enum Err {
     ParseErr,
 }
 
+#[deriving(Show)]
 struct Args {
-    constantFilename: &'static str
+    pub constantFilename: String
 }
 
 static BRIEF: &'static str = "Spiking neural network simulator";
 
-pub fn parseArgs(args: Vec<String>) -> Option<Args> {
-    let program = args.get(0).clone();
-
+pub fn parse_args(args: Vec<String>) -> Option<Args> {
     let opts = [
         optopt("c", "", "set constants file name", ""),
         optflag("h", "help", "print this help menu")
@@ -31,9 +31,10 @@ pub fn parseArgs(args: Vec<String>) -> Option<Args> {
         return(None);
     }
     let constF = match  matches.opt_str("c") {
-        Some(c) => c.as_slice(),
-        None => { return(None) }            
+        Some(c) => c,
+        None => { println!("Need constants filename!"); return(None) }            
     };
+
     Some(Args { constantFilename : constF })
 }
 

@@ -22,6 +22,14 @@ typedef struct {
 } AdExConstants;
 
 typedef struct {
+    bool pacemaker_on;
+    indVector *net_layer_ids;
+    double frequency;
+    double cumulative_period_delta;
+    double amplitude;
+} PacemakerConstants;
+
+typedef struct {
     double Aplus;
     double Aminus;
     double tau_plus;
@@ -33,6 +41,7 @@ typedef struct {
     double gain;
     double sigma;
     double dt;
+    double mult;
 } PreprocessConstants;
 
 typedef struct {
@@ -78,6 +87,7 @@ typedef struct {
     doubleVector *weight_per_neuron;
     doubleVector *wmax;
     doubleVector *weight_decay_factor;
+    doubleVector *lrate;
 
     double tc;
     double mean_p_dur;
@@ -94,7 +104,6 @@ typedef struct {
     double aw;
     double weight_var;
 
-    doubleVector *lrate;
     int epochs;
     double p_set;
     
@@ -107,6 +116,8 @@ typedef struct {
     double reward_ltp;
     double reward_baseline;
     double tel;
+    double trew;
+    PacemakerConstants *pacemaker;
 } Constants;
 
 int file_handler(void* user, const char* section, const char* name,

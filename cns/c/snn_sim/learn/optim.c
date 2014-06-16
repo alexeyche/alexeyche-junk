@@ -76,7 +76,7 @@ void trainWeightsStep_TOptimalSTDP(learn_t *ls_t, const double *u, const double 
                 ls->B[ *ni ] = c->reward_baseline;
             }
         } else {
-            ls->B[ *ni ] = s->global_reward;
+            ls->B[ *ni ] = s->global_reward - s->mean_global_reward/c->trew;
         }
     } else {
 //        printf("%zu unsup\n", *ni);
@@ -101,7 +101,12 @@ void trainWeightsStep_TOptimalSTDP(learn_t *ls_t, const double *u, const double 
 #endif               
         double wmax = layerConstD(l, c->wmax);
         dw = bound_grad(&l->W[ *ni ][ *syn_id ], &dw, &wmax, c);
-        l->W[ *ni ][ *syn_id ] += dw;
+        if(l->syn_spec[*ni][*syn_id]>0) {
+          l->W[ *ni ][ *syn_id ] += dw;
+        } else {
+            l->W[ *ni ][ *syn_id ] += dw*0.1;
+        }
+
         
         if( (ls->C[ *ni ][ *syn_id ] < LEARN_ACT_TOL ) && (ls->C[ *ni ][ *syn_id ] > -LEARN_ACT_TOL ) && 
                                                           (dC < LEARN_ACT_TOL ) && (dC > -LEARN_ACT_TOL ) ) {

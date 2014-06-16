@@ -201,7 +201,7 @@ AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
-#AM_CFLAGS = -Wall -std=gnu99 -pthread -O0 -g  
+#AM_CFLAGS = -Wall -std=gnu99 -pthread -O0 -pg  
 CFLAGS = 
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
