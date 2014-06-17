@@ -13,6 +13,7 @@ typedef struct {
     double Tmax;
 } SimRuntime;
 
-
+SimRuntime* createRuntime();
+void deleteRuntime(SimRuntime *sr);
 
 #endif

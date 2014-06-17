@@ -2,27 +2,6 @@
 #include <sim.h>
 
 
-
-SimRuntime* createRuntime() {
-    SimRuntime *rt = (SimRuntime*) malloc(sizeof(SimRuntime));
-    rt->reset_timeline = TEMPLATE(createVector,double)();
-    rt->pattern_classes = TEMPLATE(createVector,double)();
-    rt->uniq_classes = TEMPLATE(createVector,int)();
-    rt->classes_indices_train = TEMPLATE(createVector,ind)(); 
-
-    rt->timeline_iter = 0;
-    rt->Tmax = 0;
-    return(rt);
-}
-
-void deleteRuntime(SimRuntime *sr) {
-    TEMPLATE(deleteVector,double)(sr->reset_timeline);
-    TEMPLATE(deleteVector,int)(sr->uniq_classes);
-    TEMPLATE(deleteVector,ind)(sr->classes_indices_train);
-    free(sr);
-}
-
-
 void configureNetSpikesSim(Sim *s, const char *input_spikes_filename, Constants *c) {
     // filling receiver-oriented connection map
     allocNetSim(s->ns, s->net_size);
@@ -108,17 +87,7 @@ void configureLayersSim(Sim *s, Constants *c, unsigned char statLevel) {
     TEMPLATE(deleteVector,ind)(inputIDs);
 }
 
-size_t getLayerIdOfNeuron(Sim *s, size_t n_id) {
-    for(size_t li=0; li<s->layers->size; li++) {
-        SRMLayer *l = s->layers->array[li];
-        assert(l->N);
-        if((l->ids[0] <= n_id) && (l->ids[l->N-1] >= n_id)) {
-            return(l->id);
-        }
-    }
-    printf("Can't find layer id for neuron with id %zu\n", n_id);
-    exit(1);
-}
+
 
 void configureSynapses(Sim *s, Constants *c) {
     assert(s->ns);

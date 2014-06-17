@@ -57,7 +57,7 @@ void propagateSynSpike_TOptimalSTDP(learn_t *ls_t, const size_t *ni, const SynSp
     }
 }
 
-void trainWeightsStep_TOptimalSTDP(learn_t *ls_t, const double *u, const double *p, const double *M, const size_t *ni, const Sim *s) {
+void trainWeightsStep_TOptimalSTDP(learn_t *ls_t, const double *u, const double *p, const double *M, const size_t *ni, const SimContext *s) {
     TOptimalSTDP *ls = (TOptimalSTDP*)ls_t;
     SRMLayer *l = ls->base.l; 
     const Constants *c = s->c;

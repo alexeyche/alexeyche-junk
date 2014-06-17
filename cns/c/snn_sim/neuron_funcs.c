@@ -48,9 +48,9 @@ inline double B_calc(const unsigned char *Yspike, const double *p, const double 
 }
 
 
-inline double C_calc(const unsigned char *Yspike, const double *p, const double *u, const double *M, const double *syn, const Constants *c) {
+inline double C_calc(const unsigned char *Yspike, const double *p, const double *u, const double *denominator_p, const double *syn, const Constants *c) {
     double pstr = pstroke(u, c);
-    return ( pstr/(*p/ *M) ) * ( *Yspike - *p ) * (*syn);
+    return ( pstr/(*p/ *denominator_p) ) * ( *Yspike - *p ) * (*syn);
 }
 
 inline double bound_grad(const double *w, const double *dw, const double *wmax, const Constants *c) {

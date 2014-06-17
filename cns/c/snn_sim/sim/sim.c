@@ -1,7 +1,53 @@
 
 #include <sim.h>
 
+Sim* createSim(size_t nthreads, unsigned char stat_level, Constants *c) {
+    Sim *s = (Sim*) malloc(sizeof(Sim));
+    s->ns = createNetSim();
+    s->layers = TEMPLATE(createVector,pSRMLayer)(); 
+    s->rt = createRuntime();
+    s->nthreads = nthreads;
+    s->ctx = (SimContext*) malloc(sizeof(SimContext));
+    s->ctx->c = c;
+    s->ctx->global_reward = 0;
+    s->ctx->mean_global_reward = 0;
+    s->ctx->stat_level = stat_level;
+    if(s->stat_level > 0) {
+        s->ctx->stat_global_reward = TEMPLATE(createVector,double)();
+    }
+    s->impl = (SimImpl*) malloc(sizeof(SimImpl));
+    return(s);
+}
 
+
+void appendLayerSim(Sim *s, SRMLayer *l) {
+    TEMPLATE(insertVector,pSRMLayer)(s->layers, l);
+    l->id = s->layers->size - 1;
+}
+
+void deleteSim(Sim *s) {
+    TEMPLATE(deleteVector,pSRMLayer)(s->layers);
+    deleteNetSim(s->ns);
+    deleteRuntime(s->rt);
+    if(s->stat_level > 1) {
+        TEMPLATE(deleteVector,double)(s->ctx->stat_global_reward);
+    }
+    free(s->ctx);
+    free(s->impl);
+    free(s);
+}
+
+size_t getLayerIdOfNeuron(Sim *s, size_t n_id) {
+    for(size_t li=0; li<s->layers->size; li++) {
+        SRMLayer *l = s->layers->array[li];
+        assert(l->N);
+        if((l->ids[0] <= n_id) && (l->ids[l->N-1] >= n_id)) {
+            return(l->id);
+        }
+    }
+    printf("Can't find layer id for neuron with id %zu\n", n_id);
+    exit(1);
+}
 
 
 const SynSpike* getInputSpike(double t, const size_t *n_id, NetSim *ns, SimRuntime *sr, const Constants *c) {

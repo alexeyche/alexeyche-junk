@@ -33,5 +33,14 @@ typedef struct {
     size_t size;
 } NetSim;
 
+NetSim* createNetSim();
+void deallocNetSim(NetSim *ns);
+void allocNetSim(NetSim *ns, size_t net_size);
+void deleteNetSim(NetSim *ns);
+void propagateInputSpikesNetSim(Sim *s, SpikesList *sl);
+void printInputSpikesQueue(NetSim *ns);
+void configureConnMapNetSim(NetSim *ns, pSRMLayerVector *l);
+void propagateSpikeNetSim(Sim *s, SRMLayer *l, const size_t *ni, double t);
+
 
 #endif

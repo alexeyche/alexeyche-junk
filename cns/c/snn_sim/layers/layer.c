@@ -1,4 +1,5 @@
 
+#include <sim.h>
 
 Layer* createPoissonLayer(size_t N, size_t *glob_idx, unsigned char statLevel) {
     Layer *l = (Layer*)malloc(sizeof(SRMLayer));
@@ -114,30 +115,9 @@ double layerConstD(Layer *l, doubleVector *v) {
     return( v->array[ l->id ]);
 }
 
-void calculateMembranePotentials_Poisson(Layer *l, const size_t *ni, const Constants *s, const double *t) {
-    l->u[*ni] = c->u_rest;
-    if((l->id == 0)&&(c->pacemaker->pacemaker_on)) {
-        double u_p = c->pacemaker->amplitude + c->pacemaker->amplitude * sin(2*PI*c->pacemaker->frequency * *t/1000 - l->ids[*ni] * c->pacemaker->cumulative_period_delta/1000);
-        l->u[*ni] += u_p;
-    }
-    indLNode *act_node;
-    while( (act_node = TEMPLATE(getNextLList,ind)(l->active_syn_ids[ *ni ]) ) != NULL ) {
-        const size_t *syn_id = &act_node->value;
-        l->u[*ni] += l->W[ *ni ][ *syn_id ] * l->syn[ *ni ][ *syn_id ];
-    }
-}
 
-void calculateSpike_Poisson(struct Layer *l, size_t *ni) {
-    l->p[*ni] = probf(&l->u[*ni], c) * c->dt;
-    double coin = getUnif();
-    if( l->p[*ni] > coin ) {
-        l->fired[ *ni ] = 1;
-    }
-    if(c->learn) {
-        double M=0;
-        l->ls_t->trainWeightsStep(l->ls_t, &l->u[*ni], &l->p[*ni], &M, ni, s);
-    }
-}
+
+
 
 void initLearningRule(Layer *l, const Constants *c) {
     if( c->learning_rule == EOptimalSTDP) {
@@ -228,19 +208,44 @@ void toStartValues_Poisson(Layer *l, const Constants *c) {
 }
 
 
-void propagateSpike_Poisson(Layer *l, const size_t *ni, const SynSpike *sp, const Constants *c) {
+void propagateSpike_Poisson(Layer *l, const size_t *ni, const SynSpike *sp, const SimContext *s) {
+    const Constants *c = s->c;
     if(l->syn[*ni][ sp->syn_id ] < SYN_ACT_TOL) {
         TEMPLATE(addValueLList,ind)(l->active_syn_ids[*ni], sp->syn_id);
     } 
-    
     l->syn[*ni][ sp->syn_id ] += l->syn_spec[*ni][ sp->syn_id ] * c->e0;
-#if BACKPROP_POT == 1    
-    l->syn[*ni][ sp->syn_id ] *= l->a[*ni];
-#endif
     l->syn_fired[*ni][ sp->syn_id ] = 1;
     l->ls_t->propagateSynSpike(l->ls_t, ni, sp, c);
 }
 
+void calculateMembranePotentials_Poisson(Layer *l, const size_t *ni, const SimContext *s) {
+    const Constants *c = s->c;
+    l->u[*ni] = c->u_rest;
+    if((l->id == 0)&&(c->pacemaker->pacemaker_on)) {
+        double u_p = c->pacemaker->amplitude + c->pacemaker->amplitude * sin(2*PI*c->pacemaker->frequency * *s->t/1000 - l->ids[*ni] * c->pacemaker->cumulative_period_delta/1000);
+        l->u[*ni] += u_p;
+    }
+    indLNode *act_node;
+    while( (act_node = TEMPLATE(getNextLList,ind)(l->active_syn_ids[ *ni ]) ) != NULL ) {
+        const size_t *syn_id = &act_node->value;
+        l->u[*ni] += l->W[ *ni ][ *syn_id ] * l->syn[ *ni ][ *syn_id ];
+    }
+}
+
+void calculateSpike_Poisson(struct Layer *l, size_t *ni, const SimContext *s) {
+    const Constants *c = s->c;
+    l->p[*ni] = probf(&l->u[*ni], c) * c->dt;
+    double coin = getUnif();
+    if( l->p[*ni] > coin ) {
+        l->fired[ *ni ] = 1;
+    }
+}
+
+void calculateWeightsDynamics(Layer *l, const size_t *ni, const SimContext *s) {
+    const Constants *c = s->c;
+    double denominator=0;
+    l->ls_t->trainWeightsStep(l->ls_t, &l->u[*ni], &l->p[*ni], &denominator, ni, c);   
+}
 
 void allocSynData_Poisson(Layer *l) {
     for(size_t ni=0; ni<l->N; ni++) {
