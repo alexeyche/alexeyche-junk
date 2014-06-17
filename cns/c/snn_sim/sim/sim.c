@@ -1,35 +1,35 @@
 
-#include <sim.h>
+#include "sim.h"
 
 Sim* createSim(size_t nthreads, unsigned char stat_level, Constants *c) {
     Sim *s = (Sim*) malloc(sizeof(Sim));
     s->ns = createNetSim();
-    s->layers = TEMPLATE(createVector,pSRMLayer)(); 
+    s->layers = TEMPLATE(createVector,pLayer)(); 
     s->rt = createRuntime();
-    s->nthreads = nthreads;
     s->ctx = (SimContext*) malloc(sizeof(SimContext));
     s->ctx->c = c;
     s->ctx->global_reward = 0;
     s->ctx->mean_global_reward = 0;
     s->ctx->stat_level = stat_level;
-    if(s->stat_level > 0) {
+    if(s->ctx->stat_level > 0) {
         s->ctx->stat_global_reward = TEMPLATE(createVector,double)();
     }
     s->impl = (SimImpl*) malloc(sizeof(SimImpl));
+    s->impl->nthreads = nthreads;
     return(s);
 }
 
 
-void appendLayerSim(Sim *s, SRMLayer *l) {
-    TEMPLATE(insertVector,pSRMLayer)(s->layers, l);
+void appendLayerSim(Sim *s, Layer *l) {
+    TEMPLATE(insertVector,pLayer)(s->layers, l);
     l->id = s->layers->size - 1;
 }
 
 void deleteSim(Sim *s) {
-    TEMPLATE(deleteVector,pSRMLayer)(s->layers);
+    TEMPLATE(deleteVector,pLayer)(s->layers);
     deleteNetSim(s->ns);
     deleteRuntime(s->rt);
-    if(s->stat_level > 1) {
+    if(s->ctx->stat_level > 1) {
         TEMPLATE(deleteVector,double)(s->ctx->stat_global_reward);
     }
     free(s->ctx);
@@ -39,7 +39,7 @@ void deleteSim(Sim *s) {
 
 size_t getLayerIdOfNeuron(Sim *s, size_t n_id) {
     for(size_t li=0; li<s->layers->size; li++) {
-        SRMLayer *l = s->layers->array[li];
+        Layer *l = s->layers->array[li];
         assert(l->N);
         if((l->ids[0] <= n_id) && (l->ids[l->N-1] >= n_id)) {
             return(l->id);
@@ -82,36 +82,40 @@ const SynSpike* getInputSpike(double t, const size_t *n_id, NetSim *ns, SimRunti
 
 
 void runSim(Sim *s) {
-    configureSimAttr(s);
-    if(s->c->reinforcement) {
+    configureSimAttr(s->impl);
+    if(s->ctx->c->reinforcement) {
         configureRewardModulation(s);
 //        global_reward_spinlock = (pthread_spinlock_t*)malloc( sizeof(pthread_spinlock_t));
 //        pthread_spin_init(global_reward_spinlock, 0);
     }
 
-    spinlocks = (pthread_spinlock_t*)malloc( s->net_size * sizeof(pthread_spinlock_t));
-    for(size_t ni=0; ni<s->net_size; ni++) {
+    spinlocks = (pthread_spinlock_t*)malloc( s->impl->net_size * sizeof(pthread_spinlock_t));
+    for(size_t ni=0; ni<s->impl->net_size; ni++) {
         pthread_spin_init(&spinlocks[ni], 0); // net sim spinlock
     }
     
-    pthread_t *threads = (pthread_t *) malloc( s->nthreads * sizeof( pthread_t ) );
-    SimWorker *workers = (SimWorker*) malloc( s->nthreads * sizeof(SimWorker) );
-    for(size_t ti=0; ti < s->nthreads; ti++) {
+    pthread_t *threads = (pthread_t *) malloc( s->impl->nthreads * sizeof( pthread_t ) );
+    SimWorker *workers = (SimWorker*) malloc( s->impl->nthreads * sizeof(SimWorker) );
+    for(size_t ti=0; ti < s->impl->nthreads; ti++) {
         workers[ti].thread_id = ti;
         workers[ti].s = s;
+        int neuron_per_thread = (s->impl->num_neurons + s->impl->nthreads - 1) / s->impl->nthreads;
+        workers[ti].first = min( ti    * neuron_per_thread, s->impl->num_neurons );
+        workers[ti].last  = min( (ti+1) * neuron_per_thread, s->impl->num_neurons );
     }
     
     pthread_attr_t attr;
     P( pthread_attr_init( &attr ) );
-    P( pthread_barrier_init( &barrier, NULL, s->nthreads ) );
-    for( int i = 1; i < s->nthreads; i++ )  {
+    P( pthread_barrier_init( &barrier, NULL, s->impl->nthreads ) );
+    for( int i = 1; i < s->impl->nthreads; i++ )  {
         P( pthread_create( &threads[i], &attr, simRunRoutine,  &workers[i]) );
+
     }
     simRunRoutine(&workers[0]);
 
     free(workers);
     free(threads);
-    for(size_t ni=0; ni<s->net_size; ni++) {
+    for(size_t ni=0; ni<s->impl->net_size; ni++) {
         pthread_spin_destroy(&spinlocks[ni]);
     }
 //    if(s->c->reinforcement) {
@@ -122,15 +126,14 @@ void runSim(Sim *s) {
 void* simRunRoutine(void *args) {
     SimWorker *sw = (SimWorker*)args;
     Sim *s = sw->s;
+    SimContext *ctx = s->ctx;
+    const Constants *c = ctx->c; 
+    SimImpl* impl = s->impl;
 
-    int neuron_per_thread = (s->num_neurons + s->nthreads - 1) / s->nthreads;
-    int first = min(  sw->thread_id    * neuron_per_thread, s->num_neurons );
-    int last  = min( (sw->thread_id+1) * neuron_per_thread, s->num_neurons );
-   
-    for(double t=0; t< s->rt->Tmax; t+=s->c->dt) {
+    for(ctx->t=0; t< s->rt->Tmax; ctx->t+=c->dt) {
 //        printf("t: %f\n",t);
-        for(size_t na_i=first; na_i<last; na_i++) {
-            simulateNeuron(s, &s->na[na_i].layer_id, &s->na[na_i].n_id, t, s->c);
+        for(size_t na_i=sw->first; na_i<sw->last; na_i++) {
+            simulateNeuron(s, &impl->na[na_i].layer_id, &impl->na[na_i].n_id, t, c);
         }
         //bool we_did_reset = false;
         //if(s->rt->reset_timeline->size > s->rt->timeline_iter) {

@@ -1,12 +1,15 @@
 #ifndef CONFIGURE_H
 #define CONFIGURE_H
 
+#include <constants.h>
 
-void configureLayersSim(Sim *s, Constants *c, unsigned char statLevel);
+struct Sim;
+struct SimImpl;
 
-void configureNetSpikesSim(Sim *s, const char *input_spikes_filename, Constants *c);
-void configureSimAttr(Sim *s);
-void configureSynapses(Sim *s, Constants *c);
-void configureRewardModulation(Sim *s);
+void configureLayersSim(struct Sim *s, Constants *c, unsigned char statLevel);
+void configureNetSpikesSim(struct Sim *s, const char *input_spikes_filename, Constants *c);
+void configureSimAttr(struct SimImpl *s);
+void configureSynapses(struct Sim *s, Constants *c);
+void configureRewardModulation(struct Sim *s);
 
 #endif

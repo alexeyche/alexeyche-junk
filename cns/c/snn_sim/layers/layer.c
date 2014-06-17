@@ -115,7 +115,26 @@ double layerConstD(Layer *l, doubleVector *v) {
     return( v->array[ l->id ]);
 }
 
+size_t getLocalNeuronId(Layer *l, const size_t *glob_id) {
+    int local_id = *glob_id - l->ids[0];
+    if((local_id<0)||(local_id>=l->N)) printf("Error: Can't find neuron with id %zu\n", *glob_id);
+    return(local_id);
+}
 
+const size_t getGlobalId(Layer *l, const size_t *ni) {
+    return(l->ids[*ni]);
+}
+
+double getSynDelay(Layer *l, const size_t *ni, const size_t *syn_id) {
+    assert(*syn_id < l->nconn[*ni]);
+    return(l->syn_del[*ni][*syn_id]);
+
+}
+
+
+void setSynapseSpeciality(Layer *l, size_t ni, size_t syn_id, double spec) {
+    l->syn_spec[ni][syn_id] = spec;
+}
 
 
 

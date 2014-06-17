@@ -3,7 +3,7 @@
 
 #include <stddef.h>
 
-#include <layer.h>
+#include <layers/layer.h>
 #include <constants.h>
 #include <util/spikes_list.h>
 #include <util/matrix.h>
@@ -22,49 +22,56 @@
 
 #include <sim/runtime.h>
 #include <sim/netsim.h>
-
+#include <sim/configure.h>
 
 pthread_barrier_t barrier;
-
-typedef struct {
-    double global_reward;
-    double mean_global_reward;
-    doubleVector *stat_global_reward;
-    double t
-    const Constants *c;
-    unsigned char stat_level;
-} SimContext;
-
 
 typedef struct {
     size_t layer_id;
     size_t n_id;
 } NeuronAddress;
 
-struct SimImpl {
+
+struct SimContext {
+    double global_reward;
+    double mean_global_reward;
+    doubleVector *stat_global_reward;
+    double t;
+    const Constants *c;
+    unsigned char stat_level;
+};
+typedef struct SimContext SimContext;
+
+
+struct SimImpl{
     size_t net_size;
     size_t nthreads;
     NeuronAddress *na;
     size_t num_neurons;
 };
+typedef struct SimImpl SimImpl;
 
-typedef struct {
-    Sim *s;
-    size_t thread_id;
-} SimWorker;
-
-typedef struct Sim {
-    pSRMLayerVector *layers;
+struct Sim {
+    pLayerVector *layers;
     NetSim *ns;
     SimRuntime *rt;
     SimContext *ctx;    
 
-    SimImpl *impl
-} Sim;
+    SimImpl *impl;
+};
+typedef struct Sim Sim;
+
+typedef struct {
+    Sim *s;
+    size_t thread_id;
+    int first;
+    int last;
+} SimWorker;
+
 
 
 Sim* createSim(size_t nthreads, unsigned char stat_level, Constants *c);
-void appendLayerSim(Sim *s, SRMLayer *l);
+void appendLayerSim(Sim *s, Layer *l);
 void deleteSim(Sim *s);
 size_t getLayerIdOfNeuron(Sim *s, size_t n_id);
 

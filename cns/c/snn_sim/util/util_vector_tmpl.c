@@ -24,6 +24,12 @@ void TEMPLATE(deleteVector,T)(TVEC(T) *a) {
   for(size_t ai=0; ai<a->size; ai++) {
     DESTRUCT(a->array[ai]);
   }
+#else
+#ifdef DESTRUCT_METHOD
+  for(size_t ai=0; ai<a->size; ai++) {
+    a->array[ai]->DESTRUCT_METHOD(a->array[ai]);
+  }
+#endif
 #endif  
   free(a->array);
   a->array = NULL;

@@ -61,7 +61,7 @@ void configureLayersSim(Sim *s, Constants *c, unsigned char statLevel) {
         net_size += l->N;
     }   
 
-    s->net_size = net_size;
+    s->impl->net_size = net_size;
     indVector *inp = NULL;
     indVector *outp = NULL;
     for(size_t li=0; li< s->c->layers_size->size; li++) {
@@ -110,7 +110,7 @@ void configureSynapses(Sim *s, Constants *c) {
     }
 }
 
-void configureSimAttr(Sim *s) {
+void configureSimAttr(SimImpl *s) {
     size_t num_neurons = 0;
     for(size_t li=0; li<s->layers->size; li++) {
         num_neurons += s->layers->array[li]->N;

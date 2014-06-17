@@ -3,7 +3,7 @@
 
 AC_PREREQ([2.69])
 AC_INIT([snn_sim], [0.1], [alexey.chernushev@gmail.com])
-AC_CONFIG_SRCDIR([snn_sim/layer.c])
+AC_CONFIG_SRCDIR([snn_sim/])
 AM_INIT_AUTOMAKE([subdir-objects])
 #AC_CONFIG_HEADERS([config.h])
 

@@ -18,16 +18,27 @@
 #include <util/io.h>
 #include <learn.h>
 
-struct LayerStat {
+typedef struct {
     unsigned char statLevel;
     doubleVector **stat_u;
     doubleVector **stat_p;
     doubleVector **stat_fired;
     doubleVector ***stat_W;
     doubleVector ***stat_syn;
-};
+} LayerStat;
+
+typedef struct SynSpike {
+    double t;
+    size_t n_id;
+    size_t syn_id;
+} SynSpike;
+
 
 struct SimContext;
+
+typedef enum {EXC, INH} nspec_t;
+
+struct learn_t;
 
 struct Layer {
     size_t id;
@@ -78,6 +89,7 @@ struct Layer {
 typedef struct Layer Layer;
 
 Layer* createPoissonLayer(size_t N, size_t *glob_idx, unsigned char statLevel);
+
 // methods sim
 void calculateMembranePotentials_Poisson(Layer *l, const size_t *ni, const struct SimContext *s, const double *t);
 void calculateSpike_Poisson(Layer *l, const size_t *ni);
@@ -93,5 +105,15 @@ void configureLayer_Poisson(Layer *l, const indVector *inputIDs, const indVector
 
 // common procedures
 double layerConstD(Layer *l, doubleVector *v);
+size_t getLocalNeuronId(Layer *l, const size_t *glob_id);
+const size_t getGlobalId(Layer *l, const size_t *ni);
+double getSynDelay(Layer *l, const size_t *ni, const size_t *syn_id);
+void setSynapseSpeciality(Layer *l, size_t ni, size_t syn_id, double spec);
 
+typedef Layer* pLayer;
+
+#include <util/templates_clean.h>
+#define T pLayer
+#define DESTRUCT_METHOD deleteLayer
+#include <util/util_vector_tmpl.h>
 #endif
