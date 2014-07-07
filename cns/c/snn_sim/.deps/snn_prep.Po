@@ -35,7 +35,7 @@ snn_prep.o: snn_prep.c /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/bits/string3.h /usr/include/pthread.h \
  /usr/include/sched.h /usr/include/x86_64-linux-gnu/bits/sched.h \
  /usr/include/x86_64-linux-gnu/bits/setjmp.h /usr/include/assert.h \
- /usr/local/include/libactor/list.h layer/adex.h /usr/include/math.h \
+ /usr/local/include/libactor/list.h layers/adex.h /usr/include/math.h \
  /usr/include/x86_64-linux-gnu/bits/huge_val.h \
  /usr/include/x86_64-linux-gnu/bits/huge_valf.h \
  /usr/include/x86_64-linux-gnu/bits/huge_vall.h \
@@ -153,7 +153,7 @@ core.h:
 
 /usr/local/include/libactor/list.h:
 
-layer/adex.h:
+layers/adex.h:
 
 /usr/include/math.h:
 

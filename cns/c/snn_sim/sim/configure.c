@@ -1,10 +1,11 @@
 
-#include <sim.h>
+#include <sim/sim.h>
 
 
 void configureNetSpikesSim(Sim *s, const char *input_spikes_filename, Constants *c) {
     // filling receiver-oriented connection map
-    allocNetSim(s->ns, s->net_size);
+    assert(s->impl->net_size>0);
+    allocNetSim(s->ns, s->impl->net_size);
     
     configureConnMapNetSim(s->ns, s->layers); 
     if(s->rt) {
@@ -45,18 +46,23 @@ void configureNetSpikesSim(Sim *s, const char *input_spikes_filename, Constants 
 }
 
 void configureLayersSim(Sim *s, Constants *c, unsigned char statLevel) {
-    s->c = c;
+    s->ctx->c = c;
+
     indVector *inputIDs = TEMPLATE(createVector,ind)();
     for(size_t inp_i=0; inp_i<c->M; inp_i++) {
         TEMPLATE(insertVector,ind)(inputIDs, inp_i);
     }
     
-    size_t net_size = s->c->M; 
-
+    size_t net_size = c->M; 
     size_t neurons_idx = inputIDs->size; // start from last input ID
 
-    for(size_t li=0; li< s->c->layers_size->size; li++) {
-        SRMLayer *l = createSRMLayer(c->layers_size->array[li], &neurons_idx, statLevel);
+    for(size_t li=0; li< c->layers_size->size; li++) {
+        Layer *l;
+        if(c->neuron_type == EPoissonLayer) {
+            l = createPoissonLayer(c->layers_size->array[li], &neurons_idx, statLevel);
+        } else {
+            exit(1);
+        }
         appendLayerSim(s, l);
         net_size += l->N;
     }   
@@ -64,19 +70,19 @@ void configureLayersSim(Sim *s, Constants *c, unsigned char statLevel) {
     s->impl->net_size = net_size;
     indVector *inp = NULL;
     indVector *outp = NULL;
-    for(size_t li=0; li< s->c->layers_size->size; li++) {
-        SRMLayer *l = s->layers->array[li];
+    for(size_t li=0; li< c->layers_size->size; li++) {
+        Layer *l = s->layers->array[li];
         if(li == 0) {
             inp = inputIDs;
         } else {
             inp = TEMPLATE(copyFromArray,ind)(s->layers->array[li-1]->ids, s->layers->array[li-1]->N);
         }
-        if(li+1 < s->c->layers_size->size) {
+        if(li+1 < c->layers_size->size) {
             outp = TEMPLATE(copyFromArray,ind)(s->layers->array[li+1]->ids, s->layers->array[li+1]->N);
         } else {
             outp = NULL;
         }        
-        configureSRMLayer(l, inp, outp, s->c);
+        l->configureLayer(l, inp, outp, c);
         if(inp) {
             TEMPLATE(deleteVector,ind)(inp);
         }
@@ -92,13 +98,13 @@ void configureLayersSim(Sim *s, Constants *c, unsigned char statLevel) {
 void configureSynapses(Sim *s, Constants *c) {
     assert(s->ns);
     for(size_t li=0; li < s->layers->size; li++) {
-        SRMLayer *l = s->layers->array[li];
+        Layer *l = s->layers->array[li];
         for(size_t ni=0; ni < l->N; ni++) {
             size_t n_id = l->ids[ni];
             for(size_t cons_i=0; cons_i < s->ns->conn_map[n_id]->size; cons_i++) {
                 Conn con = s->ns->conn_map[n_id]->array[cons_i];
                 
-                SRMLayer *l_cons = s->layers->array[con.l_id];
+                Layer *l_cons = s->layers->array[con.l_id];
                 if(l->nt[ni] == EXC) {
                     setSynapseSpeciality(l_cons, con.n_id, con.syn_id, c->e_exc);
                 } else 
@@ -110,18 +116,18 @@ void configureSynapses(Sim *s, Constants *c) {
     }
 }
 
-void configureSimAttr(SimImpl *s) {
+void configureSimImpl(Sim *s) {
     size_t num_neurons = 0;
     for(size_t li=0; li<s->layers->size; li++) {
         num_neurons += s->layers->array[li]->N;
     }
-    s->na = (NeuronAddress*) malloc(num_neurons * sizeof(NeuronAddress));
-    s->num_neurons = num_neurons;
+    s->impl->na = (NeuronAddress*) malloc(num_neurons * sizeof(NeuronAddress));
+    s->impl->num_neurons = num_neurons;
     size_t iter = 0;
     for(size_t li=0; li<s->layers->size; li++) {
         for(size_t ni=0; ni<s->layers->array[li]->N; ni++) {
-            s->na[iter].n_id = ni;
-            s->na[iter].layer_id = li;
+            s->impl->na[iter].n_id = ni;
+            s->impl->na[iter].layer_id = li;
             ++iter;
         }
     }

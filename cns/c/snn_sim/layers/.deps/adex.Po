@@ -1,5 +1,5 @@
-layer/adex.o: layer/adex.c /usr/include/stdc-predef.h \
- /usr/include/x86_64-linux-gnu/bits/predefs.h layer/adex.h \
+layers/adex.o: layers/adex.c /usr/include/stdc-predef.h \
+ /usr/include/x86_64-linux-gnu/bits/predefs.h layers/adex.h \
  /usr/include/math.h /usr/include/features.h \
  /usr/include/x86_64-linux-gnu/sys/cdefs.h \
  /usr/include/x86_64-linux-gnu/bits/wordsize.h \
@@ -50,7 +50,7 @@ layer/adex.o: layer/adex.c /usr/include/stdc-predef.h \
 
 /usr/include/x86_64-linux-gnu/bits/predefs.h:
 
-layer/adex.h:
+layers/adex.h:
 
 /usr/include/math.h:
 

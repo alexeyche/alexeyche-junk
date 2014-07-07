@@ -1,17 +1,17 @@
 
 
 #include "res_stdp.h"
-#include <layer.h>
-#include <sim.h>
+#include <layers/layer.h>
+#include <sim/sim.h>
 
-TResourceSTDP* init_TResourceSTDP(struct SRMLayer *l) {
+TResourceSTDP* init_TResourceSTDP(struct Layer *l) {
     TResourceSTDP *ls = (TResourceSTDP*) malloc( sizeof(TResourceSTDP) );    
     ls->base.l = l;
     ls->learn_syn_ids = (indLList**) malloc( l->N*sizeof(indLList*));
     ls->x_tr = (double**) malloc( l->N*sizeof(double*));
     ls->y_tr = (double*) malloc( l->N*sizeof(double));
     ls->res = (double*) malloc( l->N*sizeof(double));
-    if(l->statLevel>1) {
+    if(l->stat->statLevel>1) {
         ls->stat_x_tr = (doubleVector***) malloc( l->N * sizeof(doubleVector**) );
         ls->stat_y_tr = (doubleVector**) malloc( l->N * sizeof(doubleVector*) );
         ls->stat_res = (doubleVector**) malloc( l->N * sizeof(doubleVector*) );
@@ -22,7 +22,7 @@ TResourceSTDP* init_TResourceSTDP(struct SRMLayer *l) {
         ls->eligibility_trace[ni] = (double*) malloc( l->nconn[ni] * sizeof(double) );
         ls->x_tr[ni] = (double*) malloc( l->nconn[ni] * sizeof(double) );
         ls->learn_syn_ids[ni] = TEMPLATE(createLList,ind)();
-        if(l->statLevel>1) {
+        if(l->stat->statLevel>1) {
             ls->stat_y_tr[ni] = TEMPLATE(createVector,double)();
             ls->stat_res[ni] = TEMPLATE(createVector,double)();
             ls->stat_x_tr[ni] = (doubleVector**) malloc( l->nconn[ni] * sizeof(doubleVector*) );
@@ -42,7 +42,7 @@ TResourceSTDP* init_TResourceSTDP(struct SRMLayer *l) {
 
 void toStartValues_TResourceSTDP(learn_t *ls_t) {
     TResourceSTDP *ls = (TResourceSTDP*)ls_t;
-    SRMLayer *l = ls->base.l;
+    Layer *l = ls->base.l;
     for(size_t ni=0; ni<l->N; ni++) {
         ls->y_tr[ni] = 0;
         ls->res[ni] = 1;
@@ -77,9 +77,9 @@ void consumeResource(double *res, const double *dw, const Constants *c) {
     }
 }
 
-void trainWeightsStep_TResourceSTDP(learn_t *ls_t, const double *u, const double *p, const double *M, const size_t *ni, const Sim *s) {
+void trainWeightsStep_TResourceSTDP(learn_t *ls_t, const double *u, const double *p, const double *M, const size_t *ni, const SimContext *s) {
     TResourceSTDP *ls = (TResourceSTDP*)ls_t;
-    SRMLayer *l = ls->base.l;
+    Layer *l = ls->base.l;
     const Constants *c = s->c; 
 
     if(l->fired[*ni] == 1) {
@@ -99,25 +99,7 @@ void trainWeightsStep_TResourceSTDP(learn_t *ls_t, const double *u, const double
         double wmax = layerConstD(l, c->wmax);
         dw = bound_grad(&l->W[*ni][*syn_id], &dw, &wmax, c);
         dw = dw * ls->res[*ni] * layerConstD(l, c->lrate);
-        if(c->reinforcement) {
-            ls->eligibility_trace[*ni][*syn_id] += dw;
-            if(l->id == s->layers->size -1) {
-                if((l->fired[ *ni ] == 1)&&(s->rt->timeline_iter <  s->rt->classes_indices_train->size)) {
-                    if(floor(*ni/ (l->N/s->rt->uniq_classes->size)) ==  s->rt->classes_indices_train->array[ s->rt->timeline_iter ]) {
-                        ls->reward[ *ni ] = c->reward_ltp;
-                    } else {
-                        ls->reward[ *ni ] = c->reward_ltd;
-                    }
-                } else {
-                    ls->reward[*ni] = c->reward_baseline;
-                }
-            } else {
-                ls->reward[*ni] = s->global_reward;
-            }
-            l->W[*ni][*syn_id] += c->dt * dw * ls->reward[*ni];
-        } else {
-            l->W[*ni][*syn_id] += c->dt * dw;
-        }
+        l->W[*ni][*syn_id] += c->dt * dw;
         consumeResource(&ls->res[*ni], &dw, c);
 
         // melting
@@ -132,7 +114,7 @@ void trainWeightsStep_TResourceSTDP(learn_t *ls_t, const double *u, const double
     ls->y_tr[*ni] += -c->dt * ls->y_tr[*ni] / c->res_stdp->tau_minus;
     ls->res[*ni] += (1-ls->res[*ni])/c->res_stdp->tau_res;
 
-    if(l->statLevel>1) {
+    if(l->stat->statLevel>1) {
         TEMPLATE(insertVector,double)(ls->stat_y_tr[ *ni ], ls->y_tr[ *ni ]);
         TEMPLATE(insertVector,double)(ls->stat_res[ *ni ], ls->res[ *ni ]);
         for(size_t con_i=0; con_i<l->nconn[ *ni ]; con_i++) {
@@ -144,7 +126,7 @@ void trainWeightsStep_TResourceSTDP(learn_t *ls_t, const double *u, const double
 
 void resetValues_TResourceSTDP(learn_t *ls_t, const size_t *ni) {
     TResourceSTDP *ls = (TResourceSTDP*)ls_t;
-    SRMLayer *l = ls->base.l;
+    Layer *l = ls->base.l;
     ls->y_tr[*ni] = 0;
     ls->res[*ni] = 1;
     for(size_t con_i=0; con_i<l->nconn[*ni]; con_i++) {
@@ -159,13 +141,13 @@ void resetValues_TResourceSTDP(learn_t *ls_t, const size_t *ni) {
 }
 void free_TResourceSTDP(learn_t *ls_t) {
     TResourceSTDP* ls = (TResourceSTDP*)ls_t;
-    SRMLayer *l = ls->base.l;
+    Layer *l = ls->base.l;
     for(size_t ni=0; ni < l->N; ni++) {
         if(l->nconn[ni]>0) {
             free(ls->x_tr[ni]);
         }
         TEMPLATE(deleteLList,ind)(ls->learn_syn_ids[ni]);
-        if(l->statLevel>1) {
+        if(l->stat->statLevel>1) {
             TEMPLATE(deleteVector,double)(ls->stat_y_tr[ni]);
             TEMPLATE(deleteVector,double)(ls->stat_res[ni]);
             for(size_t con_i=0; con_i < l->nconn[ni]; con_i++) {
@@ -174,7 +156,7 @@ void free_TResourceSTDP(learn_t *ls_t) {
             free(ls->stat_x_tr[ni]);
         }
     }
-    if(l->statLevel>1) {
+    if(l->stat->statLevel>1) {
         free(ls->stat_x_tr);        
         free(ls->stat_y_tr);
         free(ls->stat_res);

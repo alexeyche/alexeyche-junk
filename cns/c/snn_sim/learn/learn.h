@@ -12,19 +12,22 @@
 #include <neuron_funcs.h>
 #include <constants.h>
 #include <util/util_dlink_list.h>
+#include <util/matrix.h>
 
-struct SRMLayer;
+struct Layer;
 struct SynSpike;
-struct Sim;
+struct SimContext;
 
 struct learn_t {
-    struct SRMLayer *l;
+    struct Layer *l;
     
     void (*toStartValues)(struct learn_t *);
     void (*propagateSynSpike)(struct learn_t *, const size_t *, const struct SynSpike *, const Constants *);
-    void (*trainWeightsStep)(struct learn_t *, const double *, const double *, const double *, const size_t *, const struct Sim *);
+    void (*trainWeightsStep)(struct learn_t *, const double *, const double *, const double *, const size_t *, const struct SimContext *);
     void (*resetValues)(struct learn_t *, const size_t *);
     void (*free)(struct learn_t *);
+    pMatrixVector* (*serialize)(struct learn_t*);
+    void (*deserialize)(struct learn_t*, pMatrixVector *data);
 };
 typedef struct learn_t learn_t;
 

@@ -9,6 +9,7 @@
 #include <util/ini.h>
 
 typedef enum { EOptimalSTDP, EResourceSTDP } learning_rule_t;
+typedef enum { EPoissonLayer } neuron_layer_t;
 
 typedef struct {
     double C;
@@ -45,6 +46,7 @@ typedef struct {
 } PreprocessConstants;
 
 typedef struct {
+    neuron_layer_t neuron_type;
     double e0;
     double e_exc;
     double e_inh;

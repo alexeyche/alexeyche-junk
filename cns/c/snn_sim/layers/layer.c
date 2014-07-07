@@ -1,8 +1,13 @@
 
-#include <sim.h>
+#include <sim/sim.h>
+
+#include <util/templates_clean.h>
+#define T pLayer
+#define DESTRUCT_METHOD deleteLayer
+#include <util/util_vector_tmpl.c>
 
 Layer* createPoissonLayer(size_t N, size_t *glob_idx, unsigned char statLevel) {
-    Layer *l = (Layer*)malloc(sizeof(SRMLayer));
+    Layer *l = (Layer*)malloc(sizeof(Layer));
     l->N = N;
     l->ids = (size_t*)malloc( l->N*sizeof(size_t));
     l->nt = (nspec_t*)malloc( l->N*sizeof(nspec_t));
@@ -13,6 +18,7 @@ Layer* createPoissonLayer(size_t N, size_t *glob_idx, unsigned char statLevel) {
     l->W = (double**)malloc( l->N*sizeof(double*));
     l->u = (double*)malloc( l->N*sizeof(double));
     l->p = (double*)malloc( l->N*sizeof(double));
+    l->M = (double*) malloc( l->N*sizeof(double));
     l->syn = (double**)malloc( l->N*sizeof(double*));
     l->syn_spec = (double**)malloc( l->N*sizeof(double*));
     l->id_conns = (size_t**)malloc( l->N*sizeof(size_t*));
@@ -30,35 +36,40 @@ Layer* createPoissonLayer(size_t N, size_t *glob_idx, unsigned char statLevel) {
     l->syn_del = (double**)malloc( l->N*sizeof(double));
     l->fired = (unsigned char*)malloc( l->N*sizeof(unsigned char));
     l->syn_fired = (unsigned char**)malloc( l->N*sizeof(unsigned char*));
-    
+    l->gr = (double*)malloc( l->N*sizeof(double));
+
     l->stat = (LayerStat*)malloc(sizeof(LayerStat));
     l->stat->statLevel = statLevel;
     if(l->stat->statLevel > 0) {
-        l->stat->stat_p = (doubleVector**) malloc( l->stat->N*sizeof(doubleVector*));
-        l->stat->stat_fired = (doubleVector**) malloc( l->stat->N*sizeof(doubleVector*));
-        for(size_t ni=0; ni<l->stat->N; ni++) {
+        l->stat->stat_p = (doubleVector**) malloc( l->N*sizeof(doubleVector*));
+        l->stat->stat_fired = (doubleVector**) malloc( l->N*sizeof(doubleVector*));
+        for(size_t ni=0; ni<l->N; ni++) {
             l->stat->stat_p[ni] = TEMPLATE(createVector,double)();
             l->stat->stat_fired[ni] = TEMPLATE(createVector,double)(); 
 
         }
         if(l->stat->statLevel > 1) {
-            l->stat->stat_u = (doubleVector**) malloc( l->stat->N*sizeof(doubleVector*));
-            l->stat->stat_W = (doubleVector***) malloc( l->stat->N*sizeof(doubleVector**));
-            l->stat->stat_syn = (doubleVector***) malloc( l->stat->N*sizeof(doubleVector**));
+            l->stat->stat_u = (doubleVector**) malloc( l->N*sizeof(doubleVector*));
+            l->stat->stat_W = (doubleVector***) malloc( l->N*sizeof(doubleVector**));
+            l->stat->stat_syn = (doubleVector***) malloc( l->N*sizeof(doubleVector**));
             for(size_t ni=0; ni<l->N; ni++) {
                 l->stat->stat_u[ni] = TEMPLATE(createVector,double)();
             }
         }
     }
+
     l->ls_t = NULL;
     l->calculateMembranePotentials = &calculateMembranePotentials_Poisson;
-    l->calculateSpike_Poisson = &calculateSpike_Poisson;
+    l->calculateSpike = &calculateSpike_Poisson;
+    l->calculateDynamics = &calculateDynamics_Poisson;
     l->deleteLayer = &deleteLayer_Poisson;
     l->configureLayer = &configureLayer_Poisson;
     l->toStartValues = &toStartValues_Poisson;
     l->propagateSpike = &propagateSpike_Poisson;
     l->allocSynData = &allocSynData_Poisson;
     l->printLayer = &printLayer_Poisson;
+    l->serializeLayer = &serializeLayer_Poisson;
+    l->deserializeLayer= &deserializeLayer_Poisson;
     return(l);
 }
 
@@ -88,6 +99,7 @@ void deleteLayer_Poisson(Layer *l) {
         l->ls_t->free(l->ls_t);
     free(l->u); 
     free(l->p); 
+    free(l->M);
     free(l->ids);
     free(l->nt);
     free(l->id_conns);
@@ -99,6 +111,7 @@ void deleteLayer_Poisson(Layer *l) {
     free(l->fired);
     free(l->syn_fired);
     free(l->axon_del);
+    free(l->gr);
     if(l->stat->statLevel >0) {    
         free(l->stat->stat_p);
         free(l->stat->stat_fired);
@@ -140,7 +153,7 @@ void setSynapseSpeciality(Layer *l, size_t ni, size_t syn_id, double spec) {
 
 void initLearningRule(Layer *l, const Constants *c) {
     if( c->learning_rule == EOptimalSTDP) {
-        l->ls_t = (learn_t*)init_TOptimalSTDP(l);
+        l->ls_t = (learn_t*)init_OptimalSTDP(l);
     } else
     if( c->learning_rule == EResourceSTDP) {
         l->ls_t = (learn_t*)init_TResourceSTDP(l);
@@ -178,7 +191,7 @@ void configureLayer_Poisson(Layer *l, const indVector *inputIDs, const indVector
         }
         l->nconn[ni] = layer_conns[ni]->size; 
     }
-    allocSynData(l);
+    l->allocSynData(l);
     for(size_t ni=0; ni<l->N; ni++) {
         if(l->nconn[ni]>0) {
             memcpy(l->id_conns[ni], layer_conns[ni]->array, l->nconn[ni]*sizeof(size_t));
@@ -187,7 +200,9 @@ void configureLayer_Poisson(Layer *l, const indVector *inputIDs, const indVector
     }
     // allocation done
     // configure learning part 
-    initLearningRule(l, c)
+    if(c->learn) {
+        initLearningRule(l, c);
+    }
     // start values assignment 
     l->toStartValues(l, c);
 
@@ -202,6 +217,8 @@ void toStartValues_Poisson(Layer *l, const Constants *c) {
         } else {
             l->axon_del[ni] = 0.0;
         }
+        l->gr[ni] = 0.0;
+        l->M[ni] = 0.0;
         for(size_t syn_i=0; syn_i<l->nconn[ni]; syn_i++) {
             l->W[ni][syn_i] = start_weight;
             l->syn[ni][syn_i] = 0;
@@ -214,13 +231,6 @@ void toStartValues_Poisson(Layer *l, const Constants *c) {
             }
         }
     }        
-    if(c->axonal_delays_rate > 0) {
-        for(size_t ni=0; ni<l->N; ni++) {
-            for(size_t syn_i=0; syn_i<l->nconn[ni]; syn_i++) {
-            }
-        }
-    }
-
     if(l->ls_t) {
         l->ls_t->toStartValues(l->ls_t);
     }
@@ -234,16 +244,18 @@ void propagateSpike_Poisson(Layer *l, const size_t *ni, const SynSpike *sp, cons
     } 
     l->syn[*ni][ sp->syn_id ] += l->syn_spec[*ni][ sp->syn_id ] * c->e0;
     l->syn_fired[*ni][ sp->syn_id ] = 1;
-    l->ls_t->propagateSynSpike(l->ls_t, ni, sp, c);
+    if(c->learn) {
+        l->ls_t->propagateSynSpike(l->ls_t, ni, sp, c);
+    }
 }
 
 void calculateMembranePotentials_Poisson(Layer *l, const size_t *ni, const SimContext *s) {
     const Constants *c = s->c;
     l->u[*ni] = c->u_rest;
-    if((l->id == 0)&&(c->pacemaker->pacemaker_on)) {
-        double u_p = c->pacemaker->amplitude + c->pacemaker->amplitude * sin(2*PI*c->pacemaker->frequency * *s->t/1000 - l->ids[*ni] * c->pacemaker->cumulative_period_delta/1000);
-        l->u[*ni] += u_p;
-    }
+//    if((l->id == 0)&&(c->pacemaker->pacemaker_on)) {
+//        double u_p = c->pacemaker->amplitude + c->pacemaker->amplitude * sin(2*PI*c->pacemaker->frequency * s->t/1000 - l->ids[*ni] * c->pacemaker->cumulative_period_delta/1000);
+//        l->u[*ni] += u_p;
+//    }
     indLNode *act_node;
     while( (act_node = TEMPLATE(getNextLList,ind)(l->active_syn_ids[ *ni ]) ) != NULL ) {
         const size_t *syn_id = &act_node->value;
@@ -251,19 +263,40 @@ void calculateMembranePotentials_Poisson(Layer *l, const size_t *ni, const SimCo
     }
 }
 
-void calculateSpike_Poisson(struct Layer *l, size_t *ni, const SimContext *s) {
+void calculateSpike_Poisson(struct Layer *l, const size_t *ni, const SimContext *s) {
     const Constants *c = s->c;
     l->p[*ni] = probf(&l->u[*ni], c) * c->dt;
-    double coin = getUnif();
-    if( l->p[*ni] > coin ) {
+    l->M[*ni] = exp(-l->gr[ *ni ]);
+    l->p[*ni] *= l->M[*ni];
+
+    if( l->p[*ni] > getUnif() ) {
         l->fired[ *ni ] = 1;
+        l->gr[ *ni ] += c->qr;
     }
 }
 
-void calculateWeightsDynamics(Layer *l, const size_t *ni, const SimContext *s) {
+void calculateDynamics_Poisson(Layer *l, const size_t *ni, const SimContext *s) {
     const Constants *c = s->c;
-    double denominator=0;
-    l->ls_t->trainWeightsStep(l->ls_t, &l->u[*ni], &l->p[*ni], &denominator, ni, c);   
+
+    // training
+    if(c->learn) {
+        l->ls_t->trainWeightsStep(l->ls_t, &l->u[*ni], &l->p[*ni], &l->M[*ni], ni, s);   
+    }
+
+    // melting      
+    indLNode *act_node;
+    while( (act_node = TEMPLATE(getNextLList,ind)(l->active_syn_ids[ *ni ]) ) != NULL ) {
+        const size_t *syn_id = &act_node->value;
+
+        l->syn[ *ni ][ *syn_id ] -= l->syn[ *ni ][ *syn_id ]/c->tm;
+        if(l->syn_fired[ *ni ][ *syn_id ] == 1) {
+            l->syn_fired[ *ni ][ *syn_id ] = 0; 
+        }
+        if( ( l->syn[ *ni ][ *syn_id ] < SYN_ACT_TOL ) && ( l->syn[ *ni ][ *syn_id ] > -SYN_ACT_TOL )){
+            TEMPLATE(dropNodeLList,ind)(l->active_syn_ids[ *ni ], act_node);
+        }
+    }
+    l->gr[ *ni ] += -l->gr[ *ni ]/c->tr;
 }
 
 void allocSynData_Poisson(Layer *l) {
@@ -274,12 +307,12 @@ void allocSynData_Poisson(Layer *l) {
         l->syn_spec[ni] = (double*) malloc(l->nconn[ni]*sizeof(double));
         l->syn_fired[ni] = (unsigned char*) malloc(l->nconn[ni]*sizeof(unsigned char));
         l->syn_del[ni] = (double*) malloc(l->nconn[ni]*sizeof(double));
-        if(l->statLevel > 1) {
-            l->stat_W[ni] = (doubleVector**) malloc( l->nconn[ni]*sizeof(doubleVector*));
-            l->stat_syn[ni] = (doubleVector**) malloc( l->nconn[ni]*sizeof(doubleVector*));
+        if(l->stat->statLevel > 1) {
+            l->stat->stat_W[ni] = (doubleVector**) malloc( l->nconn[ni]*sizeof(doubleVector*));
+            l->stat->stat_syn[ni] = (doubleVector**) malloc( l->nconn[ni]*sizeof(doubleVector*));
             for(size_t syn_i=0; syn_i < l->nconn[ni]; syn_i++) {
-                l->stat_W[ni][syn_i] = TEMPLATE(createVector,double)();
-                l->stat_syn[ni][syn_i] = TEMPLATE(createVector,double)();
+                l->stat->stat_W[ni][syn_i] = TEMPLATE(createVector,double)();
+                l->stat->stat_syn[ni][syn_i] = TEMPLATE(createVector,double)();
             }
         }
     }        
@@ -287,7 +320,7 @@ void allocSynData_Poisson(Layer *l) {
 
 
 void printLayer_Poisson(Layer *l) {
-    printf("SRMLayer, size: %zu \n", l->N);
+    printf("Poisson Layer, size: %zu \n", l->N);
     for(size_t ni=0; ni<l->N; ni++) {
         printf("%zu, ", l->ids[ni]);
         if(l->nt[ni] == EXC) {
@@ -315,4 +348,121 @@ void printLayer_Poisson(Layer *l) {
     }
 }
 
+#define POISSON_LAYER_SERIALIZATION_SIZE 6
+void deserializeLayer_Poisson(Layer *l, const Constants *c, pMatrixVector *data) {
+    assert(data->size >= POISSON_LAYER_SERIALIZATION_SIZE);
+    Matrix *W = data->array[0];
+    Matrix *conns = data->array[1];
+    Matrix *nt = data->array[2];
+    Matrix *ids = data->array[4];
+    Matrix *axon_del = data->array[5];
+    Matrix *syn_del = data->array[6];
+    assert(l->N == W->nrow);
+
+    doubleVector **W_vals = (doubleVector**) malloc( W->nrow * sizeof(doubleVector*));
+    doubleVector **syn_del_vals = (doubleVector**) malloc( syn_del->nrow * sizeof(doubleVector*));
+    indVector **id_conns_vals = (indVector**) malloc( W->nrow * sizeof(indVector*));
+    for(size_t i=0; i<W->nrow; i++) {  // shape form and get the values
+        W_vals[i] = TEMPLATE(createVector,double)();
+        syn_del_vals[i] = TEMPLATE(createVector,double)();
+        id_conns_vals[i] = TEMPLATE(createVector,ind)();
+        for(size_t j=0; j<W->ncol; j++) {
+            double w_ij = getMatrixElement(W, i, j);
+            double syn_del_ij = getMatrixElement(syn_del, i, j);
+            double conn_ij = getMatrixElement(conns, i, j);
+            if(conn_ij>0) {
+                TEMPLATE(insertVector,double)(W_vals[i], w_ij);
+                TEMPLATE(insertVector,double)(syn_del_vals[i], syn_del_ij);
+                TEMPLATE(insertVector,ind)(id_conns_vals[i], j);
+            }
+        }
+
+        l->nconn[i] = W_vals[i]->size;
+        if(getMatrixElement(nt, i, 0) == 0) {
+            l->nt[i] = EXC;
+        } else 
+        if(getMatrixElement(nt, i, 0) == 1.0) {
+            l->nt[i] = INH;
+        } else {
+            printf("Error in neuron type\n");
+            exit(1);
+        }
+        l->ids[i] = getMatrixElement(ids, i, 0);    
+    }
+ 
+    l->toStartValues(l,c);
+    for(size_t ni=0; ni<l->N; ni++) {  // apply values
+        assert(l->nconn[ni] != W_vals[ni]->size);
+        for(size_t con_i=0; con_i < l->nconn[ni]; con_i++) {
+            l->W[ni][con_i] = W_vals[ni]->array[con_i];
+            l->id_conns[ni][con_i] = id_conns_vals[ni]->array[con_i];
+            l->syn_del[ni][con_i] = syn_del_vals[ni]->array[con_i];
+        }
+        l->axon_del[ni] = getMatrixElement(axon_del, ni, 0);
+
+        TEMPLATE(deleteVector,double)(W_vals[ni]);
+        TEMPLATE(deleteVector,double)(syn_del_vals[ni]);
+        TEMPLATE(deleteVector,ind)(id_conns_vals[ni]);
+    }
+    if(l->ls_t) {
+        l->ls_t->deserialize( l->ls_t, TEMPLATE(tailVector,pMatrix)(data, data->size-POISSON_LAYER_SERIALIZATION_SIZE) );
+    }
+    free(syn_del_vals);
+    free(W_vals);
+    free(id_conns_vals);
+}
+
+
+pMatrixVector* serializeLayer_Poisson(Layer *l) {
+    pMatrixVector *data = TEMPLATE(createVector,pMatrix)();
+    size_t max_conn_id = 0;
+    for(size_t ni=0; ni< l->N; ni++) {
+        for(size_t con_i=0; con_i < l->nconn[ni]; con_i++) {
+            if(max_conn_id < l->id_conns[ni][con_i]) {
+                max_conn_id = l->id_conns[ni][con_i];
+            }
+        }
+
+    }
+    Matrix *W = createMatrix(l->N, max_conn_id+1);
+    Matrix *conns = createMatrix(l->N, max_conn_id+1);
+    Matrix *nt = createMatrix(l->N, 1);
+    Matrix *ids = createMatrix(l->N, 1);
+    Matrix *axon_del = createMatrix(l->N, 1);
+    Matrix *syn_del = createMatrix(l->N, max_conn_id+1);
+   
+    for(size_t i=0; i<W->nrow; i++) {
+        for(size_t j=0; j<W->ncol; j++) {
+            setMatrixElement(W, i, j, 0);
+            setMatrixElement(syn_del, i, j, 0);
+            setMatrixElement(conns, i, j, 0);
+        }
+    }
+    for(size_t ni=0; ni< l->N; ni++) {
+        for(size_t con_i=0; con_i < l->nconn[ni]; con_i++) {
+            setMatrixElement(W, ni, l->id_conns[ni][con_i], l->W[ni][con_i]);
+            setMatrixElement(syn_del, ni, l->id_conns[ni][con_i], l->syn_del[ni][con_i]);
+            setMatrixElement(conns, ni, l->id_conns[ni][con_i], 1);
+        }
+        setMatrixElement(nt, ni, 0, l->nt[ni]);
+        setMatrixElement(ids, ni, 0, l->ids[ni]);
+        setMatrixElement(axon_del, ni, 0, l->axon_del[ni]);
+    }
+    
+    TEMPLATE(insertVector,pMatrix)(data, W);
+    TEMPLATE(insertVector,pMatrix)(data, conns);
+    TEMPLATE(insertVector,pMatrix)(data, nt);
+    TEMPLATE(insertVector,pMatrix)(data, ids);
+    TEMPLATE(insertVector,pMatrix)(data, axon_del);
+    TEMPLATE(insertVector,pMatrix)(data, syn_del);
+    if(l->ls_t) {
+        pMatrixVector *learn_rule_data = l->ls_t->serialize(l->ls_t);
+        for(size_t i=0; i<learn_rule_data->size; i++) {
+            printf("%zu\n", i);
+            TEMPLATE(insertVector,pMatrix)(data, copyMatrix(learn_rule_data->array[i]));
+        }
+        TEMPLATE(deleteVector,pMatrix)(learn_rule_data);
+    }
+    return(data);
+}
 

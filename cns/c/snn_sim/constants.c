@@ -88,6 +88,14 @@ int file_handler(void* user, const char* section, const char* name,
     if (MATCH("preprocess", "dt")) {
         c->preproc->dt = atof(value);
     } else 
+    if (MATCH("srm neuron", "neuron_type")) {
+        if(strcmp(value, "PoissonLayer") == 0) {
+            c->neuron_type = EPoissonLayer;
+        } else {
+            printf("Can't neuron type %s\n", value);
+            exit(1);
+        }
+    } else 
     if (MATCH("srm neuron", "e0")) {
         c->e0 = atof(value);
     } else 

@@ -1,7 +1,7 @@
 
 #include <core.h>
 
-#include <layer/adex.h>
+#include <layers/adex.h>
 #include <args/prep_opts.h>
 
 #include <util/spikes_list.h>

@@ -1,6 +1,6 @@
 sim/configure.o: sim/configure.c /usr/include/stdc-predef.h \
- /usr/include/x86_64-linux-gnu/bits/predefs.h sim.h \
- /usr/lib/gcc/x86_64-linux-gnu/4.8/include/stddef.h layer.h \
+ /usr/include/x86_64-linux-gnu/bits/predefs.h sim/sim.h \
+ /usr/lib/gcc/x86_64-linux-gnu/4.8/include/stddef.h layers/layer.h \
  /usr/include/stdlib.h /usr/include/features.h \
  /usr/include/x86_64-linux-gnu/sys/cdefs.h \
  /usr/include/x86_64-linux-gnu/bits/wordsize.h \
@@ -48,19 +48,20 @@ sim/configure.o: sim/configure.c /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/bits/mathdef.h \
  /usr/include/x86_64-linux-gnu/bits/mathcalls.h \
  /usr/include/x86_64-linux-gnu/bits/mathinline.h util/matrix.h \
- util/util_vector_tmpl.h neuron_funcs.h util/io.h learn.h learn/optim.h \
- learn/res_stdp.h util/spikes_list.h sim/runtime.h sim/netsim.h \
- util/util_dlink_list_tmpl.h
+ util/util_vector_tmpl.h neuron_funcs.h util/io.h learn/learn.h \
+ util/spikes_list.h sim/runtime.h sim/netsim.h \
+ util/util_dlink_list_tmpl.h sim/configure.h learn/optim.h \
+ learn/res_stdp.h
 
 /usr/include/stdc-predef.h:
 
 /usr/include/x86_64-linux-gnu/bits/predefs.h:
 
-sim.h:
+sim/sim.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/4.8/include/stddef.h:
 
-layer.h:
+layers/layer.h:
 
 /usr/include/stdlib.h:
 
@@ -204,11 +205,7 @@ neuron_funcs.h:
 
 util/io.h:
 
-learn.h:
-
-learn/optim.h:
-
-learn/res_stdp.h:
+learn/learn.h:
 
 util/spikes_list.h:
 
@@ -217,3 +214,9 @@ sim/runtime.h:
 sim/netsim.h:
 
 util/util_dlink_list_tmpl.h:
+
+sim/configure.h:
+
+learn/optim.h:
+
+learn/res_stdp.h:

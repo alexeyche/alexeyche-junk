@@ -58,3 +58,21 @@ TVEC(T)* TEMPLATE(copyVector,T)(TVEC(T) *oldv) {
 
 }
 
+TVEC(T)* TEMPLATE(tailVector,T)(TVEC(T) *v, size_t n) {
+    assert(n <= v->size);
+    TVEC(T) *cutted_v = TEMPLATE(createVector,T)();
+    for(size_t i = (v->size-1); i >= (v->size-n); i--) {
+        TEMPLATE(insertVector,T)(cutted_v, v->array[i]);
+    }
+    return(cutted_v);
+}
+
+TVEC(T)* TEMPLATE(headVector,T)(TVEC(T) *v, size_t n) {
+    assert(n <= v->size);
+    TVEC(T) *cutted_v = TEMPLATE(createVector,T)();
+    for(size_t i = 0; i<n; i++) {
+        TEMPLATE(insertVector,T)(cutted_v, v->array[i]);
+    }
+    return(cutted_v);
+
+}

@@ -1,33 +1,29 @@
 
 
-#include <sim.h>
+#include <sim/sim.h>
 
-#define MATRIX_PER_LAYER 8
+#define MATRIX_PER_LAYER 6
 void loadLayersFromFile(Sim *s, const char *model_fname, Constants *c, unsigned char statLevel) {
-    s->c = c;
     pMatrixVector* data = readMatrixList(model_fname);
     assert(data != NULL);
-    size_t net_size = s->c->M;
-    for(size_t li=0; li< s->c->layers_size->size; li++) {
+    assert(s->layers->size > 0);
+    for(size_t li=0; li< s->layers->size; li++) {
         pMatrixVector* data_layer = TEMPLATE(createVector,pMatrix)();
         for(size_t di=0; di < MATRIX_PER_LAYER; di++) {
             TEMPLATE(insertVector,pMatrix)(data_layer, data->array[di + MATRIX_PER_LAYER*li]);
         }
-        size_t neurons_idx = s->c->M;
-        SRMLayer *l = createSRMLayer(s->c->layers_size->array[li], &neurons_idx, statLevel);
-        appendLayerSim(s, l);
-        loadSRMLayer(l, s->c, data_layer);
+        Layer *l = s->layers->array[li];
+        l->deserializeLayer(l, s->ctx->c, data_layer);
         TEMPLATE(deleteVectorNoDestroy,pMatrix)(data_layer);
-        net_size += l->N;
     }
-    s->net_size = net_size;
     TEMPLATE(deleteVector,pMatrix)(data);
 }
 
 void saveLayersToFile(Sim *s, const char *model_fname) {
     pMatrixVector *data = TEMPLATE(createVector,pMatrix)();
     for(size_t li=0; li<s->layers->size; li++) {
-        pMatrixVector *data_layer = serializeSRMLayer(s->layers->array[li]);
+        Layer *l = s->layers->array[li];
+        pMatrixVector *data_layer = l->serializeLayer(l);
         assert(data_layer->size == MATRIX_PER_LAYER);
         for(size_t di=0; di < data_layer->size; di++) {
             TEMPLATE(insertVector,pMatrix)(data, data_layer->array[di]);

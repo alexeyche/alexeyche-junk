@@ -2,17 +2,18 @@
 
 #include "optim.h"
 
-#include <layer.h>
-#include <sim.h>
+#include <layers/layer.h>
+#include <sim/sim.h>
 
-TOptimalSTDP* init_TOptimalSTDP(SRMLayer *l) {
-    TOptimalSTDP *ls = (TOptimalSTDP*) malloc( sizeof(TOptimalSTDP));
+OptimalSTDP* init_OptimalSTDP(Layer *l) {
+    OptimalSTDP *ls = (OptimalSTDP*) malloc( sizeof(OptimalSTDP));
     ls->base.l = l; 
     ls->learn_syn_ids = (indLList**) malloc( l->N*sizeof(indLList*));
     ls->B = (double*)malloc( l->N*sizeof(double));
     ls->C = (double**)malloc( l->N*sizeof(double*));
+    ls->pacc = (double*)malloc( l->N*sizeof(double));
     
-    if(l->statLevel>1) {
+    if(l->stat->statLevel>1) {
         ls->stat_B = (doubleVector**) malloc( l->N*sizeof(doubleVector*));
         ls->stat_C = (doubleVector***) malloc( l->N*sizeof(doubleVector**));
     }
@@ -20,8 +21,9 @@ TOptimalSTDP* init_TOptimalSTDP(SRMLayer *l) {
     for(size_t ni=0; ni<l->N; ni++) {
         ls->learn_syn_ids[ni] = TEMPLATE(createLList,ind)();
         ls->C[ni] = (double*) malloc(l->nconn[ni]*sizeof(double));
+        ls->pacc[ni] = 0;
         ls->eligibility_trace[ni] = 0;
-        if(l->statLevel>1) {
+        if(l->stat->statLevel>1) {
             ls->stat_B[ni] = TEMPLATE(createVector,double)();
             ls->stat_C[ni] = (doubleVector**) malloc( l->nconn[ni]*sizeof(doubleVector*));
             for(size_t con_i=0; con_i < l->nconn[ni]; con_i++) {
@@ -30,17 +32,19 @@ TOptimalSTDP* init_TOptimalSTDP(SRMLayer *l) {
         }
     }
     
-    ls->base.toStartValues = &toStartValues_TOptimalSTDP;
-    ls->base.propagateSynSpike = &propagateSynSpike_TOptimalSTDP;
-    ls->base.trainWeightsStep = &trainWeightsStep_TOptimalSTDP;
-    ls->base.resetValues = &resetValues_TOptimalSTDP;
-    ls->base.free = &free_TOptimalSTDP;
+    ls->base.toStartValues = &toStartValues_OptimalSTDP;
+    ls->base.propagateSynSpike = &propagateSynSpike_OptimalSTDP;
+    ls->base.trainWeightsStep = &trainWeightsStep_OptimalSTDP;
+    ls->base.resetValues = &resetValues_OptimalSTDP;
+    ls->base.free = &free_OptimalSTDP;
+    ls->base.serialize = &serialize_OptimalSTDP;
+    ls->base.deserialize = &deserialize_OptimalSTDP;
     return(ls);
 }
 
-void toStartValues_TOptimalSTDP(learn_t *ls_t) {
-    TOptimalSTDP *ls = (TOptimalSTDP*)ls_t; 
-    SRMLayer *l = ls->base.l;
+void toStartValues_OptimalSTDP(learn_t *ls_t) {
+    OptimalSTDP *ls = (OptimalSTDP*)ls_t; 
+    Layer *l = ls->base.l;
     
     for(size_t ni=0; ni<l->N; ni++) {
         ls->B[ni] = 0;
@@ -50,38 +54,24 @@ void toStartValues_TOptimalSTDP(learn_t *ls_t) {
     }
 }
 
-void propagateSynSpike_TOptimalSTDP(learn_t *ls_t, const size_t *ni, const SynSpike *sp, const Constants *c) {
-    TOptimalSTDP *ls = (TOptimalSTDP*)ls_t;
+void propagateSynSpike_OptimalSTDP(learn_t *ls_t, const size_t *ni, const SynSpike *sp, const Constants *c) {
+    OptimalSTDP *ls = (OptimalSTDP*)ls_t;
     if( (ls->C[ *ni ][ sp->syn_id ] < LEARN_ACT_TOL ) && (ls->C[ *ni ][ sp->syn_id ] > -LEARN_ACT_TOL ) ) {
         TEMPLATE(addValueLList,ind)(ls->learn_syn_ids[*ni], sp->syn_id);
     }
 }
 
-void trainWeightsStep_TOptimalSTDP(learn_t *ls_t, const double *u, const double *p, const double *M, const size_t *ni, const SimContext *s) {
-    TOptimalSTDP *ls = (TOptimalSTDP*)ls_t;
-    SRMLayer *l = ls->base.l; 
+void trainWeightsStep_OptimalSTDP(learn_t *ls_t, const double *u, const double *p, const double *M, const size_t *ni, const SimContext *s) {
+    OptimalSTDP *ls = (OptimalSTDP*)ls_t;
+    Layer *l = ls->base.l; 
     const Constants *c = s->c;
 
-    if (c->reinforcement) {
-        if(l->id == s->layers->size -1) {
-            if((l->fired[ *ni ] == 1)&&(s->rt->timeline_iter <  s->rt->classes_indices_train->size)) {
-                if(floor(*ni/ (l->N/s->rt->uniq_classes->size)) ==  s->rt->classes_indices_train->array[ s->rt->timeline_iter ]) {
-    //                printf("%zu got spike ltp (class %zu)\n", *ni, s->rt->classes_indices_train->array[ s->rt->timeline_iter ]);
-                    ls->B[ *ni ] = c->reward_ltp;
-                } else {
-    //                printf("%zu got spike ltd (class %zu)\n", *ni, s->rt->classes_indices_train->array[ s->rt->timeline_iter ]);
-                    ls->B[ *ni ] = c->reward_ltd;
-                }
-            } else {
-                ls->B[ *ni ] = c->reward_baseline;
-            }
-        } else {
-            ls->B[ *ni ] = s->global_reward - s->mean_global_reward/c->trew;
-        }
-    } else {
-//        printf("%zu unsup\n", *ni);
-        ls->B[ *ni ] = B_calc( &l->fired[ *ni ], p, &l->pacc[ *ni ], c);
+    if(l->fired[ *ni ] == 1) {
+        ls->pacc[*ni] += 1;
     }
+
+    ls->B[ *ni ] = B_calc( &l->fired[ *ni ], p, &ls->pacc[ *ni ], c);
+
     indLNode *act_node = NULL;
     while( (act_node = TEMPLATE(getNextLList,ind)(ls->learn_syn_ids[ *ni ]) ) != NULL ) {
 //            for(size_t con_i=0; con_i < l->nconn[ *ni ]; con_i++) {
@@ -115,22 +105,24 @@ void trainWeightsStep_TOptimalSTDP(learn_t *ls_t, const double *u, const double 
         }
         if( isnan(dw) ) { 
             printf("\nFound bad value\n");
-            printf("nid: %zu, p: %f, u: %f, B: %f, pacc: %f, C: %f, W: %f, dw: %f\n", *ni, *p, *u, ls->B[ *ni ], l->pacc[ *ni ], ls->C[ *ni ][ *syn_id ], l->W[ *ni ][ *syn_id ], dw);
+            printf("nid: %zu, p: %f, u: %f, B: %f, pacc: %f, C: %f, W: %f, dw: %f\n", *ni, *p, *u, ls->B[ *ni ], ls->pacc[ *ni ], ls->C[ *ni ][ *syn_id ], l->W[ *ni ][ *syn_id ], dw);
             printf("C params: Yspike: %d, synapse: %f, dC: %f, p': %f\n", l->fired[ *ni],l->syn[ *ni ][ *syn_id ], dC, pstroke(u,c));
             exit(1);
         }
 
    }
-   if(l->statLevel>1) {
+   ls->pacc[ *ni ] -= ls->pacc[ *ni ]/c->mean_p_dur; 
+
+   if(l->stat->statLevel>1) {
         TEMPLATE(insertVector,double)(ls->stat_B[ *ni ], ls->B[ *ni ]);
         for(size_t con_i=0; con_i<l->nconn[ *ni ]; con_i++) {
             TEMPLATE(insertVector,double)(ls->stat_C[ *ni ][ con_i ], ls->C[ *ni ][ con_i ]);
         }
     }        
 }
-void resetValues_TOptimalSTDP(learn_t *ls_t, const size_t *ni) {
-    TOptimalSTDP *ls = (TOptimalSTDP*)ls_t;
-    SRMLayer *l = ls->base.l; 
+void resetValues_OptimalSTDP(learn_t *ls_t, const size_t *ni) {
+    OptimalSTDP *ls = (OptimalSTDP*)ls_t;
+    Layer *l = ls->base.l; 
     
     ls->B[ *ni ] = 0;
     for(size_t con_i=0; con_i < l->nconn[ *ni ]; con_i++) {
@@ -142,15 +134,15 @@ void resetValues_TOptimalSTDP(learn_t *ls_t, const size_t *ni) {
     }
 }
 
-void free_TOptimalSTDP(learn_t *ls_t) {
-    TOptimalSTDP *ls = (TOptimalSTDP*)ls_t;
-    SRMLayer *l = ls->base.l; 
+void free_OptimalSTDP(learn_t *ls_t) {
+    OptimalSTDP *ls = (OptimalSTDP*)ls_t;
+    Layer *l = ls->base.l; 
     for(size_t ni=0; ni<l->N; ni++) {
         if(l->nconn[ni]>0) {
             free(ls->C[ni]);
         }
         TEMPLATE(deleteLList,ind)(ls->learn_syn_ids[ni]);
-        if(l->statLevel>1) {
+        if(l->stat->statLevel>1) {
             TEMPLATE(deleteVector,double)(ls->stat_B[ni]);
             for(size_t con_i=0; con_i < l->nconn[ni]; con_i++) {
                 TEMPLATE(deleteVector,double)(ls->stat_C[ni][con_i]);
@@ -158,7 +150,7 @@ void free_TOptimalSTDP(learn_t *ls_t) {
             free(ls->stat_C[ni]);
         }
     }
-    if(l->statLevel>1) {
+    if(l->stat->statLevel>1) {
         free(ls->stat_B);
         free(ls->stat_C);
     }
@@ -168,3 +160,30 @@ void free_TOptimalSTDP(learn_t *ls_t) {
     free(ls->C);
     free(ls);
 }
+
+pMatrixVector* serialize_OptimalSTDP(learn_t *ls_t) {
+    OptimalSTDP *ls = (OptimalSTDP*)ls_t;
+    Layer *l = ls->base.l; 
+
+    pMatrixVector *data = TEMPLATE(createVector,pMatrix)();    
+    Matrix *pacc_m = createMatrix(l->N,1);
+    for(size_t ni=0; ni < l->N; ni++) {
+        setMatrixElement(pacc_m, ni, 0, ls->pacc[ni]);
+    }
+    TEMPLATE(insertVector,pMatrix)(data, pacc_m);
+    return(data);
+}
+
+void deserialize_OptimalSTDP(learn_t *ls_t, pMatrixVector *data) {
+    OptimalSTDP *ls = (OptimalSTDP*)ls_t;
+    Layer *l = ls->base.l; 
+
+    assert(data->size > 0);
+    Matrix *pacc_m = data->array[0];
+    assert( (pacc_m->nrow == l->N) && (pacc_m->ncol == 1) );
+    
+    for(size_t ni=0; ni<l->N; ni++) {
+        ls->pacc[ni] = getMatrixElement(pacc_m, ni, 0);
+    }
+}
+

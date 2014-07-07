@@ -16,7 +16,11 @@
 
 #include <neuron_funcs.h>
 #include <util/io.h>
-#include <learn.h>
+#include <learn/learn.h>
+
+
+#define SYN_ACT_TOL 0.0001 // value of synapse needed to delete 
+
 
 typedef struct {
     unsigned char statLevel;
@@ -57,7 +61,9 @@ struct Layer {
     double *p;
     double **syn;
     double **syn_spec;
-    
+    double *gr;
+    double *M;
+
     // learn structure 
     struct learn_t *ls_t;
 
@@ -76,7 +82,7 @@ struct Layer {
     // methods sim
     void (*calculateMembranePotentials)(struct Layer *l, const size_t *ni, const struct SimContext *s);
     void (*calculateSpike)(struct Layer *l, const size_t *ni, const struct SimContext *s);
-    void (*calculateWeightsDynamics)(struct Layer *l, const size_t *ni, const struct SimContext *s);
+    void (*calculateDynamics)(struct Layer *l, const size_t *ni, const struct SimContext *s);
     void (*propagateSpike)(struct Layer *l, const size_t *ni, const SynSpike *sp, const struct SimContext *s);
     // methods common    
     void (*deleteLayer)(struct Layer *l);
@@ -84,16 +90,19 @@ struct Layer {
     void (*toStartValues)(struct Layer *l, const Constants *c);
     void (*allocSynData)(struct Layer *l);
     void (*printLayer)(struct Layer *l);
+    pMatrixVector* (*serializeLayer)(struct Layer *l);
+    void (*deserializeLayer)(struct Layer *l, const Constants *c, pMatrixVector *layer_data);
 };
 
 typedef struct Layer Layer;
 
+
 Layer* createPoissonLayer(size_t N, size_t *glob_idx, unsigned char statLevel);
 
 // methods sim
-void calculateMembranePotentials_Poisson(Layer *l, const size_t *ni, const struct SimContext *s, const double *t);
-void calculateSpike_Poisson(Layer *l, const size_t *ni);
-void calculateWeightsDynamics(Layer *l, const size_t *ni, const struct SimContext *s);
+void calculateMembranePotentials_Poisson(Layer *l, const size_t *ni, const struct SimContext *s);
+void calculateSpike_Poisson(Layer *l, const size_t *ni, const struct SimContext *s);
+void calculateDynamics_Poisson(Layer *l, const size_t *ni, const struct SimContext *s);
 void propagateSpike_Poisson(Layer *l, const size_t *ni, const SynSpike *sp, const struct SimContext *s);
 
 // methods common
@@ -102,6 +111,8 @@ void allocSynData_Poisson(Layer *l);
 void printLayer_Poisson(Layer *l);
 void deleteLayer_Poisson(Layer *l);
 void configureLayer_Poisson(Layer *l, const indVector *inputIDs, const indVector *outputIDs, const Constants *c);
+pMatrixVector* serializeLayer_Poisson(struct Layer *l);
+void deserializeLayer_Poisson(Layer *l, const Constants *c, pMatrixVector *data);
 
 // common procedures
 double layerConstD(Layer *l, doubleVector *v);

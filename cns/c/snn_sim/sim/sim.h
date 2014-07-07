@@ -24,6 +24,9 @@
 #include <sim/netsim.h>
 #include <sim/configure.h>
 
+#include <learn/optim.h>
+#include <learn/res_stdp.h>
+
 pthread_barrier_t barrier;
 
 typedef struct {
@@ -36,7 +39,7 @@ struct SimContext {
     double global_reward;
     double mean_global_reward;
     doubleVector *stat_global_reward;
-    double t;
+//    double t;
     const Constants *c;
     unsigned char stat_level;
 };
@@ -76,8 +79,8 @@ void deleteSim(Sim *s);
 size_t getLayerIdOfNeuron(Sim *s, size_t n_id);
 
 void runSim(Sim *s);
-void simulateNeuron(Sim *s, const size_t *layer_id, const size_t *n_id, double t,  const Constants *c);
-const SynSpike* getInputSpike(double t, const size_t *n_id, NetSim *ns, SimRuntime *sr, const Constants *c);
+void simulateNeuron(Sim *s, const size_t *layer_id, const size_t *n_id, const double *t);
+const SynSpike* getInputSpike(Sim *s, const size_t *layer_id, const size_t *n_id, const double *t);
 void* simRunRoutine(void *args);
 
 
