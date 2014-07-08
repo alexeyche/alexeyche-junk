@@ -12,7 +12,7 @@
 int main(int argc, char **argv) {
 	ArgOptionsCalc a = parseCalcOptions(argc, argv);
     
-    pMatrixVector* stats = readMatrixList(a.stat_file);
+    pMatrixVector* stats = readMatrixListFromFile(a.stat_file);
     assert(stats->size == 3);
 
      
@@ -55,7 +55,7 @@ int main(int argc, char **argv) {
         for(size_t ni=0; ni < fired->nrow; ni++) {
             TEMPLATE(insertVector,pMatrix)(out_listf, out_full[ni]);
         }
-        saveMatrixList(a.output_file_full, out_listf);
+        saveMatrixListToFile(a.output_file_full, out_listf);
     }
     if(a.printMI) {
         double misum = 0.0;
@@ -67,7 +67,7 @@ int main(int argc, char **argv) {
     }
     pMatrixVector *out_list = TEMPLATE(createVector,pMatrix)();
     TEMPLATE(insertVector,pMatrix)(out_list, out);
-    saveMatrixList(a.output_file, out_list);
+    saveMatrixListToFile(a.output_file, out_list);
      
     TEMPLATE(deleteVector,pMatrix)(out_list);
     

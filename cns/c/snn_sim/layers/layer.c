@@ -252,10 +252,7 @@ void propagateSpike_Poisson(Layer *l, const size_t *ni, const SynSpike *sp, cons
 void calculateMembranePotentials_Poisson(Layer *l, const size_t *ni, const SimContext *s) {
     const Constants *c = s->c;
     l->u[*ni] = c->u_rest;
-//    if((l->id == 0)&&(c->pacemaker->pacemaker_on)) {
-//        double u_p = c->pacemaker->amplitude + c->pacemaker->amplitude * sin(2*PI*c->pacemaker->frequency * s->t/1000 - l->ids[*ni] * c->pacemaker->cumulative_period_delta/1000);
-//        l->u[*ni] += u_p;
-//    }
+
     indLNode *act_node;
     while( (act_node = TEMPLATE(getNextLList,ind)(l->active_syn_ids[ *ni ]) ) != NULL ) {
         const size_t *syn_id = &act_node->value;
@@ -349,8 +346,9 @@ void printLayer_Poisson(Layer *l) {
 }
 
 #define POISSON_LAYER_SERIALIZATION_SIZE 6
-void deserializeLayer_Poisson(Layer *l, const Constants *c, pMatrixVector *data) {
-    assert(data->size >= POISSON_LAYER_SERIALIZATION_SIZE);
+void deserializeLayer_Poisson(Layer *l, FileStream *file, const Constants *c) {
+    pMatrixVector* data = readMatrixList(file, POISSON_LAYER_SERIALIZATION_SIZE);
+
     Matrix *W = data->array[0];
     Matrix *conns = data->array[1];
     Matrix *nt = data->array[2];
@@ -405,15 +403,16 @@ void deserializeLayer_Poisson(Layer *l, const Constants *c, pMatrixVector *data)
         TEMPLATE(deleteVector,ind)(id_conns_vals[ni]);
     }
     if(l->ls_t) {
-        l->ls_t->deserialize( l->ls_t, TEMPLATE(tailVector,pMatrix)(data, data->size-POISSON_LAYER_SERIALIZATION_SIZE) );
+        l->ls_t->deserialize( l->ls_t, file, c );
     }
     free(syn_del_vals);
     free(W_vals);
     free(id_conns_vals);
+    TEMPLATE(deleteVector,pMatrix)(data);
 }
 
 
-pMatrixVector* serializeLayer_Poisson(Layer *l) {
+void serializeLayer_Poisson(Layer *l, FileStream *file, const Constants *c) {
     pMatrixVector *data = TEMPLATE(createVector,pMatrix)();
     size_t max_conn_id = 0;
     for(size_t ni=0; ni< l->N; ni++) {
@@ -455,14 +454,11 @@ pMatrixVector* serializeLayer_Poisson(Layer *l) {
     TEMPLATE(insertVector,pMatrix)(data, ids);
     TEMPLATE(insertVector,pMatrix)(data, axon_del);
     TEMPLATE(insertVector,pMatrix)(data, syn_del);
+    saveMatrixList(file, data);
+    TEMPLATE(deleteVector,pMatrix)(data);
+    
     if(l->ls_t) {
-        pMatrixVector *learn_rule_data = l->ls_t->serialize(l->ls_t);
-        for(size_t i=0; i<learn_rule_data->size; i++) {
-            printf("%zu\n", i);
-            TEMPLATE(insertVector,pMatrix)(data, copyMatrix(learn_rule_data->array[i]));
-        }
-        TEMPLATE(deleteVector,pMatrix)(learn_rule_data);
+        l->ls_t->serialize(l->ls_t, file, c);
     }
-    return(data);
 }
 

@@ -13,6 +13,7 @@
 #include <constants.h>
 #include <util/util_dlink_list.h>
 #include <util/matrix.h>
+#include <util/io.h>
 
 struct Layer;
 struct SynSpike;
@@ -26,10 +27,14 @@ struct learn_t {
     void (*trainWeightsStep)(struct learn_t *, const double *, const double *, const double *, const size_t *, const struct SimContext *);
     void (*resetValues)(struct learn_t *, const size_t *);
     void (*free)(struct learn_t *);
-    pMatrixVector* (*serialize)(struct learn_t*);
-    void (*deserialize)(struct learn_t*, pMatrixVector *data);
+    void (*serialize)(struct learn_t*, FileStream *file, const Constants *c);
+    void (*deserialize)(struct learn_t*, FileStream *file, const Constants *c);
 };
 typedef struct learn_t learn_t;
 
+struct learn_serial_t {
+    struct Layer *l;
+};
+typedef struct learn_serial_t learn_serial_t;
 
 #endif

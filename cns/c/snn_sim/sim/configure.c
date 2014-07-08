@@ -14,8 +14,8 @@ void configureNetSpikesSim(Sim *s, const char *input_spikes_filename, Constants 
     }
 
     if(input_spikes_filename) {
-        pMatrixVector *ml = readMatrixList(input_spikes_filename);
-        assert(ml && ml->size >= 2);
+        FileStream *fs = createInputFileStream(input_spikes_filename);
+        pMatrixVector *ml = readMatrixList(fs, 3);
     
         Matrix *inp_m = ml->array[0];
         SpikesList *inp_sl = spikesMatrixToSpikesList(inp_m);

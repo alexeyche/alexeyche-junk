@@ -42,7 +42,7 @@ int main(int argc, char **argv) {
     configureLayersSim(s, c, statLevel);
 
     if(model_to_load) {
-        loadLayersFromFile(s, model_to_load, c, statLevel);
+        loadLayersFromFile(s, model_to_load);
     }
 
     configureNetSpikesSim(s, a.input_spikes_file, c);
@@ -117,7 +117,7 @@ int main(int argc, char **argv) {
             }
         }            
      
-        saveMatrixList(a.stat_file, mv);
+        saveMatrixListToFile(a.stat_file, mv);
             
         TEMPLATE(deleteVector,pMatrix)(mv);
     }
@@ -140,7 +140,7 @@ int main(int argc, char **argv) {
         Matrix *classes  = vectorArrayToMatrix(&s->rt->pattern_classes, 1);
         TEMPLATE(insertVector,pMatrix)(mv, classes);
 
-        saveMatrixList(a.output_spikes_file, mv);
+        saveMatrixListToFile(a.output_spikes_file, mv);
 
         TEMPLATE(deleteVector,pMatrix)(mv);
     }

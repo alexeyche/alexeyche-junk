@@ -5,7 +5,20 @@
 #include <util/matrix.h>
 #include <string.h>
 
-pMatrixVector* readMatrixList(const char *filename);
-void saveMatrixList(const char *filename, pMatrixVector *mv);
+typedef struct FileStream {
+    FILE *fd;
+    const char *fname;
+} FileStream;
+
+pMatrixVector* readMatrixList(FileStream *f, int num_to_read);
+void saveMatrixList(FileStream *f, pMatrixVector *mv);
+
+pMatrixVector* readMatrixListFromFile(const char *fname);
+void saveMatrixListToFile(const char *fname, pMatrixVector *mv);
+
+FileStream* createOutputFileStream(const char *fname);
+FileStream* createInputFileStream(const char *fname);
+void deleteFileStream(FileStream *fs);
+
 
 #endif

@@ -39,7 +39,7 @@ struct SimContext {
     double global_reward;
     double mean_global_reward;
     doubleVector *stat_global_reward;
-//    double t;
+    
     const Constants *c;
     unsigned char stat_level;
 };

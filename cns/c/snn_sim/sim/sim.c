@@ -194,6 +194,13 @@ void simulateNeuron(Sim *s, const size_t *layer_id, const size_t *n_id, const do
         l->propagateSpike(l, n_id, sp, s->ctx);
     }
     l->calculateMembranePotentials(l, n_id, s->ctx);
+
+    // pacemaker
+    if((l->id == 0)&&(c->pacemaker->pacemaker_on)) {
+        double u_p = c->pacemaker->amplitude + c->pacemaker->amplitude * sin(2*PI*c->pacemaker->frequency * *t/1000 - l->ids[*n_id] * c->pacemaker->cumulative_period_delta/1000);
+        l->u[*n_id] += u_p;
+    }
+
     l->calculateSpike(l, n_id, s->ctx);
     l->calculateDynamics(l, n_id, s->ctx);
 

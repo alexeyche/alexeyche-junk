@@ -23,7 +23,7 @@ SpikesList* cutSpikesList(SpikesList *sl, int number_to_cut_from_head) {
 int main(int argc, char **argv) {
     ArgOptionsPostProc a = parsePostProcOptions(argc, argv);
 //train data    
-    pMatrixVector *input_train_struct = readMatrixList(a.input_train_spikes);
+    pMatrixVector *input_train_struct = readMatrixListFromFile(a.input_train_spikes);
     
     assert(input_train_struct->size == 3);
     
@@ -38,7 +38,7 @@ int main(int argc, char **argv) {
     doubleVector *timeline_train = TEMPLATE(copyFromArray,double)(timeline_train_m->vals, timeline_train_m->nrow*timeline_train_m->ncol);
     double dur = timeline_train->array[1] - timeline_train->array[0];
 //test data    
-    pMatrixVector *input_test_struct = readMatrixList(a.input_test_spikes);
+    pMatrixVector *input_test_struct = readMatrixListFromFile(a.input_test_spikes);
     
     assert(input_test_struct->size == 3);
     
@@ -97,8 +97,8 @@ int main(int argc, char **argv) {
 //        TEMPLATE(deleteVector,pMatrix)(hists_train);
 //        TEMPLATE(deleteVector,pMatrix)(hists_test);
 //    
-//        hists_test = readMatrixList("/home/alexeyche/prog/sim/ts/synthetic_control/synthetic_control_TEST_1000.bin");
-//        hists_train = readMatrixList("/home/alexeyche/prog/sim/ts/synthetic_control/synthetic_control_TRAIN_1000.bin");
+//        hists_test = readMatrixListFromFile("/home/alexeyche/prog/sim/ts/synthetic_control/synthetic_control_TEST_1000.bin");
+//        hists_train = readMatrixListFromFile("/home/alexeyche/prog/sim/ts/synthetic_control/synthetic_control_TRAIN_1000.bin");
     //================    
         ClassificationStat s = getClassificationStat(hists_train, classes_indices_train, hists_test, classes_indices_test, uniq_classes, a.jobs);
 //        printf("rate: %f\n", s.rate); 
@@ -127,7 +127,7 @@ int main(int argc, char **argv) {
         TEMPLATE(deleteVector,pMatrix)(hists_test);
     }
     if(a.output_file) {
-        saveMatrixList(a.output_file, stat);
+        saveMatrixListToFile(a.output_file, stat);
     }
     printf("%f\n", max_NMI);
     TEMPLATE(deleteVector,pMatrix)(stat);    

@@ -17,13 +17,18 @@ typedef struct {
     double *eligibility_trace;
 } OptimalSTDP;
 
+typedef struct {
+    learn_serial_t base;
+    Matrix *pacc;
+} OptimalSTDPSerial;
+
 OptimalSTDP* init_OptimalSTDP(struct Layer *l);
 void toStartValues_OptimalSTDP(learn_t *ls_t);
 void propagateSynSpike_OptimalSTDP(learn_t *ls_t, const size_t *ni, const struct SynSpike *sp, const Constants *c);
 void trainWeightsStep_OptimalSTDP(learn_t *ls_t, const double *u, const double *p, const double *M, const size_t *ni, const struct SimContext *s);
 void resetValues_OptimalSTDP(learn_t *ls_t, const size_t *ni);
 void free_OptimalSTDP(learn_t *ls_t);
-pMatrixVector* serialize_OptimalSTDP(learn_t *ls_t);
-void deserialize_OptimalSTDP(learn_t *ls_t, pMatrixVector *data);
+void serialize_OptimalSTDP(learn_t *ls_t, FileStream *file, const Constants *c);
+void deserialize_OptimalSTDP(learn_t *ls_t, FileStream *file, const Constants *c);
 
 #endif

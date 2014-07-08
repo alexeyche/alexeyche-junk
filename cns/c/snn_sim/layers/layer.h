@@ -43,6 +43,7 @@ struct SimContext;
 typedef enum {EXC, INH} nspec_t;
 
 struct learn_t;
+struct LayerSerial;
 
 struct Layer {
     size_t id;
@@ -90,10 +91,9 @@ struct Layer {
     void (*toStartValues)(struct Layer *l, const Constants *c);
     void (*allocSynData)(struct Layer *l);
     void (*printLayer)(struct Layer *l);
-    pMatrixVector* (*serializeLayer)(struct Layer *l);
-    void (*deserializeLayer)(struct Layer *l, const Constants *c, pMatrixVector *layer_data);
+    void (*serializeLayer)(struct Layer *l, FileStream *file, const Constants *c);
+    void (*deserializeLayer)(struct Layer *l, FileStream *file, const Constants *c);
 };
-
 typedef struct Layer Layer;
 
 
@@ -111,8 +111,8 @@ void allocSynData_Poisson(Layer *l);
 void printLayer_Poisson(Layer *l);
 void deleteLayer_Poisson(Layer *l);
 void configureLayer_Poisson(Layer *l, const indVector *inputIDs, const indVector *outputIDs, const Constants *c);
-pMatrixVector* serializeLayer_Poisson(struct Layer *l);
-void deserializeLayer_Poisson(Layer *l, const Constants *c, pMatrixVector *data);
+void serializeLayer_Poisson(Layer *l, FileStream *file, const Constants *c);
+void deserializeLayer_Poisson(Layer *l, FileStream *file, const Constants *c);
 
 // common procedures
 double layerConstD(Layer *l, doubleVector *v);

@@ -20,8 +20,8 @@ int main(int argc, char **argv) {
         saveStat = true;
     }
 
-    pMatrixVector* ts_data = readMatrixList(a.input_file);
-    pMatrixVector* ts_labels = readMatrixList(a.input_labels_file);
+    pMatrixVector* ts_data = readMatrixListFromFile(a.input_file);
+    pMatrixVector* ts_labels = readMatrixListFromFile(a.input_labels_file);
     assert(ts_labels->size == 1);
     assert(ts_labels->array[0]->nrow == ts_data->size);
     
@@ -72,7 +72,7 @@ int main(int argc, char **argv) {
     transposeMatrix(classes);
     TEMPLATE(insertVector,pMatrix)(out_data, classes);    
 
-    saveMatrixList(a.output_file, out_data);
+    saveMatrixListToFile(a.output_file, out_data);
 
     if(l->saveStat) {
         pMatrixVector *stat_data = TEMPLATE(createVector,pMatrix)();
@@ -85,7 +85,7 @@ int main(int argc, char **argv) {
         TEMPLATE(insertVector,pMatrix)(stat_data, ws);
 
 
-        saveMatrixList(a.stat_file, stat_data);
+        saveMatrixListToFile(a.stat_file, stat_data);
 
         TEMPLATE(deleteVector,pMatrix)(stat_data);
     }

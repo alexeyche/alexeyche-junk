@@ -161,7 +161,7 @@ void free_OptimalSTDP(learn_t *ls_t) {
     free(ls);
 }
 
-pMatrixVector* serialize_OptimalSTDP(learn_t *ls_t) {
+void serialize_OptimalSTDP(learn_t *ls_t, FileStream *file, const Constants *c) {
     OptimalSTDP *ls = (OptimalSTDP*)ls_t;
     Layer *l = ls->base.l; 
 
@@ -171,19 +171,22 @@ pMatrixVector* serialize_OptimalSTDP(learn_t *ls_t) {
         setMatrixElement(pacc_m, ni, 0, ls->pacc[ni]);
     }
     TEMPLATE(insertVector,pMatrix)(data, pacc_m);
-    return(data);
+    saveMatrixList(file, data);
+    TEMPLATE(deleteVector,pMatrix)(data);
 }
 
-void deserialize_OptimalSTDP(learn_t *ls_t, pMatrixVector *data) {
+#define OPTIMAL_STDP_RULE_SERIALIZATION_SIZE 1
+void deserialize_OptimalSTDP(learn_t *ls_t, FileStream *file, const Constants *c) {
     OptimalSTDP *ls = (OptimalSTDP*)ls_t;
     Layer *l = ls->base.l; 
-
-    assert(data->size > 0);
+    pMatrixVector *data = readMatrixList(file, OPTIMAL_STDP_RULE_SERIALIZATION_SIZE);
+    
     Matrix *pacc_m = data->array[0];
     assert( (pacc_m->nrow == l->N) && (pacc_m->ncol == 1) );
     
     for(size_t ni=0; ni<l->N; ni++) {
         ls->pacc[ni] = getMatrixElement(pacc_m, ni, 0);
     }
+    TEMPLATE(deleteVector,pMatrix)(data);
 }
 
