@@ -2,12 +2,19 @@
 
 #include "constants.h"
 
+#include <util/templates_clean.h>
+#define T pLConst
+#include <util/util_vector_tmpl.c>
+
+
+
 Constants* createConstants(const char *filename) {
     Constants *c = (Constants*)malloc(sizeof(Constants));
     c->adex = (AdExConstants*) malloc( sizeof(AdExConstants) );
     c->res_stdp = (ResourceSTDPConstants*) malloc( sizeof(ResourceSTDPConstants) );
     c->preproc = (PreprocessConstants*) malloc( sizeof(PreprocessConstants) );
     c->pacemaker = (PacemakerConstants*) malloc( sizeof(PacemakerConstants) );
+    c->lc = TEMPLATE(createVector,pLConst)();
 
     if (ini_parse(filename, file_handler, c) < 0) {
         printf("Can't load %s\n", filename);
@@ -41,6 +48,29 @@ void deleteConstants(Constants *c) {
     free(c);
 }
 
+indVector* indVectorParse(const char *vals) {
+    indVector *v = TEMPLATE(createVector,ind)();
+    char *token;
+    char *string = strdup(vals);
+    while ((token = strsep(&string, " ")) != NULL) {
+
+        TEMPLATE(insertVector,ind)(v, atoi(token));
+    }
+    free(string);
+    return(v);
+}
+
+doubleVector* doubleVectorParse(const char *vals) {
+    doubleVector *v = TEMPLATE(createVector,double)();
+    char *token;
+    char *string = strdup(vals);
+    while ((token = strsep(&string, " ")) != NULL) {
+        TEMPLATE(insertVector,double)(v, atof(token));
+    }
+    free(string);
+    return(v);
+}             
+
 void fillIndVector(indVector *v, const char *vals) {
     char *token;
     char *string = strdup(vals);
@@ -60,6 +90,13 @@ void fillDoubleVector(doubleVector *v, const char *vals) {
     free(string);
 }
 
+#define FILL_LAYER_CONST(name,type) {       \
+        type##Vector *v = type##VectorParse(value); \
+        for(size_t i=0; i<v->size; i++) {   \
+            checkLC(c,i);                   \
+            getLC(c,i)->name = v->array[i]; \
+        }                                   \
+ 
 int file_handler(void* user, const char* section, const char* name,
                    const char* value)
 {
@@ -167,11 +204,11 @@ int file_handler(void* user, const char* section, const char* name,
     if (MATCH("sim", "target_neurons")) {
         c->target_neurons = strcmp(value, "true") == 0;
     } else 
-    if (MATCH("net", "M")) {
+    if (MATCH("sim", "M")) {
         c->M = atoi(value);
     } else 
     if (MATCH("net", "N")) {
-        fillIndVector(c->layers_size, value);
+        FILL_LAYER_CONST(N,ind)
     } else 
     if (MATCH("net", "net_edge_prob")) {
         fillDoubleVector(c->net_edge_prob, value);
@@ -324,8 +361,16 @@ int file_handler(void* user, const char* section, const char* name,
     return(1);
 }
 
+LayerConstants* getLC(Constants *c, size_t i) {
+    return(c->lc->array[i]);
+}
 
-
+void checkLC(Constants *c, size_t i) {
+    if (c->lc->size <= i) {
+        TEMPLATE(insertVector,pLConst)(c->lc, (LayerConstants*) malloc(sizeof(LayerConstants)));
+    }
+}
+//
 // for i in `sed -ne '11,44p' ./srm_sim/constants.h | cut -d ' ' -f6  | sort | uniq  | tr -d ';'`; do  echo "printf(\"$i: %f,\n\", c->$i);"; done
 void printConstants(Constants *c) {
     printf("lrate: "); printDoubleVector(c->lrate);

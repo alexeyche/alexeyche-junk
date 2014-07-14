@@ -65,8 +65,14 @@ typedef struct {
     double syn_delays_gain;
     double ws;
     double aw;
-
 } LayerConstants;
+
+typedef LayerConstants lConst;
+typedef lConst* pLConst;
+
+#include <util/templates_clean.h>
+#define T pLConst
+#include <util/util_vector_tmpl.h>
 
 typedef struct {
     double e0;
@@ -105,8 +111,7 @@ typedef struct {
     bool target_neurons;
     
     int M;
-    size_t layersNum;
-    LayerConstants *lc;
+    pLConstVector *lc;
 
     double target_rate;
     double __target_rate; // not to fill
@@ -135,5 +140,8 @@ void printConstants(Constants *c);
 void deleteConstants(Constants *c);
 void fillIndVector(indVector *v, const char *vals);
 void fillDoubleVector(doubleVector *v, const char *vals);
+
+LayerConstants* getLC(Constants *c, size_t i);
+void checkLC(Constants *c, size_t i);
 
 #endif
