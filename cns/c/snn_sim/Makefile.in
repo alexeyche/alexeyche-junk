@@ -78,10 +78,11 @@ am___top_builddir__bin_snn_sim_OBJECTS = util/matrix.$(OBJEXT) \
 	util/util.$(OBJEXT) util/spikes_list.$(OBJEXT) \
 	./util/util_dlink_list.$(OBJEXT) sim/netsim.$(OBJEXT) \
 	neuron_funcs.$(OBJEXT) constants.$(OBJEXT) util/io.$(OBJEXT) \
-	sim/runtime.$(OBJEXT) sim/configure.$(OBJEXT) \
-	sim/serialize.$(OBJEXT) ./layers/layer.$(OBJEXT) \
-	sim/sim.$(OBJEXT) learn/optim.$(OBJEXT) \
-	learn/res_stdp.$(OBJEXT) snn_sim.$(OBJEXT)
+	util/mem.$(OBJEXT) sim/runtime.$(OBJEXT) \
+	sim/configure.$(OBJEXT) sim/serialize.$(OBJEXT) \
+	./layers/layer.$(OBJEXT) sim/sim.$(OBJEXT) \
+	learn/optim.$(OBJEXT) learn/res_stdp.$(OBJEXT) \
+	snn_sim.$(OBJEXT)
 __top_builddir__bin_snn_sim_OBJECTS =  \
 	$(am___top_builddir__bin_snn_sim_OBJECTS)
 __top_builddir__bin_snn_sim_LDADD = $(LDADD)
@@ -197,7 +198,7 @@ AM_CFLAGS = -Wall -std=gnu99 -pthread -O3 #-O0 -g
 #AM_CFLAGS = -Wall -std=gnu99 -pthread -O0 -pg  
 #CFLAGS=
 LDADD = -lm
-__top_builddir__bin_snn_sim_SOURCES = util/matrix.c util/util_vector.c ./util/ini.c ./util/matrix.h util/util.c util/spikes_list.c ./util/util_dlink_list.c sim/netsim.c neuron_funcs.c  constants.c util/io.c sim/runtime.c sim/configure.c sim/serialize.c ./layers/layer.c sim/sim.c learn/optim.c learn/res_stdp.c snn_sim.c 
+__top_builddir__bin_snn_sim_SOURCES = util/matrix.c util/util_vector.c ./util/ini.c ./util/matrix.h util/util.c util/spikes_list.c ./util/util_dlink_list.c sim/netsim.c neuron_funcs.c  constants.c util/io.c util/mem.c sim/runtime.c sim/configure.c sim/serialize.c ./layers/layer.c sim/sim.c learn/optim.c learn/res_stdp.c snn_sim.c 
 __top_builddir__bin_snn_prep_SOURCES = util/matrix.c util/util_vector.c ./util/ini.c ./util/matrix.h util/util.c util/spikes_list.c  constants.c util/io.c layers/adex.c prep/prepare_ts.c snn_prep.c 
 __top_builddir__bin_snn_calc_SOURCES = util/matrix.c util/util_vector.c ./util/ini.c ./util/matrix.h util/util.c util/spikes_list.c  util/io.c snn_calc.c calc.c
 __top_builddir__bin_snn_postproc_SOURCES = util/matrix.c util/util_vector.c ./util/ini.c ./util/matrix.h util/util.c util/spikes_list.c  util/io.c postproc.c snn_postproc.c
@@ -327,6 +328,8 @@ sim/$(DEPDIR)/$(am__dirstamp):
 	@: > sim/$(DEPDIR)/$(am__dirstamp)
 sim/netsim.$(OBJEXT): sim/$(am__dirstamp) \
 	sim/$(DEPDIR)/$(am__dirstamp)
+util/mem.$(OBJEXT): util/$(am__dirstamp) \
+	util/$(DEPDIR)/$(am__dirstamp)
 sim/runtime.$(OBJEXT): sim/$(am__dirstamp) \
 	sim/$(DEPDIR)/$(am__dirstamp)
 sim/configure.$(OBJEXT): sim/$(am__dirstamp) \
@@ -366,6 +369,7 @@ mostlyclean-compile:
 	-rm -f sim/sim.$(OBJEXT)
 	-rm -f util/io.$(OBJEXT)
 	-rm -f util/matrix.$(OBJEXT)
+	-rm -f util/mem.$(OBJEXT)
 	-rm -f util/spikes_list.$(OBJEXT)
 	-rm -f util/util.$(OBJEXT)
 	-rm -f util/util_vector.$(OBJEXT)
@@ -395,6 +399,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@sim/$(DEPDIR)/sim.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@util/$(DEPDIR)/io.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@util/$(DEPDIR)/matrix.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@util/$(DEPDIR)/mem.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@util/$(DEPDIR)/spikes_list.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@util/$(DEPDIR)/util.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@util/$(DEPDIR)/util_vector.Po@am__quote@

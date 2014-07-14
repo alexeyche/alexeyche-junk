@@ -2,6 +2,18 @@
 
 #include <sim/sim.h>
 
+void writeModelHead(Sim *s, FileStream *fs) {
+    const Constants *c = s->ctx->c;
+    ModelHead *mh = (ModelHead*) malloc( sizeof(ModelHead) );
+    mh->num_of_layers = c->layers_size->size;
+    
+}
+
+ModelHead* readModelHead(Sim *s, FileStream *fs) {
+}
+
+
+
 void loadLayersFromFile(Sim *s, const char *model_fname) {
     const Constants *c = s->ctx->c;
     

@@ -4,20 +4,10 @@
 
 Constants* createConstants(const char *filename) {
     Constants *c = (Constants*)malloc(sizeof(Constants));
-    c->layers_size = TEMPLATE(createVector,ind)();
-    c->net_edge_prob = TEMPLATE(createVector,double)();
-    c->input_edge_prob= TEMPLATE(createVector,double)();
-    c->output_edge_prob = TEMPLATE(createVector,double)();
-    c->inhib_frac= TEMPLATE(createVector,double)();
-    c->weight_per_neuron= TEMPLATE(createVector,double)();
-    c->wmax = TEMPLATE(createVector,double)();
-    c->weight_decay_factor = TEMPLATE(createVector,double)();
-    c->lrate = TEMPLATE(createVector,double)();
     c->adex = (AdExConstants*) malloc( sizeof(AdExConstants) );
     c->res_stdp = (ResourceSTDPConstants*) malloc( sizeof(ResourceSTDPConstants) );
     c->preproc = (PreprocessConstants*) malloc( sizeof(PreprocessConstants) );
     c->pacemaker = (PacemakerConstants*) malloc( sizeof(PacemakerConstants) );
-    c->pacemaker->net_layer_ids = TEMPLATE(createVector,ind)();
 
     if (ini_parse(filename, file_handler, c) < 0) {
         printf("Can't load %s\n", filename);
@@ -325,9 +315,6 @@ int file_handler(void* user, const char* section, const char* name,
     } else 
     if (MATCH("pacemaker", "frequency")) {
         c->pacemaker->frequency = atof(value);
-    } else 
-    if (MATCH("pacemaker", "net_layer_ids")) {
-        fillIndVector(c->pacemaker->net_layer_ids, value);
     } else 
     if (MATCH("pacemaker", "pacemaker_on")) {
         c->pacemaker->pacemaker_on = strcmp(value, "true") == 0;

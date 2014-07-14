@@ -109,7 +109,7 @@ void saveMatrixList(FileStream *f, pMatrixVector *mv) {
         fwrite(type_name, sizeof(char), strlen(type_name)+1, f->fd);
         fwrite(m->vals, sizeof(double), m->nrow*m->ncol, f->fd);
         
-        int pos = ftell(f);
+        int pos = ftell(f->fd);
         fwrite(&pos, sizeof(int), 1, f_idx);
     }
     fclose(f_idx);

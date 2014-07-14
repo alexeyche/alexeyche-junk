@@ -24,7 +24,6 @@ typedef struct {
 
 typedef struct {
     bool pacemaker_on;
-    indVector *net_layer_ids;
     double frequency;
     double cumulative_period_delta;
     double amplitude;
@@ -46,7 +45,30 @@ typedef struct {
 } PreprocessConstants;
 
 typedef struct {
+    size_t N;
+    learning_rule_t learning_rule;
     neuron_layer_t neuron_type;
+    bool learn;
+    bool determ;
+    double net_edge_prob;
+    double input_edge_prob;
+    double output_edge_prob;
+    double inhib_frac;
+    double weight_per_neuron;
+    double wmax;
+    double weight_decay_factor;
+    double weight_var;
+    double lrate;
+    double axonal_delays_rate;
+    double axonal_delays_gain;
+    double syn_delays_rate;
+    double syn_delays_gain;
+    double ws;
+    double aw;
+
+} LayerConstants;
+
+typedef struct {
     double e0;
     double e_exc;
     double e_inh;
@@ -71,6 +93,8 @@ typedef struct {
     double pr;
     double __pr;
     double u_rest;
+    double tc;
+    double mean_p_dur;
 
     double duration;
     double dt;
@@ -81,35 +105,16 @@ typedef struct {
     bool target_neurons;
     
     int M;
-    indVector *layers_size; 
-    doubleVector *net_edge_prob;
-    doubleVector *input_edge_prob;
-    doubleVector *output_edge_prob;
-    doubleVector *inhib_frac;
-    doubleVector *weight_per_neuron;
-    doubleVector *wmax;
-    doubleVector *weight_decay_factor;
-    doubleVector *lrate;
-
-    double tc;
-    double mean_p_dur;
-    double axonal_delays_rate;
-    double axonal_delays_gain;
-    double syn_delays_rate;
-    double syn_delays_gain;
-
+    size_t layersNum;
+    LayerConstants *lc;
 
     double target_rate;
     double __target_rate; // not to fill
     double target_rate_factor;
-    double ws;
-    double aw;
-    double weight_var;
 
     int epochs;
     double p_set;
     
-    learning_rule_t learning_rule;
     AdExConstants *adex;
     ResourceSTDPConstants *res_stdp;
     PreprocessConstants *preproc;

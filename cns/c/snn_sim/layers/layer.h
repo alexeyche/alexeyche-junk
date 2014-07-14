@@ -13,6 +13,7 @@
 #include <util/util_dlink_list.h>
 #include <util/util.h>
 #include <util/matrix.h>
+#include <util/mem.h>
 
 #include <neuron_funcs.h>
 #include <util/io.h>

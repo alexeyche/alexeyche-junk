@@ -44,8 +44,8 @@ learn/res_stdp.o: learn/res_stdp.c learn/res_stdp.h /usr/include/math.h \
  /usr/local/include/libactor/list.h util/util_vector.h util/templates.h \
  util/templates_clean.h util/util_vector_tmpl.h util/ini.h \
  util/util_dlink_list.h util/util_dlink_list_tmpl.h util/matrix.h \
- util/util_vector_tmpl.h util/io.h layers/layer.h util/util.h sim/sim.h \
- util/spikes_list.h sim/runtime.h sim/netsim.h \
+ util/util_vector_tmpl.h util/io.h layers/layer.h util/util.h util/mem.h \
+ sim/sim.h util/spikes_list.h sim/runtime.h sim/netsim.h \
  util/util_dlink_list_tmpl.h sim/configure.h learn/optim.h \
  learn/res_stdp.h
 
@@ -194,6 +194,8 @@ util/io.h:
 layers/layer.h:
 
 util/util.h:
+
+util/mem.h:
 
 sim/sim.h:
 

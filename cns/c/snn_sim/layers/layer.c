@@ -352,9 +352,9 @@ void deserializeLayer_Poisson(Layer *l, FileStream *file, const Constants *c) {
     Matrix *W = data->array[0];
     Matrix *conns = data->array[1];
     Matrix *nt = data->array[2];
-    Matrix *ids = data->array[4];
-    Matrix *axon_del = data->array[5];
-    Matrix *syn_del = data->array[6];
+    Matrix *ids = data->array[3];
+    Matrix *axon_del = data->array[4];
+    Matrix *syn_del = data->array[5];
     assert(l->N == W->nrow);
 
     doubleVector **W_vals = (doubleVector**) malloc( W->nrow * sizeof(doubleVector*));
@@ -390,12 +390,10 @@ void deserializeLayer_Poisson(Layer *l, FileStream *file, const Constants *c) {
  
     l->toStartValues(l,c);
     for(size_t ni=0; ni<l->N; ni++) {  // apply values
-        assert(l->nconn[ni] != W_vals[ni]->size);
-        for(size_t con_i=0; con_i < l->nconn[ni]; con_i++) {
-            l->W[ni][con_i] = W_vals[ni]->array[con_i];
-            l->id_conns[ni][con_i] = id_conns_vals[ni]->array[con_i];
-            l->syn_del[ni][con_i] = syn_del_vals[ni]->array[con_i];
-        }
+        assert(l->nconn[ni] == W_vals[ni]->size);
+        replaceDoubleMem(l->W[ni], W_vals[ni]);
+        replaceIndMem(l->id_conns[ni], id_conns_vals[ni]);
+        replaceDoubleMem(l->syn_del[ni], syn_del_vals[ni]);
         l->axon_del[ni] = getMatrixElement(axon_del, ni, 0);
 
         TEMPLATE(deleteVector,double)(W_vals[ni]);

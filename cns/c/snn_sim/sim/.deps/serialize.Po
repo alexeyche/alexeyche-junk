@@ -45,8 +45,8 @@ sim/serialize.o: sim/serialize.c sim/sim.h \
  /usr/include/x86_64-linux-gnu/bits/mathdef.h \
  /usr/include/x86_64-linux-gnu/bits/mathcalls.h \
  /usr/include/x86_64-linux-gnu/bits/mathinline.h util/matrix.h \
- util/util_vector_tmpl.h neuron_funcs.h util/io.h learn/learn.h \
- util/spikes_list.h sim/runtime.h sim/netsim.h \
+ util/util_vector_tmpl.h util/mem.h neuron_funcs.h util/io.h \
+ learn/learn.h util/spikes_list.h sim/runtime.h sim/netsim.h \
  util/util_dlink_list_tmpl.h sim/configure.h learn/optim.h \
  learn/res_stdp.h
 
@@ -189,6 +189,8 @@ util/util.h:
 util/matrix.h:
 
 util/util_vector_tmpl.h:
+
+util/mem.h:
 
 neuron_funcs.h:
 
