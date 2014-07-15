@@ -8,7 +8,7 @@
 #include <util/util_vector.h>
 #include <util/ini.h>
 
-typedef enum { EOptimalSTDP, EResourceSTDP } learning_rule_t;
+typedef enum { ENull, EOptimalSTDP, EResourceSTDP } learning_rule_t;
 typedef enum { EPoissonLayer } neuron_layer_t;
 
 typedef struct {
@@ -106,8 +106,6 @@ typedef struct {
     double dt;
     double sim_dim;
     unsigned int seed;
-    bool determ;
-    bool learn;
     bool target_neurons;
     
     int M;

@@ -33,9 +33,10 @@ layers/layer.o: layers/layer.c /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/bits/stdio2.h constants.h \
  /usr/include/string.h /usr/include/x86_64-linux-gnu/bits/string.h \
  /usr/include/x86_64-linux-gnu/bits/string2.h \
- /usr/include/x86_64-linux-gnu/bits/string3.h core.h util/util_vector.h \
- util/templates.h util/templates_clean.h util/util_vector_tmpl.h \
- util/ini.h util/util_vector_tmpl.h util/util_dlink_list.h \
+ /usr/include/x86_64-linux-gnu/bits/string3.h core.h \
+ /usr/include/assert.h util/util_vector.h util/templates.h \
+ util/templates_clean.h util/util_vector_tmpl.h util/ini.h \
+ util/util_vector_tmpl.h util/util_dlink_list.h \
  util/util_dlink_list_tmpl.h util/util.h /usr/include/math.h \
  /usr/include/x86_64-linux-gnu/bits/huge_val.h \
  /usr/include/x86_64-linux-gnu/bits/huge_valf.h \
@@ -150,6 +151,8 @@ constants.h:
 /usr/include/x86_64-linux-gnu/bits/string3.h:
 
 core.h:
+
+/usr/include/assert.h:
 
 util/util_vector.h:
 

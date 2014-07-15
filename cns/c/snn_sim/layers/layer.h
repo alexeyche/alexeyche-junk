@@ -97,6 +97,10 @@ struct Layer {
 };
 typedef struct Layer Layer;
 
+typedef struct {
+    neuron_layer_t neuron_type;
+    learning_rule_t learning_rule;
+} LayerSerializeInfo;
 
 Layer* createPoissonLayer(size_t N, size_t *glob_idx, unsigned char statLevel);
 
@@ -114,13 +118,14 @@ void deleteLayer_Poisson(Layer *l);
 void configureLayer_Poisson(Layer *l, const indVector *inputIDs, const indVector *outputIDs, const Constants *c);
 void serializeLayer_Poisson(Layer *l, FileStream *file, const Constants *c);
 void deserializeLayer_Poisson(Layer *l, FileStream *file, const Constants *c);
-
 // common procedures
-double layerConstD(Layer *l, doubleVector *v);
 size_t getLocalNeuronId(Layer *l, const size_t *glob_id);
 const size_t getGlobalId(Layer *l, const size_t *ni);
 double getSynDelay(Layer *l, const size_t *ni, const size_t *syn_id);
 void setSynapseSpeciality(Layer *l, size_t ni, size_t syn_id, double spec);
+void writeLayerSerializeInfo(LayerSerializeInfo info, FileStream *file);
+LayerSerializeInfo readLayerSerializeInfo(FileStream *file);
+const LayerConstants* getLC(Layer *l, const Constants *c);
 
 typedef Layer* pLayer;
 

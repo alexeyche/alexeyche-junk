@@ -20,14 +20,16 @@ Constants* createConstants(const char *filename) {
     }
     c->__target_rate = c->target_rate/c->sim_dim;
     c->__pr = c->pr/c->sim_dim;
-    if(c->determ) {
-        c->beta = 1000;
-//        c->r0 = 1000;
+    for(size_t i=0; i<c->lc->size; i++) {
+        if((getLayerConstantsC(c,i)->determ)&&(getLayerConstantsC(c,i)->learn)) {
+            printf("Can't learn anything in determenistic mode\n");
+            exit(1);
+        }
+        if(getLayerConstantsC(c,i)->learn) {
+            getLayerConstantsC(c,i)->learning_rule = ENull;
+        }
     }
-    if((c->determ)&&(c->learn)) {
-        printf("Can't learn anything in determenistic mode\n");
-        exit(1);
-    }
+
     return(c);
 }
 void deleteConstants(Constants *c) {
@@ -364,7 +366,7 @@ void checkLC(Constants *c, size_t i) {
     if (c->lc->size <= i) {
         LayerConstants *new_lc = (LayerConstants*) malloc(sizeof(LayerConstants));
         if(c->lc->size > 0) {
-            *new_lc = c->lc->array[ c->lc->size-1 ];
+            memcpy(new_lc, c->lc->array[ c->lc->size-1 ], sizeof(LayerConstants));
         }
         TEMPLATE(insertVector,pLConst)(c->lc, new_lc);
     }
@@ -495,8 +497,6 @@ void printConstants(Constants *c) {
     printf("dt->"); doublePrint(c->dt);
     printf("sim_dim->"); doublePrint(c->sim_dim);
     printf("seed->"); uintPrint(c->seed);
-    printf("determ->"); boolPrint(c->determ);
-    printf("learn->"); boolPrint(c->learn);
     printf("target_neurons->"); boolPrint(c->target_neurons);
     printf("M->"); intPrint(c->M);
     printf("lc->"); pLConstVectorPrint(c->lc);
