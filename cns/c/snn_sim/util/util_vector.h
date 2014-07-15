@@ -21,6 +21,10 @@
 #define T uchar
 #include "util_vector_tmpl.h"
 
+#include <util/templates_clean.h>
+#define T pcchar
+#include "util_vector_tmpl.h"
+
 
 void printDoubleVector(doubleVector *dv);
 void printIndVector(indVector *v);

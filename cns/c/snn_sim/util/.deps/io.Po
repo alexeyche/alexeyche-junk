@@ -32,11 +32,7 @@ util/io.o: util/io.c /usr/include/stdc-predef.h \
  /usr/include/xlocale.h /usr/include/x86_64-linux-gnu/bits/string.h \
  /usr/include/x86_64-linux-gnu/bits/string2.h \
  /usr/include/x86_64-linux-gnu/bits/string3.h util/templates.h \
- util/util_vector.h core.h /usr/local/include/libactor/actor.h \
- /usr/local/include/libactor/types.h /usr/include/pthread.h \
- /usr/include/sched.h /usr/include/x86_64-linux-gnu/bits/sched.h \
- /usr/include/x86_64-linux-gnu/bits/setjmp.h /usr/include/assert.h \
- /usr/local/include/libactor/list.h util/templates_clean.h \
+ util/util_vector.h core.h /usr/include/assert.h util/templates_clean.h \
  util/util_vector_tmpl.h util/util_vector_tmpl.h
 
 /usr/include/stdc-predef.h:
@@ -135,21 +131,7 @@ util/util_vector.h:
 
 core.h:
 
-/usr/local/include/libactor/actor.h:
-
-/usr/local/include/libactor/types.h:
-
-/usr/include/pthread.h:
-
-/usr/include/sched.h:
-
-/usr/include/x86_64-linux-gnu/bits/sched.h:
-
-/usr/include/x86_64-linux-gnu/bits/setjmp.h:
-
 /usr/include/assert.h:
-
-/usr/local/include/libactor/list.h:
 
 util/templates_clean.h:
 

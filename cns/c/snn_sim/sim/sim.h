@@ -2,6 +2,7 @@
 #define SIM_H
 
 #include <stddef.h>
+#include <pthread.h>
 
 #include <layers/layer.h>
 #include <constants.h>
@@ -9,7 +10,6 @@
 #include <util/matrix.h>
 #include <util/io.h>
 
-#include <pthread.h>
 
 #ifndef max
     #define max( a, b ) ( ((a) > (b)) ? (a) : (b) )

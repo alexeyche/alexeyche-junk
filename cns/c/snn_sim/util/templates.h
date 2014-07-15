@@ -8,6 +8,7 @@
 
 typedef size_t ind;
 typedef unsigned char uchar;
+typedef char* pcchar;
 
 #define TVEC(T) TNAME(T,Vector)
 

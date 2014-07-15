@@ -18,6 +18,12 @@
 #define T uchar
 #include "util_vector_tmpl.c"
 
+#include <util/templates_clean.h>
+#define DESTRUCT free
+#define T pcchar
+#include "util_vector_tmpl.c"
+
+
 
 void printDoubleVector(doubleVector *dv) {
     for(size_t el_i=0; el_i < dv->size; el_i++) {

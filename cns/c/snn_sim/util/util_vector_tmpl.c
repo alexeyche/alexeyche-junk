@@ -55,7 +55,6 @@ TVEC(T)* TEMPLATE(copyVector,T)(TVEC(T) *oldv) {
         TEMPLATE(insertVector,T)(v, oldv->array[eli]);
     }
     return(v);
-
 }
 
 TVEC(T)* TEMPLATE(tailVector,T)(TVEC(T) *v, size_t n) {
@@ -74,5 +73,4 @@ TVEC(T)* TEMPLATE(headVector,T)(TVEC(T) *v, size_t n) {
         TEMPLATE(insertVector,T)(cutted_v, v->array[i]);
     }
     return(cutted_v);
-
 }

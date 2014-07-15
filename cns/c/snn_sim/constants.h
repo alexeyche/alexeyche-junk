@@ -132,16 +132,31 @@ typedef struct {
     PacemakerConstants *pacemaker;
 } Constants;
 
-int file_handler(void* user, const char* section, const char* name,
-                   const char* value);
-
+// cat ./snn_sim/constants.c | grep -E "^[-a-zA-Z_*]+ " | sed -e 's/[ ]*{/;/g'
 Constants* createConstants(const char *filename);
-void printConstants(Constants *c); 
 void deleteConstants(Constants *c);
-void fillIndVector(indVector *v, const char *vals);
-void fillDoubleVector(doubleVector *v, const char *vals);
-
-LayerConstants* getLC(Constants *c, size_t i);
+indVector* indVectorParse(const char *vals);
+doubleVector* doubleVectorParse(const char *vals);
+pccharVector* pccharVectorParse(const char *vals);
+neuron_layer_t neuronTypeParse(char *str);
+learning_rule_t learningRuleParse(char *str);
+bool boolParse(char *str);
+int file_handler(void* user, const char* section, const char* name, const char* value);
+LayerConstants* getLayerConstantsC(Constants *c, size_t i);
 void checkLC(Constants *c, size_t i);
+void doublePrint(double v);
+void uintPrint(unsigned int v);
+void intPrint(int v);
+void boolPrint(bool v);
+void AdExConstantsPrint(AdExConstants *c);
+void ResourceSTDPConstantsPrint(ResourceSTDPConstants *c);
+void PacemakerConstantsPrint(PacemakerConstants *c);
+void PreprocessConstantsPrint(PreprocessConstants *c);
+void pLConstVectorPrint(pLConstVector *v);
+void size_tPrint(size_t v);
+void learning_rule_tPrint(learning_rule_t v);
+void neuron_layer_tPrint(neuron_layer_t v);
+void LayerConstantsPrint(LayerConstants *c);
+void printConstants(Constants *c);
 
 #endif
