@@ -5,8 +5,13 @@
 void writeModelHead(Sim *s, FileStream *fs) {
     const Constants *c = s->ctx->c;
     ModelHead *mh = (ModelHead*) malloc( sizeof(ModelHead) );
-    mh->num_of_layers = c->layers_size->size;
-    
+    mh->num_of_layers = c->lc->size;
+    mh->neuron_types = (neuron_layer_t*) malloc( sizeof(neuron_layer_t) * mh->num_of_layers); 
+    mh->learn_types = (learning_rule_t*) malloc( sizeof(learning_rule_t) * mh->num_of_layers); 
+    for(size_t li=0; li<c->lc->size; li++) {
+        mh->neuron_types[li] = c->lc[li]->neuron_type;
+        mh->learn_types[li] = c->lc[li]->learning_rule;
+    }
 }
 
 ModelHead* readModelHead(Sim *s, FileStream *fs) {

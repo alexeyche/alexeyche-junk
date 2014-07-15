@@ -2,10 +2,8 @@
 #define SERIALIZE_H
 
 typedef struct ModelHead {
-    indVector *M;
-    indVector *N;
-    learning_rule_t rule_types;
-    neuron_layer_t layer_types;
+    neuron_layer_t *neuron_types;
+    learning_rule_t *learn_types;
     size_t num_of_layers;
 } ModelHead;
 

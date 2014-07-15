@@ -362,7 +362,11 @@ LayerConstants* getLayerConstantsC(Constants *c, size_t i) {
 
 void checkLC(Constants *c, size_t i) {
     if (c->lc->size <= i) {
-        TEMPLATE(insertVector,pLConst)(c->lc, (LayerConstants*) malloc(sizeof(LayerConstants)));
+        LayerConstants *new_lc = (LayerConstants*) malloc(sizeof(LayerConstants));
+        if(c->lc->size > 0) {
+            *new_lc = c->lc->array[ c->lc->size-1 ];
+        }
+        TEMPLATE(insertVector,pLConst)(c->lc, new_lc);
     }
 }
 

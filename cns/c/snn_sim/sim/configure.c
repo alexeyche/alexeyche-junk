@@ -56,10 +56,11 @@ void configureLayersSim(Sim *s, Constants *c, unsigned char statLevel) {
     size_t net_size = c->M; 
     size_t neurons_idx = inputIDs->size; // start from last input ID
 
-    for(size_t li=0; li< c->layers_size->size; li++) {
+    for(size_t li=0; li< c->lc->size; li++) {
+        LayerConstants *lc = getLayerConstantsC(c, li);
         Layer *l;
-        if(c->neuron_type == EPoissonLayer) {
-            l = createPoissonLayer(c->layers_size->array[li], &neurons_idx, statLevel);
+        if(lc->neuron_type == EPoissonLayer) {
+            l = createPoissonLayer(lc->N, &neurons_idx, statLevel);
         } else {
             exit(1);
         }
@@ -70,14 +71,14 @@ void configureLayersSim(Sim *s, Constants *c, unsigned char statLevel) {
     s->impl->net_size = net_size;
     indVector *inp = NULL;
     indVector *outp = NULL;
-    for(size_t li=0; li< c->layers_size->size; li++) {
+    for(size_t li=0; li< c->lc->size; li++) {
         Layer *l = s->layers->array[li];
         if(li == 0) {
             inp = inputIDs;
         } else {
             inp = TEMPLATE(copyFromArray,ind)(s->layers->array[li-1]->ids, s->layers->array[li-1]->N);
         }
-        if(li+1 < c->layers_size->size) {
+        if(li+1 < c->lc->size) {
             outp = TEMPLATE(copyFromArray,ind)(s->layers->array[li+1]->ids, s->layers->array[li+1]->N);
         } else {
             outp = NULL;

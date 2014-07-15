@@ -124,8 +124,8 @@ void deleteLayer_Poisson(Layer *l) {
     free(l);
 }
 
-double layerConstD(Layer *l, doubleVector *v) {
-    return( v->array[ l->id ]);
+double getLC(Layer *l, Constants *c) {
+    return( c->lc->array[l->id] );
 }
 
 size_t getLocalNeuronId(Layer *l, const size_t *glob_id) {
