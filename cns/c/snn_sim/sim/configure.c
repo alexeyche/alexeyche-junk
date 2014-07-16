@@ -45,7 +45,7 @@ void configureNetSpikesSim(Sim *s, const char *input_spikes_filename, Constants 
     }
 }
 
-void configureLayersSim(Sim *s, Constants *c, unsigned char statLevel) {
+void configureLayersSim(Sim *s, Constants *c) {
     s->ctx->c = c;
 
     indVector *inputIDs = TEMPLATE(createVector,ind)();
@@ -60,7 +60,7 @@ void configureLayersSim(Sim *s, Constants *c, unsigned char statLevel) {
         LayerConstants *lc = getLayerConstantsC(c, li);
         Layer *l;
         if(lc->neuron_type == EPoissonLayer) {
-            l = createPoissonLayer(lc->N, &neurons_idx, statLevel);
+            l = createPoissonLayer(lc->N, &neurons_idx, s->ctx->stat_level);
         } else {
             exit(1);
         }

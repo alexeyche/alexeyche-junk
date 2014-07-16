@@ -11,7 +11,7 @@
 #define PROB_FUNC EXP2
 #define WEIGHT_BOUND B_HARD
 
-inline double probf( const double *u, const Constants *c) {
+double probf( const double *u, const Constants *c) {
 #if PROB_FUNC == LINEAR 
     double p = (c->pr + (*u - c->u_rest)*c->gain_factor)/c->sim_dim;
     if(p < c->pr/c->sim_dim) return(c->pr/c->sim_dim);
@@ -27,7 +27,7 @@ inline double probf( const double *u, const Constants *c) {
 }
 
 
-inline double pstroke(const double *u, const Constants *c) {
+double pstroke(const double *u, const Constants *c) {
 #if PROB_FUNC == LINEAR 
     return( c->gain_factor / c->sim_dim );
 #elif PROB_FUNC == EXP
@@ -39,7 +39,7 @@ inline double pstroke(const double *u, const Constants *c) {
 }
 
 
-inline double B_calc(const unsigned char *Yspike, const double *p, const double *pmean, const Constants *c) {
+double B_calc(const unsigned char *Yspike, const double *p, const double *pmean, const Constants *c) {
     if( fabs(*pmean - 0.0) < 0.0000001 ) return(0);
     double pmean_w = *pmean/c->mean_p_dur;
 //    printf("pmean_w %f, 1part: %f, 2part: %f\n", pmean_w, ( *Yspike * log( *p/pmean_w) - (*p - pmean_w)), c->target_rate_factor * ( *Yspike * log( pmean_w/c->__target_rate) - (pmean_w - c->__target_rate) ));
@@ -48,12 +48,12 @@ inline double B_calc(const unsigned char *Yspike, const double *p, const double 
 }
 
 
-inline double C_calc(const unsigned char *Yspike, const double *p, const double *u, const double *denominator_p, const double *syn, const Constants *c) {
+double C_calc(const unsigned char *Yspike, const double *p, const double *u, const double *denominator_p, const double *syn, const Constants *c) {
     double pstr = pstroke(u, c);
     return ( pstr/(*p/ *denominator_p) ) * ( *Yspike - *p ) * (*syn);
 }
 
-inline double bound_grad(const double *w, const double *dw, const double *wmax, const Constants *c) {
+double bound_grad(const double *w, const double *dw, const double *wmax, const Constants *c) {
 #if WEIGHT_BOUND == B_SOFT   
     if(*dw > 0) return(*dw);
     return( (1 - 1/(1+c->aw*(*w/c->ws)) + (1/(1+c->aw))*(*w/c->ws)) * *dw );

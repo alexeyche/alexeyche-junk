@@ -20,7 +20,7 @@ void loadLayersFromFile(Sim *s, const char *model_fname) {
 void saveLayersToFile(Sim *s, const char *model_fname) {
     const Constants *c = s->ctx->c;
 
-    checkIdxFnameOfModel(model_fname);
+    checkIdxFnameOfFile(model_fname);
     
     FileStream *fs = createOutputFileStream(model_fname);
     for(size_t li=0; li<s->layers->size; li++) {

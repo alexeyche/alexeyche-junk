@@ -23,6 +23,6 @@ FileStream* createOutputFileStream(const char *fname);
 FileStream* createInputFileStream(const char *fname);
 void deleteFileStream(FileStream *fs);
 char* getIdxName(const char *fname);
-void checkIdxFnameOfModel(const char *fname);
+void checkIdxFnameOfFile(const char *fname);
 
 #endif

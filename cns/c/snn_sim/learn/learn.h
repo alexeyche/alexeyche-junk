@@ -2,7 +2,7 @@
 #define LEARN_H
 
 
-#define LEARN_ACT_TOL 0.00001 // value of synapse needed to delete 
+#define LEARN_ACT_TOL 0.001 // value of synapse needed to delete 
 
 #define RATE_NORM PRESYNAPTIC
 

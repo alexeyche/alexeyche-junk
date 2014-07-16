@@ -20,7 +20,7 @@
 #include <learn/learn.h>
 
 
-#define SYN_ACT_TOL 0.0001 // value of synapse needed to delete 
+#define SYN_ACT_TOL 0.001 // value of synapse needed to delete 
 
 
 typedef struct {
@@ -91,6 +91,7 @@ struct Layer {
     void (*configureLayer)(struct Layer *l, const indVector *inputIDs, const indVector *outputIDs, const Constants *c);
     void (*toStartValues)(struct Layer *l, const Constants *c);
     void (*allocSynData)(struct Layer *l);
+    void (*deallocSynData)(struct Layer *l);
     void (*printLayer)(struct Layer *l);
     void (*serializeLayer)(struct Layer *l, FileStream *file, const Constants *c);
     void (*deserializeLayer)(struct Layer *l, FileStream *file, const Constants *c);
@@ -113,6 +114,7 @@ void propagateSpike_Poisson(Layer *l, const size_t *ni, const SynSpike *sp, cons
 // methods common
 void toStartValues_Poisson(Layer *l, const Constants *c);
 void allocSynData_Poisson(Layer *l);
+void deallocSynData_Poisson(Layer *l);
 void printLayer_Poisson(Layer *l);
 void deleteLayer_Poisson(Layer *l);
 void configureLayer_Poisson(Layer *l, const indVector *inputIDs, const indVector *outputIDs, const Constants *c);

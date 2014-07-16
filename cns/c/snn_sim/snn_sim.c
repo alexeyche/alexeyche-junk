@@ -42,7 +42,7 @@ int main(int argc, char **argv) {
     if(a.model_file) model_to_load = strdup(a.model_file);
     if(a.model_file_load) model_to_load = strdup(a.model_file_load); 
     
-    configureLayersSim(s, c, statLevel);
+    configureLayersSim(s, c);
 
     if(model_to_load) {
         loadLayersFromFile(s, model_to_load);
@@ -66,6 +66,7 @@ int main(int argc, char **argv) {
     }
 
     if(statLevel > 0) {
+        checkIdxFnameOfFile(a.stat_file);
         pMatrixVector *mv = TEMPLATE(createVector,pMatrix)();
         if((c->reinforcement)&&(!a.calcStat)) {
             Matrix *m_stat_glob_rew = vectorArrayToMatrix(&s->ctx->stat_global_reward, 1);
@@ -100,23 +101,24 @@ int main(int argc, char **argv) {
                 Matrix *mu = vectorArrayToMatrix(l->stat->stat_u, l->N);
                 TEMPLATE(insertVector,pMatrix)(mv, mu);
                 
-                OptimalSTDP *ls = (OptimalSTDP*)l->ls_t;
-                Matrix *mB = vectorArrayToMatrix(ls->stat_B, l->N);
-
-                TEMPLATE(insertVector,pMatrix)(mv, mB);
-                
                 for(size_t ni=0; ni < l->N; ni++) {
                     Matrix *mSyn = vectorArrayToMatrix(l->stat->stat_syn[ni], l->nconn[ni]);
                     TEMPLATE(insertVector,pMatrix)(mv, mSyn);
                 }
                 for(size_t ni=0; ni < l->N; ni++) {
-                    Matrix *mC = vectorArrayToMatrix(ls->stat_C[ni], l->nconn[ni]);
-                    TEMPLATE(insertVector,pMatrix)(mv, mC);
-                }
-                for(size_t ni=0; ni < l->N; ni++) {
                     Matrix *mdW = vectorArrayToMatrix(l->stat->stat_W[ni], l->nconn[ni]);
                     TEMPLATE(insertVector,pMatrix)(mv, mdW);
                 }
+                if(l->ls_t) {
+                    OptimalSTDP *ls = (OptimalSTDP*)l->ls_t;
+                    Matrix *mB = vectorArrayToMatrix(ls->stat_B, l->N);
+
+                    TEMPLATE(insertVector,pMatrix)(mv, mB);
+                    for(size_t ni=0; ni < l->N; ni++) {
+                        Matrix *mC = vectorArrayToMatrix(ls->stat_C[ni], l->nconn[ni]);
+                        TEMPLATE(insertVector,pMatrix)(mv, mC);
+                    }
+                }                    
             }
         }            
      

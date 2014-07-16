@@ -94,7 +94,7 @@ char* getIdxName(const char *fname) {
     return(idx_fname);
 }
 
-void checkIdxFnameOfModel(const char *fname) {
+void checkIdxFnameOfFile(const char *fname) {
     char *idx_fname = getIdxName(fname);
     if( access( idx_fname, F_OK ) != -1 ) {
         if( remove( idx_fname ) != 0 ) {
