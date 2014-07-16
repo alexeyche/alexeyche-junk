@@ -18,13 +18,15 @@ int main(int argc, char **argv) {
     bool saveStat = a.stat_file != NULL;
     Constants *c = createConstants(a.const_filename);
     srand(a.seed);
-    if(a.learn == 0) {
-        c->learn = false;
-    } else
-    if(a.learn == 1) {
-        c->learn = true;
-    }
 //    printConstants(c);
+    for(size_t i=0; i<c->lc->size; i++) {
+        if(a.learn == 0) {
+            getLayerConstantsC(c,i)->learn = false;
+        } else
+        if(a.learn == 1) {
+            getLayerConstantsC(c,i)->learn = true;
+        }
+    }
     assert(a.jobs != 0);
     unsigned char statLevel = 0;
     if(saveStat) {

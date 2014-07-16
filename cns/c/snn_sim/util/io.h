@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <util/matrix.h>
 #include <string.h>
+#include <sys/stat.h>
 
 typedef struct FileStream {
     FILE *fd;

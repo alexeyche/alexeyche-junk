@@ -34,8 +34,8 @@ calc.o: calc.c /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/bits/string.h \
  /usr/include/x86_64-linux-gnu/bits/string2.h \
  /usr/include/x86_64-linux-gnu/bits/string3.h util/templates.h \
- util/util_vector.h core.h util/templates_clean.h util/util_vector_tmpl.h \
- util/util_vector_tmpl.h /usr/include/math.h \
+ util/util_vector.h core.h /usr/include/assert.h util/templates_clean.h \
+ util/util_vector_tmpl.h util/util_vector_tmpl.h /usr/include/math.h \
  /usr/include/x86_64-linux-gnu/bits/huge_val.h \
  /usr/include/x86_64-linux-gnu/bits/huge_valf.h \
  /usr/include/x86_64-linux-gnu/bits/huge_vall.h \
@@ -148,6 +148,8 @@ util/templates.h:
 util/util_vector.h:
 
 core.h:
+
+/usr/include/assert.h:
 
 util/templates_clean.h:
 

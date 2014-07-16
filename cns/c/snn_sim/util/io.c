@@ -98,8 +98,7 @@ void saveMatrixList(FileStream *f, pMatrixVector *mv) {
     idx_fname[fi+strlen(postfix)] = '\0';
 
     FILE *f_idx = fopen(idx_fname, "ab");    
-
-    int null_pos = 0;
+    int null_pos = ftell(f->fd);
     fwrite(&null_pos, sizeof(int), 1, f_idx);
     const char *type_name = "double";
     for(size_t mi=0; mi < mv->size; mi++) {

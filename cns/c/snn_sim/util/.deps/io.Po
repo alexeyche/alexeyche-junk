@@ -33,7 +33,9 @@ util/io.o: util/io.c /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/bits/string2.h \
  /usr/include/x86_64-linux-gnu/bits/string3.h util/templates.h \
  util/util_vector.h core.h /usr/include/assert.h util/templates_clean.h \
- util/util_vector_tmpl.h util/util_vector_tmpl.h
+ util/util_vector_tmpl.h util/util_vector_tmpl.h \
+ /usr/include/x86_64-linux-gnu/sys/stat.h \
+ /usr/include/x86_64-linux-gnu/bits/stat.h
 
 /usr/include/stdc-predef.h:
 
@@ -138,3 +140,7 @@ util/templates_clean.h:
 util/util_vector_tmpl.h:
 
 util/util_vector_tmpl.h:
+
+/usr/include/x86_64-linux-gnu/sys/stat.h:
+
+/usr/include/x86_64-linux-gnu/bits/stat.h:

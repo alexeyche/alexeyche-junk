@@ -141,7 +141,7 @@ learning_rule_t learningRuleParse(char *str);
 bool boolParse(char *str);
 int file_handler(void* user, const char* section, const char* name, const char* value);
 LayerConstants* getLayerConstantsC(Constants *c, size_t i);
-void checkLC(Constants *c, size_t i);
+bool checkLC(Constants *c, size_t i, const char *field);
 void doublePrint(double v);
 void uintPrint(unsigned int v);
 void intPrint(int v);

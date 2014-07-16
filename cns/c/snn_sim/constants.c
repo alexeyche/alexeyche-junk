@@ -25,7 +25,7 @@ Constants* createConstants(const char *filename) {
             printf("Can't learn anything in determenistic mode\n");
             exit(1);
         }
-        if(getLayerConstantsC(c,i)->learn) {
+        if(!getLayerConstantsC(c,i)->learn) {
             getLayerConstantsC(c,i)->learning_rule = ENull;
         }
     }
@@ -82,10 +82,10 @@ neuron_layer_t neuronTypeParse(char *str) {
 }
 
 learning_rule_t learningRuleParse(char *str) {
-    if(strcmp(str, "EOptimalSTDP") == 0) {
+    if(strcmp(str, "OptimalSTDP") == 0) {
         return(EOptimalSTDP);
     }
-    if(strcmp(str, "EResourceSTDP") == 0) {
+    if(strcmp(str, "ResourceSTDP") == 0) {
         return(EResourceSTDP);
     }
     printf("Can't do parse of learning rule: %s\n", str);
@@ -106,7 +106,7 @@ bool boolParse(char *str) {
 #define FILL_LAYER_CONST(name,type) {       \
         type##Vector *v = type##VectorParse(value); \
         for(size_t i=0; i<v->size; i++) {   \
-            checkLC(c,i);                   \
+            if(!checkLC(c,i, #name)) break;  \
             getLayerConstantsC(c,i)->name = v->array[i]; \
         }                                   \
         TEMPLATE(deleteVector,type)(v);        \
@@ -115,7 +115,7 @@ bool boolParse(char *str) {
 #define FILL_LAYER_CONST_FUN(name,type,fun) {       \
         type##Vector *v = type##VectorParse(value); \
         for(size_t i=0; i<v->size; i++) {   \
-            checkLC(c,i);                   \
+            if(!checkLC(c,i, #name)) break;  \
             getLayerConstantsC(c,i)->name = fun(v->array[i]); \
         }                                   \
         TEMPLATE(deleteVector,type)(v);     \
@@ -215,58 +215,64 @@ int file_handler(void* user, const char* section, const char* name, const char* 
     if (MATCH("sim", "M")) {
         c->M = atoi(value);
     } else 
-    if (MATCH("net", "neuron_type")) {
+    if (MATCH("layer", "neuron_type")) {
         FILL_LAYER_CONST_FUN(neuron_type,pcchar,neuronTypeParse)
     } else 
-    if (MATCH("net", "learning_rule")) {
+    if (MATCH("layer", "learning_rule")) {
         FILL_LAYER_CONST_FUN(learning_rule,pcchar,learningRuleParse)
     } else 
-    if (MATCH("net", "learn")) {
+    if (MATCH("layer", "learn")) {
         FILL_LAYER_CONST_FUN(learn,pcchar,boolParse)
     } else 
-    if (MATCH("net", "determ")) {
+    if (MATCH("layer", "determ")) {
         FILL_LAYER_CONST_FUN(determ,pcchar,boolParse)
     } else 
-    if (MATCH("net", "N")) {
+    if (MATCH("layer", "N")) {
         FILL_LAYER_CONST(N,ind)
     } else 
-    if (MATCH("net", "net_edge_prob")) {
+    if (MATCH("layer", "lrate")) {
+        FILL_LAYER_CONST(lrate,double)
+    } else 
+    if (MATCH("layer", "net_edge_prob")) {
         FILL_LAYER_CONST(net_edge_prob,double)
     } else 
-    if (MATCH("net", "input_edge_prob")) {
+    if (MATCH("layer", "input_edge_prob")) {
         FILL_LAYER_CONST(input_edge_prob,double)
     } else 
-    if (MATCH("net", "output_edge_prob")) {
+    if (MATCH("layer", "output_edge_prob")) {
         FILL_LAYER_CONST(output_edge_prob,double)
     } else 
-    if (MATCH("net", "weight_per_neuron")) {
+    if (MATCH("layer", "weight_decay_factor")) {
+        FILL_LAYER_CONST(weight_decay_factor,double)
+    } else 
+    if (MATCH("layer", "weight_per_neuron")) {
         FILL_LAYER_CONST(weight_per_neuron,double)
     } else 
-    if (MATCH("net", "inhib_frac")) {
+    if (MATCH("layer", "inhib_frac")) {
         FILL_LAYER_CONST(inhib_frac,double)
     } else
-    if (MATCH("net", "ws")) {
+    if (MATCH("layer", "ws")) {
         FILL_LAYER_CONST(ws,double)
     } else 
-    if (MATCH("net", "wmax")) {
+    if (MATCH("layer", "wmax")) {
         FILL_LAYER_CONST(wmax,double)
     } else 
-    if (MATCH("net", "aw")) {
+    if (MATCH("layer", "aw")) {
         FILL_LAYER_CONST(aw,double)
     } else 
-    if (MATCH("net", "weight_var")) {
+    if (MATCH("layer", "weight_var")) {
         FILL_LAYER_CONST(weight_var,double)
     } else 
-    if (MATCH("net", "syn_delays_gain")) {
+    if (MATCH("layer", "syn_delays_gain")) {
         FILL_LAYER_CONST(syn_delays_gain,double)
     } else 
-    if (MATCH("net", "syn_delays_rate")) {
+    if (MATCH("layer", "syn_delays_rate")) {
         FILL_LAYER_CONST(syn_delays_rate,double)
     } else 
-    if (MATCH("net", "axonal_delays_gain")) {
+    if (MATCH("layer", "axonal_delays_gain")) {
         FILL_LAYER_CONST(axonal_delays_gain,double)
     } else 
-    if (MATCH("net", "axonal_delays_rate")) {
+    if (MATCH("layer", "axonal_delays_rate")) {
         FILL_LAYER_CONST(axonal_delays_rate,double)
     } else 
     if (MATCH("optimal stdp", "tc")) {
@@ -362,14 +368,17 @@ LayerConstants* getLayerConstantsC(Constants *c, size_t i) {
     return(c->lc->array[i]);
 }
 
-void checkLC(Constants *c, size_t i) {
-    if (c->lc->size <= i) {
+bool checkLC(Constants *c, size_t i, const char *field) {
+    if(c->lc->size > i) return(true); 
+    if (strcmp(field, "N") == 0) {
         LayerConstants *new_lc = (LayerConstants*) malloc(sizeof(LayerConstants));
         if(c->lc->size > 0) {
             memcpy(new_lc, c->lc->array[ c->lc->size-1 ], sizeof(LayerConstants));
         }
         TEMPLATE(insertVector,pLConst)(c->lc, new_lc);
+        return(true);
     }
+    return(false);
 }
 
 void doublePrint(double v) {
@@ -387,6 +396,7 @@ void boolPrint(bool v) {
 }
 
 void AdExConstantsPrint(AdExConstants *c) {
+    printf("==================\n");
     printf("C->"); doublePrint(c->C);
     printf("gL->"); doublePrint(c->gL);
     printf("EL->"); doublePrint(c->EL);
@@ -395,35 +405,44 @@ void AdExConstantsPrint(AdExConstants *c) {
     printf("tau_w->"); doublePrint(c->tau_w);
     printf("a->"); doublePrint(c->a);
     printf("b->"); doublePrint(c->b);
+    printf("==================\n");
 }
 
 void ResourceSTDPConstantsPrint(ResourceSTDPConstants *c) {
+    printf("==================\n");
     printf("Aplus->"); doublePrint(c->Aplus);
     printf("Aminus->"); doublePrint(c->Aminus);
     printf("tau_plus->"); doublePrint(c->tau_plus);
     printf("tau_minus->"); doublePrint(c->tau_minus);
     printf("tau_res->"); doublePrint(c->tau_res);
+    printf("==================\n");
 }
 
 void PacemakerConstantsPrint(PacemakerConstants *c) {
+    printf("==================\n");
     printf("pacemaker_on->"); boolPrint(c->pacemaker_on);
     printf("frequency->"); doublePrint(c->frequency);
     printf("cumulative_period_delta->"); doublePrint(c->cumulative_period_delta);
     printf("amplitude->"); doublePrint(c->amplitude);
+    printf("==================\n");
 }
 
 void PreprocessConstantsPrint(PreprocessConstants *c) {
+    printf("==================\n");
     printf("gain->"); doublePrint(c->gain);
     printf("sigma->"); doublePrint(c->sigma);
     printf("dt->"); doublePrint(c->dt);
     printf("mult->"); doublePrint(c->mult);
+    printf("==================\n");
 }
 
 void pLConstVectorPrint(pLConstVector *v) {
+    printf("==================\n");
     for(size_t i=0; i<v->size; i++) {
         printf("Layer %zu\n", i);
         LayerConstantsPrint(v->array[i]);
     }
+    printf("==================\n");
 }
 
 void size_tPrint(size_t v) {
