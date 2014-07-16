@@ -65,7 +65,7 @@ inline double bound_grad(const double *w, const double *dw, const double *wmax, 
 }
 
 
-inline double rate_calc(const double *w, const Constants *c) {
+//inline double rate_calc(const double *w, const Constants *c) {
 //    double norm_w = *w/(2*c->ws);
 //    double w4 = pow(*w, 4);
 //    return( 0.04*(w4/(w4+0.0016)) );
@@ -87,4 +87,4 @@ inline double rate_calc(const double *w, const Constants *c) {
 ////        printf("x: %f y: %f\n", norm_w, norm_w*k+b);
 //        return(norm_w*k+b);
 //    }        
-}
+//}

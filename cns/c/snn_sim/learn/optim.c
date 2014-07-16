@@ -83,13 +83,13 @@ void trainWeightsStep_OptimalSTDP(learn_t *ls_t, const double *u, const double *
 //                printf("dC: %f C: %f, params: %d %f %f %f %f\n", dC, l->C[ *ni ][ *syn_id ], l->fired[ *ni ], p, u, l->syn[ *ni ][ *syn_id ], M);
         
 #if RATE_NORM == PRESYNAPTIC
-        double dw = layerConstD(l, c->lrate)*( ls->C[ *ni ][ *syn_id ]*ls->B[ *ni ] -  \
-                                    layerConstD(l, c->weight_decay_factor) * l->syn_fired[ *ni ][ *syn_id ] * l->W[ *ni ][ *syn_id ] );
+        double dw = getLC(l,c)->lrate*( ls->C[ *ni ][ *syn_id ]*ls->B[ *ni ] -  \
+                                    getLC(l,c)->weight_decay_factor * l->syn_fired[ *ni ][ *syn_id ] * l->W[ *ni ][ *syn_id ] );
 #elif RATE_NORM == POSTSYNAPTIC                
-        double dw = layerConstD(l, c->added)*( l->C[ *ni ][ *syn_id ]*l->B[ *ni ] -  \
-                                    layerConstD(l, c->weight_decay_factor) * (l->fired[ *ni ] + l->syn_fired[ *ni ][ *syn_id ]) * l->W[ *ni ][ *syn_id ] );
+        double dw = getLC(l,c)->lrate*( l->C[ *ni ][ *syn_id ]*l->B[ *ni ] -  \
+                                    getLC(l,c)->weight_decay_factor * (l->fired[ *ni ] + l->syn_fired[ *ni ][ *syn_id ]) * l->W[ *ni ][ *syn_id ] );
 #endif               
-        double wmax = layerConstD(l, c->wmax);
+        double wmax = getLC(l,c)->wmax;
         dw = bound_grad(&l->W[ *ni ][ *syn_id ], &dw, &wmax, c);
         if(l->syn_spec[*ni][*syn_id]>0) {
           l->W[ *ni ][ *syn_id ] += dw;

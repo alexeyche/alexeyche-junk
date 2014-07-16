@@ -96,9 +96,9 @@ void trainWeightsStep_TResourceSTDP(learn_t *ls_t, const double *u, const double
         if(l->syn_fired[*ni][*syn_id] == 1) {
             dw -= c->res_stdp->Aminus * ls->y_tr[*ni];
         }
-        double wmax = layerConstD(l, c->wmax);
+        double wmax = getLC(l,c)->wmax;
         dw = bound_grad(&l->W[*ni][*syn_id], &dw, &wmax, c);
-        dw = dw * ls->res[*ni] * layerConstD(l, c->lrate);
+        dw = dw * ls->res[*ni] * getLC(l,c)->lrate;
         l->W[*ni][*syn_id] += c->dt * dw;
         consumeResource(&ls->res[*ni], &dw, c);
 
