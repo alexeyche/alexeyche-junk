@@ -282,8 +282,8 @@ top_builddir = ..
 top_srcdir = ..
 
 # what flags you want to pass to the C compiler & linker
-#AM_CFLAGS = -Wall -std=gnu99 -pthread -O3  #-O0 -g  
-AM_CFLAGS = -Wall -std=gnu99 -pthread -O0 -pg  
+AM_CFLAGS = -Wall -std=gnu99 -pthread -O3  #-O0 -g  
+#AM_CFLAGS = -Wall -std=gnu99 -pthread -O0 -pg  
 #CFLAGS=
 LDADD = -lm
 __top_builddir__bin_snn_sim_SOURCES = util/matrix.c util/util_vector.c ./util/ini.c ./util/matrix.h util/util.c util/spikes_list.c ./util/util_dlink_list.c sim/netsim.c neuron_funcs.c  constants.c util/io.c util/mem.c sim/runtime.c sim/configure.c sim/serialize.c ./layers/layer.c sim/sim.c learn/optim.c learn/res_stdp.c snn_sim.c 

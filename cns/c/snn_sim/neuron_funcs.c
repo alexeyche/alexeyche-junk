@@ -11,7 +11,7 @@
 #define PROB_FUNC EXP2
 #define WEIGHT_BOUND B_HARD
 
-double probf( const double *u, const Constants *c) {
+inline double probf( const double *u, const Constants *c) {
 #if PROB_FUNC == LINEAR 
     double p = (c->pr + (*u - c->u_rest)*c->gain_factor)/c->sim_dim;
     if(p < c->pr/c->sim_dim) return(c->pr/c->sim_dim);
@@ -27,7 +27,7 @@ double probf( const double *u, const Constants *c) {
 }
 
 
-double pstroke(const double *u, const Constants *c) {
+inline double pstroke(const double *u, const Constants *c) {
 #if PROB_FUNC == LINEAR 
     return( c->gain_factor / c->sim_dim );
 #elif PROB_FUNC == EXP

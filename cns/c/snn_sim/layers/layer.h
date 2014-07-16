@@ -61,10 +61,10 @@ struct Layer {
     // vars 
     double *u;
     double *p;
-    double **syn;
-    double **syn_spec;
     double *gr;
     double *M;
+    double **syn;
+    double **syn_spec;
 
     // learn structure 
     struct learn_t *ls_t;

@@ -4,7 +4,7 @@
 #include <math.h>
 
 #include <constants.h>
-
+double exp5(double x);
 double probf( const double *u, const Constants *c);
 double pstroke(const double *u, const Constants *c);
 double B_calc(const unsigned char *Yspike, const double *p, const double *pmean, const Constants *c);
