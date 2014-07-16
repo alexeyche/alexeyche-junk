@@ -2,6 +2,8 @@
 #define IO_H_
 
 #include <stdio.h>
+#include <unistd.h>
+
 #include <util/matrix.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -20,6 +22,7 @@ void saveMatrixListToFile(const char *fname, pMatrixVector *mv);
 FileStream* createOutputFileStream(const char *fname);
 FileStream* createInputFileStream(const char *fname);
 void deleteFileStream(FileStream *fs);
-
+char* getIdxName(const char *fname);
+void checkIdxFnameOfModel(const char *fname);
 
 #endif

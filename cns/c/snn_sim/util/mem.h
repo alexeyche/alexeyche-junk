@@ -3,8 +3,8 @@
 
 #include <util/util_vector.h>
 
-void replaceDoubleMem(double *src, doubleVector *v);
-void replaceIndMem(size_t *src, indVector *v);
+double* copyDoubleMem(doubleVector *v);
+size_t* copyIndMem(indVector *v);
 
 
 #endif

@@ -74,32 +74,49 @@ pMatrixVector* readMatrixList(FileStream *f, int num_to_read) {
     return(mlist);
 }
 
+char* getIdxName(const char *fname) {
+    size_t fi=strlen(fname)-1;
+    while( (fi >= 0) ) {
+        if( fname[fi] == '.' ) break;
+        fi--;
+    }
+    if(fi == 0) { 
+        printf("Need .bin format for matrix file\n");
+        exit(1);
+    }
+    const char *postfix = ".idx";
+    char *idx_fname = (char*)malloc(fi+strlen(postfix)+1);
+    strncpy(idx_fname, fname, fi);
+    for(size_t ci=0; ci<strlen(postfix); ci++) {
+        idx_fname[fi+ci] = postfix[ci];
+    }
+    idx_fname[fi+strlen(postfix)] = '\0';
+    return(idx_fname);
+}
+
+void checkIdxFnameOfModel(const char *fname) {
+    char *idx_fname = getIdxName(fname);
+    if( access( idx_fname, F_OK ) != -1 ) {
+        if( remove( idx_fname ) != 0 ) {
+            perror( "Error deleting file" );
+        }
+    } 
+    free(idx_fname);
+}
+
 
 void saveMatrixList(FileStream *f, pMatrixVector *mv) {
     if(f == NULL) {
         printf("Error in opening file %s\n", f->fname);
         return;
     }
-    size_t fi=strlen(f->fname)-1;
-    while( (fi >= 0) ) {
-        if( f->fname[fi] == '.' ) break;
-        fi--;
-    }
-    if(fi == 0) { 
-        printf("Need .bin format for matrix file\n");
-        return;
-    }
-    const char *postfix = ".idx";
-    char *idx_fname = (char*)malloc(fi+strlen(postfix)+1);
-    strncpy(idx_fname, f->fname, fi);
-    for(size_t ci=0; ci<strlen(postfix); ci++) {
-        idx_fname[fi+ci] = postfix[ci];
-    }
-    idx_fname[fi+strlen(postfix)] = '\0';
 
+    char* idx_fname = getIdxName(f->fname);
     FILE *f_idx = fopen(idx_fname, "ab");    
     int null_pos = ftell(f->fd);
+
     fwrite(&null_pos, sizeof(int), 1, f_idx);
+
     const char *type_name = "double";
     for(size_t mi=0; mi < mv->size; mi++) {
         Matrix *m = mv->array[mi];        

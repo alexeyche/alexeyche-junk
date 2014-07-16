@@ -63,12 +63,16 @@ void deleteNetSim(NetSim *ns) {
 
 void configureConnMapNetSim(NetSim *ns, pLayerVector *l) {
     for(size_t li=0; li< l->size; li++) {
+//        printf("%zu\n", li); 
         for(size_t ni=0; ni < l->array[li]->N; ni++) {
+//            printf("%zu\n", ni); 
             for(size_t con_i=0; con_i < l->array[li]->nconn[ni]; con_i++) {
                 Conn conseq;
                 conseq.l_id = li;
                 conseq.n_id = ni;
                 conseq.syn_id = con_i;
+//                printf("%zu\n", con_i); 
+//                printf("===\n");
                 TEMPLATE(insertVector,Conn)( ns->conn_map[ l->array[li]->id_conns[ni][con_i] ], conseq); 
             }
         }

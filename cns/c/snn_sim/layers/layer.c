@@ -349,17 +349,17 @@ void printLayer_Poisson(Layer *l) {
 
 
 void writeLayerSerializeInfo(LayerSerializeInfo info, FileStream *file) {
-    fwrite(&info.neuron_type, sizeof(unsigned int), 1, file->fd);
-    fwrite(&info.learning_rule, sizeof(unsigned int), 1, file->fd);
+    fwrite(&info.neuron_type, sizeof(int), 1, file->fd);
+    fwrite(&info.learning_rule, sizeof(int), 1, file->fd);
 }
 
 LayerSerializeInfo readLayerSerializeInfo(FileStream *file) {
     LayerSerializeInfo info;
-    if(fread(&info.neuron_type, sizeof(unsigned int), 1, file->fd) == 0) {
+    if(fread(&info.neuron_type, sizeof(int), 1, file->fd) == 0) {
         printf("Error while reading neuron type from file %s\n", file->fname);
         exit(1);
     }
-    if(fread(&info.learning_rule, sizeof(unsigned int), 1, file->fd) == 0) {
+    if(fread(&info.learning_rule, sizeof(int), 1, file->fd) == 0) {
         printf("Error while reading learning rule from file %s\n", file->fname);
         exit(1);
     }
@@ -386,6 +386,7 @@ void deserializeLayer_Poisson(Layer *l, FileStream *file, const Constants *c) {
     doubleVector **W_vals = (doubleVector**) malloc( W->nrow * sizeof(doubleVector*));
     doubleVector **syn_del_vals = (doubleVector**) malloc( syn_del->nrow * sizeof(doubleVector*));
     indVector **id_conns_vals = (indVector**) malloc( W->nrow * sizeof(indVector*));
+    
     for(size_t i=0; i<W->nrow; i++) {  // shape form and get the values
         W_vals[i] = TEMPLATE(createVector,double)();
         syn_del_vals[i] = TEMPLATE(createVector,double)();
@@ -414,12 +415,24 @@ void deserializeLayer_Poisson(Layer *l, FileStream *file, const Constants *c) {
         l->ids[i] = getMatrixElement(ids, i, 0);    
     }
  
-    l->toStartValues(l,c);
     for(size_t ni=0; ni<l->N; ni++) {  // apply values
         assert(l->nconn[ni] == W_vals[ni]->size);
-        replaceDoubleMem(l->W[ni], W_vals[ni]);
-        replaceIndMem(l->id_conns[ni], id_conns_vals[ni]);
-        replaceDoubleMem(l->syn_del[ni], syn_del_vals[ni]);
+        assert(l->nconn[ni] == id_conns_vals[ni]->size);
+        assert(l->nconn[ni] == syn_del_vals[ni]->size);
+        
+        free(l->W[ni]); 
+        l->W[ni] = copyDoubleMem(W_vals[ni]);
+        free(l->id_conns[ni]);
+        l->id_conns[ni] = copyIndMem(id_conns_vals[ni]);
+        free(l->syn_del[ni]);
+        l->syn_del[ni] = copyDoubleMem(syn_del_vals[ni]);
+        
+        printf("%zu: ", ni);
+        for(size_t i=0; i<l->nconn[ni]; i++) {
+            printf("%zu->%zu, ", id_conns_vals[ni]->array[i], l->id_conns[ni][i]);
+        }
+        printf("\n");
+        
         l->axon_del[ni] = getMatrixElement(axon_del, ni, 0);
 
         TEMPLATE(deleteVector,double)(W_vals[ni]);

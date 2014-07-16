@@ -22,6 +22,7 @@ int main(int argc, char **argv) {
     for(size_t i=0; i<c->lc->size; i++) {
         if(a.learn == 0) {
             getLayerConstantsC(c,i)->learn = false;
+            getLayerConstantsC(c,i)->learning_rule = ENull;
         } else
         if(a.learn == 1) {
             getLayerConstantsC(c,i)->learn = true;

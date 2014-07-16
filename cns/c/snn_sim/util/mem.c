@@ -1,14 +1,14 @@
 
 #include "mem.h"
 
-void replaceDoubleMem(double *src, doubleVector *v) {
-//    free(src);
-    src = (double*) malloc( v->size * sizeof(double) );
-    memcpy(src, v->array, v->size);
+double* copyDoubleMem(doubleVector *v) {
+    double *new_src = (double*) malloc( v->size * sizeof(double) );
+    memcpy(new_src, v->array, v->size);
+    return(new_src);
 }
 
-void replaceIndMem(size_t *src, indVector *v) {
-//    free(src);
-    src = (size_t*) malloc( v->size * sizeof(size_t) );
-    memcpy(src, v->array, v->size);
+size_t* copyIndMem(indVector *v) {
+    size_t* new_src = (size_t*) malloc( v->size * sizeof(size_t) );
+    memcpy(new_src, v->array, v->size);
+    return(new_src);
 }
