@@ -11,6 +11,33 @@
 #define PROB_FUNC EXP2
 #define WEIGHT_BOUND B_HARD
 
+static double old_arg = -999999999, old_result;
+
+double exp_cached(double arg, double* old_arg, double* old_result){
+  if (arg== *old_arg) return *old_result;
+  *old_arg = arg;
+  *old_result = exp(arg);
+  return *old_result;
+}
+
+/* max. rel. error <= 1.73e-3 on [-87,88] */
+ float fast_exp (float x)
+ {
+   volatile union {
+     float f;
+     unsigned int i;
+   } cvt;
+
+   /* exp(x) = 2^i * 2^f; i = floor (log2(e) * x), 0 <= f <= 1 */
+   float t = x * 1.442695041f;
+   float fi = floorf (t);
+   float f = t - fi;
+   int i = (int)fi;
+   cvt.f = (0.3371894346f * f + 0.657636276f) * f + 1.00172476f; /* compute 2^f */
+   cvt.i += (i << 23);                                          /* scale by 2^i */
+   return cvt.f;
+ }
+
 inline double probf( const double *u, const Constants *c) {
 #if PROB_FUNC == LINEAR 
     double p = (c->pr + (*u - c->u_rest)*c->gain_factor)/c->sim_dim;
@@ -20,7 +47,7 @@ inline double probf( const double *u, const Constants *c) {
     double p = ( (c->pr + (c->beta/c->alpha) * (log(1 + exp( c->alpha*(c->u_tr - *u))) - c->alpha * (c->u_tr - *u)))/c->sim_dim );
 #elif PROB_FUNC == EXP2
     if( *u  <= c->u_rest ) return(c->__pr);    
-    double p = (c->pr + c->r0 * log(1 + exp( c->beta*(*u - c->u_tr) )))/c->sim_dim;
+    double p = (c->pr + c->r0 * log(1 + fast_exp( c->beta*(*u - c->u_tr) )))/c->sim_dim;
     if(p>1) return(1);
 #endif
     return(p);
@@ -33,7 +60,11 @@ inline double pstroke(const double *u, const Constants *c) {
 #elif PROB_FUNC == EXP
     return( (c->beta/(1+exp(c->alpha*(c->u_tr - *u))))/c->sim_dim );
 #elif PROB_FUNC == EXP2
-    double part = exp(c->beta*(*u - c->u_tr));
+//    printf("%3.10f\n", c->beta*(*u - c->u_tr));
+//    double part = exp_cached(c->beta*(*u - c->u_tr), &old_arg, &old_result);
+    double part = fast_exp(c->beta*(*u - c->u_tr));
+//    double part = exp(c->beta*(*u - c->u_tr));
+
     return( ( (part*c->r0*c->beta) / ( 1+part))/c->sim_dim );
 #endif
 }
