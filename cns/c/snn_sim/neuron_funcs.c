@@ -21,17 +21,17 @@ double exp_cached(double arg, double* old_arg, double* old_result){
 }
 
 /* max. rel. error <= 1.73e-3 on [-87,88] */
- float fast_exp (float x)
+double fast_exp (double x)
  {
    volatile union {
-     float f;
+     double f;
      unsigned int i;
    } cvt;
 
    /* exp(x) = 2^i * 2^f; i = floor (log2(e) * x), 0 <= f <= 1 */
-   float t = x * 1.442695041f;
-   float fi = floorf (t);
-   float f = t - fi;
+   double t = x * 1.442695041f;
+   double fi = floorf (t);
+   double f = t - fi;
    int i = (int)fi;
    cvt.f = (0.3371894346f * f + 0.657636276f) * f + 1.00172476f; /* compute 2^f */
    cvt.i += (i << 23);                                          /* scale by 2^i */

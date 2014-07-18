@@ -17,7 +17,7 @@ uint64_t pack754(long double f, unsigned bits, unsigned expbits)
     while(fnorm < 1.0) { fnorm *= 2.0; shift--; }
     fnorm = fnorm - 1.0;
 
-    // calculate the binary form (non-float) of the significand data
+    // calculate the binary form (non-double) of the significand data
     significand = fnorm * ((1LL<<significandbits) + 0.5f);
 
     // get the biased exponent
@@ -38,7 +38,7 @@ long double unpack754(uint64_t i, unsigned bits, unsigned expbits)
 
     // pull the significand
     result = (i&((1LL<<significandbits)-1)); // mask
-    result /= (1LL<<significandbits); // convert back to float
+    result /= (1LL<<significandbits); // convert back to double
     result += 1.0f; // add the one back on
 
     // deal with the exponent

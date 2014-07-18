@@ -6,7 +6,7 @@
 #include <stdarg.h>
 #include <string.h>
 
-// macros for packing floats and doubles:
+// macros for packing doubles and doubles:
 #define pack754_16(f) (pack754((f), 16, 5))
 #define pack754_32(f) (pack754((f), 32, 8))
 #define pack754_64(f) (pack754((f), 64, 11))
@@ -15,7 +15,7 @@
 #define unpack754_64(i) (unpack754((i), 64, 11))
 
 /*
-** pack754() -- pack a floating point number into IEEE-754 format
+** pack754() -- pack a doubleing point number into IEEE-754 format
 */ 
 unsigned long long int pack754(long double f, unsigned bits, unsigned expbits)
 {
@@ -36,7 +36,7 @@ unsigned long long int pack754(long double f, unsigned bits, unsigned expbits)
     while(fnorm < 1.0) { fnorm *= 2.0; shift--; }
     fnorm = fnorm - 1.0;
 
-    // calculate the binary form (non-float) of the significand data
+    // calculate the binary form (non-double) of the significand data
     significand = fnorm * ((1LL<<significandbits) + 0.5f);
 
     // get the biased exponent
@@ -47,7 +47,7 @@ unsigned long long int pack754(long double f, unsigned bits, unsigned expbits)
 }
 
 /*
-** unpack754() -- unpack a floating point number from IEEE-754 format
+** unpack754() -- unpack a doubleing point number from IEEE-754 format
 */ 
 long double unpack754(unsigned long long int i, unsigned bits, unsigned expbits)
 {
@@ -60,7 +60,7 @@ long double unpack754(unsigned long long int i, unsigned bits, unsigned expbits)
 
     // pull the significand
     result = (i&((1LL<<significandbits)-1)); // mask
-    result /= (1LL<<significandbits); // convert back to float
+    result /= (1LL<<significandbits); // convert back to double
     result += 1.0f; // add the one back on
 
     // deal with the exponent
@@ -195,7 +195,7 @@ unsigned long long int unpacku64(unsigned char *buf)
 /*
 ** pack() -- store data dictated by the format string in the buffer
 **
-**   bits |signed   unsigned   float   string
+**   bits |signed   unsigned   double   string
 **   -----+----------------------------------
 **      8 |   c        C         
 **     16 |   h        H         f
@@ -222,7 +222,7 @@ unsigned int pack(unsigned char *buf, char *format, ...)
     long long int q;            // 64-bit
     unsigned long long int Q;
 
-    float f;                    // floats
+    double f;                    // doubles
     double d;
     long double g;
     unsigned long long int fhold;
@@ -290,15 +290,15 @@ unsigned int pack(unsigned char *buf, char *format, ...)
             buf += 8;
             break;
 
-        case 'f': // float-16
+        case 'f': // double-16
             size += 2;
-            f = (float)va_arg(ap, double); // promoted
+            f = (double)va_arg(ap, double); // promoted
             fhold = pack754_16(f); // convert to IEEE 754
             packi16(buf, fhold);
             buf += 2;
             break;
 
-        case 'd': // float-32
+        case 'd': // double-32
             size += 4;
             d = va_arg(ap, double);
             fhold = pack754_32(d); // convert to IEEE 754
@@ -306,7 +306,7 @@ unsigned int pack(unsigned char *buf, char *format, ...)
             buf += 4;
             break;
 
-        case 'g': // float-64
+        case 'g': // double-64
             size += 8;
             g = va_arg(ap, long double);
             fhold = pack754_64(g); // convert to IEEE 754
@@ -334,7 +334,7 @@ unsigned int pack(unsigned char *buf, char *format, ...)
 /*
 ** unpack() -- unpack data dictated by the format string into the buffer
 **
-**   bits |signed   unsigned   float   string
+**   bits |signed   unsigned   double   string
 **   -----+----------------------------------
 **      8 |   c        C         
 **     16 |   h        H         f
@@ -361,7 +361,7 @@ void unpack(unsigned char *buf, char *format, ...)
     long long int *q;            // 64-bit
     unsigned long long int *Q;
 
-    float *f;                    // floats
+    double *f;                    // doubles
     double *d;
     long double *g;
     unsigned long long int fhold;
@@ -420,21 +420,21 @@ void unpack(unsigned char *buf, char *format, ...)
             buf += 8;
             break;
 
-        case 'f': // float
-            f = va_arg(ap, float*);
+        case 'f': // double
+            f = va_arg(ap, double*);
             fhold = unpacku16(buf);
             *f = unpack754_16(fhold);
             buf += 2;
             break;
 
-        case 'd': // float-32
+        case 'd': // double-32
             d = va_arg(ap, double*);
             fhold = unpacku32(buf);
             *d = unpack754_32(fhold);
             buf += 4;
             break;
 
-        case 'g': // float-64
+        case 'g': // double-64
             g = va_arg(ap, long double*);
             fhold = unpacku64(buf);
             *g = unpack754_64(fhold);
