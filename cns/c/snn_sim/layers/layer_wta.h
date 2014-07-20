@@ -11,6 +11,7 @@ typedef struct {
     LayerPoisson base;
 
     double sum_prob;
+    double *b;
 } LayerWta;
 
 pthread_spinlock_t sum_prob_spinlock;

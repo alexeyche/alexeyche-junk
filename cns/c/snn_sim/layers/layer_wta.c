@@ -21,6 +21,7 @@ LayerWta* createWtaLayer(size_t N, size_t *glob_idx, unsigned char statLevel) {
     l->base.deserializeLayer= &deserializeLayer_Wta;
 
     l->sum_prob = 0.0;
+    l->b = (double*) malloc( sizeof(double) * N );
     pthread_spin_init(&sum_prob_spinlock, 0);
     return(l);
 }
@@ -65,7 +66,9 @@ void propagateSpike_Wta(LayerPoisson *l, const size_t *ni, const SynSpike *sp, c
 void toStartValues_Wta(LayerPoisson *l, const Constants *c) {
     LayerWta* linh = (LayerWta*) l;
     toStartValues_Poisson(l, c);
-
+    for(size_t ni=0; ni < l->N; ni++) {
+        linh->b[ni] = 0.0;
+    }
 }
 
 void allocSynData_Wta(LayerPoisson *l) {
@@ -88,8 +91,9 @@ void printLayer_Wta(LayerPoisson *l) {
 
 void deleteLayer_Wta(LayerPoisson *l) {
     LayerWta* linh = (LayerWta*) l;
+    free(linh->b);
     deleteLayer_Poisson(l);
-
+    
 }
 
 void configureLayer_Wta(LayerPoisson *l, const indVector *inputIDs, const indVector *outputIDs, const Constants *c) {
@@ -102,12 +106,30 @@ void serializeLayer_Wta(LayerPoisson *l, FileStream *file, const Constants *c) {
     LayerWta* linh = (LayerWta*) l;
     serializeLayer_Poisson(l, file, c);
 
+//    pMatrixVector *data = TEMPLATE(createVector,pMatrix)();    
+//    Matrix *b_m= createMatrix(l->N,1);
+//    for(size_t ni=0; ni < l->N; ni++) {
+//        setMatrixElement(b_m, ni, 0, linh->b[ni]);
+//    }
+//    TEMPLATE(insertVector,pMatrix)(data, b_m);
+//    saveMatrixList(file, data);
 }
 
+#define WTA_LAYER_SERIALIZATION_SIZE 1
 void deserializeLayer_Wta(LayerPoisson *l, FileStream *file, const Constants *c) {
     LayerWta* linh = (LayerWta*) l;
     deserializeLayer_Poisson(l, file, c);
 
+//    pMatrixVector *data = readMatrixList(file, WTA_LAYER_SERIALIZATION_SIZE);
+//    
+//    Matrix *b_m= data->array[0];
+//    assert( (b_m->nrow == l->N) && (b_m->ncol == 1) );
+//    
+//    for(size_t ni=0; ni<l->N; ni++) {
+//        linh->b[ni] = getMatrixElement(b_m, ni, 0);
+//    }
+//
+//    TEMPLATE(deleteVector,pMatrix)(data);
 }
 
 

@@ -138,19 +138,27 @@ bool boolParse(char *str) {
 
 #define FILL_LAYER_CONST(name,type) {       \
         type##Vector *v = type##VectorParse(value); \
-        for(size_t i=0; i<v->size; i++) {   \
+        size_t i;\
+        for(i=0; i<v->size; i++) {   \
             if(!checkLC(c,i, #name)) break;  \
             getLayerConstantsC(c,i)->name = v->array[i]; \
         }                                   \
+        for( ; i < c->lc->size; i++) { \
+            getLayerConstantsC(c,i)->name = v->array[v->size-1]; \
+        }\
         TEMPLATE(deleteVector,type)(v);        \
     } \
 
 #define FILL_LAYER_CONST_FUN(name,type,fun) {       \
         type##Vector *v = type##VectorParse(value); \
-        for(size_t i=0; i<v->size; i++) {   \
+        size_t i; \
+        for(i=0; i<v->size; i++) {   \
             if(!checkLC(c,i, #name)) break;  \
             getLayerConstantsC(c,i)->name = fun(v->array[i]); \
         }                                   \
+        for( ; i < c->lc->size; i++) { \
+            getLayerConstantsC(c,i)->name = fun(v->array[v->size-1]); \
+        }\
         TEMPLATE(deleteVector,type)(v);     \
     } \
 
@@ -412,9 +420,6 @@ bool checkLC(Constants *c, size_t i, const char *field) {
     if(c->lc->size > i) return(true); 
     if (strcmp(field, "N") == 0) {
         LayerConstants *new_lc = (LayerConstants*) malloc(sizeof(LayerConstants));
-        if(c->lc->size > 0) {
-            memcpy(new_lc, c->lc->array[ c->lc->size-1 ], sizeof(LayerConstants));
-        }
         TEMPLATE(insertVector,pLConst)(c->lc, new_lc);
         return(true);
     }

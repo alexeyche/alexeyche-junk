@@ -18,7 +18,7 @@ int main(int argc, char **argv) {
     bool saveStat = a.stat_file != NULL;
     Constants *c = createConstants(a.const_filename);
     srand(a.seed);
-//    printConstants(c);
+    printConstants(c);
     for(size_t i=0; i<c->lc->size; i++) {
         if(a.learn == 0) {
             getLayerConstantsC(c,i)->learn = false;
