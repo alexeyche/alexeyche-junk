@@ -14,7 +14,7 @@ sim/serialize.o: sim/serialize.c /usr/include/stdc-predef.h \
  /usr/include/time.h /usr/include/x86_64-linux-gnu/bits/sched.h \
  /usr/include/x86_64-linux-gnu/bits/time.h /usr/include/xlocale.h \
  /usr/include/x86_64-linux-gnu/bits/pthreadtypes.h \
- /usr/include/x86_64-linux-gnu/bits/setjmp.h layers/layer.h \
+ /usr/include/x86_64-linux-gnu/bits/setjmp.h layers/layer_poisson.h \
  /usr/include/stdlib.h /usr/include/x86_64-linux-gnu/bits/waitflags.h \
  /usr/include/x86_64-linux-gnu/bits/waitstatus.h \
  /usr/include/x86_64-linux-gnu/sys/types.h \
@@ -53,9 +53,9 @@ sim/serialize.o: sim/serialize.c /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/bits/unistd.h \
  /usr/include/x86_64-linux-gnu/sys/stat.h \
  /usr/include/x86_64-linux-gnu/bits/stat.h learn/learn.h \
- util/spikes_list.h sim/runtime.h sim/netsim.h \
+ layers/layer_wta.h util/spikes_list.h sim/runtime.h sim/netsim.h \
  util/util_dlink_list_tmpl.h sim/configure.h learn/optim.h \
- learn/res_stdp.h
+ learn/res_stdp.h learn/simple_stdp.h
 
 /usr/include/stdc-predef.h:
 
@@ -103,7 +103,7 @@ sim/sim.h:
 
 /usr/include/x86_64-linux-gnu/bits/setjmp.h:
 
-layers/layer.h:
+layers/layer_poisson.h:
 
 /usr/include/stdlib.h:
 
@@ -223,6 +223,8 @@ util/io.h:
 
 learn/learn.h:
 
+layers/layer_wta.h:
+
 util/spikes_list.h:
 
 sim/runtime.h:
@@ -236,3 +238,5 @@ sim/configure.h:
 learn/optim.h:
 
 learn/res_stdp.h:
+
+learn/simple_stdp.h:

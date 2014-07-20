@@ -22,7 +22,6 @@ int main(int argc, char **argv) {
     for(size_t i=0; i<c->lc->size; i++) {
         if(a.learn == 0) {
             getLayerConstantsC(c,i)->learn = false;
-            getLayerConstantsC(c,i)->learning_rule = ENull;
         } else
         if(a.learn == 1) {
             getLayerConstantsC(c,i)->learn = true;
@@ -53,7 +52,7 @@ int main(int argc, char **argv) {
     if(a.Tmax > 0) {
         s->rt->Tmax = a.Tmax;
     }
-//    Layer *l = s->layers->array[0];
+//    LayerPoisson *l = s->layers->array[0];
 //    l->printLayer(l);
 //    printSpikesList(s->ns->net);
 //    printConnMap(s->ns);
@@ -73,7 +72,7 @@ int main(int argc, char **argv) {
             TEMPLATE(insertVector,pMatrix)(mv, m_stat_glob_rew);
         }
         for(size_t li=0; li < s->layers->size; li++) {
-            Layer *l = s->layers->array[li];
+            LayerPoisson *l = s->layers->array[li];
             if(a.calcStat) {
                 indVector *active_neurons = TEMPLATE(createVector,ind)();
                 for(size_t ni=0; ni<l->N; ni++) {
@@ -145,6 +144,7 @@ int main(int argc, char **argv) {
         Matrix *classes  = vectorArrayToMatrix(&s->rt->pattern_classes, 1);
         TEMPLATE(insertVector,pMatrix)(mv, classes);
 
+        checkIdxFnameOfFile(a.output_spikes_file);
         saveMatrixListToFile(a.output_spikes_file, mv);
 
         TEMPLATE(deleteVector,pMatrix)(mv);

@@ -4,11 +4,12 @@
 #define LINEAR 1
 #define EXP 2
 #define EXP2 3
+#define SIMP_EXP 4
 
 #define B_HARD 1
 #define B_SOFT 2
 
-#define PROB_FUNC EXP2
+#define PROB_FUNC SIMP_EXP
 #define WEIGHT_BOUND B_HARD
 
 static double old_arg = -999999999, old_result;
@@ -38,6 +39,45 @@ double fast_exp (double x)
    return cvt.f;
  }
 
+double prob_fun_Exp( const double *u, const Constants *c) {
+    return( exp(*u) );
+}
+double prob_fun_stroke_Exp( const double *u, const Constants *c) {
+    return( exp(*u) );
+}
+
+
+double prob_fun_ExpHennequin( const double *u, const Constants *c) {
+    if( *u  <= c->u_rest ) return(c->__pr);    
+    double p = (c->pr + c->r0 * log(1 + exp( c->beta*(*u - c->u_tr) )))/c->sim_dim;
+    if(p>1) return(1);
+    return(p);
+}
+double prob_fun_stroke_ExpHennequin( const double *u, const Constants *c) {
+    double part = exp(c->beta*(*u - c->u_tr));
+//    double part = exp(c->beta*(*u - c->u_tr));
+    return( ( (part*c->r0*c->beta) / ( 1+part))/c->sim_dim );
+}
+
+
+double prob_fun_ExpBohte( const double *u, const Constants *c) {
+    if( *u  <= c->u_rest ) return(c->__pr);    
+    double p = ( (c->pr + (c->beta/c->alpha) * (log(1 + exp( c->alpha*(c->u_tr - *u))) - c->alpha * (c->u_tr - *u)))/c->sim_dim );
+    return( p );
+}
+double prob_fun_stroke_ExpBohte( const double *u, const Constants *c) {
+    return( (c->beta/(1+exp(c->alpha*(c->u_tr - *u))))/c->sim_dim );
+}
+
+
+double prob_fun_LinToyoizumi( const double *u, const Constants *c) {
+    double p = (c->pr + (*u - c->u_rest)*c->gain_factor)/c->sim_dim;
+    if(p < c->pr/c->sim_dim) return(c->pr/c->sim_dim);
+}
+double prob_fun_stroke_LinToyoizumi( const double *u, const Constants *c) {
+    return( c->gain_factor / c->sim_dim );
+}
+
 inline double probf( const double *u, const Constants *c) {
 #if PROB_FUNC == LINEAR 
     double p = (c->pr + (*u - c->u_rest)*c->gain_factor)/c->sim_dim;
@@ -47,10 +87,12 @@ inline double probf( const double *u, const Constants *c) {
     double p = ( (c->pr + (c->beta/c->alpha) * (log(1 + exp( c->alpha*(c->u_tr - *u))) - c->alpha * (c->u_tr - *u)))/c->sim_dim );
 #elif PROB_FUNC == EXP2
     if( *u  <= c->u_rest ) return(c->__pr);    
-    double p = (c->pr + c->r0 * log(1 + fast_exp( c->beta*(*u - c->u_tr) )))/c->sim_dim;
+    double p = (c->pr + c->r0 * log(1 + exp( c->beta*(*u - c->u_tr) )))/c->sim_dim;
     if(p>1) return(1);
-#endif
     return(p);
+#elif PROB_FUNC == SIMP_EXP
+    return( exp(*u) );
+#endif
 }
 
 
@@ -62,10 +104,12 @@ inline double pstroke(const double *u, const Constants *c) {
 #elif PROB_FUNC == EXP2
 //    printf("%3.10f\n", c->beta*(*u - c->u_tr));
 //    double part = exp_cached(c->beta*(*u - c->u_tr), &old_arg, &old_result);
-    double part = fast_exp(c->beta*(*u - c->u_tr));
+    double part = exp(c->beta*(*u - c->u_tr));
 //    double part = exp(c->beta*(*u - c->u_tr));
 
     return( ( (part*c->r0*c->beta) / ( 1+part))/c->sim_dim );
+#elif PROB_FUNC == SIMP_EXP
+    return( exp(*u) );
 #endif
 }
 
@@ -79,9 +123,9 @@ double B_calc(const unsigned char *Yspike, const double *p, const double *pmean,
 }
 
 
-double C_calc(const unsigned char *Yspike, const double *p, const double *u, const double *denominator_p, const double *syn, const Constants *c) {
+double C_calc(const unsigned char *Yspike, const double *p, const double *p_stroke, const double *u, const double *denominator_p, const double *syn, const Constants *c) {
     double pstr = pstroke(u, c);
-    return ( pstr/(*p/ *denominator_p) ) * ( *Yspike - *p ) * (*syn);
+    return ( (*p_stroke)/(*p/ *denominator_p) ) * ( *Yspike - *p ) * (*syn);
 }
 
 double bound_grad(const double *w, const double *dw, const double *wmax, const Constants *c) {

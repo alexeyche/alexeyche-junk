@@ -6,8 +6,8 @@
 #define DESTRUCT_METHOD deleteLayer
 #include <util/util_vector_tmpl.c>
 
-Layer* createPoissonLayer(size_t N, size_t *glob_idx, unsigned char statLevel) {
-    Layer *l = (Layer*)malloc(sizeof(Layer));
+LayerPoisson* createPoissonLayer(size_t N, size_t *glob_idx, unsigned char statLevel) {
+    LayerPoisson *l = (LayerPoisson*)malloc(sizeof(LayerPoisson));
     l->N = N;
     l->ids = (size_t*)malloc( l->N*sizeof(size_t));
     l->nt = (nspec_t*)malloc( l->N*sizeof(nspec_t));
@@ -59,7 +59,7 @@ Layer* createPoissonLayer(size_t N, size_t *glob_idx, unsigned char statLevel) {
     }
 
     l->ls_t = NULL;
-    l->calculateMembranePotentials = &calculateMembranePotentials_Poisson;
+    l->calculateProbability = &calculateProbability_Poisson;
     l->calculateSpike = &calculateSpike_Poisson;
     l->calculateDynamics = &calculateDynamics_Poisson;
     l->deleteLayer = &deleteLayer_Poisson;
@@ -74,7 +74,7 @@ Layer* createPoissonLayer(size_t N, size_t *glob_idx, unsigned char statLevel) {
     return(l);
 }
 
-void deleteLayer_Poisson(Layer *l) {
+void deleteLayer_Poisson(LayerPoisson *l) {
     for(size_t ni=0; ni<l->N; ni++) {
 
         TEMPLATE(deleteLList,ind)(l->active_syn_ids[ni]);
@@ -114,46 +114,68 @@ void deleteLayer_Poisson(Layer *l) {
     free(l);
 }
 
-const LayerConstants* getLC(Layer *l, const Constants *c) {
+const LayerConstants* getLC(LayerPoisson *l, const Constants *c) {
     return( c->lc->array[l->id] );
 }
 
-size_t getLocalNeuronId(Layer *l, const size_t *glob_id) {
+size_t getLocalNeuronId(LayerPoisson *l, const size_t *glob_id) {
     int local_id = *glob_id - l->ids[0];
     if((local_id<0)||(local_id>=l->N)) printf("Error: Can't find neuron with id %zu\n", *glob_id);
     return(local_id);
 }
 
-const size_t getGlobalId(Layer *l, const size_t *ni) {
+const size_t getGlobalId(LayerPoisson *l, const size_t *ni) {
     return(l->ids[*ni]);
 }
 
-double getSynDelay(Layer *l, const size_t *ni, const size_t *syn_id) {
+double getSynDelay(LayerPoisson *l, const size_t *ni, const size_t *syn_id) {
     assert(*syn_id < l->nconn[*ni]);
     return(l->syn_del[*ni][*syn_id]);
 
 }
 
 
-void setSynapseSpeciality(Layer *l, size_t ni, size_t syn_id, double spec) {
+void setSynapseSpeciality(LayerPoisson *l, size_t ni, size_t syn_id, double spec) {
     l->syn_spec[ni][syn_id] = spec;
 }
 
 
 
-void initLearningRule(Layer *l, const Constants *c) {
+void initLearningRule(LayerPoisson *l, const Constants *c) {
     if( getLC(l,c)->learning_rule == EOptimalSTDP) {
         l->ls_t = (learn_t*)init_OptimalSTDP(l);
     } else
     if( getLC(l,c)->learning_rule == EResourceSTDP) {
         l->ls_t = (learn_t*)init_TResourceSTDP(l);
+    } else
+    if( getLC(l,c)->learning_rule == ESimpleSTDP) {
+        l->ls_t = (learn_t*)init_SimpleSTDP(l);
     } 
 }
 
-void configureLayer_Poisson(Layer *l, const indVector *inputIDs, const indVector *outputIDs, const Constants *c) {
+void initProbFun(LayerPoisson *l, const Constants *c) {
+    if( getLC(l,c)->prob_fun == EExp) {
+        l->prob_fun = &prob_fun_Exp;
+        l->prob_fun_stroke = &prob_fun_stroke_Exp;
+    } else
+    if( getLC(l,c)->prob_fun == EExpHennequin) {
+        l->prob_fun = &prob_fun_ExpHennequin;
+        l->prob_fun_stroke = &prob_fun_stroke_ExpHennequin;
+    } else
+    if( getLC(l,c)->prob_fun == EExpBohte) {
+        l->prob_fun = &prob_fun_ExpBohte;
+        l->prob_fun_stroke = &prob_fun_stroke_ExpBohte;
+    } else
+    if( getLC(l,c)->prob_fun == ELinToyoizumi) {
+        l->prob_fun = &prob_fun_LinToyoizumi;
+        l->prob_fun_stroke = &prob_fun_stroke_LinToyoizumi;
+    } 
+}
+
+void configureLayer_Poisson(LayerPoisson *l, const indVector *inputIDs, const indVector *outputIDs, const Constants *c) {
     indVector **layer_conns = (indVector**) malloc(l->N * sizeof(indVector));
     for(size_t ni=0; ni<l->N; ni++) {
-        layer_conns[ni] = TEMPLATE(createVector,ind)(0);
+        layer_conns[ni] = TEMPLATE(createVector,ind)();
         l->nt[ni] = EXC;
         if (getLC(l,c)->inhib_frac > getUnif()) {
             l->nt[ni] = INH;
@@ -188,17 +210,16 @@ void configureLayer_Poisson(Layer *l, const indVector *inputIDs, const indVector
         }
         TEMPLATE(deleteVector,ind)(layer_conns[ni]);
     }
+    free(layer_conns);
     // allocation done
     // configure learning part 
-    if(getLC(l,c)->learn) {
-        initLearningRule(l, c);
-    }
+    initProbFun(l, c);
+    initLearningRule(l, c);
     // start values assignment 
     l->toStartValues(l, c);
-
 }
 
-void toStartValues_Poisson(Layer *l, const Constants *c) {
+void toStartValues_Poisson(LayerPoisson *l, const Constants *c) {
     for(size_t ni=0; ni<l->N; ni++) {
         double start_weight = getLC(l,c)->weight_var * getNorm() + getLC(l,c)->weight_per_neuron/l->nconn[ni];
         l->fired[ni] = 0;
@@ -221,13 +242,11 @@ void toStartValues_Poisson(Layer *l, const Constants *c) {
             }
         }
     }        
-    if(l->ls_t) {
-        l->ls_t->toStartValues(l->ls_t);
-    }
+    l->ls_t->toStartValues(l->ls_t);
 }
 
 
-void propagateSpike_Poisson(Layer *l, const size_t *ni, const SynSpike *sp, const SimContext *s) {
+void propagateSpike_Poisson(LayerPoisson *l, const size_t *ni, const SynSpike *sp, const SimContext *s) {
     const Constants *c = s->c;
     if( ( l->syn[ *ni ][ sp->syn_id ] < SYN_ACT_TOL ) && ( l->syn[ *ni ][ sp->syn_id ] > -SYN_ACT_TOL )){
         TEMPLATE(addValueLList,ind)(l->active_syn_ids[*ni], sp->syn_id);
@@ -239,7 +258,7 @@ void propagateSpike_Poisson(Layer *l, const size_t *ni, const SynSpike *sp, cons
     }
 }
 
-void calculateMembranePotentials_Poisson(Layer *l, const size_t *ni, const SimContext *s) {
+void calculateProbability_Poisson(LayerPoisson *l, const size_t *ni, const SimContext *s) {
     const Constants *c = s->c;
     l->u[*ni] = c->u_rest;
 
@@ -247,21 +266,29 @@ void calculateMembranePotentials_Poisson(Layer *l, const size_t *ni, const SimCo
     while( (act_node = TEMPLATE(getNextLList,ind)(l->active_syn_ids[ *ni ]) ) != NULL ) {
         const size_t *syn_id = &act_node->value;
         l->u[*ni] += l->W[ *ni ][ *syn_id ] * l->syn[ *ni ][ *syn_id ];
-        if(l->stat->statLevel > 1)  {
-            TEMPLATE(insertVector,double)(l->stat->stat_syn[*ni][*syn_id], l->syn[ *ni ][ *syn_id ]);
-            TEMPLATE(insertVector,double)(l->stat->stat_W[*ni][*syn_id], l->W[ *ni ][ *syn_id ]);
-        }
     }
+    //// pacemaker
+    //if((l->id == 0)&&(c->pacemaker->pacemaker_on)) {
+    //    double u_p = c->pacemaker->amplitude + c->pacemaker->amplitude * sin(2*PI*c->pacemaker->frequency * *t/1000 - l->ids[*n_id] * c->pacemaker->cumulative_period_delta/1000);
+    //    l->u[*n_id] += u_p;
+    //}
+
+    l->p[*ni] = l->prob_fun(&l->u[*ni], c) * c->dt;
+    l->M[*ni] = exp(-l->gr[ *ni ]);
+
+    l->p[*ni] *= l->M[*ni];
+
     if(l->stat->statLevel > 1)  {
+        for(size_t con_i=0; con_i<l->nconn[*ni]; con_i++) {
+            TEMPLATE(insertVector,double)(l->stat->stat_syn[*ni][con_i], l->syn[ *ni ][ con_i ]);
+            TEMPLATE(insertVector,double)(l->stat->stat_W[*ni][con_i], l->W[ *ni ][ con_i ]);
+        }
         TEMPLATE(insertVector,double)(l->stat->stat_u[*ni], l->u[*ni]);
     }
 }
 
-void calculateSpike_Poisson(struct Layer *l, const size_t *ni, const SimContext *s) {
+void calculateSpike_Poisson(struct LayerPoisson *l, const size_t *ni, const SimContext *s) {
     const Constants *c = s->c;
-    l->p[*ni] = probf(&l->u[*ni], c) * c->dt;
-    l->M[*ni] = exp(-l->gr[ *ni ]);
-    l->p[*ni] *= l->M[*ni];
 
     if( l->p[*ni] > getUnif() ) {
         l->fired[ *ni ] = 1;
@@ -272,13 +299,11 @@ void calculateSpike_Poisson(struct Layer *l, const size_t *ni, const SimContext 
     }
 }
 
-void calculateDynamics_Poisson(Layer *l, const size_t *ni, const SimContext *s) {
+void calculateDynamics_Poisson(LayerPoisson *l, const size_t *ni, const SimContext *s) {
     const Constants *c = s->c;
 
     // training
-    if(l->ls_t) {
-        l->ls_t->trainWeightsStep(l->ls_t, &l->u[*ni], &l->p[*ni], &l->M[*ni], ni, s);   
-    }
+    l->ls_t->trainWeightsStep(l->ls_t, &l->u[*ni], &l->p[*ni], &l->M[*ni], ni, s);   
 
     // melting      
     indLNode *act_node;
@@ -296,7 +321,7 @@ void calculateDynamics_Poisson(Layer *l, const size_t *ni, const SimContext *s) 
     l->gr[ *ni ] += -l->gr[ *ni ]/c->tr;
 }
 
-void allocSynData_Poisson(Layer *l) {
+void allocSynData_Poisson(LayerPoisson *l) {
     for(size_t ni=0; ni<l->N; ni++) {
         l->id_conns[ni] = (size_t*) malloc(l->nconn[ni]*sizeof(size_t));
         l->W[ni] = (double*) malloc(l->nconn[ni]*sizeof(double));
@@ -315,7 +340,7 @@ void allocSynData_Poisson(Layer *l) {
     }        
 }
 
-void deallocSynData_Poisson(Layer *l) {
+void deallocSynData_Poisson(LayerPoisson *l) {
     for(size_t ni=0; ni<l->N; ni++) {
         free(l->id_conns[ni]);
         free(l->W[ni]);
@@ -334,8 +359,8 @@ void deallocSynData_Poisson(Layer *l) {
     }        
 }
 
-void printLayer_Poisson(Layer *l) {
-    printf("Poisson Layer, size: %zu \n", l->N);
+void printLayer_Poisson(LayerPoisson *l) {
+    printf("Poisson LayerPoisson, size: %zu \n", l->N);
     for(size_t ni=0; ni<l->N; ni++) {
         printf("%zu, ", l->ids[ni]);
         if(l->nt[ni] == EXC) {
@@ -385,7 +410,7 @@ LayerSerializeInfo readLayerSerializeInfo(FileStream *file) {
 }
 
 #define POISSON_LAYER_SERIALIZATION_SIZE 6
-void deserializeLayer_Poisson(Layer *l, FileStream *file, const Constants *c) {
+void deserializeLayer_Poisson(LayerPoisson *l, FileStream *file, const Constants *c) {
     LayerSerializeInfo info = readLayerSerializeInfo(file);
     if(info.neuron_type != getLC(l,c)->neuron_type) {
         printf("Can't read layer with different type from model %s\n", file->fname);
@@ -393,9 +418,8 @@ void deserializeLayer_Poisson(Layer *l, FileStream *file, const Constants *c) {
     }
 
     l->deallocSynData(l); 
-    if(l->ls_t) {
-        l->ls_t->free(l->ls_t);
-    }
+    l->ls_t->free(l->ls_t);
+
     pMatrixVector* data = readMatrixList(file, POISSON_LAYER_SERIALIZATION_SIZE);
     Matrix *W = data->array[0];
     Matrix *conns = data->array[1];
@@ -418,12 +442,13 @@ void deserializeLayer_Poisson(Layer *l, FileStream *file, const Constants *c) {
             double syn_del_ij = getMatrixElement(syn_del, i, j);
             double conn_ij = getMatrixElement(conns, i, j);
             if(conn_ij>0) {
+//                printf("%f.f, ", w_ij);
                 TEMPLATE(insertVector,double)(W_vals[i], w_ij);
                 TEMPLATE(insertVector,double)(syn_del_vals[i], syn_del_ij);
                 TEMPLATE(insertVector,ind)(id_conns_vals[i], j);
             }
         }
-
+//        printf("\n");
         l->nconn[i] = W_vals[i]->size;
         if(getMatrixElement(nt, i, 0) == 0) {
             l->nt[i] = EXC;
@@ -437,6 +462,13 @@ void deserializeLayer_Poisson(Layer *l, FileStream *file, const Constants *c) {
         l->ids[i] = getMatrixElement(ids, i, 0);    
     }
     l->allocSynData(l); 
+    if(info.learning_rule != getLC(l,c)->learning_rule) {
+        printf("Can't read layer with different learning rule type from model %s\n", file->fname);
+        exit(1);
+    }
+
+    initLearningRule(l, c);
+    l->toStartValues(l, c);
     for(size_t ni=0; ni<l->N; ni++) {  // apply values
         assert(l->nconn[ni] == W_vals[ni]->size);
         
@@ -449,27 +481,16 @@ void deserializeLayer_Poisson(Layer *l, FileStream *file, const Constants *c) {
         TEMPLATE(deleteVector,double)(syn_del_vals[ni]);
         TEMPLATE(deleteVector,ind)(id_conns_vals[ni]);
     }
-    if(info.learning_rule != ENull) {
-        if(info.learning_rule != getLC(l,c)->learning_rule) {
-            printf("Can't read layer with different learning rule type from model %s\n", file->fname);
-            exit(1);
-        }
-
-        l->ls_t->deserialize( l->ls_t, file, c );
-    }
+    l->ls_t->deserialize( l->ls_t, file, c );
+    
     free(syn_del_vals);
     free(W_vals);
     free(id_conns_vals);
     TEMPLATE(deleteVector,pMatrix)(data);
-
-    if(getLC(l,c)->learn) {
-        initLearningRule(l, c);
-    }
-    l->toStartValues(l, c);
 }
 
 
-void serializeLayer_Poisson(Layer *l, FileStream *file, const Constants *c) {
+void serializeLayer_Poisson(LayerPoisson *l, FileStream *file, const Constants *c) {
     LayerSerializeInfo info;
     info.neuron_type= getLC(l,c)->neuron_type;
     info.learning_rule = getLC(l,c)->learning_rule;

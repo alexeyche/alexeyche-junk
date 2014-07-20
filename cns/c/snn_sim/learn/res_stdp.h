@@ -5,11 +5,8 @@
 
 #include <learn/learn.h>
 
-#ifndef max
-    #define max( a, b ) ( ((a) > (b)) ? (a) : (b) )
-#endif
 
-struct Layer;
+struct LayerPoisson;
 struct SynSpike;
 
 typedef struct {
@@ -27,11 +24,16 @@ typedef struct {
     doubleVector **stat_res;
 } TResourceSTDP;
 
-TResourceSTDP* init_TResourceSTDP(struct Layer *l);
+TResourceSTDP* init_TResourceSTDP(struct LayerPoisson *l);
 void toStartValues_TResourceSTDP(learn_t *ls_t);
 void propagateSynSpike_TResourceSTDP(learn_t *ls_t, const size_t *ni, const struct SynSpike *sp, const Constants *c);
 void trainWeightsStep_TResourceSTDP(learn_t *ls_t, const double *u, const double *p, const double *M, const size_t *ni, const struct SimContext *s);
 void resetValues_TResourceSTDP(learn_t *ls_t, const size_t *ni);
 void free_TResourceSTDP(learn_t *ls_t);
+void serialize_TResourceSTDP(learn_t *ls_t, FileStream *file, const Constants *c);
+void deserialize_TResourceSTDP(learn_t *ls_t, FileStream *file, const Constants *c);
+
+void consumeResource(double *res, const double *dw, const Constants *c);
+float Q_rsqrt( float number );
 
 #endif

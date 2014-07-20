@@ -22,7 +22,7 @@ typedef struct {
     Matrix *pacc;
 } OptimalSTDPSerial;
 
-OptimalSTDP* init_OptimalSTDP(struct Layer *l);
+OptimalSTDP* init_OptimalSTDP(struct LayerPoisson *l);
 void toStartValues_OptimalSTDP(learn_t *ls_t);
 void propagateSynSpike_OptimalSTDP(learn_t *ls_t, const size_t *ni, const struct SynSpike *sp, const Constants *c);
 void trainWeightsStep_OptimalSTDP(learn_t *ls_t, const double *u, const double *p, const double *real_p, const size_t *ni, const struct SimContext *s);

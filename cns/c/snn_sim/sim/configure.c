@@ -58,10 +58,20 @@ void configureLayersSim(Sim *s, Constants *c) {
 
     for(size_t li=0; li< c->lc->size; li++) {
         LayerConstants *lc = getLayerConstantsC(c, li);
-        Layer *l;
+        LayerPoisson *l;
         if(lc->neuron_type == EPoissonLayer) {
             l = createPoissonLayer(lc->N, &neurons_idx, s->ctx->stat_level);
-        } else {
+        } else
+        if(lc->neuron_type == EWtaLayer) {
+            l = createWtaLayer(lc->N, &neurons_idx, s->ctx->stat_level);
+        } else 
+        if(lc->neuron_type == EAdaptLayer) {
+            l = createAdaptLayer(lc->N, &neurons_idx, s->ctx->stat_level);
+        } else 
+        if(lc->neuron_type == EWtaAdaptLayer) {
+            l = createWtaAdaptLayer(lc->N, &neurons_idx, s->ctx->stat_level);
+        } else 
+        {
             exit(1);
         }
         appendLayerSim(s, l);
@@ -72,7 +82,7 @@ void configureLayersSim(Sim *s, Constants *c) {
     indVector *inp = NULL;
     indVector *outp = NULL;
     for(size_t li=0; li< c->lc->size; li++) {
-        Layer *l = s->layers->array[li];
+        LayerPoisson *l = s->layers->array[li];
         if(li == 0) {
             inp = inputIDs;
         } else {
@@ -99,13 +109,13 @@ void configureLayersSim(Sim *s, Constants *c) {
 void configureSynapses(Sim *s, Constants *c) {
     assert(s->ns);
     for(size_t li=0; li < s->layers->size; li++) {
-        Layer *l = s->layers->array[li];
+        LayerPoisson *l = s->layers->array[li];
         for(size_t ni=0; ni < l->N; ni++) {
             size_t n_id = l->ids[ni];
             for(size_t cons_i=0; cons_i < s->ns->conn_map[n_id]->size; cons_i++) {
                 Conn con = s->ns->conn_map[n_id]->array[cons_i];
                 
-                Layer *l_cons = s->layers->array[con.l_id];
+                LayerPoisson *l_cons = s->layers->array[con.l_id];
                 if(l->nt[ni] == EXC) {
                     setSynapseSpeciality(l_cons, con.n_id, con.syn_id, c->e_exc);
                 } else 

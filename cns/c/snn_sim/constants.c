@@ -12,6 +12,7 @@ Constants* createConstants(const char *filename) {
     c->res_stdp = (ResourceSTDPConstants*) malloc( sizeof(ResourceSTDPConstants) );
     c->preproc = (PreprocessConstants*) malloc( sizeof(PreprocessConstants) );
     c->pacemaker = (PacemakerConstants*) malloc( sizeof(PacemakerConstants) );
+    c->wta = (WtaConstants*) malloc( sizeof(WtaConstants) );
     c->lc = TEMPLATE(createVector,pLConst)();
 
     if (ini_parse(filename, file_handler, c) < 0) {
@@ -20,6 +21,8 @@ Constants* createConstants(const char *filename) {
     }
     c->__target_rate = c->target_rate/c->sim_dim;
     c->__pr = c->pr/c->sim_dim;
+    c->wta->__max_freq = c->wta->max_freq/c->sim_dim;
+    c->res_stdp->__Aplus_max_Amin = 1.0/max(c->res_stdp->Aplus, c->res_stdp->Aminus);
     for(size_t i=0; i<c->lc->size; i++) {
         if((getLayerConstantsC(c,i)->determ)&&(getLayerConstantsC(c,i)->learn)) {
             printf("Can't learn anything in determenistic mode\n");
@@ -77,7 +80,34 @@ neuron_layer_t neuronTypeParse(char *str) {
     if(strcmp(str, "PoissonLayer") == 0) {
         return(EPoissonLayer);
     }
+    if(strcmp(str, "WtaLayer") == 0) {
+        return(EWtaLayer);
+    }
+    if(strcmp(str, "AdaptLayer") == 0) {
+        return(EAdaptLayer);
+    }
+    if(strcmp(str, "WtaAdaptLayer") == 0) {
+        return(EWtaAdaptLayer);
+    }
     printf("Can't do parse of neuron type: %s\n", str);
+    exit(1);
+}
+
+prob_fun_t probFunTypeParse(char *str) {
+//    EExpHennequin, ELinToyoizumi, EExpBohte, EExp
+    if(strcmp(str, "ExpHennequin") == 0) {
+        return(EExpHennequin);
+    }
+    if(strcmp(str, "LinToyoizumi") == 0) {
+        return(ELinToyoizumi);
+    }
+    if(strcmp(str, "ExpBohte") == 0) {
+        return(EExpBohte);
+    }
+    if(strcmp(str, "Exp") == 0) {
+        return(EExp);
+    }
+    printf("Can't do parse of function type: %s\n", str);
     exit(1);
 }
 
@@ -87,6 +117,9 @@ learning_rule_t learningRuleParse(char *str) {
     }
     if(strcmp(str, "ResourceSTDP") == 0) {
         return(EResourceSTDP);
+    }
+    if(strcmp(str, "SimpleSTDP") == 0) {
+        return(ESimpleSTDP);
     }
     printf("Can't do parse of learning rule: %s\n", str);
     exit(1);
@@ -217,6 +250,9 @@ int file_handler(void* user, const char* section, const char* name, const char* 
     } else 
     if (MATCH("layer", "neuron_type")) {
         FILL_LAYER_CONST_FUN(neuron_type,pcchar,neuronTypeParse)
+    } else 
+    if (MATCH("layer", "prob_fun")) {
+        FILL_LAYER_CONST_FUN(prob_fun,pcchar,probFunTypeParse)
     } else 
     if (MATCH("layer", "learning_rule")) {
         FILL_LAYER_CONST_FUN(learning_rule,pcchar,learningRuleParse)
@@ -358,7 +394,11 @@ int file_handler(void* user, const char* section, const char* name, const char* 
     } else 
     if (MATCH("pacemaker", "pacemaker_on")) {
         c->pacemaker->pacemaker_on = strcmp(value, "true") == 0;
-    } else {
+    } else 
+    if (MATCH("wta", "max_freq")) {
+        c->wta->max_freq = atof(value);
+    } else 
+    {
         return(0);
     } 
     return(1);
@@ -439,7 +479,7 @@ void PreprocessConstantsPrint(PreprocessConstants *c) {
 void pLConstVectorPrint(pLConstVector *v) {
     printf("==================\n");
     for(size_t i=0; i<v->size; i++) {
-        printf("Layer %zu\n", i);
+        printf("LayerPoisson %zu\n", i);
         LayerConstantsPrint(v->array[i]);
     }
     printf("==================\n");
@@ -456,11 +496,38 @@ void learning_rule_tPrint(learning_rule_t v) {
     if(v == EOptimalSTDP) {
         printf("OptimalSTDP\n");
     }
+    if(v == ESimpleSTDP) {
+        printf("SimpleSTDP\n");
+    }
 }
 
 void neuron_layer_tPrint(neuron_layer_t v) {
     if(v == EPoissonLayer) {
         printf("PoissonLayer\n");
+    }
+    if(v == EWtaLayer) {
+        printf("WtaLayer\n");
+    }
+    if(v == EAdaptLayer) {
+        printf("AdaptLayer\n");
+    }
+    if(v == EWtaAdaptLayer) {
+        printf("WtaAdaptLayer\n");
+    }
+}
+
+void prob_fun_tPrint(prob_fun_t v) {
+    if(v == EExpHennequin) {
+        printf("ExpHennequin\n");
+    }
+    if(v == EExpBohte) {
+        printf("ExpBohte\n");
+    }
+    if(v == EExp) {
+        printf("EExp\n");
+    }
+    if(v == ELinToyoizumi) {
+        printf("LinToyoizumi\n");
     }
 }
 
@@ -468,6 +535,7 @@ void LayerConstantsPrint(LayerConstants *c) {
     printf("N->"); size_tPrint(c->N);
     printf("learning_rule->"); learning_rule_tPrint(c->learning_rule);
     printf("neuron_type->"); neuron_layer_tPrint(c->neuron_type);
+    printf("prob_fun->"); prob_fun_tPrint(c->prob_fun);
     printf("learn->"); boolPrint(c->learn);
     printf("determ->"); boolPrint(c->determ);
     printf("net_edge_prob->"); doublePrint(c->net_edge_prob);

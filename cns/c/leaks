@@ -1,0 +1,747 @@
+==16125== Memcheck, a memory error detector
+==16125== Copyright (C) 2002-2012, and GNU GPL'd, by Julian Seward et al.
+==16125== Using Valgrind-3.8.1 and LibVEX; rerun with -h for copyright info
+==16125== Command: ./bin/snn_sim -c /home/alexeyche/prog/sim/runs/test_run/constants.ini -i /home/alexeyche/prog/sim/test_spikes.bin -o /home/alexeyche/prog/sim/runs/test_run/2_output_spikes.bin -ms /home/alexeyche/prog/sim/runs/test_run/2_model.bin -l yes -j 1 -T 1000 -ml /home/alexeyche/prog/sim/runs/test_run/1_model.bin
+==16125== 
+==16125== 
+==16125== HEAP SUMMARY:
+==16125==     in use at exit: 301,716 bytes in 1,483 blocks
+==16125==   total heap usage: 1,869,498 allocs, 1,868,015 frees, 227,194,626 bytes allocated
+==16125== 
+==16125== 2 bytes in 1 blocks are definitely lost in loss record 1 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x53DE8C1: strdup (strdup.c:42)
+==16125==    by 0x405A28: doubleVectorParse (constants.c:57)
+==16125==    by 0x406CF2: file_handler (constants.c:264)
+==16125==    by 0x403187: ini_parse_file (ini.c:145)
+==16125==    by 0x403299: ini_parse (ini.c:178)
+==16125==    by 0x405857: createConstants (constants.c:17)
+==16125==    by 0x4013A2: main (snn_sim.c:19)
+==16125== 
+==16125== 2 bytes in 1 blocks are definitely lost in loss record 2 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x53DE8C1: strdup (strdup.c:42)
+==16125==    by 0x405A28: doubleVectorParse (constants.c:57)
+==16125==    by 0x406C27: file_handler (constants.c:255)
+==16125==    by 0x403187: ini_parse_file (ini.c:145)
+==16125==    by 0x403299: ini_parse (ini.c:178)
+==16125==    by 0x405857: createConstants (constants.c:17)
+==16125==    by 0x4013A2: main (snn_sim.c:19)
+==16125== 
+==16125== 2 bytes in 1 blocks are definitely lost in loss record 3 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x53DE8C1: strdup (strdup.c:42)
+==16125==    by 0x405A28: doubleVectorParse (constants.c:57)
+==16125==    by 0x40685F: file_handler (constants.c:261)
+==16125==    by 0x403187: ini_parse_file (ini.c:145)
+==16125==    by 0x403299: ini_parse (ini.c:178)
+==16125==    by 0x405857: createConstants (constants.c:17)
+==16125==    by 0x4013A2: main (snn_sim.c:19)
+==16125== 
+==16125== 4 bytes in 1 blocks are definitely lost in loss record 4 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x53DE8C1: strdup (strdup.c:42)
+==16125==    by 0x4059A8: indVectorParse (constants.c:46)
+==16125==    by 0x4063A0: file_handler (constants.c:231)
+==16125==    by 0x403187: ini_parse_file (ini.c:145)
+==16125==    by 0x403299: ini_parse (ini.c:178)
+==16125==    by 0x405857: createConstants (constants.c:17)
+==16125==    by 0x4013A2: main (snn_sim.c:19)
+==16125== 
+==16125== 4 bytes in 1 blocks are definitely lost in loss record 5 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x53DE8C1: strdup (strdup.c:42)
+==16125==    by 0x405A28: doubleVectorParse (constants.c:57)
+==16125==    by 0x40697D: file_handler (constants.c:243)
+==16125==    by 0x403187: ini_parse_file (ini.c:145)
+==16125==    by 0x403299: ini_parse (ini.c:178)
+==16125==    by 0x405857: createConstants (constants.c:17)
+==16125==    by 0x4013A2: main (snn_sim.c:19)
+==16125== 
+==16125== 4 bytes in 1 blocks are definitely lost in loss record 6 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x53DE8C1: strdup (strdup.c:42)
+==16125==    by 0x405A28: doubleVectorParse (constants.c:57)
+==16125==    by 0x406560: file_handler (constants.c:276)
+==16125==    by 0x403187: ini_parse_file (ini.c:145)
+==16125==    by 0x403299: ini_parse (ini.c:178)
+==16125==    by 0x405857: createConstants (constants.c:17)
+==16125==    by 0x4013A2: main (snn_sim.c:19)
+==16125== 
+==16125== 4 bytes in 1 blocks are definitely lost in loss record 7 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x53DE8C1: strdup (strdup.c:42)
+==16125==    by 0x405A28: doubleVectorParse (constants.c:57)
+==16125==    by 0x406E32: file_handler (constants.c:273)
+==16125==    by 0x403187: ini_parse_file (ini.c:145)
+==16125==    by 0x403299: ini_parse (ini.c:178)
+==16125==    by 0x405857: createConstants (constants.c:17)
+==16125==    by 0x4013A2: main (snn_sim.c:19)
+==16125== 
+==16125== 4 bytes in 1 blocks are definitely lost in loss record 8 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x53DE8C1: strdup (strdup.c:42)
+==16125==    by 0x405A28: doubleVectorParse (constants.c:57)
+==16125==    by 0x406E95: file_handler (constants.c:270)
+==16125==    by 0x403187: ini_parse_file (ini.c:145)
+==16125==    by 0x403299: ini_parse (ini.c:178)
+==16125==    by 0x405857: createConstants (constants.c:17)
+==16125==    by 0x4013A2: main (snn_sim.c:19)
+==16125== 
+==16125== 4 bytes in 1 blocks are definitely lost in loss record 9 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x53DE8C1: strdup (strdup.c:42)
+==16125==    by 0x405A28: doubleVectorParse (constants.c:57)
+==16125==    by 0x406D55: file_handler (constants.c:267)
+==16125==    by 0x403187: ini_parse_file (ini.c:145)
+==16125==    by 0x403299: ini_parse (ini.c:178)
+==16125==    by 0x405857: createConstants (constants.c:17)
+==16125==    by 0x4013A2: main (snn_sim.c:19)
+==16125== 
+==16125== 5 bytes in 1 blocks are definitely lost in loss record 10 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x53DE8C1: strdup (strdup.c:42)
+==16125==    by 0x405A28: doubleVectorParse (constants.c:57)
+==16125==    by 0x4067CF: file_handler (constants.c:234)
+==16125==    by 0x403187: ini_parse_file (ini.c:145)
+==16125==    by 0x403299: ini_parse (ini.c:178)
+==16125==    by 0x405857: createConstants (constants.c:17)
+==16125==    by 0x4013A2: main (snn_sim.c:19)
+==16125== 
+==16125== 5 bytes in 1 blocks are definitely lost in loss record 11 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x53DE8C1: strdup (strdup.c:42)
+==16125==    by 0x405A28: doubleVectorParse (constants.c:57)
+==16125==    by 0x4069DD: file_handler (constants.c:246)
+==16125==    by 0x403187: ini_parse_file (ini.c:145)
+==16125==    by 0x403299: ini_parse (ini.c:178)
+==16125==    by 0x405857: createConstants (constants.c:17)
+==16125==    by 0x4013A2: main (snn_sim.c:19)
+==16125== 
+==16125== 5 bytes in 1 blocks are definitely lost in loss record 12 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x53DE8C1: strdup (strdup.c:42)
+==16125==    by 0x405A98: pccharVectorParse (constants.c:68)
+==16125==    by 0x406709: file_handler (constants.c:225)
+==16125==    by 0x403187: ini_parse_file (ini.c:145)
+==16125==    by 0x403299: ini_parse (ini.c:178)
+==16125==    by 0x405857: createConstants (constants.c:17)
+==16125==    by 0x4013A2: main (snn_sim.c:19)
+==16125== 
+==16125== 6 bytes in 1 blocks are definitely lost in loss record 13 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x53DE8C1: strdup (strdup.c:42)
+==16125==    by 0x405A28: doubleVectorParse (constants.c:57)
+==16125==    by 0x406BB6: file_handler (constants.c:258)
+==16125==    by 0x403187: ini_parse_file (ini.c:145)
+==16125==    by 0x403299: ini_parse (ini.c:178)
+==16125==    by 0x405857: createConstants (constants.c:17)
+==16125==    by 0x4013A2: main (snn_sim.c:19)
+==16125== 
+==16125== 6 bytes in 1 blocks are definitely lost in loss record 14 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x53DE8C1: strdup (strdup.c:42)
+==16125==    by 0x405A98: pccharVectorParse (constants.c:68)
+==16125==    by 0x40676F: file_handler (constants.c:228)
+==16125==    by 0x403187: ini_parse_file (ini.c:145)
+==16125==    by 0x403299: ini_parse (ini.c:178)
+==16125==    by 0x405857: createConstants (constants.c:17)
+==16125==    by 0x4013A2: main (snn_sim.c:19)
+==16125== 
+==16125== 7 bytes in 1 blocks are definitely lost in loss record 15 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x53DE8C1: strdup (strdup.c:42)
+==16125==    by 0x405A28: doubleVectorParse (constants.c:57)
+==16125==    by 0x406ADB: file_handler (constants.c:252)
+==16125==    by 0x403187: ini_parse_file (ini.c:145)
+==16125==    by 0x403299: ini_parse (ini.c:178)
+==16125==    by 0x405857: createConstants (constants.c:17)
+==16125==    by 0x4013A2: main (snn_sim.c:19)
+==16125== 
+==16125== 8 bytes in 1 blocks are definitely lost in loss record 16 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x53DE8C1: strdup (strdup.c:42)
+==16125==    by 0x405A28: doubleVectorParse (constants.c:57)
+==16125==    by 0x406A3D: file_handler (constants.c:249)
+==16125==    by 0x403187: ini_parse_file (ini.c:145)
+==16125==    by 0x403299: ini_parse (ini.c:178)
+==16125==    by 0x405857: createConstants (constants.c:17)
+==16125==    by 0x4013A2: main (snn_sim.c:19)
+==16125== 
+==16125== 10 bytes in 1 blocks are definitely lost in loss record 17 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x53DE8C1: strdup (strdup.c:42)
+==16125==    by 0x405A28: doubleVectorParse (constants.c:57)
+==16125==    by 0x4068C0: file_handler (constants.c:237)
+==16125==    by 0x403187: ini_parse_file (ini.c:145)
+==16125==    by 0x403299: ini_parse (ini.c:178)
+==16125==    by 0x405857: createConstants (constants.c:17)
+==16125==    by 0x4013A2: main (snn_sim.c:19)
+==16125== 
+==16125== 10 bytes in 1 blocks are definitely lost in loss record 18 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x53DE8C1: strdup (strdup.c:42)
+==16125==    by 0x405A28: doubleVectorParse (constants.c:57)
+==16125==    by 0x40691D: file_handler (constants.c:240)
+==16125==    by 0x403187: ini_parse_file (ini.c:145)
+==16125==    by 0x403299: ini_parse (ini.c:178)
+==16125==    by 0x405857: createConstants (constants.c:17)
+==16125==    by 0x4013A2: main (snn_sim.c:19)
+==16125== 
+==16125== 12 bytes in 1 blocks are definitely lost in loss record 19 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x53DE8C1: strdup (strdup.c:42)
+==16125==    by 0x405A98: pccharVectorParse (constants.c:68)
+==16125==    by 0x4066A9: file_handler (constants.c:222)
+==16125==    by 0x403187: ini_parse_file (ini.c:145)
+==16125==    by 0x403299: ini_parse (ini.c:178)
+==16125==    by 0x405857: createConstants (constants.c:17)
+==16125==    by 0x4013A2: main (snn_sim.c:19)
+==16125== 
+==16125== 13 bytes in 1 blocks are definitely lost in loss record 20 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x53DE8C1: strdup (strdup.c:42)
+==16125==    by 0x405A98: pccharVectorParse (constants.c:68)
+==16125==    by 0x40663B: file_handler (constants.c:219)
+==16125==    by 0x403187: ini_parse_file (ini.c:145)
+==16125==    by 0x403299: ini_parse (ini.c:178)
+==16125==    by 0x405857: createConstants (constants.c:17)
+==16125==    by 0x4013A2: main (snn_sim.c:19)
+==16125== 
+==16125== 24 bytes in 1 blocks are definitely lost in loss record 21 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x40556A: createVector_pLConst (util_vector_tmpl.c:7)
+==16125==    by 0x405840: createConstants (constants.c:15)
+==16125==    by 0x4013A2: main (snn_sim.c:19)
+==16125== 
+==16125== 24 bytes in 1 blocks are definitely lost in loss record 22 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x4023EA: createVector_ind (util_vector_tmpl.c:7)
+==16125==    by 0x40599D: indVectorParse (constants.c:44)
+==16125==    by 0x4063A0: file_handler (constants.c:231)
+==16125==    by 0x403187: ini_parse_file (ini.c:145)
+==16125==    by 0x403299: ini_parse (ini.c:178)
+==16125==    by 0x405857: createConstants (constants.c:17)
+==16125==    by 0x4013A2: main (snn_sim.c:19)
+==16125== 
+==16125== 24 bytes in 1 blocks are definitely lost in loss record 23 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x402B6A: createVector_pcchar (util_vector_tmpl.c:7)
+==16125==    by 0x405A8D: pccharVectorParse (constants.c:66)
+==16125==    by 0x40663B: file_handler (constants.c:219)
+==16125==    by 0x403187: ini_parse_file (ini.c:145)
+==16125==    by 0x403299: ini_parse (ini.c:178)
+==16125==    by 0x405857: createConstants (constants.c:17)
+==16125==    by 0x4013A2: main (snn_sim.c:19)
+==16125== 
+==16125== 24 bytes in 1 blocks are definitely lost in loss record 24 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x40214A: createVector_double (util_vector_tmpl.c:7)
+==16125==    by 0x405A1D: doubleVectorParse (constants.c:55)
+==16125==    by 0x4068C0: file_handler (constants.c:237)
+==16125==    by 0x403187: ini_parse_file (ini.c:145)
+==16125==    by 0x403299: ini_parse (ini.c:178)
+==16125==    by 0x405857: createConstants (constants.c:17)
+==16125==    by 0x4013A2: main (snn_sim.c:19)
+==16125== 
+==16125== 24 bytes in 1 blocks are definitely lost in loss record 25 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x40214A: createVector_double (util_vector_tmpl.c:7)
+==16125==    by 0x405A1D: doubleVectorParse (constants.c:55)
+==16125==    by 0x40691D: file_handler (constants.c:240)
+==16125==    by 0x403187: ini_parse_file (ini.c:145)
+==16125==    by 0x403299: ini_parse (ini.c:178)
+==16125==    by 0x405857: createConstants (constants.c:17)
+==16125==    by 0x4013A2: main (snn_sim.c:19)
+==16125== 
+==16125== 24 bytes in 1 blocks are definitely lost in loss record 26 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x40214A: createVector_double (util_vector_tmpl.c:7)
+==16125==    by 0x405A1D: doubleVectorParse (constants.c:55)
+==16125==    by 0x40697D: file_handler (constants.c:243)
+==16125==    by 0x403187: ini_parse_file (ini.c:145)
+==16125==    by 0x403299: ini_parse (ini.c:178)
+==16125==    by 0x405857: createConstants (constants.c:17)
+==16125==    by 0x4013A2: main (snn_sim.c:19)
+==16125== 
+==16125== 24 bytes in 1 blocks are definitely lost in loss record 27 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x40214A: createVector_double (util_vector_tmpl.c:7)
+==16125==    by 0x405A1D: doubleVectorParse (constants.c:55)
+==16125==    by 0x406ADB: file_handler (constants.c:252)
+==16125==    by 0x403187: ini_parse_file (ini.c:145)
+==16125==    by 0x403299: ini_parse (ini.c:178)
+==16125==    by 0x405857: createConstants (constants.c:17)
+==16125==    by 0x4013A2: main (snn_sim.c:19)
+==16125== 
+==16125== 24 bytes in 1 blocks are definitely lost in loss record 28 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x40214A: createVector_double (util_vector_tmpl.c:7)
+==16125==    by 0x405A1D: doubleVectorParse (constants.c:55)
+==16125==    by 0x406560: file_handler (constants.c:276)
+==16125==    by 0x403187: ini_parse_file (ini.c:145)
+==16125==    by 0x403299: ini_parse (ini.c:178)
+==16125==    by 0x405857: createConstants (constants.c:17)
+==16125==    by 0x4013A2: main (snn_sim.c:19)
+==16125== 
+==16125== 24 bytes in 1 blocks are definitely lost in loss record 29 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x40214A: createVector_double (util_vector_tmpl.c:7)
+==16125==    by 0x405A1D: doubleVectorParse (constants.c:55)
+==16125==    by 0x406E32: file_handler (constants.c:273)
+==16125==    by 0x403187: ini_parse_file (ini.c:145)
+==16125==    by 0x403299: ini_parse (ini.c:178)
+==16125==    by 0x405857: createConstants (constants.c:17)
+==16125==    by 0x4013A2: main (snn_sim.c:19)
+==16125== 
+==16125== 24 bytes in 1 blocks are definitely lost in loss record 30 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x40214A: createVector_double (util_vector_tmpl.c:7)
+==16125==    by 0x405A1D: doubleVectorParse (constants.c:55)
+==16125==    by 0x406E95: file_handler (constants.c:270)
+==16125==    by 0x403187: ini_parse_file (ini.c:145)
+==16125==    by 0x403299: ini_parse (ini.c:178)
+==16125==    by 0x405857: createConstants (constants.c:17)
+==16125==    by 0x4013A2: main (snn_sim.c:19)
+==16125== 
+==16125== 24 bytes in 1 blocks are definitely lost in loss record 31 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x40214A: createVector_double (util_vector_tmpl.c:7)
+==16125==    by 0x405A1D: doubleVectorParse (constants.c:55)
+==16125==    by 0x406D55: file_handler (constants.c:267)
+==16125==    by 0x403187: ini_parse_file (ini.c:145)
+==16125==    by 0x403299: ini_parse (ini.c:178)
+==16125==    by 0x405857: createConstants (constants.c:17)
+==16125==    by 0x4013A2: main (snn_sim.c:19)
+==16125== 
+==16125== 24 bytes in 1 blocks are definitely lost in loss record 32 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x40214A: createVector_double (util_vector_tmpl.c:7)
+==16125==    by 0x405A1D: doubleVectorParse (constants.c:55)
+==16125==    by 0x406A3D: file_handler (constants.c:249)
+==16125==    by 0x403187: ini_parse_file (ini.c:145)
+==16125==    by 0x403299: ini_parse (ini.c:178)
+==16125==    by 0x405857: createConstants (constants.c:17)
+==16125==    by 0x4013A2: main (snn_sim.c:19)
+==16125== 
+==16125== 24 bytes in 1 blocks are definitely lost in loss record 33 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x40214A: createVector_double (util_vector_tmpl.c:7)
+==16125==    by 0x405A1D: doubleVectorParse (constants.c:55)
+==16125==    by 0x406CF2: file_handler (constants.c:264)
+==16125==    by 0x403187: ini_parse_file (ini.c:145)
+==16125==    by 0x403299: ini_parse (ini.c:178)
+==16125==    by 0x405857: createConstants (constants.c:17)
+==16125==    by 0x4013A2: main (snn_sim.c:19)
+==16125== 
+==16125== 24 bytes in 1 blocks are definitely lost in loss record 34 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x40214A: createVector_double (util_vector_tmpl.c:7)
+==16125==    by 0x405A1D: doubleVectorParse (constants.c:55)
+==16125==    by 0x406BB6: file_handler (constants.c:258)
+==16125==    by 0x403187: ini_parse_file (ini.c:145)
+==16125==    by 0x403299: ini_parse (ini.c:178)
+==16125==    by 0x405857: createConstants (constants.c:17)
+==16125==    by 0x4013A2: main (snn_sim.c:19)
+==16125== 
+==16125== 24 bytes in 1 blocks are definitely lost in loss record 35 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x40214A: createVector_double (util_vector_tmpl.c:7)
+==16125==    by 0x405A1D: doubleVectorParse (constants.c:55)
+==16125==    by 0x406C27: file_handler (constants.c:255)
+==16125==    by 0x403187: ini_parse_file (ini.c:145)
+==16125==    by 0x403299: ini_parse (ini.c:178)
+==16125==    by 0x405857: createConstants (constants.c:17)
+==16125==    by 0x4013A2: main (snn_sim.c:19)
+==16125== 
+==16125== 24 bytes in 1 blocks are definitely lost in loss record 36 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x40214A: createVector_double (util_vector_tmpl.c:7)
+==16125==    by 0x405A1D: doubleVectorParse (constants.c:55)
+==16125==    by 0x40685F: file_handler (constants.c:261)
+==16125==    by 0x403187: ini_parse_file (ini.c:145)
+==16125==    by 0x403299: ini_parse (ini.c:178)
+==16125==    by 0x405857: createConstants (constants.c:17)
+==16125==    by 0x4013A2: main (snn_sim.c:19)
+==16125== 
+==16125== 24 bytes in 1 blocks are definitely lost in loss record 37 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x402B6A: createVector_pcchar (util_vector_tmpl.c:7)
+==16125==    by 0x405A8D: pccharVectorParse (constants.c:66)
+==16125==    by 0x4066A9: file_handler (constants.c:222)
+==16125==    by 0x403187: ini_parse_file (ini.c:145)
+==16125==    by 0x403299: ini_parse (ini.c:178)
+==16125==    by 0x405857: createConstants (constants.c:17)
+==16125==    by 0x4013A2: main (snn_sim.c:19)
+==16125== 
+==16125== 24 bytes in 1 blocks are definitely lost in loss record 38 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x40214A: createVector_double (util_vector_tmpl.c:7)
+==16125==    by 0x405A1D: doubleVectorParse (constants.c:55)
+==16125==    by 0x4067CF: file_handler (constants.c:234)
+==16125==    by 0x403187: ini_parse_file (ini.c:145)
+==16125==    by 0x403299: ini_parse (ini.c:178)
+==16125==    by 0x405857: createConstants (constants.c:17)
+==16125==    by 0x4013A2: main (snn_sim.c:19)
+==16125== 
+==16125== 24 bytes in 1 blocks are definitely lost in loss record 39 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x40214A: createVector_double (util_vector_tmpl.c:7)
+==16125==    by 0x405A1D: doubleVectorParse (constants.c:55)
+==16125==    by 0x4069DD: file_handler (constants.c:246)
+==16125==    by 0x403187: ini_parse_file (ini.c:145)
+==16125==    by 0x403299: ini_parse (ini.c:178)
+==16125==    by 0x405857: createConstants (constants.c:17)
+==16125==    by 0x4013A2: main (snn_sim.c:19)
+==16125== 
+==16125== 24 bytes in 1 blocks are definitely lost in loss record 40 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x402B6A: createVector_pcchar (util_vector_tmpl.c:7)
+==16125==    by 0x405A8D: pccharVectorParse (constants.c:66)
+==16125==    by 0x406709: file_handler (constants.c:225)
+==16125==    by 0x403187: ini_parse_file (ini.c:145)
+==16125==    by 0x403299: ini_parse (ini.c:178)
+==16125==    by 0x405857: createConstants (constants.c:17)
+==16125==    by 0x4013A2: main (snn_sim.c:19)
+==16125== 
+==16125== 24 bytes in 1 blocks are definitely lost in loss record 41 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x402B6A: createVector_pcchar (util_vector_tmpl.c:7)
+==16125==    by 0x405A8D: pccharVectorParse (constants.c:66)
+==16125==    by 0x40676F: file_handler (constants.c:228)
+==16125==    by 0x403187: ini_parse_file (ini.c:145)
+==16125==    by 0x403299: ini_parse (ini.c:178)
+==16125==    by 0x405857: createConstants (constants.c:17)
+==16125==    by 0x4013A2: main (snn_sim.c:19)
+==16125== 
+==16125== 24 bytes in 1 blocks are definitely lost in loss record 42 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x409E5A: createVector_pLayer (util_vector_tmpl.c:7)
+==16125==    by 0x40B13F: createSim (sim.c:7)
+==16125==    by 0x401452: main (snn_sim.c:38)
+==16125== 
+==16125== 24 bytes in 1 blocks are definitely lost in loss record 43 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x40214A: createVector_double (util_vector_tmpl.c:7)
+==16125==    by 0x408874: createRuntime (runtime.c:7)
+==16125==    by 0x40B149: createSim (sim.c:8)
+==16125==    by 0x401452: main (snn_sim.c:38)
+==16125== 
+==16125== 24 bytes in 1 blocks are definitely lost in loss record 44 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x40266A: createVector_int (util_vector_tmpl.c:7)
+==16125==    by 0x408889: createRuntime (runtime.c:9)
+==16125==    by 0x40B149: createSim (sim.c:8)
+==16125==    by 0x401452: main (snn_sim.c:38)
+==16125== 
+==16125== 24 bytes in 1 blocks are definitely lost in loss record 45 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x4023EA: createVector_ind (util_vector_tmpl.c:7)
+==16125==    by 0x408894: createRuntime (runtime.c:10)
+==16125==    by 0x40B149: createSim (sim.c:8)
+==16125==    by 0x401452: main (snn_sim.c:38)
+==16125== 
+==16125== 24 bytes in 1 blocks are definitely lost in loss record 46 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x4023EA: createVector_ind (util_vector_tmpl.c:7)
+==16125==    by 0x408AD2: configureLayersSim (configure.c:51)
+==16125==    by 0x40148B: main (snn_sim.c:44)
+==16125== 
+==16125== 24 bytes in 1 blocks are definitely lost in loss record 47 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x401ADA: createVector_pMatrix (util_vector_tmpl.c:7)
+==16125==    by 0x40835E: readMatrixList (io.c:35)
+==16125==    by 0x40ACAD: deserializeLayer_Poisson (layer.c:392)
+==16125==    by 0x409089: loadLayersFromFile (serialize.c:15)
+==16125==    by 0x40149B: main (snn_sim.c:47)
+==16125== 
+==16125== 24 bytes in 1 blocks are definitely lost in loss record 48 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x401ADA: createVector_pMatrix (util_vector_tmpl.c:7)
+==16125==    by 0x40835E: readMatrixList (io.c:35)
+==16125==    by 0x40BF90: deserialize_OptimalSTDP (optim.c:183)
+==16125==    by 0x40AFE0: deserializeLayer_Poisson (layer.c:452)
+==16125==    by 0x409089: loadLayersFromFile (serialize.c:15)
+==16125==    by 0x40149B: main (snn_sim.c:47)
+==16125== 
+==16125== 24 bytes in 1 blocks are definitely lost in loss record 49 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x40214A: createVector_double (util_vector_tmpl.c:7)
+==16125==    by 0x408874: createRuntime (runtime.c:7)
+==16125==    by 0x40892A: configureNetSpikesSim (configure.c:13)
+==16125==    by 0x4014B8: main (snn_sim.c:50)
+==16125== 
+==16125== 24 bytes in 1 blocks are definitely lost in loss record 50 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x40266A: createVector_int (util_vector_tmpl.c:7)
+==16125==    by 0x408889: createRuntime (runtime.c:9)
+==16125==    by 0x40892A: configureNetSpikesSim (configure.c:13)
+==16125==    by 0x4014B8: main (snn_sim.c:50)
+==16125== 
+==16125== 24 bytes in 1 blocks are definitely lost in loss record 51 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x4023EA: createVector_ind (util_vector_tmpl.c:7)
+==16125==    by 0x408894: createRuntime (runtime.c:10)
+==16125==    by 0x40892A: configureNetSpikesSim (configure.c:13)
+==16125==    by 0x4014B8: main (snn_sim.c:50)
+==16125== 
+==16125== 24 bytes in 1 blocks are definitely lost in loss record 52 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x401ADA: createVector_pMatrix (util_vector_tmpl.c:7)
+==16125==    by 0x40835E: readMatrixList (io.c:35)
+==16125==    by 0x40894C: configureNetSpikesSim (configure.c:18)
+==16125==    by 0x4014B8: main (snn_sim.c:50)
+==16125== 
+==16125== 24 bytes in 1 blocks are definitely lost in loss record 53 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x401ADA: createVector_pMatrix (util_vector_tmpl.c:7)
+==16125==    by 0x40A894: serializeLayer_Poisson (layer.c:469)
+==16125==    by 0x409119: saveLayersToFile (serialize.c:28)
+==16125==    by 0x401537: main (snn_sim.c:133)
+==16125== 
+==16125== 24 bytes in 1 blocks are definitely lost in loss record 54 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x401ADA: createVector_pMatrix (util_vector_tmpl.c:7)
+==16125==    by 0x40BEFF: serialize_OptimalSTDP (optim.c:169)
+==16125==    by 0x409119: saveLayersToFile (serialize.c:28)
+==16125==    by 0x401537: main (snn_sim.c:133)
+==16125== 
+==16125== 24 bytes in 1 blocks are definitely lost in loss record 55 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x401ADA: createVector_pMatrix (util_vector_tmpl.c:7)
+==16125==    by 0x40154C: main (snn_sim.c:136)
+==16125== 
+==16125== 32 bytes in 1 blocks are definitely lost in loss record 56 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x405832: createConstants (constants.c:14)
+==16125==    by 0x4013A2: main (snn_sim.c:19)
+==16125== 
+==16125== 41 bytes in 1 blocks are definitely lost in loss record 58 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x53DE8C1: strdup (strdup.c:42)
+==16125==    by 0x40D166: parseSimOptions (sim_opts.h:114)
+==16125==    by 0x401342: main (snn_sim.c:16)
+==16125== 
+==16125== 48 bytes in 1 blocks are definitely lost in loss record 59 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x40A2A6: createPoissonLayer (layer.c:41)
+==16125==    by 0x408B5E: configureLayersSim (configure.c:63)
+==16125==    by 0x40148B: main (snn_sim.c:44)
+==16125== 
+==16125== 51 bytes in 1 blocks are definitely lost in loss record 60 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x53DE8C1: strdup (strdup.c:42)
+==16125==    by 0x40D050: parseSimOptions (sim_opts.h:146)
+==16125==    by 0x401342: main (snn_sim.c:16)
+==16125== 
+==16125== 51 bytes in 1 blocks are definitely lost in loss record 61 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x53DE8C1: strdup (strdup.c:42)
+==16125==    by 0x40CE12: parseSimOptions (sim_opts.h:154)
+==16125==    by 0x401342: main (snn_sim.c:16)
+==16125== 
+==16125== 51 bytes in 1 blocks are definitely lost in loss record 62 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x53DE8C1: strdup (strdup.c:42)
+==16125==    by 0x401476: main (snn_sim.c:42)
+==16125== 
+==16125== 51 bytes in 1 blocks are definitely lost in loss record 63 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x53DE8C1: strdup (strdup.c:42)
+==16125==    by 0x4082ED: createInputFileStream (io.c:14)
+==16125==    by 0x40905C: loadLayersFromFile (serialize.c:11)
+==16125==    by 0x40149B: main (snn_sim.c:47)
+==16125== 
+==16125== 51 bytes in 1 blocks are definitely lost in loss record 64 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x53DE8C1: strdup (strdup.c:42)
+==16125==    by 0x401525: main (snn_sim.c:130)
+==16125== 
+==16125== 51 bytes in 1 blocks are definitely lost in loss record 65 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x53DE8C1: strdup (strdup.c:42)
+==16125==    by 0x4082AD: createOutputFileStream (io.c:7)
+==16125==    by 0x4090E9: saveLayersToFile (serialize.c:25)
+==16125==    by 0x401537: main (snn_sim.c:133)
+==16125== 
+==16125== 53 bytes in 1 blocks are definitely lost in loss record 66 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x53DE8C1: strdup (strdup.c:42)
+==16125==    by 0x40D217: parseSimOptions (sim_opts.h:162)
+==16125==    by 0x401342: main (snn_sim.c:16)
+==16125== 
+==16125== 57 (16 direct, 41 indirect) bytes in 1 blocks are definitely lost in loss record 67 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x4082D2: createInputFileStream (io.c:12)
+==16125==    by 0x40893F: configureNetSpikesSim (configure.c:17)
+==16125==    by 0x4014B8: main (snn_sim.c:50)
+==16125== 
+==16125== 59 bytes in 1 blocks are definitely lost in loss record 68 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x53DE8C1: strdup (strdup.c:42)
+==16125==    by 0x40D1A1: parseSimOptions (sim_opts.h:138)
+==16125==    by 0x401342: main (snn_sim.c:16)
+==16125== 
+==16125== 59 bytes in 1 blocks are definitely lost in loss record 69 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x53DE8C1: strdup (strdup.c:42)
+==16125==    by 0x4082AD: createOutputFileStream (io.c:7)
+==16125==    by 0x40878D: saveMatrixListToFile (io.c:136)
+==16125==    by 0x4015C0: main (snn_sim.c:148)
+==16125== 
+==16125== 104 (24 direct, 80 indirect) bytes in 1 blocks are definitely lost in loss record 71 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x40214A: createVector_double (util_vector_tmpl.c:7)
+==16125==    by 0x40887E: createRuntime (runtime.c:8)
+==16125==    by 0x40B149: createSim (sim.c:8)
+==16125==    by 0x401452: main (snn_sim.c:38)
+==16125== 
+==16125== 144 bytes in 1 blocks are definitely lost in loss record 72 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x405C42: checkLC (constants.c:374)
+==16125==    by 0x4063E3: file_handler (constants.c:231)
+==16125==    by 0x403187: ini_parse_file (ini.c:145)
+==16125==    by 0x403299: ini_parse (ini.c:178)
+==16125==    by 0x405857: createConstants (constants.c:17)
+==16125==    by 0x4013A2: main (snn_sim.c:19)
+==16125== 
+==16125== 664 (24 direct, 640 indirect) bytes in 1 blocks are definitely lost in loss record 75 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x40214A: createVector_double (util_vector_tmpl.c:7)
+==16125==    by 0x40887E: createRuntime (runtime.c:8)
+==16125==    by 0x40892A: configureNetSpikesSim (configure.c:13)
+==16125==    by 0x4014B8: main (snn_sim.c:50)
+==16125== 
+==16125== 800 bytes in 1 blocks are definitely lost in loss record 77 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x40A26E: createPoissonLayer (layer.c:36)
+==16125==    by 0x408B5E: configureLayersSim (configure.c:63)
+==16125==    by 0x40148B: main (snn_sim.c:44)
+==16125== 
+==16125== 800 bytes in 1 blocks are definitely lost in loss record 78 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x40C06B: init_OptimalSTDP (optim.c:14)
+==16125==    by 0x40A55C: initLearningRule (layer.c:146)
+==16125==    by 0x40A7E5: configureLayer_Poisson (layer.c:193)
+==16125==    by 0x408BB2: configureLayersSim (configure.c:86)
+==16125==    by 0x40148B: main (snn_sim.c:44)
+==16125== 
+==16125== 800 bytes in 1 blocks are definitely lost in loss record 79 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x40C09E: init_OptimalSTDP (optim.c:20)
+==16125==    by 0x40A55C: initLearningRule (layer.c:146)
+==16125==    by 0x40A7E5: configureLayer_Poisson (layer.c:193)
+==16125==    by 0x408BB2: configureLayersSim (configure.c:86)
+==16125==    by 0x40148B: main (snn_sim.c:44)
+==16125== 
+==16125== 800 bytes in 1 blocks are definitely lost in loss record 80 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x40C06B: init_OptimalSTDP (optim.c:14)
+==16125==    by 0x40A55C: initLearningRule (layer.c:146)
+==16125==    by 0x40AFCE: deserializeLayer_Poisson (layer.c:451)
+==16125==    by 0x409089: loadLayersFromFile (serialize.c:15)
+==16125==    by 0x40149B: main (snn_sim.c:47)
+==16125== 
+==16125== 800 bytes in 1 blocks are definitely lost in loss record 81 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x40C09E: init_OptimalSTDP (optim.c:20)
+==16125==    by 0x40A55C: initLearningRule (layer.c:146)
+==16125==    by 0x40AFCE: deserializeLayer_Poisson (layer.c:451)
+==16125==    by 0x409089: loadLayersFromFile (serialize.c:15)
+==16125==    by 0x40149B: main (snn_sim.c:47)
+==16125== 
+==16125== 1,600 bytes in 1 blocks are definitely lost in loss record 82 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x408E5F: configureSimImpl (configure.c:125)
+==16125==    by 0x40B683: runSim (sim.c:89)
+==16125==    by 0x4014E5: main (snn_sim.c:61)
+==16125== 
+==16125== 2,400 bytes in 100 blocks are definitely lost in loss record 84 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x40214A: createVector_double (util_vector_tmpl.c:7)
+==16125==    by 0x40AD55: deserializeLayer_Poisson (layer.c:406)
+==16125==    by 0x409089: loadLayersFromFile (serialize.c:15)
+==16125==    by 0x40149B: main (snn_sim.c:47)
+==16125== 
+==16125== 2,400 bytes in 100 blocks are definitely lost in loss record 85 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x40214A: createVector_double (util_vector_tmpl.c:7)
+==16125==    by 0x40AD68: deserializeLayer_Poisson (layer.c:407)
+==16125==    by 0x409089: loadLayersFromFile (serialize.c:15)
+==16125==    by 0x40149B: main (snn_sim.c:47)
+==16125== 
+==16125== 2,400 bytes in 100 blocks are definitely lost in loss record 86 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x4023EA: createVector_ind (util_vector_tmpl.c:7)
+==16125==    by 0x40AD7D: deserializeLayer_Poisson (layer.c:408)
+==16125==    by 0x409089: loadLayersFromFile (serialize.c:15)
+==16125==    by 0x40149B: main (snn_sim.c:47)
+==16125== 
+==16125== 2,400 bytes in 100 blocks are definitely lost in loss record 87 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x40214A: createVector_double (util_vector_tmpl.c:7)
+==16125==    by 0x4034EA: createSpikesList (spikes_list.c:9)
+==16125==    by 0x403721: spikesMatrixToSpikesList (spikes_list.c:47)
+==16125==    by 0x40895A: configureNetSpikesSim (configure.c:21)
+==16125==    by 0x4014B8: main (snn_sim.c:50)
+==16125== 
+==16125== 4,800 (2,400 direct, 2,400 indirect) bytes in 1 blocks are definitely lost in loss record 88 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x40A59C: configureLayer_Poisson (layer.c:154)
+==16125==    by 0x408BB2: configureLayersSim (configure.c:86)
+==16125==    by 0x40148B: main (snn_sim.c:44)
+==16125== 
+==16125== 4,800 bytes in 200 blocks are definitely lost in loss record 89 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x40214A: createVector_double (util_vector_tmpl.c:7)
+==16125==    by 0x4034EA: createSpikesList (spikes_list.c:9)
+==16125==    by 0x40498D: allocNetSim (netsim.c:45)
+==16125==    by 0x408908: configureNetSpikesSim (configure.c:8)
+==16125==    by 0x4014B8: main (snn_sim.c:50)
+==16125== 
+==16125== 4,800 bytes in 200 blocks are definitely lost in loss record 90 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x403EAA: createVector_Conn (util_vector_tmpl.c:7)
+==16125==    by 0x4049EA: allocNetSim (netsim.c:50)
+==16125==    by 0x408908: configureNetSpikesSim (configure.c:8)
+==16125==    by 0x4014B8: main (snn_sim.c:50)
+==16125== 
+==16125== 4,800 bytes in 200 blocks are definitely lost in loss record 91 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x4041CA: createVector_SynSpike (util_vector_tmpl.c:7)
+==16125==    by 0x404BEA: propagateInputSpikesNetSim (netsim.c:95)
+==16125==    by 0x408968: configureNetSpikesSim (configure.c:22)
+==16125==    by 0x4014B8: main (snn_sim.c:50)
+==16125== 
+==16125== 87,808 bytes in 100 blocks are definitely lost in loss record 92 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x40918C: allocSynData_Poisson (layer.c:295)
+==16125==    by 0x40AEA6: deserializeLayer_Poisson (layer.c:432)
+==16125==    by 0x409089: loadLayersFromFile (serialize.c:15)
+==16125==    by 0x40149B: main (snn_sim.c:47)
+==16125== 
+==16125== 87,808 bytes in 100 blocks are definitely lost in loss record 93 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x4091A8: allocSynData_Poisson (layer.c:296)
+==16125==    by 0x40AEA6: deserializeLayer_Poisson (layer.c:432)
+==16125==    by 0x409089: loadLayersFromFile (serialize.c:15)
+==16125==    by 0x40149B: main (snn_sim.c:47)
+==16125== 
+==16125== 87,808 bytes in 100 blocks are definitely lost in loss record 94 of 94
+==16125==    at 0x4C2A2DB: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==16125==    by 0x40921A: allocSynData_Poisson (layer.c:300)
+==16125==    by 0x40AEA6: deserializeLayer_Poisson (layer.c:432)
+==16125==    by 0x409089: loadLayersFromFile (serialize.c:15)
+==16125==    by 0x40149B: main (snn_sim.c:47)
+==16125== 
+==16125== LEAK SUMMARY:
+==16125==    definitely lost: 297,187 bytes in 1,378 blocks
+==16125==    indirectly lost: 3,161 bytes in 103 blocks
+==16125==      possibly lost: 0 bytes in 0 blocks
+==16125==    still reachable: 1,368 bytes in 2 blocks
+==16125==         suppressed: 0 bytes in 0 blocks
+==16125== Reachable blocks (those to which a pointer was found) are not shown.
+==16125== To see them, rerun with: --leak-check=full --show-reachable=yes
+==16125== 
+==16125== For counts of detected and suppressed errors, rerun with: -v
+==16125== ERROR SUMMARY: 88 errors from 88 contexts (suppressed: 2 from 2)

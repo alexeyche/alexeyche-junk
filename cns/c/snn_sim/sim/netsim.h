@@ -42,7 +42,7 @@ void deleteNetSim(NetSim *ns);
 void propagateInputSpikesNetSim(struct Sim *s, SpikesList *sl);
 void printInputSpikesQueue(NetSim *ns);
 void configureConnMapNetSim(NetSim *ns, pLayerVector *l);
-void propagateSpikeNetSim(struct Sim *s, Layer *l, const size_t *ni, double t);
+void propagateSpikeNetSim(struct Sim *s, LayerPoisson *l, const size_t *ni, double t);
 void printConnMap(NetSim *ns);
 
 #endif

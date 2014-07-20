@@ -49,12 +49,13 @@ learn/optim.o: learn/optim.c /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/bits/confname.h /usr/include/getopt.h \
  /usr/include/x86_64-linux-gnu/bits/unistd.h \
  /usr/include/x86_64-linux-gnu/sys/stat.h \
- /usr/include/x86_64-linux-gnu/bits/stat.h layers/layer.h util/util.h \
- util/mem.h sim/sim.h /usr/include/pthread.h /usr/include/sched.h \
- /usr/include/x86_64-linux-gnu/bits/sched.h \
- /usr/include/x86_64-linux-gnu/bits/setjmp.h util/spikes_list.h \
- sim/runtime.h sim/netsim.h util/util_dlink_list_tmpl.h sim/configure.h \
- learn/optim.h learn/res_stdp.h
+ /usr/include/x86_64-linux-gnu/bits/stat.h layers/layer_poisson.h \
+ util/util.h util/mem.h sim/sim.h /usr/include/pthread.h \
+ /usr/include/sched.h /usr/include/x86_64-linux-gnu/bits/sched.h \
+ /usr/include/x86_64-linux-gnu/bits/setjmp.h layers/layer_wta.h \
+ util/spikes_list.h sim/runtime.h sim/netsim.h \
+ util/util_dlink_list_tmpl.h sim/configure.h learn/optim.h \
+ learn/res_stdp.h learn/simple_stdp.h
 
 /usr/include/stdc-predef.h:
 
@@ -208,7 +209,7 @@ util/io.h:
 
 /usr/include/x86_64-linux-gnu/bits/stat.h:
 
-layers/layer.h:
+layers/layer_poisson.h:
 
 util/util.h:
 
@@ -224,6 +225,8 @@ sim/sim.h:
 
 /usr/include/x86_64-linux-gnu/bits/setjmp.h:
 
+layers/layer_wta.h:
+
 util/spikes_list.h:
 
 sim/runtime.h:
@@ -237,3 +240,5 @@ sim/configure.h:
 learn/optim.h:
 
 learn/res_stdp.h:
+
+learn/simple_stdp.h:

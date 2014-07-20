@@ -4,7 +4,8 @@
 #include <stddef.h>
 #include <pthread.h>
 
-#include <layers/layer.h>
+#include <layers/layer_poisson.h>
+#include <layers/layer_wta.h>
 #include <constants.h>
 #include <util/spikes_list.h>
 #include <util/matrix.h>
@@ -26,6 +27,7 @@
 
 #include <learn/optim.h>
 #include <learn/res_stdp.h>
+#include <learn/simple_stdp.h>
 
 pthread_barrier_t barrier;
 
@@ -39,7 +41,8 @@ struct SimContext {
     double global_reward;
     double mean_global_reward;
     doubleVector *stat_global_reward;
-    
+    double sum_prob_wta;
+
     const Constants *c;
     unsigned char stat_level;
 };
@@ -74,7 +77,7 @@ typedef struct {
 
 
 Sim* createSim(size_t nthreads, unsigned char stat_level, Constants *c);
-void appendLayerSim(Sim *s, Layer *l);
+void appendLayerSim(Sim *s, LayerPoisson *l);
 void deleteSim(Sim *s);
 size_t getLayerIdOfNeuron(Sim *s, size_t n_id);
 

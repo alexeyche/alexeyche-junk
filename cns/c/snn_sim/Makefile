@@ -125,8 +125,10 @@ am___top_builddir__bin_snn_sim_OBJECTS = util/matrix.$(OBJEXT) \
 	neuron_funcs.$(OBJEXT) constants.$(OBJEXT) util/io.$(OBJEXT) \
 	util/mem.$(OBJEXT) sim/runtime.$(OBJEXT) \
 	sim/configure.$(OBJEXT) sim/serialize.$(OBJEXT) \
-	./layers/layer.$(OBJEXT) sim/sim.$(OBJEXT) \
+	./layers/layer_poisson.$(OBJEXT) sim/sim.$(OBJEXT) \
 	learn/optim.$(OBJEXT) learn/res_stdp.$(OBJEXT) \
+	learn/simple_stdp.$(OBJEXT) layers/layer_wta.$(OBJEXT) \
+	layers/layer_adapt.$(OBJEXT) layers/layer_wtaadapt.$(OBJEXT) \
 	snn_sim.$(OBJEXT)
 __top_builddir__bin_snn_sim_OBJECTS =  \
 	$(am___top_builddir__bin_snn_sim_OBJECTS)
@@ -202,7 +204,8 @@ AUTOMAKE = ${SHELL} /home/alexeyche/prog/alexeyche-junk/cns/c/missing automake-1
 AWK = gawk
 CC = gcc
 CCDEPMODE = depmode=gcc3
-CFLAGS = -g -O2
+#AM_CFLAGS = -Wall -std=gnu99 -pthread -O0 -g  
+CFLAGS = 
 CPP = gcc -E
 CPPFLAGS = 
 CYGPATH_W = echo
@@ -282,11 +285,9 @@ top_builddir = ..
 top_srcdir = ..
 
 # what flags you want to pass to the C compiler & linker
-AM_CFLAGS = -Wall -std=gnu99 -pthread -O3  #-O0 -g  
-#AM_CFLAGS = -Wall -std=gnu99 -pthread -O0 -pg  
-#CFLAGS=
+AM_CFLAGS = -Wall -std=gnu99 -pthread  -O3  #-g  
 LDADD = -lm
-__top_builddir__bin_snn_sim_SOURCES = util/matrix.c util/util_vector.c ./util/ini.c ./util/matrix.h util/util.c util/spikes_list.c ./util/util_dlink_list.c sim/netsim.c neuron_funcs.c  constants.c util/io.c util/mem.c sim/runtime.c sim/configure.c sim/serialize.c ./layers/layer.c sim/sim.c learn/optim.c learn/res_stdp.c snn_sim.c 
+__top_builddir__bin_snn_sim_SOURCES = util/matrix.c util/util_vector.c ./util/ini.c ./util/matrix.h util/util.c util/spikes_list.c ./util/util_dlink_list.c sim/netsim.c neuron_funcs.c  constants.c util/io.c util/mem.c sim/runtime.c sim/configure.c sim/serialize.c ./layers/layer_poisson.c sim/sim.c learn/optim.c learn/res_stdp.c learn/simple_stdp.c layers/layer_wta.c layers/layer_adapt.c layers/layer_wtaadapt.c snn_sim.c 
 __top_builddir__bin_snn_prep_SOURCES = util/matrix.c util/util_vector.c ./util/ini.c ./util/matrix.h util/util.c util/spikes_list.c  constants.c util/io.c layers/adex.c prep/prepare_ts.c snn_prep.c 
 __top_builddir__bin_snn_calc_SOURCES = util/matrix.c util/util_vector.c ./util/ini.c ./util/matrix.h util/util.c util/spikes_list.c  util/io.c snn_calc.c calc.c
 __top_builddir__bin_snn_postproc_SOURCES = util/matrix.c util/util_vector.c ./util/ini.c ./util/matrix.h util/util.c util/spikes_list.c  util/io.c postproc.c snn_postproc.c
@@ -432,7 +433,7 @@ sim/configure.$(OBJEXT): sim/$(am__dirstamp) \
 	sim/$(DEPDIR)/$(am__dirstamp)
 sim/serialize.$(OBJEXT): sim/$(am__dirstamp) \
 	sim/$(DEPDIR)/$(am__dirstamp)
-./layers/layer.$(OBJEXT): layers/$(am__dirstamp) \
+./layers/layer_poisson.$(OBJEXT): layers/$(am__dirstamp) \
 	layers/$(DEPDIR)/$(am__dirstamp)
 sim/sim.$(OBJEXT): sim/$(am__dirstamp) sim/$(DEPDIR)/$(am__dirstamp)
 learn/$(am__dirstamp):
@@ -445,6 +446,14 @@ learn/optim.$(OBJEXT): learn/$(am__dirstamp) \
 	learn/$(DEPDIR)/$(am__dirstamp)
 learn/res_stdp.$(OBJEXT): learn/$(am__dirstamp) \
 	learn/$(DEPDIR)/$(am__dirstamp)
+learn/simple_stdp.$(OBJEXT): learn/$(am__dirstamp) \
+	learn/$(DEPDIR)/$(am__dirstamp)
+layers/layer_wta.$(OBJEXT): layers/$(am__dirstamp) \
+	layers/$(DEPDIR)/$(am__dirstamp)
+layers/layer_adapt.$(OBJEXT): layers/$(am__dirstamp) \
+	layers/$(DEPDIR)/$(am__dirstamp)
+layers/layer_wtaadapt.$(OBJEXT): layers/$(am__dirstamp) \
+	layers/$(DEPDIR)/$(am__dirstamp)
 
 $(top_builddir)/bin/snn_sim$(EXEEXT): $(__top_builddir__bin_snn_sim_OBJECTS) $(__top_builddir__bin_snn_sim_DEPENDENCIES) $(EXTRA___top_builddir__bin_snn_sim_DEPENDENCIES) $(top_builddir)/bin/$(am__dirstamp)
 	@rm -f $(top_builddir)/bin/snn_sim$(EXEEXT)
@@ -471,12 +480,16 @@ include ./$(DEPDIR)/snn_calc.Po
 include ./$(DEPDIR)/snn_postproc.Po
 include ./$(DEPDIR)/snn_prep.Po
 include ./$(DEPDIR)/snn_sim.Po
-include ./layers/$(DEPDIR)/layer.Po
+include ./layers/$(DEPDIR)/layer_poisson.Po
 include ./util/$(DEPDIR)/ini.Po
 include ./util/$(DEPDIR)/util_dlink_list.Po
 include layers/$(DEPDIR)/adex.Po
+include layers/$(DEPDIR)/layer_adapt.Po
+include layers/$(DEPDIR)/layer_wta.Po
+include layers/$(DEPDIR)/layer_wtaadapt.Po
 include learn/$(DEPDIR)/optim.Po
 include learn/$(DEPDIR)/res_stdp.Po
+include learn/$(DEPDIR)/simple_stdp.Po
 include prep/$(DEPDIR)/prepare_ts.Po
 include sim/$(DEPDIR)/configure.Po
 include sim/$(DEPDIR)/netsim.Po

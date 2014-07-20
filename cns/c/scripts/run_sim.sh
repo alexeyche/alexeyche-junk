@@ -104,7 +104,7 @@ for EP in $EPOCHS; do
     MODEL_FILE=$WORK_DIR/${EPOCH_SFX}model.bin
     STAT_OPT=
     if [ "$STAT_SAVE" == "yes" ]; then
-        STAT_OPT="-s $WORK_DIR/${EPOCH_SFX}stat.bin"
+        STAT_OPT="-s $WORK_DIR/${EPOCH_SFX}stat.bin --stat-level 2"
     elif [[ "$REINFORCEMENT" =~ "true" ]]; then
         STAT_OPT="--stat-level 1 -s $WORK_DIR/${EPOCH_SFX}stat.bin"
     fi    

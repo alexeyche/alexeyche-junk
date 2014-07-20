@@ -2,7 +2,7 @@
 #define LEARN_H
 
 
-#define LEARN_ACT_TOL 0.001 // value of synapse needed to delete 
+#define LEARN_ACT_TOL 0.00001 // value of synapse needed to delete 
 
 #define RATE_NORM PRESYNAPTIC
 
@@ -15,12 +15,12 @@
 #include <util/matrix.h>
 #include <util/io.h>
 
-struct Layer;
+struct LayerPoisson;
 struct SynSpike;
 struct SimContext;
 
 struct learn_t {
-    struct Layer *l;
+    struct LayerPoisson *l;
     
     void (*toStartValues)(struct learn_t *);
     void (*propagateSynSpike)(struct learn_t *, const size_t *, const struct SynSpike *, const Constants *);
@@ -33,7 +33,7 @@ struct learn_t {
 typedef struct learn_t learn_t;
 
 struct learn_serial_t {
-    struct Layer *l;
+    struct LayerPoisson *l;
 };
 typedef struct learn_serial_t learn_serial_t;
 

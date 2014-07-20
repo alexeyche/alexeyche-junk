@@ -8,8 +8,13 @@
 #include <util/util_vector.h>
 #include <util/ini.h>
 
-typedef enum { ENull, EOptimalSTDP, EResourceSTDP } learning_rule_t;
-typedef enum { EPoissonLayer } neuron_layer_t;
+typedef enum { ENull, EOptimalSTDP, EResourceSTDP, ESimpleSTDP } learning_rule_t;
+typedef enum { EPoissonLayer, EWtaLayer, EAdaptLayer, EWtaAdaptLayer } neuron_layer_t;
+typedef enum { EExpHennequin, ELinToyoizumi, EExpBohte, EExp } prob_fun_t;
+
+#ifndef max
+    #define max( a, b ) ( ((a) > (b)) ? (a) : (b) )
+#endif
 
 typedef struct {
     double C;
@@ -21,6 +26,12 @@ typedef struct {
     double a;
     double b;
 } AdExConstants;
+
+
+typedef struct {
+    double max_freq;
+    double __max_freq;
+} WtaConstants;
 
 typedef struct {
     bool pacemaker_on;
@@ -35,6 +46,7 @@ typedef struct {
     double tau_plus;
     double tau_minus;
     double tau_res;
+    double __Aplus_max_Amin;
 } ResourceSTDPConstants;
 
 typedef struct {
@@ -48,6 +60,7 @@ typedef struct {
     size_t N;
     learning_rule_t learning_rule;
     neuron_layer_t neuron_type;
+    prob_fun_t prob_fun;
     bool learn;
     bool determ;
     double net_edge_prob;
@@ -128,6 +141,7 @@ typedef struct {
     double tel;
     double trew;
     PacemakerConstants *pacemaker;
+    WtaConstants *wta;
 } Constants;
 
 // cat ./snn_sim/constants.c | grep -E "^[-a-zA-Z_*]+ " | sed -e 's/[ ]*{/;/g'

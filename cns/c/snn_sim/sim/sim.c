@@ -21,7 +21,7 @@ Sim* createSim(size_t nthreads, unsigned char stat_level, Constants *c) {
 }
 
 
-void appendLayerSim(Sim *s, Layer *l) {
+void appendLayerSim(Sim *s, LayerPoisson *l) {
     TEMPLATE(insertVector,pLayer)(s->layers, l);
     l->id = s->layers->size - 1;
 }
@@ -40,7 +40,7 @@ void deleteSim(Sim *s) {
 
 size_t getLayerIdOfNeuron(Sim *s, size_t n_id) {
     for(size_t li=0; li<s->layers->size; li++) {
-        Layer *l = s->layers->array[li];
+        LayerPoisson *l = s->layers->array[li];
         assert(l->N);
         if((l->ids[0] <= n_id) && (l->ids[l->N-1] >= n_id)) {
             return(l->id);
@@ -133,81 +133,67 @@ void* simRunRoutine(void *args) {
     const Constants *c = ctx->c; 
     SimImpl* impl = s->impl;
 
+    bool need_second_step = false;
     for(double t=0; t< s->rt->Tmax; t+=c->dt) {
 //        printf("t: %f\n",ctx->t);
         for(size_t na_i=sw->first; na_i<sw->last; na_i++) {
-            simulateNeuron(s, &impl->na[na_i].layer_id, &impl->na[na_i].n_id, &t);
-        }
-        //bool we_did_reset = false;
-        //if(s->rt->reset_timeline->size > s->rt->timeline_iter) {
-        //    if(s->rt->reset_timeline->array[ s->rt->timeline_iter ] <= t) {
-        //        we_did_reset = true;
-        //        for(size_t na_i=first; na_i<last; na_i++) {
-        //            SRMLayer *l = s->layers->array[s->na[na_i].layer_id];
-        //            resetSRMLayerNeuron(l, &s->na[na_i].n_id);
-        //        }
+            const size_t *layer_id = &impl->na[na_i].layer_id;
+            const size_t *n_id = &impl->na[na_i].n_id;
 
-        //    }
-        //}
+            LayerPoisson *l = s->layers->array[*layer_id];
+
+            const SynSpike *sp;
+            while( (sp = getInputSpike(s, layer_id, n_id, &t)) != NULL) {
+        //        printf("got input spike on %zu:%zu at %f in syn %zu (%f)\n", *layer_id, *n_id, t, sp->syn_id, sp->t);
+                l->propagateSpike(l, n_id, sp, s->ctx);
+            }
+
+            l->calculateProbability(l, n_id, s->ctx);
+
+            if( (getLC(l,c)->neuron_type != EWtaLayer) && (getLC(l,c)->neuron_type != EWtaAdaptLayer)) {
+                l->calculateSpike(l, n_id, s->ctx);
+                l->calculateDynamics(l, n_id, s->ctx);
+                if(l->fired[*n_id] == 1) {
+                    propagateSpikeNetSim(s, l, &l->ids[*n_id], t);
+                    l->fired[*n_id] = 0;
+                }
+            } else {
+                need_second_step = true;
+            }
+        }
         pthread_barrier_wait( &barrier );
-        //if(we_did_reset) {
-        //    if(sw->thread_id == 0) {
-        //        ++s->rt->timeline_iter;
-        //    }
-        //    pthread_barrier_wait( &barrier );
-        //}
-//        if(c->reinforcement) { 
-//            if(sw->thread_id == 0) {
-//                double B_acc = 0;
-//
-//                for(size_t ni=0; ni < s->layers->array[ s->layers->size-1]->N; ni++) {
-//                    if( c->learning_rule == EOptimalSTDP) {
-//                        B_acc += ((TOptimalSTDP*) (s->layers->array[ s->layers->size-1 ]->ls_t))->B[ni];
-//                        ((TOptimalSTDP*) (s->layers->array[ s->layers->size-1 ]->ls_t))->B[ni] = 0;
-//                    } else
-//                    if( c->learning_rule == EResourceSTDP) {
-//                        B_acc += ((TResourceSTDP*) (s->layers->array[ s->layers->size-1 ]->ls_t))->reward[ni];
-//                        ((TResourceSTDP*) (s->layers->array[ s->layers->size-1 ]->ls_t))->reward[ni] = 0;
-//                    } 
-//                }
-//                ctx->global_reward = B_acc/s->layers->array[ s->layers->size-1]->N;
-//                ctx->mean_global_reward += ctx->global_reward;
-//
-//                ctx->mean_global_reward -= ctx->mean_global_reward/c->trew;
-//                if((ctx->stat_level > 0)&&(B_acc != 0)) {
-//                    TEMPLATE(insertVector,double)(ctx->stat_global_reward, B_acc);
-//                }
-//            }
-//            pthread_barrier_wait( &barrier );
-//        }
+
+        if(need_second_step) {
+            for(size_t na_i=sw->first; na_i<sw->last; na_i++) {
+                const size_t *layer_id = &impl->na[na_i].layer_id;
+                const size_t *n_id = &impl->na[na_i].n_id;
+
+                LayerPoisson *l = s->layers->array[*layer_id];
+
+                l->calculateSpike(l, n_id, s->ctx);
+            }
+            pthread_barrier_wait( &barrier );
+            for(size_t na_i=sw->first; na_i<sw->last; na_i++) {
+                const size_t *layer_id = &impl->na[na_i].layer_id;
+                const size_t *n_id = &impl->na[na_i].n_id;
+
+                LayerPoisson *l = s->layers->array[*layer_id];
+
+                l->calculateDynamics(l, n_id, s->ctx);
+                if(l->fired[*n_id] == 1) {
+                    propagateSpikeNetSim(s, l, &l->ids[*n_id], t);
+                    l->fired[*n_id] = 0;
+                }
+            }
+            pthread_barrier_wait( &barrier );
+        }
     }
     return(NULL);
 }
 
 void simulateNeuron(Sim *s, const size_t *layer_id, const size_t *n_id, const double *t) {
-    const SynSpike *sp;
     const Constants *c = s->ctx->c;
-    Layer *l = s->layers->array[*layer_id];
 
-    while( (sp = getInputSpike(s, layer_id, n_id, t)) != NULL) {
-//        printf("got input spike on %zu:%zu at %f in syn %zu (%f)\n", *layer_id, *n_id, t, sp->syn_id, sp->t);
-        l->propagateSpike(l, n_id, sp, s->ctx);
-    }
-    l->calculateMembranePotentials(l, n_id, s->ctx);
-
-    // pacemaker
-    if((l->id == 0)&&(c->pacemaker->pacemaker_on)) {
-        double u_p = c->pacemaker->amplitude + c->pacemaker->amplitude * sin(2*PI*c->pacemaker->frequency * *t/1000 - l->ids[*n_id] * c->pacemaker->cumulative_period_delta/1000);
-        l->u[*n_id] += u_p;
-    }
-
-    l->calculateSpike(l, n_id, s->ctx);
-    l->calculateDynamics(l, n_id, s->ctx);
-
-    if(l->fired[*n_id] == 1) {
-        propagateSpikeNetSim(s, l, &l->ids[*n_id], *t);
-        l->fired[*n_id] = 0;
-    }
 }
 
 

@@ -97,7 +97,7 @@ void propagateInputSpikesNetSim(Sim *s, SpikesList *sl) {
     
     for(size_t ni=0; ni< sl->size; ni++) {
         for(size_t con_i=0; con_i < ns->conn_map[ni]->size; con_i++) {
-            Layer *l = s->layers->array[ ns->conn_map[ni]->array[con_i].l_id ];
+            LayerPoisson *l = s->layers->array[ ns->conn_map[ni]->array[con_i].l_id ];
             
             for(size_t sp_i=0; sp_i < sl->list[ni]->size; sp_i++) {
                 SynSpike sp;
@@ -155,7 +155,7 @@ void printInputSpikesQueue(NetSim *ns) {
 #define SORT_LIM 10
 #define MINIMAL_DELAY 1
 
-void propagateSpikeNetSim(Sim *s, Layer *l, const size_t *ni, double t) {
+void propagateSpikeNetSim(Sim *s, LayerPoisson *l, const size_t *ni, double t) {
     NetSim *ns = s->ns;
     TEMPLATE(insertVector,double)(ns->net->list[*ni], t);
     double ax_delay = l->axon_del[getLocalNeuronId(l, ni)];
@@ -165,7 +165,7 @@ void propagateSpikeNetSim(Sim *s, Layer *l, const size_t *ni, double t) {
         sp.n_id = *ni;
         sp.syn_id = ns->conn_map[*ni]->array[con_i].syn_id;
 
-        Layer *l_cons = s->layers->array[ ns->conn_map[*ni]->array[con_i].l_id ];
+        LayerPoisson *l_cons = s->layers->array[ ns->conn_map[*ni]->array[con_i].l_id ];
         sp.t = t + MINIMAL_DELAY + ax_delay + getSynDelay(l_cons, &ns->conn_map[*ni]->array[con_i].n_id,  &sp.syn_id);
         
         size_t naffect = getGlobalId(l_cons, &ns->conn_map[*ni]->array[con_i].n_id);

@@ -1,10 +1,11 @@
 
 
 #include "res_stdp.h"
-#include <layers/layer.h>
+#include <layers/layer_poisson.h>
 #include <sim/sim.h>
+#include <neuron_funcs.h>
 
-TResourceSTDP* init_TResourceSTDP(struct Layer *l) {
+TResourceSTDP* init_TResourceSTDP(struct LayerPoisson *l) {
     TResourceSTDP *ls = (TResourceSTDP*) malloc( sizeof(TResourceSTDP) );    
     ls->base.l = l;
     ls->learn_syn_ids = (indLList**) malloc( l->N*sizeof(indLList*));
@@ -36,13 +37,15 @@ TResourceSTDP* init_TResourceSTDP(struct Layer *l) {
     ls->base.trainWeightsStep = &trainWeightsStep_TResourceSTDP;
     ls->base.resetValues = &resetValues_TResourceSTDP;
     ls->base.free = &free_TResourceSTDP;
+    ls->base.serialize = &serialize_TResourceSTDP;
+    ls->base.deserialize = &deserialize_TResourceSTDP;
 
     return(ls);
 }
 
 void toStartValues_TResourceSTDP(learn_t *ls_t) {
     TResourceSTDP *ls = (TResourceSTDP*)ls_t;
-    Layer *l = ls->base.l;
+    LayerPoisson *l = ls->base.l;
     for(size_t ni=0; ni<l->N; ni++) {
         ls->y_tr[ni] = 0;
         ls->res[ni] = 1;
@@ -69,8 +72,30 @@ double fastsqrt(double val) {
     return *(double *)&tmp;
 }
 
+
+float fastsqrt2(float x) {
+   return( 1+ (x-1)/2. - (1./8)*(x-1)*(x-1) - (1/16.)*(x-1)*(x-1)*(x-1) - (5/128.)*(x-1)*(x-1)*(x-1)*(x-1));
+}
+
+float Q_rsqrt( float number )
+{
+    long i;
+    float x2, y;
+    const float threehalfs = 1.5F;
+ 
+    x2 = number * 0.5F;
+    y  = number;
+    i  = * ( long * ) &y;                       // evil floating point bit level hacking
+    i  = 0x5f3759df - ( i >> 1 );               // what the fuck?
+    y  = * ( float * ) &i;
+    y  = y * ( threehalfs - ( x2 * y * y ) );   // 1st iteration
+//      y  = y * ( threehalfs - ( x2 * y * y ) );   // 2nd iteration, this can be removed
+ 
+    return 1.0/y;
+}
+
 void consumeResource(double *res, const double *dw, const Constants *c) {
-    double dr = sqrt(fabs(*dw)/max(c->res_stdp->Aplus, c->res_stdp->Aminus));
+    double dr = Q_rsqrt(fabs(*dw)*c->res_stdp->__Aplus_max_Amin);
     *res -= dr; 
     if(*res<0) {
         *res = 0;
@@ -79,7 +104,7 @@ void consumeResource(double *res, const double *dw, const Constants *c) {
 
 void trainWeightsStep_TResourceSTDP(learn_t *ls_t, const double *u, const double *p, const double *M, const size_t *ni, const SimContext *s) {
     TResourceSTDP *ls = (TResourceSTDP*)ls_t;
-    Layer *l = ls->base.l;
+    LayerPoisson *l = ls->base.l;
     const Constants *c = s->c; 
 
     if(l->fired[*ni] == 1) {
@@ -126,7 +151,7 @@ void trainWeightsStep_TResourceSTDP(learn_t *ls_t, const double *u, const double
 
 void resetValues_TResourceSTDP(learn_t *ls_t, const size_t *ni) {
     TResourceSTDP *ls = (TResourceSTDP*)ls_t;
-    Layer *l = ls->base.l;
+    LayerPoisson *l = ls->base.l;
     ls->y_tr[*ni] = 0;
     ls->res[*ni] = 1;
     for(size_t con_i=0; con_i<l->nconn[*ni]; con_i++) {
@@ -141,7 +166,7 @@ void resetValues_TResourceSTDP(learn_t *ls_t, const size_t *ni) {
 }
 void free_TResourceSTDP(learn_t *ls_t) {
     TResourceSTDP* ls = (TResourceSTDP*)ls_t;
-    Layer *l = ls->base.l;
+    LayerPoisson *l = ls->base.l;
     for(size_t ni=0; ni < l->N; ni++) {
         if(l->nconn[ni]>0) {
             free(ls->x_tr[ni]);
@@ -166,4 +191,8 @@ void free_TResourceSTDP(learn_t *ls_t) {
     free(ls->x_tr);
 }
 
+void serialize_TResourceSTDP(learn_t *ls_t, FileStream *file, const Constants *c) {
+}
+void deserialize_TResourceSTDP(learn_t *ls_t, FileStream *file, const Constants *c) {
+}
 

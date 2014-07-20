@@ -1,0 +1,30 @@
+#ifndef LAYER_{{NAME}}_H
+#define LAYER_{{NAME}}_H
+
+#include <layers/layer_{{superclassname}}.h>
+
+
+typedef struct {
+    Layer{{SuperClassName}} base;
+
+} Layer{{Name}};
+
+Layer{{Name}}* create{{Name}}Layer(size_t N, size_t *glob_idx, unsigned char statLevel);
+
+// methods sim
+void calculateProbability_{{Name}}(Layer{{BaseClassName}} *l, const size_t *ni, const struct SimContext *s);
+void calculateSpike_{{Name}}(Layer{{BaseClassName}} *l, const size_t *ni, const struct SimContext *s);
+void calculateDynamics_{{Name}}(Layer{{BaseClassName}} *l, const size_t *ni, const struct SimContext *s);
+void propagateSpike_{{Name}}(Layer{{BaseClassName}} *l, const size_t *ni, const SynSpike *sp, const struct SimContext *s);
+
+// methods common
+void toStartValues_{{Name}}(Layer{{BaseClassName}} *l, const Constants *c);
+void allocSynData_{{Name}}(Layer{{BaseClassName}} *l);
+void deallocSynData_{{Name}}(Layer{{BaseClassName}} *l);
+void printLayer_{{Name}}(Layer{{BaseClassName}} *l);
+void deleteLayer_{{Name}}(Layer{{BaseClassName}} *l);
+void configureLayer_{{Name}}(Layer{{BaseClassName}} *l, const indVector *inputIDs, const indVector *outputIDs, const Constants *c);
+void serializeLayer_{{Name}}(Layer{{BaseClassName}} *l, FileStream *file, const Constants *c);
+void deserializeLayer_{{Name}}(Layer{{BaseClassName}} *l, FileStream *file, const Constants *c);
+
+#endif    
