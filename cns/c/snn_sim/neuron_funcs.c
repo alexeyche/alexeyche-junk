@@ -39,6 +39,42 @@ double fast_exp (double x)
    return cvt.f;
  }
 
+inline double probf( const double *u, const Constants *c) {
+#if PROB_FUNC == LINEAR 
+    double p = (c->pr + (*u - c->u_rest)*c->gain_factor)/c->sim_dim;
+    if(p < c->pr/c->sim_dim) return(c->pr/c->sim_dim);
+#elif PROB_FUNC == EXP
+    if( *u  <= c->u_rest ) return(c->__pr);    
+    double p = ( (c->pr + (c->beta/c->alpha) * (log(1 + exp( c->alpha*(c->u_tr - *u))) - c->alpha * (c->u_tr - *u)))/c->sim_dim );
+#elif PROB_FUNC == EXP2
+    if( *u  <= c->u_rest ) return(c->__pr);    
+    double p = (c->pr + c->r0 * log(1 + exp( c->beta*(*u - c->u_tr) )))/c->sim_dim;
+    if(p>1) return(1);
+    return(p);
+#elif PROB_FUNC == SIMP_EXP
+    return( exp(*u) );
+#endif
+}
+
+
+inline double pstroke(const double *u, const Constants *c) {
+#if PROB_FUNC == LINEAR 
+    return( c->gain_factor / c->sim_dim );
+#elif PROB_FUNC == EXP
+    return( (c->beta/(1+exp(c->alpha*(c->u_tr - *u))))/c->sim_dim );
+#elif PROB_FUNC == EXP2
+//    printf("%3.10f\n", c->beta*(*u - c->u_tr));
+//    double part = exp_cached(c->beta*(*u - c->u_tr), &old_arg, &old_result);
+    double part = exp(c->beta*(*u - c->u_tr));
+//    double part = exp(c->beta*(*u - c->u_tr));
+
+    return( ( (part*c->r0*c->beta) / ( 1+part))/c->sim_dim );
+#elif PROB_FUNC == SIMP_EXP
+    return( exp(*u) );
+#endif
+}
+
+// new versions:
 double prob_fun_Exp( const double *u, const Constants *c) {
     return( exp(*u) );
 }
@@ -78,55 +114,6 @@ double prob_fun_stroke_LinToyoizumi( const double *u, const Constants *c) {
     return( c->gain_factor / c->sim_dim );
 }
 
-inline double probf( const double *u, const Constants *c) {
-#if PROB_FUNC == LINEAR 
-    double p = (c->pr + (*u - c->u_rest)*c->gain_factor)/c->sim_dim;
-    if(p < c->pr/c->sim_dim) return(c->pr/c->sim_dim);
-#elif PROB_FUNC == EXP
-    if( *u  <= c->u_rest ) return(c->__pr);    
-    double p = ( (c->pr + (c->beta/c->alpha) * (log(1 + exp( c->alpha*(c->u_tr - *u))) - c->alpha * (c->u_tr - *u)))/c->sim_dim );
-#elif PROB_FUNC == EXP2
-    if( *u  <= c->u_rest ) return(c->__pr);    
-    double p = (c->pr + c->r0 * log(1 + exp( c->beta*(*u - c->u_tr) )))/c->sim_dim;
-    if(p>1) return(1);
-    return(p);
-#elif PROB_FUNC == SIMP_EXP
-    return( exp(*u) );
-#endif
-}
-
-
-inline double pstroke(const double *u, const Constants *c) {
-#if PROB_FUNC == LINEAR 
-    return( c->gain_factor / c->sim_dim );
-#elif PROB_FUNC == EXP
-    return( (c->beta/(1+exp(c->alpha*(c->u_tr - *u))))/c->sim_dim );
-#elif PROB_FUNC == EXP2
-//    printf("%3.10f\n", c->beta*(*u - c->u_tr));
-//    double part = exp_cached(c->beta*(*u - c->u_tr), &old_arg, &old_result);
-    double part = exp(c->beta*(*u - c->u_tr));
-//    double part = exp(c->beta*(*u - c->u_tr));
-
-    return( ( (part*c->r0*c->beta) / ( 1+part))/c->sim_dim );
-#elif PROB_FUNC == SIMP_EXP
-    return( exp(*u) );
-#endif
-}
-
-
-double B_calc(const unsigned char *Yspike, const double *p, const double *pmean, const Constants *c) {
-    if( fabs(*pmean - 0.0) < 0.0000001 ) return(0);
-    double pmean_w = *pmean/c->mean_p_dur;
-//    printf("pmean_w %f, 1part: %f, 2part: %f\n", pmean_w, ( *Yspike * log( *p/pmean_w) - (*p - pmean_w)), c->target_rate_factor * ( *Yspike * log( pmean_w/c->__target_rate) - (pmean_w - c->__target_rate) ));
-    return (( *Yspike * log( *p/pmean_w) - (*p - pmean_w)) - c->target_rate_factor * ( *Yspike * log( pmean_w/c->__target_rate) - (pmean_w - c->__target_rate) ));
-
-}
-
-
-double C_calc(const unsigned char *Yspike, const double *p, const double *p_stroke, const double *u, const double *denominator_p, const double *syn, const Constants *c) {
-    double pstr = pstroke(u, c);
-    return ( (*p_stroke)/(*p/ *denominator_p) ) * ( *Yspike - *p ) * (*syn);
-}
 
 double bound_grad(const double *w, const double *dw, const double *wmax, const Constants *c) {
 #if WEIGHT_BOUND == B_SOFT   

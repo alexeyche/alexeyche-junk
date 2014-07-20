@@ -61,6 +61,19 @@ void propagateSynSpike_OptimalSTDP(learn_t *ls_t, const size_t *ni, const SynSpi
     }
 }
 
+double B_calc(const unsigned char *Yspike, const double *p, const double *pmean, const Constants *c) {
+    if( fabs(*pmean - 0.0) < 0.0000001 ) return(0);
+    double pmean_w = *pmean/c->mean_p_dur;
+//    printf("pmean_w %f, 1part: %f, 2part: %f\n", pmean_w, ( *Yspike * log( *p/pmean_w) - (*p - pmean_w)), c->target_rate_factor * ( *Yspike * log( pmean_w/c->__target_rate) - (pmean_w - c->__target_rate) ));
+    return (( *Yspike * log( *p/pmean_w) - (*p - pmean_w)) - c->target_rate_factor * ( *Yspike * log( pmean_w/c->__target_rate) - (pmean_w - c->__target_rate) ));
+
+}
+
+
+double C_calc(const unsigned char *Yspike, const double *p, const double *p_stroke, const double *u, const double *denominator_p, const double *syn, const Constants *c) {
+    return ( (*p_stroke)/(*p/ *denominator_p) ) * ( *Yspike - *p ) * (*syn);
+}
+
 void trainWeightsStep_OptimalSTDP(learn_t *ls_t, const double *u, const double *p, const double *M, const size_t *ni, const SimContext *s) {
     OptimalSTDP *ls = (OptimalSTDP*)ls_t;
     LayerPoisson *l = ls->base.l; 
