@@ -66,64 +66,13 @@ int main(int argc, char **argv) {
 
     if(statLevel > 0) {
         checkIdxFnameOfFile(a.stat_file);
-        pMatrixVector *mv = TEMPLATE(createVector,pMatrix)();
-        if((c->reinforcement)&&(!a.calcStat)) {
-            Matrix *m_stat_glob_rew = vectorArrayToMatrix(&s->ctx->stat_global_reward, 1);
-            TEMPLATE(insertVector,pMatrix)(mv, m_stat_glob_rew);
-        }
+        FileStream *fs = createOutputFileStream(a.stat_file);
+
         for(size_t li=0; li < s->layers->size; li++) {
             LayerPoisson *l = s->layers->array[li];
-            if(a.calcStat) {
-                indVector *active_neurons = TEMPLATE(createVector,ind)();
-                for(size_t ni=0; ni<l->N; ni++) {
-                    TEMPLATE(insertVector,ind)(active_neurons, ni);
-                }
-                assert(l->N > 0);
-                Matrix *mp = createMatrix(active_neurons->size, l->stat->stat_p[0]->size);
-                Matrix *mf = createMatrix(active_neurons->size, l->stat->stat_fired[0]->size);
-                assert(mp->ncol == mf->ncol);
-                for(size_t ni=0; ni < active_neurons->size; ni++) {
-                    for(size_t el_i=0; el_i < mp->ncol; el_i++) {
-                        setMatrixElement(mp, ni, el_i, l->stat->stat_p[ active_neurons->array[ni] ]->array[ el_i] );
-                        setMatrixElement(mf, ni, el_i, l->stat->stat_fired[ active_neurons->array[ni] ]->array[ el_i] );
-                    }
-                }
-                TEMPLATE(insertVector,pMatrix)(mv, mp);
-                TEMPLATE(insertVector,pMatrix)(mv, mf);
-                Matrix *m_patt_classes = vectorArrayToMatrix(&s->rt->pattern_classes, 1);
-                TEMPLATE(insertVector,pMatrix)(mv, m_patt_classes);
-            } else {
-                Matrix *mp = vectorArrayToMatrix(l->stat->stat_p, l->N);
-                TEMPLATE(insertVector,pMatrix)(mv, mp);
-            }
-            if(statLevel > 1) {
-                Matrix *mu = vectorArrayToMatrix(l->stat->stat_u, l->N);
-                TEMPLATE(insertVector,pMatrix)(mv, mu);
-                
-                for(size_t ni=0; ni < l->N; ni++) {
-                    Matrix *mSyn = vectorArrayToMatrix(l->stat->stat_syn[ni], l->nconn[ni]);
-                    TEMPLATE(insertVector,pMatrix)(mv, mSyn);
-                }
-                for(size_t ni=0; ni < l->N; ni++) {
-                    Matrix *mdW = vectorArrayToMatrix(l->stat->stat_W[ni], l->nconn[ni]);
-                    TEMPLATE(insertVector,pMatrix)(mv, mdW);
-                }
-                if(l->ls_t) {
-                    OptimalSTDP *ls = (OptimalSTDP*)l->ls_t;
-                    Matrix *mB = vectorArrayToMatrix(ls->stat_B, l->N);
-
-                    TEMPLATE(insertVector,pMatrix)(mv, mB);
-                    for(size_t ni=0; ni < l->N; ni++) {
-                        Matrix *mC = vectorArrayToMatrix(ls->stat_C[ni], l->nconn[ni]);
-                        TEMPLATE(insertVector,pMatrix)(mv, mC);
-                    }
-                }                    
-            }
+            l->saveStat(l, fs);
         }            
-     
-        saveMatrixListToFile(a.stat_file, mv);
-            
-        TEMPLATE(deleteVector,pMatrix)(mv);
+        deleteFileStream(fs);
     }
     char *model_to_save = NULL;
     if(a.model_file) model_to_save = strdup(a.model_file);
@@ -135,14 +84,9 @@ int main(int argc, char **argv) {
     if(a.output_spikes_file) {
         pMatrixVector *mv = TEMPLATE(createVector,pMatrix)();
         
-        Matrix *spikes = vectorArrayToMatrix(s->ns->net->list, s->ns->net->size);
-        TEMPLATE(insertVector,pMatrix)(mv, spikes);
-        
-        Matrix *timeline = vectorArrayToMatrix(&s->rt->reset_timeline, 1);
-        TEMPLATE(insertVector,pMatrix)(mv, timeline);
-
-        Matrix *classes  = vectorArrayToMatrix(&s->rt->pattern_classes, 1);
-        TEMPLATE(insertVector,pMatrix)(mv, classes);
+        TEMPLATE(insertVector,pMatrix)(mv, vectorArrayToMatrix(s->ns->net->list, s->ns->net->size));
+        TEMPLATE(insertVector,pMatrix)(mv, vectorArrayToMatrix(&s->rt->reset_timeline, 1));
+        TEMPLATE(insertVector,pMatrix)(mv, vectorArrayToMatrix(&s->rt->pattern_classes, 1));
 
         checkIdxFnameOfFile(a.output_spikes_file);
         saveMatrixListToFile(a.output_spikes_file, mv);

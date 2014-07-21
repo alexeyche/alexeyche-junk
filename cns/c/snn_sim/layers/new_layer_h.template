@@ -1,7 +1,7 @@
-#ifndef LAYER_{{NAME}}_H
-#define LAYER_{{NAME}}_H
+#ifndef {{NAME}}_H
+#define {{NAME}}_H
 
-#include <layers/layer_{{superclassname}}.h>
+#include <layers/{{superclassname}}.h>
 
 
 typedef struct {
@@ -26,5 +26,6 @@ void deleteLayer_{{Name}}(Layer{{BaseClassName}} *l);
 void configureLayer_{{Name}}(Layer{{BaseClassName}} *l, const indVector *inputIDs, const indVector *outputIDs, const Constants *c);
 void serializeLayer_{{Name}}(Layer{{BaseClassName}} *l, FileStream *file, const Constants *c);
 void deserializeLayer_{{Name}}(Layer{{BaseClassName}} *l, FileStream *file, const Constants *c);
+void saveStat_{{Name}}(Layer{{BaseClassName}} *l, FileStream *file);
 
 #endif    

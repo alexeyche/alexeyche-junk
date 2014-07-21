@@ -1,7 +1,7 @@
 
 
 #include "res_stdp.h"
-#include <layers/layer_poisson.h>
+#include <layers/poisson.h>
 #include <sim/sim.h>
 #include <neuron_funcs.h>
 

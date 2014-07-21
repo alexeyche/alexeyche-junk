@@ -92,6 +92,7 @@ struct LayerPoisson {
     void (*printLayer)(struct LayerPoisson *l); 
     void (*serializeLayer)(struct LayerPoisson *l, FileStream *file, const Constants *c); 
     void (*deserializeLayer)(struct LayerPoisson *l, FileStream *file, const Constants *c); 
+    void (*saveStat)(struct LayerPoisson *l, FileStream *file);
 
     double (*prob_fun)(const double *u, const Constants *c);
     double (*prob_fun_stroke)(const double *u, const Constants *c);
@@ -120,6 +121,8 @@ void deleteLayer_Poisson(LayerPoisson *l);
 void configureLayer_Poisson(LayerPoisson *l, const indVector *inputIDs, const indVector *outputIDs, const Constants *c);
 void serializeLayer_Poisson(LayerPoisson *l, FileStream *file, const Constants *c);
 void deserializeLayer_Poisson(LayerPoisson *l, FileStream *file, const Constants *c);
+void saveStat_Poisson(LayerPoisson *l, FileStream *file);
+
 // common procedures
 size_t getLocalNeuronId(LayerPoisson *l, const size_t *glob_id);
 const size_t getGlobalId(LayerPoisson *l, const size_t *ni);

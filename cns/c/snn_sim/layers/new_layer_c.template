@@ -1,5 +1,5 @@
 
-#include "layer_{{name}}.h"
+#include "{{name}}.h"
 #
 #include <sim/sim.h>
 
@@ -20,6 +20,7 @@ Layer{{Name}}* create{{Name}}Layer(size_t N, size_t *glob_idx, unsigned char sta
     lbase->printLayer = &printLayer_{{Name}};
     lbase->serializeLayer = &serializeLayer_{{Name}};
     lbase->deserializeLayer= &deserializeLayer_{{Name}};
+    lbase->saveStat = &saveStat_{{Name}};
 
     return(l);
 }
@@ -99,4 +100,9 @@ void deserializeLayer_{{Name}}(Layer{{BaseClassName}} *l, FileStream *file, cons
 
 }
 
+void saveStat_{{Name}}(Layer{{BaseClassName}} *l, FileStream *file) {
+    Layer{{Name}}* linh = (Layer{{Name}}*) l;
+    saveStat_{{SuperClassName}}(l, file, c);
+
+}
 

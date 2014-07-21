@@ -29,6 +29,7 @@ struct learn_t {
     void (*free)(struct learn_t *);
     void (*serialize)(struct learn_t*, FileStream *file, const Constants *c);
     void (*deserialize)(struct learn_t*, FileStream *file, const Constants *c);
+    void (*saveStat)(struct learn_t*, FileStream *file);
 };
 typedef struct learn_t learn_t;
 

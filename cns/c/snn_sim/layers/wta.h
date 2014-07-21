@@ -4,7 +4,7 @@
 #include <pthread.h>
 
 
-#include <layers/layer_poisson.h>
+#include <layers/poisson.h>
 
 
 typedef struct {
@@ -33,5 +33,6 @@ void deleteLayer_Wta(LayerPoisson *l);
 void configureLayer_Wta(LayerPoisson *l, const indVector *inputIDs, const indVector *outputIDs, const Constants *c);
 void serializeLayer_Wta(LayerPoisson *l, FileStream *file, const Constants *c);
 void deserializeLayer_Wta(LayerPoisson *l, FileStream *file, const Constants *c);
+void saveStat_Wta(LayerPoisson *l, FileStream *file);
 
 #endif    

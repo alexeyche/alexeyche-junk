@@ -71,6 +71,7 @@ LayerPoisson* createPoissonLayer(size_t N, size_t *glob_idx, unsigned char statL
     l->printLayer = &printLayer_Poisson;
     l->serializeLayer = &serializeLayer_Poisson;
     l->deserializeLayer= &deserializeLayer_Poisson;
+    l->saveStat = &saveStat_Poisson;
     return(l);
 }
 
@@ -442,13 +443,11 @@ void deserializeLayer_Poisson(LayerPoisson *l, FileStream *file, const Constants
             double syn_del_ij = getMatrixElement(syn_del, i, j);
             double conn_ij = getMatrixElement(conns, i, j);
             if(conn_ij>0) {
-//                printf("%f.f, ", w_ij);
                 TEMPLATE(insertVector,double)(W_vals[i], w_ij);
                 TEMPLATE(insertVector,double)(syn_del_vals[i], syn_del_ij);
                 TEMPLATE(insertVector,ind)(id_conns_vals[i], j);
             }
         }
-//        printf("\n");
         l->nconn[i] = W_vals[i]->size;
         if(getMatrixElement(nt, i, 0) == 0) {
             l->nt[i] = EXC;
@@ -544,4 +543,31 @@ void serializeLayer_Poisson(LayerPoisson *l, FileStream *file, const Constants *
         l->ls_t->serialize(l->ls_t, file, c);
     }
 }
+
+void saveStat_Poisson(LayerPoisson *l, FileStream *file) {
+    pMatrixVector *mv = TEMPLATE(createVector,pMatrix)();
+
+    Matrix *mp = vectorArrayToMatrix(l->stat->stat_p, l->N);
+    TEMPLATE(insertVector,pMatrix)(mv, mp);
+    if(l->stat->statLevel> 1) {
+        Matrix *mu = vectorArrayToMatrix(l->stat->stat_u, l->N);
+        TEMPLATE(insertVector,pMatrix)(mv, mu);
+        
+        for(size_t ni=0; ni < l->N; ni++) {
+            Matrix *mSyn = vectorArrayToMatrix(l->stat->stat_syn[ni], l->nconn[ni]);
+            TEMPLATE(insertVector,pMatrix)(mv, mSyn);
+        }
+        for(size_t ni=0; ni < l->N; ni++) {
+            Matrix *mdW = vectorArrayToMatrix(l->stat->stat_W[ni], l->nconn[ni]);
+            TEMPLATE(insertVector,pMatrix)(mv, mdW);
+        }
+        if(l->ls_t) {
+            l->ls_t->saveStat(l->ls_t, file);
+        }
+    }        
+    saveMatrixList(file, mv);
+        
+    TEMPLATE(deleteVector,pMatrix)(mv);
+}
+
 

@@ -109,6 +109,7 @@ double prob_fun_stroke_ExpBohte( const double *u, const Constants *c) {
 double prob_fun_LinToyoizumi( const double *u, const Constants *c) {
     double p = (c->pr + (*u - c->u_rest)*c->gain_factor)/c->sim_dim;
     if(p < c->pr/c->sim_dim) return(c->pr/c->sim_dim);
+    return( p );
 }
 double prob_fun_stroke_LinToyoizumi( const double *u, const Constants *c) {
     return( c->gain_factor / c->sim_dim );

@@ -4,8 +4,8 @@
 #include <stddef.h>
 #include <pthread.h>
 
-#include <layers/layer_poisson.h>
-#include <layers/layer_wta.h>
+#include <layers/poisson.h>
+#include <layers/wta.h>
 #include <constants.h>
 #include <util/spikes_list.h>
 #include <util/matrix.h>

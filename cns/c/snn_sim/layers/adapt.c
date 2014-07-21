@@ -1,6 +1,6 @@
 
-#include "layer_adapt.h"
-#
+#include "adapt.h"
+
 #include <sim/sim.h>
 
 LayerAdapt* createAdaptLayer(size_t N, size_t *glob_idx, unsigned char statLevel) {
@@ -19,6 +19,7 @@ LayerAdapt* createAdaptLayer(size_t N, size_t *glob_idx, unsigned char statLevel
     l->base.printLayer = &printLayer_Adapt;
     l->base.serializeLayer = &serializeLayer_Adapt;
     l->base.deserializeLayer= &deserializeLayer_Adapt;
+    l->base.saveStat= &saveStat_Adapt;
 
     l->ga = (double*) malloc(sizeof(double)*N);
     return(l);
@@ -125,4 +126,8 @@ void deserializeLayer_Adapt(LayerPoisson *l, FileStream *file, const Constants *
     TEMPLATE(deleteVector,pMatrix)(data);
 }
 
+void saveStat_Adapt(LayerPoisson *l, FileStream *file) {
+    LayerAdapt* linh = (LayerAdapt*) l;
+    saveStat_Poisson(l, file);
 
+}

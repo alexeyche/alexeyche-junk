@@ -1,7 +1,7 @@
 #ifndef LAYER_WTAADAPT_H
 #define LAYER_WTAADAPT_H
 
-#include <layers/layer_wta.h>
+#include <layers/wta.h>
 
 
 typedef struct {
@@ -27,5 +27,6 @@ void deleteLayer_WtaAdapt(LayerPoisson *l);
 void configureLayer_WtaAdapt(LayerPoisson *l, const indVector *inputIDs, const indVector *outputIDs, const Constants *c);
 void serializeLayer_WtaAdapt(LayerPoisson *l, FileStream *file, const Constants *c);
 void deserializeLayer_WtaAdapt(LayerPoisson *l, FileStream *file, const Constants *c);
+void saveStat_WtaAdapt(LayerPoisson *l, FileStream *file);
 
 #endif    

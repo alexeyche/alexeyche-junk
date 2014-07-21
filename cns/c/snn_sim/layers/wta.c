@@ -1,5 +1,5 @@
 
-#include "layer_wta.h"
+#include "wta.h"
 
 #include <sim/sim.h>
 
@@ -19,6 +19,7 @@ LayerWta* createWtaLayer(size_t N, size_t *glob_idx, unsigned char statLevel) {
     l->base.printLayer = &printLayer_Wta;
     l->base.serializeLayer = &serializeLayer_Wta;
     l->base.deserializeLayer= &deserializeLayer_Wta;
+    l->base.saveStat= &saveStat_Wta;
 
     l->sum_prob = 0.0;
     l->b = (double*) malloc( sizeof(double) * N );
@@ -132,4 +133,8 @@ void deserializeLayer_Wta(LayerPoisson *l, FileStream *file, const Constants *c)
 //    TEMPLATE(deleteVector,pMatrix)(data);
 }
 
+void saveStat_Wta(LayerPoisson *l, FileStream *file) {
+    LayerWta* linh = (LayerWta*) l;
+    saveStat_Poisson(l, file);
 
+}

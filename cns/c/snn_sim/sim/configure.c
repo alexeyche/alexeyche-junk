@@ -63,13 +63,13 @@ void configureLayersSim(Sim *s, Constants *c) {
             l = createPoissonLayer(lc->N, &neurons_idx, s->ctx->stat_level);
         } else
         if(lc->neuron_type == EWtaLayer) {
-            l = createWtaLayer(lc->N, &neurons_idx, s->ctx->stat_level);
+            l = (LayerPoisson*)createWtaLayer(lc->N, &neurons_idx, s->ctx->stat_level);
         } else 
         if(lc->neuron_type == EAdaptLayer) {
-            l = createAdaptLayer(lc->N, &neurons_idx, s->ctx->stat_level);
+            l = (LayerPoisson*)createAdaptLayer(lc->N, &neurons_idx, s->ctx->stat_level);
         } else 
         if(lc->neuron_type == EWtaAdaptLayer) {
-            l = createWtaAdaptLayer(lc->N, &neurons_idx, s->ctx->stat_level);
+            l = (LayerPoisson*)createWtaAdaptLayer(lc->N, &neurons_idx, s->ctx->stat_level);
         } else 
         {
             exit(1);

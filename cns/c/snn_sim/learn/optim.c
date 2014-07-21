@@ -2,7 +2,7 @@
 
 #include "optim.h"
 
-#include <layers/layer_poisson.h>
+#include <layers/poisson.h>
 #include <sim/sim.h>
 
 OptimalSTDP* init_OptimalSTDP(LayerPoisson *l) {
@@ -39,6 +39,7 @@ OptimalSTDP* init_OptimalSTDP(LayerPoisson *l) {
     ls->base.free = &free_OptimalSTDP;
     ls->base.serialize = &serialize_OptimalSTDP;
     ls->base.deserialize = &deserialize_OptimalSTDP;
+    ls->base.saveStat = &saveStat_OptimalSTDP;
     return(ls);
 }
 
@@ -207,3 +208,19 @@ void deserialize_OptimalSTDP(learn_t *ls_t, FileStream *file, const Constants *c
     TEMPLATE(deleteVector,pMatrix)(data);
 }
 
+void saveStat_OptimalSTDP(learn_t *ls_t, FileStream *file) {
+    OptimalSTDP *ls = (OptimalSTDP*)ls_t;
+    LayerPoisson *l = ls->base.l; 
+    
+    pMatrixVector *mv = TEMPLATE(createVector,pMatrix)();
+    Matrix *mB = vectorArrayToMatrix(ls->stat_B, l->N);
+
+    TEMPLATE(insertVector,pMatrix)(mv, mB);
+    for(size_t ni=0; ni < l->N; ni++) {
+        Matrix *mC = vectorArrayToMatrix(ls->stat_C[ni], l->nconn[ni]);
+        TEMPLATE(insertVector,pMatrix)(mv, mC);
+    }
+    saveMatrixList(file, mv);
+
+    TEMPLATE(deleteVector,pMatrix)(mv);
+}

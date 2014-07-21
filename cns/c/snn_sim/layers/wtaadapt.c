@@ -1,6 +1,6 @@
 
-#include "layer_wtaadapt.h"
-#
+#include "wtaadapt.h"
+
 #include <sim/sim.h>
 
 LayerWtaAdapt* createWtaAdaptLayer(size_t N, size_t *glob_idx, unsigned char statLevel) {
@@ -20,6 +20,7 @@ LayerWtaAdapt* createWtaAdaptLayer(size_t N, size_t *glob_idx, unsigned char sta
     lbase->printLayer = &printLayer_WtaAdapt;
     lbase->serializeLayer = &serializeLayer_WtaAdapt;
     lbase->deserializeLayer= &deserializeLayer_WtaAdapt;
+    lbase->saveStat= &saveStat_WtaAdapt;
 
     l->ga = (double*) malloc(sizeof(double)*N);
     return(l);
@@ -127,4 +128,8 @@ void deserializeLayer_WtaAdapt(LayerPoisson *l, FileStream *file, const Constant
     TEMPLATE(deleteVector,pMatrix)(data);
 }
 
+void saveStat_WtaAdapt(LayerPoisson *l, FileStream *file) {
+    LayerWtaAdapt* linh = (LayerWtaAdapt*) l;
+    saveStat_Wta(l, file);
 
+}
