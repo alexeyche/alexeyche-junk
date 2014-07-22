@@ -59,10 +59,10 @@ am__make_running_with_option = \
   test $$has_opt = yes
 am__make_dryrun = (target_option=n; $(am__make_running_with_option))
 am__make_keepgoing = (target_option=k; $(am__make_running_with_option))
-pkgdatadir = $(datadir)/srm_sim
-pkgincludedir = $(includedir)/srm_sim
-pkglibdir = $(libdir)/srm_sim
-pkglibexecdir = $(libexecdir)/srm_sim
+pkgdatadir = $(datadir)/snn_sim
+pkgincludedir = $(includedir)/snn_sim
+pkglibdir = $(libdir)/snn_sim
+pkglibexecdir = $(libexecdir)/snn_sim
 am__cd = CDPATH="$${ZSH_VERSION+.}$(PATH_SEPARATOR)" && cd
 install_sh_DATA = $(install_sh) -c -m 644
 install_sh_PROGRAM = $(install_sh) -c
@@ -77,7 +77,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 subdir = .
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
-	$(top_srcdir)/configure $(am__configure_deps) compile depcomp \
+	$(top_srcdir)/configure $(am__configure_deps) compile \
 	install-sh missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -199,7 +199,7 @@ CFLAGS = -g -O2
 CPP = gcc -E
 CPPFLAGS = 
 CYGPATH_W = echo
-DEFS = -DPACKAGE_NAME=\"srm_sim\" -DPACKAGE_TARNAME=\"srm_sim\" -DPACKAGE_VERSION=\"0.1\" -DPACKAGE_STRING=\"srm_sim\ 0.1\" -DPACKAGE_BUGREPORT=\"alexey.chernushev@gmail.com\" -DPACKAGE_URL=\"\" -DPACKAGE=\"srm_sim\" -DVERSION=\"0.1\" -DSTDC_HEADERS=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STRINGS_H=1 -DHAVE_INTTYPES_H=1 -DHAVE_STDINT_H=1 -DHAVE_UNISTD_H=1 -DHAVE_ARPA_INET_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_STDDEF_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_SYS_SOCKET_H=1 -DHAVE_UNISTD_H=1 -DHAVE_STDLIB_H=1 -DHAVE_MALLOC=1 -DHAVE_STDLIB_H=1 -DHAVE_REALLOC=1 -DHAVE_INET_NTOA=1 -DHAVE_SOCKET=1
+DEFS = -DPACKAGE_NAME=\"snn_sim\" -DPACKAGE_TARNAME=\"snn_sim\" -DPACKAGE_VERSION=\"0.1\" -DPACKAGE_STRING=\"snn_sim\ 0.1\" -DPACKAGE_BUGREPORT=\"alexey.chernushev@gmail.com\" -DPACKAGE_URL=\"\" -DPACKAGE=\"snn_sim\" -DVERSION=\"0.1\" -DSTDC_HEADERS=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STRINGS_H=1 -DHAVE_INTTYPES_H=1 -DHAVE_STDINT_H=1 -DHAVE_UNISTD_H=1 -DHAVE_ARPA_INET_H=1 -DHAVE_NETINET_IN_H=1 -DHAVE_STDDEF_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_SYS_SOCKET_H=1 -DHAVE_UNISTD_H=1 -DHAVE_STDLIB_H=1 -DHAVE_MALLOC=1 -DHAVE_STDLIB_H=1 -DHAVE_REALLOC=1 -DHAVE_INET_NTOA=1 -DHAVE_SOCKET=1
 DEPDIR = .deps
 ECHO_C = 
 ECHO_N = -n
@@ -219,11 +219,11 @@ LTLIBOBJS =
 MAKEINFO = ${SHELL} /home/alexeyche/prog/alexeyche-junk/cns/c/missing makeinfo
 MKDIR_P = /bin/mkdir -p
 OBJEXT = o
-PACKAGE = srm_sim
+PACKAGE = snn_sim
 PACKAGE_BUGREPORT = alexey.chernushev@gmail.com
-PACKAGE_NAME = srm_sim
-PACKAGE_STRING = srm_sim 0.1
-PACKAGE_TARNAME = srm_sim
+PACKAGE_NAME = snn_sim
+PACKAGE_STRING = snn_sim 0.1
+PACKAGE_TARNAME = snn_sim
 PACKAGE_URL = 
 PACKAGE_VERSION = 0.1
 PATH_SEPARATOR = :
@@ -274,7 +274,7 @@ top_build_prefix =
 top_builddir = .
 top_srcdir = .
 AUTOMAKE_OPTIONS = foreign
-SUBDIRS = srm_sim
+SUBDIRS = snn_sim
 all: all-recursive
 
 .SUFFIXES:

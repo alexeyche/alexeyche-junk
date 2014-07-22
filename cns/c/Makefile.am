@@ -1,2 +1,2 @@
 AUTOMAKE_OPTIONS = foreign
-SUBDIRS = srm_sim
+SUBDIRS = snn_sim

@@ -64,8 +64,8 @@ def run_neurons(input,v,ref):
 
 
 
-inputs_test = ( np.genfromtxt("/home/alexeyche/prog/sim/ts/synthetic_control/synthetic_control_TRAIN.512"), "train" ,)
-inputs_train = ( np.genfromtxt("/home/alexeyche/prog/sim/ts/synthetic_control/synthetic_control_TEST.512"), "test", )
+inputs_test = ( np.genfromtxt("/home/alexeyche/prog/sim/ts/synthetic_control/synthetic_control_TRAIN_1000"), "train" ,)
+inputs_train = ( np.genfromtxt("/home/alexeyche/prog/sim/ts/synthetic_control/synthetic_control_TEST_1000"), "test", )
 
 for ds, lab in (inputs_train, inputs_test):
     spikes_all = []

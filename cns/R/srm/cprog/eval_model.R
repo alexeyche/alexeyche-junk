@@ -11,8 +11,8 @@ source('../eval_funcs.R')
 source('../ucr_ts.R')
 source('../plot_funcs.R')
 
-ucr_spikes_dir = "/home/alexeyche/prog/sim/ucr_spikes_full"
-#ucr_spikes_dir = "/home/alexeyche/my/sim/ucr_spikes"
+#ucr_spikes_dir = "/home/alexeyche/prog/sim/ucr_spikes_full"
+ucr_spikes_dir = "/home/alexeyche/prog/sim/spikes/ucr"
 gitdir = "/home/alexeyche/prog/alexeyche-junk"
 #gitdir = "/home/alexeyche/my/git/alexeyche-junk"
 rundir = "/home/alexeyche/prog/sim/runs"
@@ -20,8 +20,8 @@ rundir = "/home/alexeyche/prog/sim/runs"
 #runname="test_run"
 #runname = "n50_no_conn"
 #runname = "n50_conn_3"
-runname = "n100_full.1"
-ep = 20
+runname = "test_run"
+ep = 11
 if(length(epoch_opt) > 0) {
     ep = epoch_opt
 }
@@ -29,7 +29,7 @@ if(length(runname_opt) > 0) {
     runname = runname_opt
 }
 
-srm_sim_exec = sprintf("%s/cns/c/bin/srm_sim", gitdir)
+srm_sim_exec = sprintf("%s/cns/c/bin/snn_sim", gitdir)
 jobs = 8
 
 workdir = sprintf("%s/%s", rundir, runname)
@@ -41,10 +41,13 @@ Mids=1:M
 Nids=(M+1):(M+N)
 
 
-input_file = sprintf("%s/train/1_ucr_50elems_6classes_1000dur", ucr_spikes_dir)
+#input_file = sprintf("%s/train/1_ucr_50elems_6classes_1000dur", ucr_spikes_dir)
+input_file = sprintf("%s/1_train_spikes", ucr_spikes_dir)
+
 timeline = c(loadMatrix(input_file,2))
 labels = c(loadMatrix(input_file,3))
-test_input_file =  sprintf("%s/test/ucr_50elems_6classes_1000dur", ucr_spikes_dir)
+#test_input_file =  sprintf("%s/test/ucr_50elems_6classes_1000dur", ucr_spikes_dir)
+test_input_file =  sprintf("%s/test_spikes", ucr_spikes_dir)
 test_timeline = c(loadMatrix(test_input_file,2))
 test_labels = c(loadMatrix(test_input_file,3))
 duration = timeline[2]-timeline[1]
@@ -60,9 +63,8 @@ model_file = sprintf("%s/%s_model", workdir, ep)
 ################
 
 #tresholds = seq(-65, -40, by=2.5)
-tresholds = seq(5, 20, by=2.5)
+tresholds = seq(12.5, 30, by=2.5)
 #tresholds = c(12)
-sigmas = seq(0.1,10, length.out=10)
 kernel_param = seq(10, 200, by=10)
 #tresholds = c(-60)
 #sigmas = c(1)
@@ -74,7 +76,7 @@ for(tr_i in 1:length(tresholds)) {
     
     run_const_ini = sprintf("%s/constants.ini.%s", evalepdir, tr_i)
     system( sprintf("cp %s %s", const_ini, run_const_ini))
-    patch_const(run_const_ini, "tr", tr)
+    patch_const(run_const_ini, "u_tr", tr)
     patch_const(run_const_ini, "determ", "true")
     patch_const(run_const_ini, "learn", "false")
     
