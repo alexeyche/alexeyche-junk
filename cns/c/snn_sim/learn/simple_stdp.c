@@ -38,7 +38,7 @@ void trainWeightsStep_SimpleSTDP(learn_t *ls_t, const double *u, const double *p
         while( (act_node = TEMPLATE(getNextLList,ind)(l->active_syn_ids[ *ni ]) ) != NULL ) {
             const size_t *syn_id = &act_node->value;
 
-            double dw = getLC(l,c)->lrate * ( exp( - l->W[*ni][*syn_id] ) *  l->syn[*ni][*syn_id] -0.2 );
+            double dw = getLC(l,c)->lrate * ( exp( - l->W[*ni][*syn_id] ) *  l->syn[*ni][*syn_id] -0.1 );
             dw = bound_grad(&l->W[ *ni ][ *syn_id ], &dw, &getLC(l,c)->wmax, c);
             l->W[*ni][*syn_id] += dw;
         }
