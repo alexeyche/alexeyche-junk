@@ -1,0 +1,49 @@
+This is BibTeX, Version 0.99d (TeX Live 2013/Debian)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: ./review.aux
+The style file: unsrt.bst
+Database file #1: refs.bib
+Warning--empty publisher in Zaencev1999
+Warning--empty author and editor in Genesis
+You've used 3 entries,
+            1791 wiz_defined-function locations,
+            464 strings with 3923 characters,
+and the built_in function-call counts, 537 in all, are:
+= -- 43
+> -- 13
+< -- 0
++ -- 6
+- -- 3
+* -- 33
+:= -- 83
+add.period$ -- 8
+call.type$ -- 3
+change.case$ -- 1
+chr.to.int$ -- 0
+cite$ -- 5
+duplicate$ -- 30
+empty$ -- 65
+format.name$ -- 3
+if$ -- 120
+int.to.chr$ -- 0
+int.to.str$ -- 3
+missing$ -- 4
+newline$ -- 17
+num.names$ -- 2
+pop$ -- 16
+preamble$ -- 1
+purify$ -- 0
+quote$ -- 0
+skip$ -- 9
+stack$ -- 0
+substring$ -- 27
+swap$ -- 3
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 0
+warning$ -- 2
+while$ -- 3
+width$ -- 4
+write$ -- 30
+(There were 2 warnings)

@@ -1,0 +1,19 @@
+\begin{thebibliography}{1}
+
+\bibitem{Zaencev1999}
+И.В. Заенцев.
+\newblock {\em Нейронные сети: основные модели}.
+\newblock 1999.
+
+\bibitem{Genesis}
+{\em The Book of GENESIS: Exploring Realistic Neural Models with the GEneral
+  NEural SImulation System}.
+\newblock Springer, 2nd edition, 1998.
+
+\bibitem{HH}
+A.~L. Hodgkin and A.~F. Huxley.
+\newblock A quantitative description of membrane current and its application to
+  conduction and excitation in nerve.
+\newblock {\em J Physiol.}, 117(4):500–544, 1952.
+
+\end{thebibliography}
