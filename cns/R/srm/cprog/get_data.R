@@ -19,8 +19,8 @@ for(ep in 1:1000) {
     output_spikes = sprintf("%s/%s_output_spikes.bin", workdir, ep)
     if(!file.exists(output_spikes)) { ep=ep-1; break }
 }
-#ep=1
-
+#
+#ep=7
 
 ep_str=""
 if(ep>0) {
@@ -50,7 +50,7 @@ for(i in 1:length(net)) {
 }
 
 Ti=0
-Trange=3000
+Trange=500
 p1 = plot_rastl(net[(M-M+1):(M+sum(N))],T0=Ti*Trange,Tmax=(Ti+1)*Trange)
 
 if(file.exists(sprintf("%s.bin",stat_file))) {
@@ -71,21 +71,21 @@ if(file.exists(sprintf("%s.bin",stat_file))) {
     } else {
         u = loadMatrix(stat_file, 2)
         p = loadMatrix(stat_file, 1)
-        syn=56
-        nid=2
-        Tplot=1:3000
+        syn=1
+        nid=1
+        Tplot=1:1000
         
-        if(lrule == "OptimalSTDP") {
-            B = loadMatrix(stat_file, 3)
-            syns = loadMatrix(stat_file, 3+nid)
-            Cn = loadMatrix(stat_file, 3+N+nid)
-            dWn = loadMatrix(stat_file, 3+2*N+nid)
-            par(mfrow=c(4,1))
+        if(lrule == "OptimalSTDP") {            
+            syns = loadMatrix(stat_file, 2+nid)
+            dWn = loadMatrix(stat_file, 2+1*N+nid)
+            B = loadMatrix(stat_file, 2+2*N+1)
+            Cn = loadMatrix(stat_file, 2+2*N+1+nid)
+            par(mfrow=c(3,1))
             spikes = net[[M+nid]][net[[M+nid]]<max(Tplot)]
             plot(spikes, rep(1,length(spikes)), xlim=c(min(Tplot),max(Tplot)) )
             plotl(syns[syn,Tplot])
             plotl(Cn[syn,Tplot])
-            plotl(dWn[syn,Tplot])
+            #plotl(dWn[syn,Tplot])
         }
         if(lrule == "ResourceSTDP") {
             res = loadMatrix(stat_file, 3)
@@ -103,7 +103,7 @@ if(file.exists(sprintf("%s.bin",stat_file))) {
     }
 }
 
-matrix_per_layer = 8
+matrix_per_layer = 10
 Wnorm = W = NULL
 max_row = sum(sum(N)+M)
 for(Ni in 1:length(N)) {

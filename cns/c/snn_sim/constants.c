@@ -406,6 +406,9 @@ int file_handler(void* user, const char* section, const char* name, const char* 
     if (MATCH("wta", "max_freq")) {
         c->wta->max_freq = atof(value);
     } else 
+    if (MATCH("wta", "ltd_factor")) {
+        c->wta->ltd_factor = atof(value);
+    } else 
     {
         return(0);
     } 

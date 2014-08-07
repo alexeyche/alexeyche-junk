@@ -31,6 +31,7 @@ typedef struct {
 typedef struct {
     double max_freq;
     double __max_freq;
+    double ltd_factor;
 } WtaConstants;
 
 typedef struct {
