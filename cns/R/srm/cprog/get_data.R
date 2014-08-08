@@ -11,7 +11,7 @@ library(snn)
 
 rundir="/home/alexeyche/prog/sim/runs"
 #rundir="/home/alexeyche/prog/sim/spear_runs"
-runname = "test_run"
+runname = "n100_half_conn"
 workdir=sprintf("%s/%s", rundir, runname)
 
 

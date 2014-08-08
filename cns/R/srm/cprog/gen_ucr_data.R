@@ -8,10 +8,10 @@ data_dir = '~/prog/sim'
 
 samples_per_class = 50
 
-samples_from_dataset = 50
-sample_size = 1000
+samples_from_dataset = 10
+sample_size = 60
 #sample_size = 1024
-selected_classes = c(1,2,3,4,5,6)
+selected_classes = c(1,2,3,4) #,5,6)
 
 data = synth # synthetic control
 #data = starlight_curves
@@ -82,26 +82,26 @@ for(fname in c(train_fname, test_fname)) {
 source('../gen_spikes.R')    
 patterns = list()
 dt=1
-duration=1000
+duration=120
 M=100
 for(ds in train_dataset) {
-    p = genSpikePattern(M, ds$data, duration, dt, lambda=25)
-    p = lapply(p, function(sp) sp*1)
+    p = genSpikePattern(M, ds$data, duration, dt, lambda=1)
+    p = lapply(p, function(sp) sp*(duration/sample_size))
     patterns[[length(patterns)+1]] = list(data=p, label=ds$label)
 }
 
 test_patterns = list()
 it=0
 for(ds in test_dataset) {
-    p = genSpikePattern(M, ds$data, duration, dt, lambda=25)
-    p = lapply(p, function(sp) sp*1)
+    p = genSpikePattern(M, ds$data, duration, dt, lambda=1)
+    p = lapply(p, function(sp) sp*(duration/sample_size))
     test_patterns[[length(test_patterns)+1]] = list(data=p, label=ds$label)
     cat("iter number: ", it, "\n")
     it=it+1
 }
 
-duration=1000
-gap=0
+duration=duration
+gap=50
 spikes_dir = "~/prog/sim/spikes/ucr"
 for(ep in 1:10) {
     ntrain = NetClass(patterns[sample(length(patterns), length(patterns))], duration, gap=gap)
