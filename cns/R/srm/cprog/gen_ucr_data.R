@@ -9,9 +9,15 @@ data_dir = '~/prog/sim'
 samples_per_class = 50
 
 samples_from_dataset = 10
+<<<<<<< HEAD
 sample_size = 60
 #sample_size = 1024
 selected_classes = c(1,2,3,4) #,5,6)
+=======
+sample_size = 180
+#sample_size = 1024
+selected_classes = c(1,2,3,4)
+>>>>>>> 7acf8d66dc2ae36e5ab6d480d462ead285cfe7d3
 
 data = synth # synthetic control
 #data = starlight_curves
@@ -82,7 +88,11 @@ for(fname in c(train_fname, test_fname)) {
 source('../gen_spikes.R')    
 patterns = list()
 dt=1
+<<<<<<< HEAD
 duration=120
+=======
+duration=180
+>>>>>>> 7acf8d66dc2ae36e5ab6d480d462ead285cfe7d3
 M=100
 for(ds in train_dataset) {
     p = genSpikePattern(M, ds$data, duration, dt, lambda=1)
