@@ -1,11 +1,17 @@
+#![feature(macro_rules)]
+
 extern crate regex;
 extern crate getopts;
 use std::os;
 
-use layer::Layer;
-mod layer;
+use layers::layer::Layer;
+
+mod layers {
+    pub mod layer;
+}
 mod args;
 mod constants;
+
 
 fn main() {
     let l = Layer::new(10);        
@@ -14,7 +20,7 @@ fn main() {
         Some(v) => v,
         None => return,
     };
-//    println!("{}", args.to_str());
+    println!("{}", args.to_string());
     let c = match constants::parse_constants(args.constantFilename) {
         Some(v) => v,
         None => return,
