@@ -30,7 +30,7 @@ pub fn parse_args(args: Vec<String>) -> Option<Args> {
         println!("{}", usage(BRIEF, opts));
         return(None);
     }
-    let constF = match  matches.opt_str("c") {
+    let constF = match matches.opt_str("c") {
         Some(c) => c,
         None => { println!("Need constants filename!"); return(None) }            
     };
