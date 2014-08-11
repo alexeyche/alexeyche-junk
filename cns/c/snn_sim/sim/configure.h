@@ -3,7 +3,9 @@
 
 #include <constants.h>
 #include <sim/runtime.h>
-
+#include <layers/wta.h>
+#include <layers/wtaadapt.h>
+#include <layers/adapt.h>
 
 struct Sim;
 struct SimImpl;

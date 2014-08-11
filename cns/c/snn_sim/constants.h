@@ -31,7 +31,6 @@ typedef struct {
 typedef struct {
     double max_freq;
     double __max_freq;
-    double ltd_factor;
 } WtaConstants;
 
 typedef struct {
@@ -79,6 +78,7 @@ typedef struct {
     double syn_delays_gain;
     double ws;
     double aw;
+    double ltd_factor;
 } LayerConstants;
 
 typedef LayerConstants lConst;

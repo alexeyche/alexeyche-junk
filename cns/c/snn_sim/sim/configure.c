@@ -72,6 +72,7 @@ void configureLayersSim(Sim *s, Constants *c) {
             l = (LayerPoisson*)createWtaAdaptLayer(lc->N, &neurons_idx, s->ctx->stat_level);
         } else 
         {
+            printf("Unknown layer type\n");
             exit(1);
         }
         appendLayerSim(s, l);

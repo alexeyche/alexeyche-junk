@@ -28,9 +28,6 @@ Constants* createConstants(const char *filename) {
             printf("Can't learn anything in determenistic mode\n");
             exit(1);
         }
-        if(!getLayerConstantsC(c,i)->learn) {
-            getLayerConstantsC(c,i)->learning_rule = ENull;
-        }
     }
 
     return(c);
@@ -319,6 +316,9 @@ int file_handler(void* user, const char* section, const char* name, const char* 
     if (MATCH("layer", "axonal_delays_rate")) {
         FILL_LAYER_CONST(axonal_delays_rate,double)
     } else 
+    if (MATCH("layer", "ltd_factor")) {
+        FILL_LAYER_CONST(ltd_factor,double)
+    } else 
     if (MATCH("optimal stdp", "tc")) {
         c->tc = atof(value);
     } else 
@@ -405,9 +405,6 @@ int file_handler(void* user, const char* section, const char* name, const char* 
     } else 
     if (MATCH("wta", "max_freq")) {
         c->wta->max_freq = atof(value);
-    } else 
-    if (MATCH("wta", "ltd_factor")) {
-        c->wta->ltd_factor = atof(value);
     } else 
     {
         return(0);
@@ -561,6 +558,7 @@ void LayerConstantsPrint(LayerConstants *c) {
     printf("syn_delays_gain->"); doublePrint(c->syn_delays_gain);
     printf("ws->"); doublePrint(c->ws);
     printf("aw->"); doublePrint(c->aw);
+    printf("ltd_factor->"); doublePrint(c->ltd_factor);
 }
 
 

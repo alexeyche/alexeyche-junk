@@ -11,7 +11,7 @@ library(snn)
 
 rundir="/home/alexeyche/prog/sim/runs"
 #rundir="/home/alexeyche/prog/sim/spear_runs"
-runname = "n100_half_conn"
+runname = "test_run"
 workdir=sprintf("%s/%s", rundir, runname)
 
 
@@ -50,7 +50,7 @@ for(i in 1:length(net)) {
 }
 
 Ti=0
-Trange=500
+Trange=1000
 p1 = plot_rastl(net[(M-M+1):(M+sum(N))],T0=Ti*Trange,Tmax=(Ti+1)*Trange)
 
 if(file.exists(sprintf("%s.bin",stat_file))) {
@@ -103,7 +103,7 @@ if(file.exists(sprintf("%s.bin",stat_file))) {
     }
 }
 
-matrix_per_layer = 10
+matrix_per_layer = 7
 Wnorm = W = NULL
 max_row = sum(sum(N)+M)
 for(Ni in 1:length(N)) {

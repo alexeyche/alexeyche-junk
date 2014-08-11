@@ -304,7 +304,9 @@ void calculateDynamics_Poisson(LayerPoisson *l, const size_t *ni, const SimConte
     const Constants *c = s->c;
 
     // training
-    l->ls_t->trainWeightsStep(l->ls_t, &l->u[*ni], &l->p[*ni], &l->M[*ni], ni, s);   
+    if(getLC(l,c)->learn) {
+        l->ls_t->trainWeightsStep(l->ls_t, &l->u[*ni], &l->p[*ni], &l->M[*ni], ni, s);   
+    }
 
     // melting      
     indLNode *act_node;
