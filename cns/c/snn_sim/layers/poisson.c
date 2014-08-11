@@ -183,6 +183,7 @@ void configureLayer_Poisson(LayerPoisson *l, const indVector *inputIDs, const in
         }
         for(size_t nj=0; nj<l->N; nj++) {        
             if(ni != nj) {
+                printf("net_edge: %f\n", getLC(l,c)->net_edge_prob);
                 if(getLC(l,c)->net_edge_prob > getUnif()) {
                     TEMPLATE(insertVector,ind)(layer_conns[ni], l->ids[nj]);
                 }

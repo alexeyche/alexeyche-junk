@@ -21,7 +21,7 @@ EPOCH=
 LEARN="no"
 AUTO="no"
 EVALUATE=
-JOBS=$(cat /proc/cpuinfo | grep processor | wc -l)
+JOBS=$(cat /proc/cpuinfo | grep -E "processor|cores"  | wc -l)
 
 # Enumerating options
 while getopts "j:w:hsle:av:" opt; do
