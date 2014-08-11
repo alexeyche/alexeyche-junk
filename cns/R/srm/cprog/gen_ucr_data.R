@@ -9,8 +9,8 @@ data_dir = '~/prog/sim'
 samples_per_class = 50
 
 samples_from_dataset = 10
-#sample_size = 180
-sample_size = 512
+sample_size = 180
+
 selected_classes = c(1,2,3,4)
 
 data = synth # synthetic control
@@ -82,10 +82,10 @@ for(fname in c(train_fname, test_fname)) {
 source('../gen_spikes.R')    
 patterns = list()
 dt=1
-duration=1024
+duration=sample_size*3
 M=100
 for(ds in train_dataset) {
-    p = genSpikePattern(M, ds$data, duration, dt, lambda=10)
+    p = genSpikePattern(M, ds$data, duration, dt, lambda=1)
     p = lapply(p, function(sp) sp*(duration/sample_size))
     patterns[[length(patterns)+1]] = list(data=p, label=ds$label)
 }
@@ -93,7 +93,7 @@ for(ds in train_dataset) {
 test_patterns = list()
 it=0
 for(ds in test_dataset) {
-    p = genSpikePattern(M, ds$data, duration, dt, lambda=10)
+    p = genSpikePattern(M, ds$data, duration, dt, lambda=1)
     p = lapply(p, function(sp) sp*(duration/sample_size))
     test_patterns[[length(test_patterns)+1]] = list(data=p, label=ds$label)
     cat("iter number: ", it, "\n")
@@ -101,7 +101,7 @@ for(ds in test_dataset) {
 }
 
 duration=duration
-gap=0
+gap=100
 spikes_dir = "~/prog/sim/spikes/ucr"
 for(ep in 1:10) {
     ntrain = NetClass(patterns[sample(length(patterns), length(patterns))], duration, gap=gap)

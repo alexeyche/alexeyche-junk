@@ -11,7 +11,7 @@ library(snn)
 
 rundir="/home/alexeyche/prog/sim/runs"
 #rundir="/home/alexeyche/prog/sim/spear_runs"
-runname = "test_run"
+runname = "WtaLayer_SimpleSTDP_Exp_0001"
 workdir=sprintf("%s/%s", rundir, runname)
 
 

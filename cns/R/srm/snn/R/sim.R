@@ -19,12 +19,12 @@ NetClass = setRefClass("NetClass", fields = list(net="list", timeline="vector", 
                                                 net[[id]] <<- c(net[[id]], sp)
                                             }))
                                             Tcur = Tcur + duration
-                                            for(t_gap in seq(0,gap, by=dt)) {
-                                                syn_fired = (m*dt)>runif(M)
-                                                for(fi in which(syn_fired==TRUE)) {
-                                                    net[[ fi ]] <<- c(net[[ fi ]], t_gap+Tcur)
-                                                }
-                                            }
+                                            #for(t_gap in seq(0,gap, by=dt)) {
+                                            #    syn_fired = (m*dt)>runif(M)
+                                            #    for(fi in which(syn_fired==TRUE)) {
+                                            #        net[[ fi ]] <<- c(net[[ fi ]], t_gap+Tcur)
+                                            #    }
+                                            #}
                                             Tcur = Tcur + gap
                                             timeline <<- c(timeline, Tcur)
                                             labels <<- c(labels, p$label)
