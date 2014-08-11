@@ -106,7 +106,7 @@ AMTAR = $${TAR-tar}
 AUTOCONF = ${SHELL} /home/alexeyche/prog/alexeyche-junk/cns/c/missing --run autoconf
 AUTOHEADER = ${SHELL} /home/alexeyche/prog/alexeyche-junk/cns/c/missing --run autoheader
 AUTOMAKE = ${SHELL} /home/alexeyche/prog/alexeyche-junk/cns/c/missing --run automake-1.11
-AWK = mawk
+AWK = gawk
 CC = gcc
 CCDEPMODE = depmode=gcc3
 CFLAGS = -g -O2

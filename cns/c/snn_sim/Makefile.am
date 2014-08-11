@@ -1,5 +1,5 @@
 # what flags you want to pass to the C compiler & linker
-AM_CFLAGS = -Wall -Wno-unused-variable -std=gnu99 -pthread  -O0  -g  
+AM_CFLAGS = -Wall -Wno-unused-variable -std=gnu99 -pthread  -O3 
 #AM_CFLAGS = -Wall -std=gnu99 -pthread -O0 -g  
 CFLAGS=
 LDADD= -lm
