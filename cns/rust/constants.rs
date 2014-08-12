@@ -12,6 +12,8 @@ use std::from_str::FromStr;
 use std::to_string::ToString;
 use std::fmt::FormatError;
 
+use args::Err;
+
 #[deriving(Show)]
 enum LayerType {
     PoissonLayer,
@@ -108,11 +110,15 @@ macro_rules! fill_lc(
         }
     );
 )    
-
+#[deriving(Eq, Show, PartialEq)]
+enum Err {
+    // Now we don't need that phoney None variant.
+    ParseErr,
+}
 
 type ConstParsed = HashMap<String, HashMap<String,Vec<String>>>;
 
-fn fill_constants(c: &mut Constants, cp: &ConstParsed) {
+fn fill_constants(c: &mut Constants, cp: &ConstParsed) -> Result<(), Err> {
     for (section_name, section_data) in cp.iter() {
         match section_name.as_slice() {
             "layers" => {
@@ -127,7 +133,7 @@ fn fill_constants(c: &mut Constants, cp: &ConstParsed) {
                         "output_edge_prob"  => fill_lc!(c.lc, vals, output_edge_prob, f32),
                         "inhib_frac"        => fill_lc!(c.lc, vals, inhib_frac, f32),
                         "layer_type"        => fill_lc!(c.lc, vals, layer_type, LayerType),
-                        _ => fail!("Unknown value {} in section name: {}", val_name, section_name),
+                        _ => return Err(ParseErr("Unknown value {} in section name: {}", val_name, section_name)),
                     }
                 }
             },
@@ -138,7 +144,7 @@ fn fill_constants(c: &mut Constants, cp: &ConstParsed) {
                 for (val_name, vals) in section_data.iter() {
                     match val_name.as_slice() {
                         "size"              => fill_lc!(c.in_lc, vals, size, uint),
-                        _ => fail!("Unknown value {} in section name: {}", val_name, section_name),
+                        _ => return ParseErr("Unknown value {} in section name: {}", val_name, section_name),
                     }
                 }
             },
@@ -149,7 +155,7 @@ fn fill_constants(c: &mut Constants, cp: &ConstParsed) {
 }
 
 
-pub fn parse_constants(const_filename : String) -> Result<Constants,Err> {
+pub fn parse_constants(const_filename : String) -> Result<Constants, Err> {
     let path = Path::new(const_filename);
     let mut file = BufferedReader::new(File::open(&path));
     let re_group = regex!(r"^[\s]*\[(.*)\]");
@@ -157,7 +163,7 @@ pub fn parse_constants(const_filename : String) -> Result<Constants,Err> {
     let re_val = regex!(r"([\S]+)");
     
     let mut current_section = String::new();
-    let mut m: ConstParsed = ConstParsed::new();
+    let mut m: ConstParsed = HashMap::new();
 
     for line in file.lines() {
         for cap in re_group.captures_iter(line.clone().unwrap().as_slice()) {
