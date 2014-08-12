@@ -529,7 +529,7 @@ void prob_fun_tPrint(prob_fun_t v) {
         printf("ExpBohte\n");
     }
     if(v == EExp) {
-        printf("EExp\n");
+        printf("Exp\n");
     }
     if(v == ELinToyoizumi) {
         printf("LinToyoizumi\n");

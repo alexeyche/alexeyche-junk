@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -x
 
 CWD_SCR=$(readlink -f $0)
 CWD=$(dirname $CWD_SCR)
@@ -7,12 +8,16 @@ CWD=$(dirname $CWD_SCR)
 function usage {
     echo "$0 -w WORK_DIR -s -l -e EPOCHS -v TEST_SPIKES.BIN INPUT_FILE1 [INPUT_FILE2]"
 }
+function get_const_for_name {
+   grep -Eo "^$1.*=[ ]*[ \/_.a-zA-Z0-9]+" ../snn_sim/constants.ini | awk -F'=' '{ print $2}' | sed -e 's|^[ ]*||g' -e 's|[ ]*$||g'  | tr ' ' _
+}
 
 ulimit -c unlimited
 
 pushd $CWD &> /dev/null
 SNN_SIM="../bin/snn_sim"
 SNN_POSTPROC="../bin/snn_postproc"
+RUNS_DIR=~/prog/sim/runs
 
 INPUT_FILES=
 WORK_DIR=
@@ -20,15 +25,16 @@ STAT_SAVE="no"
 EPOCH=
 LEARN="no"
 AUTO="no"
+LASTW="no"
 EVALUATE=
-JOBS=$(cat /proc/cpuinfo | grep -E "processor|cores"  | wc -l)
+JOBS=$(cat /proc/cpuinfo | grep -E "processor"  | wc -l)
 
 # Enumerating options
 while getopts "j:w:hsle:av:" opt; do
     case "$opt" in
         w) WORK_DIR=${OPTARG} ;;
         s) STAT_SAVE="yes" ;;
-        l) LEARN="yes" ;;
+        l) LASTW="yes" ;;
         e) EPOCH=${OPTARG} ;; 
         a) AUTO="yes" ;; 
         j) JOBS=${OPTARG} ;;
@@ -40,7 +46,20 @@ done
 shift $(( OPTIND - 1 ))
 INPUT_FILES=${@}    
 
-[ -z "$WORK_DIR" -o -z "$INPUT_FILES" ] && usage && exit 1
+[ -z "$INPUT_FILES" ] && usage && exit 1
+if [ -z "$WORK_DIR" ]; then
+    WORK_DIR_BASE=$RUNS_DIR/$(get_const_for_name neuron_type)_$(get_const_for_name learning_rule)_$(get_const_for_name prob_fun)
+    for i in $(seq 0 1 1000); do
+        WORK_DIR=${WORK_DIR_BASE}_$(printf %04d $i)
+        if [ ! -d "$WORK_DIR" ]; then
+            if [ $i -gt 0 ] && [ $LASTW == "yes" ]; then
+                WORK_DIR=${WORK_DIR_BASE}_$(printf %04d $((i-1)))
+            fi                
+            break
+        fi            
+    done        
+fi    
+
 INPUT_FILES_DIR=$(for f in $INPUT_FILES; do dirname $f; done | sort -n | uniq)
 INPUT_FILES_BN=$(for f in $INPUT_FILES; do basename $f; done | sort -n)
 MAX_INPUT_FILES=$(echo $INPUT_FILES | wc -w)
@@ -75,6 +94,7 @@ function get_const {
     egrep -o "^$1.*=[ ]*[\/_.a-zA-Z0-9]+" $WORK_DIR/constants.ini | awk -F'=' '{ print $2}' | tr -d ' '
 }
 
+
 MEAN_P_DUR=$(get_const mean_p_dur)
 LEARNING_RULE=$(get_const learning_rule)
 REINFORCEMENT=$(get_const reinforcement)
@@ -94,9 +114,11 @@ for EP in $EPOCHS; do
     fi    
     LEARN=yes
     TMAX_OPT=
+    LEARN_OPT=""
     if [ $EP -eq 1 ] && [ "$LEARNING_RULE" == "OptimalSTDP" ]; then
         LEARN=no
         TMAX_OPT=" -T $MEAN_P_DUR"
+        LEARN_OPT="-l no"
     fi        
 
     OUTPUT_SPIKES=$WORK_DIR/${EPOCH_SFX}output_spikes.bin
@@ -109,7 +131,7 @@ for EP in $EPOCHS; do
         STAT_OPT="--stat-level 1 -s $WORK_DIR/${EPOCH_SFX}stat.bin"
     fi    
     INPUT_FILE=$INPUT_FILES_DIR/$(echo $INPUT_FILES_BN | cut -d ' ' -f $INP_ITER)
-    $SNN_SIM -c $WORK_DIR/constants.ini -i $INPUT_FILE -o $OUTPUT_SPIKES $STAT_OPT $MODEL_TO_LOAD_OPT -ms $MODEL_FILE -j $JOBS $TMAX_OPT &> $OUTPUT_FILE
+    $SNN_SIM -c $WORK_DIR/constants.ini -i $INPUT_FILE -o $OUTPUT_SPIKES $STAT_OPT $MODEL_TO_LOAD_OPT -ms $MODEL_FILE -j $JOBS $TMAX_OPT $LEARN_OPT &> $OUTPUT_FILE
     if [ "$?" -ne 0 ]; then
         echo "Not null exit code ($?)"
         exit $?
