@@ -25,4 +25,5 @@ fn main() {
         Some(v) => v,
         None => return,
     };
+    println!("{}", c.to_string());
 }

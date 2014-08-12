@@ -3,13 +3,11 @@ struct Neuron {
     id : uint,
     x : Vec<f32>,
     y : f32,
-    fired : bool,
-    syn_fired : Vec<bool>,
 }
 
 impl Neuron {
     fn new() -> Neuron {
-        Neuron { x : vec!{}, y : 0.0, fired : false, syn_fired : vec!{}, id : 0 }
+        Neuron { x : vec!{}, y : 0.0, id : 0 }
     }
 }
 
@@ -23,7 +21,7 @@ impl Layer {
        for i in range(0u, N) {
            l.neurons.push( Neuron::new() );
        }
-       return(l);
+       return l;
     }
 }
 
