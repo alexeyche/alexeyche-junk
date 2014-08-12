@@ -16,7 +16,7 @@ struct Args {
 
 static BRIEF: &'static str = "Spiking neural network simulator";
 
-pub fn parse_args(args: Vec<String>) -> Option<Args> {
+pub fn parse_args(args: Vec<String>) -> Result<Args,Err> {
     let opts = [
         optopt("c", "", "set constants file name", ""),
         optflag("h", "help", "print this help menu")
@@ -35,6 +35,6 @@ pub fn parse_args(args: Vec<String>) -> Option<Args> {
         None => { println!("Need constants filename!"); return(None) }            
     };
 
-    Some(Args { constantFilename : constF })
+    Ok(Args { constantFilename : constF })
 }
 

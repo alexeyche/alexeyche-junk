@@ -149,7 +149,7 @@ fn fill_constants(c: &mut Constants, cp: &ConstParsed) {
 }
 
 
-pub fn parse_constants(const_filename : String) -> Option<Constants> {
+pub fn parse_constants(const_filename : String) -> Result<Constants,Err> {
     let path = Path::new(const_filename);
     let mut file = BufferedReader::new(File::open(&path));
     let re_group = regex!(r"^[\s]*\[(.*)\]");
@@ -157,34 +157,27 @@ pub fn parse_constants(const_filename : String) -> Option<Constants> {
     let re_val = regex!(r"([\S]+)");
     
     let mut current_section = String::new();
-    
-    let mut c = Constants::new();
-    let mut m: ConstParsed = HashMap::new();
+    let mut m: ConstParsed = ConstParsed::new();
 
     for line in file.lines() {
         for cap in re_group.captures_iter(line.clone().unwrap().as_slice()) {
-//            println!("section: {}", cap.at(1));
             current_section = String::from_str(cap.at(1));
         }
         if !current_section.is_empty() && !m.contains_key(&current_section) {
             m.insert(current_section.clone(), HashMap::new());
         }
-    
         for cap in re_name_val.captures_iter(line.clone().unwrap().as_slice()) {
-//            println!("valname: \"{}\" val: \"{}\"", cap.at(1), cap.at(2));
             let name_val = String::from_str(cap.at(1));
             if !m.get(&current_section).contains_key( &name_val ) {
                 m.get_mut(&current_section).insert(name_val.clone(), vec!{});
             }
             for cap_val in re_val.captures_iter(cap.at(2)) {
                 m.get_mut(&current_section).get_mut(&name_val).push( String::from_str(cap_val.at(1)) );
-//                println!("\tmatch val {}", cap_val.at(1));
             }                
         }
 
-//        println!("section current: \"{}\"", current_section);
     }
-//    println!("{}", c);
+    let mut c = Constants::new();
     fill_constants(&mut c,&m);   
-    Some(c)
+    Ok(c)
 }
