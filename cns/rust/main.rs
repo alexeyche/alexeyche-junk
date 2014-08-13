@@ -15,15 +15,22 @@ mod sim;
 mod args;
 mod constants;
 
-
+macro_rules! trysome(
+    ($e:expr) => (
+        match $e {
+            Some(v) => v,
+            None => fail!("Failed operation"),
+        };
+    );
+)
 
 fn main() {
     let a = os::args();
-    let args = try!(parse_args(a));
+    let args = trysome!(parse_args(a));
 
     println!("{}", args.to_string());
     
-    let c = try!(parse_constants(args.constantFilename));
+    let c = trysome!(parse_constants(args.constantFilename));
 
     println!("{}", c.to_string());
 

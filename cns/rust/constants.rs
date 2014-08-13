@@ -9,10 +9,6 @@ use std::fmt::Formatter;
 use std::fmt::Result;
 use std::fmt::Show;
 use std::from_str::FromStr;
-use std::to_string::ToString;
-use std::fmt::FormatError;
-
-use args::Err;
 
 #[deriving(Show)]
 enum LayerType {
@@ -56,11 +52,11 @@ impl LayerConst {
 }
 impl Show for LayerConst {
     fn fmt(&self, f: &mut Formatter) -> Result {
-        writeln!(f, "\n\tConstants: ");
-        writeln!(f, "\tsize : {} ", self.size);
-        writeln!(f, "\toutput_edge_prob : {} ", self.output_edge_prob);
-        writeln!(f, "\tinput_edge_prob : {} ", self.input_edge_prob);
-        writeln!(f, "\tinhib_frac : {} ", self.inhib_frac);
+        try!(writeln!(f, ""));
+        try!(writeln!(f, "\tsize : {} ", self.size));
+        try!(writeln!(f, "\toutput_edge_prob : {} ", self.output_edge_prob));
+        try!(writeln!(f, "\tinput_edge_prob : {} ", self.input_edge_prob));
+        try!(writeln!(f, "\tinhib_frac : {} ", self.inhib_frac));
         writeln!(f, "\tlayer_type: {}", self.layer_type)
     }
 }
@@ -110,15 +106,11 @@ macro_rules! fill_lc(
         }
     );
 )    
-#[deriving(Eq, Show, PartialEq)]
-enum Err {
-    // Now we don't need that phoney None variant.
-    ParseErr,
-}
 
 type ConstParsed = HashMap<String, HashMap<String,Vec<String>>>;
 
-fn fill_constants(c: &mut Constants, cp: &ConstParsed) -> Result<(), Err> {
+#[allow(unused_variable)]
+fn fill_constants(c: &mut Constants, cp: &ConstParsed) {
     for (section_name, section_data) in cp.iter() {
         match section_name.as_slice() {
             "layers" => {
@@ -133,7 +125,7 @@ fn fill_constants(c: &mut Constants, cp: &ConstParsed) -> Result<(), Err> {
                         "output_edge_prob"  => fill_lc!(c.lc, vals, output_edge_prob, f32),
                         "inhib_frac"        => fill_lc!(c.lc, vals, inhib_frac, f32),
                         "layer_type"        => fill_lc!(c.lc, vals, layer_type, LayerType),
-                        _ => return Err(ParseErr("Unknown value {} in section name: {}", val_name, section_name)),
+                        _ => return fail!("Unknown value {} in section name: {}", val_name, section_name),
                     }
                 }
             },
@@ -144,7 +136,7 @@ fn fill_constants(c: &mut Constants, cp: &ConstParsed) -> Result<(), Err> {
                 for (val_name, vals) in section_data.iter() {
                     match val_name.as_slice() {
                         "size"              => fill_lc!(c.in_lc, vals, size, uint),
-                        _ => return ParseErr("Unknown value {} in section name: {}", val_name, section_name),
+                        _ => return fail!("Unknown value {} in section name: {}", val_name, section_name),
                     }
                 }
             },
@@ -155,7 +147,7 @@ fn fill_constants(c: &mut Constants, cp: &ConstParsed) -> Result<(), Err> {
 }
 
 
-pub fn parse_constants(const_filename : String) -> Result<Constants, Err> {
+pub fn parse_constants(const_filename : String) -> Option<Constants> {
     let path = Path::new(const_filename);
     let mut file = BufferedReader::new(File::open(&path));
     let re_group = regex!(r"^[\s]*\[(.*)\]");
@@ -185,5 +177,5 @@ pub fn parse_constants(const_filename : String) -> Result<Constants, Err> {
     }
     let mut c = Constants::new();
     fill_constants(&mut c,&m);   
-    Ok(c)
+    Some(c)
 }
