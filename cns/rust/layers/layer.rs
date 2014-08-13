@@ -1,4 +1,34 @@
 
+pub trait NetLayer {
+    fn new(size: uint, id : uint, glob_id: &mut uint) -> Self;
+}
+
+#[deriving(Show)]
+struct InputNeuron {
+    id : uint,
+}
+
+pub struct InputLayer {
+    id : uint,
+    neurons: Vec<InputNeuron>,
+}
+impl InputNeuron {
+    fn new(id: uint) -> InputNeuron {
+        InputNeuron { id : id }
+    }
+}
+impl NetLayer for InputLayer{
+    fn new(size: uint, id : uint, glob_id: &mut uint) -> InputLayer {
+       let mut l = InputLayer { neurons : vec!{}, id : id };
+       for i in range(0u, size) {
+           l.neurons.push( InputNeuron::new(*glob_id) );
+           *glob_id+=1;
+       }
+       return l;
+    }
+}
+
+
 #[deriving(Show)]
 struct Neuron {
     id : uint,
@@ -20,8 +50,8 @@ pub struct Layer {
     neurons : Vec<Neuron>,
 }
 
-impl Layer {
-    pub fn new(size: uint, id : uint, glob_id: &mut uint) -> Layer {
+impl NetLayer for Layer{
+    fn new(size: uint, id : uint, glob_id: &mut uint) -> Layer {
        let mut l = Layer { neurons : vec!{}, id : id };
        for i in range(0u, size) {
            l.neurons.push( Neuron::new(*glob_id) );
@@ -29,6 +59,10 @@ impl Layer {
        }
        return l;
     }
+//    pub fn connect_feed_forward(&mut self, l: &Layer, in_prob: f32, out_prob: f32) {
+//    }
+//    pub fn connect_reccurrent(&mut self, prob: f32) {
+//    }
 }
 
 

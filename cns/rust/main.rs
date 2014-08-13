@@ -35,5 +35,5 @@ fn main() {
     println!("{}", c.to_string());
 
     let s = Sim::new(&c);
-    println!("{}", s);
+//    println!("{}", s);
 }
