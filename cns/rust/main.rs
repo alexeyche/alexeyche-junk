@@ -10,6 +10,8 @@ use constants::parse_constants;
 
 mod layers {
     pub mod layer;
+    pub mod input_layer;
+    pub mod net_layer;
 }
 mod sim;
 mod args;
