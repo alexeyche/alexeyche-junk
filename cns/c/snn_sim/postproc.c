@@ -173,5 +173,22 @@ ClassificationStat getClassificationStat(pMatrixVector *train, indVector *train_
     return(s);
 }
 
+void writeMatrixListToSVMStruct(pMatrixVector *v, doubleVector *cl, const char *output_file) {
+    assert(v->size == cl->size);
+    FileStream *fs = createOutputFileStream(output_file);
+    for(size_t i=0; i<v->size; i++) {
+        Matrix *m = v->array[i];
+        writeLineSVMStruct(m->vals, m->ncol*m->nrow, (int)cl->array[i], fs);
+    }
+}
+
+
+void writeLineSVMStruct(double *vals, size_t size, int class, FileStream *fs) {
+    fprintf(fs->fd, "%d ", class);
+    for(size_t i=0; i<size; i++) {
+        fprintf(fs->fd, "%zu:%5.8f ", i+1, vals[i]);
+    }
+    fprintf(fs->fd, "\n");
+}
 
 

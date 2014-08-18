@@ -5,6 +5,8 @@
 
 #include <util/spikes_list.h>
 #include <util/matrix.h>
+#include <util/io.h>
+
 #include <math.h>
 #include <float.h>
 
@@ -43,5 +45,7 @@ pMatrixVector *calcHists(SpikesList *spikes, doubleVector *timeline, double ts_d
 indVector* firstNNClassify(Matrix *K, indVector *train_labels_ind);
 ClassificationStat getClassificationStat(pMatrixVector *train, indVector *train_labels_ind, pMatrixVector *test, indVector *test_labels_ind, intVector *uniq_classes, int jobs);
 double euclDistance(Matrix *m1, Matrix *m2);
+void writeLineSVMStruct(double *vals, size_t size, int class, FileStream *fs);
+void writeMatrixListToSVMStruct(pMatrixVector *v, doubleVector *cl, const char *output_file);
 
 #endif

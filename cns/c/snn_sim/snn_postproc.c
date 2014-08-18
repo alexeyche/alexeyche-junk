@@ -100,7 +100,47 @@ int main(int argc, char **argv) {
 //        hists_test = readMatrixListFromFile("/home/alexeyche/prog/sim/ts/synthetic_control/synthetic_control_TEST_1000.bin");
 //        hists_train = readMatrixListFromFile("/home/alexeyche/prog/sim/ts/synthetic_control/synthetic_control_TRAIN_1000.bin");
     //================    
-        ClassificationStat s = getClassificationStat(hists_train, classes_indices_train, hists_test, classes_indices_test, uniq_classes, a.jobs);
+        if(a.classify_one_nn) {
+            ClassificationStat s = getClassificationStat(hists_train, classes_indices_train, hists_test, classes_indices_test, uniq_classes, a.jobs);
+            if(a.output_file) {
+                TEMPLATE(insertVector,pMatrix)(stat, copyMatrix(s.confM));
+                Matrix *r = createMatrix(1,1);
+                setMatrixElement(r, 0, 0, s.rate);
+                TEMPLATE(insertVector,pMatrix)(stat, r);
+
+                Matrix *i = createMatrix(1,1);
+                setMatrixElement(i, 0, 0, s.NMI);
+                TEMPLATE(insertVector,pMatrix)(stat, i);
+            }
+            if(max_NMI < s.NMI) {
+                max_NMI = s.NMI;
+            }
+            deleteMatrix(s.confM);
+        } else {
+            char output_file_kernel[256];
+            snprintf(output_file_kernel, sizeof output_file_kernel, "%s.train.k%3.1f", a.output_file, ksize);
+            if(!a.svm_out) {
+                char buf[256];
+                snprintf(buf, sizeof buf, "%s.bin", output_file_kernel);
+                saveMatrixListToFile(buf, hists_train);        
+            } else {
+                char buf[256];
+                snprintf(buf, sizeof buf, "%s.dat", output_file_kernel);
+                writeMatrixListToSVMStruct(hists_train, classes_train, buf);        
+            }
+            char output_file_kernel_test[256];
+            snprintf(output_file_kernel_test, sizeof output_file_kernel_test, "%s.test.k%3.1f", a.output_file, ksize);
+            if(!a.svm_out) {
+                char buf[256];
+                snprintf(buf, sizeof buf, "%s.bin", output_file_kernel_test);
+                saveMatrixListToFile(buf, hists_test);        
+            } else {
+                char buf[256];
+                snprintf(buf, sizeof buf, "%s.dat", output_file_kernel_test);
+                writeMatrixListToSVMStruct(hists_test, classes_test, buf);        
+            }
+            
+        }
 //        printf("rate: %f\n", s.rate); 
 //        for(size_t i=0; i < s.confM->nrow; i++) {
 //            for(size_t j=0; j < s.confM->ncol; j++) {
@@ -109,27 +149,16 @@ int main(int argc, char **argv) {
 //            printf("\n");
 //        }
 //        printf("NMI: %f\n", s.NMI);
-        if(a.output_file) {
-            TEMPLATE(insertVector,pMatrix)(stat, copyMatrix(s.confM));
-            Matrix *r = createMatrix(1,1);
-            setMatrixElement(r, 0, 0, s.rate);
-            TEMPLATE(insertVector,pMatrix)(stat, r);
-
-            Matrix *i = createMatrix(1,1);
-            setMatrixElement(i, 0, 0, s.NMI);
-            TEMPLATE(insertVector,pMatrix)(stat, i);
-        }
-        if(max_NMI < s.NMI) {
-            max_NMI = s.NMI;
-        }
-        deleteMatrix(s.confM);
         TEMPLATE(deleteVector,pMatrix)(hists_train);
         TEMPLATE(deleteVector,pMatrix)(hists_test);
     }
-    if(a.output_file) {
-        saveMatrixListToFile(a.output_file, stat);
+
+    if(a.classify_one_nn) {
+        if(a.output_file) {
+            saveMatrixListToFile(a.output_file, stat);
+        }
+        printf("%f\n", max_NMI);
     }
-    printf("%f\n", max_NMI);
     TEMPLATE(deleteVector,pMatrix)(stat);    
     TEMPLATE(deleteVector,double)(timeline_train);
     TEMPLATE(deleteVector,double)(timeline_test);
