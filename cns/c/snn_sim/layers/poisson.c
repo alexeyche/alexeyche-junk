@@ -151,6 +151,9 @@ void initLearningRule(LayerPoisson *l, const Constants *c) {
     } else
     if( getLC(l,c)->learning_rule == ESimpleSTDP) {
         l->ls_t = (learn_t*)init_SimpleSTDP(l);
+    } else
+    if( getLC(l,c)->learning_rule == ETripleSTDP) {
+        l->ls_t = (learn_t*)init_TripleSTDP(l);
     } 
 }
 

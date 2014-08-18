@@ -8,7 +8,7 @@
 #include <util/util_vector.h>
 #include <util/ini.h>
 
-typedef enum { ENull, EOptimalSTDP, EResourceSTDP, ESimpleSTDP } learning_rule_t;
+typedef enum { ENull, EOptimalSTDP, EResourceSTDP, ESimpleSTDP, ETripleSTDP } learning_rule_t;
 typedef enum { EPoissonLayer, EWtaLayer, EAdaptLayer, EWtaAdaptLayer } neuron_layer_t;
 typedef enum { EExpHennequin, ELinToyoizumi, EExpBohte, EExp } prob_fun_t;
 
@@ -39,6 +39,19 @@ typedef struct {
     double cumulative_period_delta;
     double amplitude;
 } PacemakerConstants;
+
+typedef struct {
+    double tau_plus;
+    double tau_minus;
+    double tau_y;
+    double Aplus;
+    double __Aplus;
+    double Aminus;
+    double p_target;
+    double __Aminus_cube_delim_p_target;
+    double tau_average;
+} TripleSTDPConstants;
+
 
 typedef struct {
     double Aplus;
@@ -134,6 +147,7 @@ typedef struct {
     
     AdExConstants *adex;
     ResourceSTDPConstants *res_stdp;
+    TripleSTDPConstants *tr_stdp;
     PreprocessConstants *preproc;
     bool reinforcement;
     double reward_ltd;

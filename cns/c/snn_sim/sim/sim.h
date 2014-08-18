@@ -28,6 +28,7 @@
 #include <learn/optim.h>
 #include <learn/res_stdp.h>
 #include <learn/simple_stdp.h>
+#include <learn/triple_stdp.h>
 
 pthread_barrier_t barrier;
 

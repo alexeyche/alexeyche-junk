@@ -10,6 +10,7 @@ Constants* createConstants(const char *filename) {
     Constants *c = (Constants*)malloc(sizeof(Constants));
     c->adex = (AdExConstants*) malloc( sizeof(AdExConstants) );
     c->res_stdp = (ResourceSTDPConstants*) malloc( sizeof(ResourceSTDPConstants) );
+    c->tr_stdp = (TripleSTDPConstants*) malloc( sizeof(TripleSTDPConstants) );
     c->preproc = (PreprocessConstants*) malloc( sizeof(PreprocessConstants) );
     c->pacemaker = (PacemakerConstants*) malloc( sizeof(PacemakerConstants) );
     c->wta = (WtaConstants*) malloc( sizeof(WtaConstants) );
@@ -23,6 +24,8 @@ Constants* createConstants(const char *filename) {
     c->__pr = c->pr/c->sim_dim;
     c->wta->__max_freq = c->wta->max_freq/c->sim_dim;
     c->res_stdp->__Aplus_max_Amin = 1.0/max(c->res_stdp->Aplus, c->res_stdp->Aminus);
+    c->tr_stdp->__Aminus_cube_delim_p_target = c->tr_stdp->Aminus * 1.0/(c->tr_stdp->p_target * c->tr_stdp->p_target * c->tr_stdp->p_target);
+    c->tr_stdp->__Aplus = (c->tr_stdp->Aminus * c->tr_stdp->tau_minus)/(c->tr_stdp->p_target * c->tr_stdp->tau_plus * c->tr_stdp->tau_minus);
     for(size_t i=0; i<c->lc->size; i++) {
         if((getLayerConstantsC(c,i)->determ)&&(getLayerConstantsC(c,i)->learn)) {
             printf("Can't learn anything in determenistic mode\n");
@@ -37,6 +40,7 @@ void deleteConstants(Constants *c) {
     free(c->adex);
     free(c->res_stdp);
     free(c->preproc);
+    free(c->tr_stdp);
     free(c);
 }
 
@@ -117,6 +121,9 @@ learning_rule_t learningRuleParse(char *str) {
     }
     if(strcmp(str, "SimpleSTDP") == 0) {
         return(ESimpleSTDP);
+    }
+    if(strcmp(str, "TripleSTDP") == 0) {
+        return(ETripleSTDP);
     }
     printf("Can't do parse of learning rule: %s\n", str);
     exit(1);
@@ -331,6 +338,27 @@ int file_handler(void* user, const char* section, const char* name, const char* 
     if (MATCH("optimal stdp", "target_rate_factor")) {
         c->target_rate_factor = atof(value);
     } else 
+    if (MATCH("triple stdp", "A+")) {
+        c->tr_stdp->Aplus = atof(value);
+    } else 
+    if (MATCH("triple stdp", "A-")) {
+        c->tr_stdp->Aminus = atof(value);
+    } else 
+    if (MATCH("triple stdp", "tau+")) {
+        c->tr_stdp->tau_plus = atof(value);
+    } else 
+    if (MATCH("triple stdp", "tau-")) {
+        c->tr_stdp->tau_minus = atof(value);
+    } else 
+    if (MATCH("triple stdp", "tau_y")) {
+        c->tr_stdp->tau_y = atof(value);
+    } else 
+    if (MATCH("triple stdp", "p_target")) {
+        c->tr_stdp->p_target = atof(value);
+    } else 
+    if (MATCH("triple stdp", "tau_average")) {
+        c->tr_stdp->tau_average = atof(value);
+    } else 
     if (MATCH("resource stdp", "A+")) {
         c->res_stdp->Aplus = atof(value);
     } else 
@@ -453,6 +481,19 @@ void AdExConstantsPrint(AdExConstants *c) {
     printf("==================\n");
 }
 
+void TripleSTDPConstantsPrint(TripleSTDPConstants *c) {
+    printf("==================\n");
+    printf("Aplus->"); doublePrint(c->Aplus);
+    printf("Aminus->"); doublePrint(c->Aminus);
+    printf("tau_plus->"); doublePrint(c->tau_plus);
+    printf("tau_minus->"); doublePrint(c->tau_minus);
+    printf("tau_y->"); doublePrint(c->tau_y);
+    printf("p_target->"); doublePrint(c->p_target);
+    printf("tau_average->"); doublePrint(c->tau_average);
+    printf("==================\n");
+}
+
+
 void ResourceSTDPConstantsPrint(ResourceSTDPConstants *c) {
     printf("==================\n");
     printf("Aplus->"); doublePrint(c->Aplus);
@@ -503,6 +544,9 @@ void learning_rule_tPrint(learning_rule_t v) {
     }
     if(v == ESimpleSTDP) {
         printf("SimpleSTDP\n");
+    }
+    if(v == ETripleSTDP) {
+        printf("TripleSTDP\n");
     }
 }
 
@@ -600,6 +644,7 @@ void printConstants(Constants *c) {
     printf("p_set->"); doublePrint(c->p_set);
     printf("adex->"); AdExConstantsPrint(c->adex);
     printf("res_stdp->"); ResourceSTDPConstantsPrint(c->res_stdp);
+    printf("tr_stdp->"); TripleSTDPConstantsPrint(c->tr_stdp);
     printf("preproc->"); PreprocessConstantsPrint(c->preproc);
     printf("reinforcement->"); boolPrint(c->reinforcement);
     printf("reward_ltd->"); doublePrint(c->reward_ltd);
