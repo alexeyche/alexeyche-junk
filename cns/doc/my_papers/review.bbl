@@ -1,9 +1,9 @@
 \begin{thebibliography}{1}
 
-\bibitem{Zaencev1999}
-И.В. Заенцев.
-\newblock {\em Нейронные сети: основные модели}.
-\newblock 1999.
+\bibitem{BohteReview}
+H.~Paugam-Moisy and S.M. Bohte.
+\newblock Computing with spiking neuron networks.
+\newblock {\em Handbook of Natural Computing}, pages 335--376, 2012.
 
 \bibitem{Genesis}
 {\em The Book of GENESIS: Exploring Realistic Neural Models with the GEneral
@@ -15,6 +15,11 @@ A.~L. Hodgkin and A.~F. Huxley.
 \newblock A quantitative description of membrane current and its application to
   conduction and excitation in nerve.
 \newblock {\em J Physiol.}, 117(4):500–544, 1952.
+
+\bibitem{Zaencev1999}
+И.В. Заенцев.
+\newblock {\em Нейронные сети: основные модели}.
+\newblock 1999.
 
 \bibitem{Lapicque}
 Mark C.W. van~Rossum Nicolas~Brunel.
