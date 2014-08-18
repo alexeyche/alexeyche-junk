@@ -31,6 +31,7 @@ impl NetNeuron for Neuron {
 
 }
 
+#[deriving(Show)]
 pub struct Layer {
     id : uint, 
     neurons : Vec<Box<NetNeuron>>,
@@ -50,29 +51,13 @@ impl NetLayer for Layer {
     }
 }
 
+//impl Show for Box<NetNeuron> {
+//    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+//                
+//
+//    }
+//}
 
-
-impl<'a> Iterator<int> for SListIter<'a> {
-    fn next(&mut self) -> Option<int> {
-        self.current.map(|current| {
-            let value = current.n;
-            self.current = match current.next {
-                Some(box ref next) => Some(next),
-                None => None
-            };
-            value
-        })
-    }
-}
-
-impl Show for Layer {
-    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
-        for n in self.neurons.iter() {
-            writeln!(f, "{}", n.getId());
-        }
-        Ok(())
-    }
-}
 
 //impl NetLayer for Layer{
 //    fn new(size: uint, id : uint, glob_id: &mut uint) -> Layer {

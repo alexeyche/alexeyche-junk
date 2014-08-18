@@ -31,9 +31,9 @@ impl Sim {
         for layer_size in c.lc.iter().map(|lc| lc.size) {
             let layer_id = s.layers.len();
             let l: Layer = NetLayer::new(layer_size, layer_id);
+            println!("{}", l);
             s.layers.push(box l);
         }
-        println!("{}", s.layers.to_str());
 //        println!("{}", inp);
         return s;
     }
