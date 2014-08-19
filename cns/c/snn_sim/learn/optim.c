@@ -83,50 +83,49 @@ void trainWeightsStep_OptimalSTDP(learn_t *ls_t, const double *u, const double *
     if(l->fired[ *ni ] == 1) {
         ls->pacc[*ni] += 1;
     }
-    if(getLC(l,c)->learn) {
-        ls->B[ *ni ] = B_calc( &l->fired[ *ni ], p, &ls->pacc[ *ni ], c);
     
-        indLNode *act_node = NULL;
-        while( (act_node = TEMPLATE(getNextLList,ind)(ls->learn_syn_ids[ *ni ]) ) != NULL ) {
-    //            for(size_t con_i=0; con_i < l->nconn[ *ni ]; con_i++) {
-    //                const size_t *syn_id = &con_i;
-            const size_t *syn_id = &act_node->value;
+    ls->B[ *ni ] = B_calc( &l->fired[ *ni ], p, &ls->pacc[ *ni ], c);
 
-    //                if( (l->C[ *ni ][ *syn_id ] == 0) && (l->syn[ *ni ][ *syn_id ] == 0) ) continue;
-            double p_stroke = l->prob_fun_stroke(u,c);
-            double dC = C_calc( &l->fired[ *ni ], p, &p_stroke, u, M, &l->syn[ *ni ][ *syn_id ], c); // * l->syn_spec[ *ni ][ *syn_id ];
-            ls->C[ *ni ][ *syn_id ] += -ls->C[ *ni ][ *syn_id ]/c->tc + dC;
-    //                printf("dC: %f C: %f, params: %d %f %f %f %f\n", dC, l->C[ *ni ][ *syn_id ], l->fired[ *ni ], p, u, l->syn[ *ni ][ *syn_id ], M);
-            
-    #if RATE_NORM == PRESYNAPTIC
-            double dw = getLC(l,c)->lrate*( ls->C[ *ni ][ *syn_id ]*ls->B[ *ni ] -  \
-                                        getLC(l,c)->weight_decay_factor * l->syn_fired[ *ni ][ *syn_id ] * l->W[ *ni ][ *syn_id ] );
-    #elif RATE_NORM == POSTSYNAPTIC                
-            double dw = getLC(l,c)->lrate*( l->C[ *ni ][ *syn_id ]*l->B[ *ni ] -  \
-                                        getLC(l,c)->weight_decay_factor * (l->fired[ *ni ] + l->syn_fired[ *ni ][ *syn_id ]) * l->W[ *ni ][ *syn_id ] );
-    #endif               
-            double wmax = getLC(l,c)->wmax;
-            dw = bound_grad(&l->W[ *ni ][ *syn_id ], &dw, &wmax, c);
+    indLNode *act_node = NULL;
+    while( (act_node = TEMPLATE(getNextLList,ind)(ls->learn_syn_ids[ *ni ]) ) != NULL ) {
+//            for(size_t con_i=0; con_i < l->nconn[ *ni ]; con_i++) {
+//                const size_t *syn_id = &con_i;
+        const size_t *syn_id = &act_node->value;
+
+//                if( (l->C[ *ni ][ *syn_id ] == 0) && (l->syn[ *ni ][ *syn_id ] == 0) ) continue;
+        double p_stroke = l->prob_fun_stroke(u,c);
+        double dC = C_calc( &l->fired[ *ni ], p, &p_stroke, u, M, &l->syn[ *ni ][ *syn_id ], c); // * l->syn_spec[ *ni ][ *syn_id ];
+        ls->C[ *ni ][ *syn_id ] += -ls->C[ *ni ][ *syn_id ]/c->tc + dC;
+//                printf("dC: %f C: %f, params: %d %f %f %f %f\n", dC, l->C[ *ni ][ *syn_id ], l->fired[ *ni ], p, u, l->syn[ *ni ][ *syn_id ], M);
+        
+#if RATE_NORM == PRESYNAPTIC
+        double dw = getLC(l,c)->lrate*( ls->C[ *ni ][ *syn_id ]*ls->B[ *ni ] -  \
+                                    getLC(l,c)->weight_decay_factor * l->syn_fired[ *ni ][ *syn_id ] * l->W[ *ni ][ *syn_id ] );
+#elif RATE_NORM == POSTSYNAPTIC                
+        double dw = getLC(l,c)->lrate*( l->C[ *ni ][ *syn_id ]*l->B[ *ni ] -  \
+                                    getLC(l,c)->weight_decay_factor * (l->fired[ *ni ] + l->syn_fired[ *ni ][ *syn_id ]) * l->W[ *ni ][ *syn_id ] );
+#endif               
+        double wmax = getLC(l,c)->wmax;
+        dw = bound_grad(&l->W[ *ni ][ *syn_id ], &dw, &wmax, c);
 //            if(l->syn_spec[*ni][*syn_id]>0) {
-                l->W[ *ni ][ *syn_id ] += dw;
+            l->W[ *ni ][ *syn_id ] += dw;
 //            } else {
 //                l->W[ *ni ][ *syn_id ] += dw*0.1;
 //            }
-    
-            
-            if( (ls->C[ *ni ][ *syn_id ] < LEARN_ACT_TOL ) && (ls->C[ *ni ][ *syn_id ] > -LEARN_ACT_TOL ) && 
-                                                              (dC < LEARN_ACT_TOL ) && (dC > -LEARN_ACT_TOL ) ) {
-    
-                TEMPLATE(dropNodeLList,ind)(ls->learn_syn_ids[ *ni ], act_node);
-            }
-            if( isnan(dw) ) { 
-                printf("\nFound bad value\n");
-                printf("nid: %zu, p: %f, u: %f, B: %f, pacc: %f, C: %f, W: %f, dw: %f\n", *ni, *p, *u, ls->B[ *ni ], ls->pacc[ *ni ], ls->C[ *ni ][ *syn_id ], l->W[ *ni ][ *syn_id ], dw);
-                printf("C params: Yspike: %d, synapse: %f, dC: %f, p': %f\n", l->fired[ *ni],l->syn[ *ni ][ *syn_id ], dC, pstroke(u,c));
-                exit(1);
-            }
-    
-       }
+
+        
+        if( (ls->C[ *ni ][ *syn_id ] < LEARN_ACT_TOL ) && (ls->C[ *ni ][ *syn_id ] > -LEARN_ACT_TOL ) && 
+                                                          (dC < LEARN_ACT_TOL ) && (dC > -LEARN_ACT_TOL ) ) {
+
+            TEMPLATE(dropNodeLList,ind)(ls->learn_syn_ids[ *ni ], act_node);
+        }
+        if( isnan(dw) ) { 
+            printf("\nFound bad value\n");
+            printf("nid: %zu, p: %f, u: %f, B: %f, pacc: %f, C: %f, W: %f, dw: %f\n", *ni, *p, *u, ls->B[ *ni ], ls->pacc[ *ni ], ls->C[ *ni ][ *syn_id ], l->W[ *ni ][ *syn_id ], dw);
+            printf("C params: Yspike: %d, synapse: %f, dC: %f, p': %f\n", l->fired[ *ni],l->syn[ *ni ][ *syn_id ], dC, pstroke(u,c));
+            exit(1);
+        }
+
    }
    ls->pacc[ *ni ] -= ls->pacc[ *ni ]/c->mean_p_dur; 
 

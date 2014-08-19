@@ -43,18 +43,15 @@ LayerPoisson* createPoissonLayer(size_t N, size_t *glob_idx, unsigned char statL
     if(l->stat->statLevel > 0) {
         l->stat->stat_p = (doubleVector**) malloc( l->N*sizeof(doubleVector*));
         l->stat->stat_fired = (doubleVector**) malloc( l->N*sizeof(doubleVector*));
+        l->stat->stat_u = (doubleVector**) malloc( l->N*sizeof(doubleVector*));
         for(size_t ni=0; ni<l->N; ni++) {
             l->stat->stat_p[ni] = TEMPLATE(createVector,double)();
             l->stat->stat_fired[ni] = TEMPLATE(createVector,double)(); 
-
+            l->stat->stat_u[ni] = TEMPLATE(createVector,double)();
         }
         if(l->stat->statLevel > 1) {
-            l->stat->stat_u = (doubleVector**) malloc( l->N*sizeof(doubleVector*));
             l->stat->stat_W = (doubleVector***) malloc( l->N*sizeof(doubleVector**));
             l->stat->stat_syn = (doubleVector***) malloc( l->N*sizeof(doubleVector**));
-            for(size_t ni=0; ni<l->N; ni++) {
-                l->stat->stat_u[ni] = TEMPLATE(createVector,double)();
-            }
         }
     }
 
@@ -82,9 +79,7 @@ void deleteLayer_Poisson(LayerPoisson *l) {
         if(l->stat->statLevel > 0) {
             TEMPLATE(deleteVector,double)(l->stat->stat_p[ni]);
             TEMPLATE(deleteVector,double)(l->stat->stat_fired[ni]);
-            if(l->stat->statLevel > 1) {
-                TEMPLATE(deleteVector,double)(l->stat->stat_u[ni]);
-            }                
+            TEMPLATE(deleteVector,double)(l->stat->stat_u[ni]);
         }
     }
     l->deallocSynData(l);
@@ -108,9 +103,7 @@ void deleteLayer_Poisson(LayerPoisson *l) {
     if(l->stat->statLevel >0) {    
         free(l->stat->stat_p);
         free(l->stat->stat_fired);
-        if(l->stat->statLevel > 1) {        
-            free(l->stat->stat_u);
-        }            
+        free(l->stat->stat_u);
     }
     free(l);
 }
@@ -307,9 +300,7 @@ void calculateDynamics_Poisson(LayerPoisson *l, const size_t *ni, const SimConte
     const Constants *c = s->c;
 
     // training
-    if(getLC(l,c)->learn) {
-        l->ls_t->trainWeightsStep(l->ls_t, &l->u[*ni], &l->p[*ni], &l->M[*ni], ni, s);   
-    }
+    l->ls_t->trainWeightsStep(l->ls_t, &l->u[*ni], &l->p[*ni], &l->M[*ni], ni, s);   
 
     // melting      
     indLNode *act_node;
@@ -554,10 +545,11 @@ void saveStat_Poisson(LayerPoisson *l, FileStream *file) {
 
     Matrix *mp = vectorArrayToMatrix(l->stat->stat_p, l->N);
     TEMPLATE(insertVector,pMatrix)(mv, mp);
-    if(l->stat->statLevel> 1) {
-        Matrix *mu = vectorArrayToMatrix(l->stat->stat_u, l->N);
-        TEMPLATE(insertVector,pMatrix)(mv, mu);
-        
+    
+    Matrix *mu = vectorArrayToMatrix(l->stat->stat_u, l->N);
+    TEMPLATE(insertVector,pMatrix)(mv, mu);
+    
+    if(l->stat->statLevel > 1) {
         for(size_t ni=0; ni < l->N; ni++) {
             Matrix *mSyn = vectorArrayToMatrix(l->stat->stat_syn[ni], l->nconn[ni]);
             TEMPLATE(insertVector,pMatrix)(mv, mSyn);
@@ -566,13 +558,16 @@ void saveStat_Poisson(LayerPoisson *l, FileStream *file) {
             Matrix *mdW = vectorArrayToMatrix(l->stat->stat_W[ni], l->nconn[ni]);
             TEMPLATE(insertVector,pMatrix)(mv, mdW);
         }
-        if(l->ls_t) {
-            l->ls_t->saveStat(l->ls_t, file);
-        }
     }        
+
     saveMatrixList(file, mv);
-        
     TEMPLATE(deleteVector,pMatrix)(mv);
+    
+    if(l->ls_t) {
+        l->ls_t->saveStat(l->ls_t, file);
+    }        
+    
+
 }
 
 

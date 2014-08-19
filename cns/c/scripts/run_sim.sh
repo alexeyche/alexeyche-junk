@@ -96,6 +96,7 @@ function get_const {
 
 
 MEAN_P_DUR=$(get_const mean_p_dur)
+TAU_AVERAGE=$(get_const tau_average)
 LEARNING_RULE=$(get_const learning_rule)
 REINFORCEMENT=$(get_const reinforcement)
 
@@ -115,18 +116,24 @@ for EP in $EPOCHS; do
     LEARN=yes
     TMAX_OPT=
     LEARN_OPT=""
-    if [ $EP -eq 1 ] && [ "$LEARNING_RULE" == "OptimalSTDP" ]; then
+    if [ $EP -eq 1 ]; then
+        if [ "$LEARNING_RULE" == "OptimalSTDP" ]; then
+            TMAX_OPT=" -T $MEAN_P_DUR"
+        elif [ "$LEARNING_RULE" == "TripleSTDP" ]; then 
+            TMAX_OPT=" -T $(($TAU_AVERAGE*2))"
+        fi            
         LEARN=no
-        TMAX_OPT=" -T $MEAN_P_DUR"
         LEARN_OPT="-l no"
+
     fi        
+
 
     OUTPUT_SPIKES=$WORK_DIR/${EPOCH_SFX}output_spikes.bin
     OUTPUT_FILE=$WORK_DIR/${EPOCH_SFX}output.log
     MODEL_FILE=$WORK_DIR/${EPOCH_SFX}model.bin
     STAT_OPT=
     if [ "$STAT_SAVE" == "yes" ]; then
-        STAT_OPT="-s $WORK_DIR/${EPOCH_SFX}stat.bin --stat-level 2"
+        STAT_OPT="-s $WORK_DIR/${EPOCH_SFX}stat.bin --stat-level 1"
     elif [[ "$REINFORCEMENT" =~ "true" ]]; then
         STAT_OPT="--stat-level 1 -s $WORK_DIR/${EPOCH_SFX}stat.bin"
     fi    

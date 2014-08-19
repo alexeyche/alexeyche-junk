@@ -11,7 +11,9 @@ library(snn)
 
 rundir="/home/alexeyche/prog/sim/runs"
 #rundir="/home/alexeyche/prog/sim/spear_runs"
-runname = "WtaLayer_SimpleSTDP_Exp_0001"
+#runname = "PoissonLayer_TripleSTDP_ExpHennequin_0003"
+
+runname = system(sprintf("ls -t %s | head -n1", rundir),intern=TRUE)
 workdir=sprintf("%s/%s", rundir, runname)
 
 
@@ -20,7 +22,7 @@ for(ep in 1:1000) {
     if(!file.exists(output_spikes)) { ep=ep-1; break }
 }
 #
-#ep=7
+#ep=2
 
 ep_str=""
 if(ep>0) {
@@ -71,13 +73,15 @@ if(file.exists(sprintf("%s.bin",stat_file))) {
     } else {
         u = loadMatrix(stat_file, 2)
         p = loadMatrix(stat_file, 1)
+        
         syn=1
         nid=1
         Tplot=1:1000
         
+        syns = loadMatrix(stat_file, 2+nid)
+        dWn = loadMatrix(stat_file, 2+1*N+nid)
+        
         if(lrule == "OptimalSTDP") {            
-            syns = loadMatrix(stat_file, 2+nid)
-            dWn = loadMatrix(stat_file, 2+1*N+nid)
             B = loadMatrix(stat_file, 2+2*N+1)
             Cn = loadMatrix(stat_file, 2+2*N+1+nid)
             par(mfrow=c(3,1))
@@ -99,6 +103,18 @@ if(file.exists(sprintf("%s.bin",stat_file))) {
             plotl(x_tr[syn,Tplot])
             plotl(res[nid,Tplot])
             plotl(dWn[syn,Tplot])
+        }
+        if(lrule == "TripleSTDP") {    
+          o_one = loadMatrix(stat_file, 2+2*N+1)
+          o_two = loadMatrix(stat_file, 2+2*N+2)
+          a_minus = loadMatrix(stat_file, 2+2*N+3)
+          #r = loadMatrix(stat_file, 2+2*N+3+nid)
+          par(mfrow=c(3,1))
+          spikes = net[[M+nid]][net[[M+nid]]<max(Tplot)]
+          plot(spikes, rep(1,length(spikes)), xlim=c(min(Tplot),max(Tplot)) )
+          plotl(o_one[nid,Tplot])
+          plotl(o_two[nid,Tplot])
+          #plotl(r[syn,Tplot])
         }
     }
 }

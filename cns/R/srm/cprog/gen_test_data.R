@@ -8,7 +8,7 @@ setwd("~/prog/alexeyche-junk/cns/R/srm/cprog")
 
 spike_file = "/home/alexeyche/prog/sim/test_spikes"
 
-N=5
+N=100
 
 gen_pattern = function(f, dur, N, len=400, del=70) {
     net=blank_net(N)
@@ -28,7 +28,7 @@ patt_dur = 1000
 p1 = gen_pattern(fun1, patt_dur, N)
 p2 = gen_pattern(fun2, patt_dur, N)
 
-patt_nums = 60
+patt_nums = 1
 net = blank_net(N)
 patts = list(p1, p2)
 glob_t = 0

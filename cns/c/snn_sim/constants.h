@@ -50,6 +50,7 @@ typedef struct {
     double p_target;
     double __Aminus_cube_delim_p_target;
     double tau_average;
+    double __sec_tau_average;
 } TripleSTDPConstants;
 
 
