@@ -77,6 +77,7 @@ struct LayerPoisson {
     double *axon_del;
     double **syn_del;
 
+    const double *global_time; // do not use it without proper reason
     // stat
     LayerStat *stat;
     

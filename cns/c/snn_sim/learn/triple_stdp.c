@@ -99,10 +99,10 @@ void trainWeightsStep_TripleSTDP(learn_t *ls_t, const double *u, const double *p
         dw = bound_grad(&l->W[ *ni ][ *syn_id ], &dw, &getLC(l,c)->wmax, c);
         l->W[ *ni ][ *syn_id ] += dw;
 
+        ls->r[ *ni ][ *syn_id ] -= ls->r[ *ni ][ *syn_id ] / c->tr_stdp->tau_plus;
+        
         if( (ls->r[ *ni ][ *syn_id ] < LEARN_ACT_TOL ) && (ls->r[ *ni ][ *syn_id ] > -LEARN_ACT_TOL )) {
             TEMPLATE(dropNodeLList,ind)(ls->learn_syn_ids[ *ni ], act_node);
-        } else {
-            ls->r[ *ni ][ *syn_id ] -= ls->r[ *ni ][ *syn_id ] / c->tr_stdp->tau_plus;
         }
     }
     if(l->fired[ *ni ] == 1) {

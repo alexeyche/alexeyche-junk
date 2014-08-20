@@ -1,0 +1,149 @@
+Wrong Argument: --svm-out
+Usage: 
+	-c - constants ini filename
+	-j - number of parallel jobs
+	-s(c) - stat file, or special version of stat file for calc
+	-m(s|l) - model file for save and load or save or load
+	-i - file for input spikes
+	-o - file for output spikes
+	-l - yes/no to learn
+	-T - run sim till that simtime value
+	-seed - integer seed
+	-ip - port for input spikes
+	-op - port for output spikes
+	-? - print this message
+	--stat-level - (0 - NO STAT, 1 - REWARD STAT, 2 - FULL STAT)
+e0->1.000000
+e_exc->1.000000
+e_inh->-1.000000
+ts->1.000000
+tm->20.000000
+tsr->50.000000
+alpha->1.000000
+beta->0.500000
+u_tr->15.000000
+r0->9.250000
+tr->10.000000
+ta->150.000000
+tb->30.000000
+qr->100.000000
+qa->1.000000
+qb->-9.000000
+gain_factor->12.500000
+pr->0.100000
+__pr->0.000100
+u_rest->0.000000
+tc->100.000000
+mean_p_dur->60000.000000
+duration->1000.000000
+dt->1.000000
+sim_dim->1000.000000
+seed->1234
+target_neurons->false
+M->100
+lc->==================
+LayerPoisson 0
+N->100
+learning_rule->OptimalSTDP
+neuron_type->PoissonLayer
+prob_fun->ExpHennequin
+learn->true
+determ->false
+net_edge_prob->0.000000
+input_edge_prob->1.000000
+output_edge_prob->0.000000
+inhib_frac->0.500000
+weight_per_neuron->200.000000
+wmax->10.000000
+weight_decay_factor->0.010000
+weight_var->0.000000
+lrate->0.000000
+axonal_delays_rate->0.000000
+axonal_delays_gain->0.000000
+syn_delays_rate->0.000000
+syn_delays_gain->0.000000
+ws->1.000000
+aw->9.000000
+ltd_factor->0.150000
+==================
+target_rate->15.000000
+__target_rate->0.015000
+target_rate_factor->0.000000
+epochs->100
+p_set->15.000000
+adex->==================
+C->10.000000
+gL->1.000000
+EL->-70.600000
+Vtr->-50.000000
+slope->10.000000
+tau_w->1.000000
+a->0.000000
+b->0.000000
+==================
+res_stdp->==================
+Aplus->0.320000
+Aminus->0.270000
+tau_plus->16.000000
+tau_minus->32.000000
+tau_res->45.000000
+==================
+tr_stdp->==================
+Aplus->0.006500
+Aminus->0.002800
+tau_plus->16.800000
+tau_minus->33.700000
+tau_y->114.000000
+p_target->5.000000
+tau_average->10000.000000
+==================
+preproc->==================
+gain->25.000000
+sigma->0.010000
+dt->10.000000
+mult->1.666667
+==================
+reinforcement->false
+reward_ltd->-1.000000
+reward_ltp->1.000000
+reward_baseline->0.000000
+tel->100.000000
+trew->10000.000000
+pacemaker->==================
+pacemaker_on->false
+frequency->10.000000
+cumulative_period_delta->50.000000
+amplitude->4.000000
+==================
+Wrong Argument: --svm-out
+Usage: 
+	-c - constants ini filename
+	-j - number of parallel jobs
+	-s(c) - stat file, or special version of stat file for calc
+	-m(s|l) - model file for save and load or save or load
+	-i - file for input spikes
+	-o - file for output spikes
+	-l - yes/no to learn
+	-T - run sim till that simtime value
+	-seed - integer seed
+	-ip - port for input spikes
+	-op - port for output spikes
+	-? - print this message
+	--stat-level - (0 - NO STAT, 1 - REWARD STAT, 2 - FULL STAT)
++ /home/alexeyche/distr/liblinear-1.94/train -s 0 /home/alexeyche/prog/sim/runs/PoissonLayer_OptimalSTDP_ExpHennequin_0000/eval/postproc_1.train.k5.0.dat /home/alexeyche/prog/sim/runs/PoissonLayer_OptimalSTDP_ExpHennequin_0000/eval/postproc_1.train.k5.0.model
+iter  1 act 1.992e+01 pre 1.806e+01 delta 2.055e+00 f 2.773e+01 |g| 2.004e+01 CG   2
+iter  2 act 1.360e+00 pre 1.214e+00 delta 2.055e+00 f 7.807e+00 |g| 3.824e+00 CG   2
+iter  3 act 6.026e-02 pre 5.800e-02 delta 2.055e+00 f 6.447e+00 |g| 6.990e-01 CG   2
+iter  1 act 1.993e+01 pre 1.807e+01 delta 2.044e+00 f 2.773e+01 |g| 2.019e+01 CG   2
+iter  2 act 1.384e+00 pre 1.234e+00 delta 2.044e+00 f 7.795e+00 |g| 3.878e+00 CG   2
+iter  3 act 6.291e-02 pre 6.049e-02 delta 2.044e+00 f 6.411e+00 |g| 7.168e-01 CG   2
+iter  1 act 2.014e+01 pre 1.823e+01 delta 1.978e+00 f 2.773e+01 |g| 2.140e+01 CG   2
+iter  2 act 1.479e+00 pre 1.309e+00 delta 1.978e+00 f 7.582e+00 |g| 4.192e+00 CG   2
+iter  3 act 7.994e-02 pre 7.621e-02 delta 1.978e+00 f 6.103e+00 |g| 8.320e-01 CG   2
+iter  4 act 5.037e-04 pre 5.012e-04 delta 1.978e+00 f 6.023e+00 |g| 6.446e-02 CG   2
+iter  1 act 2.011e+01 pre 1.820e+01 delta 1.987e+00 f 2.773e+01 |g| 2.133e+01 CG   2
+iter  2 act 1.471e+00 pre 1.302e+00 delta 1.987e+00 f 7.617e+00 |g| 4.179e+00 CG   2
+iter  3 act 7.908e-02 pre 7.539e-02 delta 1.987e+00 f 6.146e+00 |g| 8.294e-01 CG   2
+iter  4 act 4.984e-04 pre 4.959e-04 delta 1.987e+00 f 6.067e+00 |g| 6.432e-02 CG   2
++ /home/alexeyche/distr/liblinear-1.94/predict /home/alexeyche/prog/sim/runs/PoissonLayer_OptimalSTDP_ExpHennequin_0000/eval/postproc_1.test.k5.0.dat /home/alexeyche/prog/sim/runs/PoissonLayer_OptimalSTDP_ExpHennequin_0000/eval/postproc_1.train.k5.0.model /home/alexeyche/prog/sim/runs/PoissonLayer_OptimalSTDP_ExpHennequin_0000/eval/postproc_1.test.k5.0.predict
+Accuracy = 77.5% (31/40)

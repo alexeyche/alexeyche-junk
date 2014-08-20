@@ -22,6 +22,63 @@ SpikesList* cutSpikesList(SpikesList *sl, int number_to_cut_from_head) {
 
 int main(int argc, char **argv) {
     ArgOptionsPostProc a = parsePostProcOptions(argc, argv);
+    if(a.calc_predict_stat_table) {
+        intVector *uniq_classes_calc_stat_left = TEMPLATE(createVector,int)();
+        intVector *uniq_classes_calc_stat_right = TEMPLATE(createVector,int)();
+        intVector *classes_calc_stat_left = TEMPLATE(createVector,int)();
+        intVector *classes_calc_stat_right = TEMPLATE(createVector,int)();
+        FILE *s; 
+        if((s = fopen(a.calc_predict_stat_table, "r")) == NULL) {
+            perror("Error open");
+        }
+        char *line;
+        size_t len = 0;
+        ssize_t read;
+        while((read = getline(&line, &len, s)) != -1) {
+            int left, right;
+            sscanf (line, "%d %d", &left, &right);
+            
+            int index_left = -1;
+            for(size_t ci=0; ci < uniq_classes_calc_stat_left->size; ci++) {
+                if(uniq_classes_calc_stat_left->array[ci] == left) {
+                    index_left = ci;
+                }
+            }                
+            if(index_left<0) {
+                TEMPLATE(insertVector,int)(uniq_classes_calc_stat_left, left);
+            }
+
+            int index_right = -1;
+            for(size_t ci=0; ci < uniq_classes_calc_stat_right->size; ci++) {
+                if(uniq_classes_calc_stat_right->array[ci] == right) {
+                    index_right = ci;
+                }
+            }                
+            if(index_right<0) {
+                TEMPLATE(insertVector,int)(uniq_classes_calc_stat_right, right);
+            }
+            TEMPLATE(insertVector,int)(classes_calc_stat_right, right);
+            TEMPLATE(insertVector,int)(classes_calc_stat_left, left);
+        }
+        if(line) {
+            free(line);
+        }
+        fclose(s);  /* close the file prior to exiting the routine */
+        
+
+        assert(uniq_classes_calc_stat_right->size == uniq_classes_calc_stat_left->size);
+        Matrix *confM = calcConfMatrix(classes_calc_stat_left, classes_calc_stat_right, uniq_classes_calc_stat_left);
+        for(size_t i=0; i<confM->nrow; i++) {
+            for(size_t j=0; j<confM->nrow; j++) {
+                printf("%3.1f ", getMatrixElement(confM, i, j));
+            }
+            printf("\n");
+        }
+        printf("NMI = %f\n", calcNMI(confM));
+        deleteMatrix(confM);
+        return(0);
+    }
+   
 //train data    
     pMatrixVector *input_train_struct = readMatrixListFromFile(a.input_train_spikes);
     

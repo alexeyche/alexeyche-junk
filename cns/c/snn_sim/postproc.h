@@ -47,5 +47,7 @@ ClassificationStat getClassificationStat(pMatrixVector *train, indVector *train_
 double euclDistance(Matrix *m1, Matrix *m2);
 void writeLineSVMStruct(double *vals, size_t size, int class, FileStream *fs);
 void writeMatrixListToSVMStruct(pMatrixVector *v, doubleVector *cl, const char *output_file);
+Matrix* calcConfMatrix(intVector *test, intVector *pred, intVector *uniq_classes);
+double calcNMI(Matrix *confM);
 
 #endif

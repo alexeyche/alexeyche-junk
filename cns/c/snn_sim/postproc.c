@@ -97,6 +97,50 @@ double judge_log(double v) {
     return(log(v));        
 }
 
+Matrix* calcConfMatrix(intVector *test, intVector *pred, intVector *uniq_classes) {
+    Matrix *confM = createZeroMatrix(uniq_classes->size, uniq_classes->size);
+    for(size_t el_i=0; el_i < test->size; el_i++) {
+//        printf("%d %d\n",  test->array[ el_i ]-1, pred->array[ el_i ]-1);
+        incMatrixElement(confM, test->array[ el_i ]-1, pred->array[ el_i ]-1, 1);
+//        printf("%f", getMatrixElement(confM, test->array[ el_i ]-1, pred->array[ el_i ]-1));
+    }
+    return confM;
+}
+
+double calcNMI(Matrix *confM) {
+    double log_cl = log(confM->nrow);
+    
+    double sum_of_col[confM->nrow];
+    for(size_t i=0; i<confM->nrow; i++) { sum_of_col[i]=0.0; }
+    double sum_of_row[confM->ncol];
+    for(size_t i=0; i<confM->ncol; i++) { sum_of_row[i]=0.0; }
+
+    printf("%zu %zu\n", confM->nrow, confM->ncol);
+    double whole_sum = 0;
+    for(size_t i=0; i<confM->nrow; i++) {
+        for(size_t j=0; j<confM->ncol; j++) {
+            double el = getMatrixElement(confM, i, j);
+            sum_of_row[j] += el;
+            sum_of_col[i] += el;
+            whole_sum += el;
+        }
+    }
+
+    double NMI = 0;
+    for(size_t i=0; i<confM->nrow; i++) {
+        for(size_t j=0; j<confM->ncol; j++) {
+            double Nij = getMatrixElement(confM, i, j);
+            double v = judge_log(Nij)/log_cl;        
+            v -= judge_log(sum_of_row[j])/log_cl;
+            v -= judge_log(sum_of_col[i])/log_cl;
+            v += judge_log(whole_sum)/log_cl;
+            NMI += v * Nij;
+        }
+    }
+    NMI = NMI/whole_sum;
+    return NMI;
+}
+
 ClassificationStat getClassificationStat(pMatrixVector *train, indVector *train_labels_ind, pMatrixVector *test, indVector *test_labels_ind, intVector *uniq_classes, int  jobs) {
     Matrix *K = createMatrix(test->size, train->size);
     

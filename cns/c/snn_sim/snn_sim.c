@@ -23,7 +23,7 @@ int main(int argc, char **argv) {
             getLayerConstantsC(c,i)->lrate = 0.0;
         }
     }
-    printConstants(c);
+//    printConstants(c);
     assert(a.jobs != 0);
     unsigned char statLevel = 0;
     if(saveStat) {
