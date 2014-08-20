@@ -25,7 +25,7 @@ Constants* createConstants(const char *filename) {
     c->wta->__max_freq = c->wta->max_freq/c->sim_dim;
     c->res_stdp->__Aplus_max_Amin = 1.0/max(c->res_stdp->Aplus, c->res_stdp->Aminus);
     c->tr_stdp->__Aminus_cube_delim_p_target = c->tr_stdp->Aminus * 1.0/(c->tr_stdp->p_target * c->tr_stdp->p_target * c->tr_stdp->p_target);
-    c->tr_stdp->__Aplus = (c->tr_stdp->Aminus * c->tr_stdp->tau_minus)/(c->tr_stdp->p_target * c->tr_stdp->tau_plus * c->tr_stdp->tau_minus);
+    c->tr_stdp->__Aplus = (c->tr_stdp->Aminus * c->tr_stdp->tau_minus)/( (c->tr_stdp->p_target/1000.0) * c->tr_stdp->tau_plus * c->tr_stdp->tau_minus);
     c->tr_stdp->__sec_tau_average = c->tr_stdp->tau_average/1000;
     for(size_t i=0; i<c->lc->size; i++) {
         if((getLayerConstantsC(c,i)->determ)&&(getLayerConstantsC(c,i)->learn)) {

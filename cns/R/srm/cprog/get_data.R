@@ -71,15 +71,17 @@ if(file.exists(sprintf("%s.bin",stat_file))) {
             plot(rew_all,type="l")
         }
     } else {
-        u = loadMatrix(stat_file, 2)
-        p = loadMatrix(stat_file, 1)
+        it=1
+        p = loadMatrix(stat_file, it); it=it+1
+        u = loadMatrix(stat_file, it); it=it+1
         
-        syn=1
+        
+        syn=11
         nid=1
         Tplot=1:1000
         
-        syns = loadMatrix(stat_file, 2+nid)
-        dWn = loadMatrix(stat_file, 2+1*N+nid)
+        syns = loadMatrix(stat_file, it+nid); it=it+N
+        dWn = loadMatrix(stat_file, it+nid); it=it+N
         
         if(lrule == "OptimalSTDP") {            
             B = loadMatrix(stat_file, 2+2*N+1)
@@ -105,54 +107,57 @@ if(file.exists(sprintf("%s.bin",stat_file))) {
             plotl(dWn[syn,Tplot])
         }
         if(lrule == "TripleSTDP") {    
-          o_one = loadMatrix(stat_file, 2+2*N+1)
-          o_two = loadMatrix(stat_file, 2+2*N+2)
-          a_minus = loadMatrix(stat_file, 2+2*N+3)
-          #r = loadMatrix(stat_file, 2+2*N+3+nid)
-          par(mfrow=c(3,1))
+          o_one = loadMatrix(stat_file, it); it=it+1
+          o_two = loadMatrix(stat_file, it); it=it+1
+          a_minus = loadMatrix(stat_file, it); it=it+1
+          pacc = loadMatrix(stat_file, it); it=it+1
+          r = loadMatrix(stat_file, it+nid)
+          par(mfrow=c(4,1))
           spikes = net[[M+nid]][net[[M+nid]]<max(Tplot)]
           plot(spikes, rep(1,length(spikes)), xlim=c(min(Tplot),max(Tplot)) )
           plotl(o_one[nid,Tplot])
-          plotl(o_two[nid,Tplot])
-          #plotl(r[syn,Tplot])
+          #plotl(o_two[nid,Tplot])
+          #plotl(pacc[nid,Tplot])
+          plotl(dWn[syn,Tplot])
+          plotl(syns[syn,Tplot])
         }
     }
-}
-
-matrix_per_layer = 7
-Wnorm = W = NULL
-max_row = sum(sum(N)+M)
-for(Ni in 1:length(N)) {
-    Wlayer = loadMatrix(model_file,(Ni-1)*matrix_per_layer+1)
-    if(ncol(Wlayer)<max_row) {
-        Wlayer = cbind(Wlayer, matrix(0, nrow=nrow(Wlayer), ncol=(max_row-ncol(Wlayer))))
+} else {
+    matrix_per_layer = 7
+    Wnorm = W = NULL
+    max_row = sum(sum(N)+M)
+    for(Ni in 1:length(N)) {
+        Wlayer = loadMatrix(model_file,(Ni-1)*matrix_per_layer+1)
+        if(ncol(Wlayer)<max_row) {
+            Wlayer = cbind(Wlayer, matrix(0, nrow=nrow(Wlayer), ncol=(max_row-ncol(Wlayer))))
+        }
+        Wnorm = rbind(Wnorm, Wlayer/max(Wlayer))
+        
+        W = rbind(W, Wlayer)
     }
-    Wnorm = rbind(Wnorm, Wlayer/max(Wlayer))
     
-    W = rbind(W, Wlayer)
-}
-
-Wnorm = W
-p2 = levelplot(t(Wnorm), col.regions=colorRampPalette(c("black", "white")))
-
-print(p1, position=c(0, 0.6, 1, 1), more=TRUE)
-print(p2, position=c(0, 0, 1, 0.6))
-
-#hist(W[101:200,])
-
-# Wacc = vector("list",N)
-# pacc = vector("list",N)
-# for(ep in 3:200) {
-#     model_file = sprintf("%s/%d_model", workdir, ep)
-#     if(file.exists(sprintf("%s.bin",model_file))) {
-#         W = loadMatrix(model_file,1)
-#         pmean = loadMatrix(model_file,3)
-#         for(ni in 1:N) {
-#             Wacc[[ni]] = cbind(Wacc[[ni]], W[ni,])    
-#             pacc[[ni]] = c(pacc[[ni]], c(pmean[ni,]))
-#         }
-#         
-#     }
-# }
-# 
-# gr_pl(t(Wacc[[1]]))
+    Wnorm = W
+    p2 = levelplot(t(Wnorm), col.regions=colorRampPalette(c("black", "white")))
+    
+    print(p1, position=c(0, 0.6, 1, 1), more=TRUE)
+    print(p2, position=c(0, 0, 1, 0.6))
+    
+    #hist(W[101:200,])
+    
+    # Wacc = vector("list",N)
+    # pacc = vector("list",N)
+    # for(ep in 3:200) {
+    #     model_file = sprintf("%s/%d_model", workdir, ep)
+    #     if(file.exists(sprintf("%s.bin",model_file))) {
+    #         W = loadMatrix(model_file,1)
+    #         pmean = loadMatrix(model_file,3)
+    #         for(ni in 1:N) {
+    #             Wacc[[ni]] = cbind(Wacc[[ni]], W[ni,])    
+    #             pacc[[ni]] = c(pacc[[ni]], c(pmean[ni,]))
+    #         }
+    #         
+    #     }
+    # }
+    # 
+    # gr_pl(t(Wacc[[1]]))
+}    

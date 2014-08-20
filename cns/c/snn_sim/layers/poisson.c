@@ -275,12 +275,14 @@ void calculateProbability_Poisson(LayerPoisson *l, const size_t *ni, const SimCo
 
     l->p[*ni] *= l->M[*ni];
 
-    if(l->stat->statLevel > 1)  {
-        for(size_t con_i=0; con_i<l->nconn[*ni]; con_i++) {
-            TEMPLATE(insertVector,double)(l->stat->stat_syn[*ni][con_i], l->syn[ *ni ][ con_i ]);
-            TEMPLATE(insertVector,double)(l->stat->stat_W[*ni][con_i], l->W[ *ni ][ con_i ]);
-        }
+    if(l->stat->statLevel > 0)  {
         TEMPLATE(insertVector,double)(l->stat->stat_u[*ni], l->u[*ni]);
+        if(l->stat->statLevel > 1)  {
+            for(size_t con_i=0; con_i<l->nconn[*ni]; con_i++) {
+                TEMPLATE(insertVector,double)(l->stat->stat_syn[*ni][con_i], l->syn[ *ni ][ con_i ]);
+                TEMPLATE(insertVector,double)(l->stat->stat_W[*ni][con_i], l->W[ *ni ][ con_i ]);
+            }
+        }
     }
 }
 

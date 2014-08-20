@@ -22,6 +22,7 @@ typedef struct {
     doubleVector **stat_o_two;
     doubleVector ***stat_r;
     doubleVector **stat_a_minus;
+    doubleVector **stat_pacc;
 } TripleSTDP;
 
 TripleSTDP* init_TripleSTDP(struct LayerPoisson *l);

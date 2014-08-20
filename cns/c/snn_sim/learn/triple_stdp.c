@@ -14,6 +14,7 @@ TripleSTDP* init_TripleSTDP(LayerPoisson *l) {
         ls->stat_o_one = (doubleVector**) malloc( l->N*sizeof(doubleVector*));
         ls->stat_o_two = (doubleVector**) malloc( l->N*sizeof(doubleVector*));
         ls->stat_a_minus = (doubleVector**) malloc( l->N*sizeof(doubleVector*));
+        ls->stat_pacc = (doubleVector**) malloc( l->N*sizeof(doubleVector*));
         ls->stat_r = (doubleVector***) malloc( l->N*sizeof(doubleVector**));
     }
 
@@ -29,6 +30,7 @@ TripleSTDP* init_TripleSTDP(LayerPoisson *l) {
             ls->stat_o_one[ni] = TEMPLATE(createVector,double)();
             ls->stat_o_two[ni] = TEMPLATE(createVector,double)();
             ls->stat_a_minus[ni] = TEMPLATE(createVector,double)();
+            ls->stat_pacc[ni] = TEMPLATE(createVector,double)();
             ls->stat_r[ni] = (doubleVector**) malloc( l->nconn[ni]*sizeof(doubleVector*));
             for(size_t con_i=0; con_i < l->nconn[ni]; con_i++) {
                 ls->stat_r[ni][con_i] = TEMPLATE(createVector,double)();
@@ -81,10 +83,9 @@ void trainWeightsStep_TripleSTDP(learn_t *ls_t, const double *u, const double *p
         ls->pacc[*ni] += 1;
         ls->o_one[*ni] += 1;
     }
-//    double p_norm = ls->pacc[*ni]/c->tr_stdp->__sec_tau_average;
-//    printf("%f\n", p_norm);
-//    double Aminus = p_norm * p_norm * p_norm * c->tr_stdp->__Aminus_cube_delim_p_target;
-    double Aminus = c->tr_stdp->Aminus;
+    double p_norm = ls->pacc[*ni]/c->tr_stdp->__sec_tau_average;
+    double Aminus = p_norm * p_norm * p_norm * c->tr_stdp->__Aminus_cube_delim_p_target;
+//    Aminus = c->tr_stdp->Aminus;
 
     indLNode *act_node = NULL;
     while( (act_node = TEMPLATE(getNextLList,ind)(ls->learn_syn_ids[ *ni ]) ) != NULL ) {
@@ -117,6 +118,7 @@ void trainWeightsStep_TripleSTDP(learn_t *ls_t, const double *u, const double *p
         TEMPLATE(insertVector,double)(ls->stat_o_one[ *ni ], ls->o_one[ *ni ]);
         TEMPLATE(insertVector,double)(ls->stat_o_two[ *ni ], ls->o_two[ *ni ]);
         TEMPLATE(insertVector,double)(ls->stat_a_minus[ *ni ], Aminus);
+        TEMPLATE(insertVector,double)(ls->stat_pacc[ *ni ], ls->pacc[ *ni ]);
         if(l->stat->statLevel > 1) {
             for(size_t con_i=0; con_i<l->nconn[ *ni ]; con_i++) {
                 TEMPLATE(insertVector,double)(ls->stat_r[ *ni ][ con_i ], ls->r[ *ni ][ con_i ]);
@@ -141,6 +143,7 @@ void free_TripleSTDP(learn_t *ls_t) {
             TEMPLATE(deleteVector,double)(ls->stat_o_one[ni]);
             TEMPLATE(deleteVector,double)(ls->stat_o_two[ni]);
             TEMPLATE(deleteVector,double)(ls->stat_a_minus[ni]);
+            TEMPLATE(deleteVector,double)(ls->stat_pacc[ni]);
             for(size_t con_i=0; con_i < l->nconn[ni]; con_i++) {
                 TEMPLATE(deleteVector,double)(ls->stat_r[ni][con_i]);
             }                
@@ -151,6 +154,7 @@ void free_TripleSTDP(learn_t *ls_t) {
         free(ls->stat_o_one);
         free(ls->stat_o_two);
         free(ls->stat_a_minus);
+        free(ls->pacc);
         free(ls->stat_r);
     }
     free(ls->learn_syn_ids);
@@ -200,10 +204,12 @@ void saveStat_TripleSTDP(learn_t *ls_t, FileStream *file) {
     Matrix *m_o_one = vectorArrayToMatrix(ls->stat_o_one, l->N);
     Matrix *m_o_two = vectorArrayToMatrix(ls->stat_o_two, l->N);
     Matrix *m_a_minus = vectorArrayToMatrix(ls->stat_a_minus, l->N);
+    Matrix *m_pacc = vectorArrayToMatrix(ls->stat_pacc, l->N);
 
     TEMPLATE(insertVector,pMatrix)(mv, m_o_one);
     TEMPLATE(insertVector,pMatrix)(mv, m_o_two);
     TEMPLATE(insertVector,pMatrix)(mv, m_a_minus);
+    TEMPLATE(insertVector,pMatrix)(mv, m_pacc);
     for(size_t ni=0; ni < l->N; ni++) {
         Matrix *mr = vectorArrayToMatrix(ls->stat_r[ni], l->nconn[ni]);
         TEMPLATE(insertVector,pMatrix)(mv, mr);
