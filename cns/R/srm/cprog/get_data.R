@@ -22,7 +22,7 @@ for(ep in 1:1000) {
     if(!file.exists(output_spikes)) { ep=ep-1; break }
 }
 #
-#ep=2
+#ep=1
 
 ep_str=""
 if(ep>0) {

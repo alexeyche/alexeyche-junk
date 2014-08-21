@@ -83,8 +83,9 @@ void deleteLayer_Poisson(LayerPoisson *l) {
         }
     }
     l->deallocSynData(l);
-    if(l->ls_t)
+    if(l->ls_t) {
         l->ls_t->free(l->ls_t);
+    }
     free(l->u); 
     free(l->p); 
     free(l->M);
@@ -211,7 +212,9 @@ void configureLayer_Poisson(LayerPoisson *l, const indVector *inputIDs, const in
     // allocation done
     // configure learning part 
     initProbFun(l, c);
-    initLearningRule(l, c);
+    if(getLC(l,c)->learn) {
+        initLearningRule(l, c);
+    }
     // start values assignment 
     l->toStartValues(l, c);
 }
@@ -239,7 +242,9 @@ void toStartValues_Poisson(LayerPoisson *l, const Constants *c) {
             }
         }
     }        
-    l->ls_t->toStartValues(l->ls_t);
+    if(l->ls_t) {
+        l->ls_t->toStartValues(l->ls_t);
+    }
 }
 
 
@@ -302,7 +307,9 @@ void calculateDynamics_Poisson(LayerPoisson *l, const size_t *ni, const SimConte
     const Constants *c = s->c;
 
     // training
-    l->ls_t->trainWeightsStep(l->ls_t, &l->u[*ni], &l->p[*ni], &l->M[*ni], ni, s);   
+    if(l->ls_t) {
+        l->ls_t->trainWeightsStep(l->ls_t, &l->u[*ni], &l->p[*ni], &l->M[*ni], ni, s);   
+    }
 
     // melting      
     indLNode *act_node;
@@ -409,7 +416,8 @@ LayerSerializeInfo readLayerSerializeInfo(FileStream *file) {
 }
 
 #define POISSON_LAYER_SERIALIZATION_SIZE 6
-void deserializeLayer_Poisson(LayerPoisson *l, FileStream *file, const Constants *c) {
+void deserializeLayer_Poisson(LayerPoisson *l, FileStream *file, const Sim *s) {
+    const Constants *c  = s->ctx->c;
     LayerSerializeInfo info = readLayerSerializeInfo(file);
     if(info.neuron_type != getLC(l,c)->neuron_type) {
         printf("Can't read layer with different type from model %s\n", file->fname);
@@ -417,7 +425,9 @@ void deserializeLayer_Poisson(LayerPoisson *l, FileStream *file, const Constants
     }
 
     l->deallocSynData(l); 
-    l->ls_t->free(l->ls_t);
+    if(l->ls_t) {
+        l->ls_t->free(l->ls_t);
+    }
 
     pMatrixVector* data = readMatrixList(file, POISSON_LAYER_SERIALIZATION_SIZE);
     Matrix *W = data->array[0];
@@ -464,7 +474,9 @@ void deserializeLayer_Poisson(LayerPoisson *l, FileStream *file, const Constants
         exit(1);
     }
 
-    initLearningRule(l, c);
+    if(getLC(l,c)->learn) {
+        initLearningRule(l, c);
+    }
     l->toStartValues(l, c);
     for(size_t ni=0; ni<l->N; ni++) {  // apply values
         assert(l->nconn[ni] == W_vals[ni]->size);
@@ -478,7 +490,9 @@ void deserializeLayer_Poisson(LayerPoisson *l, FileStream *file, const Constants
         TEMPLATE(deleteVector,double)(syn_del_vals[ni]);
         TEMPLATE(deleteVector,ind)(id_conns_vals[ni]);
     }
-    l->ls_t->deserialize( l->ls_t, file, c );
+    if(l->ls_t) {
+        l->ls_t->deserialize( l->ls_t, file, s );
+    }
     
     free(syn_del_vals);
     free(W_vals);
@@ -487,7 +501,8 @@ void deserializeLayer_Poisson(LayerPoisson *l, FileStream *file, const Constants
 }
 
 
-void serializeLayer_Poisson(LayerPoisson *l, FileStream *file, const Constants *c) {
+void serializeLayer_Poisson(LayerPoisson *l, FileStream *file, const Sim *s) {
+    const Constants *c = s->ctx->c;
     LayerSerializeInfo info;
     info.neuron_type= getLC(l,c)->neuron_type;
     info.learning_rule = getLC(l,c)->learning_rule;
@@ -538,7 +553,7 @@ void serializeLayer_Poisson(LayerPoisson *l, FileStream *file, const Constants *
     TEMPLATE(deleteVector,pMatrix)(data);
     
     if(l->ls_t) {
-        l->ls_t->serialize(l->ls_t, file, c);
+        l->ls_t->serialize(l->ls_t, file, s);
     }
 }
 

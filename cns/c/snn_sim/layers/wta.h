@@ -6,6 +6,7 @@
 
 #include <layers/poisson.h>
 
+struct Sim;
 
 typedef struct {
     LayerPoisson base;
@@ -31,8 +32,8 @@ void deallocSynData_Wta(LayerPoisson *l);
 void printLayer_Wta(LayerPoisson *l);
 void deleteLayer_Wta(LayerPoisson *l);
 void configureLayer_Wta(LayerPoisson *l, const indVector *inputIDs, const indVector *outputIDs, const Constants *c);
-void serializeLayer_Wta(LayerPoisson *l, FileStream *file, const Constants *c);
-void deserializeLayer_Wta(LayerPoisson *l, FileStream *file, const Constants *c);
+void serializeLayer_Wta(LayerPoisson *l, FileStream *file, const struct Sim *s);
+void deserializeLayer_Wta(LayerPoisson *l, FileStream *file, const struct Sim *s);
 void saveStat_Wta(LayerPoisson *l, FileStream *file);
 
 #endif    

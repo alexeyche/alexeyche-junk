@@ -393,9 +393,6 @@ int file_handler(void* user, const char* section, const char* name, const char* 
     if (MATCH("learn", "reward_ltd")) {
         c->reward_ltd = atof(value);
     } else 
-    if (MATCH("learn", "p_set")) {
-        c->p_set = atof(value);
-    } else 
     if (MATCH("adex neuron", "C")) {
         c->adex->C = atof(value);
     } else 
@@ -642,7 +639,6 @@ void printConstants(Constants *c) {
     printf("__target_rate->"); doublePrint(c->__target_rate);
     printf("target_rate_factor->"); doublePrint(c->target_rate_factor);
     printf("epochs->"); intPrint(c->epochs);
-    printf("p_set->"); doublePrint(c->p_set);
     printf("adex->"); AdExConstantsPrint(c->adex);
     printf("res_stdp->"); ResourceSTDPConstantsPrint(c->res_stdp);
     printf("tr_stdp->"); TripleSTDPConstantsPrint(c->tr_stdp);

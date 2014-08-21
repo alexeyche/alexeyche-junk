@@ -38,6 +38,7 @@ TripleSTDP* init_TripleSTDP(LayerPoisson *l) {
 
         }
     } 
+    ls->time_passed = 0.0;
 
     ls->base.toStartValues = &toStartValues_TripleSTDP;
     ls->base.propagateSynSpike = &propagateSynSpike_TripleSTDP;
@@ -78,41 +79,47 @@ void trainWeightsStep_TripleSTDP(learn_t *ls_t, const double *u, const double *p
     TripleSTDP *ls = (TripleSTDP*)ls_t;
     LayerPoisson *l = ls->base.l;
     const Constants *c = s->c;
-
+    
+    ls->pacc[*ni] -= ls->pacc[*ni]/c->tr_stdp->tau_average;
+    ls->o_one[*ni] -= ls->o_one[*ni]/c->tr_stdp->tau_minus;
     if(l->fired[ *ni ] == 1) {
         ls->pacc[*ni] += 1;
         ls->o_one[*ni] += 1;
     }
+    
     double p_norm = ls->pacc[*ni]/c->tr_stdp->__sec_tau_average;
     double Aminus = p_norm * p_norm * p_norm * c->tr_stdp->__Aminus_cube_delim_p_target;
-//    Aminus = c->tr_stdp->Aminus;
 
-    indLNode *act_node = NULL;
-    while( (act_node = TEMPLATE(getNextLList,ind)(ls->learn_syn_ids[ *ni ]) ) != NULL ) {
-        const size_t *syn_id = &act_node->value;
-        if(l->syn_fired[ *ni ][ *syn_id ] == 1) {
-            ls->r[*ni][*syn_id] += 1;
+
+    if(ls->time_passed >= c->tr_stdp->tau_average) {
+    //    Aminus = c->tr_stdp->Aminus;
+
+        indLNode *act_node = NULL;
+        while( (act_node = TEMPLATE(getNextLList,ind)(ls->learn_syn_ids[ *ni ]) ) != NULL ) {
+            const size_t *syn_id = &act_node->value;
+
+            ls->r[ *ni ][ *syn_id ] -= ls->r[ *ni ][ *syn_id ] / c->tr_stdp->tau_plus;
+            if(l->syn_fired[ *ni ][ *syn_id ] == 1) {
+                ls->r[*ni][*syn_id] += 1;
+            }
+            
+            double dw = getLC(l,c)->lrate * ( c->tr_stdp->__Aplus * ls->r[*ni][*syn_id] * ls->o_two[ *ni ] * l->fired[ *ni ] - 
+                                                                                   Aminus * ls->o_one[*ni] * l->syn_fired[ *ni ][ *syn_id ]);
+            
+            dw = bound_grad(&l->W[ *ni ][ *syn_id ], &dw, &getLC(l,c)->wmax, c);
+            l->W[ *ni ][ *syn_id ] += dw;
+
+            
+            if( (ls->r[ *ni ][ *syn_id ] < LEARN_ACT_TOL ) && (ls->r[ *ni ][ *syn_id ] > -LEARN_ACT_TOL )) {
+                TEMPLATE(dropNodeLList,ind)(ls->learn_syn_ids[ *ni ], act_node);
+            }
         }
-        double dw = getLC(l,c)->lrate * ( c->tr_stdp->__Aplus * ls->r[*ni][*syn_id] * ls->o_two[ *ni ] * l->fired[ *ni ] - 
-                                                                               Aminus * ls->o_one[*ni] * l->syn_fired[ *ni ][ *syn_id ]);
-        
-        dw = bound_grad(&l->W[ *ni ][ *syn_id ], &dw, &getLC(l,c)->wmax, c);
-        l->W[ *ni ][ *syn_id ] += dw;
-
-        ls->r[ *ni ][ *syn_id ] -= ls->r[ *ni ][ *syn_id ] / c->tr_stdp->tau_plus;
-        
-        if( (ls->r[ *ni ][ *syn_id ] < LEARN_ACT_TOL ) && (ls->r[ *ni ][ *syn_id ] > -LEARN_ACT_TOL )) {
-            TEMPLATE(dropNodeLList,ind)(ls->learn_syn_ids[ *ni ], act_node);
+        ls->o_two[*ni] -= ls->o_two[*ni]/c->tr_stdp->tau_y;
+        if(l->fired[ *ni ] == 1) {
+            ls->o_two[*ni] += 1;
         }
     }
-    if(l->fired[ *ni ] == 1) {
-        ls->o_two[*ni] += 1;
-    }
-    ls->o_two[*ni] -= ls->o_two[*ni]/c->tr_stdp->tau_y;
-    
 
-    ls->pacc[*ni] -= ls->pacc[*ni]/c->tr_stdp->tau_average;
-    ls->o_one[*ni] -= ls->o_one[*ni]/c->tr_stdp->tau_minus;
 
     if(l->stat->statLevel > 0) {
         TEMPLATE(insertVector,double)(ls->stat_o_one[ *ni ], ls->o_one[ *ni ]);
@@ -165,7 +172,7 @@ void free_TripleSTDP(learn_t *ls_t) {
     free(ls);
 }
 
-void serialize_TripleSTDP(learn_t *ls_t, FileStream *file, const Constants *c) {
+void serialize_TripleSTDP(learn_t *ls_t, FileStream *file, const Sim *s) {
     TripleSTDP *ls = (TripleSTDP*)ls_t;
     LayerPoisson *l = ls->base.l; 
 
@@ -175,12 +182,17 @@ void serialize_TripleSTDP(learn_t *ls_t, FileStream *file, const Constants *c) {
         setMatrixElement(pacc_m, ni, 0, ls->pacc[ni]);
     }
     TEMPLATE(insertVector,pMatrix)(data, pacc_m);
+    
+    Matrix *t_passed_m = createMatrix(1,1);
+    setMatrixElement(t_passed_m, 0, 0, ls->time_passed + s->rt->Tmax);
+    TEMPLATE(insertVector,pMatrix)(data, t_passed_m);
+
     saveMatrixList(file, data);
     TEMPLATE(deleteVector,pMatrix)(data);
 }
 
-#define TRIPLE_STDP_RULE_SERIALIZATION_SIZE 1
-void deserialize_TripleSTDP(learn_t *ls_t, FileStream *file, const Constants *c) {
+#define TRIPLE_STDP_RULE_SERIALIZATION_SIZE 2
+void deserialize_TripleSTDP(learn_t *ls_t, FileStream *file, const Sim *s) {
     TripleSTDP *ls = (TripleSTDP*)ls_t;
     LayerPoisson *l = ls->base.l; 
     pMatrixVector *data = readMatrixList(file, TRIPLE_STDP_RULE_SERIALIZATION_SIZE);
@@ -191,6 +203,9 @@ void deserialize_TripleSTDP(learn_t *ls_t, FileStream *file, const Constants *c)
     for(size_t ni=0; ni<l->N; ni++) {
         ls->pacc[ni] = getMatrixElement(pacc_m, ni, 0);
     }
+    Matrix *t_passed_m = data->array[1];
+    assert((t_passed_m->nrow == 1) && (t_passed_m->ncol == 1));
+    ls->time_passed = getMatrixElement(t_passed_m, 0, 0);
 
     TEMPLATE(deleteVector,pMatrix)(data);
 }

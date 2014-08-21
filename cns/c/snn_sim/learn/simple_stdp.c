@@ -53,8 +53,8 @@ void free_SimpleSTDP(learn_t *ls_t) {
     free(ls);
 }
 
-void serialize_SimpleSTDP(learn_t *ls_t, FileStream *file, const Constants *c) {
+void serialize_SimpleSTDP(learn_t *ls_t, FileStream *file, const Sim *s) {
 }
-void deserialize_SimpleSTDP(learn_t *ls_t, FileStream *file, const Constants *c) {
+void deserialize_SimpleSTDP(learn_t *ls_t, FileStream *file, const Sim *s) {
 }
 

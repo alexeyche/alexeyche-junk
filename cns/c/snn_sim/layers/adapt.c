@@ -96,9 +96,9 @@ void configureLayer_Adapt(LayerPoisson *l, const indVector *inputIDs, const indV
 
 }
 
-void serializeLayer_Adapt(LayerPoisson *l, FileStream *file, const Constants *c) {
+void serializeLayer_Adapt(LayerPoisson *l, FileStream *file, const Sim *s) {
     LayerAdapt* linh = (LayerAdapt*) l;
-    serializeLayer_Poisson(l, file, c);
+    serializeLayer_Poisson(l, file, s);
 
     pMatrixVector *data = TEMPLATE(createVector,pMatrix)();    
     Matrix *ga_m= createMatrix(l->N,1);
@@ -110,9 +110,9 @@ void serializeLayer_Adapt(LayerPoisson *l, FileStream *file, const Constants *c)
 }
 
 #define ADAPT_LAYER_SERIALIZATION_SIZE 1
-void deserializeLayer_Adapt(LayerPoisson *l, FileStream *file, const Constants *c) {
+void deserializeLayer_Adapt(LayerPoisson *l, FileStream *file, const Sim *s) {
     LayerAdapt* linh = (LayerAdapt*) l;
-    deserializeLayer_Poisson(l, file, c);
+    deserializeLayer_Poisson(l, file, s);
 
     pMatrixVector *data = readMatrixList(file, ADAPT_LAYER_SERIALIZATION_SIZE);
     

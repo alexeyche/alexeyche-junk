@@ -116,6 +116,7 @@ AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
+#AM_CFLAGS = -Wall -std=gnu99 -pthread -O0 -g  
 CFLAGS = 
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
@@ -196,8 +197,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 # what flags you want to pass to the C compiler & linker
-#AM_CFLAGS = -Wall -Wno-unused-variable -std=gnu99 -pthread  -O3 
-AM_CFLAGS = -Wall -std=gnu99 -pthread -O0 -g  
+AM_CFLAGS = -Wall -Wno-unused-variable -std=gnu99 -pthread  -O3 
 LDADD = -lm
 __top_builddir__bin_snn_sim_SOURCES = util/matrix.c util/util_vector.c ./util/ini.c ./util/matrix.h util/util.c util/spikes_list.c ./util/util_dlink_list.c sim/netsim.c neuron_funcs.c  constants.c util/io.c util/mem.c sim/runtime.c sim/configure.c sim/serialize.c ./layers/poisson.c sim/sim.c learn/triple_stdp.c learn/optim.c learn/res_stdp.c learn/simple_stdp.c layers/wta.c layers/adapt.c layers/wtaadapt.c snn_sim.c 
 __top_builddir__bin_snn_prep_SOURCES = util/matrix.c util/util_vector.c ./util/ini.c ./util/matrix.h util/util.c util/spikes_list.c  constants.c util/io.c layers/adex.c prep/prepare_ts.c snn_prep.c 

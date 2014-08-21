@@ -24,8 +24,8 @@ void deallocSynData_{{Name}}(Layer{{BaseClassName}} *l);
 void printLayer_{{Name}}(Layer{{BaseClassName}} *l);
 void deleteLayer_{{Name}}(Layer{{BaseClassName}} *l);
 void configureLayer_{{Name}}(Layer{{BaseClassName}} *l, const indVector *inputIDs, const indVector *outputIDs, const Constants *c);
-void serializeLayer_{{Name}}(Layer{{BaseClassName}} *l, FileStream *file, const Constants *c);
-void deserializeLayer_{{Name}}(Layer{{BaseClassName}} *l, FileStream *file, const Constants *c);
+void serializeLayer_{{Name}}(Layer{{BaseClassName}} *l, FileStream *file, const Sim *s);
+void deserializeLayer_{{Name}}(Layer{{BaseClassName}} *l, FileStream *file, const Sim *s);
 void saveStat_{{Name}}(Layer{{BaseClassName}} *l, FileStream *file);
 
 #endif    

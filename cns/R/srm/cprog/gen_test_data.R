@@ -10,7 +10,7 @@ spike_file = "/home/alexeyche/prog/sim/test_spikes"
 
 N=100
 
-gen_pattern = function(f, dur, N, len=400, del=70) {
+gen_pattern = function(f, dur, N, len=200, del=70) {
     net=blank_net(N)
     for(t in seq(0,dur,length.out=len)) {
         i = as.integer((N-1)*(1+f(t/del))/2)+1
@@ -28,7 +28,7 @@ patt_dur = 1000
 p1 = gen_pattern(fun1, patt_dur, N)
 p2 = gen_pattern(fun2, patt_dur, N)
 
-patt_nums = 1
+patt_nums = 20
 net = blank_net(N)
 patts = list(p1, p2)
 glob_t = 0

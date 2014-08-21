@@ -8,6 +8,7 @@
 
 struct LayerPoisson;
 struct SynSpike;
+struct Sim;
 
 typedef struct {
     learn_t base;
@@ -30,8 +31,8 @@ void propagateSynSpike_TResourceSTDP(learn_t *ls_t, const size_t *ni, const stru
 void trainWeightsStep_TResourceSTDP(learn_t *ls_t, const double *u, const double *p, const double *M, const size_t *ni, const struct SimContext *s);
 void resetValues_TResourceSTDP(learn_t *ls_t, const size_t *ni);
 void free_TResourceSTDP(learn_t *ls_t);
-void serialize_TResourceSTDP(learn_t *ls_t, FileStream *file, const Constants *c);
-void deserialize_TResourceSTDP(learn_t *ls_t, FileStream *file, const Constants *c);
+void serialize_TResourceSTDP(learn_t *ls_t, FileStream *file, const struct Sim *s);
+void deserialize_TResourceSTDP(learn_t *ls_t, FileStream *file, const struct Sim *s);
 
 void consumeResource(double *res, const double *dw, const Constants *c);
 float Q_rsqrt( float number );

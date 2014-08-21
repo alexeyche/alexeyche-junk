@@ -20,7 +20,7 @@ int main(int argc, char **argv) {
     srand(a.seed);
     for(size_t i=0; i<c->lc->size; i++) {
         if(a.learn == 0) {
-            getLayerConstantsC(c,i)->lrate = 0.0;
+            getLayerConstantsC(c,i)->learn = false;
         }
     }
 //    printConstants(c);

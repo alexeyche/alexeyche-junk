@@ -9,7 +9,7 @@ data_dir = '~/prog/sim'
 samples_per_class = 50
 
 samples_from_dataset = 10
-sample_size = 512
+sample_size = 60
 
 selected_classes = c(1,2,3,4)
 
@@ -82,10 +82,10 @@ for(fname in c(train_fname, test_fname)) {
 source('../gen_spikes.R')    
 patterns = list()
 dt=1
-duration=sample_size*2
+duration=sample_size*10
 M=100
 for(ds in train_dataset) {
-    p = genSpikePattern(M, ds$data, duration, dt, lambda=21)
+    p = genSpikePattern(M, ds$data, duration, dt, lambda=1)
     p = lapply(p, function(sp) sp*(duration/sample_size))
     patterns[[length(patterns)+1]] = list(data=p, label=ds$label)
 }
@@ -93,7 +93,7 @@ for(ds in train_dataset) {
 test_patterns = list()
 it=0
 for(ds in test_dataset) {
-    p = genSpikePattern(M, ds$data, duration, dt, lambda=21)
+    p = genSpikePattern(M, ds$data, duration, dt, lambda=1)
     p = lapply(p, function(sp) sp*(duration/sample_size))
     test_patterns[[length(test_patterns)+1]] = list(data=p, label=ds$label)
     cat("iter number: ", it, "\n")

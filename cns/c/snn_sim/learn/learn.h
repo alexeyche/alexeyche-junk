@@ -18,6 +18,7 @@
 struct LayerPoisson;
 struct SynSpike;
 struct SimContext;
+struct Sim;
 
 struct learn_t {
     struct LayerPoisson *l;
@@ -27,8 +28,8 @@ struct learn_t {
     void (*trainWeightsStep)(struct learn_t *, const double *, const double *, const double *, const size_t *, const struct SimContext *);
     void (*resetValues)(struct learn_t *, const size_t *);
     void (*free)(struct learn_t *);
-    void (*serialize)(struct learn_t*, FileStream *file, const Constants *c);
-    void (*deserialize)(struct learn_t*, FileStream *file, const Constants *c);
+    void (*serialize)(struct learn_t*, FileStream *file, const struct Sim *s);
+    void (*deserialize)(struct learn_t*, FileStream *file, const struct Sim *s);
     void (*saveStat)(struct learn_t*, FileStream *file);
 };
 typedef struct learn_t learn_t;

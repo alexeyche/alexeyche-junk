@@ -144,7 +144,6 @@ typedef struct {
     double target_rate_factor;
 
     int epochs;
-    double p_set;
     
     AdExConstants *adex;
     ResourceSTDPConstants *res_stdp;

@@ -39,6 +39,7 @@ typedef struct SynSpike {
 
 
 struct SimContext;
+struct Sim;
 
 typedef enum {EXC, INH} nspec_t;
 
@@ -77,7 +78,6 @@ struct LayerPoisson {
     double *axon_del;
     double **syn_del;
 
-    const double *global_time; // do not use it without proper reason
     // stat
     LayerStat *stat;
     
@@ -91,8 +91,8 @@ struct LayerPoisson {
     void (*allocSynData)(struct LayerPoisson *l); 
     void (*deallocSynData)(struct LayerPoisson *l); 
     void (*printLayer)(struct LayerPoisson *l); 
-    void (*serializeLayer)(struct LayerPoisson *l, FileStream *file, const Constants *c); 
-    void (*deserializeLayer)(struct LayerPoisson *l, FileStream *file, const Constants *c); 
+    void (*serializeLayer)(struct LayerPoisson *l, FileStream *file, const struct Sim *s); 
+    void (*deserializeLayer)(struct LayerPoisson *l, FileStream *file, const struct Sim *s); 
     void (*saveStat)(struct LayerPoisson *l, FileStream *file);
 
     double (*prob_fun)(const double *u, const Constants *c);
@@ -120,8 +120,8 @@ void deallocSynData_Poisson(LayerPoisson *l);
 void printLayer_Poisson(LayerPoisson *l);
 void deleteLayer_Poisson(LayerPoisson *l);
 void configureLayer_Poisson(LayerPoisson *l, const indVector *inputIDs, const indVector *outputIDs, const Constants *c);
-void serializeLayer_Poisson(LayerPoisson *l, FileStream *file, const Constants *c);
-void deserializeLayer_Poisson(LayerPoisson *l, FileStream *file, const Constants *c);
+void serializeLayer_Poisson(LayerPoisson *l, FileStream *file, const struct Sim *s);
+void deserializeLayer_Poisson(LayerPoisson *l, FileStream *file, const struct Sim *s);
 void saveStat_Poisson(LayerPoisson *l, FileStream *file);
 
 // common procedures

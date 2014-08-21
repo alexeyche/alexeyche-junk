@@ -114,19 +114,6 @@ for EP in $EPOCHS; do
         fi        
     fi    
     LEARN=yes
-    TMAX_OPT=
-    LEARN_OPT=""
-    if [ $EP -eq 1 ]; then
-        if [ "$LEARNING_RULE" == "OptimalSTDP" ]; then
-            TMAX_OPT=" -T $MEAN_P_DUR"
-        elif [ "$LEARNING_RULE" == "TripleSTDP" ]; then 
-            TMAX_OPT=" -T $(($TAU_AVERAGE*2))"
-        fi            
-        LEARN=no
-        LEARN_OPT="-l no"
-
-    fi        
-
 
     OUTPUT_SPIKES=$WORK_DIR/${EPOCH_SFX}output_spikes.bin
     OUTPUT_FILE=$WORK_DIR/${EPOCH_SFX}output.log
@@ -138,7 +125,7 @@ for EP in $EPOCHS; do
         STAT_OPT="--stat-level 1 -s $WORK_DIR/${EPOCH_SFX}stat.bin"
     fi    
     INPUT_FILE=$INPUT_FILES_DIR/$(echo $INPUT_FILES_BN | cut -d ' ' -f $INP_ITER)
-    $SNN_SIM -c $WORK_DIR/constants.ini -i $INPUT_FILE -o $OUTPUT_SPIKES $STAT_OPT $MODEL_TO_LOAD_OPT -ms $MODEL_FILE -j $JOBS $TMAX_OPT $LEARN_OPT &> $OUTPUT_FILE
+    $SNN_SIM -c $WORK_DIR/constants.ini -i $INPUT_FILE -o $OUTPUT_SPIKES $STAT_OPT $MODEL_TO_LOAD_OPT -ms $MODEL_FILE -j $JOBS &> $OUTPUT_FILE
     if [ "$?" -ne 0 ]; then
         echo "Not null exit code ($?)"
         exit $?
@@ -152,7 +139,7 @@ done
 
 if [ -n "$EVALUATE" ]; then
     INPUT_FILE=$INPUT_FILES_DIR/$(echo $INPUT_FILES_BN | cut -d ' ' -f 1)
-    ./eval_model.sh -m $WORK_DIR/${LAST_EP}_model.bin -e $EVALUATE -t $INPUT_FILE
+    ./eval_model.sh -m $WORK_DIR/${LAST_EP}_model.bin -e $EVALUATE -t $INPUT_FILE 
 fi    
 
 popd &> /dev/null

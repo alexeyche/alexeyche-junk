@@ -3,6 +3,7 @@
 
 #include <layers/wta.h>
 
+struct Sim;
 
 typedef struct {
     LayerWta base;
@@ -25,8 +26,8 @@ void deallocSynData_WtaAdapt(LayerPoisson *l);
 void printLayer_WtaAdapt(LayerPoisson *l);
 void deleteLayer_WtaAdapt(LayerPoisson *l);
 void configureLayer_WtaAdapt(LayerPoisson *l, const indVector *inputIDs, const indVector *outputIDs, const Constants *c);
-void serializeLayer_WtaAdapt(LayerPoisson *l, FileStream *file, const Constants *c);
-void deserializeLayer_WtaAdapt(LayerPoisson *l, FileStream *file, const Constants *c);
+void serializeLayer_WtaAdapt(LayerPoisson *l, FileStream *file, const struct Sim *s);
+void deserializeLayer_WtaAdapt(LayerPoisson *l, FileStream *file, const struct Sim *s);
 void saveStat_WtaAdapt(LayerPoisson *l, FileStream *file);
 
 #endif    

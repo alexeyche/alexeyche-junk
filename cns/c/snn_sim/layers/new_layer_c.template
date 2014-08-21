@@ -88,15 +88,15 @@ void configureLayer_{{Name}}(Layer{{BaseClassName}} *l, const indVector *inputID
 
 }
 
-void serializeLayer_{{Name}}(Layer{{BaseClassName}} *l, FileStream *file, const Constants *c) {
+void serializeLayer_{{Name}}(Layer{{BaseClassName}} *l, FileStream *file, const Sim *s) {
     Layer{{Name}}* linh = (Layer{{Name}}*) l;
-    serializeLayer_{{SuperClassName}}(l, file, c);
+    serializeLayer_{{SuperClassName}}(l, file, s);
 
 }
 
-void deserializeLayer_{{Name}}(Layer{{BaseClassName}} *l, FileStream *file, const Constants *c) {
+void deserializeLayer_{{Name}}(Layer{{BaseClassName}} *l, FileStream *file, const Sim *s) {
     Layer{{Name}}* linh = (Layer{{Name}}*) l;
-    deserializeLayer_{{SuperClassName}}(l, file, c);
+    deserializeLayer_{{SuperClassName}}(l, file, s);
 
 }
 

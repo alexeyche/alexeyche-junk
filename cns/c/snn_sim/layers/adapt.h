@@ -3,6 +3,7 @@
 
 #include <layers/poisson.h>
 
+struct Sim;
 
 typedef struct {
     LayerPoisson base;
@@ -25,8 +26,8 @@ void deallocSynData_Adapt(LayerPoisson *l);
 void printLayer_Adapt(LayerPoisson *l);
 void deleteLayer_Adapt(LayerPoisson *l);
 void configureLayer_Adapt(LayerPoisson *l, const indVector *inputIDs, const indVector *outputIDs, const Constants *c);
-void serializeLayer_Adapt(LayerPoisson *l, FileStream *file, const Constants *c);
-void deserializeLayer_Adapt(LayerPoisson *l, FileStream *file, const Constants *c);
+void serializeLayer_Adapt(LayerPoisson *l, FileStream *file, const struct Sim *s);
+void deserializeLayer_Adapt(LayerPoisson *l, FileStream *file, const struct Sim *s);
 void saveStat_Adapt(LayerPoisson *l, FileStream *file);
 
 #endif    

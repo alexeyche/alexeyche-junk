@@ -98,9 +98,9 @@ void configureLayer_WtaAdapt(LayerPoisson *l, const indVector *inputIDs, const i
 
 }
 
-void serializeLayer_WtaAdapt(LayerPoisson *l, FileStream *file, const Constants *c) {
+void serializeLayer_WtaAdapt(LayerPoisson *l, FileStream *file, const Sim *s) {
     LayerWtaAdapt* linh = (LayerWtaAdapt*) l;
-    serializeLayer_Wta(l, file, c);
+    serializeLayer_Wta(l, file, s);
 
     pMatrixVector *data = TEMPLATE(createVector,pMatrix)();    
     Matrix *ga_m= createMatrix(l->N,1);
@@ -112,9 +112,9 @@ void serializeLayer_WtaAdapt(LayerPoisson *l, FileStream *file, const Constants 
 }
 
 #define WTAADAPT_LAYER_SERIALIZATION_SIZE 1
-void deserializeLayer_WtaAdapt(LayerPoisson *l, FileStream *file, const Constants *c) {
+void deserializeLayer_WtaAdapt(LayerPoisson *l, FileStream *file, const Sim *s) {
     LayerWtaAdapt* linh = (LayerWtaAdapt*) l;
-    deserializeLayer_Wta(l, file, c);
+    deserializeLayer_Wta(l, file, s);
 
     pMatrixVector *data = readMatrixList(file, WTAADAPT_LAYER_SERIALIZATION_SIZE);
     

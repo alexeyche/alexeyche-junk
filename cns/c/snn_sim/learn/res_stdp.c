@@ -191,8 +191,8 @@ void free_TResourceSTDP(learn_t *ls_t) {
     free(ls->x_tr);
 }
 
-void serialize_TResourceSTDP(learn_t *ls_t, FileStream *file, const Constants *c) {
+void serialize_TResourceSTDP(learn_t *ls_t, FileStream *file, const Sim *s) {
 }
-void deserialize_TResourceSTDP(learn_t *ls_t, FileStream *file, const Constants *c) {
+void deserialize_TResourceSTDP(learn_t *ls_t, FileStream *file, const Sim *s) {
 }
 

@@ -8,6 +8,7 @@
 
 struct LayerPoisson;
 struct SynSpike;
+struct Sim;
 
 typedef struct {
     learn_t base;
@@ -17,6 +18,8 @@ typedef struct {
     double *o_one;
     double *o_two;
     double *pacc;    
+    
+    double time_passed;
     
     doubleVector **stat_o_one;
     doubleVector **stat_o_two;
@@ -31,8 +34,8 @@ void propagateSynSpike_TripleSTDP(learn_t *ls_t, const size_t *ni, const struct 
 void trainWeightsStep_TripleSTDP(learn_t *ls_t, const double *u, const double *p, const double *M, const size_t *ni, const struct SimContext *s);
 void resetValues_TripleSTDP(learn_t *ls_t, const size_t *ni);
 void free_TripleSTDP(learn_t *ls_t);
-void serialize_TripleSTDP(learn_t *ls_t, FileStream *file, const Constants *c);
-void deserialize_TripleSTDP(learn_t *ls_t, FileStream *file, const Constants *c);
+void serialize_TripleSTDP(learn_t *ls_t, FileStream *file, const struct Sim *s);
+void deserialize_TripleSTDP(learn_t *ls_t, FileStream *file, const struct Sim *s);
 void saveStat_TripleSTDP(learn_t *ls_t, FileStream *file);
 
 #endif
