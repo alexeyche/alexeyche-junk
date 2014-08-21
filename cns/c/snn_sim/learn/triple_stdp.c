@@ -91,7 +91,7 @@ void trainWeightsStep_TripleSTDP(learn_t *ls_t, const double *u, const double *p
     double Aminus = p_norm * p_norm * p_norm * c->tr_stdp->__Aminus_cube_delim_p_target;
 
 
-    if(ls->time_passed >= c->tr_stdp->tau_average) {
+    if(ls->time_passed >= 5*c->tr_stdp->tau_average) {
     //    Aminus = c->tr_stdp->Aminus;
 
         indLNode *act_node = NULL;

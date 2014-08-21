@@ -9,7 +9,7 @@ data_dir = '~/prog/sim'
 samples_per_class = 50
 
 samples_from_dataset = 10
-sample_size = 60
+sample_size = 180
 
 selected_classes = c(1,2,3,4)
 
@@ -82,7 +82,7 @@ for(fname in c(train_fname, test_fname)) {
 source('../gen_spikes.R')    
 patterns = list()
 dt=1
-duration=sample_size*10
+duration=sample_size*2
 M=100
 for(ds in train_dataset) {
     p = genSpikePattern(M, ds$data, duration, dt, lambda=1)
