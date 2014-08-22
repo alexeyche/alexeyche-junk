@@ -223,15 +223,17 @@ void saveStat_OptimalSTDP(learn_t *ls_t, FileStream *file) {
     OptimalSTDP *ls = (OptimalSTDP*)ls_t;
     LayerPoisson *l = ls->base.l; 
     
-    pMatrixVector *mv = TEMPLATE(createVector,pMatrix)();
-    Matrix *mB = vectorArrayToMatrix(ls->stat_B, l->N);
+    if(l->stat->statLevel>1) {
+        pMatrixVector *mv = TEMPLATE(createVector,pMatrix)();
+        Matrix *mB = vectorArrayToMatrix(ls->stat_B, l->N);
 
-    TEMPLATE(insertVector,pMatrix)(mv, mB);
-    for(size_t ni=0; ni < l->N; ni++) {
-        Matrix *mC = vectorArrayToMatrix(ls->stat_C[ni], l->nconn[ni]);
-        TEMPLATE(insertVector,pMatrix)(mv, mC);
-    }
-    saveMatrixList(file, mv);
+        TEMPLATE(insertVector,pMatrix)(mv, mB);
+        for(size_t ni=0; ni < l->N; ni++) {
+            Matrix *mC = vectorArrayToMatrix(ls->stat_C[ni], l->nconn[ni]);
+            TEMPLATE(insertVector,pMatrix)(mv, mC);
+        }
+        saveMatrixList(file, mv);
 
-    TEMPLATE(deleteVector,pMatrix)(mv);
+        TEMPLATE(deleteVector,pMatrix)(mv);
+    }        
 }

@@ -76,10 +76,10 @@ inline double pstroke(const double *u, const Constants *c) {
 
 // new versions:
 double prob_fun_Exp( const double *u, const Constants *c) {
-    return( exp(*u) );
+    return( exp(*u)/c->sim_dim );
 }
 double prob_fun_stroke_Exp( const double *u, const Constants *c) {
-    return( exp(*u) );
+    return( exp(*u)/c->sim_dim );
 }
 
 

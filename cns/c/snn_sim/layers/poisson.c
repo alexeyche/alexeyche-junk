@@ -277,7 +277,6 @@ void calculateProbability_Poisson(LayerPoisson *l, const size_t *ni, const SimCo
 
     l->p[*ni] = l->prob_fun(&l->u[*ni], c) * c->dt;
     l->M[*ni] = exp(-l->gr[ *ni ]);
-
     l->p[*ni] *= l->M[*ni];
 
     if(l->stat->statLevel > 0)  {
@@ -583,8 +582,4 @@ void saveStat_Poisson(LayerPoisson *l, FileStream *file) {
     if(l->ls_t) {
         l->ls_t->saveStat(l->ls_t, file);
     }        
-    
-
 }
-
-

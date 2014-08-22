@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-set -x
 
 CWD_SCR=$(readlink -f $0)
 CWD=$(dirname $CWD_SCR)
