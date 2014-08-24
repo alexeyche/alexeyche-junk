@@ -5,7 +5,7 @@
 % updated: Sept 20, 2007.  (J. Pillow)
 
 % Create 2 orthogonal filters --------------------
-n = 20; 
+n = 10; 
 filt1 = exp(-((.5:n)-(n+5)/2).^2/(n/3))';
 filt2 = exp(-((.5:n)-(n+4)/2).^2/(n/3))';
 filt1 = filt1./norm(filt1);

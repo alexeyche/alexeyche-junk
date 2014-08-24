@@ -77,8 +77,12 @@ typedef struct {
     prob_fun_t prob_fun;
     bool learn;
     bool determ;
-    double net_edge_prob;
-    double input_edge_prob;
+    double net_edge_prob0;
+    double net_edge_prob1;
+    double net_edge_prob_group_size;
+    double input_edge_prob0;
+    double input_edge_prob1;
+    double input_edge_prob_group_size;
     double output_edge_prob;
     double inhib_frac;
     double weight_per_neuron;
