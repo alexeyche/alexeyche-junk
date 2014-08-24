@@ -1,5 +1,22 @@
 \begin{thebibliography}{1}
 
+\bibitem{Phizi}
+Коротько~Г.Ф. Покровский~В.М.
+\newblock {\em Физиология человека}.
+\newblock Москва "Медицина", 2003.
+
+\bibitem{Adapt}
+Colin W. G.~Clifford Mehdi~Adibi, James S.~McDonald and Ehsan Arabzadeh.
+\newblock Adaptation improves neural coding efficiency despite increasing
+  correlations in variability.
+\newblock {\em The Journal of Neuroscience}, 33(5):2108–2120, 2013.
+
+\bibitem{TripleAdapt}
+Wulfram~Gerstner Guillaume~Hennequin and Jean-Pascal Pfister.
+\newblock Stdp in adaptive neurons gives close-to-optimal information
+  transmission.
+\newblock {\em Front Comput Neurosci.}, 143(4), 2010.
+
 \bibitem{BohteReview}
 H.~Paugam-Moisy and S.M. Bohte.
 \newblock Computing with spiking neuron networks.
