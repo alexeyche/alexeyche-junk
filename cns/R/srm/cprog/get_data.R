@@ -52,7 +52,7 @@ for(i in 1:length(net)) {
     net[[i]] = sp[i, spike_elems]
 }
 
-Ti=0
+Ti=2
 Trange=1000
 p1 = plot_rastl(net[(M-M+1):(M+sum(N))],T0=Ti*Trange,Tmax=(Ti+1)*Trange)
 
