@@ -125,7 +125,7 @@ if(file.exists(sprintf("%s.bin",stat_file))) {
         }
     }
 } else {
-    matrix_per_layer = 7
+    matrix_per_layer = 8
     Wnorm = W = NULL
     max_row = sum(sum(N)+M)
     for(Ni in 1:length(N)) {

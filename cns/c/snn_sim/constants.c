@@ -32,6 +32,12 @@ Constants* createConstants(const char *filename) {
             printf("Can't learn anything in determenistic mode\n");
             exit(1);
         }
+        if(getLayerConstantsC(c,i)->net_edge_prob_group_size == 0) {
+            getLayerConstantsC(c,i)->net_edge_prob_group_size = getLayerConstantsC(c,i)->N;
+        }
+        if(getLayerConstantsC(c,i)->input_edge_prob_group_size == 0) {
+            getLayerConstantsC(c,i)->input_edge_prob_group_size = getLayerConstantsC(c,i)->N;
+        }
     }
 
     return(c);
@@ -66,6 +72,17 @@ doubleVector* doubleVectorParse(const char *vals) {
     free(string);
     return(v);
 }             
+
+pccharVector* pccharVectorColonParse(const char *vals) {
+    pccharVector *v = TEMPLATE(createVector,pcchar)();
+    char *token;
+    char *string = strdup(vals);
+    while ((token = strsep(&string, ":")) != NULL) {
+        TEMPLATE(insertVector,pcchar)(v, strdup(token));
+    }
+    free(string);
+    return(v);
+}
 
 pccharVector* pccharVectorParse(const char *vals) {
     pccharVector *v = TEMPLATE(createVector,pcchar)();
@@ -141,6 +158,60 @@ bool boolParse(char *str) {
     exit(1);
 }
 
+    
+void fillNetEdgeProb(const char *str, LayerConstants *c) {
+    c->net_edge_prob0 = 0.0;
+    c->net_edge_prob1 = 0.0;
+    c->net_edge_prob_group_size = 1;
+    pccharVector *v = pccharVectorColonParse(str);    
+    if(v->size == 0) {
+        printf("Too less argumnets in colon option in net_edge_prob\n");
+        exit(1);
+    } else
+    if(v->size == 1) {
+        c->net_edge_prob0 = atof(v->array[0]);
+        c->net_edge_prob1 = c->net_edge_prob0;
+    } else
+    if(v->size == 2) {
+        c->net_edge_prob1 = atof(v->array[1]);
+    } else 
+    if(v->size == 3) {
+        c->net_edge_prob0 = atof(v->array[0]);
+        c->net_edge_prob_group_size = atoi(v->array[1]);
+        c->net_edge_prob1 = atof(v->array[2]);
+    } else {
+        printf("Too much argumnets in colon option in net_edge_prob\n");
+        exit(1);
+    }
+}
+
+void fillInputEdgeProb(const char *str, LayerConstants *c) {
+    c->input_edge_prob0 = 0.0;
+    c->input_edge_prob1 = 0.0;
+    c->input_edge_prob_group_size = 0;
+    pccharVector *v = pccharVectorColonParse(str);    
+
+    if(v->size == 0) {
+        printf("Too less argumnets in colon option in input_edge_prob\n");
+        exit(1);
+    } else
+    if(v->size == 1) {
+        c->input_edge_prob0 = atof(v->array[0]);
+        c->input_edge_prob1 = c->input_edge_prob0;
+    } else
+    if(v->size == 2) {
+        c->input_edge_prob1 = atof(v->array[1]);
+    } else 
+    if(v->size == 3) {
+        c->input_edge_prob0 = atof(v->array[0]);
+        c->input_edge_prob_group_size = atoi(v->array[1]);
+        c->input_edge_prob1 = atof(v->array[2]);
+    } else {
+        printf("Too much argumnets in colon option in input_edge_prob\n");
+        exit(1);
+    }
+}
+
 #define FILL_LAYER_CONST(name,type) {       \
         type##Vector *v = type##VectorParse(value); \
         size_t i;\
@@ -163,6 +234,19 @@ bool boolParse(char *str) {
         }                                   \
         for( ; i < c->lc->size; i++) { \
             getLayerConstantsC(c,i)->name = fun(v->array[v->size-1]); \
+        }\
+        TEMPLATE(deleteVector,type)(v);     \
+    } \
+
+#define FILL_LAYER_CONST_FUN_ARG(name,type,fun) {       \
+        type##Vector *v = type##VectorParse(value); \
+        size_t i; \
+        for(i=0; i<v->size; i++) {   \
+            if(!checkLC(c,i, #name)) break;  \
+             fun(v->array[i], getLayerConstantsC(c,i)); \
+        }                                   \
+        for( ; i < c->lc->size; i++) { \
+             fun(v->array[v->size-1], getLayerConstantsC(c,i)); \
         }\
         TEMPLATE(deleteVector,type)(v);     \
     } \
@@ -283,10 +367,10 @@ int file_handler(void* user, const char* section, const char* name, const char* 
         FILL_LAYER_CONST(lrate,double)
     } else 
     if (MATCH("layer", "net_edge_prob")) {
-        FILL_LAYER_CONST(net_edge_prob,double)
+        FILL_LAYER_CONST_FUN_ARG(net_edge_prob0,pcchar,fillNetEdgeProb)
     } else 
     if (MATCH("layer", "input_edge_prob")) {
-        FILL_LAYER_CONST(input_edge_prob,double)
+        FILL_LAYER_CONST_FUN_ARG(input_edge_prob0,pcchar,fillInputEdgeProb)
     } else 
     if (MATCH("layer", "output_edge_prob")) {
         FILL_LAYER_CONST(output_edge_prob,double)
@@ -585,8 +669,12 @@ void LayerConstantsPrint(LayerConstants *c) {
     printf("prob_fun->"); prob_fun_tPrint(c->prob_fun);
     printf("learn->"); boolPrint(c->learn);
     printf("determ->"); boolPrint(c->determ);
-    printf("net_edge_prob->"); doublePrint(c->net_edge_prob);
-    printf("input_edge_prob->"); doublePrint(c->input_edge_prob);
+    printf("net_edge_prob0->"); doublePrint(c->net_edge_prob0);
+    printf("net_edge_prob_group_size->"); doublePrint(c->net_edge_prob_group_size);
+    printf("net_edge_prob1->"); doublePrint(c->net_edge_prob1);
+    printf("input_edge_prob0->"); doublePrint(c->input_edge_prob0);
+    printf("input_edge_prob_group_size->"); doublePrint(c->input_edge_prob_group_size);
+    printf("input_edge_prob1->"); doublePrint(c->input_edge_prob1);
     printf("output_edge_prob->"); doublePrint(c->output_edge_prob);
     printf("inhib_frac->"); doublePrint(c->inhib_frac);
     printf("weight_per_neuron->"); doublePrint(c->weight_per_neuron);

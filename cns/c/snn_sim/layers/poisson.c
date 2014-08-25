@@ -172,6 +172,11 @@ void initProbFun(LayerPoisson *l, const Constants *c) {
 
 void configureLayer_Poisson(LayerPoisson *l, const indVector *inputIDs, const indVector *outputIDs, const Constants *c) {
     indVector **layer_conns = (indVector**) malloc(l->N * sizeof(indVector));
+    double acc_prob_net_edge = getLC(l,c)->net_edge_prob0;
+    double delta_prob_net_edge = (getLC(l,c)->net_edge_prob1 - getLC(l,c)->net_edge_prob0)/(l->N/getLC(l,c)->net_edge_prob_group_size);
+    double acc_prob_input_edge = getLC(l,c)->input_edge_prob0;
+    double delta_prob_input_edge = (getLC(l,c)->input_edge_prob1 - getLC(l,c)->input_edge_prob0)/(l->N/getLC(l,c)->input_edge_prob_group_size);
+    
     for(size_t ni=0; ni<l->N; ni++) {
         layer_conns[ni] = TEMPLATE(createVector,ind)();
         l->nt[ni] = EXC;
@@ -180,14 +185,14 @@ void configureLayer_Poisson(LayerPoisson *l, const indVector *inputIDs, const in
         }
         for(size_t nj=0; nj<l->N; nj++) {        
             if(ni != nj) {
-                if(getLC(l,c)->net_edge_prob > getUnif()) {
+                if(acc_prob_net_edge > getUnif()) {
                     TEMPLATE(insertVector,ind)(layer_conns[ni], l->ids[nj]);
                 }
             }
         }
         if(inputIDs) {
             for(size_t inp_i=0; inp_i<inputIDs->size; inp_i++) {        
-                if(getLC(l,c)->input_edge_prob > getUnif()) {
+                if(acc_prob_input_edge > getUnif()) {
                     TEMPLATE(insertVector,ind)(layer_conns[ni], inputIDs->array[inp_i]);
                 }
             }
@@ -200,7 +205,14 @@ void configureLayer_Poisson(LayerPoisson *l, const indVector *inputIDs, const in
             }
         }
         l->nconn[ni] = layer_conns[ni]->size; 
+        if(ni % getLC(l,c)->net_edge_prob_group_size == 0) {
+            acc_prob_net_edge += delta_prob_net_edge;
+        }
+        if(ni % getLC(l,c)->input_edge_prob_group_size == 0) {
+            acc_prob_input_edge += delta_prob_input_edge;
+        }
     }
+    
     l->allocSynData(l);
     for(size_t ni=0; ni<l->N; ni++) {
         if(l->nconn[ni]>0) {

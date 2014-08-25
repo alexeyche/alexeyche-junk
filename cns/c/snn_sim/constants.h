@@ -79,10 +79,10 @@ typedef struct {
     bool determ;
     double net_edge_prob0;
     double net_edge_prob1;
-    double net_edge_prob_group_size;
+    size_t net_edge_prob_group_size;
     double input_edge_prob0;
     double input_edge_prob1;
-    double input_edge_prob_group_size;
+    size_t input_edge_prob_group_size;
     double output_edge_prob;
     double inhib_frac;
     double weight_per_neuron;
