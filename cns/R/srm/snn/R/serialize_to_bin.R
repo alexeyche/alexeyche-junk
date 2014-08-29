@@ -24,7 +24,14 @@ saveMatrixList <- function(baseName, mtxList) {
     flush(idxCon)
 }
 
+substrRight <- function(x, n){
+  substr(x, nchar(x)-n+1, nchar(x))
+}
+
 loadMatrix <- function(baseName = "data", index) {
+    if(substrRight(baseName,4) == ".bin") {
+        baseName = substr(baseName, 0, nchar(baseName)-4)
+    }
     idxName <- paste(baseName, ".idx", sep="")
     idxCon <- file(idxName, 'rb')
     on.exit(close(idxCon))

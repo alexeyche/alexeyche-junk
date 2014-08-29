@@ -101,7 +101,7 @@ for(ds in test_dataset) {
 }
 
 duration=duration
-gap=100
+gap=0
 spikes_dir = "~/prog/sim/spikes/ucr"
 for(ep in 1:10) {
     ntrain = NetClass(patterns[sample(length(patterns), length(patterns))], duration, gap=gap)

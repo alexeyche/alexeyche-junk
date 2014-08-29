@@ -137,7 +137,7 @@ ArgOptionsPostProc parsePostProcOptions(int argc, char **argv) {
             printf("Need input test spikes file\n");
             usagePostProc();
         }
-        if(kernel_range->size != 3) {
+        if((kernel_range->size != 3)&&(kernel_range->size != 1)) {
             printf("Kernels range is inappropriate\n");
             usagePostProc();
         }
@@ -145,8 +145,13 @@ ArgOptionsPostProc parsePostProcOptions(int argc, char **argv) {
             printf("Jobs number is inappropriate\n");
             usagePostProc();
         }
-        for(double k=kernel_range->array[0]; k <= kernel_range->array[2]; k+=kernel_range->array[1]) { 
-            TEMPLATE(insertVector,double)(args.kernel_values, k);
+        if(kernel_range->size == 3) {
+            for(double k=kernel_range->array[0]; k <= kernel_range->array[2]; k+=kernel_range->array[1]) { 
+                TEMPLATE(insertVector,double)(args.kernel_values, k);
+            }
+        } else
+        if(kernel_range->size == 1) {
+            TEMPLATE(insertVector,double)(args.kernel_values, kernel_range->array[0]);
         }
     }        
     return(args);
