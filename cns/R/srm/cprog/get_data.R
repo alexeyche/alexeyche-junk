@@ -1,7 +1,6 @@
 #!/usr/bin/RScript
 setwd("~/prog/alexeyche-junk/cns/R/srm/cprog")
 #setwd("~/my/git/alexeyche-junk/cns/R/srm/cprog")
-source('../serialize_to_bin.R')
 source('../util.R')
 
 source('../plot_funcs.R')
