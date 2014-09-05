@@ -41,6 +41,7 @@
 
 import random
 import math
+import sys
 
 #################################################
 # Parameters
@@ -145,7 +146,6 @@ def compute_response(x, encoder, gain, bias, time_limit=0.5):
 def compute_tuning_curves(encoder, gain, bias):
     # generate a set of x values to sample at
     x_values=[i*2.0/N_samples - 1.0 for i in range(N_samples)]  
-
     # build up a matrix of neural responses to each input (i.e. tuning curves)
     A=[]
     for x in x_values:
@@ -174,6 +174,7 @@ def compute_decoder(encoder, gain, bias, function=lambda x:x):
 decoder_A=compute_decoder(encoder_A, gain_A, bias_A, function=function)
 decoder_B=compute_decoder(encoder_B, gain_B, bias_B)
 
+
 # compute the weight matrix
 weights=numpy.dot(decoder_A, [encoder_B])
 
@@ -192,7 +193,7 @@ input_B = [0.0]*N_B   # input for population B
 
 # scaling factor for the post-synaptic filter
 pstc_scale=1.0-math.exp(-dt/t_pstc)  
-
+sys.exit(0)
 
 # for storing simulation data to plot afterward
 inputs=[]             
@@ -238,9 +239,10 @@ while t<10.0:
     output*=(1.0-pstc_scale)
     for j,s in enumerate(spikes_B):
         if s:
+            print decoder_B[j][0]*pstc_scale
             output+=decoder_B[j][0]*pstc_scale
     
-    print t, output
+    print t, output, function(x)
     times.append(t)
     inputs.append(x)
     outputs.append(output)
