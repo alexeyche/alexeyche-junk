@@ -22,7 +22,7 @@ for(ep in 1:1000) {
     if(!file.exists(output_spikes)) { ep=ep-1; break }
 }
 #
-#ep=500
+#ep=2
 
 ep_str=""
 if(ep>0) {
@@ -52,7 +52,7 @@ for(i in 1:length(net)) {
 }
 
 Ti=0
-Trange=1000
+Trange=512
 p1 = plot_rastl(net[(M-M+1):(M+sum(N))],T0=Ti*Trange,Tmax=(Ti+1)*Trange)
 
 if(file.exists(sprintf("%s.bin",stat_file))) {

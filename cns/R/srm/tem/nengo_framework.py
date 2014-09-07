@@ -193,7 +193,6 @@ input_B = [0.0]*N_B   # input for population B
 
 # scaling factor for the post-synaptic filter
 pstc_scale=1.0-math.exp(-dt/t_pstc)  
-sys.exit(0)
 
 # for storing simulation data to plot afterward
 inputs=[]             
@@ -256,6 +255,7 @@ while t<10.0:
     
 x,A = compute_tuning_curves(encoder_A, gain_A, bias_A)
 x,B = compute_tuning_curves(encoder_B, gain_B, bias_B)
+import pdb
 
 import pylab
 pylab.figure()
