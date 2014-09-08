@@ -19,6 +19,7 @@ xcorr = function(x, y=NULL, len) {
     
     return(ret_coeff*Re(r/length(x)))    
 }
+
 toeplitz = function(x,y) {
     if(x[1] != y[1]) stop("Need first elements be equal")
     A = matrix(0, nrow=length(x), ncol=length(y))
@@ -30,9 +31,11 @@ toeplitz = function(x,y) {
     return(A)
 }
 
+require(MASS)
+
 Lx = 10000
 
-L=6
+L=2
 
 x = sin(2*pi/8*(seq(0,Lx-1)))
 
@@ -48,4 +51,6 @@ p = rdx[L:(2*L-1)]
 
 w_opt = ginv(R) %*% p
 
-xs = conv(x,w_opt)
+xs = filter(d, rev(w_opt), circular=TRUE)
+
+hist(x-xs)
