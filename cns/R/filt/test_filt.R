@@ -59,52 +59,36 @@ sp = sp[1:L]
 
 w = as.matrix(exp(-(1:L)/10)) # default filter
 
-filt = Vectorize(function(s, w) {
-    if(s<0) return(0)
-    if(s>=L) return(0)
-    w[s+1]
-},"s")
 
-conv = function(x, w) {
-    xv = NULL
-    L = length(w)
-    for(i in 1:length(x)) {    
-        w_i = (i-L+1):i
-        w_i = w_i[w_i>0]
-        
-        xv = c(xv, t(rev(w[1:length(w_i)])) %*% x[w_i])
-    }
-    return(xv)
-}
-sp_c = conv(sp, w)
-
-plotl(sp_c)
-
-E = sum((x_ts - sp_c)^2)
-
-Rxx = matrix(0, nrow=L, ncol=L)
-rxd = rep(0, L)
-for(i in L:length(x_ts)) {
-    w_i = (i-L+1):i
-    
-    Rxx = Rxx + x_ts[w_i] %*% t(x_ts[w_i])
-    rxd = rxd + x_ts[w_i] * sp[w_i]
-}
-Rxx = sapply(1:nrow(Rxx), function(i) rev(Rxx[i,]))
-
-
-Rxx = Rxx/(length(x_ts)-L+1)
-rxd = rxd/(length(x_ts)-L+1)
-
-w2 = ginv(Rxx) %*% rxd
-
-sp_c2 = conv(sp, w2)
-
-E2 = sum((x_ts - sp_c2)^2)
-plotl(sp_c2)
-
-Lx = 10000
-
-x = sin(2*pi/8*(seq(0,Lx-1)))
-x = c(1,2,3,4,5)
-
+# sp_c = conv(sp, w)
+# 
+# plotl(sp_c)
+# 
+# E = sum((x_ts - sp_c)^2)
+# 
+# Rxx = matrix(0, nrow=L, ncol=L)
+# rxd = rep(0, L)
+# for(i in L:length(x_ts)) {
+#     w_i = (i-L+1):i
+#     
+#     Rxx = Rxx + x_ts[w_i] %*% t(x_ts[w_i])
+#     rxd = rxd + x_ts[w_i] * sp[w_i]
+# }
+# Rxx = sapply(1:nrow(Rxx), function(i) rev(Rxx[i,]))
+# 
+# 
+# Rxx = Rxx/(length(x_ts)-L+1)
+# rxd = rxd/(length(x_ts)-L+1)
+# 
+# w2 = ginv(Rxx) %*% rxd
+# 
+# sp_c2 = conv(sp, w2)
+# 
+# E2 = sum((x_ts - sp_c2)^2)
+# plotl(sp_c2)
+# 
+# Lx = 10000
+# 
+# x = sin(2*pi/8*(seq(0,Lx-1)))
+# x = c(1,2,3,4,5)
+# 
