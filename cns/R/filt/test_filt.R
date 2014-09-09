@@ -54,8 +54,8 @@ big_id = which(rowSums(spikes) >= max(rowSums(spikes)))
 sp = as.matrix(spikes[big_id[1], ])
 sp_t = which(sp == 1)
 
-x_ts = x_ts[1:L]
-sp = sp[1:L]
+#x_ts = x_ts[1:L]
+#sp = sp[1:L]
 
 w = as.matrix(exp(-(1:L)/10)) # default filter
 

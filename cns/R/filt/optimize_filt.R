@@ -2,45 +2,62 @@
 #source('filt_funcs.R')
 #source('test_filt.R')
 
-L = 100
-y = matrix(sp, nrow=L)
-x = matrix(x_ts, nrow=L)
+L = 50
+y = matrix(sp, nrow=length(sp))
+x = matrix(x_ts, nrow=length(x_ts))
 
 
-w = as.matrix(exp(-(1:L)/10), nrow=L) # default filter
+
+w = as.matrix(exp(-(1:L)/2), nrow=L) # default filter
+#w = rep(0, L)
 
 cut_window = function(i,x) {
-    w_i = i:(i+L-1)
+    w_i = rev((i-L+1):i)
     w_i = w_i[w_i>0]
     
     return(matrix(x[w_i], nrow=length(w_i)))
 }
 
-E = Vectorize(function(i, x, y, w) {
-    xc = cut_window(i,x)
+conv = Vectorize(function(i, y, w) {
     yc = cut_window(i,y)
-    wc = matrix(w[1:length(xc)], nrow=length(xc))
+    wc = matrix(w[1:length(yc)], nrow=length(yc))
     
-    (xc- wc %*% yc)^2
+    t(wc) %*% yc
+}, "i")
+
+E = Vectorize(function(i, x, y, w) {
+    (x[i]- conv(i,y,w))^2
 },"i")
 
-dEdw = function(i, x, y, w) {
-    w_i = i:(i+L-1)
-    w_i = w_i[w_i>0]
-    I = rep(1, L)
-    gr = -2 * t(y[w_i]) %*% (x[w_i] - y[w_i] %*% t(w[1:length(w_i)]))
-    c(-gr)
+dEdw = Vectorize(function(i, x, y, w) { # x = d
+    yc = cut_window(i,y)
+    
+    -2 * ( x[i] - conv(i, y, w) ) * yc
+},"i")
+
+mean_area = (L):(L+400)
+
+m_E = function(w) {
+    mean(  E(mean_area,x,y,w) ) 
+}
+m_dEdw = function(w) {
+    dEdw_whole = dEdw(mean_area, x, y, w)
+    rowMeans(dEdw_whole)
 }
 
+simple_gd = function(max_ep, alpha) {
+    for(ep in 1:max_ep) {
+        w = w - alpha * m_dEdw(w)
+        cat("Error: ", m_E(w), "\n")
+    }
+    return(w)
+}    
 
-alpha = 0.00001
 
-plot(E(i,x,y,w), type="l")
+#opt_res = optim(w, m_E, m_dEdw, method="CG",control=list(trace=5), hessian=FALSE)
+#w_opt = opt_res$par
 
-i=1
-for(ep in 1:100) {
-    w = w - alpha * dEdw(i,x,y,w)    
-    cat("Error: ", sum(E(i,x,y,w)), "\n")
-}
 
+
+plot(conv(mean_area,y,w_opt), type="l")
 
