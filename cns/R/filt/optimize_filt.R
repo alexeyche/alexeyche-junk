@@ -4,11 +4,15 @@
 
 L = 50
 y = matrix(sp, nrow=length(sp))
+
 x = matrix(x_ts, nrow=length(x_ts))
 
 
 
 w = as.matrix(exp(-(1:L)/2), nrow=L) # default filter
+
+
+
 #w = rep(0, L)
 
 cut_window = function(i,x) {
@@ -25,6 +29,7 @@ conv = Vectorize(function(i, y, w) {
     t(wc) %*% yc
 }, "i")
 
+
 E = Vectorize(function(i, x, y, w) {
     (x[i]- conv(i,y,w))^2
 },"i")
@@ -32,10 +37,11 @@ E = Vectorize(function(i, x, y, w) {
 dEdw = Vectorize(function(i, x, y, w) { # x = d
     yc = cut_window(i,y)
     
-    -2 * ( x[i] - conv(i, y, w) ) * yc
+    gr = -2 * ( x[i] - conv(i, y, w) ) * yc
+    c(gr, rep(0, L-length(gr)) )
 },"i")
 
-mean_area = (L):(L+400)
+mean_area = 1:length(x) 
 
 m_E = function(w) {
     mean(  E(mean_area,x,y,w) ) 
@@ -58,6 +64,6 @@ simple_gd = function(max_ep, alpha) {
 #w_opt = opt_res$par
 
 
-
-plot(conv(mean_area,y,w_opt), type="l")
+w_opt = simple_gd(1000, 0.1)
+plot(conv(1:100,y,w_opt), type="l")
 
