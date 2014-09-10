@@ -1,7 +1,9 @@
 
 
 
-generate_gain_and_bias = function(count, intercept_low, intercept_high, rate_low, rate_high) {
+generate_gain_and_bias = function(count, rate_low, rate_high) {
+    intercept_low = -1
+    intercept_high = 1
     gain = bias = NULL
     intercept = intercept_low+(intercept_high-intercept_low)*runif(count)
     rate = rate_low +(rate_high-rate_low)*runif(count)
