@@ -12,6 +12,7 @@ generate_gain_and_bias = function(count, intercept_low, intercept_high, rate_low
 }
 
 
+
 run_neurons = function(input, n) {
     dV = dt * (input - n$v)/t_rc
     n$v = n$v + dV
@@ -24,6 +25,7 @@ run_neurons = function(input, n) {
     fired = n$v>v_tresh
     n$v[fired] <- 0
     n$ref[fired] <- t_ref
+        
     return(list(n, fired))
 }
 

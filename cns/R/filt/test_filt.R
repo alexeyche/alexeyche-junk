@@ -7,7 +7,7 @@ dt = 1
 
 t_rc = 0.02 * 1000 
 t_ref = 0.002 * 1000
-M = 100
+M = 50
 rate_low = 25
 rate_high = 50
 v_tresh = 1

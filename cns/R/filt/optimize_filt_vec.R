@@ -1,10 +1,10 @@
 #source('test_filt.R')
 
-L = 50
+L = 10
 
 
 y = spikes
-
+x = x_ts
 M = nrow(spikes)
 #w = matrix(rep(exp(-(1:L)/2),M), nrow=M, ncol=L, byrow=TRUE) # default filter
 w = matrix(0, nrow=M, ncol=L) # default filter
