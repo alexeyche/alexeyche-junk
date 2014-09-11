@@ -2,7 +2,7 @@
 
 source('util.R')
 
-L = 10
+L = 20
 
 
 y = spikes
@@ -50,16 +50,53 @@ m_dEdw = function(w) {
 }
 
 require(lbfgs)
-out = lbfgs(m_E, m_dEdw, w)
+out = lbfgs(m_E, m_dEdw, w, ftol=1e-02)
 w_opt = out$par
 
 #opt_res = optim(w, m_E, m_dEdw, method="BFGS",control=list(trace=1), hessian=FALSE)
 #w_opt = opt_res$par
+area_cut = mean_area
+if(length(area_cut) > 200) {
+    area_cut = area_cut[1:200]
+}
 
-plot(, type="l")
 
 d = conv_mat(mean_area,y,w_opt)
+plot(x[area_cut], type="l", col="black", lwd=2)
+lines(d[area_cut], col="red")
 
+source('filt_funcs.R')
+require(SynchWave)
+g0 = x
+g1 = d
+
+
+p_signal = sum(abs(g0)^2)/length(x)
+p_noise = sd(g1-g0)^2
+
+snr_time = 10*log10(p_signal/p_noise)
+
+G0 = fft(g0)/length(x)
+G0 = fftshift(G0)
+G0_dB = 20*log10(abs(G0))
+
+G1 = fft(g1)/length(x)
+G1 = fftshift(G1)
+G1_dB = 20*log10(abs(G1))
+
+Fs = 1000 # Hz, sampling rate
+f = Fs/2*seq(-1,1,length.out=length(x))
+
+p_signal_f = sum(abs(G0)^2)/length(G0)
+p_noise_f = sd( abs(G1-G0)^2 )
+p_noise_f1 = sum( abs(G1-G0)^2 )
+
+snr_freq = 10*log10(p_signal_f/p_noise_f)
+snr_freq1 = max(G1_dB) - 10*log10(p_noise_f) - 10*log10(length(x)/2)
+snr_freq2 = max(G1_dB) - 10*log10(p_noise_f1) - 10*log10(length(x)/2)
+
+plot(f, G0_dB, type="l")
+lines(f, G1_dB, col="red")
 
 
 
