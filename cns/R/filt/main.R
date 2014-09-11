@@ -1,8 +1,8 @@
 
 source('nengo.R')
 source('util.R')
-
-Xi = sample(1:100)
+source('serialize_to_bin.R')
+Xi = sample(1:10)
 
 X = NULL
 for(i in Xi) {

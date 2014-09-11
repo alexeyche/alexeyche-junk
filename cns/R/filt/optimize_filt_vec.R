@@ -49,14 +49,16 @@ m_dEdw = function(w) {
     Reduce("+", dEdw_whole)/length(dEdw_whole)
 }
 
-out = lbfgs(m_E, m_dEdw, w_opt)
+require(lbfgs)
+out = lbfgs(m_E, m_dEdw, w)
 w_opt = out$par
 
 #opt_res = optim(w, m_E, m_dEdw, method="BFGS",control=list(trace=1), hessian=FALSE)
 #w_opt = opt_res$par
 
-plot(conv_mat(1:500,y,w_opt), type="l")
+plot(, type="l")
 
+d = conv_mat(mean_area,y,w_opt)
 
 
 
