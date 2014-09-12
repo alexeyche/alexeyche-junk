@@ -1,19 +1,33 @@
-filt = Vectorize(function(s, w) {
-    if(s<0) return(0)
-    if(s>=L) return(0)
-    w[s+1]
-},"s")
 
-conv = function(x, w) {
-    xv = NULL
-    L = length(w)
-    for(i in 1:length(x)) {    
-        #w_i = (i-L+1):i
-        #w_i = w_i[w_i>0]
-        w_i = i:(i+L-1)
-        w_i = w_i[w_i>0]
-        
-        xv = c(xv, t(rev(w[1:length(w_i)])) %*% x[w_i])
+nextpow2 <- function(x) {
+    if (is.null(x) || length(x) == 0) return(c())
+    if (!is.numeric(x) && !is.complex(x))
+        stop("Argument 'x' must be a numeric/complex vector/matrix.")
+    
+    x[x == 0] <- 1
+    return(ceiling(log2(abs(x))))
+}
+
+xcorr = function(x, y=NULL, len) {
+    ret_coeff = -1
+    if(is.null(y)) {
+        y = x
+        ret_coeff = 1
     }
-    return(xv)
+    nfft = 2^nextpow2(2*len+1);
+    r = fft( fft(x,nfft) * Conj(fft(y,nfft)) , inverse=TRUE);
+    r = c(r[(length(r)-len+1):length(r)], r[1:(len+1)]) 
+    
+    return(ret_coeff*Re(r/length(x)))    
+}
+
+toeplitz = function(x,y) {
+    if(x[1] != y[1]) stop("Need first elements be equal")
+    A = matrix(0, nrow=length(x), ncol=length(y))
+    ind = col(A) - row(A)
+    xi = which(ind <= 0, arr.ind=TRUE)
+    A[xi] <- x[abs(ind[xi])+1]
+    yi = which(ind >= 0, arr.ind=TRUE)
+    A[yi] <- y[abs(ind[yi])+1]
+    return(A)
 }

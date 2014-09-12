@@ -2,6 +2,20 @@
 source('nengo.R')
 source('util.R')
 source('serialize_to_bin.R')
+
+
+dt = 1
+
+t_rc = 0.02 * 1000 
+t_ref = 0.002 * 1000
+M = 50
+rate_low = 0
+rate_high = 50
+v_tresh = 1
+
+
+
+
 Xi = sample(1:10)
 
 X = NULL
@@ -11,10 +25,13 @@ for(i in Xi) {
 
 X =  2*(X-min(X))/(max(X)-min(X))-1
 
+
 M = 25
 c(gain, bias) := generate_gain_and_bias(M, rate_low, rate_high)
-gain = gain
-bias = bias
+encoder = sample(c(1,-1),M, replace=TRUE)
+
+
+n = list(v=rep(0, M), ref=rep(0,M))
 
 
 spikes = NULL
