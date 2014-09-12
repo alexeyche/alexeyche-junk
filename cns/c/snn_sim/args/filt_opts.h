@@ -8,11 +8,13 @@ typedef struct {
     int jobs;
     const char *input_file;
     const char *output_file;
+    const char *target_values_file;
 } ArgOptionsFilt;
 
 void usageFilt(void) {
     printf("Usage: \n");
-    printf("\t-i - file for input ts\n");
+    printf("\t-i - file for input spikes\n");
+    printf("\t-t - file for target values\n");
     printf("\t-o - file for output\n");
     printf("\t-? - print this message\n");
     exit(8);
@@ -25,6 +27,14 @@ ArgOptionsFilt parseFiltOptions(int argc, char **argv) {
     args.output_file = NULL;
     if(argc == 1) usageFilt();
     while ((argc > 1) && (argv[1][0] == '-')) {
+        if(strcmp(argv[1], "-t") == 0) {                
+            if(argc == 2) { 
+                printf("No options for -t\n");
+                usageFilt();
+            }
+            args.target_values_file = strdup(argv[2]);
+            ++argv; --argc;
+        } else
         if(strcmp(argv[1], "-i") == 0) {                
             if(argc == 2) { 
                 printf("No options for -i\n");
