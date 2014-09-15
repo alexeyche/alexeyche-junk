@@ -132,8 +132,15 @@ void* simRunRoutine(void *args) {
     SimContext *ctx = s->ctx;
     const Constants *c = ctx->c; 
     SimImpl* impl = s->impl;
-
-    bool need_second_step = false;
+    
+    bool need_sync = false;
+    for(size_t na_i=sw->first; na_i<sw->last; na_i++) {
+        LayerPoisson *l = s->layers->array[ impl->na[na_i].layer_id ];
+        if(l->need_steps_sync) {
+            need_sync = true;
+        }
+    }
+    
     for(double t=0; t< s->rt->Tmax; t+=c->dt) {
 //        printf("t: %f\n",ctx->t);
         for(size_t na_i=sw->first; na_i<sw->last; na_i++) {
@@ -150,20 +157,18 @@ void* simRunRoutine(void *args) {
 
             l->calculateProbability(l, n_id, s->ctx);
 
-            if( (getLC(l,c)->neuron_type != EWtaLayer) && (getLC(l,c)->neuron_type != EWtaAdaptLayer)) {
+            if(!need_sync) {
                 l->calculateSpike(l, n_id, s->ctx);
                 l->calculateDynamics(l, n_id, s->ctx);
                 if(l->fired[*n_id] == 1) {
                     propagateSpikeNetSim(s, l, &l->ids[*n_id], t);
                     l->fired[*n_id] = 0;
                 }
-            } else {
-                need_second_step = true;
             }
         }
         pthread_barrier_wait( &barrier );
 
-        if(need_second_step) {
+        if(need_sync) {
             for(size_t na_i=sw->first; na_i<sw->last; na_i++) {
                 const size_t *layer_id = &impl->na[na_i].layer_id;
                 const size_t *n_id = &impl->na[na_i].n_id;

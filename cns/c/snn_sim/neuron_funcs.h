@@ -25,4 +25,7 @@ double prob_fun_stroke_ExpBohte( const double *u, const Constants *c);
 double prob_fun_LinToyoizumi( const double *u, const Constants *c);
 double prob_fun_stroke_LinToyoizumi( const double *u, const Constants *c);
 
+double prob_fun_Determ( const double *u, const Constants *c);
+double prob_fun_stroke_Determ( const double *u, const Constants *c);
+
 #endif

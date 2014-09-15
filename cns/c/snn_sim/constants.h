@@ -10,7 +10,7 @@
 
 typedef enum { ENull, EOptimalSTDP, EResourceSTDP, ESimpleSTDP, ETripleSTDP } learning_rule_t;
 typedef enum { EPoissonLayer, EWtaLayer, EAdaptLayer, EWtaAdaptLayer } neuron_layer_t;
-typedef enum { EExpHennequin, ELinToyoizumi, EExpBohte, EExp } prob_fun_t;
+typedef enum { EExpHennequin, ELinToyoizumi, EExpBohte, EExp, EDeterm } prob_fun_t;
 
 #ifndef max
     #define max( a, b ) ( ((a) > (b)) ? (a) : (b) )

@@ -83,6 +83,14 @@ double prob_fun_stroke_Exp( const double *u, const Constants *c) {
 }
 
 
+double prob_fun_Determ( const double *u, const Constants *c) {
+    if(*u < c->u_tr) return (0.0);
+    return(1.0);
+}
+double prob_fun_stroke_Determ( const double *u, const Constants *c) {
+    return( 0.0 );
+}
+
 double prob_fun_ExpHennequin( const double *u, const Constants *c) {
     if( *u  <= c->u_rest ) return(c->__pr);    
     double p = (c->pr + c->r0 * log(1 + exp( c->beta*(*u - c->u_tr) )))/c->sim_dim;

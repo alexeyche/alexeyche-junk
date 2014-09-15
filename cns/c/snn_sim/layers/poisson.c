@@ -10,6 +10,7 @@ LayerPoisson* createPoissonLayer(size_t N, size_t *glob_idx, unsigned char statL
     LayerPoisson *l = (LayerPoisson*)malloc(sizeof(LayerPoisson));
     l->N = N;
     l->ids = (size_t*)malloc( l->N*sizeof(size_t));
+    l->need_steps_sync = false;
     l->nt = (nspec_t*)malloc( l->N*sizeof(nspec_t));
     for(size_t ni=0; ni<l->N; ni++) {
         l->ids[ni] = (*glob_idx)++;
@@ -167,6 +168,10 @@ void initProbFun(LayerPoisson *l, const Constants *c) {
     if( getLC(l,c)->prob_fun == ELinToyoizumi) {
         l->prob_fun = &prob_fun_LinToyoizumi;
         l->prob_fun_stroke = &prob_fun_stroke_LinToyoizumi;
+    } else
+    if( getLC(l,c)->prob_fun == EDeterm) {
+        l->prob_fun = &prob_fun_Determ;
+        l->prob_fun_stroke = &prob_fun_stroke_Determ;
     } 
 }
 
@@ -281,11 +286,6 @@ void calculateProbability_Poisson(LayerPoisson *l, const size_t *ni, const SimCo
         const size_t *syn_id = &act_node->value;
         l->u[*ni] += l->W[ *ni ][ *syn_id ] * l->syn[ *ni ][ *syn_id ];
     }
-    //// pacemaker
-    //if((l->id == 0)&&(c->pacemaker->pacemaker_on)) {
-    //    double u_p = c->pacemaker->amplitude + c->pacemaker->amplitude * sin(2*PI*c->pacemaker->frequency * *t/1000 - l->ids[*n_id] * c->pacemaker->cumulative_period_delta/1000);
-    //    l->u[*n_id] += u_p;
-    //}
 
     l->p[*ni] = l->prob_fun(&l->u[*ni], c) * c->dt;
     l->M[*ni] = exp(-l->gr[ *ni ]);
