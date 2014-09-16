@@ -1,6 +1,6 @@
-\name{snn-package}
-\alias{snn-package}
-\alias{snn}
+\name{Rsnn-package}
+\alias{Rsnn-package}
+\alias{Rsnn}
 \docType{package}
 \title{
 What the package does (short line)
@@ -11,7 +11,7 @@ More about what it does (maybe more than one line)
 }
 \details{
 \tabular{ll}{
-Package: \tab snn\cr
+Package: \tab Rsnn\cr
 Type: \tab Package\cr
 Version: \tab 1.0\cr
 Date: \tab 2014-01-06\cr
