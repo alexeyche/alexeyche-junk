@@ -1,0 +1,3 @@
+useDynLib(snn)
+exportPattern("^[[:alpha:]]+")
+export(':=')
