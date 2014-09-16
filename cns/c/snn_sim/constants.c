@@ -126,6 +126,9 @@ prob_fun_t probFunTypeParse(char *str) {
     if(strcmp(str, "Exp") == 0) {
         return(EExp);
     }
+    if(strcmp(str, "Determ") == 0) {
+        return(EDeterm);
+    }
     printf("Can't do parse of function type: %s\n", str);
     exit(1);
 }
@@ -659,6 +662,9 @@ void prob_fun_tPrint(prob_fun_t v) {
     }
     if(v == ELinToyoizumi) {
         printf("LinToyoizumi\n");
+    }
+    if(v == EDeterm) {
+        printf("Determ\n");
     }
 }
 

@@ -48,6 +48,7 @@ struct learn_t;
 
 struct LayerPoisson {
     size_t id;
+    bool need_steps_sync;
     //consts
     size_t N;
     size_t *ids;

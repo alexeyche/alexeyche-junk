@@ -6,6 +6,7 @@
 LayerWta* createWtaLayer(size_t N, size_t *glob_idx, unsigned char statLevel) {
     LayerWta *l = (LayerWta*)malloc(sizeof(LayerWta));
     l->base = *createPoissonLayer(N, glob_idx, statLevel);
+    l->base.need_steps_sync = true;
 
     l->base.calculateProbability = &calculateProbability_Wta;
     l->base.calculateSpike = &calculateSpike_Wta;
