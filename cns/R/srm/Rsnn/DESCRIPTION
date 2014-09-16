@@ -7,4 +7,6 @@ Author: alexeyche
 Maintainer: Alexey Chernyshev <alexey.chernushev@gmail.com>
 Description: Package contains a bunch of Spiking Neural Networks methods 
 License:  GPL (>=2)
-Depends: zoo, lattice
+Imports: Rcpp (>= 0.11.2)
+LinkingTo: Rcpp (>= 0.11.2)
+Depends: Rcpp, zoo, lattice
