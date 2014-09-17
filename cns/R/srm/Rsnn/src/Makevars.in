@@ -32,7 +32,7 @@ PKG_CPPFLAGS=-I"@SNN_INCLUDE@"
 PKG_LIBS=-L@SNN_LIB@ $(LIBS)
 
 
-OBJECTS.root=test.o RcppExports.o
+OBJECTS.root=RSim.o
 
 OBJECTS=  $(OBJECTS.root)
 
