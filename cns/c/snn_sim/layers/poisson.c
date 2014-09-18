@@ -178,10 +178,10 @@ void initProbFun(LayerPoisson *l, const Constants *c) {
 void configureLayer_Poisson(LayerPoisson *l, const indVector *inputIDs, const indVector *outputIDs, const Constants *c) {
     indVector **layer_conns = (indVector**) malloc(l->N * sizeof(indVector));
     double acc_prob_net_edge = getLC(l,c)->net_edge_prob0;
-    double delta_prob_net_edge = (getLC(l,c)->net_edge_prob1 - getLC(l,c)->net_edge_prob0)/(l->N/getLC(l,c)->net_edge_prob_group_size);
+    double delta_prob_net_edge = (getLC(l,c)->net_edge_prob1 - getLC(l,c)->net_edge_prob0)/((double)l->N/getLC(l,c)->net_edge_prob_group_size);
     double acc_prob_input_edge = getLC(l,c)->input_edge_prob0;
-    double delta_prob_input_edge = (getLC(l,c)->input_edge_prob1 - getLC(l,c)->input_edge_prob0)/(l->N/getLC(l,c)->input_edge_prob_group_size);
-    
+    double delta_prob_input_edge = (getLC(l,c)->input_edge_prob1 - getLC(l,c)->input_edge_prob0)/((double)l->N/getLC(l,c)->input_edge_prob_group_size);
+
     for(size_t ni=0; ni<l->N; ni++) {
         layer_conns[ni] = TEMPLATE(createVector,ind)();
         l->nt[ni] = EXC;

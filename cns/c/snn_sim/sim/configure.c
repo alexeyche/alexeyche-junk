@@ -2,48 +2,15 @@
 #include <sim/sim.h>
 
 
-void configureNetSpikesSim(Sim *s, const char *input_spikes_filename, Constants *c) {
+void configureNetSpikesSim(Sim *s, Constants *c) {
     // filling receiver-oriented connection map
     assert(s->impl->net_size>0);
     allocNetSim(s->ns, s->impl->net_size);
     
     configureConnMapNetSim(s->ns, s->layers); 
-    if(s->rt) {
-        deleteRuntime(s->rt);
-        s->rt = createRuntime();
-    }
-
-    if(input_spikes_filename) {
-        FileStream *fs = createInputFileStream(input_spikes_filename);
-        pMatrixVector *ml = readMatrixList(fs, 3);
-    
-        Matrix *inp_m = ml->array[0];
-        SpikesList *inp_sl = spikesMatrixToSpikesList(inp_m);
-        propagateInputSpikesNetSim(s, inp_sl);
-
-        double Tmax = 0;
-        for(size_t ni=0; ni<s->ns->net->size; ni++) {
-            if(s->ns->net->list[ni]->size>0) {
-                if(s->ns->net->list[ni]->array[ s->ns->net->list[ni]->size-1 ]> Tmax) {
-                    Tmax = s->ns->net->list[ni]->array[ s->ns->net->list[ni]->size-1 ];
-                }
-            }
-        }   
-        s->rt->Tmax = Tmax + 100;
-        deleteSpikesList(inp_sl); 
-    
-        Matrix *timeline_m = ml->array[1];
-        for(size_t ri=0; ri<timeline_m->nrow*timeline_m->ncol; ri++) {
-            TEMPLATE(insertVector,double)(s->rt->reset_timeline, timeline_m->vals[ri]);
-        }
-        Matrix *classes_m = ml->array[2];
-        for(size_t ri=0; ri<classes_m->nrow*classes_m->ncol; ri++) {
-            TEMPLATE(insertVector,double)(s->rt->pattern_classes, classes_m->vals[ri]);
-        }
-    
-        TEMPLATE(deleteVector,pMatrix)(ml);
-    }
 }
+
+
 
 void configureLayersSim(Sim *s, Constants *c) {
     s->ctx->c = c;

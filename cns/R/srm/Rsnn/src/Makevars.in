@@ -32,7 +32,7 @@ PKG_CPPFLAGS=-I"@SNN_INCLUDE@"
 PKG_LIBS = -L"@SNN_LIB@" -lsnn_sim  $(LIBS) 
 
 
-OBJECTS.root=RSim.o RConstants.o mod.o
+OBJECTS.root=RSim.o RConstants.o mod.o conv_util.o
 
 OBJECTS=  $(OBJECTS.root)
 

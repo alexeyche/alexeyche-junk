@@ -11,7 +11,7 @@ struct Sim;
 struct SimImpl;
 
 void configureLayersSim(struct Sim *s, Constants *c);
-void configureNetSpikesSim(struct Sim *s, const char *input_spikes_filename, Constants *c);
+void configureNetSpikesSim(struct Sim *s, Constants *c);
 void configureSimImpl(struct Sim *s);
 void configureSynapses(struct Sim *s, Constants *c);
 void configureRewardModulation(struct Sim *s);

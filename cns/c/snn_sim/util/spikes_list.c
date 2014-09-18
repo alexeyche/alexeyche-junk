@@ -49,3 +49,25 @@ SpikesList* spikesMatrixToSpikesList(Matrix *m) {
     return(sl);
 }
 
+SpikePatternsList* readSpikePatternsListFromFile(const char *filename) {
+    SpikePatternsList* spl = (SpikePatternsList*) malloc( sizeof(SpikePatternsList) );
+
+    FileStream *fs = createInputFileStream(filename);
+    pMatrixVector *ml = readMatrixList(fs, 3);
+    Matrix *inp_m = ml->array[0];
+    spl->sl = spikesMatrixToSpikesList(inp_m);
+
+    spl->timeline = TEMPLATE(createVector,double)();
+    spl->pattern_classes = TEMPLATE(createVector,double)();
+
+    Matrix *timeline_m = ml->array[1];
+    for(size_t ri=0; ri<timeline_m->nrow*timeline_m->ncol; ri++) {
+        TEMPLATE(insertVector,double)(spl->timeline, timeline_m->vals[ri]);
+    }
+    Matrix *classes_m = ml->array[2];
+    for(size_t ri=0; ri<classes_m->nrow*classes_m->ncol; ri++) {
+        TEMPLATE(insertVector,double)(spl->pattern_classes, classes_m->vals[ri]);
+    }
+    return(spl);
+}
+

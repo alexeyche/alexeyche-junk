@@ -22,6 +22,31 @@ Sim* createSim(size_t nthreads, unsigned char stat_level, Constants *c) {
     return(s);
 }
 
+void simSetInputSpikes(Sim *s, SpikesList *sl) {
+    if(s->rt) {
+        deleteRuntime(s->rt);
+        s->rt = createRuntime();
+    }
+
+    propagateInputSpikesNetSim(s, sl);
+
+    double Tmax = 0;
+    for(size_t ni=0; ni<s->ns->net->size; ni++) {
+        if(s->ns->net->list[ni]->size>0) {
+            if(s->ns->net->list[ni]->array[ s->ns->net->list[ni]->size-1 ]> Tmax) {
+                Tmax = s->ns->net->list[ni]->array[ s->ns->net->list[ni]->size-1 ];
+            }
+        }
+    }   
+    s->rt->Tmax = Tmax + 100;
+}
+
+void simSetInputSpikePatterns(Sim *s, SpikePatternsList *spl) {
+    simSetInputSpikes(s, spl->sl);
+    s->rt->reset_timeline = TEMPLATE(copyVector,double)(spl->timeline);
+    s->rt->pattern_classes = TEMPLATE(copyVector,double)(spl->pattern_classes);
+}
+
 
 void appendLayerSim(Sim *s, LayerPoisson *l) {
     TEMPLATE(insertVector,pLayer)(s->layers, l);

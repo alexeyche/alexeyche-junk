@@ -37,7 +37,6 @@ void deallocNetSim(NetSim *ns) {
 }
 
 
-
 void allocNetSim(NetSim *ns, size_t net_size) {
     if(ns->size > 0) {
         deallocNetSim(ns);    

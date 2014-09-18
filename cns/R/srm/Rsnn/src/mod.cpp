@@ -9,10 +9,13 @@ RCPP_MODULE(snnMod) {
     Rcpp::class_<RSim>("RSim")
     .constructor<RConstants*,unsigned char, size_t>()
     .method("print", &RSim::print, "Print sim")
+    .method("printLayers", &RSim::printLayers, "Print detailed information about layers")
+    .method("setInputSpikes", &RSim::setInputSpikes, "Set input spikes")
     ;
     Rcpp::class_<RConstants>("RConstants")
     .constructor<std::string>()
     .field("const_filename", &RConstants::const_filename, "Constants filename")
+    .method("setValue", &RConstants::setValue, "Set value of constant with section and name")
     .method("print", &RConstants::print, "Print constants")
     ;
 }

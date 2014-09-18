@@ -7,7 +7,7 @@
 #include <sim/sim.h>
 #include <sim/serialize.h>
 #include <util/io.h>
-
+#include <util/spikes_list.h>
 
 
 
@@ -44,7 +44,10 @@ int main(int argc, char **argv) {
         loadLayersFromFile(s, model_to_load);
     }
 
-    configureNetSpikesSim(s, a.input_spikes_file, c);
+    configureNetSpikesSim(s, c);
+
+    SpikePatternsList *spl = readSpikePatternsListFromFile(a.input_spikes_file);
+    simSetInputSpikePatterns(s, spl);
     configureSynapses(s, c);
     if(a.Tmax > 0) {
         s->rt->Tmax = a.Tmax;
