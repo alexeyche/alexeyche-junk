@@ -84,3 +84,6 @@ get_const = function(const_name) {
 patch_const = function(const_ini, param, new_val) {
     system( sprintf("sed -i -e 's:%s[ ]*=.*:%s = %s:g' %s", param, param, new_val, const_ini))
 }
+
+
+

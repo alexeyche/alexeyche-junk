@@ -1,0 +1,55 @@
+This is BibTeX, Version 0.99c (TeX Live 2009/Debian)
+The top-level auxiliary file: ./review.aux
+The style file: unsrt.bst
+Database file #1: refs.bib
+Name 1 in "Mehdi Adibi, James S. McDonald, Colin W. G. Clifford, and Ehsan Arabzadeh" has a comma at the end for entry Adapt
+while executing---line 944 of file unsrt.bst
+Name 1 in "Guillaume Hennequin, Wulfram Gerstner, and Jean-Pascal Pfister" has a comma at the end for entry TripleAdapt
+while executing---line 944 of file unsrt.bst
+Warning--empty publisher in Zaencev1999
+Too many commas in name 1 of "Markram H, Lubke J, Frotscher M, SakmannB." for entry stdp1
+while executing---line 944 of file unsrt.bst
+Too many commas in name 1 of "Bell C.C., Han V.Z., Sugawara Y., Grant K." for entry stdp3
+while executing---line 944 of file unsrt.bst
+You've used 19 entries,
+            1791 wiz_defined-function locations,
+            570 strings with 6115 characters,
+and the built_in function-call counts, 3631 in all, are:
+= -- 329
+> -- 96
+< -- 1
++ -- 43
+- -- 24
+* -- 197
+:= -- 582
+add.period$ -- 57
+call.type$ -- 19
+change.case$ -- 12
+chr.to.int$ -- 0
+cite$ -- 20
+duplicate$ -- 182
+empty$ -- 403
+format.name$ -- 24
+if$ -- 828
+int.to.chr$ -- 0
+int.to.str$ -- 19
+missing$ -- 24
+newline$ -- 98
+num.names$ -- 19
+pop$ -- 59
+preamble$ -- 1
+purify$ -- 0
+quote$ -- 0
+skip$ -- 68
+stack$ -- 0
+substring$ -- 241
+swap$ -- 28
+text.length$ -- 1
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 0
+warning$ -- 1
+while$ -- 30
+width$ -- 21
+write$ -- 204
+(There were 4 error messages)

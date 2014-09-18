@@ -30,7 +30,6 @@
 #include <learn/simple_stdp.h>
 #include <learn/triple_stdp.h>
 
-pthread_barrier_t barrier;
 
 typedef struct {
     size_t layer_id;

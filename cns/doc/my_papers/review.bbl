@@ -1,0 +1,107 @@
+\begin{thebibliography}{10}
+
+\bibitem{BohteReview}
+H.~Paugam-Moisy and S.M. Bohte.
+\newblock Computing with spiking neuron networks.
+\newblock {\em Handbook of Natural Computing}, pages 335--376, 2012.
+
+\bibitem{Phizi}
+Коротько~Г.Ф. Покровский~В.М.
+\newblock {\em Физиология человека}.
+\newblock Москва "Медицина", 2003.
+
+\bibitem{Adapt}
+Colin W. G.~Clifford Mehdi~Adibi, James S.~McDonald and Ehsan Arabzadeh.
+\newblock Adaptation improves neural coding efficiency despite increasing
+  correlations in variability.
+\newblock {\em The Journal of Neuroscience}, 33(5):2108–2120, 2013.
+
+\bibitem{TripleAdapt}
+Wulfram~Gerstner Guillaume~Hennequin and Jean-Pascal Pfister.
+\newblock Stdp in adaptive neurons gives close-to-optimal information
+  transmission.
+\newblock {\em Front Comput Neurosci.}, 143(4), 2010.
+
+\bibitem{Genesis}
+David~Beeman James M.~Bower.
+\newblock {\em The Book of GENESIS: Exploring Realistic Neural Models with the
+  GEneral NEural SImulation System}.
+\newblock Springer, 2nd edition, 1998.
+
+\bibitem{HH}
+A.~L. Hodgkin and A.~F. Huxley.
+\newblock A quantitative description of membrane current and its application to
+  conduction and excitation in nerve.
+\newblock {\em J Physiol.}, 117(4):500–544, 1952.
+
+\bibitem{Zaencev1999}
+И.В. Заенцев.
+\newblock {\em Нейронные сети: основные модели}.
+\newblock 1999.
+
+\bibitem{Lapicque}
+Mark C.W. van~Rossum Nicolas~Brunel.
+\newblock Lapicque’s 1907 paper: from frogs to integrate-and-fire.
+\newblock {\em Biological Cybernetics}, 97(5-6):337--339, 2007.
+
+\bibitem{IzhSimpleModel}
+Eugene~M. Izhikevich.
+\newblock Simple model of spiking neurons.
+\newblock {\em Transactions on Neural Networks}, 14(6), 2003.
+
+\bibitem{IzhTalam}
+Eugene~M. Izhikevich and Gerald~M. Edelman.
+\newblock Large-scale model of mammalian thalamocortical systems.
+\newblock {\em PNAS}, 105:3593--3598, 2008.
+
+\bibitem{AdaptThesis}
+Richard Naud.
+\newblock {\em The Dynamics of Adapting Neurons}.
+\newblock PhD thesis, EPFL Lausanne, 2011.
+
+\bibitem{Hebb1949}
+D.O. Hebb.
+\newblock {\em The Organization of Behavior}.
+\newblock Willey: New York, 1949.
+
+\bibitem{BiPoo}
+Poo~M. Bi~G.
+\newblock Synaptic modification by correlated activity: Hebb's postulate
+  revisited.
+\newblock {\em Annu Rev Neurosci}, 24:139--166, 2001.
+
+\bibitem{stdp1}
+Frotscher M~SakmannB. Markram~H, Lubke~J.
+\newblock Regulation of synaptic efficacy by coincidence of postsynaptic aps
+  and epsps.
+\newblock {\em Science}, 275:213--15, 1997.
+
+\bibitem{stdp2}
+Johnston~D. Magee~J.C.
+\newblock A synaptically controlled, associative signal for hebbian plasticity
+  in hippocampal neurons.
+\newblock {\em Science}, 275:209--13, 1997.
+
+\bibitem{stdp3}
+Sugawara Y. Grant~K. Bell~C.C., Han~V.Z.
+\newblock Synaptic plasticity in a cerebellum-like structure depends on
+  temporal order.
+\newblock {\em Nature}, 387:278--81, 1997.
+
+\bibitem{stdp4}
+Poo~M. Bi~G.
+\newblock Synaptic modifications in cultured hippocampal neurons: Dependence on
+  spike timing, synaptic strength and postsynaptic cell type.
+\newblock {\em Neurosci}, 18:10464–72, 1998.
+
+\bibitem{NeuralAndAdaptiveSystems}
+W.~Curt~Lefebvre Jose C.~Principe, Neil R.~Euliano.
+\newblock {\em Neural and Adaptive Systems: Fundamentals Through Simulation}.
+\newblock Wiley, 1999.
+
+\bibitem{rate_first}
+Adrian~E. D.
+\newblock {\em The basis of sensation: The action of the sense organs}.
+\newblock New York: Norton, 1928.
+
+\end{thebibliography}

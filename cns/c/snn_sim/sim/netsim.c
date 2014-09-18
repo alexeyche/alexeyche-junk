@@ -14,6 +14,7 @@
 #include <util/util_dlink_list_tmpl.c>
 
 
+pthread_spinlock_t *spinlocks;
 
 
 NetSim* createNetSim() {

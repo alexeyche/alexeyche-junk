@@ -669,32 +669,32 @@ void prob_fun_tPrint(prob_fun_t v) {
 }
 
 void LayerConstantsPrint(LayerConstants *c) {
-    printf("N->"); size_tPrint(c->N);
-    printf("learning_rule->"); learning_rule_tPrint(c->learning_rule);
-    printf("neuron_type->"); neuron_layer_tPrint(c->neuron_type);
-    printf("prob_fun->"); prob_fun_tPrint(c->prob_fun);
-    printf("learn->"); boolPrint(c->learn);
-    printf("determ->"); boolPrint(c->determ);
-    printf("net_edge_prob0->"); doublePrint(c->net_edge_prob0);
-    printf("net_edge_prob_group_size->"); doublePrint(c->net_edge_prob_group_size);
-    printf("net_edge_prob1->"); doublePrint(c->net_edge_prob1);
-    printf("input_edge_prob0->"); doublePrint(c->input_edge_prob0);
-    printf("input_edge_prob_group_size->"); doublePrint(c->input_edge_prob_group_size);
-    printf("input_edge_prob1->"); doublePrint(c->input_edge_prob1);
-    printf("output_edge_prob->"); doublePrint(c->output_edge_prob);
-    printf("inhib_frac->"); doublePrint(c->inhib_frac);
-    printf("weight_per_neuron->"); doublePrint(c->weight_per_neuron);
-    printf("wmax->"); doublePrint(c->wmax);
-    printf("weight_decay_factor->"); doublePrint(c->weight_decay_factor);
-    printf("weight_var->"); doublePrint(c->weight_var);
-    printf("lrate->"); doublePrint(c->lrate);
-    printf("axonal_delays_rate->"); doublePrint(c->axonal_delays_rate);
-    printf("axonal_delays_gain->"); doublePrint(c->axonal_delays_gain);
-    printf("syn_delays_rate->"); doublePrint(c->syn_delays_rate);
-    printf("syn_delays_gain->"); doublePrint(c->syn_delays_gain);
-    printf("ws->"); doublePrint(c->ws);
-    printf("aw->"); doublePrint(c->aw);
-    printf("ltd_factor->"); doublePrint(c->ltd_factor);
+    printf("\tN->"); size_tPrint(c->N);
+    printf("\tlearning_rule->"); learning_rule_tPrint(c->learning_rule);
+    printf("\tneuron_type->"); neuron_layer_tPrint(c->neuron_type);
+    printf("\tprob_fun->"); prob_fun_tPrint(c->prob_fun);
+    printf("\tlearn->"); boolPrint(c->learn);
+    printf("\tdeterm->"); boolPrint(c->determ);
+    printf("\tnet_edge_prob0->"); doublePrint(c->net_edge_prob0);
+    printf("\tnet_edge_prob_group_size->"); doublePrint(c->net_edge_prob_group_size);
+    printf("\tnet_edge_prob1->"); doublePrint(c->net_edge_prob1);
+    printf("\tinput_edge_prob0->"); doublePrint(c->input_edge_prob0);
+    printf("\tinput_edge_prob_group_size->"); doublePrint(c->input_edge_prob_group_size);
+    printf("\tinput_edge_prob1->"); doublePrint(c->input_edge_prob1);
+    printf("\toutput_edge_prob->"); doublePrint(c->output_edge_prob);
+    printf("\tinhib_frac->"); doublePrint(c->inhib_frac);
+    printf("\tweight_per_neuron->"); doublePrint(c->weight_per_neuron);
+    printf("\twmax->"); doublePrint(c->wmax);
+    printf("\tweight_decay_factor->"); doublePrint(c->weight_decay_factor);
+    printf("\tweight_var->"); doublePrint(c->weight_var);
+    printf("\tlrate->"); doublePrint(c->lrate);
+    printf("\taxonal_delays_rate->"); doublePrint(c->axonal_delays_rate);
+    printf("\taxonal_delays_gain->"); doublePrint(c->axonal_delays_gain);
+    printf("\tsyn_delays_rate->"); doublePrint(c->syn_delays_rate);
+    printf("\tsyn_delays_gain->"); doublePrint(c->syn_delays_gain);
+    printf("\tws->"); doublePrint(c->ws);
+    printf("\taw->"); doublePrint(c->aw);
+    printf("\tltd_factor->"); doublePrint(c->ltd_factor);
 }
 
 

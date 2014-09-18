@@ -27,16 +27,16 @@
 
 
 
-PKG_CPPFLAGS=-I"@SNN_INCLUDE@"  
+PKG_CPPFLAGS=-I"@SNN_INCLUDE@"
 
-PKG_LIBS=-L@SNN_LIB@ $(LIBS)
+PKG_LIBS = -L"@SNN_LIB@" -lsnn_sim  $(LIBS) 
 
 
-OBJECTS.root=RSim.o
+OBJECTS.root=RSim.o RConstants.o mod.o
 
 OBJECTS=  $(OBJECTS.root)
 
-all: before $(SHLIB) after
+all: $(SHLIB) before  after
 
 clean:
 	rm -f $(OBJECTS)

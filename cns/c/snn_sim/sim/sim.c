@@ -1,6 +1,8 @@
 
 #include "sim.h"
 
+pthread_barrier_t barrier;
+
 Sim* createSim(size_t nthreads, unsigned char stat_level, Constants *c) {
     Sim *s = (Sim*) malloc(sizeof(Sim));
     s->ns = createNetSim();

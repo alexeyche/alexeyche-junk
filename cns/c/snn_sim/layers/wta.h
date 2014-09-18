@@ -15,7 +15,6 @@ typedef struct {
     double *b;
 } LayerWta;
 
-pthread_spinlock_t sum_prob_spinlock;
 
 LayerWta* createWtaLayer(size_t N, size_t *glob_idx, unsigned char statLevel);
 

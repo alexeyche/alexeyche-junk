@@ -1,0 +1,4 @@
+g++ -I/usr/local/lib/R/include -DNDEBUG -I"/home/alexeyche/prog/alexeyche-junk/cns/c/snn_sim" -I/usr/local/include -I"/home/alexeyche/R/x86_64-unknown-linux-gnu-library/3.1/Rcpp/include"   -fpic  -g -O2  -c RSim.cpp -o RSim.o
+g++ -I/usr/local/lib/R/include -DNDEBUG -I"/home/alexeyche/prog/alexeyche-junk/cns/c/snn_sim" -I/usr/local/include -I"/home/alexeyche/R/x86_64-unknown-linux-gnu-library/3.1/Rcpp/include"   -fpic  -g -O2  -c RConstants.cpp -o RConstants.o
+g++ -I/usr/local/lib/R/include -DNDEBUG -I"/home/alexeyche/prog/alexeyche-junk/cns/c/snn_sim" -I/usr/local/include -I"/home/alexeyche/R/x86_64-unknown-linux-gnu-library/3.1/Rcpp/include"   -fpic  -g -O2  -c mod.cpp -o mod.o
+g++ -shared -L/usr/local/lib -L/home/alexeyche/prog/alexeyche-junk/cns/c/bin/.libs -lsnn_sim RSim.o RConstants.o mod.o -lrt -ldl -lm -L/usr/local/lib/R/lib -lR -o Rsnn.so 

@@ -6,7 +6,6 @@ AC_INIT([snn_sim], [0.1], [alexey.chernushev@gmail.com])
 AC_CONFIG_SRCDIR([snn_sim/])
 AM_INIT_AUTOMAKE([subdir-objects])
 #AC_CONFIG_HEADERS([config.h])
-
 # Checks for programs.
 AC_PROG_CC
 
@@ -22,5 +21,7 @@ AC_TYPE_SIZE_T
 AC_FUNC_MALLOC
 AC_FUNC_REALLOC
 AC_CHECK_FUNCS([inet_ntoa socket])
+
+LT_INIT
 
 AC_OUTPUT(Makefile snn_sim/Makefile)

@@ -1,8 +1,9 @@
 #ifndef CORE_H
 #define CORE_H
 
-typedef enum { false, true } bool;
+//typedef enum { false, true } bool;
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>

@@ -22,8 +22,8 @@ typedef struct {
 #define T SynSpike
 #include <util/util_dlink_list_tmpl.h>
 
+extern pthread_spinlock_t *spinlocks;
 
-pthread_spinlock_t *spinlocks;
 
 typedef struct {
     ConnVector **conn_map;

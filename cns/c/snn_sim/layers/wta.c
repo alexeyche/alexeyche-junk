@@ -3,6 +3,8 @@
 
 #include <sim/sim.h>
 
+pthread_spinlock_t sum_prob_spinlock;
+
 LayerWta* createWtaLayer(size_t N, size_t *glob_idx, unsigned char statLevel) {
     LayerWta *l = (LayerWta*)malloc(sizeof(LayerWta));
     l->base = *createPoissonLayer(N, glob_idx, statLevel);
