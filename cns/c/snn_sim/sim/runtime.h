@@ -9,7 +9,7 @@ typedef struct {
     size_t timeline_iter;
     intVector *uniq_classes;
     indVector *classes_indices_train;
-
+    
     double Tmax;
 } SimRuntime;
 

@@ -30,7 +30,7 @@ struct learn_t {
     void (*free)(struct learn_t *);
     void (*serialize)(struct learn_t*, FileStream *file, const struct Sim *s);
     void (*deserialize)(struct learn_t*, FileStream *file, const struct Sim *s);
-    void (*saveStat)(struct learn_t*, FileStream *file);
+    void (*saveStat)(struct learn_t*, pMatrixVector *mv);
 };
 typedef struct learn_t learn_t;
 

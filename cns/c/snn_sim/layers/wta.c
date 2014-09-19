@@ -136,8 +136,8 @@ void deserializeLayer_Wta(LayerPoisson *l, FileStream *file, const Sim *s) {
 //    TEMPLATE(deleteVector,pMatrix)(data);
 }
 
-void saveStat_Wta(LayerPoisson *l, FileStream *file) {
+void saveStat_Wta(LayerPoisson *l, pMatrixVector *mv) { 
     LayerWta* linh = (LayerWta*) l;
-    saveStat_Poisson(l, file);
+    saveStat_Poisson(l, mv);
 
 }

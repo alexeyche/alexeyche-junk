@@ -36,6 +36,6 @@ void resetValues_TripleSTDP(learn_t *ls_t, const size_t *ni);
 void free_TripleSTDP(learn_t *ls_t);
 void serialize_TripleSTDP(learn_t *ls_t, FileStream *file, const struct Sim *s);
 void deserialize_TripleSTDP(learn_t *ls_t, FileStream *file, const struct Sim *s);
-void saveStat_TripleSTDP(learn_t *ls_t, FileStream *file);
+void saveStat_TripleSTDP(learn_t *ls_t, pMatrixVector *mv); 
 
 #endif

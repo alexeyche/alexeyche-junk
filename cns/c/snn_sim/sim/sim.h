@@ -43,6 +43,8 @@ struct SimContext {
     doubleVector *stat_global_reward;
     double sum_prob_wta;
 
+    double actual_running_time;
+    
     const Constants *c;
     unsigned char stat_level;
 };

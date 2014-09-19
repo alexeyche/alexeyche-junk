@@ -28,6 +28,6 @@ void deleteLayer_Adapt(LayerPoisson *l);
 void configureLayer_Adapt(LayerPoisson *l, const indVector *inputIDs, const indVector *outputIDs, const Constants *c);
 void serializeLayer_Adapt(LayerPoisson *l, FileStream *file, const struct Sim *s);
 void deserializeLayer_Adapt(LayerPoisson *l, FileStream *file, const struct Sim *s);
-void saveStat_Adapt(LayerPoisson *l, FileStream *file);
+void saveStat_Adapt(LayerPoisson *l, pMatrixVector *mv); 
 
 #endif    

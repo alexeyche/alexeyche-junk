@@ -88,8 +88,9 @@ int compSynSpike( const void *elem1, const void *elem2 ) {
 
 void propagateInputSpikesNetSim(Sim *s, SpikesList *sl) {
     NetSim *ns = s->ns;
-
+    
     assert(ns->size >= sl->size);
+
     SynSpikeVector **input_spikes = (SynSpikeVector**) malloc( ns->size * sizeof(SynSpikeVector*));
     for(size_t ni=0; ni< ns->size; ni++) {
         input_spikes[ni] = TEMPLATE(createVector,SynSpike)();
@@ -115,6 +116,7 @@ void propagateInputSpikesNetSim(Sim *s, SpikesList *sl) {
         for(size_t sp_i=0; sp_i < input_spikes[ni]->size; sp_i++) {
             TEMPLATE(addValueLList,SynSpike)(ns->input_spikes_queue[ni], input_spikes[ni]->array[sp_i]);
         }
+
         ns->input_spikes_queue[ni]->current = ns->input_spikes_queue[ni]->first;
         TEMPLATE(deleteVector,SynSpike)(input_spikes[ni]);
     }
@@ -125,7 +127,6 @@ void propagateInputSpikesNetSim(Sim *s, SpikesList *sl) {
             TEMPLATE(insertVector,double)(ns->net->list[ni], sl->list[ni]->array[sp_i]);
         }
     }
-
 }
 
 void printConnMap(NetSim *ns) {
@@ -141,7 +142,7 @@ void printConnMap(NetSim *ns) {
 
 void printInputSpikesQueue(NetSim *ns) {
     for(size_t ni=0; ni<ns->size; ni++) {
-        printf("%zu: ", ni);
+        printf("%zu(%zu): ", ni, ns->input_spikes_queue[ ni ]->size);
         SynSpikeLNode *current_node = ns->input_spikes_queue[ ni ]->current;
         SynSpikeLNode *spike_node;
         while( (spike_node = TEMPLATE(getNextLList,SynSpike)(ns->input_spikes_queue[ ni ]) ) != NULL ) {

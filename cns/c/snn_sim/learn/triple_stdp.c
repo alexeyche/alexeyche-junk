@@ -210,12 +210,10 @@ void deserialize_TripleSTDP(learn_t *ls_t, FileStream *file, const Sim *s) {
     TEMPLATE(deleteVector,pMatrix)(data);
 }
 
-void saveStat_TripleSTDP(learn_t *ls_t, FileStream *file) {
+void saveStat_TripleSTDP(learn_t *ls_t, pMatrixVector *mv) { 
     TripleSTDP *ls = (TripleSTDP*)ls_t;
     LayerPoisson *l = ls->base.l; 
     
-    pMatrixVector *mv = TEMPLATE(createVector,pMatrix)();
-
     Matrix *m_o_one = vectorArrayToMatrix(ls->stat_o_one, l->N);
     Matrix *m_o_two = vectorArrayToMatrix(ls->stat_o_two, l->N);
     Matrix *m_a_minus = vectorArrayToMatrix(ls->stat_a_minus, l->N);
@@ -229,6 +227,4 @@ void saveStat_TripleSTDP(learn_t *ls_t, FileStream *file) {
         Matrix *mr = vectorArrayToMatrix(ls->stat_r[ni], l->nconn[ni]);
         TEMPLATE(insertVector,pMatrix)(mv, mr);
     }
-    saveMatrixList(file, mv);
-    TEMPLATE(deleteVector,pMatrix)(mv);
 }

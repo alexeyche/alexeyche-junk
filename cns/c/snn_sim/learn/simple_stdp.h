@@ -21,6 +21,6 @@ void resetValues_SimpleSTDP(learn_t *ls_t, const size_t *ni);
 void free_SimpleSTDP(learn_t *ls_t);
 void serialize_SimpleSTDP(learn_t *ls_t, FileStream *file, const struct Sim *s);
 void deserialize_SimpleSTDP(learn_t *ls_t, FileStream *file, const struct Sim *s);
-
+void saveStat_SimpleSTDP(learn_t *ls_t, pMatrixVector *mv);
 
 #endif

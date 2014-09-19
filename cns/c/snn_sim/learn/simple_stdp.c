@@ -17,6 +17,7 @@ SimpleSTDP* init_SimpleSTDP(LayerPoisson *l) {
     ls->base.free = &free_SimpleSTDP;
     ls->base.serialize = &serialize_SimpleSTDP;
     ls->base.deserialize = &deserialize_SimpleSTDP;
+    ls->base.saveStat = &saveStat_SimpleSTDP;
 
     return(ls);
 }
@@ -56,5 +57,9 @@ void free_SimpleSTDP(learn_t *ls_t) {
 void serialize_SimpleSTDP(learn_t *ls_t, FileStream *file, const Sim *s) {
 }
 void deserialize_SimpleSTDP(learn_t *ls_t, FileStream *file, const Sim *s) {
+}
+
+void saveStat_SimpleSTDP(learn_t *ls_t, pMatrixVector *mv) {
+
 }
 

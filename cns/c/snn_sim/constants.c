@@ -165,7 +165,7 @@ bool boolParse(char *str) {
 void fillNetEdgeProb(const char *str, LayerConstants *c) {
     c->net_edge_prob0 = 0.0;
     c->net_edge_prob1 = 0.0;
-    c->net_edge_prob_group_size = 1;
+    c->net_edge_prob_group_size = c->N;
     pccharVector *v = pccharVectorColonParse(str);    
     if(v->size == 0) {
         printf("Too less argumnets in colon option in net_edge_prob\n");
@@ -191,7 +191,7 @@ void fillNetEdgeProb(const char *str, LayerConstants *c) {
 void fillInputEdgeProb(const char *str, LayerConstants *c) {
     c->input_edge_prob0 = 0.0;
     c->input_edge_prob1 = 0.0;
-    c->input_edge_prob_group_size = 0;
+    c->input_edge_prob_group_size = c->N;
     pccharVector *v = pccharVectorColonParse(str);    
 
     if(v->size == 0) {

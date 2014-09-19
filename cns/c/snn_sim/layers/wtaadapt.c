@@ -128,8 +128,8 @@ void deserializeLayer_WtaAdapt(LayerPoisson *l, FileStream *file, const Sim *s) 
     TEMPLATE(deleteVector,pMatrix)(data);
 }
 
-void saveStat_WtaAdapt(LayerPoisson *l, FileStream *file) {
+void saveStat_WtaAdapt(LayerPoisson *l, pMatrixVector *mv) { 
     LayerWtaAdapt* linh = (LayerWtaAdapt*) l;
-    saveStat_Wta(l, file);
+    saveStat_Wta(l, mv);
 
 }

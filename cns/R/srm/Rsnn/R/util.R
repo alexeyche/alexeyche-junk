@@ -86,4 +86,20 @@ patch_const = function(const_ini, param, new_val) {
 }
 
 
+require(lattice)
 
+plot_rastl <- function(raster, lab="",T0=0, Tmax=Inf) {
+  x <- c()
+  y <- c()
+  
+  for(i in 1:length(raster)) {
+    rast = raster[[i]]
+    rast = rast[rast >= T0]
+    rast = rast[rast < Tmax]
+    x <- c(x, rast)
+    y <- c(y, rep(i, length(rast)))
+  }
+  return(xyplot(y~x,list(x=x, y=y), main=lab, xlim=c(T0, max(x)), col="black"))
+}
+
+prast = plot_rastl

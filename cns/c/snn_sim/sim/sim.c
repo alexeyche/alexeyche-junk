@@ -16,9 +16,12 @@ Sim* createSim(size_t nthreads, unsigned char stat_level, Constants *c) {
     if(s->ctx->stat_level > 0) {
         s->ctx->stat_global_reward = TEMPLATE(createVector,double)();
     }
+    s->ctx->actual_running_time = 0.0;
     s->impl = (SimImpl*) malloc(sizeof(SimImpl));
     s->impl->nthreads = nthreads;
     s->impl->net_size=0;
+    s->impl->na = NULL;
+    s->impl->num_neurons = 0;
     return(s);
 }
 
@@ -27,6 +30,7 @@ void simSetInputSpikes(Sim *s, SpikesList *sl) {
         deleteRuntime(s->rt);
         s->rt = createRuntime();
     }
+    configureNetSpikesSim(s, s->ctx->c);
 
     propagateInputSpikesNetSim(s, sl);
 
@@ -114,11 +118,6 @@ const SynSpike* getInputSpike(Sim *s, const size_t *layer_id, const size_t *n_id
 
 void runSim(Sim *s) {
     configureSimImpl(s);
-    if(s->ctx->c->reinforcement) {
-        configureRewardModulation(s);
-//        global_reward_spinlock = (pthread_spinlock_t*)malloc( sizeof(pthread_spinlock_t));
-//        pthread_spin_init(global_reward_spinlock, 0);
-    }
 
     spinlocks = (pthread_spinlock_t*)malloc( s->impl->net_size * sizeof(pthread_spinlock_t));
     for(size_t ni=0; ni<s->impl->net_size; ni++) {
@@ -178,7 +177,7 @@ void* simRunRoutine(void *args) {
 
             const SynSpike *sp;
             while( (sp = getInputSpike(s, layer_id, n_id, &t)) != NULL) {
-        //        printf("got input spike on %zu:%zu at %f in syn %zu (%f)\n", *layer_id, *n_id, t, sp->syn_id, sp->t);
+                //printf("got input spike on %zu:%zu at %f in syn %zu (%f)\n", *layer_id, *n_id, t, sp->syn_id, sp->t);
                 l->propagateSpike(l, n_id, sp, s->ctx);
             }
 
@@ -219,6 +218,9 @@ void* simRunRoutine(void *args) {
             }
             pthread_barrier_wait( &barrier );
         }
+    }
+    if(sw->thread_id == 0) {
+        s->ctx->actual_running_time += s->rt->Tmax;
     }
     return(NULL);
 }

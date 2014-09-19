@@ -33,6 +33,6 @@ void resetValues_OptimalSTDP(learn_t *ls_t, const size_t *ni);
 void free_OptimalSTDP(learn_t *ls_t);
 void serialize_OptimalSTDP(learn_t *ls_t, FileStream *file, const struct Sim *s);
 void deserialize_OptimalSTDP(learn_t *ls_t, FileStream *file, const struct Sim *s);
-void saveStat_OptimalSTDP(learn_t *ls_t, FileStream *file);
+void saveStat_OptimalSTDP(learn_t *ls_t, pMatrixVector *mv); 
 
 #endif

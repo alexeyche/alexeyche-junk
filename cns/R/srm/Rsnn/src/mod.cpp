@@ -13,6 +13,9 @@ RCPP_MODULE(snnMod) {
     .method("setInputSpikes", &RSim::setInputSpikes, "Set input spikes")
     .method("printConn", &RSim::printConn, "Print sim connection map")
     .method("printInputSpikes", &RSim::printInputSpikes, "Print input spikes queue")
+    .method("run", &RSim::run, "Run sim")
+    .method("getLayerStat", &RSim::getLayerStat, "Get layer stat")
+    .method("W", &RSim::W, "Get List of W matrices")
     ;
     Rcpp::class_<RConstants>("RConstants")
     .constructor<std::string>()

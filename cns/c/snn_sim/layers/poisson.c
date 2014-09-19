@@ -181,6 +181,7 @@ void configureLayer_Poisson(LayerPoisson *l, const indVector *inputIDs, const in
     double delta_prob_net_edge = (getLC(l,c)->net_edge_prob1 - getLC(l,c)->net_edge_prob0)/((double)l->N/getLC(l,c)->net_edge_prob_group_size);
     double acc_prob_input_edge = getLC(l,c)->input_edge_prob0;
     double delta_prob_input_edge = (getLC(l,c)->input_edge_prob1 - getLC(l,c)->input_edge_prob0)/((double)l->N/getLC(l,c)->input_edge_prob_group_size);
+//    printf("%zu %zu\n", getLC(l,c)->net_edge_prob_group_size, getLC(l,c)->input_edge_prob_group_size);
 
     for(size_t ni=0; ni<l->N; ni++) {
         layer_conns[ni] = TEMPLATE(createVector,ind)();
@@ -568,30 +569,25 @@ void serializeLayer_Poisson(LayerPoisson *l, FileStream *file, const Sim *s) {
     }
 }
 
-void saveStat_Poisson(LayerPoisson *l, FileStream *file) {
-    pMatrixVector *mv = TEMPLATE(createVector,pMatrix)();
-
-    Matrix *mp = vectorArrayToMatrix(l->stat->stat_p, l->N);
-    TEMPLATE(insertVector,pMatrix)(mv, mp);
-    
-    Matrix *mu = vectorArrayToMatrix(l->stat->stat_u, l->N);
-    TEMPLATE(insertVector,pMatrix)(mv, mu);
-    
-    if(l->stat->statLevel > 1) {
-        for(size_t ni=0; ni < l->N; ni++) {
-            Matrix *mSyn = vectorArrayToMatrix(l->stat->stat_syn[ni], l->nconn[ni]);
-            TEMPLATE(insertVector,pMatrix)(mv, mSyn);
+void saveStat_Poisson(LayerPoisson *l, pMatrixVector *mv) { 
+    if(l->stat->statLevel > 0) {
+        Matrix *mp = vectorArrayToMatrix(l->stat->stat_p, l->N);
+        TEMPLATE(insertVector,pMatrix)(mv, mp);
+        
+        Matrix *mu = vectorArrayToMatrix(l->stat->stat_u, l->N);
+        TEMPLATE(insertVector,pMatrix)(mv, mu);
+        if(l->stat->statLevel > 1) {
+            for(size_t ni=0; ni < l->N; ni++) {
+                Matrix *mSyn = vectorArrayToMatrix(l->stat->stat_syn[ni], l->nconn[ni]);
+                TEMPLATE(insertVector,pMatrix)(mv, mSyn);
+            }
+            for(size_t ni=0; ni < l->N; ni++) {
+                Matrix *mdW = vectorArrayToMatrix(l->stat->stat_W[ni], l->nconn[ni]);
+                TEMPLATE(insertVector,pMatrix)(mv, mdW);
+            }
+        }        
+        if(l->ls_t) {
+            l->ls_t->saveStat(l->ls_t, mv);
         }
-        for(size_t ni=0; ni < l->N; ni++) {
-            Matrix *mdW = vectorArrayToMatrix(l->stat->stat_W[ni], l->nconn[ni]);
-            TEMPLATE(insertVector,pMatrix)(mv, mdW);
-        }
-    }        
-
-    saveMatrixList(file, mv);
-    TEMPLATE(deleteVector,pMatrix)(mv);
-    
-    if(l->ls_t) {
-        l->ls_t->saveStat(l->ls_t, file);
-    }        
+    }
 }

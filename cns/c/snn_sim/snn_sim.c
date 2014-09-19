@@ -66,13 +66,12 @@ int main(int argc, char **argv) {
 
     if(statLevel > 0) {
         checkIdxFnameOfFile(a.stat_file);
-        FileStream *fs = createOutputFileStream(a.stat_file);
-
+        pMatrixVector *mv = TEMPLATE(createVector,pMatrix)();
         for(size_t li=0; li < s->layers->size; li++) {
             LayerPoisson *l = s->layers->array[li];
-            l->saveStat(l, fs);
+            l->saveStat(l, mv);
         }            
-        deleteFileStream(fs);
+        saveMatrixListToFile(a.stat_file, mv);
     }
     char *model_to_save = NULL;
     if(a.model_file) model_to_save = strdup(a.model_file);

@@ -2,7 +2,7 @@
 #include <sim/sim.h>
 
 
-void configureNetSpikesSim(Sim *s, Constants *c) {
+void configureNetSpikesSim(Sim *s, const Constants *c) {
     // filling receiver-oriented connection map
     assert(s->impl->net_size>0);
     allocNetSim(s->ns, s->impl->net_size);
@@ -99,6 +99,9 @@ void configureSimImpl(Sim *s) {
     size_t num_neurons = 0;
     for(size_t li=0; li<s->layers->size; li++) {
         num_neurons += s->layers->array[li]->N;
+    }
+    if(s->impl->na) {
+        free(s->impl->na);
     }
     s->impl->na = (NeuronAddress*) malloc(num_neurons * sizeof(NeuronAddress));
     s->impl->num_neurons = num_neurons;

@@ -33,6 +33,6 @@ void deleteLayer_Wta(LayerPoisson *l);
 void configureLayer_Wta(LayerPoisson *l, const indVector *inputIDs, const indVector *outputIDs, const Constants *c);
 void serializeLayer_Wta(LayerPoisson *l, FileStream *file, const struct Sim *s);
 void deserializeLayer_Wta(LayerPoisson *l, FileStream *file, const struct Sim *s);
-void saveStat_Wta(LayerPoisson *l, FileStream *file);
+void saveStat_Wta(LayerPoisson *l, pMatrixVector *mv); 
 
 #endif    

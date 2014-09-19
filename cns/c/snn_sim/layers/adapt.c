@@ -126,8 +126,7 @@ void deserializeLayer_Adapt(LayerPoisson *l, FileStream *file, const Sim *s) {
     TEMPLATE(deleteVector,pMatrix)(data);
 }
 
-void saveStat_Adapt(LayerPoisson *l, FileStream *file) {
+void saveStat_Adapt(LayerPoisson *l, pMatrixVector *mv) { 
     LayerAdapt* linh = (LayerAdapt*) l;
-    saveStat_Poisson(l, file);
-
+    saveStat_Poisson(l, mv);
 }

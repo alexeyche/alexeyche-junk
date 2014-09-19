@@ -11,5 +11,9 @@ extern "C" {
 
 
 SpikesList* RListToSpikesList(Rcpp::List l);
+Rcpp::List SpikesListToRList(SpikesList *sl);
+Rcpp::List MatrixVectorToRList(pMatrixVector *mv);
+Rcpp::NumericMatrix MatrixToRMatrix(pMatrix *m);
+Rcpp::NumericMatrix DoublesAllocToRMatrix(double **v, int *sizes, int N);
 
 #endif

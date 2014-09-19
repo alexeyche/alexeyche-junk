@@ -85,7 +85,7 @@ void trainWeightsStep_OptimalSTDP(learn_t *ls_t, const double *u, const double *
     if(l->fired[ *ni ] == 1) {
         ls->pacc[*ni] += 1;
     }
-    if(ls->time_passed >= c->mean_p_dur) {
+    if(s->actual_running_time >= c->mean_p_dur) {
         ls->B[ *ni ] = B_calc( &l->fired[ *ni ], p, &ls->pacc[ *ni ], c);
 
         indLNode *act_node = NULL;
@@ -192,7 +192,7 @@ void serialize_OptimalSTDP(learn_t *ls_t, FileStream *file, const Sim *s) {
     TEMPLATE(insertVector,pMatrix)(data, pacc_m);
     
     Matrix *t_passed_m = createMatrix(1,1);
-    setMatrixElement(t_passed_m, 0, 0, ls->time_passed + s->rt->Tmax);
+    setMatrixElement(t_passed_m, 0, 0, s->ctx->actual_running_time);
     TEMPLATE(insertVector,pMatrix)(data, t_passed_m);
 
     saveMatrixList(file, data);
@@ -214,12 +214,12 @@ void deserialize_OptimalSTDP(learn_t *ls_t, FileStream *file, const Sim *s) {
     }
     Matrix *t_passed_m = data->array[1];
     assert((t_passed_m->nrow == 1) && (t_passed_m->ncol == 1));
-    ls->time_passed = getMatrixElement(t_passed_m, 0, 0);
+    s->ctx->actual_running_time = getMatrixElement(t_passed_m, 0, 0);
 
     TEMPLATE(deleteVector,pMatrix)(data);
 }
 
-void saveStat_OptimalSTDP(learn_t *ls_t, FileStream *file) {
+void saveStat_OptimalSTDP(learn_t *ls_t, pMatrixVector *mv) { 
     OptimalSTDP *ls = (OptimalSTDP*)ls_t;
     LayerPoisson *l = ls->base.l; 
     
@@ -232,8 +232,5 @@ void saveStat_OptimalSTDP(learn_t *ls_t, FileStream *file) {
             Matrix *mC = vectorArrayToMatrix(ls->stat_C[ni], l->nconn[ni]);
             TEMPLATE(insertVector,pMatrix)(mv, mC);
         }
-        saveMatrixList(file, mv);
-
-        TEMPLATE(deleteVector,pMatrix)(mv);
     }        
 }
