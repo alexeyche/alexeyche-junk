@@ -45,6 +45,11 @@ public:
         simSetInputSpikes(s, sl);
         deleteSpikesList(sl); 
     }    
+    Rcpp::List run() {
+       runSim(s); 
+    }
+
+private:
     Sim *s;
 };
 
