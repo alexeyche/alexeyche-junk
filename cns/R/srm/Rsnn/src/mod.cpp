@@ -11,6 +11,8 @@ RCPP_MODULE(snnMod) {
     .method("print", &RSim::print, "Print sim")
     .method("printLayers", &RSim::printLayers, "Print detailed information about layers")
     .method("setInputSpikes", &RSim::setInputSpikes, "Set input spikes")
+    .method("printConn", &RSim::printConn, "Print sim connection map")
+    .method("printInputSpikes", &RSim::printInputSpikes, "Print input spikes queue")
     ;
     Rcpp::class_<RConstants>("RConstants")
     .constructor<std::string>()

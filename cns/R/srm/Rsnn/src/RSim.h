@@ -17,6 +17,7 @@ public:
     RSim(RConstants *rc, unsigned char statLevel, size_t nthreads) {
         s = createSim(nthreads, statLevel, rc->c);
         configureLayersSim(s, rc->c);
+        configureNetSpikesSim(s, rc->c);
     }
     ~RSim() {
         deleteSim(s);    
@@ -32,9 +33,17 @@ public:
             std::cout <<"\tlayer " << li+1 << ". size: " << s->layers->array[li]->N << "\n";
         }
     }
+    void printConn() {
+        printConnMap(s->ns);
+    }
+    void printInputSpikes() {
+        printInputSpikesQueue(s->ns);
+    }
     void setInputSpikes(Rcpp::List sp) {
         assert(s->c->M == sp.size());
-        simSetInputSpikes(s, RListToSpikesList(sp));
+        SpikesList *sl = RListToSpikesList(sp);
+        simSetInputSpikes(s, sl);
+        deleteSpikesList(sl); 
     }    
     Sim *s;
 };

@@ -63,7 +63,6 @@ void deleteNetSim(NetSim *ns) {
 
 void configureConnMapNetSim(NetSim *ns, pLayerVector *l) {
     for(size_t li=0; li< l->size; li++) {
-//        printf("%zu\n", li); 
         for(size_t ni=0; ni < l->array[li]->N; ni++) {
 //            printf("%zu\n", ni); 
             for(size_t con_i=0; con_i < l->array[li]->nconn[ni]; con_i++) {
@@ -89,6 +88,7 @@ int compSynSpike( const void *elem1, const void *elem2 ) {
 
 void propagateInputSpikesNetSim(Sim *s, SpikesList *sl) {
     NetSim *ns = s->ns;
+
     assert(ns->size >= sl->size);
     SynSpikeVector **input_spikes = (SynSpikeVector**) malloc( ns->size * sizeof(SynSpikeVector*));
     for(size_t ni=0; ni< ns->size; ni++) {
