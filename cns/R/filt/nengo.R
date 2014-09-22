@@ -36,13 +36,19 @@ compute_response = function(x, encoder, gain, bias, time_limit=0.5) {
     n$v = runif(M) 
     count = rep(0, M)
     
-    input = x * encoder * gain + bias
+    #input = x * encoder * gain + bias
+    input = 2*gaussFun(x, centers, delta) #* encoder * gain + bias 
     for(i in seq(0, time_limit*1000, by=dt)) {
         c(n, spikes) := run_neurons(input, n)
         count[spikes] = count[spikes] + 1
     }
     return(count/time_limit)
 }
+
+
+gaussFun = Vectorize(function(x, mu, delta) {
+    exp(-(x-mu)^2/(2*delta^2))
+},c("mu"))
 
 plot_tuning_curves = function(encoder, gain, bias) {
     x = seq(-1, 1, length.out=100)
