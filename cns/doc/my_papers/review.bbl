@@ -110,4 +110,20 @@ L.N. Cooper and M.F. Bear.
   with experiment.
 \newblock {\em Nature Reviews Neuroscience}, 13:798--810, 2012.
 
+\bibitem{bcm_book}
+Intrator N. Blais B.~S. Cooper, L.~N and H.~Z. Shouval.
+\newblock {\em Theory of cortical plasticity}.
+\newblock World Scientific, New Jersey, 2004.
+
+\bibitem{ShouvalCaBCM}
+Castellani G. C. Blais B. S. Yeung L.~C. Shouval, H.~Z. and L.~N Cooper.
+\newblock Converging evidence for a simplified biophysical model of synaptic
+  plasticity.
+\newblock {\em Biol Cybern}, 87(5-6):383–391, 2002.
+
+\bibitem{PfisterTriple}
+J.-P. Pfister and W.~Gerstner.
+\newblock Triplets of spikes in a model of spike timing-dependent plasticity.
+\newblock {\em J. Neurosci.}, 26(38):9673–9682, 2006.
+
 \end{thebibliography}
