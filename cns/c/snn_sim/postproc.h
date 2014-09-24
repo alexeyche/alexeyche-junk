@@ -41,7 +41,7 @@ typedef struct KernelMatrixCalcWorker {
 void* kernelMatrixCalcJob(void *args);
 
 
-pMatrixVector *calcHists(SpikesList *spikes, doubleVector *timeline, double ts_dur, double ksize);
+pMatrixVector *calcHistsTimeline(SpikesList *spikes, doubleVector *timeline, double ts_dur, double ksize);
 indVector* firstNNClassify(Matrix *K, indVector *train_labels_ind);
 ClassificationStat getClassificationStat(pMatrixVector *train, indVector *train_labels_ind, pMatrixVector *test, indVector *test_labels_ind, intVector *uniq_classes, int jobs);
 double euclDistance(Matrix *m1, Matrix *m2);

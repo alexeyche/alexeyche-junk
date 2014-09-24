@@ -15,19 +15,6 @@ w = as.matrix(exp(-(1:L)/2), nrow=L) # default filter
 
 #w = rep(0, L)
 
-cut_window = function(i,x) {
-    w_i = rev((i-L+1):i)
-    w_i = w_i[w_i>0]
-    
-    return(matrix(x[w_i], nrow=length(w_i)))
-}
-
-conv = Vectorize(function(i, y, w) {
-    yc = cut_window(i,y)
-    wc = matrix(w[1:length(yc)], nrow=length(yc))
-    
-    t(wc) %*% yc
-}, "i")
 
 
 E = Vectorize(function(i, x, y, w) {

@@ -1,7 +1,7 @@
 
 #include "postproc.h"
 
-pMatrixVector *calcHists(SpikesList *spikes, doubleVector *timeline, double ts_dur, double ksize) {
+pMatrixVector *calcHistsTimeline(SpikesList *spikes, doubleVector *timeline, double ts_dur, double ksize) {
     pMatrixVector *hists = TEMPLATE(createVector,pMatrix)();
     double t;
     size_t i;

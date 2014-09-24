@@ -31,3 +31,25 @@ toeplitz = function(x,y) {
     A[yi] <- y[abs(ind[yi])+1]
     return(A)
 }
+
+
+
+cut_window = function(i,x,L) {
+    w_i = rev((i-L+1):i)
+    w_i = w_i[w_i>0]
+    
+    return(matrix(x[w_i], nrow=length(w_i)))
+}
+
+conv = Vectorize(function(i, y, w, shift=0) {
+    if( (i+shift) <= 0) return(0.0)
+    yc = cut_window(i+shift,y, length(w))
+    wc = matrix(w[1:length(yc)], nrow=length(yc))
+    
+    t(wc) %*% yc
+}, "i")
+
+
+conv_spike_matrix = function(sp_m, w) {
+    t(sapply(1:nrow(sp_m), function(i) filter(sp_m[i,], w, circular=TRUE)))
+}

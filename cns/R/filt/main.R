@@ -81,8 +81,8 @@ for(i in 1:length(X)) {
 #plotl(sapply(spikes, length))
 #plot_tuning_curves(encoder, gain, bias)
 
-fdelta = 0.05
-gauss_filt = sapply(seq(-1,1,length.out=100), function(v) gaussFun(v, 0.0, fdelta))
+
+
 
 sp_patts = lapply(1:ncol(spikes_bin), function(i) spikes_bin[,i])
 u_sp_patts = unique(sp_patts)

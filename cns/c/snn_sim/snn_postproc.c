@@ -143,11 +143,11 @@ int main(int argc, char **argv) {
         double ksize = a.kernel_values->array[ki];
 //        printf("Calc for ksize == %f ... \n", ksize);
     // train hists
-        pMatrixVector *hists_train = calcHists(spikes_train, timeline_train, dur, ksize);
+        pMatrixVector *hists_train = calcHistsTimeline(spikes_train, timeline_train, dur, ksize);
 //        printf("%zu %zu\n", hists_train->size, classes_train->size);
         assert(hists_train->size == classes_train->size);
     // test hists
-        pMatrixVector *hists_test = calcHists(spikes_test, timeline_test, dur, ksize);
+        pMatrixVector *hists_test = calcHistsTimeline(spikes_test, timeline_test, dur, ksize);
         assert(hists_test->size == classes_test->size);
         
     //=================
