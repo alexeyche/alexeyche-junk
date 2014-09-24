@@ -36,8 +36,7 @@ compute_response = function(x, encoder, gain, bias, time_limit=0.5) {
     n$v = runif(M) 
     count = rep(0, M)
     
-    #input = x * encoder * gain + bias
-    input = 2*gaussFun(x, centers, delta) #* encoder * gain + bias 
+    input = x * encoder * gain + bias    
     for(i in seq(0, time_limit*1000, by=dt)) {
         c(n, spikes) := run_neurons(input, n)
         count[spikes] = count[spikes] + 1
