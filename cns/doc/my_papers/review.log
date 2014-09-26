@@ -1,18 +1,14 @@
-<<<<<<< HEAD
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2014.3.22)  23 SEP 2014 12:19
-=======
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2014.9.14)  21 SEP 2014 16:24
->>>>>>> 05922ef3b8f7abcd105dd3af1a2a1d1496dcf4ed
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2014.3.22)  26 SEP 2014 11:12
 entering extended mode
+ restricted \write18 enabled.
  %&-line parsing enabled.
 **review.tex
 (./review.tex
-LaTeX2e <2009/09/24>
-Babel <v3.8l> and hyphenation patterns for english, usenglishmax, dumylang, noh
-yphenation, bulgarian, ukrainian, russian, loaded.
-(/usr/share/texmf-texlive/tex/latex/base/article.cls
+LaTeX2e <2011/06/27>
+Babel <3.9f> and hyphenation patterns for 9 languages loaded.
+(/usr/share/texlive/texmf-dist/tex/latex/base/article.cls
 Document Class: article 2007/10/19 v1.4h Standard LaTeX document class
-(/usr/share/texmf-texlive/tex/latex/base/size10.clo
+(/usr/share/texlive/texmf-dist/tex/latex/base/size10.clo
 File: size10.clo 2007/10/19 v1.4h Standard LaTeX file (size option)
 )
 \c@part=\count79
@@ -27,51 +23,51 @@ File: size10.clo 2007/10/19 v1.4h Standard LaTeX file (size option)
 \belowcaptionskip=\skip42
 \bibindent=\dimen102
 )
-(/usr/share/texmf-texlive/tex/latex/base/fontenc.sty
+(/usr/share/texlive/texmf-dist/tex/latex/base/fontenc.sty
 Package: fontenc 2005/09/27 v1.99g Standard LaTeX package
 
-(/usr/share/texmf-texlive/tex/latex/cyrillic/t2aenc.def
+(/usr/share/texlive/texmf-dist/tex/latex/cyrillic/t2aenc.def
 File: t2aenc.def 2005/09/27 v1.0i Cyrillic encoding definition file
 )
 LaTeX Font Info:    Try loading font information for T2A+cmr on input line 100.
 
 
-(/usr/share/texmf-texlive/tex/latex/cyrillic/t2acmr.fd
+(/usr/share/texlive/texmf-dist/tex/latex/cyrillic/t2acmr.fd
 File: t2acmr.fd 2001/08/11 v1.0a Computer Modern Cyrillic font definitions
 ))
-(/usr/share/texmf-texlive/tex/latex/base/inputenc.sty
+(/usr/share/texlive/texmf-dist/tex/latex/base/inputenc.sty
 Package: inputenc 2008/03/30 v1.1d Input encoding file
 \inpenc@prehook=\toks14
 \inpenc@posthook=\toks15
 
-(/usr/share/texmf-texlive/tex/latex/ucs/utf8x.def
+(/usr/share/texlive/texmf-dist/tex/latex/ucs/utf8x.def
 File: utf8x.def 2004/10/17 UCS: Input encoding UTF-8
 ))
-(/usr/share/texmf-texlive/tex/latex/ucs/ucs.sty
-Package: ucs 2004/10/17 UCS: Unicode input support
+(/usr/share/texlive/texmf-dist/tex/latex/ucs/ucs.sty
+Package: ucs 2013/05/11 v2.2 UCS: Unicode input support
 
-(/usr/share/texmf-texlive/tex/latex/ucs/data/uni-global.def
-File: uni-global.def 2004/10/17 UCS: Unicode global data
+(/usr/share/texlive/texmf-dist/tex/latex/ucs/data/uni-global.def
+File: uni-global.def 2013/05/13 UCS: Unicode global data
 )
 \uc@secondtry=\count87
 \uc@combtoks=\toks16
 \uc@combtoksb=\toks17
 \uc@temptokena=\toks18
 )
-(/usr/share/texmf-texlive/tex/latex/cmap/cmap.sty
+(/usr/share/texlive/texmf-dist/tex/latex/cmap/cmap.sty
 Package: cmap 2008/03/06 v1.0h CMap support: searchable PDF
 
 
 Package cmap Warning: fontenc already loaded - some fonts may be unprocessed.
 
-) (/usr/share/texmf-texlive/tex/generic/babel/babel.sty
-Package: babel 2008/07/06 v3.8l The Babel package
+) (/usr/share/texlive/texmf-dist/tex/generic/babel/babel.sty
+Package: babel 2013/05/16 v3.9f The Babel package
 
-(/usr/share/texmf-texlive/tex/generic/babel/english.ldf
-Language: english 2005/03/30 v3.3o English support from the babel system
+(/usr/share/texlive/texmf-dist/tex/generic/babel-english/english.ldf
+Language: english 2012/08/20 v3.3p English support from the babel system
 
-(/usr/share/texmf-texlive/tex/generic/babel/babel.def
-File: babel.def 2008/07/06 v3.8l Babel common definitions
+(/usr/share/texlive/texmf-dist/tex/generic/babel/babel.def
+File: babel.def 2013/05/16 v3.9f Babel common definitions
 \babel@savecnt=\count88
 \U@D=\dimen103
 )
@@ -81,45 +77,45 @@ File: babel.def 2008/07/06 v3.8l Babel common definitions
 \l@australian = a dialect from \language\l@british 
 \l@newzealand = a dialect from \language\l@british 
 )
-(/usr/share/texmf-texlive/tex/generic/babel/russianb.ldf
-Language: russianb 2008/03/21 v1.1r Russian support from the babel system
-Package babel Info: Making " an active character on input line 199.
+(/usr/share/texlive/texmf-dist/tex/generic/babel-russian/russianb.ldf
+Language: russian 2013/04/13 1.3a Russian support from the babel system
+Package babel Info: Making " an active character on input line 147.
 ))
-(/usr/share/texmf-texlive/tex/latex/amsmath/amsmath.sty
-Package: amsmath 2000/07/18 v2.13 AMS math features
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsmath.sty
+Package: amsmath 2013/01/14 v2.14 AMS math features
 \@mathmargin=\skip43
 
 For additional information on amsmath, use the `?' option.
-(/usr/share/texmf-texlive/tex/latex/amsmath/amstext.sty
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amstext.sty
 Package: amstext 2000/06/29 v2.01
 
-(/usr/share/texmf-texlive/tex/latex/amsmath/amsgen.sty
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsgen.sty
 File: amsgen.sty 1999/11/30 v2.0
 \@emptytoks=\toks19
 \ex@=\dimen104
 ))
-(/usr/share/texmf-texlive/tex/latex/amsmath/amsbsy.sty
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsbsy.sty
 Package: amsbsy 1999/11/29 v1.2d
 \pmbraise@=\dimen105
 )
-(/usr/share/texmf-texlive/tex/latex/amsmath/amsopn.sty
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsopn.sty
 Package: amsopn 1999/12/14 v2.01 operator names
 )
 \inf@bad=\count89
-LaTeX Info: Redefining \frac on input line 211.
+LaTeX Info: Redefining \frac on input line 210.
 \uproot@=\count90
 \leftroot@=\count91
-LaTeX Info: Redefining \overline on input line 307.
+LaTeX Info: Redefining \overline on input line 306.
 \classnum@=\count92
 \DOTSCASE@=\count93
-LaTeX Info: Redefining \ldots on input line 379.
-LaTeX Info: Redefining \dots on input line 382.
-LaTeX Info: Redefining \cdots on input line 467.
+LaTeX Info: Redefining \ldots on input line 378.
+LaTeX Info: Redefining \dots on input line 381.
+LaTeX Info: Redefining \cdots on input line 466.
 \Mathstrutbox@=\box26
 \strutbox@=\box27
 \big@size=\dimen106
-LaTeX Font Info:    Redeclaring font encoding OML on input line 567.
-LaTeX Font Info:    Redeclaring font encoding OMS on input line 568.
+LaTeX Font Info:    Redeclaring font encoding OML on input line 566.
+LaTeX Font Info:    Redeclaring font encoding OMS on input line 567.
 \macc@depth=\count94
 \c@MaxMatrixCols=\count95
 \dotsspace@=\muskip10
@@ -140,71 +136,80 @@ LaTeX Font Info:    Redeclaring font encoding OMS on input line 568.
 \multlinegap=\skip44
 \multlinetaggap=\skip45
 \mathdisplay@stack=\toks23
-LaTeX Info: Redefining \[ on input line 2666.
-LaTeX Info: Redefining \] on input line 2667.
+LaTeX Info: Redefining \[ on input line 2665.
+LaTeX Info: Redefining \] on input line 2666.
 )
-(/usr/share/texmf-texlive/tex/latex/graphics/color.sty
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/color.sty
 Package: color 2005/11/14 v1.0j Standard LaTeX Color (DPC)
 
-(/etc/texmf/tex/latex/config/color.cfg
+(/usr/share/texlive/texmf-dist/tex/latex/latexconfig/color.cfg
 File: color.cfg 2007/01/18 v1.5 color configuration of teTeX/TeXLive
 )
 Package color Info: Driver file: pdftex.def on input line 130.
 
-(/usr/share/texmf-texlive/tex/latex/pdftex-def/pdftex.def
-File: pdftex.def 2010/03/12 v0.04p Graphics/color for pdfTeX
+(/usr/share/texlive/texmf-dist/tex/latex/pdftex-def/pdftex.def
+File: pdftex.def 2011/05/27 v0.06d Graphics/color for pdfTeX
+
+(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/infwarerr.sty
+Package: infwarerr 2010/04/08 v1.3 Providing info/warning/error messages (HO)
+)
+(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/ltxcmds.sty
+Package: ltxcmds 2011/11/09 v1.22 LaTeX kernel commands for general use (HO)
+)
 \Gread@gobject=\count101
 ))
-(/usr/share/texmf-texlive/tex/latex/graphics/graphicx.sty
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/graphicx.sty
 Package: graphicx 1999/02/16 v1.0f Enhanced LaTeX Graphics (DPC,SPQR)
 
-(/usr/share/texmf-texlive/tex/latex/graphics/keyval.sty
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/keyval.sty
 Package: keyval 1999/03/16 v1.13 key=value parser (DPC)
 \KV@toks@=\toks24
 )
-(/usr/share/texmf-texlive/tex/latex/graphics/graphics.sty
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/graphics.sty
 Package: graphics 2009/02/05 v1.0o Standard LaTeX Graphics (DPC,SPQR)
 
-(/usr/share/texmf-texlive/tex/latex/graphics/trig.sty
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/trig.sty
 Package: trig 1999/03/16 v1.09 sin cos tan (DPC)
 )
-(/etc/texmf/tex/latex/config/graphics.cfg
-File: graphics.cfg 2009/08/28 v1.8 graphics configuration of TeX Live
+(/usr/share/texlive/texmf-dist/tex/latex/latexconfig/graphics.cfg
+File: graphics.cfg 2010/04/23 v1.9 graphics configuration of TeX Live
 )
 Package graphics Info: Driver file: pdftex.def on input line 91.
 )
 \Gin@req@height=\dimen113
 \Gin@req@width=\dimen114
 )
-(/usr/share/texmf-texlive/tex/latex/tools/indentfirst.sty
+(/usr/share/texlive/texmf-dist/tex/latex/tools/indentfirst.sty
 Package: indentfirst 1995/11/23 v1.03 Indent first paragraph (DPC)
 )
-(/usr/share/texmf-texlive/tex/latex/caption/caption.sty
-Package: caption 2009/10/09 v3.1k Customizing captions (AR)
+(/usr/share/texlive/texmf-dist/tex/latex/caption/caption.sty
+Package: caption 2013/05/02 v3.3-89 Customizing captions (AR)
 
-(/usr/share/texmf-texlive/tex/latex/caption/caption3.sty
-Package: caption3 2009/10/09 v3.1k caption3 kernel (AR)
+(/usr/share/texlive/texmf-dist/tex/latex/caption/caption3.sty
+Package: caption3 2013/05/02 v1.6-88 caption3 kernel (AR)
+Package caption3 Info: TeX engine: e-TeX on input line 57.
 \captionmargin=\dimen115
 \captionmargin@=\dimen116
 \captionwidth=\dimen117
-\caption@indent=\dimen118
-\caption@parindent=\dimen119
-\caption@hangindent=\dimen120
+\caption@tempdima=\dimen118
+\caption@indent=\dimen119
+\caption@parindent=\dimen120
+\caption@hangindent=\dimen121
 )
 \c@ContinuedFloat=\count102
 )
-(/usr/share/texmf-texlive/tex/latex/placeins/placeins.sty
+(/usr/share/texlive/texmf-dist/tex/latex/placeins/placeins.sty
 Package: placeins 2005/04/18  v 2.2
 )
-(/usr/share/texmf-texlive/tex/latex/amsfonts/amssymb.sty
-Package: amssymb 2009/06/22 v3.00
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amssymb.sty
+Package: amssymb 2013/01/14 v3.01 AMS font symbols
 
-(/usr/share/texmf-texlive/tex/latex/amsfonts/amsfonts.sty
-Package: amsfonts 2009/06/22 v3.00 Basic AMSFonts support
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amsfonts.sty
+Package: amsfonts 2013/01/14 v3.01 Basic AMSFonts support
 \symAMSa=\mathgroup4
 \symAMSb=\mathgroup5
 LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
-(Font)                  U/euf/m/n --> U/euf/b/n on input line 96.
+(Font)                  U/euf/m/n --> U/euf/b/n on input line 106.
 )) (./review.aux)
 \openout1 = `review.aux'.
 
@@ -222,37 +227,86 @@ LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 25.
 LaTeX Font Info:    ... okay on input line 25.
 LaTeX Font Info:    Checking defaults for T2A/cmr/m/n on input line 25.
 LaTeX Font Info:    ... okay on input line 25.
-
-(/usr/share/texmf-texlive/tex/latex/ucs/ucsencs.def
-File: ucsencs.def 2003/11/29 Fixes to fontencodings LGR, T3
+(/usr/share/texlive/texmf-dist/tex/latex/ucs/ucsencs.def
+File: ucsencs.def 2011/01/21 Fixes to fontencodings LGR, T3
 )
-(/usr/share/texmf-texlive/tex/context/base/supp-pdf.mkii
+(/usr/share/texlive/texmf-dist/tex/context/base/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count103
-\scratchdimen=\dimen121
+\scratchdimen=\dimen122
 \scratchbox=\box28
 \nofMPsegments=\count104
 \nofMParguments=\count105
 \everyMPshowfont=\toks25
 \MPscratchCnt=\count106
-\MPscratchDim=\dimen122
+\MPscratchDim=\dimen123
 \MPnumerator=\count107
+\makeMPintoPDFobject=\count108
 \everyMPtoPDFconversion=\toks26
+) (/usr/share/texlive/texmf-dist/tex/generic/oberdiek/pdftexcmds.sty
+Package: pdftexcmds 2011/11/29 v0.20 Utility functions of pdfTeX for LuaTeX (HO
 )
+
+(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/ifluatex.sty
+Package: ifluatex 2010/03/01 v1.3 Provides the ifluatex switch (HO)
+Package ifluatex Info: LuaTeX not detected.
+)
+(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/ifpdf.sty
+Package: ifpdf 2011/01/30 v2.3 Provides the ifpdf switch (HO)
+Package ifpdf Info: pdfTeX in PDF mode is detected.
+)
+Package pdftexcmds Info: LuaTeX not detected.
+Package pdftexcmds Info: \pdf@primitive is available.
+Package pdftexcmds Info: \pdf@ifprimitive is available.
+Package pdftexcmds Info: \pdfdraftmode found.
+)
+(/usr/share/texlive/texmf-dist/tex/latex/oberdiek/epstopdf-base.sty
+Package: epstopdf-base 2010/02/09 v2.5 Base part for package epstopdf
+
+(/usr/share/texlive/texmf-dist/tex/latex/oberdiek/grfext.sty
+Package: grfext 2010/08/19 v1.1 Manage graphics extensions (HO)
+
+(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/kvdefinekeys.sty
+Package: kvdefinekeys 2011/04/07 v1.3 Define keys (HO)
+))
+(/usr/share/texlive/texmf-dist/tex/latex/oberdiek/kvoptions.sty
+Package: kvoptions 2011/06/30 v3.11 Key value format for package options (HO)
+
+(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/kvsetkeys.sty
+Package: kvsetkeys 2012/04/25 v1.16 Key value parser (HO)
+
+(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/etexcmds.sty
+Package: etexcmds 2011/02/16 v1.5 Avoid name clashes with e-TeX commands (HO)
+Package etexcmds Info: Could not find \expanded.
+(etexcmds)             That can mean that you are not using pdfTeX 1.50 or
+(etexcmds)             that some package has redefined \expanded.
+(etexcmds)             In the latter case, load this package earlier.
+)))
+Package grfext Info: Graphics extension search list:
+(grfext)             [.png,.pdf,.jpg,.mps,.jpeg,.jbig2,.jb2,.PNG,.PDF,.JPG,.JPE
+G,.JBIG2,.JB2,.eps]
+(grfext)             \AppendGraphicsExtensions on input line 452.
+
+(/usr/share/texlive/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
+File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
+e
+))
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: End \AtBeginDocument code.
- (./review_title.tex<<t2a.cmap>>
-(/usr/share/texmf-texlive/tex/latex/ucs/data/uni-4.def
-File: uni-4.def 2004/10/17 UCS: Unicode data U+0400..U+04FF
+
+(./review_title.tex<<t2a.cmap>>
+(/usr/share/texlive/texmf-dist/tex/latex/ucs/data/uni-4.def
+File: uni-4.def 2013/05/13 UCS: Unicode data U+0400..U+04FF
 )<<ot1.cmap>><<oml.cmap>><<oms.cmap>><<omx.cmap>>
 LaTeX Font Info:    Try loading font information for U+msa on input line 14.
- (/usr/share/texmf-texlive/tex/latex/amsfonts/umsa.fd
-File: umsa.fd 2009/06/22 v3.00 AMS symbols A
+
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd
+File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
 LaTeX Font Info:    Try loading font information for U+msb on input line 14.
 
-(/usr/share/texmf-texlive/tex/latex/amsfonts/umsb.fd
-File: umsb.fd 2009/06/22 v3.00 AMS symbols B
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd
+File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 ) [1
 
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}]) (./review.toc)
@@ -264,9 +318,12 @@ Underfull \hbox (badness 10000) in paragraph at lines 31--36
 
  []
 
-<bio_neuron.jpg, id=19, 333.1647pt x 152.85104pt>
+<bio_neuron.jpg, id=20, 333.1647pt x 152.85104pt>
 File: bio_neuron.jpg Graphic file (type jpg)
- <use bio_neuron.jpg> [2
+ <use bio_neuron.jpg>
+Package pdftex.def Info: bio_neuron.jpg used on input line 42.
+(pdftex.def)             Requested size: 345.0pt x 158.28262pt.
+ [2
 
 ]
 [3 <./bio_neuron.jpg>]
@@ -276,9 +333,15 @@ Overfull \hbox (4.20886pt too wide) in paragraph at lines 57--61
  []
 
 
-Overfull \hbox (5.17973pt too wide) in paragraph at lines 67--69
-[]\T2A/cmr/m/n/10 Таким об-ра-зом ди-на-ми-ку ион-ных то-ков для мо-де-ли Ходжк
-ина-Хаксли,
+Overfull \hbox (0.8944pt too wide) in paragraph at lines 63--65
+\T2A/cmr/m/n/10 ствен-но. Вре-мен-ной про-ме-жу-ток спу-стя ко-то-рый ве-ро-ят-
+ность до-сти-га-ет рав-
+ []
+
+
+Overfull \hbox (7.95795pt too wide) in paragraph at lines 67--69
+[]\T2A/cmr/m/n/10 Таким об-ра-зом, ди-на-ми-ку ион-ных то-ков для мо-де-ли Ходж
+кина-Хаксли,
  []
 
 [4]
@@ -315,7 +378,7 @@ Overfull \hbox (1.5695pt too wide) in paragraph at lines 133--136
 [7] [8] [9]
 LaTeX Font Info:    Try loading font information for OMS+cmr on input line 204.
 
- (/usr/share/texmf-texlive/tex/latex/base/omscmr.fd
+ (/usr/share/texlive/texmf-dist/tex/latex/base/omscmr.fd
 File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
@@ -325,14 +388,16 @@ Underfull \hbox (badness 10000) in paragraph at lines 208--210
 
  []
 
-[10] <stdp.jpg, id=59, 829.0975pt x 577.15625pt>
+[10] <stdp.jpg, id=60, 829.0975pt x 577.15625pt>
 File: stdp.jpg Graphic file (type jpg)
- <use stdp.jpg> [11]
+ <use stdp.jpg>
+Package pdftex.def Info: stdp.jpg used on input line 234.
+(pdftex.def)             Requested size: 580.3643pt x 404.0066pt.
+ [11]
 Underfull \hbox (badness 10000) in paragraph at lines 239--240
 
  []
 
-<<<<<<< HEAD
 <bcm.png, id=65, 301.125pt x 227.85126pt>
 File: bcm.png Graphic file (type png)
  <use bcm.png>
@@ -351,7 +416,7 @@ Here is how much of TeX's memory you used:
  8882 multiletter control sequences out of 15000+600000
  16328 words of font info for 41 fonts, out of 8000000 for 9000
  430 hyphenation exceptions out of 8191
- 38i,21n,38p,2073b,668s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 38i,21n,38p,2075b,668s stack positions out of 5000i,500n,10000p,200000b,80000s
  </tmp/texfonts/pk/ljfour/lh/lh-t2a/lati1000.600pk> </tmp/texfo
 nts/pk/ljfour/lh/lh-t2a/labx1200.600pk> </tmp/texfonts/pk/ljfour/lh/lh-t2a/larm
 1000.600pk> </tmp/texfonts/pk/ljfour/lh/lh-t2a/labx1000.600pk> </tmp/texfonts/p
@@ -367,44 +432,10 @@ re/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texli
 ve/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/tex
 mf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/share/texlive/texmf-dist
 /fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on review.pdf (16 pages, 360823 bytes).
+Output written on review.pdf (16 pages, 360819 bytes).
 PDF statistics:
  548 PDF objects out of 1000 (max. 8388607)
  100 compressed objects within 1 object stream
-=======
-(./review.bbl [12 <./stdp.jpg>]
-(/usr/share/texmf-texlive/tex/latex/ucs/data/uni-32.def
-File: uni-32.def 2004/10/17 UCS: Unicode data U+2000..U+20FF
-) [13]) [14]
-(./review.aux) ) 
-Here is how much of TeX's memory you used:
- 5041 strings out of 494818
- 65937 string characters out of 1178666
- 132242 words of memory out of 3000000
- 8106 multiletter control sequences out of 15000+50000
- 16328 words of font info for 41 fonts, out of 3000000 for 9000
- 212 hyphenation exceptions out of 8191
- 36i,21n,38p,2073b,668s stack positions out of 5000i,500n,10000p,200000b,50000s
- </home/alexeyche/.texmf-var/fonts/pk/ljfour/lh/lh-t2a/lati1000
-.600pk> </home/alexeyche/.texmf-var/fonts/pk/ljfour/lh/lh-t2a/labx1200.600pk> <
-/home/alexeyche/.texmf-var/fonts/pk/ljfour/lh/lh-t2a/larm1000.600pk> </home/ale
-xeyche/.texmf-var/fonts/pk/ljfour/lh/lh-t2a/labx1000.600pk> </home/alexeyche/.t
-exmf-var/fonts/pk/ljfour/lh/lh-t2a/labx1440.600pk> </home/alexeyche/.texmf-var/
-fonts/pk/ljfour/lh/lh-t2a/larm1200.600pk> </home/alexeyche/.texmf-var/fonts/pk/
-ljfour/lh/lh-t2a/lati1200.600pk> </home/alexeyche/.texmf-var/fonts/pk/ljfour/lh
-/lh-t2a/labx2074.600pk></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm
-/cmex10.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmmi10.pfb
-></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmmi5.pfb></usr/share
-/texmf-texlive/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/share/texmf-texli
-ve/fonts/type1/public/amsfonts/cm/cmmib10.pfb></usr/share/texmf-texlive/fonts/t
-ype1/public/amsfonts/cm/cmr10.pfb></usr/share/texmf-texlive/fonts/type1/public/
-amsfonts/cm/cmr7.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/c
-msy10.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmsy7.pfb></
-usr/share/texmf-texlive/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on review.pdf (15 pages, 369854 bytes).
-PDF statistics:
- 540 PDF objects out of 1000 (max. 8388607)
->>>>>>> 05922ef3b8f7abcd105dd3af1a2a1d1496dcf4ed
  0 named destinations out of 1000 (max. 500000)
  36 words of extra memory for PDF output out of 10000 (max. 10000000)
 
