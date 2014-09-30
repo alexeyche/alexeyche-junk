@@ -10,7 +10,7 @@ t_rc = 0.02 * 1000
 t_ref = 0.002 * 1000
 M = 100
 rate_low = 50
-rate_high = 50
+rate_high = 25
 v_tresh = 1
 
 
@@ -19,14 +19,14 @@ timeline = NULL
 
 #Xi = sample(1:300)
 #Xi = 1:300
-Xi = 1:100
+Xi = 1:10
 
 
 X = NULL
 labels = loadMatrix("~/prog/sim/ts/synthetic_control/synthetic_control_TRAIN_120_labels",1)
 ulabels = unique(labels)
 for(i in Xi) {    
-    X = rbind(X, loadMatrix("~/prog/sim/ts/synthetic_control/synthetic_control_TRAIN_120",i)[1,])
+    X = c(X, loadMatrix("~/prog/sim/ts/synthetic_control/synthetic_control_TRAIN_120",i)[1,])
     timeline = c(timeline, length(X))
 }
 
@@ -82,16 +82,4 @@ for(i in 1:length(X)) {
 #plot_tuning_curves(encoder, gain, bias)
 
 
-
-
-sp_patts = lapply(1:ncol(spikes_bin), function(i) spikes_bin[,i])
-u_sp_patts = unique(sp_patts)
-u_sp_patts_count = rep(0, length(u_sp_patts))
-
-for(i in 1:length(u_sp_patts)) {
-    u_sp_patts_count[i] = length(which(sapply(sp_patts, function(v) all(v == u_sp_patts[[i]]) )))
-}
-
-
-u_sp_patts_count = u_sp_patts_count[u_sp_patts_count>2]
 

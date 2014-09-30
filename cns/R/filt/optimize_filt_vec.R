@@ -5,9 +5,9 @@ source('util.R')
 L = 20
 
 
-y = spikes
-x = X
-M = nrow(spikes)
+y = spikes_bin
+x = X^4
+M = nrow(spikes_bin)
 #w = matrix(rep(exp(-(1:L)/2),M), nrow=M, ncol=L, byrow=TRUE) # default filter
 w = matrix(0, nrow=M, ncol=L) # default filter
 
@@ -50,7 +50,7 @@ m_dEdw = function(w) {
 }
 
 require(lbfgs)
-out = lbfgs(m_E, m_dEdw, w, ftol=1e-02)
+out = lbfgs(m_E, m_dEdw, w,epsilon=1e-02,invisible=TRUE)
 w_opt = out$par
 
 #opt_res = optim(w, m_E, m_dEdw, method="BFGS",control=list(trace=1), hessian=FALSE)
@@ -92,12 +92,10 @@ p_noise_f = sd( abs(G1-G0)^2 )
 p_noise_f1 = sum( abs(G1-G0)^2 )
 
 snr_freq = 10*log10(p_signal_f/p_noise_f)
-snr_freq1 = max(G1_dB) - 10*log10(p_noise_f) - 10*log10(length(x)/2)
-snr_freq2 = max(G1_dB) - 10*log10(p_noise_f1) - 10*log10(length(x)/2)
 
 plot(f, G0_dB, type="l")
 lines(f, G1_dB, col="red")
 
-
+cat("Err:",m_E(w), " snr_time:", snr_time," snr_freq:",snr_freq)
 
 
