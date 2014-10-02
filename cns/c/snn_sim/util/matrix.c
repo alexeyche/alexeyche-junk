@@ -16,11 +16,29 @@ Matrix *createMatrix(size_t nr, size_t nc) {
     return(m);
 }
 
+Matrix *createMatrixOnArray(size_t nr, size_t nc, double *vals) {
+    Matrix *m = (Matrix*)malloc(sizeof(Matrix));
+    m->nrow = nr;
+    m->ncol = nc;
+    m->vals = vals;
+    return(m);
+}
+
 Matrix *createZeroMatrix(size_t nr, size_t nc) {
     Matrix *m = createMatrix(nr,nc);
     for(size_t i=0; i<nr; i++) {
         for(size_t j=0; j<nc; j++) {
             setMatrixElement(m, i, j, 0.0);
+        }
+    }
+    return(m);
+}
+
+Matrix *createNormMatrix(size_t nr, size_t nc) {
+    Matrix *m = createMatrix(nr,nc);
+    for(size_t i=0; i<nr; i++) {
+        for(size_t j=0; j<nc; j++) {
+            setMatrixElement(m, i, j, getNorm());
         }
     }
     return(m);
@@ -88,4 +106,14 @@ Matrix *copyMatrix(Matrix *m) {
 void incMatrixElement(Matrix *m, size_t i, size_t j, double inc) {
     double v = getMatrixElement(m, i, j);
     setMatrixElement(m, i, j, v+inc);
+}
+
+
+doubleVector *doubleVectorFromMatrix(Matrix *m) {
+    assert(m->ncol == 1);
+    doubleVector *v = TEMPLATE(createVector,double)();
+    for(size_t ri=0; ri < m->nrow; ri++) {
+        TEMPLATE(insertVector,double)(v, getMatrixElement(m, ri, 0));
+    }
+    return(v);
 }

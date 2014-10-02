@@ -6,8 +6,6 @@
 
 
 void loadLayersFromFile(Sim *s, const char *model_fname) {
-    const Constants *c = s->ctx->c;
-    
     FileStream *fs = createInputFileStream(model_fname);
     assert(s->layers->size > 0);
     for(size_t li=0; li< s->layers->size; li++) {
@@ -18,8 +16,6 @@ void loadLayersFromFile(Sim *s, const char *model_fname) {
 }
 
 void saveLayersToFile(Sim *s, const char *model_fname) {
-    const Constants *c = s->ctx->c;
-
     checkIdxFnameOfFile(model_fname);
     
     FileStream *fs = createOutputFileStream(model_fname);
