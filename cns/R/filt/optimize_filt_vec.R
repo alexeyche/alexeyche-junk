@@ -6,7 +6,7 @@ L = 20
 
 
 y = spikes_bin
-x = X^4
+x = X
 M = nrow(spikes_bin)
 #w = matrix(rep(exp(-(1:L)/2),M), nrow=M, ncol=L, byrow=TRUE) # default filter
 w = matrix(0, nrow=M, ncol=L) # default filter
@@ -38,20 +38,21 @@ dEdw_vec = Vectorize(function(i, x, y, w) { # x = d
 },"i", SIMPLIFY=FALSE)
 
 
-
 mean_area = 1:length(x)
 
 m_E = function(w) {
     mean(  E_vec(mean_area,x,y,w) ) 
 }
+
 m_dEdw = function(w) {
     dEdw_whole = dEdw_vec(mean_area, x, y, w)
     Reduce("+", dEdw_whole)/length(dEdw_whole)
 }
 
-require(lbfgs)
-out = lbfgs(m_E, m_dEdw, w,epsilon=1e-02,invisible=TRUE)
-w_opt = out$par
+#require(lbfgs)
+#out = lbfgs(m_E, m_dEdw, w)
+#w_opt = out$par
+w_opt = loadMatrix("/home/alexeyche/prog/alexeyche-junk/cns/c/out.bin",1)
 
 #opt_res = optim(w, m_E, m_dEdw, method="BFGS",control=list(trace=1), hessian=FALSE)
 #w_opt = opt_res$par
@@ -96,6 +97,6 @@ snr_freq = 10*log10(p_signal_f/p_noise_f)
 plot(f, G0_dB, type="l")
 lines(f, G1_dB, col="red")
 
-cat("Err:",m_E(w), " snr_time:", snr_time," snr_freq:",snr_freq)
+cat("Err:",m_E(w_opt), " snr_time:", snr_time," snr_freq:",snr_freq)
 
 

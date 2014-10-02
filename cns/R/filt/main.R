@@ -18,8 +18,8 @@ v_tresh = 1
 timeline = NULL
 
 #Xi = sample(1:300)
-#Xi = 1:300
-Xi = 1:10
+Xi = 1:100
+#Xi = 1:10
 
 
 X = NULL
@@ -81,5 +81,6 @@ for(i in 1:length(X)) {
 #plotl(sapply(spikes, length))
 #plot_tuning_curves(encoder, gain, bias)
 
-
+saveMatrixList("~/prog/sim/spikes/filt_test_spikes", list(spikes_bin))
+saveMatrixList("~/prog/sim/spikes/filt_test_target", list(matrix(X)))
 
