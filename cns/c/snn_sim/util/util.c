@@ -26,6 +26,10 @@ double getNorm() {
     }
 }
 
+double getLogNorm(double logmean, double logsd) {
+    return( exp(logmean + logsd*getNorm()) );
+}
+
 void swapInd(size_t *l, size_t *r) {
     size_t temp = *r;
     *r = *l;

@@ -64,10 +64,18 @@ typedef struct {
 } ResourceSTDPConstants;
 
 typedef struct {
-    double gain;
-    double sigma;
-    double dt;
-    double mult;
+    double t_rc;
+    double t_rc_logsd;
+    double t_ref;
+    double t_ref_logsd;
+    double t_a;
+    double t_a_logsd;
+} IaFConstants;
+
+
+typedef struct {
+    size_t N;
+    IaFConstants *iaf_c;
 } PreprocessConstants;
 
 typedef struct {

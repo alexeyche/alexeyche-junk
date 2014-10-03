@@ -153,8 +153,7 @@ am___top_builddir__bin_snn_prep_OBJECTS =  \
 	util/__top_builddir__bin_snn_prep-spikes_list.$(OBJEXT) \
 	__top_builddir__bin_snn_prep-constants.$(OBJEXT) \
 	util/__top_builddir__bin_snn_prep-io.$(OBJEXT) \
-	layers/__top_builddir__bin_snn_prep-adex.$(OBJEXT) \
-	prep/__top_builddir__bin_snn_prep-prepare_ts.$(OBJEXT) \
+	prep/__top_builddir__bin_snn_prep-adex.$(OBJEXT) \
 	__top_builddir__bin_snn_prep-snn_prep.$(OBJEXT)
 __top_builddir__bin_snn_prep_OBJECTS =  \
 	$(am___top_builddir__bin_snn_prep_OBJECTS)
@@ -346,7 +345,7 @@ MAIN_SOURCES = util/matrix.c util/util_vector.c ./util/ini.c ./util/matrix.h uti
 LDADD = -lm
 __top_builddir__bin_snn_sim_CFLAGS = $(AM_CFLAGS)
 __top_builddir__bin_snn_sim_SOURCES = $(MAIN_SOURCES) snn_sim.c 
-__top_builddir__bin_snn_prep_SOURCES = util/matrix.c util/util_vector.c ./util/ini.c ./util/matrix.h util/util.c util/spikes_list.c  constants.c util/io.c layers/adex.c prep/prepare_ts.c snn_prep.c 
+__top_builddir__bin_snn_prep_SOURCES = util/matrix.c util/util_vector.c ./util/ini.c ./util/matrix.h util/util.c util/spikes_list.c  constants.c util/io.c prep/adex.c  snn_prep.c 
 __top_builddir__bin_snn_prep_CFLAGS = $(AM_CFLAGS)
 __top_builddir__bin_snn_calc_SOURCES = util/matrix.c util/util_vector.c ./util/ini.c ./util/matrix.h util/util.c util/spikes_list.c  util/io.c snn_calc.c calc.c
 __top_builddir__bin_snn_calc_CFLAGS = $(AM_CFLAGS)
@@ -590,15 +589,13 @@ util/__top_builddir__bin_snn_prep-spikes_list.$(OBJEXT):  \
 	util/$(am__dirstamp) util/$(DEPDIR)/$(am__dirstamp)
 util/__top_builddir__bin_snn_prep-io.$(OBJEXT): util/$(am__dirstamp) \
 	util/$(DEPDIR)/$(am__dirstamp)
-layers/__top_builddir__bin_snn_prep-adex.$(OBJEXT):  \
-	layers/$(am__dirstamp) layers/$(DEPDIR)/$(am__dirstamp)
 prep/$(am__dirstamp):
 	@$(MKDIR_P) prep
 	@: > prep/$(am__dirstamp)
 prep/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) prep/$(DEPDIR)
 	@: > prep/$(DEPDIR)/$(am__dirstamp)
-prep/__top_builddir__bin_snn_prep-prepare_ts.$(OBJEXT):  \
+prep/__top_builddir__bin_snn_prep-adex.$(OBJEXT):  \
 	prep/$(am__dirstamp) prep/$(DEPDIR)/$(am__dirstamp)
 $(top_builddir)/bin/snn_prep$(EXEEXT): $(__top_builddir__bin_snn_prep_OBJECTS) $(__top_builddir__bin_snn_prep_DEPENDENCIES) $(EXTRA___top_builddir__bin_snn_prep_DEPENDENCIES) $(top_builddir)/bin/$(am__dirstamp)
 	@rm -f $(top_builddir)/bin/snn_prep$(EXEEXT)
@@ -665,7 +662,6 @@ mostlyclean-compile:
 	-rm -f ./util/util_dlink_list.lo
 	-rm -f filt/__top_builddir__bin_snn_filt-filt_funcs.$(OBJEXT)
 	-rm -f filt/__top_builddir__bin_snn_filt-optim_lbfgs.$(OBJEXT)
-	-rm -f layers/__top_builddir__bin_snn_prep-adex.$(OBJEXT)
 	-rm -f layers/__top_builddir__bin_snn_sim-adapt.$(OBJEXT)
 	-rm -f layers/__top_builddir__bin_snn_sim-wta.$(OBJEXT)
 	-rm -f layers/__top_builddir__bin_snn_sim-wtaadapt.$(OBJEXT)
@@ -687,7 +683,7 @@ mostlyclean-compile:
 	-rm -f learn/simple_stdp.lo
 	-rm -f learn/triple_stdp.$(OBJEXT)
 	-rm -f learn/triple_stdp.lo
-	-rm -f prep/__top_builddir__bin_snn_prep-prepare_ts.$(OBJEXT)
+	-rm -f prep/__top_builddir__bin_snn_prep-adex.$(OBJEXT)
 	-rm -f sim/__top_builddir__bin_snn_sim-configure.$(OBJEXT)
 	-rm -f sim/__top_builddir__bin_snn_sim-netsim.$(OBJEXT)
 	-rm -f sim/__top_builddir__bin_snn_sim-runtime.$(OBJEXT)
@@ -768,7 +764,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./util/$(DEPDIR)/util_dlink_list.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@filt/$(DEPDIR)/__top_builddir__bin_snn_filt-filt_funcs.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@filt/$(DEPDIR)/__top_builddir__bin_snn_filt-optim_lbfgs.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@layers/$(DEPDIR)/__top_builddir__bin_snn_prep-adex.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@layers/$(DEPDIR)/__top_builddir__bin_snn_sim-adapt.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@layers/$(DEPDIR)/__top_builddir__bin_snn_sim-wta.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@layers/$(DEPDIR)/__top_builddir__bin_snn_sim-wtaadapt.Po@am__quote@
@@ -783,7 +778,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@learn/$(DEPDIR)/res_stdp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@learn/$(DEPDIR)/simple_stdp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@learn/$(DEPDIR)/triple_stdp.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@prep/$(DEPDIR)/__top_builddir__bin_snn_prep-prepare_ts.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@prep/$(DEPDIR)/__top_builddir__bin_snn_prep-adex.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sim/$(DEPDIR)/__top_builddir__bin_snn_sim-configure.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sim/$(DEPDIR)/__top_builddir__bin_snn_sim-netsim.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sim/$(DEPDIR)/__top_builddir__bin_snn_sim-runtime.Po@am__quote@
@@ -1285,33 +1280,19 @@ util/__top_builddir__bin_snn_prep-io.obj: util/io.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_prep_CFLAGS) $(CFLAGS) -c -o util/__top_builddir__bin_snn_prep-io.obj `if test -f 'util/io.c'; then $(CYGPATH_W) 'util/io.c'; else $(CYGPATH_W) '$(srcdir)/util/io.c'; fi`
 
-layers/__top_builddir__bin_snn_prep-adex.o: layers/adex.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_prep_CFLAGS) $(CFLAGS) -MT layers/__top_builddir__bin_snn_prep-adex.o -MD -MP -MF layers/$(DEPDIR)/__top_builddir__bin_snn_prep-adex.Tpo -c -o layers/__top_builddir__bin_snn_prep-adex.o `test -f 'layers/adex.c' || echo '$(srcdir)/'`layers/adex.c
-@am__fastdepCC_TRUE@	$(am__mv) layers/$(DEPDIR)/__top_builddir__bin_snn_prep-adex.Tpo layers/$(DEPDIR)/__top_builddir__bin_snn_prep-adex.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='layers/adex.c' object='layers/__top_builddir__bin_snn_prep-adex.o' libtool=no @AMDEPBACKSLASH@
+prep/__top_builddir__bin_snn_prep-adex.o: prep/adex.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_prep_CFLAGS) $(CFLAGS) -MT prep/__top_builddir__bin_snn_prep-adex.o -MD -MP -MF prep/$(DEPDIR)/__top_builddir__bin_snn_prep-adex.Tpo -c -o prep/__top_builddir__bin_snn_prep-adex.o `test -f 'prep/adex.c' || echo '$(srcdir)/'`prep/adex.c
+@am__fastdepCC_TRUE@	$(am__mv) prep/$(DEPDIR)/__top_builddir__bin_snn_prep-adex.Tpo prep/$(DEPDIR)/__top_builddir__bin_snn_prep-adex.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='prep/adex.c' object='prep/__top_builddir__bin_snn_prep-adex.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_prep_CFLAGS) $(CFLAGS) -c -o layers/__top_builddir__bin_snn_prep-adex.o `test -f 'layers/adex.c' || echo '$(srcdir)/'`layers/adex.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_prep_CFLAGS) $(CFLAGS) -c -o prep/__top_builddir__bin_snn_prep-adex.o `test -f 'prep/adex.c' || echo '$(srcdir)/'`prep/adex.c
 
-layers/__top_builddir__bin_snn_prep-adex.obj: layers/adex.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_prep_CFLAGS) $(CFLAGS) -MT layers/__top_builddir__bin_snn_prep-adex.obj -MD -MP -MF layers/$(DEPDIR)/__top_builddir__bin_snn_prep-adex.Tpo -c -o layers/__top_builddir__bin_snn_prep-adex.obj `if test -f 'layers/adex.c'; then $(CYGPATH_W) 'layers/adex.c'; else $(CYGPATH_W) '$(srcdir)/layers/adex.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) layers/$(DEPDIR)/__top_builddir__bin_snn_prep-adex.Tpo layers/$(DEPDIR)/__top_builddir__bin_snn_prep-adex.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='layers/adex.c' object='layers/__top_builddir__bin_snn_prep-adex.obj' libtool=no @AMDEPBACKSLASH@
+prep/__top_builddir__bin_snn_prep-adex.obj: prep/adex.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_prep_CFLAGS) $(CFLAGS) -MT prep/__top_builddir__bin_snn_prep-adex.obj -MD -MP -MF prep/$(DEPDIR)/__top_builddir__bin_snn_prep-adex.Tpo -c -o prep/__top_builddir__bin_snn_prep-adex.obj `if test -f 'prep/adex.c'; then $(CYGPATH_W) 'prep/adex.c'; else $(CYGPATH_W) '$(srcdir)/prep/adex.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) prep/$(DEPDIR)/__top_builddir__bin_snn_prep-adex.Tpo prep/$(DEPDIR)/__top_builddir__bin_snn_prep-adex.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='prep/adex.c' object='prep/__top_builddir__bin_snn_prep-adex.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_prep_CFLAGS) $(CFLAGS) -c -o layers/__top_builddir__bin_snn_prep-adex.obj `if test -f 'layers/adex.c'; then $(CYGPATH_W) 'layers/adex.c'; else $(CYGPATH_W) '$(srcdir)/layers/adex.c'; fi`
-
-prep/__top_builddir__bin_snn_prep-prepare_ts.o: prep/prepare_ts.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_prep_CFLAGS) $(CFLAGS) -MT prep/__top_builddir__bin_snn_prep-prepare_ts.o -MD -MP -MF prep/$(DEPDIR)/__top_builddir__bin_snn_prep-prepare_ts.Tpo -c -o prep/__top_builddir__bin_snn_prep-prepare_ts.o `test -f 'prep/prepare_ts.c' || echo '$(srcdir)/'`prep/prepare_ts.c
-@am__fastdepCC_TRUE@	$(am__mv) prep/$(DEPDIR)/__top_builddir__bin_snn_prep-prepare_ts.Tpo prep/$(DEPDIR)/__top_builddir__bin_snn_prep-prepare_ts.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='prep/prepare_ts.c' object='prep/__top_builddir__bin_snn_prep-prepare_ts.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_prep_CFLAGS) $(CFLAGS) -c -o prep/__top_builddir__bin_snn_prep-prepare_ts.o `test -f 'prep/prepare_ts.c' || echo '$(srcdir)/'`prep/prepare_ts.c
-
-prep/__top_builddir__bin_snn_prep-prepare_ts.obj: prep/prepare_ts.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_prep_CFLAGS) $(CFLAGS) -MT prep/__top_builddir__bin_snn_prep-prepare_ts.obj -MD -MP -MF prep/$(DEPDIR)/__top_builddir__bin_snn_prep-prepare_ts.Tpo -c -o prep/__top_builddir__bin_snn_prep-prepare_ts.obj `if test -f 'prep/prepare_ts.c'; then $(CYGPATH_W) 'prep/prepare_ts.c'; else $(CYGPATH_W) '$(srcdir)/prep/prepare_ts.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) prep/$(DEPDIR)/__top_builddir__bin_snn_prep-prepare_ts.Tpo prep/$(DEPDIR)/__top_builddir__bin_snn_prep-prepare_ts.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='prep/prepare_ts.c' object='prep/__top_builddir__bin_snn_prep-prepare_ts.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_prep_CFLAGS) $(CFLAGS) -c -o prep/__top_builddir__bin_snn_prep-prepare_ts.obj `if test -f 'prep/prepare_ts.c'; then $(CYGPATH_W) 'prep/prepare_ts.c'; else $(CYGPATH_W) '$(srcdir)/prep/prepare_ts.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_prep_CFLAGS) $(CFLAGS) -c -o prep/__top_builddir__bin_snn_prep-adex.obj `if test -f 'prep/adex.c'; then $(CYGPATH_W) 'prep/adex.c'; else $(CYGPATH_W) '$(srcdir)/prep/adex.c'; fi`
 
 __top_builddir__bin_snn_prep-snn_prep.o: snn_prep.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_prep_CFLAGS) $(CFLAGS) -MT __top_builddir__bin_snn_prep-snn_prep.o -MD -MP -MF $(DEPDIR)/__top_builddir__bin_snn_prep-snn_prep.Tpo -c -o __top_builddir__bin_snn_prep-snn_prep.o `test -f 'snn_prep.c' || echo '$(srcdir)/'`snn_prep.c

@@ -12,6 +12,7 @@ Constants* createConstants(const char *filename) {
     c->res_stdp = (ResourceSTDPConstants*) malloc( sizeof(ResourceSTDPConstants) );
     c->tr_stdp = (TripleSTDPConstants*) malloc( sizeof(TripleSTDPConstants) );
     c->preproc = (PreprocessConstants*) malloc( sizeof(PreprocessConstants) );
+    c->preproc->iaf_c = (IaFConstants*) malloc( sizeof(IaFConstants) );
     c->pacemaker = (PacemakerConstants*) malloc( sizeof(PacemakerConstants) );
     c->wta = (WtaConstants*) malloc( sizeof(WtaConstants) );
     c->lc = TEMPLATE(createVector,pLConst)();
@@ -47,6 +48,7 @@ void deleteConstants(Constants *c) {
     free(c->adex);
     free(c->res_stdp);
     free(c->preproc);
+    free(c->preproc->iaf_c);
     free(c->tr_stdp);
     free(c);
 }
@@ -254,21 +256,31 @@ void fillInputEdgeProb(const char *str, LayerConstants *c) {
         TEMPLATE(deleteVector,type)(v);     \
     } \
 
+#define FILL_MEAN_AND_SD_PARAM(mean_name, sd_name) { \
+        pccharVector* v = pccharVectorColonParse(value);\
+        assert(v->size > 0);                            \
+        mean_name = atof(v->array[0]);   \
+        if(v->size > 1) {                               \
+            sd_name = atof(v->array[1]);  \
+        }                                 \
+        TEMPLATE(deleteVector,pcchar)(v); \
+}\
+
 int file_handler(void* user, const char* section, const char* name, const char* value) {
     Constants* c = (Constants*)user;
 
     #define MATCH(s, n) strcmp(section, s) == 0 && strcmp(name, n) == 0
-    if (MATCH("preprocess", "mult")) {
-        c->preproc->mult = atof(value);
+    if (MATCH("preprocess", "N")) {
+        c->preproc->N = atoi(value);
     } else 
-    if (MATCH("preprocess", "gain")) {
-        c->preproc->gain = atof(value);
+    if (MATCH("preprocess", "t_ref")) {
+        FILL_MEAN_AND_SD_PARAM(c->preproc->iaf_c->t_ref, c->preproc->iaf_c->t_ref_logsd);
     } else 
-    if (MATCH("preprocess", "sigma")) {
-        c->preproc->sigma = atof(value);
+    if (MATCH("preprocess", "t_rc")) {
+        FILL_MEAN_AND_SD_PARAM(c->preproc->iaf_c->t_rc, c->preproc->iaf_c->t_rc_logsd);
     } else 
-    if (MATCH("preprocess", "dt")) {
-        c->preproc->dt = atof(value);
+    if (MATCH("preprocess", "t_a")) {
+        FILL_MEAN_AND_SD_PARAM(c->preproc->iaf_c->t_a, c->preproc->iaf_c->t_a_logsd);
     } else 
     if (MATCH("srm neuron", "e0")) {
         c->e0 = atof(value);
@@ -598,14 +610,22 @@ void PacemakerConstantsPrint(PacemakerConstants *c) {
     printf("==================\n");
 }
 
+void IaFConstantsPrint(IaFConstants *c) {
+    printf("t_rc->"); doublePrint(c->t_rc);
+    printf("t_rc_logsd->"); doublePrint(c->t_rc_logsd);
+    printf("t_ref->"); doublePrint(c->t_ref);
+    printf("t_ref_logsd->"); doublePrint(c->t_ref_logsd);
+    printf("t_a->"); doublePrint(c->t_a);
+    printf("t_a_logsd->"); doublePrint(c->t_a_logsd);
+}
+
 void PreprocessConstantsPrint(PreprocessConstants *c) {
     printf("==================\n");
-    printf("gain->"); doublePrint(c->gain);
-    printf("sigma->"); doublePrint(c->sigma);
-    printf("dt->"); doublePrint(c->dt);
-    printf("mult->"); doublePrint(c->mult);
+    printf("N->"); size_tPrint(c->N);
+    printf("iaf_c->"); IaFConstantsPrint(c->iaf_c);
     printf("==================\n");
 }
+    
 
 void pLConstVectorPrint(pLConstVector *v) {
     printf("==================\n");
