@@ -11,6 +11,7 @@
 typedef enum { ENull, EOptimalSTDP, EResourceSTDP, ESimpleSTDP, ETripleSTDP } learning_rule_t;
 typedef enum { EPoissonLayer, EWtaLayer, EAdaptLayer, EWtaAdaptLayer } neuron_layer_t;
 typedef enum { EExpHennequin, ELinToyoizumi, EExpBohte, EExp, EDeterm } prob_fun_t;
+typedef enum { ESigmaTC, ELinearTC } tuning_curve_t;
 
 #ifndef max
     #define max( a, b ) ( ((a) > (b)) ? (a) : (b) )
@@ -25,6 +26,7 @@ typedef struct {
     double tau_w; 
     double a;
     double b;
+    double t_ref;
 } AdExConstants;
 
 
@@ -63,19 +65,20 @@ typedef struct {
     double __Aplus_max_Amin;
 } ResourceSTDPConstants;
 
-typedef struct {
-    double t_rc;
-    double t_rc_logsd;
-    double t_ref;
-    double t_ref_logsd;
-    double t_a;
-    double t_a_logsd;
-} IaFConstants;
-
 
 typedef struct {
     size_t N;
-    IaFConstants *iaf_c;
+    double dt;
+    tuning_curve_t tc;
+    double max_curve_num;
+    double sigma_gain_low;
+    double sigma_gain_high;
+    double sigma_low;
+    double sigma_high;
+    double gain_high;
+    double gain_low;
+    double bias_high;
+    double bias_low;
 } PreprocessConstants;
 
 typedef struct {

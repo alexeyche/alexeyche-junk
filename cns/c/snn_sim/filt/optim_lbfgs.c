@@ -42,7 +42,7 @@ Matrix *runLbfgsOptim(Matrix *y, doubleVector *target, int L, int jobs, double e
 
     if (x == NULL) {
         printf("ERROR: Failed to allocate a memory block for variables.\n");
-        return 1;
+        exit(1);
     }
 
     /* Initialize the variables. */

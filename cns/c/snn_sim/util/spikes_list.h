@@ -24,7 +24,7 @@ void deleteSpikesList(SpikesList *sl);
 void printSpikesList(SpikesList *sl);
 SpikesList* spikesMatrixToSpikesList(Matrix *m);
 
-
+SpikePatternsList* createSpikePatternsList(size_t n);
 SpikePatternsList* readSpikePatternsListFromFile(const char *filename);
 
 #endif

@@ -12,7 +12,7 @@ bin_PROGRAMS = $(top_builddir)/bin/snn_sim $(top_builddir)/bin/snn_prep $(top_bu
 __top_builddir__bin_snn_sim_CFLAGS = $(AM_CFLAGS)
 __top_builddir__bin_snn_sim_SOURCES = $(MAIN_SOURCES) snn_sim.c 
 
-__top_builddir__bin_snn_prep_SOURCES = util/matrix.c util/util_vector.c ./util/ini.c ./util/matrix.h util/util.c util/spikes_list.c  constants.c util/io.c prep/adex.c  snn_prep.c 
+__top_builddir__bin_snn_prep_SOURCES = util/matrix.c util/util_vector.c ./util/ini.c ./util/matrix.h util/util.c util/spikes_list.c  constants.c util/io.c prep/adex.c  prep/run.c snn_prep.c 
 __top_builddir__bin_snn_prep_CFLAGS = $(AM_CFLAGS)
 
 __top_builddir__bin_snn_calc_SOURCES = util/matrix.c util/util_vector.c ./util/ini.c ./util/matrix.h util/util.c util/spikes_list.c  util/io.c snn_calc.c calc.c

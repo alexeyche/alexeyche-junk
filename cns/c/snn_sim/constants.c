@@ -12,7 +12,6 @@ Constants* createConstants(const char *filename) {
     c->res_stdp = (ResourceSTDPConstants*) malloc( sizeof(ResourceSTDPConstants) );
     c->tr_stdp = (TripleSTDPConstants*) malloc( sizeof(TripleSTDPConstants) );
     c->preproc = (PreprocessConstants*) malloc( sizeof(PreprocessConstants) );
-    c->preproc->iaf_c = (IaFConstants*) malloc( sizeof(IaFConstants) );
     c->pacemaker = (PacemakerConstants*) malloc( sizeof(PacemakerConstants) );
     c->wta = (WtaConstants*) malloc( sizeof(WtaConstants) );
     c->lc = TEMPLATE(createVector,pLConst)();
@@ -48,7 +47,6 @@ void deleteConstants(Constants *c) {
     free(c->adex);
     free(c->res_stdp);
     free(c->preproc);
-    free(c->preproc->iaf_c);
     free(c->tr_stdp);
     free(c);
 }
@@ -149,6 +147,17 @@ learning_rule_t learningRuleParse(char *str) {
         return(ETripleSTDP);
     }
     printf("Can't do parse of learning rule: %s\n", str);
+    exit(1);
+}
+
+tuning_curve_t tuningCurveParse(const char *str) {
+    if(strcmp(str, "SigmaTC") == 0) {
+        return(ESigmaTC);
+    }
+    if(strcmp(str, "LinearTC") == 0) {
+        return(ELinearTC);
+    }
+    printf("Can't do parse of tuning curve: %s\n", str);
     exit(1);
 }
 
@@ -256,12 +265,13 @@ void fillInputEdgeProb(const char *str, LayerConstants *c) {
         TEMPLATE(deleteVector,type)(v);     \
     } \
 
-#define FILL_MEAN_AND_SD_PARAM(mean_name, sd_name) { \
+#define FILL_HIGH_AND_LOW_PARAM(low_name, high_name) { \
         pccharVector* v = pccharVectorColonParse(value);\
         assert(v->size > 0);                            \
-        mean_name = atof(v->array[0]);   \
+        low_name = atof(v->array[0]);   \
+        high_name = low_name; \
         if(v->size > 1) {                               \
-            sd_name = atof(v->array[1]);  \
+            high_name = atof(v->array[1]);  \
         }                                 \
         TEMPLATE(deleteVector,pcchar)(v); \
 }\
@@ -273,14 +283,26 @@ int file_handler(void* user, const char* section, const char* name, const char* 
     if (MATCH("preprocess", "N")) {
         c->preproc->N = atoi(value);
     } else 
-    if (MATCH("preprocess", "t_ref")) {
-        FILL_MEAN_AND_SD_PARAM(c->preproc->iaf_c->t_ref, c->preproc->iaf_c->t_ref_logsd);
+    if (MATCH("preprocess", "dt")) {
+        c->preproc->dt = atof(value);
     } else 
-    if (MATCH("preprocess", "t_rc")) {
-        FILL_MEAN_AND_SD_PARAM(c->preproc->iaf_c->t_rc, c->preproc->iaf_c->t_rc_logsd);
+    if (MATCH("preprocess", "tuning_curve")) {
+        c->preproc->tc = tuningCurveParse(value);    
     } else 
-    if (MATCH("preprocess", "t_a")) {
-        FILL_MEAN_AND_SD_PARAM(c->preproc->iaf_c->t_a, c->preproc->iaf_c->t_a_logsd);
+    if (MATCH("preprocess", "max_curve_num")) {
+        c->preproc->max_curve_num = atof(value);    
+    } else 
+    if (MATCH("preprocess", "sigma")) {
+        FILL_HIGH_AND_LOW_PARAM(c->preproc->sigma_low, c->preproc->sigma_high);
+    } else 
+    if (MATCH("preprocess", "sigma_gain")) {
+        FILL_HIGH_AND_LOW_PARAM(c->preproc->sigma_gain_low, c->preproc->sigma_gain_high);
+    } else 
+    if (MATCH("preprocess", "bias")) {
+        FILL_HIGH_AND_LOW_PARAM(c->preproc->bias_low, c->preproc->bias_high);
+    } else 
+    if (MATCH("preprocess", "gain")) {
+        FILL_HIGH_AND_LOW_PARAM(c->preproc->gain_low, c->preproc->gain_high);
     } else 
     if (MATCH("srm neuron", "e0")) {
         c->e0 = atof(value);
@@ -495,6 +517,9 @@ int file_handler(void* user, const char* section, const char* name, const char* 
     if (MATCH("adex neuron", "C")) {
         c->adex->C = atof(value);
     } else 
+    if (MATCH("adex neuron", "t_ref")) {
+        c->adex->t_ref = atof(value);
+    } else 
     if (MATCH("adex neuron", "gL")) {
         c->adex->gL = atof(value);
     } else 
@@ -565,6 +590,15 @@ void boolPrint(bool v) {
     else printf("false\n");
 }
 
+void tuning_curve_tPrint(tuning_curve_t v) {
+    if(v == ESigmaTC) {
+        printf("SigmaTC\n");
+    }
+    if(v == ELinearTC) {
+        printf("LinearTC\n");
+    }
+}
+
 void AdExConstantsPrint(AdExConstants *c) {
     printf("==================\n");
     printf("C->"); doublePrint(c->C);
@@ -610,19 +644,21 @@ void PacemakerConstantsPrint(PacemakerConstants *c) {
     printf("==================\n");
 }
 
-void IaFConstantsPrint(IaFConstants *c) {
-    printf("t_rc->"); doublePrint(c->t_rc);
-    printf("t_rc_logsd->"); doublePrint(c->t_rc_logsd);
-    printf("t_ref->"); doublePrint(c->t_ref);
-    printf("t_ref_logsd->"); doublePrint(c->t_ref_logsd);
-    printf("t_a->"); doublePrint(c->t_a);
-    printf("t_a_logsd->"); doublePrint(c->t_a_logsd);
-}
 
 void PreprocessConstantsPrint(PreprocessConstants *c) {
     printf("==================\n");
     printf("N->"); size_tPrint(c->N);
-    printf("iaf_c->"); IaFConstantsPrint(c->iaf_c);
+    printf("dt->"); doublePrint(c->dt);
+    printf("tc->"); tuning_curve_tPrint(c->tc);
+    printf("max_curve_num->"); doublePrint(c->max_curve_num);
+    printf("sigma_gain_low->"); doublePrint(c->sigma_gain_low);
+    printf("sigma_gain_high->"); doublePrint(c->sigma_gain_high);
+    printf("sigma_low->"); doublePrint(c->sigma_low);
+    printf("sigma_high->"); doublePrint(c->sigma_high);
+    printf("gain_low->"); doublePrint(c->gain_low);
+    printf("gain_high->"); doublePrint(c->gain_high);
+    printf("bias_low->"); doublePrint(c->bias_low);
+    printf("bias_high->"); doublePrint(c->bias_high);
     printf("==================\n");
 }
     
@@ -639,6 +675,7 @@ void pLConstVectorPrint(pLConstVector *v) {
 void size_tPrint(size_t v) {
     printf("%zu\n", v);
 }
+
 
 void learning_rule_tPrint(learning_rule_t v) {
     if(v == EResourceSTDP) {

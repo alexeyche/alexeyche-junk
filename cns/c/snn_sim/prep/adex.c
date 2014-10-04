@@ -50,7 +50,7 @@ void propagateCurrentAdExLayer(AdExLayer *l, const size_t *ni, const double *I) 
 void simulateAdExLayerNeuron(AdExLayer *l, const size_t *id_to_sim, const Constants *c) {
     double dV = - c->adex->gL * ( l->V[ *id_to_sim ] - c->adex->EL );
     if(c->adex->slope > 0.0) {
-        dV += c->adex->gL * c->adex->slope * exp( (l->V[ *id_to_sim ] - c->adex->Vtr)/c->adex->slope )   
+        dV += c->adex->gL * c->adex->slope * exp( (l->V[ *id_to_sim ] - c->adex->Vtr)/c->adex->slope );
     }                  
     dV += -l->w[ *id_to_sim ];
     double dw = c->adex->a * ( l->V[ *id_to_sim ] - c->adex->EL ) - l->w[ *id_to_sim ]; 
