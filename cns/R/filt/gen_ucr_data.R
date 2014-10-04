@@ -1,10 +1,10 @@
 source('./ucr_ts.R')
 source('./interpolate_ts.R')
 source('./serialize_to_bin.R')
-
+source('./util.R')
 data_dir = '~/prog/sim'
 
-sample_size = 120 
+sample_size = 60
 
 data = synth # synthetic control
 #data = starlight_curves
@@ -20,12 +20,12 @@ if(!file.exists(sprintf("%s.bin", train_fname))) {
     for(i in 1:length(train_dataset)) {
         inter_ts = interpolate_ts(train_dataset[[i]]$data, sample_size)
         train_dataset_inter[i, ] = c(train_dataset[[i]]$label,inter_ts)
-        train_dataset_inter_bin[[i]] = matrix(inter_ts, nrow=1, ncol=length(inter_ts))
+        train_dataset_inter_bin[[i]] = matrix(inter_ts, nrow=length(inter_ts), ncol=1)
     }
     for(i in 1:length(test_dataset)) {
         inter_ts = interpolate_ts(test_dataset[[i]]$data, sample_size)
         test_dataset_inter[i, ] = c(test_dataset[[i]]$label,inter_ts)
-        test_dataset_inter_bin[[i]] = matrix(inter_ts, nrow=1, ncol=length(inter_ts))
+        test_dataset_inter_bin[[i]] = matrix(inter_ts, nrow=length(inter_ts), ncol=1)
     }
     #write.table(train_dataset_inter,file=fname,sep=" ", col.names = F, row.names = F, append=F)
     saveMatrixList(train_fname, train_dataset_inter_bin)
