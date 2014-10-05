@@ -8,22 +8,25 @@ CFLAGS=
 LDADD= -lm
 # this lists the binaries to produce, the (non-PHONY, binary) targets in
 # the previous manual Makefile
-bin_PROGRAMS = $(top_builddir)/bin/snn_sim $(top_builddir)/bin/snn_prep $(top_builddir)/bin/snn_calc $(top_builddir)/bin/snn_postproc  $(top_builddir)/bin/snn_filt
-__top_builddir__bin_snn_sim_CFLAGS = $(AM_CFLAGS)
-__top_builddir__bin_snn_sim_SOURCES = $(MAIN_SOURCES) snn_sim.c 
 
-__top_builddir__bin_snn_prep_SOURCES = util/matrix.c util/util_vector.c ./util/ini.c ./util/matrix.h util/util.c util/spikes_list.c  constants.c util/io.c prep/adex.c  prep/run.c snn_prep.c 
+bin_PROGRAMS = $(top_builddir)/bin/snn_sim $(top_builddir)/bin/snn_prep $(top_builddir)/bin/snn_calc $(top_builddir)/bin/snn_postproc  $(top_builddir)/bin/snn_filt
+
+__top_builddir__bin_snn_sim_CFLAGS = $(AM_CFLAGS)
+__top_builddir__bin_snn_sim_SOURCES = $(MAIN_SOURCES) sim/snn_sim.c 
+
+__top_builddir__bin_snn_prep_SOURCES = util/matrix.c util/util_vector.c ./util/ini.c ./util/matrix.h util/util.c util/spikes_list.c  constants.c util/io.c prep/adex.c  prep/run.c prep/snn_prep.c 
 __top_builddir__bin_snn_prep_CFLAGS = $(AM_CFLAGS)
 
-__top_builddir__bin_snn_calc_SOURCES = util/matrix.c util/util_vector.c ./util/ini.c ./util/matrix.h util/util.c util/spikes_list.c  util/io.c snn_calc.c calc.c
+__top_builddir__bin_snn_calc_SOURCES = util/matrix.c util/util_vector.c ./util/ini.c ./util/matrix.h util/util.c util/spikes_list.c  util/io.c calc/snn_calc.c calc/calc.c
 __top_builddir__bin_snn_calc_CFLAGS = $(AM_CFLAGS)
 
-__top_builddir__bin_snn_postproc_SOURCES = util/matrix.c util/util_vector.c ./util/ini.c ./util/matrix.h util/util.c util/spikes_list.c  util/io.c postproc.c snn_postproc.c
+__top_builddir__bin_snn_postproc_SOURCES = util/matrix.c util/util_vector.c ./util/ini.c ./util/matrix.h util/util.c util/spikes_list.c  util/io.c postproc/postproc.c postproc/snn_postproc.c
 __top_builddir__bin_snn_postproc_CFLAGS = $(AM_CFLAGS)
 
-__top_builddir__bin_snn_filt_SOURCES = util/matrix.c util/util_vector.c  util/util.c util/spikes_list.c  util/io.c filt/filt_funcs.c filt/optim_lbfgs.c snn_filt.c
+__top_builddir__bin_snn_filt_SOURCES = util/matrix.c util/util_vector.c  util/util.c util/spikes_list.c  util/io.c filt/filt_funcs.c filt/optim_lbfgs.c filt/snn_filt.c
 __top_builddir__bin_snn_filt_CFLAGS = $(AM_CFLAGS)
 __top_builddir__bin_snn_filt_LDADD = -llbfgs -lm
+
 
 
 lib_LTLIBRARIES = $(top_builddir)/bin/libsnn_sim.la

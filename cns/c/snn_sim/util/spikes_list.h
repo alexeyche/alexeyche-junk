@@ -23,8 +23,10 @@ void readSpikesFromMatrix(SpikesList *sl, Matrix *m);
 void deleteSpikesList(SpikesList *sl);
 void printSpikesList(SpikesList *sl);
 SpikesList* spikesMatrixToSpikesList(Matrix *m);
+Matrix* spikesListToSpikesMatrix(SpikesList *sl);
 
 SpikePatternsList* createSpikePatternsList(size_t n);
 SpikePatternsList* readSpikePatternsListFromFile(const char *filename);
+void saveSpikePatternsListToFile(SpikePatternsList *spl, const char *filename);
 
 #endif

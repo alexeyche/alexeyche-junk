@@ -22,6 +22,7 @@ void readSpikesFromMatrix(SpikesList *sl, Matrix *m) {
     }
 }
 
+
 void deleteSpikesList(SpikesList *sl) {
     for(size_t li=0; li<sl->size; li++) {
         TEMPLATE(deleteVector,double)(sl->list[li]);
@@ -47,6 +48,20 @@ SpikesList* spikesMatrixToSpikesList(Matrix *m) {
     SpikesList *sl = createSpikesList(m->nrow);
     readSpikesFromMatrix(sl, m);    
     return(sl);
+}
+
+Matrix* spikesListToSpikesMatrix(SpikesList *sl) {
+    size_t max_spikes_size = 0;
+    for(size_t ni=0; ni<sl->size; ni++) {
+        max_spikes_size = max(sl->list[ni]->size, max_spikes_size);
+    }
+    Matrix *m = createZeroMatrix(sl->size, max_spikes_size);
+    for(size_t ni=0; ni<sl->size; ni++) {
+        for(size_t sp_i=0; sp_i<sl->list[ni]->size; sp_i++) {
+            setMatrixElement(m, ni, sp_i, sl->list[ni]->array[sp_i]);
+        }
+    }
+    return(m);
 }
 
 SpikePatternsList* createSpikePatternsList(size_t n) {
@@ -80,9 +95,15 @@ SpikePatternsList* readSpikePatternsListFromFile(const char *filename) {
 }
 
 void saveSpikePatternsListToFile(SpikePatternsList *spl, const char *filename) {
+    Matrix *sp = spikesListToSpikesMatrix(spl->sl);
+    Matrix *timeline = vectorArrayToMatrix(&spl->timeline, 1);
+    Matrix *pattern_classes  = vectorArrayToMatrix(&spl->pattern_classes, 1);
     pMatrixVector *ml = TEMPLATE(createVector,pMatrix)();
-    TEMPLATE(insertVector,pMatrix)(
-    FileStream *fs - createOuputFileStream(filename);
+    TEMPLATE(insertVector,pMatrix)(ml, sp);
+    TEMPLATE(insertVector,pMatrix)(ml, timeline);
+    TEMPLATE(insertVector,pMatrix)(ml, pattern_classes);
+    saveMatrixListToFile(filename, ml);
 
+    TEMPLATE(deleteVector,pMatrix)(ml);
 }
 

@@ -154,8 +154,8 @@ am___top_builddir__bin_snn_calc_OBJECTS =  \
 	util/__top_builddir__bin_snn_calc-util.$(OBJEXT) \
 	util/__top_builddir__bin_snn_calc-spikes_list.$(OBJEXT) \
 	util/__top_builddir__bin_snn_calc-io.$(OBJEXT) \
-	__top_builddir__bin_snn_calc-snn_calc.$(OBJEXT) \
-	__top_builddir__bin_snn_calc-calc.$(OBJEXT)
+	calc/__top_builddir__bin_snn_calc-snn_calc.$(OBJEXT) \
+	calc/__top_builddir__bin_snn_calc-calc.$(OBJEXT)
 __top_builddir__bin_snn_calc_OBJECTS =  \
 	$(am___top_builddir__bin_snn_calc_OBJECTS)
 __top_builddir__bin_snn_calc_LDADD = $(LDADD)
@@ -172,7 +172,7 @@ am___top_builddir__bin_snn_filt_OBJECTS =  \
 	util/__top_builddir__bin_snn_filt-io.$(OBJEXT) \
 	filt/__top_builddir__bin_snn_filt-filt_funcs.$(OBJEXT) \
 	filt/__top_builddir__bin_snn_filt-optim_lbfgs.$(OBJEXT) \
-	__top_builddir__bin_snn_filt-snn_filt.$(OBJEXT)
+	filt/__top_builddir__bin_snn_filt-snn_filt.$(OBJEXT)
 __top_builddir__bin_snn_filt_OBJECTS =  \
 	$(am___top_builddir__bin_snn_filt_OBJECTS)
 __top_builddir__bin_snn_filt_DEPENDENCIES =
@@ -187,8 +187,8 @@ am___top_builddir__bin_snn_postproc_OBJECTS =  \
 	util/__top_builddir__bin_snn_postproc-util.$(OBJEXT) \
 	util/__top_builddir__bin_snn_postproc-spikes_list.$(OBJEXT) \
 	util/__top_builddir__bin_snn_postproc-io.$(OBJEXT) \
-	__top_builddir__bin_snn_postproc-postproc.$(OBJEXT) \
-	__top_builddir__bin_snn_postproc-snn_postproc.$(OBJEXT)
+	postproc/__top_builddir__bin_snn_postproc-postproc.$(OBJEXT) \
+	postproc/__top_builddir__bin_snn_postproc-snn_postproc.$(OBJEXT)
 __top_builddir__bin_snn_postproc_OBJECTS =  \
 	$(am___top_builddir__bin_snn_postproc_OBJECTS)
 __top_builddir__bin_snn_postproc_LDADD = $(LDADD)
@@ -207,7 +207,7 @@ am___top_builddir__bin_snn_prep_OBJECTS =  \
 	util/__top_builddir__bin_snn_prep-io.$(OBJEXT) \
 	prep/__top_builddir__bin_snn_prep-adex.$(OBJEXT) \
 	prep/__top_builddir__bin_snn_prep-run.$(OBJEXT) \
-	__top_builddir__bin_snn_prep-snn_prep.$(OBJEXT)
+	prep/__top_builddir__bin_snn_prep-snn_prep.$(OBJEXT)
 __top_builddir__bin_snn_prep_OBJECTS =  \
 	$(am___top_builddir__bin_snn_prep_OBJECTS)
 __top_builddir__bin_snn_prep_LDADD = $(LDADD)
@@ -240,7 +240,7 @@ am__objects_2 = util/__top_builddir__bin_snn_sim-matrix.$(OBJEXT) \
 	layers/__top_builddir__bin_snn_sim-adapt.$(OBJEXT) \
 	layers/__top_builddir__bin_snn_sim-wtaadapt.$(OBJEXT)
 am___top_builddir__bin_snn_sim_OBJECTS = $(am__objects_2) \
-	__top_builddir__bin_snn_sim-snn_sim.$(OBJEXT)
+	sim/__top_builddir__bin_snn_sim-snn_sim.$(OBJEXT)
 __top_builddir__bin_snn_sim_OBJECTS =  \
 	$(am___top_builddir__bin_snn_sim_OBJECTS)
 __top_builddir__bin_snn_sim_LDADD = $(LDADD)
@@ -441,14 +441,14 @@ AM_CFLAGS = -Wall -std=gnu99 -pthread -O0 -g
 MAIN_SOURCES = util/matrix.c util/util_vector.c ./util/ini.c ./util/matrix.h util/util.c util/spikes_list.c ./util/util_dlink_list.c sim/netsim.c neuron_funcs.c  constants.c util/io.c util/mem.c sim/runtime.c sim/configure.c sim/serialize.c ./layers/poisson.c sim/sim.c learn/triple_stdp.c learn/optim.c learn/res_stdp.c learn/simple_stdp.c layers/wta.c layers/adapt.c layers/wtaadapt.c
 LDADD = -lm
 __top_builddir__bin_snn_sim_CFLAGS = $(AM_CFLAGS)
-__top_builddir__bin_snn_sim_SOURCES = $(MAIN_SOURCES) snn_sim.c 
-__top_builddir__bin_snn_prep_SOURCES = util/matrix.c util/util_vector.c ./util/ini.c ./util/matrix.h util/util.c util/spikes_list.c  constants.c util/io.c prep/adex.c  prep/run.c snn_prep.c 
+__top_builddir__bin_snn_sim_SOURCES = $(MAIN_SOURCES) sim/snn_sim.c 
+__top_builddir__bin_snn_prep_SOURCES = util/matrix.c util/util_vector.c ./util/ini.c ./util/matrix.h util/util.c util/spikes_list.c  constants.c util/io.c prep/adex.c  prep/run.c prep/snn_prep.c 
 __top_builddir__bin_snn_prep_CFLAGS = $(AM_CFLAGS)
-__top_builddir__bin_snn_calc_SOURCES = util/matrix.c util/util_vector.c ./util/ini.c ./util/matrix.h util/util.c util/spikes_list.c  util/io.c snn_calc.c calc.c
+__top_builddir__bin_snn_calc_SOURCES = util/matrix.c util/util_vector.c ./util/ini.c ./util/matrix.h util/util.c util/spikes_list.c  util/io.c calc/snn_calc.c calc/calc.c
 __top_builddir__bin_snn_calc_CFLAGS = $(AM_CFLAGS)
-__top_builddir__bin_snn_postproc_SOURCES = util/matrix.c util/util_vector.c ./util/ini.c ./util/matrix.h util/util.c util/spikes_list.c  util/io.c postproc.c snn_postproc.c
+__top_builddir__bin_snn_postproc_SOURCES = util/matrix.c util/util_vector.c ./util/ini.c ./util/matrix.h util/util.c util/spikes_list.c  util/io.c postproc/postproc.c postproc/snn_postproc.c
 __top_builddir__bin_snn_postproc_CFLAGS = $(AM_CFLAGS)
-__top_builddir__bin_snn_filt_SOURCES = util/matrix.c util/util_vector.c  util/util.c util/spikes_list.c  util/io.c filt/filt_funcs.c filt/optim_lbfgs.c snn_filt.c
+__top_builddir__bin_snn_filt_SOURCES = util/matrix.c util/util_vector.c  util/util.c util/spikes_list.c  util/io.c filt/filt_funcs.c filt/optim_lbfgs.c filt/snn_filt.c
 __top_builddir__bin_snn_filt_CFLAGS = $(AM_CFLAGS)
 __top_builddir__bin_snn_filt_LDADD = -llbfgs -lm
 lib_LTLIBRARIES = $(top_builddir)/bin/libsnn_sim.la
@@ -467,9 +467,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu snn_sim/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign snn_sim/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu snn_sim/Makefile
+	  $(AUTOMAKE) --foreign snn_sim/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -644,6 +644,16 @@ util/__top_builddir__bin_snn_calc-spikes_list.$(OBJEXT):  \
 	util/$(am__dirstamp) util/$(DEPDIR)/$(am__dirstamp)
 util/__top_builddir__bin_snn_calc-io.$(OBJEXT): util/$(am__dirstamp) \
 	util/$(DEPDIR)/$(am__dirstamp)
+calc/$(am__dirstamp):
+	@$(MKDIR_P) calc
+	@: > calc/$(am__dirstamp)
+calc/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) calc/$(DEPDIR)
+	@: > calc/$(DEPDIR)/$(am__dirstamp)
+calc/__top_builddir__bin_snn_calc-snn_calc.$(OBJEXT):  \
+	calc/$(am__dirstamp) calc/$(DEPDIR)/$(am__dirstamp)
+calc/__top_builddir__bin_snn_calc-calc.$(OBJEXT):  \
+	calc/$(am__dirstamp) calc/$(DEPDIR)/$(am__dirstamp)
 
 $(top_builddir)/bin/snn_calc$(EXEEXT): $(__top_builddir__bin_snn_calc_OBJECTS) $(__top_builddir__bin_snn_calc_DEPENDENCIES) $(EXTRA___top_builddir__bin_snn_calc_DEPENDENCIES) $(top_builddir)/bin/$(am__dirstamp)
 	@rm -f $(top_builddir)/bin/snn_calc$(EXEEXT)
@@ -668,6 +678,8 @@ filt/__top_builddir__bin_snn_filt-filt_funcs.$(OBJEXT):  \
 	filt/$(am__dirstamp) filt/$(DEPDIR)/$(am__dirstamp)
 filt/__top_builddir__bin_snn_filt-optim_lbfgs.$(OBJEXT):  \
 	filt/$(am__dirstamp) filt/$(DEPDIR)/$(am__dirstamp)
+filt/__top_builddir__bin_snn_filt-snn_filt.$(OBJEXT):  \
+	filt/$(am__dirstamp) filt/$(DEPDIR)/$(am__dirstamp)
 
 $(top_builddir)/bin/snn_filt$(EXEEXT): $(__top_builddir__bin_snn_filt_OBJECTS) $(__top_builddir__bin_snn_filt_DEPENDENCIES) $(EXTRA___top_builddir__bin_snn_filt_DEPENDENCIES) $(top_builddir)/bin/$(am__dirstamp)
 	@rm -f $(top_builddir)/bin/snn_filt$(EXEEXT)
@@ -684,6 +696,16 @@ util/__top_builddir__bin_snn_postproc-spikes_list.$(OBJEXT):  \
 	util/$(am__dirstamp) util/$(DEPDIR)/$(am__dirstamp)
 util/__top_builddir__bin_snn_postproc-io.$(OBJEXT):  \
 	util/$(am__dirstamp) util/$(DEPDIR)/$(am__dirstamp)
+postproc/$(am__dirstamp):
+	@$(MKDIR_P) postproc
+	@: > postproc/$(am__dirstamp)
+postproc/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) postproc/$(DEPDIR)
+	@: > postproc/$(DEPDIR)/$(am__dirstamp)
+postproc/__top_builddir__bin_snn_postproc-postproc.$(OBJEXT):  \
+	postproc/$(am__dirstamp) postproc/$(DEPDIR)/$(am__dirstamp)
+postproc/__top_builddir__bin_snn_postproc-snn_postproc.$(OBJEXT):  \
+	postproc/$(am__dirstamp) postproc/$(DEPDIR)/$(am__dirstamp)
 
 $(top_builddir)/bin/snn_postproc$(EXEEXT): $(__top_builddir__bin_snn_postproc_OBJECTS) $(__top_builddir__bin_snn_postproc_DEPENDENCIES) $(EXTRA___top_builddir__bin_snn_postproc_DEPENDENCIES) $(top_builddir)/bin/$(am__dirstamp)
 	@rm -f $(top_builddir)/bin/snn_postproc$(EXEEXT)
@@ -710,6 +732,8 @@ prep/__top_builddir__bin_snn_prep-adex.$(OBJEXT):  \
 	prep/$(am__dirstamp) prep/$(DEPDIR)/$(am__dirstamp)
 prep/__top_builddir__bin_snn_prep-run.$(OBJEXT): prep/$(am__dirstamp) \
 	prep/$(DEPDIR)/$(am__dirstamp)
+prep/__top_builddir__bin_snn_prep-snn_prep.$(OBJEXT):  \
+	prep/$(am__dirstamp) prep/$(DEPDIR)/$(am__dirstamp)
 
 $(top_builddir)/bin/snn_prep$(EXEEXT): $(__top_builddir__bin_snn_prep_OBJECTS) $(__top_builddir__bin_snn_prep_DEPENDENCIES) $(EXTRA___top_builddir__bin_snn_prep_DEPENDENCIES) $(top_builddir)/bin/$(am__dirstamp)
 	@rm -f $(top_builddir)/bin/snn_prep$(EXEEXT)
@@ -756,6 +780,8 @@ layers/__top_builddir__bin_snn_sim-adapt.$(OBJEXT):  \
 	layers/$(am__dirstamp) layers/$(DEPDIR)/$(am__dirstamp)
 layers/__top_builddir__bin_snn_sim-wtaadapt.$(OBJEXT):  \
 	layers/$(am__dirstamp) layers/$(DEPDIR)/$(am__dirstamp)
+sim/__top_builddir__bin_snn_sim-snn_sim.$(OBJEXT):  \
+	sim/$(am__dirstamp) sim/$(DEPDIR)/$(am__dirstamp)
 
 $(top_builddir)/bin/snn_sim$(EXEEXT): $(__top_builddir__bin_snn_sim_OBJECTS) $(__top_builddir__bin_snn_sim_DEPENDENCIES) $(EXTRA___top_builddir__bin_snn_sim_DEPENDENCIES) $(top_builddir)/bin/$(am__dirstamp)
 	@rm -f $(top_builddir)/bin/snn_sim$(EXEEXT)
@@ -767,11 +793,13 @@ mostlyclean-compile:
 	-rm -f ./layers/*.lo
 	-rm -f ./util/*.$(OBJEXT)
 	-rm -f ./util/*.lo
+	-rm -f calc/*.$(OBJEXT)
 	-rm -f filt/*.$(OBJEXT)
 	-rm -f layers/*.$(OBJEXT)
 	-rm -f layers/*.lo
 	-rm -f learn/*.$(OBJEXT)
 	-rm -f learn/*.lo
+	-rm -f postproc/*.$(OBJEXT)
 	-rm -f prep/*.$(OBJEXT)
 	-rm -f sim/*.$(OBJEXT)
 	-rm -f sim/*.lo
@@ -781,16 +809,9 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/__top_builddir__bin_snn_calc-calc.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/__top_builddir__bin_snn_calc-snn_calc.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/__top_builddir__bin_snn_filt-snn_filt.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/__top_builddir__bin_snn_postproc-postproc.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/__top_builddir__bin_snn_postproc-snn_postproc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/__top_builddir__bin_snn_prep-constants.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/__top_builddir__bin_snn_prep-snn_prep.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/__top_builddir__bin_snn_sim-constants.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/__top_builddir__bin_snn_sim-neuron_funcs.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/__top_builddir__bin_snn_sim-snn_sim.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/constants.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/neuron_funcs.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./layers/$(DEPDIR)/__top_builddir__bin_snn_sim-poisson.Po@am__quote@
@@ -802,8 +823,11 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./util/$(DEPDIR)/__top_builddir__bin_snn_sim-util_dlink_list.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./util/$(DEPDIR)/ini.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./util/$(DEPDIR)/util_dlink_list.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@calc/$(DEPDIR)/__top_builddir__bin_snn_calc-calc.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@calc/$(DEPDIR)/__top_builddir__bin_snn_calc-snn_calc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@filt/$(DEPDIR)/__top_builddir__bin_snn_filt-filt_funcs.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@filt/$(DEPDIR)/__top_builddir__bin_snn_filt-optim_lbfgs.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@filt/$(DEPDIR)/__top_builddir__bin_snn_filt-snn_filt.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@layers/$(DEPDIR)/__top_builddir__bin_snn_sim-adapt.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@layers/$(DEPDIR)/__top_builddir__bin_snn_sim-wta.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@layers/$(DEPDIR)/__top_builddir__bin_snn_sim-wtaadapt.Po@am__quote@
@@ -818,13 +842,17 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@learn/$(DEPDIR)/res_stdp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@learn/$(DEPDIR)/simple_stdp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@learn/$(DEPDIR)/triple_stdp.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@postproc/$(DEPDIR)/__top_builddir__bin_snn_postproc-postproc.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@postproc/$(DEPDIR)/__top_builddir__bin_snn_postproc-snn_postproc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@prep/$(DEPDIR)/__top_builddir__bin_snn_prep-adex.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@prep/$(DEPDIR)/__top_builddir__bin_snn_prep-run.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@prep/$(DEPDIR)/__top_builddir__bin_snn_prep-snn_prep.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sim/$(DEPDIR)/__top_builddir__bin_snn_sim-configure.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sim/$(DEPDIR)/__top_builddir__bin_snn_sim-netsim.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sim/$(DEPDIR)/__top_builddir__bin_snn_sim-runtime.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sim/$(DEPDIR)/__top_builddir__bin_snn_sim-serialize.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sim/$(DEPDIR)/__top_builddir__bin_snn_sim-sim.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sim/$(DEPDIR)/__top_builddir__bin_snn_sim-snn_sim.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sim/$(DEPDIR)/configure.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sim/$(DEPDIR)/netsim.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sim/$(DEPDIR)/runtime.Plo@am__quote@
@@ -971,33 +999,33 @@ util/__top_builddir__bin_snn_calc-io.obj: util/io.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_calc_CFLAGS) $(CFLAGS) -c -o util/__top_builddir__bin_snn_calc-io.obj `if test -f 'util/io.c'; then $(CYGPATH_W) 'util/io.c'; else $(CYGPATH_W) '$(srcdir)/util/io.c'; fi`
 
-__top_builddir__bin_snn_calc-snn_calc.o: snn_calc.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_calc_CFLAGS) $(CFLAGS) -MT __top_builddir__bin_snn_calc-snn_calc.o -MD -MP -MF $(DEPDIR)/__top_builddir__bin_snn_calc-snn_calc.Tpo -c -o __top_builddir__bin_snn_calc-snn_calc.o `test -f 'snn_calc.c' || echo '$(srcdir)/'`snn_calc.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/__top_builddir__bin_snn_calc-snn_calc.Tpo $(DEPDIR)/__top_builddir__bin_snn_calc-snn_calc.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='snn_calc.c' object='__top_builddir__bin_snn_calc-snn_calc.o' libtool=no @AMDEPBACKSLASH@
+calc/__top_builddir__bin_snn_calc-snn_calc.o: calc/snn_calc.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_calc_CFLAGS) $(CFLAGS) -MT calc/__top_builddir__bin_snn_calc-snn_calc.o -MD -MP -MF calc/$(DEPDIR)/__top_builddir__bin_snn_calc-snn_calc.Tpo -c -o calc/__top_builddir__bin_snn_calc-snn_calc.o `test -f 'calc/snn_calc.c' || echo '$(srcdir)/'`calc/snn_calc.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) calc/$(DEPDIR)/__top_builddir__bin_snn_calc-snn_calc.Tpo calc/$(DEPDIR)/__top_builddir__bin_snn_calc-snn_calc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='calc/snn_calc.c' object='calc/__top_builddir__bin_snn_calc-snn_calc.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_calc_CFLAGS) $(CFLAGS) -c -o __top_builddir__bin_snn_calc-snn_calc.o `test -f 'snn_calc.c' || echo '$(srcdir)/'`snn_calc.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_calc_CFLAGS) $(CFLAGS) -c -o calc/__top_builddir__bin_snn_calc-snn_calc.o `test -f 'calc/snn_calc.c' || echo '$(srcdir)/'`calc/snn_calc.c
 
-__top_builddir__bin_snn_calc-snn_calc.obj: snn_calc.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_calc_CFLAGS) $(CFLAGS) -MT __top_builddir__bin_snn_calc-snn_calc.obj -MD -MP -MF $(DEPDIR)/__top_builddir__bin_snn_calc-snn_calc.Tpo -c -o __top_builddir__bin_snn_calc-snn_calc.obj `if test -f 'snn_calc.c'; then $(CYGPATH_W) 'snn_calc.c'; else $(CYGPATH_W) '$(srcdir)/snn_calc.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/__top_builddir__bin_snn_calc-snn_calc.Tpo $(DEPDIR)/__top_builddir__bin_snn_calc-snn_calc.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='snn_calc.c' object='__top_builddir__bin_snn_calc-snn_calc.obj' libtool=no @AMDEPBACKSLASH@
+calc/__top_builddir__bin_snn_calc-snn_calc.obj: calc/snn_calc.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_calc_CFLAGS) $(CFLAGS) -MT calc/__top_builddir__bin_snn_calc-snn_calc.obj -MD -MP -MF calc/$(DEPDIR)/__top_builddir__bin_snn_calc-snn_calc.Tpo -c -o calc/__top_builddir__bin_snn_calc-snn_calc.obj `if test -f 'calc/snn_calc.c'; then $(CYGPATH_W) 'calc/snn_calc.c'; else $(CYGPATH_W) '$(srcdir)/calc/snn_calc.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) calc/$(DEPDIR)/__top_builddir__bin_snn_calc-snn_calc.Tpo calc/$(DEPDIR)/__top_builddir__bin_snn_calc-snn_calc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='calc/snn_calc.c' object='calc/__top_builddir__bin_snn_calc-snn_calc.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_calc_CFLAGS) $(CFLAGS) -c -o __top_builddir__bin_snn_calc-snn_calc.obj `if test -f 'snn_calc.c'; then $(CYGPATH_W) 'snn_calc.c'; else $(CYGPATH_W) '$(srcdir)/snn_calc.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_calc_CFLAGS) $(CFLAGS) -c -o calc/__top_builddir__bin_snn_calc-snn_calc.obj `if test -f 'calc/snn_calc.c'; then $(CYGPATH_W) 'calc/snn_calc.c'; else $(CYGPATH_W) '$(srcdir)/calc/snn_calc.c'; fi`
 
-__top_builddir__bin_snn_calc-calc.o: calc.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_calc_CFLAGS) $(CFLAGS) -MT __top_builddir__bin_snn_calc-calc.o -MD -MP -MF $(DEPDIR)/__top_builddir__bin_snn_calc-calc.Tpo -c -o __top_builddir__bin_snn_calc-calc.o `test -f 'calc.c' || echo '$(srcdir)/'`calc.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/__top_builddir__bin_snn_calc-calc.Tpo $(DEPDIR)/__top_builddir__bin_snn_calc-calc.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='calc.c' object='__top_builddir__bin_snn_calc-calc.o' libtool=no @AMDEPBACKSLASH@
+calc/__top_builddir__bin_snn_calc-calc.o: calc/calc.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_calc_CFLAGS) $(CFLAGS) -MT calc/__top_builddir__bin_snn_calc-calc.o -MD -MP -MF calc/$(DEPDIR)/__top_builddir__bin_snn_calc-calc.Tpo -c -o calc/__top_builddir__bin_snn_calc-calc.o `test -f 'calc/calc.c' || echo '$(srcdir)/'`calc/calc.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) calc/$(DEPDIR)/__top_builddir__bin_snn_calc-calc.Tpo calc/$(DEPDIR)/__top_builddir__bin_snn_calc-calc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='calc/calc.c' object='calc/__top_builddir__bin_snn_calc-calc.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_calc_CFLAGS) $(CFLAGS) -c -o __top_builddir__bin_snn_calc-calc.o `test -f 'calc.c' || echo '$(srcdir)/'`calc.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_calc_CFLAGS) $(CFLAGS) -c -o calc/__top_builddir__bin_snn_calc-calc.o `test -f 'calc/calc.c' || echo '$(srcdir)/'`calc/calc.c
 
-__top_builddir__bin_snn_calc-calc.obj: calc.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_calc_CFLAGS) $(CFLAGS) -MT __top_builddir__bin_snn_calc-calc.obj -MD -MP -MF $(DEPDIR)/__top_builddir__bin_snn_calc-calc.Tpo -c -o __top_builddir__bin_snn_calc-calc.obj `if test -f 'calc.c'; then $(CYGPATH_W) 'calc.c'; else $(CYGPATH_W) '$(srcdir)/calc.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/__top_builddir__bin_snn_calc-calc.Tpo $(DEPDIR)/__top_builddir__bin_snn_calc-calc.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='calc.c' object='__top_builddir__bin_snn_calc-calc.obj' libtool=no @AMDEPBACKSLASH@
+calc/__top_builddir__bin_snn_calc-calc.obj: calc/calc.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_calc_CFLAGS) $(CFLAGS) -MT calc/__top_builddir__bin_snn_calc-calc.obj -MD -MP -MF calc/$(DEPDIR)/__top_builddir__bin_snn_calc-calc.Tpo -c -o calc/__top_builddir__bin_snn_calc-calc.obj `if test -f 'calc/calc.c'; then $(CYGPATH_W) 'calc/calc.c'; else $(CYGPATH_W) '$(srcdir)/calc/calc.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) calc/$(DEPDIR)/__top_builddir__bin_snn_calc-calc.Tpo calc/$(DEPDIR)/__top_builddir__bin_snn_calc-calc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='calc/calc.c' object='calc/__top_builddir__bin_snn_calc-calc.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_calc_CFLAGS) $(CFLAGS) -c -o __top_builddir__bin_snn_calc-calc.obj `if test -f 'calc.c'; then $(CYGPATH_W) 'calc.c'; else $(CYGPATH_W) '$(srcdir)/calc.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_calc_CFLAGS) $(CFLAGS) -c -o calc/__top_builddir__bin_snn_calc-calc.obj `if test -f 'calc/calc.c'; then $(CYGPATH_W) 'calc/calc.c'; else $(CYGPATH_W) '$(srcdir)/calc/calc.c'; fi`
 
 util/__top_builddir__bin_snn_filt-matrix.o: util/matrix.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_filt_CFLAGS) $(CFLAGS) -MT util/__top_builddir__bin_snn_filt-matrix.o -MD -MP -MF util/$(DEPDIR)/__top_builddir__bin_snn_filt-matrix.Tpo -c -o util/__top_builddir__bin_snn_filt-matrix.o `test -f 'util/matrix.c' || echo '$(srcdir)/'`util/matrix.c
@@ -1097,19 +1125,19 @@ filt/__top_builddir__bin_snn_filt-optim_lbfgs.obj: filt/optim_lbfgs.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_filt_CFLAGS) $(CFLAGS) -c -o filt/__top_builddir__bin_snn_filt-optim_lbfgs.obj `if test -f 'filt/optim_lbfgs.c'; then $(CYGPATH_W) 'filt/optim_lbfgs.c'; else $(CYGPATH_W) '$(srcdir)/filt/optim_lbfgs.c'; fi`
 
-__top_builddir__bin_snn_filt-snn_filt.o: snn_filt.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_filt_CFLAGS) $(CFLAGS) -MT __top_builddir__bin_snn_filt-snn_filt.o -MD -MP -MF $(DEPDIR)/__top_builddir__bin_snn_filt-snn_filt.Tpo -c -o __top_builddir__bin_snn_filt-snn_filt.o `test -f 'snn_filt.c' || echo '$(srcdir)/'`snn_filt.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/__top_builddir__bin_snn_filt-snn_filt.Tpo $(DEPDIR)/__top_builddir__bin_snn_filt-snn_filt.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='snn_filt.c' object='__top_builddir__bin_snn_filt-snn_filt.o' libtool=no @AMDEPBACKSLASH@
+filt/__top_builddir__bin_snn_filt-snn_filt.o: filt/snn_filt.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_filt_CFLAGS) $(CFLAGS) -MT filt/__top_builddir__bin_snn_filt-snn_filt.o -MD -MP -MF filt/$(DEPDIR)/__top_builddir__bin_snn_filt-snn_filt.Tpo -c -o filt/__top_builddir__bin_snn_filt-snn_filt.o `test -f 'filt/snn_filt.c' || echo '$(srcdir)/'`filt/snn_filt.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) filt/$(DEPDIR)/__top_builddir__bin_snn_filt-snn_filt.Tpo filt/$(DEPDIR)/__top_builddir__bin_snn_filt-snn_filt.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='filt/snn_filt.c' object='filt/__top_builddir__bin_snn_filt-snn_filt.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_filt_CFLAGS) $(CFLAGS) -c -o __top_builddir__bin_snn_filt-snn_filt.o `test -f 'snn_filt.c' || echo '$(srcdir)/'`snn_filt.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_filt_CFLAGS) $(CFLAGS) -c -o filt/__top_builddir__bin_snn_filt-snn_filt.o `test -f 'filt/snn_filt.c' || echo '$(srcdir)/'`filt/snn_filt.c
 
-__top_builddir__bin_snn_filt-snn_filt.obj: snn_filt.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_filt_CFLAGS) $(CFLAGS) -MT __top_builddir__bin_snn_filt-snn_filt.obj -MD -MP -MF $(DEPDIR)/__top_builddir__bin_snn_filt-snn_filt.Tpo -c -o __top_builddir__bin_snn_filt-snn_filt.obj `if test -f 'snn_filt.c'; then $(CYGPATH_W) 'snn_filt.c'; else $(CYGPATH_W) '$(srcdir)/snn_filt.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/__top_builddir__bin_snn_filt-snn_filt.Tpo $(DEPDIR)/__top_builddir__bin_snn_filt-snn_filt.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='snn_filt.c' object='__top_builddir__bin_snn_filt-snn_filt.obj' libtool=no @AMDEPBACKSLASH@
+filt/__top_builddir__bin_snn_filt-snn_filt.obj: filt/snn_filt.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_filt_CFLAGS) $(CFLAGS) -MT filt/__top_builddir__bin_snn_filt-snn_filt.obj -MD -MP -MF filt/$(DEPDIR)/__top_builddir__bin_snn_filt-snn_filt.Tpo -c -o filt/__top_builddir__bin_snn_filt-snn_filt.obj `if test -f 'filt/snn_filt.c'; then $(CYGPATH_W) 'filt/snn_filt.c'; else $(CYGPATH_W) '$(srcdir)/filt/snn_filt.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) filt/$(DEPDIR)/__top_builddir__bin_snn_filt-snn_filt.Tpo filt/$(DEPDIR)/__top_builddir__bin_snn_filt-snn_filt.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='filt/snn_filt.c' object='filt/__top_builddir__bin_snn_filt-snn_filt.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_filt_CFLAGS) $(CFLAGS) -c -o __top_builddir__bin_snn_filt-snn_filt.obj `if test -f 'snn_filt.c'; then $(CYGPATH_W) 'snn_filt.c'; else $(CYGPATH_W) '$(srcdir)/snn_filt.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_filt_CFLAGS) $(CFLAGS) -c -o filt/__top_builddir__bin_snn_filt-snn_filt.obj `if test -f 'filt/snn_filt.c'; then $(CYGPATH_W) 'filt/snn_filt.c'; else $(CYGPATH_W) '$(srcdir)/filt/snn_filt.c'; fi`
 
 util/__top_builddir__bin_snn_postproc-matrix.o: util/matrix.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_postproc_CFLAGS) $(CFLAGS) -MT util/__top_builddir__bin_snn_postproc-matrix.o -MD -MP -MF util/$(DEPDIR)/__top_builddir__bin_snn_postproc-matrix.Tpo -c -o util/__top_builddir__bin_snn_postproc-matrix.o `test -f 'util/matrix.c' || echo '$(srcdir)/'`util/matrix.c
@@ -1195,33 +1223,33 @@ util/__top_builddir__bin_snn_postproc-io.obj: util/io.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_postproc_CFLAGS) $(CFLAGS) -c -o util/__top_builddir__bin_snn_postproc-io.obj `if test -f 'util/io.c'; then $(CYGPATH_W) 'util/io.c'; else $(CYGPATH_W) '$(srcdir)/util/io.c'; fi`
 
-__top_builddir__bin_snn_postproc-postproc.o: postproc.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_postproc_CFLAGS) $(CFLAGS) -MT __top_builddir__bin_snn_postproc-postproc.o -MD -MP -MF $(DEPDIR)/__top_builddir__bin_snn_postproc-postproc.Tpo -c -o __top_builddir__bin_snn_postproc-postproc.o `test -f 'postproc.c' || echo '$(srcdir)/'`postproc.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/__top_builddir__bin_snn_postproc-postproc.Tpo $(DEPDIR)/__top_builddir__bin_snn_postproc-postproc.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='postproc.c' object='__top_builddir__bin_snn_postproc-postproc.o' libtool=no @AMDEPBACKSLASH@
+postproc/__top_builddir__bin_snn_postproc-postproc.o: postproc/postproc.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_postproc_CFLAGS) $(CFLAGS) -MT postproc/__top_builddir__bin_snn_postproc-postproc.o -MD -MP -MF postproc/$(DEPDIR)/__top_builddir__bin_snn_postproc-postproc.Tpo -c -o postproc/__top_builddir__bin_snn_postproc-postproc.o `test -f 'postproc/postproc.c' || echo '$(srcdir)/'`postproc/postproc.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) postproc/$(DEPDIR)/__top_builddir__bin_snn_postproc-postproc.Tpo postproc/$(DEPDIR)/__top_builddir__bin_snn_postproc-postproc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='postproc/postproc.c' object='postproc/__top_builddir__bin_snn_postproc-postproc.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_postproc_CFLAGS) $(CFLAGS) -c -o __top_builddir__bin_snn_postproc-postproc.o `test -f 'postproc.c' || echo '$(srcdir)/'`postproc.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_postproc_CFLAGS) $(CFLAGS) -c -o postproc/__top_builddir__bin_snn_postproc-postproc.o `test -f 'postproc/postproc.c' || echo '$(srcdir)/'`postproc/postproc.c
 
-__top_builddir__bin_snn_postproc-postproc.obj: postproc.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_postproc_CFLAGS) $(CFLAGS) -MT __top_builddir__bin_snn_postproc-postproc.obj -MD -MP -MF $(DEPDIR)/__top_builddir__bin_snn_postproc-postproc.Tpo -c -o __top_builddir__bin_snn_postproc-postproc.obj `if test -f 'postproc.c'; then $(CYGPATH_W) 'postproc.c'; else $(CYGPATH_W) '$(srcdir)/postproc.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/__top_builddir__bin_snn_postproc-postproc.Tpo $(DEPDIR)/__top_builddir__bin_snn_postproc-postproc.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='postproc.c' object='__top_builddir__bin_snn_postproc-postproc.obj' libtool=no @AMDEPBACKSLASH@
+postproc/__top_builddir__bin_snn_postproc-postproc.obj: postproc/postproc.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_postproc_CFLAGS) $(CFLAGS) -MT postproc/__top_builddir__bin_snn_postproc-postproc.obj -MD -MP -MF postproc/$(DEPDIR)/__top_builddir__bin_snn_postproc-postproc.Tpo -c -o postproc/__top_builddir__bin_snn_postproc-postproc.obj `if test -f 'postproc/postproc.c'; then $(CYGPATH_W) 'postproc/postproc.c'; else $(CYGPATH_W) '$(srcdir)/postproc/postproc.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) postproc/$(DEPDIR)/__top_builddir__bin_snn_postproc-postproc.Tpo postproc/$(DEPDIR)/__top_builddir__bin_snn_postproc-postproc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='postproc/postproc.c' object='postproc/__top_builddir__bin_snn_postproc-postproc.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_postproc_CFLAGS) $(CFLAGS) -c -o __top_builddir__bin_snn_postproc-postproc.obj `if test -f 'postproc.c'; then $(CYGPATH_W) 'postproc.c'; else $(CYGPATH_W) '$(srcdir)/postproc.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_postproc_CFLAGS) $(CFLAGS) -c -o postproc/__top_builddir__bin_snn_postproc-postproc.obj `if test -f 'postproc/postproc.c'; then $(CYGPATH_W) 'postproc/postproc.c'; else $(CYGPATH_W) '$(srcdir)/postproc/postproc.c'; fi`
 
-__top_builddir__bin_snn_postproc-snn_postproc.o: snn_postproc.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_postproc_CFLAGS) $(CFLAGS) -MT __top_builddir__bin_snn_postproc-snn_postproc.o -MD -MP -MF $(DEPDIR)/__top_builddir__bin_snn_postproc-snn_postproc.Tpo -c -o __top_builddir__bin_snn_postproc-snn_postproc.o `test -f 'snn_postproc.c' || echo '$(srcdir)/'`snn_postproc.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/__top_builddir__bin_snn_postproc-snn_postproc.Tpo $(DEPDIR)/__top_builddir__bin_snn_postproc-snn_postproc.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='snn_postproc.c' object='__top_builddir__bin_snn_postproc-snn_postproc.o' libtool=no @AMDEPBACKSLASH@
+postproc/__top_builddir__bin_snn_postproc-snn_postproc.o: postproc/snn_postproc.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_postproc_CFLAGS) $(CFLAGS) -MT postproc/__top_builddir__bin_snn_postproc-snn_postproc.o -MD -MP -MF postproc/$(DEPDIR)/__top_builddir__bin_snn_postproc-snn_postproc.Tpo -c -o postproc/__top_builddir__bin_snn_postproc-snn_postproc.o `test -f 'postproc/snn_postproc.c' || echo '$(srcdir)/'`postproc/snn_postproc.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) postproc/$(DEPDIR)/__top_builddir__bin_snn_postproc-snn_postproc.Tpo postproc/$(DEPDIR)/__top_builddir__bin_snn_postproc-snn_postproc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='postproc/snn_postproc.c' object='postproc/__top_builddir__bin_snn_postproc-snn_postproc.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_postproc_CFLAGS) $(CFLAGS) -c -o __top_builddir__bin_snn_postproc-snn_postproc.o `test -f 'snn_postproc.c' || echo '$(srcdir)/'`snn_postproc.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_postproc_CFLAGS) $(CFLAGS) -c -o postproc/__top_builddir__bin_snn_postproc-snn_postproc.o `test -f 'postproc/snn_postproc.c' || echo '$(srcdir)/'`postproc/snn_postproc.c
 
-__top_builddir__bin_snn_postproc-snn_postproc.obj: snn_postproc.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_postproc_CFLAGS) $(CFLAGS) -MT __top_builddir__bin_snn_postproc-snn_postproc.obj -MD -MP -MF $(DEPDIR)/__top_builddir__bin_snn_postproc-snn_postproc.Tpo -c -o __top_builddir__bin_snn_postproc-snn_postproc.obj `if test -f 'snn_postproc.c'; then $(CYGPATH_W) 'snn_postproc.c'; else $(CYGPATH_W) '$(srcdir)/snn_postproc.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/__top_builddir__bin_snn_postproc-snn_postproc.Tpo $(DEPDIR)/__top_builddir__bin_snn_postproc-snn_postproc.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='snn_postproc.c' object='__top_builddir__bin_snn_postproc-snn_postproc.obj' libtool=no @AMDEPBACKSLASH@
+postproc/__top_builddir__bin_snn_postproc-snn_postproc.obj: postproc/snn_postproc.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_postproc_CFLAGS) $(CFLAGS) -MT postproc/__top_builddir__bin_snn_postproc-snn_postproc.obj -MD -MP -MF postproc/$(DEPDIR)/__top_builddir__bin_snn_postproc-snn_postproc.Tpo -c -o postproc/__top_builddir__bin_snn_postproc-snn_postproc.obj `if test -f 'postproc/snn_postproc.c'; then $(CYGPATH_W) 'postproc/snn_postproc.c'; else $(CYGPATH_W) '$(srcdir)/postproc/snn_postproc.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) postproc/$(DEPDIR)/__top_builddir__bin_snn_postproc-snn_postproc.Tpo postproc/$(DEPDIR)/__top_builddir__bin_snn_postproc-snn_postproc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='postproc/snn_postproc.c' object='postproc/__top_builddir__bin_snn_postproc-snn_postproc.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_postproc_CFLAGS) $(CFLAGS) -c -o __top_builddir__bin_snn_postproc-snn_postproc.obj `if test -f 'snn_postproc.c'; then $(CYGPATH_W) 'snn_postproc.c'; else $(CYGPATH_W) '$(srcdir)/snn_postproc.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_postproc_CFLAGS) $(CFLAGS) -c -o postproc/__top_builddir__bin_snn_postproc-snn_postproc.obj `if test -f 'postproc/snn_postproc.c'; then $(CYGPATH_W) 'postproc/snn_postproc.c'; else $(CYGPATH_W) '$(srcdir)/postproc/snn_postproc.c'; fi`
 
 util/__top_builddir__bin_snn_prep-matrix.o: util/matrix.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_prep_CFLAGS) $(CFLAGS) -MT util/__top_builddir__bin_snn_prep-matrix.o -MD -MP -MF util/$(DEPDIR)/__top_builddir__bin_snn_prep-matrix.Tpo -c -o util/__top_builddir__bin_snn_prep-matrix.o `test -f 'util/matrix.c' || echo '$(srcdir)/'`util/matrix.c
@@ -1349,19 +1377,19 @@ prep/__top_builddir__bin_snn_prep-run.obj: prep/run.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_prep_CFLAGS) $(CFLAGS) -c -o prep/__top_builddir__bin_snn_prep-run.obj `if test -f 'prep/run.c'; then $(CYGPATH_W) 'prep/run.c'; else $(CYGPATH_W) '$(srcdir)/prep/run.c'; fi`
 
-__top_builddir__bin_snn_prep-snn_prep.o: snn_prep.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_prep_CFLAGS) $(CFLAGS) -MT __top_builddir__bin_snn_prep-snn_prep.o -MD -MP -MF $(DEPDIR)/__top_builddir__bin_snn_prep-snn_prep.Tpo -c -o __top_builddir__bin_snn_prep-snn_prep.o `test -f 'snn_prep.c' || echo '$(srcdir)/'`snn_prep.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/__top_builddir__bin_snn_prep-snn_prep.Tpo $(DEPDIR)/__top_builddir__bin_snn_prep-snn_prep.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='snn_prep.c' object='__top_builddir__bin_snn_prep-snn_prep.o' libtool=no @AMDEPBACKSLASH@
+prep/__top_builddir__bin_snn_prep-snn_prep.o: prep/snn_prep.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_prep_CFLAGS) $(CFLAGS) -MT prep/__top_builddir__bin_snn_prep-snn_prep.o -MD -MP -MF prep/$(DEPDIR)/__top_builddir__bin_snn_prep-snn_prep.Tpo -c -o prep/__top_builddir__bin_snn_prep-snn_prep.o `test -f 'prep/snn_prep.c' || echo '$(srcdir)/'`prep/snn_prep.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) prep/$(DEPDIR)/__top_builddir__bin_snn_prep-snn_prep.Tpo prep/$(DEPDIR)/__top_builddir__bin_snn_prep-snn_prep.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='prep/snn_prep.c' object='prep/__top_builddir__bin_snn_prep-snn_prep.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_prep_CFLAGS) $(CFLAGS) -c -o __top_builddir__bin_snn_prep-snn_prep.o `test -f 'snn_prep.c' || echo '$(srcdir)/'`snn_prep.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_prep_CFLAGS) $(CFLAGS) -c -o prep/__top_builddir__bin_snn_prep-snn_prep.o `test -f 'prep/snn_prep.c' || echo '$(srcdir)/'`prep/snn_prep.c
 
-__top_builddir__bin_snn_prep-snn_prep.obj: snn_prep.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_prep_CFLAGS) $(CFLAGS) -MT __top_builddir__bin_snn_prep-snn_prep.obj -MD -MP -MF $(DEPDIR)/__top_builddir__bin_snn_prep-snn_prep.Tpo -c -o __top_builddir__bin_snn_prep-snn_prep.obj `if test -f 'snn_prep.c'; then $(CYGPATH_W) 'snn_prep.c'; else $(CYGPATH_W) '$(srcdir)/snn_prep.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/__top_builddir__bin_snn_prep-snn_prep.Tpo $(DEPDIR)/__top_builddir__bin_snn_prep-snn_prep.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='snn_prep.c' object='__top_builddir__bin_snn_prep-snn_prep.obj' libtool=no @AMDEPBACKSLASH@
+prep/__top_builddir__bin_snn_prep-snn_prep.obj: prep/snn_prep.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_prep_CFLAGS) $(CFLAGS) -MT prep/__top_builddir__bin_snn_prep-snn_prep.obj -MD -MP -MF prep/$(DEPDIR)/__top_builddir__bin_snn_prep-snn_prep.Tpo -c -o prep/__top_builddir__bin_snn_prep-snn_prep.obj `if test -f 'prep/snn_prep.c'; then $(CYGPATH_W) 'prep/snn_prep.c'; else $(CYGPATH_W) '$(srcdir)/prep/snn_prep.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) prep/$(DEPDIR)/__top_builddir__bin_snn_prep-snn_prep.Tpo prep/$(DEPDIR)/__top_builddir__bin_snn_prep-snn_prep.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='prep/snn_prep.c' object='prep/__top_builddir__bin_snn_prep-snn_prep.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_prep_CFLAGS) $(CFLAGS) -c -o __top_builddir__bin_snn_prep-snn_prep.obj `if test -f 'snn_prep.c'; then $(CYGPATH_W) 'snn_prep.c'; else $(CYGPATH_W) '$(srcdir)/snn_prep.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_prep_CFLAGS) $(CFLAGS) -c -o prep/__top_builddir__bin_snn_prep-snn_prep.obj `if test -f 'prep/snn_prep.c'; then $(CYGPATH_W) 'prep/snn_prep.c'; else $(CYGPATH_W) '$(srcdir)/prep/snn_prep.c'; fi`
 
 util/__top_builddir__bin_snn_sim-matrix.o: util/matrix.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_sim_CFLAGS) $(CFLAGS) -MT util/__top_builddir__bin_snn_sim-matrix.o -MD -MP -MF util/$(DEPDIR)/__top_builddir__bin_snn_sim-matrix.Tpo -c -o util/__top_builddir__bin_snn_sim-matrix.o `test -f 'util/matrix.c' || echo '$(srcdir)/'`util/matrix.c
@@ -1685,19 +1713,19 @@ layers/__top_builddir__bin_snn_sim-wtaadapt.obj: layers/wtaadapt.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_sim_CFLAGS) $(CFLAGS) -c -o layers/__top_builddir__bin_snn_sim-wtaadapt.obj `if test -f 'layers/wtaadapt.c'; then $(CYGPATH_W) 'layers/wtaadapt.c'; else $(CYGPATH_W) '$(srcdir)/layers/wtaadapt.c'; fi`
 
-__top_builddir__bin_snn_sim-snn_sim.o: snn_sim.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_sim_CFLAGS) $(CFLAGS) -MT __top_builddir__bin_snn_sim-snn_sim.o -MD -MP -MF $(DEPDIR)/__top_builddir__bin_snn_sim-snn_sim.Tpo -c -o __top_builddir__bin_snn_sim-snn_sim.o `test -f 'snn_sim.c' || echo '$(srcdir)/'`snn_sim.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/__top_builddir__bin_snn_sim-snn_sim.Tpo $(DEPDIR)/__top_builddir__bin_snn_sim-snn_sim.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='snn_sim.c' object='__top_builddir__bin_snn_sim-snn_sim.o' libtool=no @AMDEPBACKSLASH@
+sim/__top_builddir__bin_snn_sim-snn_sim.o: sim/snn_sim.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_sim_CFLAGS) $(CFLAGS) -MT sim/__top_builddir__bin_snn_sim-snn_sim.o -MD -MP -MF sim/$(DEPDIR)/__top_builddir__bin_snn_sim-snn_sim.Tpo -c -o sim/__top_builddir__bin_snn_sim-snn_sim.o `test -f 'sim/snn_sim.c' || echo '$(srcdir)/'`sim/snn_sim.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) sim/$(DEPDIR)/__top_builddir__bin_snn_sim-snn_sim.Tpo sim/$(DEPDIR)/__top_builddir__bin_snn_sim-snn_sim.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='sim/snn_sim.c' object='sim/__top_builddir__bin_snn_sim-snn_sim.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_sim_CFLAGS) $(CFLAGS) -c -o __top_builddir__bin_snn_sim-snn_sim.o `test -f 'snn_sim.c' || echo '$(srcdir)/'`snn_sim.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_sim_CFLAGS) $(CFLAGS) -c -o sim/__top_builddir__bin_snn_sim-snn_sim.o `test -f 'sim/snn_sim.c' || echo '$(srcdir)/'`sim/snn_sim.c
 
-__top_builddir__bin_snn_sim-snn_sim.obj: snn_sim.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_sim_CFLAGS) $(CFLAGS) -MT __top_builddir__bin_snn_sim-snn_sim.obj -MD -MP -MF $(DEPDIR)/__top_builddir__bin_snn_sim-snn_sim.Tpo -c -o __top_builddir__bin_snn_sim-snn_sim.obj `if test -f 'snn_sim.c'; then $(CYGPATH_W) 'snn_sim.c'; else $(CYGPATH_W) '$(srcdir)/snn_sim.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/__top_builddir__bin_snn_sim-snn_sim.Tpo $(DEPDIR)/__top_builddir__bin_snn_sim-snn_sim.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='snn_sim.c' object='__top_builddir__bin_snn_sim-snn_sim.obj' libtool=no @AMDEPBACKSLASH@
+sim/__top_builddir__bin_snn_sim-snn_sim.obj: sim/snn_sim.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_sim_CFLAGS) $(CFLAGS) -MT sim/__top_builddir__bin_snn_sim-snn_sim.obj -MD -MP -MF sim/$(DEPDIR)/__top_builddir__bin_snn_sim-snn_sim.Tpo -c -o sim/__top_builddir__bin_snn_sim-snn_sim.obj `if test -f 'sim/snn_sim.c'; then $(CYGPATH_W) 'sim/snn_sim.c'; else $(CYGPATH_W) '$(srcdir)/sim/snn_sim.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) sim/$(DEPDIR)/__top_builddir__bin_snn_sim-snn_sim.Tpo sim/$(DEPDIR)/__top_builddir__bin_snn_sim-snn_sim.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='sim/snn_sim.c' object='sim/__top_builddir__bin_snn_sim-snn_sim.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_sim_CFLAGS) $(CFLAGS) -c -o __top_builddir__bin_snn_sim-snn_sim.obj `if test -f 'snn_sim.c'; then $(CYGPATH_W) 'snn_sim.c'; else $(CYGPATH_W) '$(srcdir)/snn_sim.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(__top_builddir__bin_snn_sim_CFLAGS) $(CFLAGS) -c -o sim/__top_builddir__bin_snn_sim-snn_sim.obj `if test -f 'sim/snn_sim.c'; then $(CYGPATH_W) 'sim/snn_sim.c'; else $(CYGPATH_W) '$(srcdir)/sim/snn_sim.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -1829,12 +1857,16 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
+	-rm -f calc/$(DEPDIR)/$(am__dirstamp)
+	-rm -f calc/$(am__dirstamp)
 	-rm -f filt/$(DEPDIR)/$(am__dirstamp)
 	-rm -f filt/$(am__dirstamp)
 	-rm -f layers/$(DEPDIR)/$(am__dirstamp)
 	-rm -f layers/$(am__dirstamp)
 	-rm -f learn/$(DEPDIR)/$(am__dirstamp)
 	-rm -f learn/$(am__dirstamp)
+	-rm -f postproc/$(DEPDIR)/$(am__dirstamp)
+	-rm -f postproc/$(am__dirstamp)
 	-rm -f prep/$(DEPDIR)/$(am__dirstamp)
 	-rm -f prep/$(am__dirstamp)
 	-rm -f sim/$(DEPDIR)/$(am__dirstamp)
@@ -1852,7 +1884,7 @@ clean-am: clean-binPROGRAMS clean-generic clean-libLTLIBRARIES \
 	clean-libtool mostlyclean-am
 
 distclean: distclean-am
-	-rm -rf ./$(DEPDIR) ./layers/$(DEPDIR) ./util/$(DEPDIR) filt/$(DEPDIR) layers/$(DEPDIR) learn/$(DEPDIR) prep/$(DEPDIR) sim/$(DEPDIR) util/$(DEPDIR)
+	-rm -rf ./$(DEPDIR) ./layers/$(DEPDIR) ./util/$(DEPDIR) calc/$(DEPDIR) filt/$(DEPDIR) layers/$(DEPDIR) learn/$(DEPDIR) postproc/$(DEPDIR) prep/$(DEPDIR) sim/$(DEPDIR) util/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -1898,7 +1930,7 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-	-rm -rf ./$(DEPDIR) ./layers/$(DEPDIR) ./util/$(DEPDIR) filt/$(DEPDIR) layers/$(DEPDIR) learn/$(DEPDIR) prep/$(DEPDIR) sim/$(DEPDIR) util/$(DEPDIR)
+	-rm -rf ./$(DEPDIR) ./layers/$(DEPDIR) ./util/$(DEPDIR) calc/$(DEPDIR) filt/$(DEPDIR) layers/$(DEPDIR) learn/$(DEPDIR) postproc/$(DEPDIR) prep/$(DEPDIR) sim/$(DEPDIR) util/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

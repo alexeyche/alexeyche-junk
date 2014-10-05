@@ -133,6 +133,7 @@ void saveMatrixList(FileStream *f, pMatrixVector *mv) {
 
 void saveMatrixListToFile(const char *fname, pMatrixVector *mv) {
     FileStream *fs = createOutputFileStream(fname);
+    checkIdxFnameOfFile(fname);
     saveMatrixList(fs, mv);
     deleteFileStream(fs);
 }
