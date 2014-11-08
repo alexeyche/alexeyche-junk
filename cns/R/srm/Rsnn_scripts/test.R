@@ -4,7 +4,7 @@
 require(Rsnn)
 
 M = 100
-const_ini = "/home/alexeyche/prog/alexeyche-junk/cns/c/snn_sim/constants.ini"
+const_ini = "/home/alexeyche/prog/snn_sim/constants.ini"
 N = 100
 jobs = 8
 statLevel = 0
@@ -25,7 +25,7 @@ spikes = getSpikesFromMatrix(loadMatrix("/home/alexeyche/prog/sim/spikes/ucr/1_t
 # spikes=blank_net(M)
 # spikes[[1]] = c(10,20)
 # spikes[[2]] = c(20,30)
-max_ep = 
+max_ep = 10
 for(i in 1:max_ep) {
     s$setInputSpikes(spikes)
     out_sp = s$run()
