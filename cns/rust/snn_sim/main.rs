@@ -14,6 +14,7 @@ mod constants;
 mod sim;
 mod layers;
 mod common;
+mod spike;
 
 macro_rules! trysome(
     ($e:expr) => (
