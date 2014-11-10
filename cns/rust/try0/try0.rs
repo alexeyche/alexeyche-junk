@@ -78,19 +78,19 @@ impl<'a, T: 'a+Neuron+fmt::Show> SimLayer<'a,T> for Layer<'a,T> {
         }
         return l;
     }
-//    fn random_connection(&self, dst: &mut Layer<T>, prob: f32) {
-//        let runif = Range::new(0f32, 1f32);
-//        let mut rng = rand::task_rng();
-//
-//        for i in range(0u, self.neurons.len()) {
-//            for j in range(0u, dst.neurons.len()) {
-//                let coin = runif.ind_sample(&mut rng);
-//                if coin >= prob {
-//                    dst.neurons[j].add_connection(&self.neurons[i]);
-//                }
-//            }
-//        }
-//    }
+    fn random_connection(&self, dst: &mut Layer<T>, prob: f32) {
+        let runif = Range::new(0f32, 1f32);
+        let mut rng = rand::task_rng();
+
+        for i in range(0u, self.neurons.len()) {
+            for j in range(0u, dst.neurons.len()) {
+                let coin = runif.ind_sample(&mut rng);
+                if coin >= prob {
+                    dst.neurons[j].add_connection(&self.neurons[i]);
+                }
+            }
+        }
+    }
 }
 
 
@@ -114,8 +114,8 @@ impl<'a> Sim<'a> {
     pub fn new() -> Sim<'a> {
         Sim { layers : Vec::new() }
     }
-    pub fn add_layer(&mut self, l: &'a SimLayer<Neuron+'a>) {
-        self.layers.push( box l );        
+    pub fn add_layer(&mut self, l: Box<SimLayer<Neuron+'a>+'a>) {
+        self.layers.push(l);        
     }
 }
 
@@ -131,14 +131,12 @@ impl<'a> Sim<'a> {
 
 
 fn main() {
-    let mut v: Vec<Box<SimLayer<Neuron> > > = Vec::new();
-
     let mut l: Layer<BasicNeuron> = SimLayer::new(0, 100);
     let mut l2: Layer<BasicNeuron> = SimLayer::new(0, 100);
 
 //    l2.random_connection(&mut l, 0.5);
     let s = Sim::new();
-    s.add_layer(&l);
+    s.add_layer(box l);
 //    v.push(box l);
 
     println!("{}", l2);
