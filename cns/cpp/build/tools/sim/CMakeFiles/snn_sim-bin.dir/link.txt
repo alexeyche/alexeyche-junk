@@ -1,1 +1,0 @@
-/usr/bin/c++    -std=c++11 -O3    CMakeFiles/snn_sim-bin.dir/snn_sim.cpp.o  -o ../../bin/snn_sim -rdynamic ../../lib/libsnn_sim.so -lm -lpthread -lm -Wl,-rpath,/home/alexeyche/prog/alexeyche-junk/cns/cpp/build/lib 
