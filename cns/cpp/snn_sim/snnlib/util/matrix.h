@@ -41,8 +41,7 @@ public:
     }
     void fill_from_slice(const T *val_slice, size_t slice_size) {
         if(slice_size != nrow*ncol) {
-            stringstream ss ;
-            ss << "Can't fill matrix with size" << nrow << ":" << ncol << "  with slize with size " << slice_size << "\n";
+            stringstream ss; ss << "Can't fill matrix with size" << nrow << ":" << ncol << "  with slize with size " << slice_size << "\n";
             throw exception(ss.str());
         }
     }
