@@ -1,0 +1,1 @@
+for i in $(find ./ -mindepth 1 -not -name "CMakeLists.*" -a -not -name "*.swp" ); do us=$(echo $i | sed -r -e 's/([A-Z]+[a-z]+)([A-Z][a-z]+)/\l\1_\l\2/g' -e 's/([A-Z]+[a-z]+)/\l\1/g'); mv -f $i $us; done

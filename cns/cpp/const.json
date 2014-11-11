@@ -1,0 +1,64 @@
+{
+    "net_layers" : {
+        "IaFLayer" : {
+            "tau_refr"  : 2.0,       
+            "amp_refr"  : 200.0,     
+            "u_rest"    : 0.0       
+        }
+    },
+    "input_layers" : {
+        "SigmaTCLayer" : {
+            "sigma" : 2.0
+        }
+    },
+    "synapses" : {
+        "Synapse" : {
+            "epsp_decay" : 20.0,
+            "amp" : 1.0    
+        },
+        "InhSynapse" : {
+            "epsp_decay" : 20.0,
+            "amp" : -1.0
+        },
+        "stochastic" : false
+    },
+    "prob_funcs" : {
+        "Determ" : {
+            "u_tr" : 15.0
+        },
+        "ExpHennequin" : {
+            "gain_factor" : 12.5, 
+            "p_rest" : 0.1, 
+            "u_tr" : 15.0, 
+            "beta" : 1.0,  
+            "r0"   : 9.25  
+        }
+    },
+    "learning_rules" : {
+        "OptimalSTDP" : {
+            "tau_c" : 100, 
+            "mean_p_dur" : 60000,
+            "target_rate" : 15,
+            "target_rate_factor" : 0,
+            "weight_decay" : 0.026    
+        }
+    },
+    "sim_configuration" : {
+        "input_sizes" : [ 100 ],
+        "layers_sizes" : [ 100, 100 ],
+        "conn_matrix" : [ 
+            [ 0.0, 1.0, 0.0 ], 
+            [ 0.0, 1.0, 1.0 ],
+            [ 0.0, 0.0, 1.0 ] 
+        ],
+        "inh_frac_matrix" : [ 
+            [ 0.0, 0.0, 0.0 ], 
+            [ 0.0, 0.5, 0.0 ],
+            [ 0.0, 0.0, 0.5 ] 
+        ],
+        "input_layers" : [ "SigmaTCLayer" ],
+        "net_layers" : [ "PoissonLayer", "PoissonLayer" ],
+        "learning_rules" : [ "OptimalSTDP", "OptimalSTDP" ],
+        "prob_funcs" : [ "ExpHennequin", "ExpHennequin" ]            
+    }
+}

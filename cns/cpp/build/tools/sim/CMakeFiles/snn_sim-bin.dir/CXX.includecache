@@ -1,0 +1,32 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/alexeyche/prog/alexeyche-junk/cns/cpp/snn_sim/snnlib/config/constants.h
+
+/home/alexeyche/prog/alexeyche-junk/cns/cpp/snn_sim/snnlib/util/optionparser/opt.h
+stdio.h
+-
+stdlib.h
+-
+optionparser.h
+/home/alexeyche/prog/alexeyche-junk/cns/cpp/snn_sim/snnlib/util/optionparser/optionparser.h
+
+/home/alexeyche/prog/alexeyche-junk/cns/cpp/snn_sim/snnlib/util/optionparser/optionparser.h
+intrin.h
+-
+
+/home/alexeyche/prog/alexeyche-junk/cns/cpp/snn_sim/tools/sim/snn_sim.cpp
+iostream
+-
+stdlib.h
+-
+snnlib/util/optionparser/opt.h
+-
+snnlib/config/constants.h
+-
+

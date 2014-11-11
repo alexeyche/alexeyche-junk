@@ -1,0 +1,2 @@
+/home/alexeyche/prog/alexeyche-junk/cns/cpp/build/snnlib/CMakeFiles/snn_sim.dir
+/home/alexeyche/prog/alexeyche-junk/cns/cpp/build/tools/sim/CMakeFiles/snn_sim-bin.dir
