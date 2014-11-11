@@ -16,7 +16,7 @@
             "epsp_decay" : 20.0,
             "amp" : 1.0    
         },
-        "InhSynapse" : {
+        "Synapse_Inh" : {
             "epsp_decay" : 20.0,
             "amp" : -1.0
         },

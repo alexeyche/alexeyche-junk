@@ -1,12 +1,17 @@
 
 #include <snnlib/util/json/json_box.h>
 
-using namespace std;
 
 #include "constants.h"
 
-Constants parseConstants(const string &filename) {
-	JsonBox::Value v;
+Constants parseConstants(string filename) {
+	Constants c;
+    map_type map;
+    
+    map["DerivedA"] = &createInstance<DerivedA>;
+    map["DerivedB"] = &createInstance<DerivedB>;
+
+    JsonBox::Value v;
 	v.loadFromFile(filename);
     if(v.isObject()) {
         const JsonBox::Object &o = v.getObject();
@@ -16,7 +21,10 @@ Constants parseConstants(const string &filename) {
 
             } else 
             if(const_field == "net_layers") {
-                
+                const JsonBox::Object &inner_o = it->second.getObject();
+                for(auto inner_it = inner_o.begin(); inner_it != inner_o.end(); inner_it++) {
+                    cout << inner_it->first << "\n";
+                }
             } else 
             if(const_field == "synapses") {
                 
@@ -39,5 +47,6 @@ Constants parseConstants(const string &filename) {
     } else {
         cerr << "Failed to find main object in constants json file " << filename << "\n";
     }
+    return c;
 }
 
