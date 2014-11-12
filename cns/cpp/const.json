@@ -20,7 +20,6 @@
             "epsp_decay" : 20.0,
             "amp" : -1.0
         },
-        "stochastic" : false
     },
     "prob_funcs" : {
         "Determ" : {
@@ -35,7 +34,7 @@
         }
     },
     "learning_rules" : {
-        "OptimalSTDP" : {
+        "OptimalStdp" : {
             "tau_c" : 100, 
             "mean_p_dur" : 60000,
             "target_rate" : 15,

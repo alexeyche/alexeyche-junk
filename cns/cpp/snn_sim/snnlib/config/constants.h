@@ -132,7 +132,7 @@ public:
     }
 };
 
-class sim_configuration_t {
+class SimConfiguration: const_element_t {
 public:
     vector<size_t> input_sizes;
     vector<size_t> layers_sizes;
@@ -143,15 +143,26 @@ public:
     vector<string> net_layers;
     vector<string> learning_rules;
     vector<string> prob_funcs;
+    
+    void fill_structure(JsonBox::Value v) {
+        auto a = v["input_sizes"].getArray();
+        for(auto it=a.begin(); it!=a.end(); ++it) {
+            input_sizes.push_back(it->getInt());
+        }
+    }
+    void print(std::ostream &str) const {
+        std::copy(input_sizes.begin(), input_sizes.end(), ostream_iterator<size_t>(str, " "));
+//        str << "input_sizes: " << input_sizes;
+    }    
+//    friend std::ostream& operator<<(std::ostream& str, Constants const& data) {
+//        str << "input_sizes: " << data.input_sizes;
+//        return str;
+//    }
 };
 
 typedef map<string, unique_ptr<const_element_t> > constants_map;
 
 
-#define PRINT_ALL_ELEMENTS_OF_CONSTANTS_MAP(type) \
-        for(auto it = data.type.cbegin(); it != data.type.cend(); ++it ) { \
-            cout << it->first << " == " << *it->second; \
-        }\
 
 class Constants {
 public:    
@@ -161,14 +172,19 @@ public:
     constants_map prob_funcs;
     constants_map learning_rules;
     
-    sim_configuration_t sim_conf;
-
+    SimConfiguration sim_conf;
+    static void print_constants_map(const constants_map &m) {
+        for(auto it = m.cbegin(); it != m.cend(); ++it ) { 
+            cout << it->first << " == " << *it->second; 
+        }
+    }
     friend std::ostream& operator<<(std::ostream& str, Constants const& data) {
-        PRINT_ALL_ELEMENTS_OF_CONSTANTS_MAP(net_layers)
-        PRINT_ALL_ELEMENTS_OF_CONSTANTS_MAP(input_layers)
-        PRINT_ALL_ELEMENTS_OF_CONSTANTS_MAP(synapses)
-        PRINT_ALL_ELEMENTS_OF_CONSTANTS_MAP(prob_funcs)
-        PRINT_ALL_ELEMENTS_OF_CONSTANTS_MAP(learning_rules)
+        print_constants_map(data.net_layers);
+        print_constants_map(data.input_layers);
+        print_constants_map(data.synapses);
+        print_constants_map(data.prob_funcs);
+        print_constants_map(data.learning_rules);
+//        str << sim_conf;
         return str;
     }
 };
