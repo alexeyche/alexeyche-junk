@@ -18,3 +18,9 @@ void print_vector(vector<T> v, ostream &str) {
     std::copy(v.cbegin(), v.cend(), ostream_iterator<T>(str, ", "));
     str << "\n";
 }
+
+class Entity : public Printable {
+};
+
+typedef map<string, unique_ptr<Entity> > entity_map;
+

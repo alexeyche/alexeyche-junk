@@ -12,13 +12,13 @@
 #include <snnlib/base.h>
 
 
-class const_element_t: public Printable {
+class ConstObj: public Entity {
 public:
     virtual void fill_structure(JsonBox::Value v) = 0;
 };
 
 
-class IaFLayerC: public const_element_t {
+class IaFLayerC: public ConstObj {
 public:
     double tau_refr;
     double amp_refr;
@@ -34,7 +34,7 @@ public:
     }
 };
 
-class SigmaTCLayerC: public const_element_t {
+class SigmaTCLayerC: public ConstObj {
 public:
     double sigma;
 
@@ -47,7 +47,7 @@ public:
 };
 
 
-class SynapseC : public const_element_t {
+class SynapseC : public ConstObj {
 public:
     double epsp_delay;
     double amp;
@@ -63,7 +63,7 @@ public:
 };
 
 
-class DetermC : public const_element_t {
+class DetermC : public ConstObj {
 public:
     double u_tr;
 
@@ -76,7 +76,7 @@ public:
 
 };
 
-class ExpHennequinC : public const_element_t {
+class ExpHennequinC : public ConstObj {
 public:
     double u_tr;
     double gain_factor;
@@ -103,7 +103,7 @@ public:
 };
 
 
-class OptimalStdpC: public const_element_t {
+class OptimalStdpC: public ConstObj {
 public:
     double tau_c;
     double mean_p_dur;
@@ -128,7 +128,7 @@ public:
     }
 };
 
-class SimConfiguration: public const_element_t {
+class SimConfiguration: public ConstObj {
 public:
     vector<size_t> input_sizes;
     vector<size_t> layers_sizes;
@@ -138,7 +138,7 @@ public:
     vector<string> input_layers;
     vector<string> net_layers;
     vector<string> learning_rules;
-    vector<string> prob_funcs;
+    vector<string> act_funcs;
     
     void fill_structure(JsonBox::Value v) {
         auto a_input_sizes      = v["input_sizes"].getArray();      
@@ -146,7 +146,7 @@ public:
 
         auto a_layers_sizes     = v["layers_sizes"].getArray();     
             for(auto it=a_layers_sizes.begin(); it!=a_layers_sizes.end(); ++it) { layers_sizes.push_back(it->getInt()); }
-
+        
         auto a_input_layers     = v["input_layers"].getArray();     
             for(auto it=a_input_layers.begin(); it!=a_input_layers.end(); ++it) { input_layers.push_back(it->getString()); }
 
@@ -156,8 +156,8 @@ public:
         auto a_learning_rules   = v["learning_rules"].getArray();   
             for(auto it=a_learning_rules.begin(); it!=a_learning_rules.end(); ++it) { learning_rules.push_back(it->getString()); }
         
-        auto a_prob_funcs       = v["prob_funcs"].getArray();       
-            for(auto it=a_prob_funcs.begin(); it!=a_prob_funcs.end(); ++it) { prob_funcs.push_back(it->getString()); }
+        auto a_act_funcs       = v["act_funcs"].getArray();       
+            for(auto it=a_act_funcs.begin(); it!=a_act_funcs.end(); ++it) { act_funcs.push_back(it->getString()); }
         
         size_t nrows = input_sizes.size() + layers_sizes.size();
 
@@ -166,6 +166,22 @@ public:
 
         inh_frac_matrix.allocate(nrows, nrows);        
         inh_frac_matrix.fill_from_json(v["inh_frac_matrix"].getArray());
+        if(input_sizes.size() != input_layers.size()) {
+            cerr << "input_sizes and input_layers must have identical size\n";
+            terminate();
+        }
+        if(layers_sizes.size() != net_layers.size()) {
+            cerr << "layers_sizes and net_layers must have identical size\n";
+            terminate();
+        }
+        if(layers_sizes.size() != learning_rules.size()) {
+            cerr << "layers_sizes and learning_rules must have identical size\n";
+            terminate();
+        }
+        if(layers_sizes.size() != act_funcs.size()) {
+            cerr << "layers_sizes and act_funcs must have identical size\n";
+            terminate();
+        }
     }
     
 
@@ -177,25 +193,25 @@ public:
         str << "input_layers: ";        print_vector<string>(input_layers, str);
         str << "net_layers: ";          print_vector<string>(net_layers, str);
         str << "learning_rules: ";      print_vector<string>(learning_rules, str);
-        str << "prob_funcs: ";          print_vector<string>(prob_funcs, str);
+        str << "act_funcs: ";          print_vector<string>(act_funcs, str);
     }    
 };
 
 
-typedef map<string, unique_ptr<const_element_t> > constants_map;
+typedef map<string, unique_ptr<ConstObj> > const_map;
 
 class Constants {
 public:    
     Constants(string filename);
 
-    constants_map net_layers;
-    constants_map input_layers;
-    constants_map synapses;
-    constants_map prob_funcs;
-    constants_map learning_rules;
+    const_map net_layers;
+    const_map input_layers;
+    const_map synapses;
+    const_map act_funcs;
+    const_map learning_rules;
     
     SimConfiguration sim_conf;
-    static void print_constants_map(const constants_map &m) {
+    static void print_constants_map(const const_map &m) {
         for(auto it = m.cbegin(); it != m.cend(); ++it ) { 
             cout << it->first << " == " << *it->second; 
         }
@@ -205,7 +221,7 @@ public:
         print_constants_map(data.net_layers);
         print_constants_map(data.input_layers);
         print_constants_map(data.synapses);
-        print_constants_map(data.prob_funcs);
+        print_constants_map(data.act_funcs);
         print_constants_map(data.learning_rules);
         str << "\n== Sim Configuration ==\n";
         str << data.sim_conf;

@@ -5,8 +5,11 @@
 
 class Sim: public Printable {
 public: 
-    Sim() {
-        layers.push_back( unique_ptr<LayerObj>(new IaFLayer<IaFNeuron>(0, 100)) );
+    Sim(const Constants &c) : sc(c.sim_conf) {
+        for(size_t i=0; i<sc.input_sizes.size(); i++) {
+            string input_layer_type = sc.input_layers[i];
+            //c.input_layers[input_layer_type]            
+        }
     }
     
     void print(std::ostream& str) const {
@@ -15,7 +18,9 @@ public:
         }
     }
     
+    vector< unique_ptr<LayerObj> > input_layers;
     vector< unique_ptr<LayerObj> > layers;
+    const SimConfiguration &sc;
 };
 
 

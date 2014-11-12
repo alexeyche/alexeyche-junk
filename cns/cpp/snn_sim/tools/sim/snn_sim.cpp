@@ -58,7 +58,7 @@ int main(int argc, char **argv) {
     Constants c = Constants(options[ARG_CONSTANTS].arg);
     
     cout << c;
-    Sim s;
+    Sim s(c);
     cout << s;
 
     delete[] options;
