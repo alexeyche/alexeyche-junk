@@ -9,17 +9,12 @@
 #include <snnlib/util/matrix.h>
 #include <snnlib/core.h>
 #include <snnlib/util/json/json_box.h>
+#include <snnlib/base.h>
 
 
-class const_element_t {
-protected:
-    virtual void print(std::ostream& str) const = 0;
+class const_element_t: public Printable {
 public:
     virtual void fill_structure(JsonBox::Value v) = 0;
-    friend std::ostream& operator<<(std::ostream& str, const_element_t const& data) {
-        data.print(str);
-        return str;
-    }
 };
 
 
@@ -173,11 +168,7 @@ public:
         inh_frac_matrix.fill_from_json(v["inh_frac_matrix"].getArray());
     }
     
-    template <typename T>
-    static void print_vector(vector<T> v, ostream &str) {
-        std::copy(v.cbegin(), v.cend(), ostream_iterator<T>(str, ", "));
-        str << "\n";
-    }
+
     void print(std::ostream &str) const {
         str << "input_sizes: ";         print_vector<size_t>(input_sizes, str);
         str << "layers_sizes: ";        print_vector<size_t>(layers_sizes, str);

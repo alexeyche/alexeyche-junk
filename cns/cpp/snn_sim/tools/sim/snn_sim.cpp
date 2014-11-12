@@ -7,6 +7,8 @@ using namespace std;
 #include <snnlib/util/optionparser/opt.h>
 #include <snnlib/config/constants.h>
 
+#include <snnlib/sim/sim.h>
+
 enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_CONSTANTS};
 const option::Descriptor usage[] =
 {
@@ -56,6 +58,8 @@ int main(int argc, char **argv) {
     Constants c = Constants(options[ARG_CONSTANTS].arg);
     
     cout << c;
-    
+    Sim s;
+    cout << s;
+
     delete[] options;
 }
