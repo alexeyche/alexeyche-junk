@@ -3,11 +3,12 @@
 #include <map>
 #include <memory>
 #include <vector>
+#include <iterator>
+#include <algorithm>
 
 #include <snnlib/util/matrix.h>
 #include <snnlib/core.h>
 #include <snnlib/util/json/json_box.h>
-
 
 
 class const_element_t {
@@ -132,7 +133,7 @@ public:
     }
 };
 
-class SimConfiguration: const_element_t {
+class SimConfiguration: public const_element_t {
 public:
     vector<size_t> input_sizes;
     vector<size_t> layers_sizes;
@@ -145,27 +146,57 @@ public:
     vector<string> prob_funcs;
     
     void fill_structure(JsonBox::Value v) {
-        auto a = v["input_sizes"].getArray();
-        for(auto it=a.begin(); it!=a.end(); ++it) {
-            input_sizes.push_back(it->getInt());
-        }
+        auto a_input_sizes      = v["input_sizes"].getArray();      
+            for(auto it=a_input_sizes.begin(); it!=a_input_sizes.end(); ++it) { input_sizes.push_back(it->getInt()); }
+
+        auto a_layers_sizes     = v["layers_sizes"].getArray();     
+            for(auto it=a_layers_sizes.begin(); it!=a_layers_sizes.end(); ++it) { layers_sizes.push_back(it->getInt()); }
+
+        auto a_input_layers     = v["input_layers"].getArray();     
+            for(auto it=a_input_layers.begin(); it!=a_input_layers.end(); ++it) { input_layers.push_back(it->getString()); }
+
+        auto a_net_layers       = v["net_layers"].getArray();       
+            for(auto it=a_net_layers.begin(); it!=a_net_layers.end(); ++it) { net_layers.push_back(it->getString()); }
+        
+        auto a_learning_rules   = v["learning_rules"].getArray();   
+            for(auto it=a_learning_rules.begin(); it!=a_learning_rules.end(); ++it) { learning_rules.push_back(it->getString()); }
+        
+        auto a_prob_funcs       = v["prob_funcs"].getArray();       
+            for(auto it=a_prob_funcs.begin(); it!=a_prob_funcs.end(); ++it) { prob_funcs.push_back(it->getString()); }
+        
+        size_t nrows = input_sizes.size() + layers_sizes.size();
+
+        conn_matrix.allocate(nrows, nrows);        
+        conn_matrix.fill_from_json(v["conn_matrix"].getArray());
+
+        inh_frac_matrix.allocate(nrows, nrows);        
+        inh_frac_matrix.fill_from_json(v["inh_frac_matrix"].getArray());
+    }
+    
+    template <typename T>
+    static void print_vector(vector<T> v, ostream &str) {
+        std::copy(v.cbegin(), v.cend(), ostream_iterator<T>(str, ", "));
+        str << "\n";
     }
     void print(std::ostream &str) const {
-        std::copy(input_sizes.begin(), input_sizes.end(), ostream_iterator<size_t>(str, " "));
-//        str << "input_sizes: " << input_sizes;
+        str << "input_sizes: ";         print_vector<size_t>(input_sizes, str);
+        str << "layers_sizes: ";        print_vector<size_t>(layers_sizes, str);
+        str << "conn_matrix: \n";       str << conn_matrix;
+        str << "inh_frac_matrix: \n";   str << inh_frac_matrix;
+        str << "input_layers: ";        print_vector<string>(input_layers, str);
+        str << "net_layers: ";          print_vector<string>(net_layers, str);
+        str << "learning_rules: ";      print_vector<string>(learning_rules, str);
+        str << "prob_funcs: ";          print_vector<string>(prob_funcs, str);
     }    
-//    friend std::ostream& operator<<(std::ostream& str, Constants const& data) {
-//        str << "input_sizes: " << data.input_sizes;
-//        return str;
-//    }
 };
+
 
 typedef map<string, unique_ptr<const_element_t> > constants_map;
 
-
-
 class Constants {
 public:    
+    Constants(string filename);
+
     constants_map net_layers;
     constants_map input_layers;
     constants_map synapses;
@@ -179,32 +210,16 @@ public:
         }
     }
     friend std::ostream& operator<<(std::ostream& str, Constants const& data) {
+        str << "== Sim Constants ==\n";
         print_constants_map(data.net_layers);
         print_constants_map(data.input_layers);
         print_constants_map(data.synapses);
         print_constants_map(data.prob_funcs);
         print_constants_map(data.learning_rules);
-//        str << sim_conf;
+        str << "\n== Sim Configuration ==\n";
+        str << data.sim_conf;
         return str;
     }
 };
 
-template<typename T> const_element_t * createInstance() { return new T; }
-
-typedef map<string, const_element_t*(*)()> map_type;
-
-map_type generateMapType() {
-    map_type map;
-    
-    map["IaFLayer"]     =   &createInstance<IaFLayerC>;
-    map["Synapse"]      =   &createInstance<SynapseC>;
-    map["Determ"]       =   &createInstance<DetermC>;
-    map["ExpHennequin"] =   &createInstance<ExpHennequinC>;
-    map["OptimalStdp"]  =   &createInstance<OptimalStdpC>;
-    map["SigmaTCLayer"]  =  &createInstance<SigmaTCLayerC>;
-
-    return map;
-}
-
-Constants parseConstants(string filename);
 

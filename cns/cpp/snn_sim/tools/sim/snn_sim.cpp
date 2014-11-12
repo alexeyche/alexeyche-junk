@@ -52,7 +52,10 @@ int main(int argc, char **argv) {
     option::Stats  stats(usage, argc, argv);
     option::Option* options = new option::Option[stats.options_max];
     parseOptions(options, stats, argc, argv); 
-    Constants c = parseConstants(options[ARG_CONSTANTS].arg);
 
+    Constants c = Constants(options[ARG_CONSTANTS].arg);
+    
+    cout << c;
+    
     delete[] options;
 }

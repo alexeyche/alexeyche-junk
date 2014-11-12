@@ -58,6 +58,6 @@
         "input_layers" : [ "SigmaTCLayer" ],
         "net_layers" : [ "PoissonLayer", "PoissonLayer" ],
         "learning_rules" : [ "OptimalSTDP", "OptimalSTDP" ],
-        "prob_funcs" : [ "ExpHennequin", "ExpHennequin" ]            
+        "prob_funcs" : [ "ExpHennequin", "ExpHennequin" ]
     }
 }

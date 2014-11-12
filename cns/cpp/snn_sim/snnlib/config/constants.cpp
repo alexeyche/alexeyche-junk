@@ -2,6 +2,8 @@
 
 #include "constants.h"
 
+#include <snnlib/config/type_maps.h>
+
 string findBaseStructName(map_type &tmap, string deriv_struct_name) {
     for(auto it=tmap.begin(); it != tmap.end(); ++it) {
         string base_struct_name = it->first;
@@ -24,13 +26,12 @@ string findBaseStructName(map_type &tmap, string deriv_struct_name) {
         if(it == tmap.end()) { \
             base_struct_name = findBaseStructName(tmap, struct_name);\
         }\
-        c.name[struct_name] = unique_ptr<const_element_t>(tmap[base_struct_name]()); \
-        c.name[struct_name]->fill_structure(v);                                \
+        name[struct_name] = unique_ptr<const_element_t>(tmap[base_struct_name]()); \
+        name[struct_name]->fill_structure(v);                                \
     }                                                                               \
 }\
 
-Constants parseConstants(string filename) {
-	Constants c;
+Constants::Constants(string filename) {
     map_type tmap = generateMapType();
 
     JsonBox::Value v;
@@ -55,12 +56,8 @@ Constants parseConstants(string filename) {
                 PARSE_CONST_STRUCTURE(learning_rules)
             } else 
             if(const_field == "sim_configuration") {
-                const JsonBox::Object &inner_o = it->second.getObject();
-                for(auto inner_it = inner_o.begin(); inner_it != inner_o.end(); inner_it++) {
-                    string in_name = inner_it->first;
-                    
-                } 
-                
+                JsonBox::Value v = it->second;
+                sim_conf.fill_structure(v);                
             } else 
             {
                 cerr << "Unknown constants field " << const_field << "\n";
@@ -71,7 +68,5 @@ Constants parseConstants(string filename) {
     } else {
         cerr << "Failed to find main object in constants json file " << filename << "\n";
     }
-    cout << c;
-    return c;
 }
 
