@@ -196,7 +196,7 @@ public:
 };
 
 
-typedef map<string, shared_ptr<ConstObj> > const_map;
+typedef map<string, shared_ptr<const ConstObj> > const_map;
 
 class Constants {
 public:    

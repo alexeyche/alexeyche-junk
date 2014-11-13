@@ -7,11 +7,11 @@
 class Sim: public Printable {
 public: 
     Sim(const Constants &c) : sc(c.sim_conf) {
-        auto l = factory.createLayerObj("SRMLayer", 0, 100, c.net_layers["SRMLayerC"].get(), c.act_funcs["Determ"].get(), c.learning_rules["OptimalStdp"].get());
-        for(size_t i=0; i<sc.input_layers_conf.size(); i++) {
-//            InputLayersConf conf = sc.input_layers_conf[i];
-//            factory.createLayerObj(conf.type
-        }
+        const ConstObj * f = c.act_funcs.at("Determ").get();
+        auto af = factory.createActFunc("Determ", f);
+        auto lr = factory.createLearningRule("OptimalStdp", c.learning_rules.at("OptimalStdp").get());
+        LayerObj *l = factory.createLayerObj("SRMLayer", 0, 100, c.net_layers.at("SRMLayer").get(), af, lr);
+        cout << *(Layer<SRMNeuron>*)(l);
     }
     
     void print(std::ostream& str) const {

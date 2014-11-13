@@ -24,12 +24,15 @@ Factory::Factory() {
     entity_map["SigmaTCLayer"]  =  &createInstance<Obj, SigmaTCLayer>;
 }
 
+#define GET_BASE_NAME(map) \
+    string base_struct_name(name);\
+    auto it = map.find(name);\
+    if(it == map.end()) { \
+        base_struct_name = findBaseStructName(name);\
+    }\
+
 ConstObj* Factory::createConstObj(string name, JsonBox::Value v) {
-    string base_struct_name(name);
-    auto it = const_map.find(name);
-    if(it == const_map.end()) { 
-        base_struct_name = findBaseStructName(name);
-    }
+    GET_BASE_NAME(const_map)
     ConstObj *o = dynamic_cast<ConstObj*>(const_map[base_struct_name]());
     if(!o) {
         cerr << "Error while reading " << name << " and treating like ConstObj\n"; 
@@ -39,17 +42,24 @@ ConstObj* Factory::createConstObj(string name, JsonBox::Value v) {
     return o;
 }
 
-LayerObj* Factory::createLayerObj(string name, size_t id, size_t size, ConstObj *c, ActFunc *act, LearningRule *lrule) {
-    string base_struct_name(name);
-    auto it = const_map.find(name);
-    if(it == const_map.end()) { 
-        base_struct_name = findBaseStructName(name);
-    }
+ActFunc* Factory::createActFunc(string name, const ConstObj *c) {
+    GET_BASE_NAME(entity_map)
+    ActFunc *o = dynamic_cast<ActFunc*>(entity_map[base_struct_name]());
+    if(!o) { cerr << "Error while reading " << name << " and treating like ActFunc\n"; terminate(); }
+    return o;
+}
+
+LearningRule*  Factory::createLearningRule(string name, const ConstObj *c) {
+    GET_BASE_NAME(entity_map)
+    LearningRule *o = dynamic_cast<LearningRule*>(entity_map[base_struct_name]());
+    if(!o) { cerr << "Error while reading " << name << " and treating like LearningRule\n"; terminate(); }
+    return o;
+}
+
+LayerObj* Factory::createLayerObj(string name, size_t id, size_t size, const ConstObj *c, const ActFunc *act, const LearningRule *lrule) {
+    GET_BASE_NAME(entity_map)
     LayerObj *o = dynamic_cast<LayerObj*>(entity_map[base_struct_name]());
-    if(!o) {
-        cerr << "Error while reading " << name << " and treating like LayerObj\n"; 
-        terminate();
-    }
+    if(!o) { cerr << "Error while reading " << name << " and treating like LayerObj\n"; terminate(); }
     o->init(id, size, c, act, lrule);
     return o;
 }
