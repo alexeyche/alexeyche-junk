@@ -2,6 +2,6 @@
 
 #include <snnlib/base.h>
 
-class LearningRule : Obj { 
+class LearningRule : public Obj { 
 
 };

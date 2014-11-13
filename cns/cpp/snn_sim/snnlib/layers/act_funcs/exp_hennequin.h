@@ -5,12 +5,12 @@
 
 class Factory;
 
-class Determ : public ActFunc {
+class ExpHennequin: public ActFunc {
 protected:
-    Determ() {}
+    ExpHennequin() {}
     friend class Factory;
 public:
-    Determ(const DetermC *_c) : c(_c) {}
+    ExpHennequin(const ExpHennequinC *_c) : c(_c) {}
 
     double prob(const double &u) const { 
         if(u <= c->u_tr) return 0.0;    
@@ -21,7 +21,7 @@ public:
         return 0.0;
     };
     
-    shared_ptr<const DetermC> c;
+    shared_ptr<const ExpHennequinC> c; 
 };
 
 

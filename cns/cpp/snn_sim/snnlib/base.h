@@ -3,9 +3,11 @@
 #include <snnlib/core.h>
 
 class Obj {
+public:    
+    virtual ~Obj() {}
 };
 
-class Printable: Obj {
+class Printable: public Obj {
 protected:
     virtual void print(std::ostream& str) const = 0;
 public:    

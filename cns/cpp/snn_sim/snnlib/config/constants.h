@@ -1,11 +1,5 @@
 #pragma once
 
-#include <map>
-#include <memory>
-#include <vector>
-#include <iterator>
-#include <algorithm>
-
 #include <snnlib/util/matrix.h>
 #include <snnlib/core.h>
 #include <snnlib/util/json/json_box.h>
@@ -202,7 +196,7 @@ public:
 };
 
 
-typedef map<string, unique_ptr<ConstObj> > const_map;
+typedef map<string, shared_ptr<ConstObj> > const_map;
 
 class Constants {
 public:    

@@ -3,11 +3,16 @@
 #include "learning_rule.h"
 
 
+class Factory;
+
 class OptimalStdp : public LearningRule {
+protected:
+    OptimalStdp() {}
+    friend class Factory;
 public:
-    OptimalStdp(OptimalStdpC &_c) : c(_c) {}
+    OptimalStdp(const OptimalStdpC *_c) : c(_c) {}
 
 
-    const OptimalStdpC &c;    
+    shared_ptr<const OptimalStdpC> c;    
 };
 

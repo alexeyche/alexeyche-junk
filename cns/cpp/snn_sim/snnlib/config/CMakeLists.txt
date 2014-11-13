@@ -5,6 +5,7 @@ cmake_minimum_required(VERSION 2.8)
 set(SOURCES
 constants.cpp
 constants.h
+factory.cpp
 )
 
 # add directory name to sources
