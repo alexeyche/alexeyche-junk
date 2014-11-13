@@ -2,7 +2,10 @@
 
 #include <snnlib/core.h>
 
-class Printable {
+class Obj {
+};
+
+class Printable: Obj {
 protected:
     virtual void print(std::ostream& str) const = 0;
 public:    
@@ -14,8 +17,8 @@ public:
 
 
 template <typename T>
-void print_vector(vector<T> v, ostream &str) {
-    std::copy(v.cbegin(), v.cend(), ostream_iterator<T>(str, ", "));
+void print_vector(vector<T> v, ostream &str, string sep) {
+    std::copy(v.cbegin(), v.cend(), ostream_iterator<T>(str, sep.c_str()));
     str << "\n";
 }
 

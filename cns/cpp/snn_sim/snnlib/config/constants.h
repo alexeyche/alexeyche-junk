@@ -18,7 +18,7 @@ public:
 };
 
 
-class IaFLayerC: public ConstObj {
+class SRMLayerC: public ConstObj {
 public:
     double tau_refr;
     double amp_refr;
@@ -128,72 +128,76 @@ public:
     }
 };
 
+class InputLayersConf : public ConstObj {
+public:    
+    size_t size;
+    string type;
+
+    void fill_structure(JsonBox::Value v) {
+        size = v["size"].getInt();
+        type = v["type"].getString();
+    }
+    void print(std::ostream &str) const {
+        str << "InputLayersConf(size: " << size << ", type: " << type << ")";
+    }
+};
+
+class NetLayersConf : public ConstObj {
+public:    
+    size_t size;
+    string type;
+    string learning_rule;
+    string act_func;
+    void fill_structure(JsonBox::Value v) {
+        size = v["size"].getInt();
+        type = v["type"].getString();
+        learning_rule = v["type"].getString();
+        act_func = v["type"].getString();
+    }
+    void print(std::ostream &str) const {
+        str << "NetLayersConf(size: " << size << ", type: " << type << ", learning_rule: " << learning_rule << ", act_func: " << act_func << ")";
+    }
+};
+
 class SimConfiguration: public ConstObj {
 public:
-    vector<size_t> input_sizes;
-    vector<size_t> layers_sizes;
+    vector<InputLayersConf> input_layers_conf;
+    vector<NetLayersConf> net_layers_conf;
     Matrix<double> conn_matrix;
     Matrix<double> inh_frac_matrix;
 
-    vector<string> input_layers;
-    vector<string> net_layers;
-    vector<string> learning_rules;
-    vector<string> act_funcs;
     
     void fill_structure(JsonBox::Value v) {
-        auto a_input_sizes      = v["input_sizes"].getArray();      
-            for(auto it=a_input_sizes.begin(); it!=a_input_sizes.end(); ++it) { input_sizes.push_back(it->getInt()); }
+        auto a_input_sizes = v["input_layers_conf"].getArray();      
+        for(auto it=a_input_sizes.begin(); it!=a_input_sizes.end(); ++it) { 
+            JsonBox::Value v = *it;
+            InputLayersConf conf;
+            conf.fill_structure(v);
+            input_layers_conf.push_back(conf);
+        }
+        auto a_net_sizes = v["net_layers_conf"].getArray();      
+        for(auto it=a_net_sizes.begin(); it!=a_net_sizes.end(); ++it) { 
+            JsonBox::Value v = *it;
+            NetLayersConf conf;
+            conf.fill_structure(v);
+            net_layers_conf.push_back(conf);
+        }
 
-        auto a_layers_sizes     = v["layers_sizes"].getArray();     
-            for(auto it=a_layers_sizes.begin(); it!=a_layers_sizes.end(); ++it) { layers_sizes.push_back(it->getInt()); }
-        
-        auto a_input_layers     = v["input_layers"].getArray();     
-            for(auto it=a_input_layers.begin(); it!=a_input_layers.end(); ++it) { input_layers.push_back(it->getString()); }
-
-        auto a_net_layers       = v["net_layers"].getArray();       
-            for(auto it=a_net_layers.begin(); it!=a_net_layers.end(); ++it) { net_layers.push_back(it->getString()); }
-        
-        auto a_learning_rules   = v["learning_rules"].getArray();   
-            for(auto it=a_learning_rules.begin(); it!=a_learning_rules.end(); ++it) { learning_rules.push_back(it->getString()); }
-        
-        auto a_act_funcs       = v["act_funcs"].getArray();       
-            for(auto it=a_act_funcs.begin(); it!=a_act_funcs.end(); ++it) { act_funcs.push_back(it->getString()); }
-        
-        size_t nrows = input_sizes.size() + layers_sizes.size();
+        size_t nrows = input_layers_conf.size() + net_layers_conf.size();
 
         conn_matrix.allocate(nrows, nrows);        
         conn_matrix.fill_from_json(v["conn_matrix"].getArray());
 
         inh_frac_matrix.allocate(nrows, nrows);        
         inh_frac_matrix.fill_from_json(v["inh_frac_matrix"].getArray());
-        if(input_sizes.size() != input_layers.size()) {
-            cerr << "input_sizes and input_layers must have identical size\n";
-            terminate();
-        }
-        if(layers_sizes.size() != net_layers.size()) {
-            cerr << "layers_sizes and net_layers must have identical size\n";
-            terminate();
-        }
-        if(layers_sizes.size() != learning_rules.size()) {
-            cerr << "layers_sizes and learning_rules must have identical size\n";
-            terminate();
-        }
-        if(layers_sizes.size() != act_funcs.size()) {
-            cerr << "layers_sizes and act_funcs must have identical size\n";
-            terminate();
-        }
     }
     
 
     void print(std::ostream &str) const {
-        str << "input_sizes: ";         print_vector<size_t>(input_sizes, str);
-        str << "layers_sizes: ";        print_vector<size_t>(layers_sizes, str);
+        str << "input_layers_conf: \n";  print_vector<InputLayersConf>(input_layers_conf, str, ",\n");
+        str << "net_layers_conf: \n"; print_vector<NetLayersConf>(net_layers_conf, str, ",\n");
         str << "conn_matrix: \n";       str << conn_matrix;
         str << "inh_frac_matrix: \n";   str << inh_frac_matrix;
-        str << "input_layers: ";        print_vector<string>(input_layers, str);
-        str << "net_layers: ";          print_vector<string>(net_layers, str);
-        str << "learning_rules: ";      print_vector<string>(learning_rules, str);
-        str << "act_funcs: ";          print_vector<string>(act_funcs, str);
     }    
 };
 

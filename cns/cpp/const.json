@@ -1,6 +1,6 @@
 {
     "net_layers" : {
-        "IaFLayer" : {
+        "SRMLayer" : {
             "tau_refr"  : 2.0,       
             "amp_refr"  : 200.0,     
             "u_rest"    : 0.0       
@@ -21,7 +21,7 @@
             "amp" : -1.0
         },
     },
-    "prob_funcs" : {
+    "act_funcs" : {
         "Determ" : {
             "u_tr" : 15.0
         },
@@ -43,8 +43,26 @@
         }
     },
     "sim_configuration" : {
-        "input_sizes" : [ 100 ],
-        "layers_sizes" : [ 100, 100 ],
+        "input_layers_conf" : [
+            {
+                "size" : 100,
+                "type" : "SigmaTCLayer"
+            },                
+        ],
+        "net_layers_conf" : [
+            {
+                "size" : 100,
+                "type" : "SRMLayer",
+                "learning_rule" : "OptimalStdp",
+                "act_func" : "ExpHennequin"
+            },                    
+            {
+                "size" : 100,
+                "type" : "SRMLayer",
+                "learning_rule" : "OptimalStdp",
+                "act_func" : "ExpHennequin"
+            },                    
+        ],
         "conn_matrix" : [ 
             [ 0.0, 1.0, 0.0 ], 
             [ 0.0, 1.0, 1.0 ],
@@ -55,9 +73,5 @@
             [ 0.0, 0.5, 0.0 ],
             [ 0.0, 0.0, 0.5 ] 
         ],
-        "input_layers" : [ "SigmaTCLayer" ],
-        "net_layers" : [ "PoissonLayer", "PoissonLayer" ],
-        "learning_rules" : [ "OptimalSTDP", "OptimalSTDP" ],
-        "prob_funcs" : [ "ExpHennequin", "ExpHennequin" ]
     }
 }

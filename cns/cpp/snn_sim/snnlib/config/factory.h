@@ -2,36 +2,41 @@
 
 #include <snnlib/config/constants.h>
 #include <snnlib/layers/layer.h>
+#include <snnlib/learning/optimal_stdp.h>
 
+#include <typeinfo>
 
-typedef map<string, LayerObj*(*)()> layer_map_type;
-typedef map<string, ConstObj*(*)()> const_map_type;
+typedef map<string, Entity*(*)()> entity_map_type;
+
+template<typename E,typename T> static E* createInstance() { return new T; }
+
 
 class Factory {
 public:
-    template<typename E,typename T> static E* createInstance() { return new T; }
     Factory() {
-        const_map["IaFLayer"]     =   &createInstance<ConstObj, IaFLayerC>;
-        const_map["Synapse"]      =   &createInstance<ConstObj, SynapseC>;
-        const_map["Determ"]       =   &createInstance<ConstObj, DetermC>;
-        const_map["ExpHennequin"] =   &createInstance<ConstObj, ExpHennequinC>;
-        const_map["OptimalStdp"]  =   &createInstance<ConstObj, OptimalStdpC>;
-        const_map["SigmaTCLayer"]  =  &createInstance<ConstObj, SigmaTCLayerC>;
-
+        entity_map["SRMLayer"]  = &createInstance<Entity, SRMLayer<SRMNeuron>>;
+        entity_map["Synapse"]      =   &createInstance<Entity, SynapseC>;
+        entity_map["Determ"]       =   &createInstance<Entity, DetermC>;
+        entity_map["ExpHennequin"] =   &createInstance<Entity, ExpHennequinC>;
+        entity_map["OptimalStdp"]  =   &createInstance<Entity, OptimalStdpC>;
+        entity_map["SigmaTCLayer"]  =  &createInstance<Entity, SigmaTCLayerC>;
     }
+
 
     ConstObj* createConstObj(string name, JsonBox::Value v) {
         string base_struct_name(name);
-        auto it = const_map.find(name);
-        if(it == const_map.end()) { \
-            base_struct_name = Factory::findBaseStructName<const_map_type>(const_map, name);
+        auto it = entity_map.find(name);
+        if(it == entity_map.end()) { \
+            base_struct_name = Factory::findBaseStructName<entity_map_type>(entity_map, name);
         }
-        ConstObj *o = const_map[base_struct_name]();        
+        ConstObj *o = static_cast<ConstObj*>(entity_map[base_struct_name]());
         o->fill_structure(v);
         return o;
     }
-    LayerObj* createLayerObj(string name, ConstObj *co) { 
+
+    LayerObj* createLayerObj(string name, size_t id, size_t size, Obj &act, Obj &lrule) { 
     }
+
     template <typename T> static string findBaseStructName(T &tmap, string deriv_struct_name) {
         for(auto it=tmap.begin(); it != tmap.end(); ++it) {
             string base_struct_name = it->first;
@@ -43,7 +48,7 @@ public:
         terminate();
     }
 private:
-    const_map_type const_map;
+    entity_map_type entity_map;
 };
 
 
