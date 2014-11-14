@@ -5,6 +5,7 @@
 #include <exception>
 #include <sstream>
 #include <iostream>
+#include <fstream>
 #include <map>
 #include <memory>
 #include <vector>

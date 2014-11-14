@@ -3,26 +3,27 @@ using namespace std;
 
 #include <iostream>
 #include <stdlib.h>
+#include <fstream>
 
 #include <snnlib/util/optionparser/opt.h>
-#include <snnlib/config/constants.h>
 
-#include <snnlib/sim/sim.h>
+#include <snnlib/serialize/serialize.h>
+#include <snnlib/util/util.h>
 
-#include <snnlib/util/time_series.h>
-
-enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_CONSTANTS, ARG_INPUT_TS };
+enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_INPUT_TS, ARG_OUTPUT_TS };
 const option::Descriptor usage[] =
 {
  {ARG_UNKNOWN, 0, "", "",Arg::None, "USAGE: example [options]\n\n"
                                         "Options:" },
  {ARG_HELP, 0,"h", "help",Arg::None, "  --help  \tPrint usage and exit." },
- {ARG_CONSTANTS, 0,"c","constants",Arg::NonEmpty, "  --constants, -c  \tConstants filename." },
- {ARG_INPUT_TS, 0,"i","input-ts",Arg::NonEmpty, "  --input-ts, -i  \tInput time series protobuf file." },
+ {ARG_INPUT_TS, 0,"i","input-ts",Arg::NonEmpty, "  --input-ts, -i  \tInput time series file." },
+ {ARG_OUTPUT_TS, 0,"o","output-ts",Arg::NonEmpty, "  --output-ts, -i  \toutput time series file." },
  {ARG_UNKNOWN, 0, "", "",Arg::None, "\nExamples:\n"
                                "% Need to fill %" },
  {0,0,0,0,0,0}
 };
+
+
 
 void parseOptions(option::Option* options, option::Stats &stats,  int argc, char **argv) {
     option::Option* buffer  = new option::Option[stats.buffer_max];
@@ -34,14 +35,15 @@ void parseOptions(option::Option* options, option::Stats &stats,  int argc, char
         option::printUsage(cout, usage);
         exit(0);
     }
-    if(options[ARG_CONSTANTS].count() != 1) {
-        cerr << "Inappropriate constants filename argument\n";
-        exit(1);
-    }
     if(options[ARG_INPUT_TS].count() != 1) {
         cerr << "Inappropriate input time series argument\n";
         exit(1);
     }
+    if(options[ARG_OUTPUT_TS].count() != 1) {
+        cerr << "Inappropriate output time series argument\n";
+        exit(1);
+    }
+
     for (option::Option* opt = options[ARG_UNKNOWN]; opt; opt = opt->next()) {
       cerr << "Unknown option: " << string(opt->name,opt->namelen) << "\n";
     }
@@ -56,18 +58,48 @@ void parseOptions(option::Option* options, option::Stats &stats,  int argc, char
 }
 
 
+
+Protos::LabeledTimeSeries convertUcrTimeSeriesLine(const string &line, ostream &out) {
+    vector<string> els = split(line, ' ');
+    assert(els.size() > 0);
+    
+    string lab;
+    vector<double> ts_data;
+    for(size_t i=0; i<els.size(); i++) {
+        trim(els[i]);
+        if(!els[i].empty()) {
+            if(lab.empty()) {
+                std::ostringstream lab_format;
+                lab_format << stoi(els[i]);
+                lab = lab_format.str();
+                continue;
+            }
+            ts_data.push_back(stof(els[i]));
+        }
+    }
+    Protos::LabeledTimeSeries ts = doubleVectorToLabeledTimeSeries(lab, ts_data);
+    return ts;
+}
+
 int main(int argc, char **argv) {
     argc-=(argc>0); argv+=(argc>0); // skip program name argv[0] if present
     option::Stats  stats(usage, argc, argv);
     option::Option* options = new option::Option[stats.options_max];
     parseOptions(options, stats, argc, argv); 
-
-    Constants c = Constants(options[ARG_CONSTANTS].arg);
-    LabeledTimeSeriesList lts_list(options[ARG_INPUT_TS].arg);
-
-//    cout << c;
-//    Sim s(c);
-//    cout << s;
-
+    
+    ifstream ucr_ts_file(options[ARG_INPUT_TS].arg);
+    if (!ucr_ts_file.is_open()) {
+        cerr << "Errors while opening " << options[ARG_INPUT_TS].arg << "\n";
+        terminate();
+    }
+    fstream output(options[ARG_OUTPUT_TS].arg, ios::out | ios::binary);
+    
+    string line;
+    vector<Protos::LabeledTimeSeries> acc;
+    while ( getline (ucr_ts_file,line) ) {
+        Protos::LabeledTimeSeries ts = convertUcrTimeSeriesLine(line, output);
+        acc.push_back(ts);
+    }
+    writeMessages<Protos::LabeledTimeSeries>(acc, output);
     delete[] options;
 }

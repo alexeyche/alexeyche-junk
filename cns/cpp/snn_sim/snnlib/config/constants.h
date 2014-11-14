@@ -126,13 +126,14 @@ class InputLayersConf : public ConstObj {
 public:    
     size_t size;
     string type;
-
+    string act_func;
     void fill_structure(JsonBox::Value v) {
         size = v["size"].getInt();
         type = v["type"].getString();
+        act_func = v["act_func"].getString();
     }
     void print(std::ostream &str) const {
-        str << "InputLayersConf(size: " << size << ", type: " << type << ")";
+        str << "InputLayersConf(size: " << size << ", type: " << type <<  ", act_func: " << act_func << ")";
     }
 };
 

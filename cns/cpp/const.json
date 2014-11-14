@@ -46,7 +46,8 @@
         "input_layers_conf" : [
             {
                 "size" : 100,
-                "type" : "SigmaTCLayer"
+                "type" : "SigmaTCLayer",
+                "act_func" : "Determ"                    
             },                
         ],
         "net_layers_conf" : [

@@ -16,7 +16,7 @@ public:
     Factory();
     ConstObj* createConst(string name, JsonBox::Value v);
     LayerObj* createNetLayer(string name, size_t id, size_t size, const ConstObj *c, const ActFunc *act, const LearningRule *lrule);
-    LayerObj* createInputLayer(string name, size_t id, size_t size, const ConstObj *c);
+    LayerObj* createInputLayer(string name, size_t id, size_t size, const ConstObj *c, const ActFunc *act);
 
     ActFunc* createActFunc(string name, const ConstObj *c);
     LearningRule*  createLearningRule(string name, const ConstObj *c);

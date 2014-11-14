@@ -19,7 +19,8 @@ option(PROFILE "Compile with profiling information" OFF)
 #  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 #  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra")
 #endif(CMAKE_COMPILER_IS_GNUCC)
-
+include(FindProtobuf)
+find_package(Protobuf REQUIRED)
 find_package (Threads)
 
 # Debugging CFLAGS.  Turn optimizations off; turn debugging symbols on.
@@ -49,6 +50,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 
 include_directories(${CMAKE_SOURCE_DIR})
+include_directories(${CMAKE_BINARY_DIR})
 
 # Recurse into the rest of the project.
 add_subdirectory(snnlib)

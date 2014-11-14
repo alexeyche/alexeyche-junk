@@ -7,6 +7,7 @@
 #include <snnlib/layers/act_funcs/exp_hennequin.h>
 #include <snnlib/layers/synapse.h>
 #include <snnlib/layers/sigma_tc_layer.h>
+#include <snnlib/layers/srm_layer.h>
 
 Factory::Factory() {
     const_map["SRMLayer"]     =   &createInstance<Obj, SRMLayerC>;
@@ -21,7 +22,7 @@ Factory::Factory() {
     entity_map["Determ"]       =   &createInstance<Obj, Determ>;
     entity_map["ExpHennequin"] =   &createInstance<Obj, ExpHennequin>;
     entity_map["OptimalStdp"]  =   &createInstance<Obj, OptimalStdp>;
-    entity_map["SigmaTCLayer"]  =  &createInstance<Obj, SigmaTCLayer>;
+    entity_map["SigmaTCLayer"]  =  &createInstance<Obj, SigmaTCLayer<SRMNeuron> >;
 }
 
 #define GET_BASE_NAME(map) \
@@ -64,10 +65,11 @@ LayerObj* Factory::createNetLayer(string name, size_t id, size_t size, const Con
     return o;
 }
 
-LayerObj* Factory::createInputLayer(string name, size_t id, size_t size, const ConstObj *c) {
+LayerObj* Factory::createInputLayer(string name, size_t id, size_t size, const ConstObj *c, const ActFunc *act) {
     GET_BASE_NAME(entity_map)
     LayerObj *o = dynamic_cast<LayerObj*>(entity_map[base_struct_name]());
-    if(!o) { cerr << "Error while reading " << name << " and treating like LayerObj\n"; terminate(); }
-//    o->init(id, size, c, act, lrule);
+    if(!o) { cerr << "Error while reading " << name << " and treating like InputLayerObj\n"; terminate(); }
+    o->init(id, size, c, act, nullptr);
     return o;
 }
+

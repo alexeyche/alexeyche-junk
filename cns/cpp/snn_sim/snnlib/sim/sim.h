@@ -9,7 +9,8 @@ public:
     Sim(const Constants &c) : sc(c.sim_conf) {
         for(size_t l_id=0; l_id < sc.input_layers_conf.size(); l_id++) {
             InputLayersConf conf = sc.input_layers_conf[l_id];
-            LayerObj* l = factory.createInputLayer(conf.type, l_id, conf.size, c[conf.type]);
+            ActFunc *af = factory.createActFunc(conf.act_func, c[conf.act_func]);
+            LayerObj* l = factory.createInputLayer(conf.type, l_id, conf.size, c[conf.type], af);
             input_layers.push_back(l);
         }
         for(size_t l_id=0; l_id < sc.net_layers_conf.size(); l_id++) {

@@ -15,16 +15,14 @@ endforeach()
 set(SNN_SIM_SRCS ${SNN_SIM_SRCS} ${DIR_SRCS} PARENT_SCOPE)
 
 # executable
-add_executable(snn_sim-bin
-    snn_sim.cpp
+add_executable(convert_ts
+    convert_ts.cpp
 )
 
-SET_TARGET_PROPERTIES(snn_sim-bin
-  PROPERTIES OUTPUT_NAME snn_sim)
 
 include_directories(${CMAKE_BINARY_DIR}/protos)
 # link dependencies of executable
-target_link_libraries(snn_sim-bin
+target_link_libraries(convert_ts
     protos
     ${PROTOBUF_LIBRARY}
     snn_sim
