@@ -4,7 +4,7 @@
 #include <snnlib/core.h>
 #include <snnlib/util/json/json_box.h>
 #include <snnlib/base.h>
-
+#include <snnlib/util/util.h>
 
 class ConstObj: public Entity {
 public:
@@ -145,21 +145,77 @@ public:
     void fill_structure(JsonBox::Value v) {
         size = v["size"].getInt();
         type = v["type"].getString();
-        learning_rule = v["type"].getString();
-        act_func = v["type"].getString();
+        learning_rule = v["learning_rule"].getString();
+        act_func = v["act_func"].getString();
     }
     void print(std::ostream &str) const {
         str << "NetLayersConf(size: " << size << ", type: " << type << ", learning_rule: " << learning_rule << ", act_func: " << act_func << ")";
     }
 };
 
+class ConnectionMap: public ConstObj {
+    class ConnectionConf: public ConstObj {
+    public:
+        double prob;
+        double weight;
+        string type;
+
+        void fill_structure(JsonBox::Value v) {
+            prob = v["prob"].getDouble();
+            type = v["type"].getString();
+            weight = v["weight"].getDouble();
+        }
+        void print(std::ostream &str) const {
+            str << "ConnectionConf(" << "prob: " << prob << ", weight: " << weight << ", type: " << type << ")";
+        }
+    };
+public:
+    map< pair<size_t, size_t>, vector<ConnectionConf> > conn_map;
+
+    void fill_structure(JsonBox::Value v) {
+        JsonBox::Object o = v.getObject();
+        for(auto it=o.begin(); it!=o.end(); ++it) {
+            vector<string> aff = split(it->first, '-');
+            if(aff.size() != 2) {
+                cerr << "conn_map configuration not right: need 2 afferent layers separated by \"-\"\n";
+                terminate();
+            }
+            size_t aff_pre = stoi(aff[0].c_str());
+            size_t aff_post = stoi(aff[1].c_str());
+            pair<size_t, size_t> aff_p(aff_pre, aff_post);
+            
+            vector<ConnectionConf> conn_conf_vec;
+            JsonBox::Array conn_array = it->second.getArray();
+            for(auto conn_it=conn_array.begin(); conn_it != conn_array.end(); ++conn_it) {
+                ConnectionConf conn_conf;
+                conn_conf.fill_structure(*conn_it);
+                conn_conf_vec.push_back(conn_conf);
+            }
+            if(conn_conf_vec.size() == 0) {
+                cerr << "undefined conn configuration at " << it->first << "\n";
+                terminate();
+            }
+            conn_map[aff_p] = conn_conf_vec;
+        }
+    }   
+
+    void print(std::ostream &str) const {
+        for(auto it=conn_map.begin(); it!=conn_map.end(); ++it) {
+            pair<size_t,size_t> aff = it->first;
+            str << aff.first << "-" << aff.second << ":\n"; 
+            print_vector<ConnectionConf>(it->second, str, "\n");
+        }
+    }
+};
+
+
+
 class SimConfiguration: public ConstObj {
 public:
     vector<InputLayersConf> input_layers_conf;
     vector<NetLayersConf> net_layers_conf;
-    Matrix<double> conn_matrix;
-    Matrix<double> inh_frac_matrix;
-
+    
+    ConnectionMap conn_map;
     
     void fill_structure(JsonBox::Value v) {
         auto a_input_sizes = v["input_layers_conf"].getArray();      
@@ -177,21 +233,14 @@ public:
             net_layers_conf.push_back(conf);
         }
 
-        size_t nrows = input_layers_conf.size() + net_layers_conf.size();
-
-        conn_matrix.allocate(nrows, nrows);        
-        conn_matrix.fill_from_json(v["conn_matrix"].getArray());
-
-        inh_frac_matrix.allocate(nrows, nrows);        
-        inh_frac_matrix.fill_from_json(v["inh_frac_matrix"].getArray());
+        conn_map.fill_structure(v["conn_map"]);
     }
     
 
     void print(std::ostream &str) const {
         str << "input_layers_conf: \n";  print_vector<InputLayersConf>(input_layers_conf, str, ",\n");
         str << "net_layers_conf: \n"; print_vector<NetLayersConf>(net_layers_conf, str, ",\n");
-        str << "conn_matrix: \n";       str << conn_matrix;
-        str << "inh_frac_matrix: \n";   str << inh_frac_matrix;
+        str << "conn_map: \n";       str << conn_map;
     }    
 };
 
@@ -207,8 +256,20 @@ public:
     const_map synapses;
     const_map act_funcs;
     const_map learning_rules;
-    
+        
     SimConfiguration sim_conf;
+
+    const ConstObj* operator[](const string &key) const {
+        if(net_layers.count(key)) return net_layers.at(key).get();
+        if(input_layers.count(key)) return input_layers.at(key).get();
+        if(synapses.count(key)) return synapses.at(key).get();
+        if(act_funcs.count(key)) return act_funcs.at(key).get();
+        if(learning_rules.count(key)) return learning_rules.at(key).get();
+
+        cerr << "Couldn't find instance with key in constants: " << key << "\n";
+        terminate();
+    }
+
     static void print_constants_map(const const_map &m) {
         for(auto it = m.cbegin(); it != m.cend(); ++it ) { 
             cout << it->first << " == " << *it->second; 

@@ -11,7 +11,7 @@
     for(auto inner_it = inner_o.begin(); inner_it != inner_o.end(); inner_it++) {   \
         string struct_name = inner_it->first;                                        \
         const JsonBox::Value &v = inner_it->second;                                 \
-        name[struct_name] = shared_ptr<ConstObj>(factory.createConstObj(struct_name, v)); \
+        name[struct_name] = shared_ptr<ConstObj>(factory.createConst(struct_name, v)); \
     }\
 }\
 

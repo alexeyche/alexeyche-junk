@@ -15,6 +15,8 @@ endforeach()
 set(SOURCES
     matrix.cpp
     matrix.h
+    util.h
+    util.cpp
 )
 
 # add directory name to sources

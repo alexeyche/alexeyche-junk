@@ -31,7 +31,7 @@ Factory::Factory() {
         base_struct_name = findBaseStructName(name);\
     }\
 
-ConstObj* Factory::createConstObj(string name, JsonBox::Value v) {
+ConstObj* Factory::createConst(string name, JsonBox::Value v) {
     GET_BASE_NAME(const_map)
     ConstObj *o = dynamic_cast<ConstObj*>(const_map[base_struct_name]());
     if(!o) {
@@ -56,10 +56,18 @@ LearningRule*  Factory::createLearningRule(string name, const ConstObj *c) {
     return o;
 }
 
-LayerObj* Factory::createLayerObj(string name, size_t id, size_t size, const ConstObj *c, const ActFunc *act, const LearningRule *lrule) {
+LayerObj* Factory::createNetLayer(string name, size_t id, size_t size, const ConstObj *c, const ActFunc *act, const LearningRule *lrule) {
     GET_BASE_NAME(entity_map)
     LayerObj *o = dynamic_cast<LayerObj*>(entity_map[base_struct_name]());
     if(!o) { cerr << "Error while reading " << name << " and treating like LayerObj\n"; terminate(); }
     o->init(id, size, c, act, lrule);
+    return o;
+}
+
+LayerObj* Factory::createInputLayer(string name, size_t id, size_t size, const ConstObj *c) {
+    GET_BASE_NAME(entity_map)
+    LayerObj *o = dynamic_cast<LayerObj*>(entity_map[base_struct_name]());
+    if(!o) { cerr << "Error while reading " << name << " and treating like LayerObj\n"; terminate(); }
+//    o->init(id, size, c, act, lrule);
     return o;
 }

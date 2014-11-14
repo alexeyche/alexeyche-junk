@@ -17,7 +17,7 @@ public:
     LayerObj(size_t _id, size_t _size, const ConstObj *_c, const ActFunc *_act, const LearningRule *_lrule) {
         init(_id,_size,_c,_act,_lrule);
     }
-    void init(size_t _id, size_t _size, const ConstObj *_c, const ActFunc *_act, const LearningRule *_lrule) {
+    virtual void init(size_t _id, size_t _size, const ConstObj *_c, const ActFunc *_act, const LearningRule *_lrule) {
         id = _id;
         N = _size;
         act = shared_ptr<const ActFunc>(_act);
@@ -65,6 +65,11 @@ class SRMLayer : public Layer<N> {
 private:    
     SRMLayer() {}
     friend class Factory;
+public:
+    void init(size_t _id, size_t _size, const ConstObj *_c, const ActFunc *_act, const LearningRule *_lrule) {
+        Layer<N>::init(_id, _size, _c, _act, _lrule);
+    }
+
 };
 
 

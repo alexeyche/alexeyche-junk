@@ -14,11 +14,12 @@ class Factory {
 public:
     template<typename BASE,typename INST> static BASE* createInstance() { return new INST; }
     Factory();
-    ConstObj* createConstObj(string name, JsonBox::Value v);
-    LayerObj* createLayerObj(string name, size_t id, size_t size, const ConstObj *c, const ActFunc *act, const LearningRule *lrule);
+    ConstObj* createConst(string name, JsonBox::Value v);
+    LayerObj* createNetLayer(string name, size_t id, size_t size, const ConstObj *c, const ActFunc *act, const LearningRule *lrule);
+    LayerObj* createInputLayer(string name, size_t id, size_t size, const ConstObj *c);
+
     ActFunc* createActFunc(string name, const ConstObj *c);
     LearningRule*  createLearningRule(string name, const ConstObj *c);
-
     string findBaseStructName(string deriv_struct_name) {
         for(auto it=entity_map.begin(); it != entity_map.end(); ++it) {
             string base_struct_name = it->first;
