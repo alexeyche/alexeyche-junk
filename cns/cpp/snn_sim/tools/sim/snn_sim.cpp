@@ -64,6 +64,7 @@ int main(int argc, char **argv) {
 
     Constants c = Constants(options[ARG_CONSTANTS].arg);
     LabeledTimeSeriesList lts_list(options[ARG_INPUT_TS].arg);
+    cout << lts_list;
 
 //    cout << c;
 //    Sim s(c);

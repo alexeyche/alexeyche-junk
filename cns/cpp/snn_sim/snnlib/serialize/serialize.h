@@ -8,49 +8,34 @@
 
 using namespace google::protobuf::io;
 
-void writeMessage(::google::protobuf::Message &message, CodedOutputStream &codedOut) {
-    google::protobuf::uint32 size = message.ByteSize();
-    codedOut.WriteVarint32(size);
-
-    message.SerializeToCodedStream(&codedOut);
-}
-
-template <typename T>
-void writeMessages(vector<T> &messages, ostream &out) {
-    //write varint delimiter to buffer
-    google::protobuf::io::OstreamOutputStream zeroOut(&out);
-    google::protobuf::io::CodedOutputStream codedOut(&zeroOut);
-    for(auto it=messages.begin(); it != messages.end(); ++it) {
-        writeMessage(*it, codedOut);
-    }
-}
 
 
-void readMessage(::google::protobuf::Message &message, CodedInputStream &codedIn) {
-    google::protobuf::uint32 size;
-    if (!codedIn.ReadVarint32(&size)) { 
-        cerr << "Failed to read size of message\n";
-        terminate();
-    }
-    cout << size << "\n";
-    google::protobuf::io::CodedInputStream::Limit msgLimit = codedIn.PushLimit(size);
-    message.ParseFromCodedStream(&codedIn);
-    codedIn.PopLimit(size);
-}
-
-template <typename T>
-vector<T> readMessages(fstream &in) {
-    IstreamInputStream zeroIn(&in);
-    CodedInputStream codedIn(&zeroIn);
-    vector<T> messages;
-
-    while(!codedIn.ExpectAtEnd()) {
-        T message;
-        readMessage(message, codedIn);
-        messages.push_back(message);
-    }
-    return messages;
-}
+//template <typename T>
+//void writeMessages(vector<T> &messages, ostream &out) {
+//    //write varint delimiter to buffer
+//    google::protobuf::io::OstreamOutputStream zeroOut(&out);
+//    google::protobuf::io::CodedOutputStream codedOut(&zeroOut);
+//    for(auto it=messages.begin(); it != messages.end(); ++it) {
+//        writeMessage(*it, codedOut);
+//    }
+//}
+//
+//
+//
+//
+//template <typename T>
+//vector<T> readMessages(fstream &in) {
+//    IstreamInputStream zeroIn(&in);
+//    CodedInputStream codedIn(&zeroIn);
+//    vector<T> messages;
+//
+//    while(!codedIn.ExpectAtEnd()) {
+//        T message;
+//        readMessage(message, codedIn);
+//        messages.push_back(message);
+//    }
+//    return messages;
+//}
 
 
 Protos::LabeledTimeSeries doubleVectorToLabeledTimeSeries(string label, const vector<double> &data) {

@@ -8,6 +8,7 @@ using namespace std;
 #include <snnlib/util/optionparser/opt.h>
 
 #include <snnlib/serialize/serialize.h>
+#include <snnlib/serialize/proto_rw.h>
 #include <snnlib/util/util.h>
 
 enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_INPUT_TS, ARG_OUTPUT_TS };
@@ -59,7 +60,7 @@ void parseOptions(option::Option* options, option::Stats &stats,  int argc, char
 
 
 
-Protos::LabeledTimeSeries convertUcrTimeSeriesLine(const string &line, ostream &out) {
+Protos::LabeledTimeSeries convertUcrTimeSeriesLine(const string &line) {
     vector<string> els = split(line, ' ');
     assert(els.size() > 0);
     
@@ -92,14 +93,12 @@ int main(int argc, char **argv) {
         cerr << "Errors while opening " << options[ARG_INPUT_TS].arg << "\n";
         terminate();
     }
-    fstream output(options[ARG_OUTPUT_TS].arg, ios::out | ios::binary);
-    
+
+    ProtoRw prw(options[ARG_OUTPUT_TS].arg, ProtoRw::Write); 
     string line;
-    vector<Protos::LabeledTimeSeries> acc;
     while ( getline (ucr_ts_file,line) ) {
-        Protos::LabeledTimeSeries ts = convertUcrTimeSeriesLine(line, output);
-        acc.push_back(ts);
+        Protos::LabeledTimeSeries ts = convertUcrTimeSeriesLine(line);
+        prw.write<Protos::LabeledTimeSeries>(ts);
     }
-    writeMessages<Protos::LabeledTimeSeries>(acc, output);
     delete[] options;
 }
