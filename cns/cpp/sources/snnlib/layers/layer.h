@@ -30,7 +30,8 @@ public:
             neurons.push_back( shared_ptr<Neuron>(addNeuron(_c, _act, _lrule, _tc)) );
         }
     }
-
+    virtual void calculate() = 0;
+    
     size_t size() {
         return neurons.size();
     }

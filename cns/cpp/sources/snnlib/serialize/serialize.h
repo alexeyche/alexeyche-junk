@@ -8,36 +8,6 @@
 
 using namespace google::protobuf::io;
 
-
-
-//template <typename T>
-//void writeMessages(vector<T> &messages, ostream &out) {
-//    //write varint delimiter to buffer
-//    google::protobuf::io::OstreamOutputStream zeroOut(&out);
-//    google::protobuf::io::CodedOutputStream codedOut(&zeroOut);
-//    for(auto it=messages.begin(); it != messages.end(); ++it) {
-//        writeMessage(*it, codedOut);
-//    }
-//}
-//
-//
-//
-//
-//template <typename T>
-//vector<T> readMessages(fstream &in) {
-//    IstreamInputStream zeroIn(&in);
-//    CodedInputStream codedIn(&zeroIn);
-//    vector<T> messages;
-//
-//    while(!codedIn.ExpectAtEnd()) {
-//        T message;
-//        readMessage(message, codedIn);
-//        messages.push_back(message);
-//    }
-//    return messages;
-//}
-
-
 Protos::LabeledTimeSeries doubleVectorToLabeledTimeSeries(string label, const vector<double> &data) {
     Protos::LabeledTimeSeries lts;
     Protos::TimeSeries *ts = new Protos::TimeSeries();

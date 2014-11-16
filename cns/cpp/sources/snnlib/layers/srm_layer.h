@@ -2,9 +2,6 @@
 
 #include "layer.h"
 
-#include <snnlib/sim/sim_layer.h>
-#include <snnlib/sim/sim_neuron.h>
-
 #include "neuron.h"
 
 static bool synapseNotActive(const Synapse *s) {
@@ -12,7 +9,7 @@ static bool synapseNotActive(const Synapse *s) {
     return false;
 }
 
-class SRMNeuron : public Neuron, public SimNeuron {
+class SRMNeuron : public Neuron {
 public:
     SRMNeuron(size_t _id, const ConstObj *_c, const ActFunc *_act, const LearningRule *_lrule, const TuningCurve *_tc) 
     	: Neuron(_id, _c, _act, _lrule, _tc) {
@@ -69,11 +66,10 @@ public:
 class SRMLayer : public Layer, public SimLayer {
 private:    
     SRMLayer() { }
-
     friend class Factory;
 public:
     Neuron* addNeuron(const ConstObj *_c, const ActFunc *_act, const LearningRule *_lrule, const TuningCurve *_tc) {
-        return new SRMNeuron(++global_neuron_index, _c,_act,_lrule,_tc);
+        return new SRMNeuron(++global_neuron_index, _c,_act, _lrule,_tc);
     }
     void init(size_t _id, size_t _size, const ConstObj *_c, const ActFunc *_act, const LearningRule *_lrule, const TuningCurve *_tc) {
         Layer::init(_id, _size, _c, _act, _lrule, _tc);

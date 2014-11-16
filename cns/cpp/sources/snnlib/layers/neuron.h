@@ -37,7 +37,9 @@ public:
     void addSynapse(Synapse s) {
         syns.push_back(s);
     }
-
+    virtual void calculateProbability() = 0;
+    virtual void calculateDynamics() = 0;
+    
     void print(std::ostream& str) const {
         str << "Neuron(" << id << ")\n";
         str << "\ty == " << y;

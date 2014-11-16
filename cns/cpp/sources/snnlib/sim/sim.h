@@ -4,7 +4,7 @@
 #include <snnlib/layers/layer.h>
 #include <snnlib/util/time_series.h>
 
-#include "network_stat.h"
+#include "network.h"
 
 class Sim: public Printable {
 public: 
@@ -25,6 +25,8 @@ public:
         input_ts = l;
         size_t fullLenght = input_ts.getFullSampleLength();
         cout << fullLenght << "\n";
+        Tmax = fullLenght * sc.ts_map_conf.dt;
+
     }   
     void precalculateInputLayerSpikes() {
         if(input_ts.size() == 0) {
@@ -33,7 +35,13 @@ public:
         }
     } 
     void run() {
-
+        double dt = 1.0;
+        for(double t=0; t<Tmax; t += dt) {
+            for(auto it=input_layers.begin(); it != input_layers.end(); ++it) {
+                Layer *l = *it;
+                l->calculate();
+            }
+        }            
     }
     double Tmax;
 
