@@ -1,0 +1,861 @@
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+ActFunc	snnlib/act_funcs/act_func.h	/^class ActFunc: public Obj  {$/;"	c
+Determ	snnlib/act_funcs/determ.h	/^    Determ() {}$/;"	f	class:Determ
+Determ	snnlib/act_funcs/determ.h	/^    Determ(const DetermC *_c) {$/;"	f	class:Determ
+Determ	snnlib/act_funcs/determ.h	/^class Determ : public ActFunc {$/;"	c
+c	snnlib/act_funcs/determ.h	/^    shared_ptr<const DetermC> c;$/;"	m	class:Determ
+init	snnlib/act_funcs/determ.h	/^    void init(const ConstObj *_c) {$/;"	f	class:Determ
+prob	snnlib/act_funcs/determ.h	/^    double prob(const double &u) const { $/;"	f	class:Determ
+probDeriv	snnlib/act_funcs/determ.h	/^    double probDeriv(const double &u) const {$/;"	f	class:Determ
+ExpHennequin	snnlib/act_funcs/exp_hennequin.h	/^    ExpHennequin() {}$/;"	f	class:ExpHennequin
+ExpHennequin	snnlib/act_funcs/exp_hennequin.h	/^    ExpHennequin(const ExpHennequinC *_c) {$/;"	f	class:ExpHennequin
+ExpHennequin	snnlib/act_funcs/exp_hennequin.h	/^class ExpHennequin: public ActFunc {$/;"	c
+c	snnlib/act_funcs/exp_hennequin.h	/^    shared_ptr<const ExpHennequinC> c; $/;"	m	class:ExpHennequin
+init	snnlib/act_funcs/exp_hennequin.h	/^    void init(const ConstObj *_c) {$/;"	f	class:ExpHennequin
+prob	snnlib/act_funcs/exp_hennequin.h	/^    double prob(const double &u) const { $/;"	f	class:ExpHennequin
+probDeriv	snnlib/act_funcs/exp_hennequin.h	/^    double probDeriv(const double &u) const {$/;"	f	class:ExpHennequin
+CompareSynSpike	snnlib/base.h	/^class CompareSynSpike {$/;"	c
+Entity	snnlib/base.h	/^class Entity : public Printable {$/;"	c
+Obj	snnlib/base.h	/^class Obj {$/;"	c
+Printable	snnlib/base.h	/^class Printable: public Obj {$/;"	c
+SynSpike	snnlib/base.h	/^struct SynSpike {$/;"	s
+entity_map	snnlib/base.h	/^typedef map<string, unique_ptr<Entity> > entity_map;$/;"	t
+n_id	snnlib/base.h	/^	size_t n_id;$/;"	m	struct:SynSpike
+operator ()	snnlib/base.h	/^    bool operator()(SynSpike& s1, SynSpike& s2) \/\/ Returns true if t1 is earlier than t2$/;"	f	class:CompareSynSpike
+operator <<	snnlib/base.h	/^    friend std::ostream& operator<<(std::ostream& str, Printable const& data) {$/;"	f	class:Printable
+print_vector	snnlib/base.h	/^void print_vector(vector<T> v, ostream &str, string sep) {$/;"	f
+syn_id	snnlib/base.h	/^	size_t syn_id;$/;"	m	struct:SynSpike
+t	snnlib/base.h	/^	double t;$/;"	m	struct:SynSpike
+~Obj	snnlib/base.h	/^    virtual ~Obj() {}$/;"	f	class:Obj
+Constants	snnlib/config/constants.cpp	/^Constants::Constants(string filename) {$/;"	f	class:Constants
+PARSE_CONST_STRUCTURE	snnlib/config/constants.cpp	9;"	d	file:
+printDoublePair	snnlib/config/constants.cpp	/^void printDoublePair(pair<double,double> p, std::ostream &str) {$/;"	f
+readLowAndHigh	snnlib/config/constants.cpp	/^pair<double,double> readLowAndHigh(JsonBox::Array a) {$/;"	f
+ConnectionConf	snnlib/config/constants.h	/^class ConnectionConf: public ConstObj {$/;"	c
+ConnectionMap	snnlib/config/constants.h	/^typedef map< pair<size_t, size_t>, vector<ConnectionConf> > ConnectionMap;$/;"	t
+ConstObj	snnlib/config/constants.h	/^class ConstObj: public Entity {$/;"	c
+Constants	snnlib/config/constants.h	/^class Constants {$/;"	c
+DetermC	snnlib/config/constants.h	/^class DetermC : public ConstObj {$/;"	c
+ExpHennequinC	snnlib/config/constants.h	/^class ExpHennequinC : public ConstObj {$/;"	c
+InputLayersConf	snnlib/config/constants.h	/^class InputLayersConf : public ConstObj {$/;"	c
+NetLayersConf	snnlib/config/constants.h	/^class NetLayersConf : public ConstObj {$/;"	c
+OptimalStdpC	snnlib/config/constants.h	/^class OptimalStdpC: public ConstObj {$/;"	c
+SRMLayerC	snnlib/config/constants.h	/^class SRMLayerC: public ConstObj {$/;"	c
+SigmaTuningCurveC	snnlib/config/constants.h	/^class SigmaTuningCurveC: public ConstObj {$/;"	c
+SimConfiguration	snnlib/config/constants.h	/^class SimConfiguration: public ConstObj {$/;"	c
+SynapseC	snnlib/config/constants.h	/^class SynapseC : public ConstObj {$/;"	c
+TimeSeriesMapConf	snnlib/config/constants.h	/^class TimeSeriesMapConf : public ConstObj {$/;"	c
+act_func	snnlib/config/constants.h	/^    string act_func;$/;"	m	class:InputLayersConf
+act_func	snnlib/config/constants.h	/^    string act_func;$/;"	m	class:NetLayersConf
+act_funcs	snnlib/config/constants.h	/^    const_map act_funcs;$/;"	m	class:Constants
+amp	snnlib/config/constants.h	/^    double amp;$/;"	m	class:SynapseC
+amp_refr	snnlib/config/constants.h	/^    double amp_refr;$/;"	m	class:SRMLayerC
+beta	snnlib/config/constants.h	/^    double beta;$/;"	m	class:ExpHennequinC
+conn_map	snnlib/config/constants.h	/^    ConnectionMap conn_map;$/;"	m	class:SimConfiguration
+const_map	snnlib/config/constants.h	/^typedef map<string, shared_ptr<const ConstObj> > const_map;$/;"	t
+dt	snnlib/config/constants.h	/^    double dt;$/;"	m	class:TimeSeriesMapConf
+epsp_delay	snnlib/config/constants.h	/^    double epsp_delay;$/;"	m	class:SynapseC
+fill_structure	snnlib/config/constants.h	/^    void fill_structure(JsonBox::Value v) {$/;"	f	class:ConnectionConf
+fill_structure	snnlib/config/constants.h	/^    void fill_structure(JsonBox::Value v) {$/;"	f	class:DetermC
+fill_structure	snnlib/config/constants.h	/^    void fill_structure(JsonBox::Value v) {$/;"	f	class:ExpHennequinC
+fill_structure	snnlib/config/constants.h	/^    void fill_structure(JsonBox::Value v) {$/;"	f	class:InputLayersConf
+fill_structure	snnlib/config/constants.h	/^    void fill_structure(JsonBox::Value v) {$/;"	f	class:NetLayersConf
+fill_structure	snnlib/config/constants.h	/^    void fill_structure(JsonBox::Value v) {$/;"	f	class:OptimalStdpC
+fill_structure	snnlib/config/constants.h	/^    void fill_structure(JsonBox::Value v) {$/;"	f	class:SRMLayerC
+fill_structure	snnlib/config/constants.h	/^    void fill_structure(JsonBox::Value v) {$/;"	f	class:SigmaTuningCurveC
+fill_structure	snnlib/config/constants.h	/^    void fill_structure(JsonBox::Value v) {$/;"	f	class:SimConfiguration
+fill_structure	snnlib/config/constants.h	/^    void fill_structure(JsonBox::Value v) {$/;"	f	class:SynapseC
+fill_structure	snnlib/config/constants.h	/^    void fill_structure(JsonBox::Value v) {$/;"	f	class:TimeSeriesMapConf
+gain	snnlib/config/constants.h	/^    pair<double,double> gain;$/;"	m	class:SigmaTuningCurveC
+gain_factor	snnlib/config/constants.h	/^    double gain_factor;$/;"	m	class:ExpHennequinC
+input_layers_conf	snnlib/config/constants.h	/^    vector<InputLayersConf> input_layers_conf;$/;"	m	class:SimConfiguration
+intercept	snnlib/config/constants.h	/^    pair<double,double> intercept;$/;"	m	class:SigmaTuningCurveC
+learning_rule	snnlib/config/constants.h	/^    string learning_rule;$/;"	m	class:NetLayersConf
+learning_rules	snnlib/config/constants.h	/^    const_map learning_rules;$/;"	m	class:Constants
+mean_p_dur	snnlib/config/constants.h	/^    double mean_p_dur;$/;"	m	class:OptimalStdpC
+net_layers	snnlib/config/constants.h	/^    const_map net_layers;$/;"	m	class:Constants
+net_layers_conf	snnlib/config/constants.h	/^    vector<NetLayersConf> net_layers_conf;$/;"	m	class:SimConfiguration
+operator <<	snnlib/config/constants.h	/^    friend std::ostream& operator<<(std::ostream& str, Constants const& data) {$/;"	f	class:Constants
+operator []	snnlib/config/constants.h	/^    const ConstObj* operator[](const string &key) const {$/;"	f	class:Constants
+p_rest	snnlib/config/constants.h	/^    double p_rest;$/;"	m	class:ExpHennequinC
+print	snnlib/config/constants.h	/^    void print(std::ostream &str) const {$/;"	f	class:ConnectionConf
+print	snnlib/config/constants.h	/^    void print(std::ostream &str) const {$/;"	f	class:DetermC
+print	snnlib/config/constants.h	/^    void print(std::ostream &str) const {$/;"	f	class:ExpHennequinC
+print	snnlib/config/constants.h	/^    void print(std::ostream &str) const {$/;"	f	class:InputLayersConf
+print	snnlib/config/constants.h	/^    void print(std::ostream &str) const {$/;"	f	class:NetLayersConf
+print	snnlib/config/constants.h	/^    void print(std::ostream &str) const {$/;"	f	class:OptimalStdpC
+print	snnlib/config/constants.h	/^    void print(std::ostream &str) const {$/;"	f	class:SRMLayerC
+print	snnlib/config/constants.h	/^    void print(std::ostream &str) const {$/;"	f	class:SigmaTuningCurveC
+print	snnlib/config/constants.h	/^    void print(std::ostream &str) const {$/;"	f	class:SimConfiguration
+print	snnlib/config/constants.h	/^    void print(std::ostream &str) const {$/;"	f	class:SynapseC
+print	snnlib/config/constants.h	/^    void print(std::ostream &str) const {$/;"	f	class:TimeSeriesMapConf
+print_constants_map	snnlib/config/constants.h	/^    static void print_constants_map(const const_map &m) {$/;"	f	class:Constants
+prob	snnlib/config/constants.h	/^    double prob;$/;"	m	class:ConnectionConf
+r0	snnlib/config/constants.h	/^    double r0;$/;"	m	class:ExpHennequinC
+sigma	snnlib/config/constants.h	/^    pair<double,double> sigma;$/;"	m	class:SigmaTuningCurveC
+sim_conf	snnlib/config/constants.h	/^    SimConfiguration sim_conf;$/;"	m	class:Constants
+size	snnlib/config/constants.h	/^    size_t size;$/;"	m	class:InputLayersConf
+size	snnlib/config/constants.h	/^    size_t size;$/;"	m	class:NetLayersConf
+synapses	snnlib/config/constants.h	/^    const_map synapses;$/;"	m	class:Constants
+target_rate	snnlib/config/constants.h	/^    double target_rate;$/;"	m	class:OptimalStdpC
+target_rate_factor	snnlib/config/constants.h	/^    double target_rate_factor;$/;"	m	class:OptimalStdpC
+tau_c	snnlib/config/constants.h	/^    double tau_c;$/;"	m	class:OptimalStdpC
+tau_refr	snnlib/config/constants.h	/^    double tau_refr;$/;"	m	class:SRMLayerC
+ts_map_conf	snnlib/config/constants.h	/^    TimeSeriesMapConf ts_map_conf;        $/;"	m	class:SimConfiguration
+tuning_curve	snnlib/config/constants.h	/^    string tuning_curve;$/;"	m	class:InputLayersConf
+tuning_curves	snnlib/config/constants.h	/^    const_map tuning_curves;$/;"	m	class:Constants
+type	snnlib/config/constants.h	/^    string type;$/;"	m	class:ConnectionConf
+type	snnlib/config/constants.h	/^    string type;$/;"	m	class:InputLayersConf
+type	snnlib/config/constants.h	/^    string type;$/;"	m	class:NetLayersConf
+u_rest	snnlib/config/constants.h	/^    double u_rest;$/;"	m	class:SRMLayerC
+u_tr	snnlib/config/constants.h	/^    double u_tr;$/;"	m	class:DetermC
+u_tr	snnlib/config/constants.h	/^    double u_tr;$/;"	m	class:ExpHennequinC
+weight	snnlib/config/constants.h	/^    double weight;$/;"	m	class:ConnectionConf
+weight_decay	snnlib/config/constants.h	/^    double weight_decay;$/;"	m	class:OptimalStdpC
+FACTORY	snnlib/config/factory.cpp	21;"	d	file:
+Factory	snnlib/config/factory.cpp	/^Factory::Factory() {$/;"	f	class:Factory
+GET_BASE_NAME	snnlib/config/factory.cpp	40;"	d	file:
+_inst	snnlib/config/factory.cpp	/^Factory* Factory::_inst = nullptr;$/;"	m	class:Factory	file:
+createActFunc	snnlib/config/factory.cpp	/^ActFunc* Factory::createActFunc(string name, const ConstObj *c) {$/;"	f	class:Factory
+createConst	snnlib/config/factory.cpp	/^ConstObj* Factory::createConst(string name, JsonBox::Value v) {$/;"	f	class:Factory
+createInputLayer	snnlib/config/factory.cpp	/^Layer* Factory::createInputLayer(string name, size_t id, size_t size, const ConstObj *c, const ActFunc *act) {$/;"	f	class:Factory
+createLearningRule	snnlib/config/factory.cpp	/^LearningRule*  Factory::createLearningRule(string name, const ConstObj *c) {$/;"	f	class:Factory
+createNetLayer	snnlib/config/factory.cpp	/^Layer* Factory::createNetLayer(string name, size_t id, size_t size, const ConstObj *c, const ActFunc *act, const LearningRule *lrule) {$/;"	f	class:Factory
+createSynapse	snnlib/config/factory.cpp	/^Synapse*  Factory::createSynapse(string name, const ConstObj *c, size_t id_pre, double w) {$/;"	f	class:Factory
+inst	snnlib/config/factory.cpp	/^Factory* Factory::inst() {$/;"	f	class:Factory
+Factory	snnlib/config/factory.h	/^class Factory {$/;"	c
+_inst	snnlib/config/factory.h	/^    static Factory *_inst;$/;"	m	class:Factory
+const_map	snnlib/config/factory.h	/^    entity_map_type const_map;$/;"	m	class:Factory
+createInstance	snnlib/config/factory.h	/^    template<typename BASE,typename INST> static BASE* createInstance() { return new INST; }$/;"	f	class:Factory
+entity_map	snnlib/config/factory.h	/^    entity_map_type entity_map;$/;"	m	class:Factory
+entity_map_type	snnlib/config/factory.h	/^typedef map<string, Obj*(*)()> entity_map_type;$/;"	t
+findBaseStructName	snnlib/config/factory.h	/^    string findBaseStructName(string deriv_struct_name) {$/;"	f	class:Factory
+const_map_type	snnlib/config/type_maps.h	/^typedef map<string, ConstObj*(*)()> const_map_type;$/;"	t
+createInstance	snnlib/config/type_maps.h	/^template<typename E,typename T> E* createInstance() { return new T; }$/;"	f
+entity_map_type	snnlib/config/type_maps.h	/^typedef map<string, Entity*(*)()> entity_map_type;$/;"	t
+generateConstMapType	snnlib/config/type_maps.h	/^const_map_type generateConstMapType() {$/;"	f
+generateEntityMapType	snnlib/config/type_maps.h	/^entity_map_type generateEntityMapType() {$/;"	f
+uchar	snnlib/core.h	/^typedef unsigned char uchar;$/;"	t
+CAST_TYPE	snnlib/layers/common.h	4;"	d
+Layer	snnlib/layers/layer.h	/^    Layer() {}$/;"	f	class:Layer
+Layer	snnlib/layers/layer.h	/^    Layer(size_t _id, size_t _size, const ConstObj *_c, const ActFunc *_act, const LearningRule *_lrule) { $/;"	f	class:Layer
+Layer	snnlib/layers/layer.h	/^class Layer: public Layer {$/;"	c
+Layer	snnlib/layers/layer.h	/^    Layer() {}$/;"	f	class:Layer
+Layer	snnlib/layers/layer.h	/^    Layer(size_t _id, size_t _size, const ConstObj *_c, const ActFunc *_act, const LearningRule *_lrule) {$/;"	f	class:Layer
+Layer	snnlib/layers/layer.h	/^class Layer : public Entity {$/;"	c
+N	snnlib/layers/layer.h	/^    size_t N;$/;"	m	class:Layer
+act	snnlib/layers/layer.h	/^    shared_ptr<const ActFunc> act;$/;"	m	class:Layer
+bc	snnlib/layers/layer.h	/^    shared_ptr<const ConstObj> bc;$/;"	m	class:Layer
+connect	snnlib/layers/layer.h	/^    void connect(Layer *l_post, const ConnectionConf &conf, const Constants &c) {$/;"	f	class:Layer
+id	snnlib/layers/layer.h	/^    size_t id;$/;"	m	class:Layer
+init	snnlib/layers/layer.h	/^    virtual void init(size_t _id, size_t _size, const ConstObj *_c, const ActFunc *_act, const LearningRule *_lrule) {$/;"	f	class:Layer
+init	snnlib/layers/layer.h	/^    void init(size_t _id, size_t _size, const ConstObj *_c, const ActFunc *_act, const LearningRule *_lrule) {$/;"	f	class:Layer
+lrule	snnlib/layers/layer.h	/^    shared_ptr<const LearningRule> lrule;$/;"	m	class:Layer
+neurons	snnlib/layers/layer.h	/^    vector< shared_ptr<T> > neurons;$/;"	m	class:Layer
+operator []	snnlib/layers/layer.h	/^    Neuron *operator[](size_t i) {$/;"	f	class:Layer
+print	snnlib/layers/layer.h	/^    void print(std::ostream& str) const {$/;"	f	class:Layer
+size	snnlib/layers/layer.h	/^    size_t size() {$/;"	f	class:Layer
+Neuron	snnlib/layers/neuron.h	/^    Neuron(size_t _id) : id(_id), y(0.0), p(0.0), fired(0) {}$/;"	f	class:Neuron
+Neuron	snnlib/layers/neuron.h	/^class Neuron: public Printable {$/;"	c
+SRMNeuron	snnlib/layers/neuron.h	/^    SRMNeuron(size_t _id) : Neuron(_id) {}$/;"	f	class:SRMNeuron
+SRMNeuron	snnlib/layers/neuron.h	/^class SRMNeuron : public Neuron {$/;"	c
+addSynapse	snnlib/layers/neuron.h	/^    void addSynapse(Synapse s) {$/;"	f	class:Neuron
+fired	snnlib/layers/neuron.h	/^    uchar fired;$/;"	m	class:Neuron
+global_neuron_index	snnlib/layers/neuron.h	/^static size_t global_neuron_index = 0;$/;"	v
+id	snnlib/layers/neuron.h	/^    size_t id;$/;"	m	class:Neuron
+p	snnlib/layers/neuron.h	/^    double p;$/;"	m	class:Neuron
+print	snnlib/layers/neuron.h	/^    void print(std::ostream& str) const {$/;"	f	class:SRMNeuron
+syns	snnlib/layers/neuron.h	/^    vector<Synapse> syns;$/;"	m	class:Neuron
+y	snnlib/layers/neuron.h	/^    double y;$/;"	m	class:Neuron
+SRMLayer	snnlib/layers/srm_layer.h	/^    SRMLayer() { }$/;"	f	class:SRMLayer
+SRMLayer	snnlib/layers/srm_layer.h	/^class SRMLayer : public Layer<SRMNeuron>, public SimLayer {$/;"	c
+c	snnlib/layers/srm_layer.h	/^    shared_ptr<const SRMLayerC> c;$/;"	m	class:SRMLayer
+calculateDynamics	snnlib/layers/srm_layer.h	/^	void calculateDynamics(const size_t &ni) {$/;"	f	class:SRMLayer
+calculateProbability	snnlib/layers/srm_layer.h	/^	void calculateProbability(const size_t &ni) {$/;"	f	class:SRMLayer
+init	snnlib/layers/srm_layer.h	/^    void init(size_t _id, size_t _size, const ConstObj *_c, const ActFunc *_act, const LearningRule *_lrule) {$/;"	f	class:SRMLayer
+SpikeQueue	snnlib/layers/synapse.h	/^typedef priority_queue<SynSpike, vector<SynSpike>, CompareSynSpike> SpikeQueue; $/;"	t
+Synapse	snnlib/layers/synapse.h	/^    Synapse() {}$/;"	f	class:Synapse
+Synapse	snnlib/layers/synapse.h	/^    Synapse(const ConstObj *_c, size_t _id_pre, double _w) {$/;"	f	class:Synapse
+Synapse	snnlib/layers/synapse.h	/^class Synapse : public Printable {$/;"	c
+c	snnlib/layers/synapse.h	/^    shared_ptr<const SynapseC> c;$/;"	m	class:Synapse
+id_pre	snnlib/layers/synapse.h	/^    size_t id_pre;$/;"	m	class:Synapse
+init	snnlib/layers/synapse.h	/^    void init(const ConstObj *_c, size_t _id_pre, double _w) {$/;"	f	class:Synapse
+print	snnlib/layers/synapse.h	/^    void print(std::ostream& str) const {$/;"	f	class:Synapse
+q	snnlib/layers/synapse.h	/^    SpikeQueue q;$/;"	m	class:Synapse
+w	snnlib/layers/synapse.h	/^    double w;$/;"	m	class:Synapse
+x	snnlib/layers/synapse.h	/^    double x;$/;"	m	class:Synapse
+LearningRule	snnlib/learning/learning_rule.h	/^class LearningRule : public Obj { $/;"	c
+OptimalStdp	snnlib/learning/optimal_stdp.h	/^    OptimalStdp() {}$/;"	f	class:OptimalStdp
+OptimalStdp	snnlib/learning/optimal_stdp.h	/^    OptimalStdp(const OptimalStdpC *_c) {$/;"	f	class:OptimalStdp
+OptimalStdp	snnlib/learning/optimal_stdp.h	/^class OptimalStdp : public LearningRule {$/;"	c
+c	snnlib/learning/optimal_stdp.h	/^    shared_ptr<const OptimalStdpC> c;    $/;"	m	class:OptimalStdp
+init	snnlib/learning/optimal_stdp.h	/^    void init(const ConstObj *_c) {$/;"	f	class:OptimalStdp
+CHECK_MODE	snnlib/serialize/proto_rw.h	17;"	d
+Mode	snnlib/serialize/proto_rw.h	/^    enum Mode {Read, Write};$/;"	g	class:ProtoRw
+ProtoRw	snnlib/serialize/proto_rw.h	/^    ProtoRw(const string &f, Mode _m) : m(_m) {$/;"	f	class:ProtoRw
+ProtoRw	snnlib/serialize/proto_rw.h	/^class ProtoRw {$/;"	c
+Read	snnlib/serialize/proto_rw.h	/^    enum Mode {Read, Write};$/;"	e	enum:ProtoRw::Mode
+Write	snnlib/serialize/proto_rw.h	/^    enum Mode {Read, Write};$/;"	e	enum:ProtoRw::Mode
+codedIn	snnlib/serialize/proto_rw.h	/^    CodedInputStream *codedIn;$/;"	m	class:ProtoRw
+codedOut	snnlib/serialize/proto_rw.h	/^    CodedOutputStream *codedOut;$/;"	m	class:ProtoRw
+ifs	snnlib/serialize/proto_rw.h	/^    ifstream *ifs;$/;"	m	class:ProtoRw
+m	snnlib/serialize/proto_rw.h	/^    Mode m;$/;"	m	class:ProtoRw
+ofs	snnlib/serialize/proto_rw.h	/^    ofstream *ofs;$/;"	m	class:ProtoRw
+read	snnlib/serialize/proto_rw.h	/^    T read() {$/;"	f	class:ProtoRw
+readAll	snnlib/serialize/proto_rw.h	/^    vector<T> readAll() {$/;"	f	class:ProtoRw
+readMessage	snnlib/serialize/proto_rw.h	/^    void readMessage(::google::protobuf::Message &message) {$/;"	f	class:ProtoRw
+write	snnlib/serialize/proto_rw.h	/^    void write(T &lts) {$/;"	f	class:ProtoRw
+writeMessage	snnlib/serialize/proto_rw.h	/^    void writeMessage(::google::protobuf::Message &message) {$/;"	f	class:ProtoRw
+zeroIn	snnlib/serialize/proto_rw.h	/^    IstreamInputStream *zeroIn;$/;"	m	class:ProtoRw
+zeroOut	snnlib/serialize/proto_rw.h	/^    OstreamOutputStream *zeroOut;$/;"	m	class:ProtoRw
+~ProtoRw	snnlib/serialize/proto_rw.h	/^    ~ProtoRw() {$/;"	f	class:ProtoRw
+doubleVectorToLabeledTimeSeries	snnlib/serialize/serialize.h	/^Protos::LabeledTimeSeries doubleVectorToLabeledTimeSeries(string label, const vector<double> &data) {$/;"	f
+Conn	snnlib/sim/network_stat.h	/^struct Conn {$/;"	s
+NetworkStat	snnlib/sim/network_stat.h	/^	NetworkStat() {$/;"	f	class:NetworkStat
+NetworkStat	snnlib/sim/network_stat.h	/^	NetworkStat(size_t net_size) {$/;"	f	class:NetworkStat
+NetworkStat	snnlib/sim/network_stat.h	/^class NetworkStat {$/;"	c
+conn_map	snnlib/sim/network_stat.h	/^	vector<Conn> *conn_map;	$/;"	m	class:NetworkStat
+init	snnlib/sim/network_stat.h	/^	void init(size_t net_size) {$/;"	f	class:NetworkStat
+l_id	snnlib/sim/network_stat.h	/^	size_t l_id;$/;"	m	struct:Conn
+n_id	snnlib/sim/network_stat.h	/^	size_t n_id;$/;"	m	struct:Conn
+spikes_list	snnlib/sim/network_stat.h	/^	vector<double> *spikes_list;$/;"	m	class:NetworkStat
+syn_id	snnlib/sim/network_stat.h	/^	size_t syn_id;$/;"	m	struct:Conn
+~NetworkStat	snnlib/sim/network_stat.h	/^	~NetworkStat() {$/;"	f	class:NetworkStat
+Sim	snnlib/sim/sim.cpp	/^Sim::Sim(const Constants &c) : sc(c.sim_conf) {$/;"	f	class:Sim
+Sim	snnlib/sim/sim.h	/^class Sim: public Printable {$/;"	c
+input_layers	snnlib/sim/sim.h	/^    vector<Layer*> input_layers;$/;"	m	class:Sim
+input_ts	snnlib/sim/sim.h	/^    LabeledTimeSeriesList input_ts;$/;"	m	class:Sim
+layers	snnlib/sim/sim.h	/^    vector<Layer*> layers;$/;"	m	class:Sim
+net	snnlib/sim/sim.h	/^    NetworkStat net;$/;"	m	class:Sim
+precalculateInputLayerSpikes	snnlib/sim/sim.h	/^    void precalculateInputLayerSpikes() {$/;"	f	class:Sim
+print	snnlib/sim/sim.h	/^    void print(std::ostream& str) const {$/;"	f	class:Sim
+run	snnlib/sim/sim.h	/^    void run() {$/;"	f	class:Sim
+sc	snnlib/sim/sim.h	/^    const SimConfiguration &sc;$/;"	m	class:Sim
+setInputTimeSeries	snnlib/sim/sim.h	/^    void setInputTimeSeries(LabeledTimeSeriesList l) {$/;"	f	class:Sim
+testl	snnlib/sim/sim.h	/^    vector<Layer<Neuron>*> testl;$/;"	m	class:Sim
+~Sim	snnlib/sim/sim.h	/^    ~Sim() {$/;"	f	class:Sim
+SimInputLayer	snnlib/sim/sim_input_layer.h	/^	SimInputLayer() {}$/;"	f	class:SimInputLayer
+SimInputLayer	snnlib/sim/sim_input_layer.h	/^	SimInputLayer(size_t size) {$/;"	f	class:SimInputLayer
+SimInputLayer	snnlib/sim/sim_input_layer.h	/^class SimInputLayer {$/;"	c
+init	snnlib/sim/sim_input_layer.h	/^    void init(size_t size) {$/;"	f	class:SimInputLayer
+~SimInputLayer	snnlib/sim/sim_input_layer.h	/^	~SimInputLayer() {$/;"	f	class:SimInputLayer
+SimLayer	snnlib/sim/sim_layer.h	/^	SimLayer() : active_synapses(nullptr) {}$/;"	f	class:SimLayer
+SimLayer	snnlib/sim/sim_layer.h	/^	SimLayer(size_t size) {$/;"	f	class:SimLayer
+SimLayer	snnlib/sim/sim_layer.h	/^class SimLayer {$/;"	c
+active_synapses	snnlib/sim/sim_layer.h	/^	list<Synapse*>  *active_synapses;$/;"	m	class:SimLayer
+init	snnlib/sim/sim_layer.h	/^	void init(size_t size) {$/;"	f	class:SimLayer
+~SimLayer	snnlib/sim/sim_layer.h	/^	~SimLayer() {$/;"	f	class:SimLayer
+SigmaTuningCurve	snnlib/tuning_curves/sigma_tuning_curve.h	/^    SigmaTuningCurve() {}$/;"	f	class:SigmaTuningCurve
+SigmaTuningCurve	snnlib/tuning_curves/sigma_tuning_curve.h	/^class SigmaTuningCurve: public TuningCurve {$/;"	c
+c	snnlib/tuning_curves/sigma_tuning_curve.h	/^    shared_ptr<const SigmaTuningCurveC> c;$/;"	m	class:SigmaTuningCurve
+calculateResponse	snnlib/tuning_curves/sigma_tuning_curve.h	/^    void calculateResponse(Neuron *n, const double &x) {$/;"	f	class:SigmaTuningCurve
+centers	snnlib/tuning_curves/sigma_tuning_curve.h	/^    double *centers;$/;"	m	class:SigmaTuningCurve
+gains	snnlib/tuning_curves/sigma_tuning_curve.h	/^    double *gains;$/;"	m	class:SigmaTuningCurve
+init	snnlib/tuning_curves/sigma_tuning_curve.h	/^    void init(size_t _size, const ConstObj *_c) {$/;"	f	class:SigmaTuningCurve
+sigma	snnlib/tuning_curves/sigma_tuning_curve.h	/^    double *sigma;$/;"	m	class:SigmaTuningCurve
+~SigmaTuningCurve	snnlib/tuning_curves/sigma_tuning_curve.h	/^    ~SigmaTuningCurve() {$/;"	f	class:SigmaTuningCurve
+TuningCurve	snnlib/tuning_curves/tuning_curve.h	/^class TuningCurve : public Obj {$/;"	c
+Array	snnlib/util/json/array.cpp	/^	Array::Array(const Array &other) : data(other.data) {$/;"	f	class:JsonBox::Array
+Array	snnlib/util/json/array.cpp	/^	Array::Array(const allocator_type &alloc) : data(alloc) {$/;"	f	class:JsonBox::Array
+Array	snnlib/util/json/array.cpp	/^	Array::Array(size_type count, const_reference value, const allocator_type &alloc) : data(count, value, alloc) {$/;"	f	class:JsonBox::Array
+JsonBox	snnlib/util/json/array.cpp	/^namespace JsonBox {$/;"	n	file:
+assign	snnlib/util/json/array.cpp	/^	void Array::assign(size_type count, const_reference value) {$/;"	f	class:JsonBox::Array
+at	snnlib/util/json/array.cpp	/^	Array::const_reference Array::at(size_type pos) const {$/;"	f	class:JsonBox::Array
+at	snnlib/util/json/array.cpp	/^	Array::reference Array::at(size_type pos) {$/;"	f	class:JsonBox::Array
+back	snnlib/util/json/array.cpp	/^	Array::const_reference Array::back() const {$/;"	f	class:JsonBox::Array
+back	snnlib/util/json/array.cpp	/^	Array::reference Array::back() {$/;"	f	class:JsonBox::Array
+begin	snnlib/util/json/array.cpp	/^	Array::const_iterator Array::begin() const {$/;"	f	class:JsonBox::Array
+begin	snnlib/util/json/array.cpp	/^	Array::iterator Array::begin() {$/;"	f	class:JsonBox::Array
+capacity	snnlib/util/json/array.cpp	/^	Array::size_type Array::capacity() const {$/;"	f	class:JsonBox::Array
+clear	snnlib/util/json/array.cpp	/^	void Array::clear() {$/;"	f	class:JsonBox::Array
+empty	snnlib/util/json/array.cpp	/^	bool Array::empty() const {$/;"	f	class:JsonBox::Array
+end	snnlib/util/json/array.cpp	/^	Array::const_iterator Array::end() const {$/;"	f	class:JsonBox::Array
+end	snnlib/util/json/array.cpp	/^	Array::iterator Array::end() {$/;"	f	class:JsonBox::Array
+erase	snnlib/util/json/array.cpp	/^	Array::iterator Array::erase(iterator first, iterator last) {$/;"	f	class:JsonBox::Array
+erase	snnlib/util/json/array.cpp	/^	Array::iterator Array::erase(iterator pos) {$/;"	f	class:JsonBox::Array
+front	snnlib/util/json/array.cpp	/^	Array::const_reference Array::front() const {$/;"	f	class:JsonBox::Array
+front	snnlib/util/json/array.cpp	/^	Array::reference Array::front() {$/;"	f	class:JsonBox::Array
+get_allocator	snnlib/util/json/array.cpp	/^	Array::allocator_type Array::get_allocator() const {$/;"	f	class:JsonBox::Array
+insert	snnlib/util/json/array.cpp	/^	Array::iterator Array::insert(iterator pos, const_reference value) {$/;"	f	class:JsonBox::Array
+insert	snnlib/util/json/array.cpp	/^	void Array::insert(iterator pos, size_type count, const_reference value) {$/;"	f	class:JsonBox::Array
+max_size	snnlib/util/json/array.cpp	/^	Array::size_type Array::max_size() const {$/;"	f	class:JsonBox::Array
+operator !=	snnlib/util/json/array.cpp	/^	bool Array::operator!=(const Array &rhs) const {$/;"	f	class:JsonBox::Array
+operator <	snnlib/util/json/array.cpp	/^	bool Array::operator<(const Array &rhs) const {$/;"	f	class:JsonBox::Array
+operator <<	snnlib/util/json/array.cpp	/^	std::ostream &operator<<(std::ostream &output, const Array &a) {$/;"	f	namespace:JsonBox
+operator <=	snnlib/util/json/array.cpp	/^	bool Array::operator<=(const Array &rhs) const {$/;"	f	class:JsonBox::Array
+operator =	snnlib/util/json/array.cpp	/^	Array &Array::operator=(const Array &other) {$/;"	f	class:JsonBox::Array
+operator ==	snnlib/util/json/array.cpp	/^	bool Array::operator==(const Array &rhs) const {$/;"	f	class:JsonBox::Array
+operator >	snnlib/util/json/array.cpp	/^	bool Array::operator>(const Array &rhs) const {$/;"	f	class:JsonBox::Array
+operator >=	snnlib/util/json/array.cpp	/^	bool Array::operator>=(const Array &rhs) const {$/;"	f	class:JsonBox::Array
+operator []	snnlib/util/json/array.cpp	/^	Array::const_reference Array::operator[](size_type pos) const {$/;"	f	class:JsonBox::Array
+operator []	snnlib/util/json/array.cpp	/^	Array::reference Array::operator[](size_type pos) {$/;"	f	class:JsonBox::Array
+pop_back	snnlib/util/json/array.cpp	/^	void Array::pop_back() {$/;"	f	class:JsonBox::Array
+push_back	snnlib/util/json/array.cpp	/^	void Array::push_back(const_reference value) {$/;"	f	class:JsonBox::Array
+rbegin	snnlib/util/json/array.cpp	/^	Array::const_reverse_iterator Array::rbegin() const {$/;"	f	class:JsonBox::Array
+rbegin	snnlib/util/json/array.cpp	/^	Array::reverse_iterator Array::rbegin() {$/;"	f	class:JsonBox::Array
+rend	snnlib/util/json/array.cpp	/^	Array::const_reverse_iterator Array::rend() const {$/;"	f	class:JsonBox::Array
+rend	snnlib/util/json/array.cpp	/^	Array::reverse_iterator Array::rend() {$/;"	f	class:JsonBox::Array
+reserve	snnlib/util/json/array.cpp	/^	void Array::reserve(size_type size) {$/;"	f	class:JsonBox::Array
+resize	snnlib/util/json/array.cpp	/^	void Array::resize(size_type count, const_reference value) {$/;"	f	class:JsonBox::Array
+size	snnlib/util/json/array.cpp	/^	Array::size_type Array::size() const {$/;"	f	class:JsonBox::Array
+swap	snnlib/util/json/array.cpp	/^	void Array::swap(Array &other) {$/;"	f	class:JsonBox::Array
+Array	snnlib/util/json/array.h	/^		Array(InputIterator first, InputIterator last, const allocator_type &alloc = allocator_type()) : data(first, last) {$/;"	f	class:JsonBox::Array
+Array	snnlib/util/json/array.h	/^	class Array {$/;"	c	namespace:JsonBox
+JB_ARRAY_H	snnlib/util/json/array.h	2;"	d
+JsonBox	snnlib/util/json/array.h	/^namespace JsonBox {$/;"	n
+allocator_type	snnlib/util/json/array.h	/^		typedef container::allocator_type allocator_type;$/;"	t	class:JsonBox::Array
+assign	snnlib/util/json/array.h	/^		void assign(InputIterator first, InputIterator last) {$/;"	f	class:JsonBox::Array
+const_iterator	snnlib/util/json/array.h	/^		typedef container::const_iterator const_iterator;$/;"	t	class:JsonBox::Array
+const_pointer	snnlib/util/json/array.h	/^		typedef container::const_pointer const_pointer;$/;"	t	class:JsonBox::Array
+const_reference	snnlib/util/json/array.h	/^		typedef container::const_reference const_reference;$/;"	t	class:JsonBox::Array
+const_reverse_iterator	snnlib/util/json/array.h	/^		typedef container::const_reverse_iterator const_reverse_iterator;$/;"	t	class:JsonBox::Array
+container	snnlib/util/json/array.h	/^		typedef std::vector<Value> container;$/;"	t	class:JsonBox::Array
+data	snnlib/util/json/array.h	/^		container data;$/;"	m	class:JsonBox::Array
+difference_type	snnlib/util/json/array.h	/^		typedef container::difference_type difference_type;$/;"	t	class:JsonBox::Array
+insert	snnlib/util/json/array.h	/^		void insert(iterator pos, InputIterator first, InputIterator last) {$/;"	f	class:JsonBox::Array
+iterator	snnlib/util/json/array.h	/^		typedef container::iterator iterator;$/;"	t	class:JsonBox::Array
+pointer	snnlib/util/json/array.h	/^		typedef container::pointer pointer;$/;"	t	class:JsonBox::Array
+reference	snnlib/util/json/array.h	/^		typedef container::reference reference;$/;"	t	class:JsonBox::Array
+reverse_iterator	snnlib/util/json/array.h	/^		typedef container::reverse_iterator reverse_iterator;$/;"	t	class:JsonBox::Array
+size_type	snnlib/util/json/array.h	/^		typedef container::size_type size_type;$/;"	t	class:JsonBox::Array
+value_type	snnlib/util/json/array.h	/^		typedef container::value_type value_type;$/;"	t	class:JsonBox::Array
+JsonBox	snnlib/util/json/convert.cpp	/^namespace JsonBox {$/;"	n	file:
+MASK1BYTE	snnlib/util/json/convert.cpp	6;"	d	file:
+MASK2BYTES	snnlib/util/json/convert.cpp	7;"	d	file:
+MASK3BYTES	snnlib/util/json/convert.cpp	8;"	d	file:
+MASK4BYTES	snnlib/util/json/convert.cpp	9;"	d	file:
+MASK5BYTES	snnlib/util/json/convert.cpp	10;"	d	file:
+MASK6BYTES	snnlib/util/json/convert.cpp	11;"	d	file:
+MASKBITS	snnlib/util/json/convert.cpp	5;"	d	file:
+decodeUTF8	snnlib/util/json/convert.cpp	/^	String32 Convert::decodeUTF8(const std::string& utf8String) {$/;"	f	class:JsonBox::Convert
+encodeToUTF8	snnlib/util/json/convert.cpp	/^	std::string Convert::encodeToUTF8(const String32& utf32String) {$/;"	f	class:JsonBox::Convert
+Convert	snnlib/util/json/convert.h	/^	class Convert {$/;"	c	namespace:JsonBox
+JB_CONVERTER_H	snnlib/util/json/convert.h	5;"	d
+JsonBox	snnlib/util/json/convert.h	/^namespace JsonBox {$/;"	n
+String32	snnlib/util/json/convert.h	/^	typedef std::basic_string<int32_t> String32;$/;"	t	namespace:JsonBox
+Escaper	snnlib/util/json/escaper.cpp	/^	Escaper::Escaper() : afterBackSlash(false), inString(false) {$/;"	f	class:JsonBox::Escaper
+JsonBox	snnlib/util/json/escaper.cpp	/^namespace JsonBox {$/;"	n	file:
+operator ()	snnlib/util/json/escaper.cpp	/^	std::streambuf::int_type Escaper::operator()(std::streambuf &destination,$/;"	f	class:JsonBox::Escaper
+Escaper	snnlib/util/json/escaper.h	/^	class Escaper {$/;"	c	namespace:JsonBox
+JB_ESCAPER_H	snnlib/util/json/escaper.h	2;"	d
+JsonBox	snnlib/util/json/escaper.h	/^namespace JsonBox {$/;"	n
+afterBackSlash	snnlib/util/json/escaper.h	/^		bool afterBackSlash;$/;"	m	class:JsonBox::Escaper
+inString	snnlib/util/json/escaper.h	/^		bool inString;$/;"	m	class:JsonBox::Escaper
+BACKSPACE	snnlib/util/json/grammar.h	/^				const char BACKSPACE = 'b';$/;"	m	namespace:JsonBox::Strings::Json::Escape
+BACKSPACE	snnlib/util/json/grammar.h	/^			const char BACKSPACE = '\\b';$/;"	m	namespace:JsonBox::Strings::Std
+BACKSPACE	snnlib/util/json/grammar.h	/^			const std::string BACKSPACE = "\\\\b";$/;"	m	namespace:JsonBox::Strings::Json
+BEGIN_ARRAY	snnlib/util/json/grammar.h	/^		const char BEGIN_ARRAY = '[';$/;"	m	namespace:JsonBox::Structural
+BEGIN_END_STRING	snnlib/util/json/grammar.h	/^		const char BEGIN_END_STRING = '"';$/;"	m	namespace:JsonBox::Structural
+BEGIN_ESCAPE	snnlib/util/json/grammar.h	/^				const char BEGIN_ESCAPE = '\\\\';$/;"	m	namespace:JsonBox::Strings::Json::Escape
+BEGIN_OBJECT	snnlib/util/json/grammar.h	/^		const char BEGIN_OBJECT = '{';$/;"	m	namespace:JsonBox::Structural
+BEGIN_UNICODE	snnlib/util/json/grammar.h	/^				const char BEGIN_UNICODE = 'u';$/;"	m	namespace:JsonBox::Strings::Json::Escape
+BEGIN_UNICODE	snnlib/util/json/grammar.h	/^			const std::string BEGIN_UNICODE = "\\\\u";$/;"	m	namespace:JsonBox::Strings::Json
+CARRIAGE_RETURN	snnlib/util/json/grammar.h	/^				const char CARRIAGE_RETURN = 'r';$/;"	m	namespace:JsonBox::Strings::Json::Escape
+CARRIAGE_RETURN	snnlib/util/json/grammar.h	/^			const char CARRIAGE_RETURN = '\\r';$/;"	m	namespace:JsonBox::Strings::Std
+CARRIAGE_RETURN	snnlib/util/json/grammar.h	/^			const std::string CARRIAGE_RETURN = "\\\\r";$/;"	m	namespace:JsonBox::Strings::Json
+CARRIAGE_RETURN	snnlib/util/json/grammar.h	/^		const char CARRIAGE_RETURN = '\\r';$/;"	m	namespace:JsonBox::Whitespace
+DECIMAL_POINT	snnlib/util/json/grammar.h	/^		const char DECIMAL_POINT = '.';$/;"	m	namespace:JsonBox::Numbers
+DIGITS	snnlib/util/json/grammar.h	/^		const std::string DIGITS = "0123456789ABCDEFabcdef";$/;"	m	namespace:JsonBox::Numbers
+END_ARRAY	snnlib/util/json/grammar.h	/^		const char END_ARRAY = ']';$/;"	m	namespace:JsonBox::Structural
+END_OBJECT	snnlib/util/json/grammar.h	/^		const char END_OBJECT = '}';$/;"	m	namespace:JsonBox::Structural
+Escape	snnlib/util/json/grammar.h	/^			namespace Escape {$/;"	n	namespace:JsonBox::Strings::Json
+FALSE_STRING	snnlib/util/json/grammar.h	/^		const std::string FALSE_STRING = "false";$/;"	m	namespace:JsonBox::Literals
+FORM_FEED	snnlib/util/json/grammar.h	/^				const char FORM_FEED = 'f';$/;"	m	namespace:JsonBox::Strings::Json::Escape
+FORM_FEED	snnlib/util/json/grammar.h	/^			const char FORM_FEED = '\\f';$/;"	m	namespace:JsonBox::Strings::Std
+FORM_FEED	snnlib/util/json/grammar.h	/^			const std::string FORM_FEED = "\\\\f";$/;"	m	namespace:JsonBox::Strings::Json
+HORIZONTAL_TAB	snnlib/util/json/grammar.h	/^		const char HORIZONTAL_TAB = '\\t';$/;"	m	namespace:JsonBox::Whitespace
+JB_GRAMMAR_H	snnlib/util/json/grammar.h	2;"	d
+Json	snnlib/util/json/grammar.h	/^		namespace Json {$/;"	n	namespace:JsonBox::Strings
+JsonBox	snnlib/util/json/grammar.h	/^namespace JsonBox {$/;"	n
+LINE_FEED	snnlib/util/json/grammar.h	/^				const char LINE_FEED = 'n';$/;"	m	namespace:JsonBox::Strings::Json::Escape
+LINE_FEED	snnlib/util/json/grammar.h	/^			const char LINE_FEED = '\\n';$/;"	m	namespace:JsonBox::Strings::Std
+LINE_FEED	snnlib/util/json/grammar.h	/^			const std::string LINE_FEED = "\\\\n";$/;"	m	namespace:JsonBox::Strings::Json
+LOWER_EXP	snnlib/util/json/grammar.h	/^		const char LOWER_EXP = 'e';$/;"	m	namespace:JsonBox::Numbers
+Literals	snnlib/util/json/grammar.h	/^	namespace Literals {$/;"	n	namespace:JsonBox
+MINUS	snnlib/util/json/grammar.h	/^		const char MINUS = '-';$/;"	m	namespace:JsonBox::Numbers
+NAME_SEPARATOR	snnlib/util/json/grammar.h	/^		const char NAME_SEPARATOR = ':';$/;"	m	namespace:JsonBox::Structural
+NEW_LINE	snnlib/util/json/grammar.h	/^		const char NEW_LINE = '\\n';$/;"	m	namespace:JsonBox::Whitespace
+NULL_STRING	snnlib/util/json/grammar.h	/^		const std::string NULL_STRING = "null";$/;"	m	namespace:JsonBox::Literals
+Numbers	snnlib/util/json/grammar.h	/^	namespace Numbers {$/;"	n	namespace:JsonBox
+PLUS	snnlib/util/json/grammar.h	/^		const char PLUS = '+';$/;"	m	namespace:JsonBox::Numbers
+QUOTATION_MARK	snnlib/util/json/grammar.h	/^				const char QUOTATION_MARK = '"';$/;"	m	namespace:JsonBox::Strings::Json::Escape
+QUOTATION_MARK	snnlib/util/json/grammar.h	/^			const char QUOTATION_MARK = '"';$/;"	m	namespace:JsonBox::Strings::Std
+QUOTATION_MARK	snnlib/util/json/grammar.h	/^			const std::string QUOTATION_MARK = "\\\\\\"";$/;"	m	namespace:JsonBox::Strings::Json
+REVERSE_SOLIDUS	snnlib/util/json/grammar.h	/^				const char REVERSE_SOLIDUS = '\\\\';$/;"	m	namespace:JsonBox::Strings::Json::Escape
+REVERSE_SOLIDUS	snnlib/util/json/grammar.h	/^			const char REVERSE_SOLIDUS = '\\\\';$/;"	m	namespace:JsonBox::Strings::Std
+REVERSE_SOLIDUS	snnlib/util/json/grammar.h	/^			const std::string REVERSE_SOLIDUS = "\\\\\\\\";$/;"	m	namespace:JsonBox::Strings::Json
+SOLIDUS	snnlib/util/json/grammar.h	/^				const char SOLIDUS = '\/';$/;"	m	namespace:JsonBox::Strings::Json::Escape
+SOLIDUS	snnlib/util/json/grammar.h	/^			const char SOLIDUS = '\/';$/;"	m	namespace:JsonBox::Strings::Std
+SOLIDUS	snnlib/util/json/grammar.h	/^			const std::string SOLIDUS = "\\\\\/";$/;"	m	namespace:JsonBox::Strings::Json
+SPACE	snnlib/util/json/grammar.h	/^		const char SPACE = ' ';$/;"	m	namespace:JsonBox::Whitespace
+Std	snnlib/util/json/grammar.h	/^		namespace Std {$/;"	n	namespace:JsonBox::Strings
+Strings	snnlib/util/json/grammar.h	/^	namespace Strings {$/;"	n	namespace:JsonBox
+Structural	snnlib/util/json/grammar.h	/^	namespace Structural {$/;"	n	namespace:JsonBox
+TAB	snnlib/util/json/grammar.h	/^				const char TAB = 't';$/;"	m	namespace:JsonBox::Strings::Json::Escape
+TAB	snnlib/util/json/grammar.h	/^			const char TAB = '\\t';$/;"	m	namespace:JsonBox::Strings::Std
+TAB	snnlib/util/json/grammar.h	/^			const std::string TAB = "\\\\t";$/;"	m	namespace:JsonBox::Strings::Json
+TRUE_STRING	snnlib/util/json/grammar.h	/^		const std::string TRUE_STRING = "true";$/;"	m	namespace:JsonBox::Literals
+UPPER_EXP	snnlib/util/json/grammar.h	/^		const char UPPER_EXP = 'E';$/;"	m	namespace:JsonBox::Numbers
+VALUE_SEPARATOR	snnlib/util/json/grammar.h	/^		const char VALUE_SEPARATOR = ',';$/;"	m	namespace:JsonBox::Structural
+Whitespace	snnlib/util/json/grammar.h	/^	namespace Whitespace {$/;"	n	namespace:JsonBox
+IndentCanceller	snnlib/util/json/indent_canceller.cpp	/^	IndentCanceller::IndentCanceller() : afterBackSlash(false), inString(false) {$/;"	f	class:JsonBox::IndentCanceller
+JsonBox	snnlib/util/json/indent_canceller.cpp	/^namespace JsonBox {$/;"	n	file:
+operator ()	snnlib/util/json/indent_canceller.cpp	/^	std::streambuf::int_type IndentCanceller::operator()(std::streambuf &destination,$/;"	f	class:JsonBox::IndentCanceller
+IndentCanceller	snnlib/util/json/indent_canceller.h	/^	class IndentCanceller {$/;"	c	namespace:JsonBox
+JB_INDENT_CANCELLER_H	snnlib/util/json/indent_canceller.h	2;"	d
+JsonBox	snnlib/util/json/indent_canceller.h	/^namespace JsonBox {$/;"	n
+afterBackSlash	snnlib/util/json/indent_canceller.h	/^		bool afterBackSlash;$/;"	m	class:JsonBox::IndentCanceller
+inString	snnlib/util/json/indent_canceller.h	/^		bool inString;$/;"	m	class:JsonBox::IndentCanceller
+Indenter	snnlib/util/json/indenter.cpp	/^	Indenter::Indenter() : atStartOfLine(true) {$/;"	f	class:JsonBox::Indenter
+JsonBox	snnlib/util/json/indenter.cpp	/^namespace JsonBox {$/;"	n	file:
+operator ()	snnlib/util/json/indenter.cpp	/^	std::streambuf::int_type Indenter::operator()(std::streambuf &destination,$/;"	f	class:JsonBox::Indenter
+Indenter	snnlib/util/json/indenter.h	/^	class Indenter {$/;"	c	namespace:JsonBox
+JB_INDENTER_H	snnlib/util/json/indenter.h	2;"	d
+JsonBox	snnlib/util/json/indenter.h	/^namespace JsonBox {$/;"	n
+atStartOfLine	snnlib/util/json/indenter.h	/^		bool atStartOfLine;$/;"	m	class:JsonBox::Indenter
+JB_JSON_BOX_H	snnlib/util/json/json_box.h	2;"	d
+JsonBox	snnlib/util/json/object.cpp	/^namespace JsonBox {$/;"	n	file:
+Object	snnlib/util/json/object.cpp	/^	Object::Object(const Object &other) : data(other.data) {$/;"	f	class:JsonBox::Object
+Object	snnlib/util/json/object.cpp	/^	Object::Object(const key_compare &comp, const allocator_type &alloc) : data(comp, alloc) {$/;"	f	class:JsonBox::Object
+begin	snnlib/util/json/object.cpp	/^	Object::const_iterator Object::begin() const {$/;"	f	class:JsonBox::Object
+begin	snnlib/util/json/object.cpp	/^	Object::iterator Object::begin() {$/;"	f	class:JsonBox::Object
+clear	snnlib/util/json/object.cpp	/^	void Object::clear() {$/;"	f	class:JsonBox::Object
+count	snnlib/util/json/object.cpp	/^	Object::size_type Object::count(const key_type &key) const {$/;"	f	class:JsonBox::Object
+empty	snnlib/util/json/object.cpp	/^	bool Object::empty() const {$/;"	f	class:JsonBox::Object
+end	snnlib/util/json/object.cpp	/^	Object::const_iterator Object::end() const {$/;"	f	class:JsonBox::Object
+end	snnlib/util/json/object.cpp	/^	Object::iterator Object::end() {$/;"	f	class:JsonBox::Object
+equal_range	snnlib/util/json/object.cpp	/^	std::pair<Object::const_iterator, Object::const_iterator> Object::equal_range(const key_type &key) const {$/;"	f	class:JsonBox::Object
+equal_range	snnlib/util/json/object.cpp	/^	std::pair<Object::iterator, Object::iterator> Object::equal_range(const key_type &key) {$/;"	f	class:JsonBox::Object
+erase	snnlib/util/json/object.cpp	/^	Object::size_type Object::erase(const key_type &key) {$/;"	f	class:JsonBox::Object
+erase	snnlib/util/json/object.cpp	/^	void Object::erase(iterator first, iterator last) {$/;"	f	class:JsonBox::Object
+erase	snnlib/util/json/object.cpp	/^	void Object::erase(iterator position) {$/;"	f	class:JsonBox::Object
+find	snnlib/util/json/object.cpp	/^	Object::const_iterator Object::find(const key_type &key) const {$/;"	f	class:JsonBox::Object
+find	snnlib/util/json/object.cpp	/^	Object::iterator Object::find(const key_type &key) {$/;"	f	class:JsonBox::Object
+get_allocator	snnlib/util/json/object.cpp	/^	Object::allocator_type Object::get_allocator() const {$/;"	f	class:JsonBox::Object
+insert	snnlib/util/json/object.cpp	/^	Object::iterator Object::insert(iterator hint, const_reference value) {$/;"	f	class:JsonBox::Object
+insert	snnlib/util/json/object.cpp	/^	std::pair<Object::iterator, bool> Object::insert(const_reference value) {$/;"	f	class:JsonBox::Object
+key_comp	snnlib/util/json/object.cpp	/^	Object::key_compare Object::key_comp() const {$/;"	f	class:JsonBox::Object
+lower_bound	snnlib/util/json/object.cpp	/^	Object::const_iterator Object::lower_bound(const key_type &key) const {$/;"	f	class:JsonBox::Object
+lower_bound	snnlib/util/json/object.cpp	/^	Object::iterator Object::lower_bound(const key_type &key) {$/;"	f	class:JsonBox::Object
+max_size	snnlib/util/json/object.cpp	/^	Object::size_type Object::max_size() const {$/;"	f	class:JsonBox::Object
+operator !=	snnlib/util/json/object.cpp	/^	bool Object::operator!=(const Object &rhs) const {$/;"	f	class:JsonBox::Object
+operator <	snnlib/util/json/object.cpp	/^	bool Object::operator<(const Object &rhs) const {$/;"	f	class:JsonBox::Object
+operator <<	snnlib/util/json/object.cpp	/^	std::ostream &operator<<(std::ostream &output, const Object &o) {$/;"	f	namespace:JsonBox
+operator <=	snnlib/util/json/object.cpp	/^	bool Object::operator<=(const Object &rhs) const {$/;"	f	class:JsonBox::Object
+operator =	snnlib/util/json/object.cpp	/^	Object &Object::operator=(const Object &other) {$/;"	f	class:JsonBox::Object
+operator ==	snnlib/util/json/object.cpp	/^	bool Object::operator==(const Object &rhs) const {$/;"	f	class:JsonBox::Object
+operator >	snnlib/util/json/object.cpp	/^	bool Object::operator>(const Object &rhs) const {$/;"	f	class:JsonBox::Object
+operator >=	snnlib/util/json/object.cpp	/^	bool Object::operator>=(const Object &rhs) const {$/;"	f	class:JsonBox::Object
+operator []	snnlib/util/json/object.cpp	/^	Object::mapped_type &Object::operator[](const key_type &key) {$/;"	f	class:JsonBox::Object
+rbegin	snnlib/util/json/object.cpp	/^	Object::const_reverse_iterator Object::rbegin() const {$/;"	f	class:JsonBox::Object
+rbegin	snnlib/util/json/object.cpp	/^	Object::reverse_iterator Object::rbegin() {$/;"	f	class:JsonBox::Object
+rend	snnlib/util/json/object.cpp	/^	Object::const_reverse_iterator Object::rend() const {$/;"	f	class:JsonBox::Object
+rend	snnlib/util/json/object.cpp	/^	Object::reverse_iterator Object::rend() {$/;"	f	class:JsonBox::Object
+size	snnlib/util/json/object.cpp	/^	Object::size_type Object::size() const {$/;"	f	class:JsonBox::Object
+swap	snnlib/util/json/object.cpp	/^	void Object::swap(Object &other) {$/;"	f	class:JsonBox::Object
+upper_bound	snnlib/util/json/object.cpp	/^	Object::const_iterator Object::upper_bound(const key_type &key) const {$/;"	f	class:JsonBox::Object
+upper_bound	snnlib/util/json/object.cpp	/^	Object::iterator Object::upper_bound(const key_type &key) {$/;"	f	class:JsonBox::Object
+JB_OBJECT_H	snnlib/util/json/object.h	2;"	d
+JsonBox	snnlib/util/json/object.h	/^namespace JsonBox {$/;"	n
+Object	snnlib/util/json/object.h	/^		explicit Object(InputIterator first, InputIterator last, const key_compare &comp = key_compare(), const allocator_type &alloc = allocator_type()) : data(first, last, comp, alloc) {$/;"	f	class:JsonBox::Object
+Object	snnlib/util/json/object.h	/^	class Object {$/;"	c	namespace:JsonBox
+allocator_type	snnlib/util/json/object.h	/^		typedef container::allocator_type allocator_type;$/;"	t	class:JsonBox::Object
+const_iterator	snnlib/util/json/object.h	/^		typedef container::const_iterator const_iterator;$/;"	t	class:JsonBox::Object
+const_pointer	snnlib/util/json/object.h	/^		typedef container::const_pointer const_pointer;$/;"	t	class:JsonBox::Object
+const_reference	snnlib/util/json/object.h	/^		typedef container::const_reference const_reference;$/;"	t	class:JsonBox::Object
+const_reverse_iterator	snnlib/util/json/object.h	/^		typedef container::const_reverse_iterator const_reverse_iterator;$/;"	t	class:JsonBox::Object
+container	snnlib/util/json/object.h	/^		typedef std::map<std::string, Value> container;$/;"	t	class:JsonBox::Object
+data	snnlib/util/json/object.h	/^		container data;$/;"	m	class:JsonBox::Object
+difference_type	snnlib/util/json/object.h	/^		typedef container::difference_type difference_type;$/;"	t	class:JsonBox::Object
+insert	snnlib/util/json/object.h	/^		void insert(InputIterator first, InputIterator last) {$/;"	f	class:JsonBox::Object
+iterator	snnlib/util/json/object.h	/^		typedef container::iterator iterator;$/;"	t	class:JsonBox::Object
+key_compare	snnlib/util/json/object.h	/^		typedef container::key_compare key_compare;$/;"	t	class:JsonBox::Object
+key_type	snnlib/util/json/object.h	/^		typedef container::key_type key_type;$/;"	t	class:JsonBox::Object
+mapped_type	snnlib/util/json/object.h	/^		typedef container::mapped_type mapped_type;$/;"	t	class:JsonBox::Object
+pointer	snnlib/util/json/object.h	/^		typedef container::pointer pointer;$/;"	t	class:JsonBox::Object
+reference	snnlib/util/json/object.h	/^		typedef container::reference reference;$/;"	t	class:JsonBox::Object
+reverse_iterator	snnlib/util/json/object.h	/^		typedef container::reverse_iterator reverse_iterator;$/;"	t	class:JsonBox::Object
+size_type	snnlib/util/json/object.h	/^		typedef container::size_type size_type;$/;"	t	class:JsonBox::Object
+value_type	snnlib/util/json/object.h	/^		typedef container::value_type value_type;$/;"	t	class:JsonBox::Object
+JB_OUTPUT_FILTER_H	snnlib/util/json/output_filter.h	2;"	d
+JsonBox	snnlib/util/json/output_filter.h	/^namespace JsonBox {$/;"	n
+OutputFilter	snnlib/util/json/output_filter.h	/^		OutputFilter(std::streambuf *newDestination, Inserter newInserter,$/;"	f	class:JsonBox::OutputFilter
+OutputFilter	snnlib/util/json/output_filter.h	/^		OutputFilter(std::streambuf *newDestination,$/;"	f	class:JsonBox::OutputFilter
+OutputFilter	snnlib/util/json/output_filter.h	/^	class OutputFilter : public std::streambuf {$/;"	c	namespace:JsonBox
+deleteWhenFinished	snnlib/util/json/output_filter.h	/^		bool deleteWhenFinished;$/;"	m	class:JsonBox::OutputFilter
+destination	snnlib/util/json/output_filter.h	/^		std::streambuf *destination;$/;"	m	class:JsonBox::OutputFilter
+getDestination	snnlib/util/json/output_filter.h	/^		std::streambuf *getDestination() const {$/;"	f	class:JsonBox::OutputFilter
+getInserter	snnlib/util/json/output_filter.h	/^		Inserter &getInserter() {$/;"	f	class:JsonBox::OutputFilter
+inserter	snnlib/util/json/output_filter.h	/^		Inserter inserter;$/;"	m	class:JsonBox::OutputFilter
+overflow	snnlib/util/json/output_filter.h	/^		virtual int_type overflow(int_type ch) {$/;"	f	class:JsonBox::OutputFilter
+setbuf	snnlib/util/json/output_filter.h	/^		virtual std::streambuf *setbuf(char *p, int len) {$/;"	f	class:JsonBox::OutputFilter
+sync	snnlib/util/json/output_filter.h	/^		virtual int_type sync() {$/;"	f	class:JsonBox::OutputFilter
+underflow	snnlib/util/json/output_filter.h	/^		virtual int_type underflow() {$/;"	f	class:JsonBox::OutputFilter
+~OutputFilter	snnlib/util/json/output_filter.h	/^		virtual ~OutputFilter() {$/;"	f	class:JsonBox::OutputFilter
+JsonBox	snnlib/util/json/solidus_escaper.cpp	/^namespace JsonBox {$/;"	n	file:
+SolidusEscaper	snnlib/util/json/solidus_escaper.cpp	/^	SolidusEscaper::SolidusEscaper() : afterBackSlash(false), inString(false) {$/;"	f	class:JsonBox::SolidusEscaper
+operator ()	snnlib/util/json/solidus_escaper.cpp	/^	std::streambuf::int_type SolidusEscaper::operator()(std::streambuf &destination,$/;"	f	class:JsonBox::SolidusEscaper
+JB_SOLIDUS_ESCAPER_H	snnlib/util/json/solidus_escaper.h	2;"	d
+JsonBox	snnlib/util/json/solidus_escaper.h	/^namespace JsonBox {$/;"	n
+SolidusEscaper	snnlib/util/json/solidus_escaper.h	/^	class SolidusEscaper {$/;"	c	namespace:JsonBox
+afterBackSlash	snnlib/util/json/solidus_escaper.h	/^		bool afterBackSlash;$/;"	m	class:JsonBox::SolidusEscaper
+inString	snnlib/util/json/solidus_escaper.h	/^		bool inString;$/;"	m	class:JsonBox::SolidusEscaper
+EMPTY_ARRAY	snnlib/util/json/value.cpp	/^	const Array Value::EMPTY_ARRAY = Array();$/;"	m	class:JsonBox::Value	file:
+EMPTY_DOUBLE	snnlib/util/json/value.cpp	/^	const double Value::EMPTY_DOUBLE = 0.0;$/;"	m	class:JsonBox::Value	file:
+EMPTY_OBJECT	snnlib/util/json/value.cpp	/^	const Object Value::EMPTY_OBJECT = Object();$/;"	m	class:JsonBox::Value	file:
+EMPTY_STRING	snnlib/util/json/value.cpp	/^	const std::string Value::EMPTY_STRING = std::string();$/;"	m	class:JsonBox::Value	file:
+JsonBox	snnlib/util/json/value.cpp	/^namespace JsonBox {$/;"	n	file:
+Value	snnlib/util/json/value.cpp	/^	Value::Value() : type(NULL_VALUE), data() {$/;"	f	class:JsonBox::Value
+Value	snnlib/util/json/value.cpp	/^	Value::Value(bool newBoolean) : type(BOOLEAN), data(new bool(newBoolean)) {$/;"	f	class:JsonBox::Value
+Value	snnlib/util/json/value.cpp	/^	Value::Value(const Array &newArray) : type(ARRAY),$/;"	f	class:JsonBox::Value
+Value	snnlib/util/json/value.cpp	/^	Value::Value(const Object &newObject) : type(OBJECT),$/;"	f	class:JsonBox::Value
+Value	snnlib/util/json/value.cpp	/^	Value::Value(const Value &src) : type(src.type), data() {$/;"	f	class:JsonBox::Value
+Value	snnlib/util/json/value.cpp	/^	Value::Value(const char *newCString) : type(STRING),$/;"	f	class:JsonBox::Value
+Value	snnlib/util/json/value.cpp	/^	Value::Value(const std::string &newString) : type(STRING),$/;"	f	class:JsonBox::Value
+Value	snnlib/util/json/value.cpp	/^	Value::Value(double newDouble) : type(DOUBLE), data(new double(newDouble)) {$/;"	f	class:JsonBox::Value
+Value	snnlib/util/json/value.cpp	/^	Value::Value(int newInt) : type(INTEGER), data(new int(newInt)) {$/;"	f	class:JsonBox::Value
+Value	snnlib/util/json/value.cpp	/^	Value::Value(std::istream &input) : type(NULL_VALUE), data() {$/;"	f	class:JsonBox::Value
+ValueDataPointer	snnlib/util/json/value.cpp	/^	Value::ValueDataPointer::ValueDataPointer(): stringValue(NULL) {$/;"	f	class:JsonBox::Value::ValueDataPointer
+ValueDataPointer	snnlib/util/json/value.cpp	/^	Value::ValueDataPointer::ValueDataPointer(Array *newArrayValue) :$/;"	f	class:JsonBox::Value::ValueDataPointer
+ValueDataPointer	snnlib/util/json/value.cpp	/^	Value::ValueDataPointer::ValueDataPointer(Object *newObjectValue) :$/;"	f	class:JsonBox::Value::ValueDataPointer
+ValueDataPointer	snnlib/util/json/value.cpp	/^	Value::ValueDataPointer::ValueDataPointer(bool *newBoolValue) :$/;"	f	class:JsonBox::Value::ValueDataPointer
+ValueDataPointer	snnlib/util/json/value.cpp	/^	Value::ValueDataPointer::ValueDataPointer(double *newDoubleValue) :$/;"	f	class:JsonBox::Value::ValueDataPointer
+ValueDataPointer	snnlib/util/json/value.cpp	/^	Value::ValueDataPointer::ValueDataPointer(int *newIntValue) :$/;"	f	class:JsonBox::Value::ValueDataPointer
+ValueDataPointer	snnlib/util/json/value.cpp	/^	Value::ValueDataPointer::ValueDataPointer(std::string *newStringValue) :$/;"	f	class:JsonBox::Value::ValueDataPointer
+clear	snnlib/util/json/value.cpp	/^	void Value::clear() {$/;"	f	class:JsonBox::Value
+escapeAllCharacters	snnlib/util/json/value.cpp	/^	std::string Value::escapeAllCharacters(const std::string &str) {$/;"	f	class:JsonBox::Value
+escapeMinimumCharacters	snnlib/util/json/value.cpp	/^	std::string Value::escapeMinimumCharacters(const std::string &str) {$/;"	f	class:JsonBox::Value
+escapeToUnicode	snnlib/util/json/value.cpp	/^	const std::string Value::escapeToUnicode(char charToEscape) {$/;"	f	class:JsonBox::Value
+getArray	snnlib/util/json/value.cpp	/^	const Array &Value::getArray() const {$/;"	f	class:JsonBox::Value
+getBoolean	snnlib/util/json/value.cpp	/^	bool Value::getBoolean() const {$/;"	f	class:JsonBox::Value
+getDouble	snnlib/util/json/value.cpp	/^	double Value::getDouble() const {$/;"	f	class:JsonBox::Value
+getInt	snnlib/util/json/value.cpp	/^	int Value::getInt() const {$/;"	f	class:JsonBox::Value
+getObject	snnlib/util/json/value.cpp	/^	const Object &Value::getObject() const {$/;"	f	class:JsonBox::Value
+getString	snnlib/util/json/value.cpp	/^	const std::string &Value::getString() const {$/;"	f	class:JsonBox::Value
+getType	snnlib/util/json/value.cpp	/^	Value::Type Value::getType() const {$/;"	f	class:JsonBox::Value
+isArray	snnlib/util/json/value.cpp	/^	bool Value::isArray() const {$/;"	f	class:JsonBox::Value
+isBoolean	snnlib/util/json/value.cpp	/^	bool Value::isBoolean() const {$/;"	f	class:JsonBox::Value
+isDouble	snnlib/util/json/value.cpp	/^	bool Value::isDouble() const {$/;"	f	class:JsonBox::Value
+isHexDigit	snnlib/util/json/value.cpp	/^	bool Value::isHexDigit(char digit) {$/;"	f	class:JsonBox::Value
+isInteger	snnlib/util/json/value.cpp	/^	bool Value::isInteger() const {$/;"	f	class:JsonBox::Value
+isNull	snnlib/util/json/value.cpp	/^	bool Value::isNull() const {$/;"	f	class:JsonBox::Value
+isObject	snnlib/util/json/value.cpp	/^	bool Value::isObject() const {$/;"	f	class:JsonBox::Value
+isString	snnlib/util/json/value.cpp	/^	bool Value::isString() const {$/;"	f	class:JsonBox::Value
+isWhiteSpace	snnlib/util/json/value.cpp	/^	bool Value::isWhiteSpace(char whiteSpace) {$/;"	f	class:JsonBox::Value
+loadFromFile	snnlib/util/json/value.cpp	/^	void Value::loadFromFile(const std::string &filePath) {$/;"	f	class:JsonBox::Value
+loadFromStream	snnlib/util/json/value.cpp	/^	void Value::loadFromStream(std::istream &input) {$/;"	f	class:JsonBox::Value
+loadFromString	snnlib/util/json/value.cpp	/^	void Value::loadFromString(std::string const &json) {$/;"	f	class:JsonBox::Value
+operator !=	snnlib/util/json/value.cpp	/^	bool Value::operator!=(const Value &rhs) const {$/;"	f	class:JsonBox::Value
+operator <	snnlib/util/json/value.cpp	/^	bool Value::operator<(const Value &rhs) const {$/;"	f	class:JsonBox::Value
+operator <<	snnlib/util/json/value.cpp	/^	std::ostream &operator<<(std::ostream &output, const Value &v) {$/;"	f	namespace:JsonBox
+operator <=	snnlib/util/json/value.cpp	/^	bool Value::operator<=(const Value &rhs) const {$/;"	f	class:JsonBox::Value
+operator =	snnlib/util/json/value.cpp	/^	Value &Value::operator=(const Value &src) {$/;"	f	class:JsonBox::Value
+operator ==	snnlib/util/json/value.cpp	/^	bool Value::operator==(const Value &rhs) const {$/;"	f	class:JsonBox::Value
+operator >	snnlib/util/json/value.cpp	/^	bool Value::operator>(const Value &rhs) const {$/;"	f	class:JsonBox::Value
+operator >=	snnlib/util/json/value.cpp	/^	bool Value::operator>=(const Value &rhs) const {$/;"	f	class:JsonBox::Value
+operator []	snnlib/util/json/value.cpp	/^	Value &Value::operator[](Array::size_type index) {$/;"	f	class:JsonBox::Value
+operator []	snnlib/util/json/value.cpp	/^	Value &Value::operator[](const Object::key_type &key) {$/;"	f	class:JsonBox::Value
+operator []	snnlib/util/json/value.cpp	/^	Value &Value::operator[](const char *key) {$/;"	f	class:JsonBox::Value
+output	snnlib/util/json/value.cpp	/^	void Value::output(std::ostream &output, bool indent,$/;"	f	class:JsonBox::Value
+readArray	snnlib/util/json/value.cpp	/^	void Value::readArray(std::istream &input, Array &result) {$/;"	f	class:JsonBox::Value
+readNumber	snnlib/util/json/value.cpp	/^	void Value::readNumber(std::istream &input, JsonBox::Value &result) {$/;"	f	class:JsonBox::Value
+readObject	snnlib/util/json/value.cpp	/^	void Value::readObject(std::istream &input, Object &result) {$/;"	f	class:JsonBox::Value
+readString	snnlib/util/json/value.cpp	/^	void Value::readString(std::istream &input, std::string &result) {$/;"	f	class:JsonBox::Value
+readToNonWhiteSpace	snnlib/util/json/value.cpp	/^	void Value::readToNonWhiteSpace(std::istream &input, char &currentCharacter) {$/;"	f	class:JsonBox::Value
+setArray	snnlib/util/json/value.cpp	/^	void Value::setArray(const Array &newArray) {$/;"	f	class:JsonBox::Value
+setBoolean	snnlib/util/json/value.cpp	/^	void Value::setBoolean(bool newBoolean) {$/;"	f	class:JsonBox::Value
+setDouble	snnlib/util/json/value.cpp	/^	void Value::setDouble(double newDouble) {$/;"	f	class:JsonBox::Value
+setInt	snnlib/util/json/value.cpp	/^	void Value::setInt(int newInt) {$/;"	f	class:JsonBox::Value
+setNull	snnlib/util/json/value.cpp	/^	void Value::setNull() {$/;"	f	class:JsonBox::Value
+setObject	snnlib/util/json/value.cpp	/^	void Value::setObject(const Object &newObject) {$/;"	f	class:JsonBox::Value
+setString	snnlib/util/json/value.cpp	/^	void Value::setString(std::string const &newString) {$/;"	f	class:JsonBox::Value
+writeToFile	snnlib/util/json/value.cpp	/^	void Value::writeToFile(const std::string &filePath, bool indent,$/;"	f	class:JsonBox::Value
+writeToStream	snnlib/util/json/value.cpp	/^	void Value::writeToStream(std::ostream &output, bool indent,$/;"	f	class:JsonBox::Value
+~Value	snnlib/util/json/value.cpp	/^	Value::~Value() {$/;"	f	class:JsonBox::Value
+ARRAY	snnlib/util/json/value.h	/^		    ARRAY,$/;"	e	enum:JsonBox::Value::Type
+BOOLEAN	snnlib/util/json/value.h	/^		    BOOLEAN,$/;"	e	enum:JsonBox::Value::Type
+DOUBLE	snnlib/util/json/value.h	/^		    DOUBLE,$/;"	e	enum:JsonBox::Value::Type
+EMPTY_ARRAY	snnlib/util/json/value.h	/^		static const Array EMPTY_ARRAY;$/;"	m	class:JsonBox::Value
+EMPTY_BOOL	snnlib/util/json/value.h	/^		static const bool EMPTY_BOOL = false;$/;"	m	class:JsonBox::Value
+EMPTY_DOUBLE	snnlib/util/json/value.h	/^		static const double EMPTY_DOUBLE;$/;"	m	class:JsonBox::Value
+EMPTY_INT	snnlib/util/json/value.h	/^		static const int EMPTY_INT = 0;$/;"	m	class:JsonBox::Value
+EMPTY_OBJECT	snnlib/util/json/value.h	/^		static const Object EMPTY_OBJECT;$/;"	m	class:JsonBox::Value
+EMPTY_STRING	snnlib/util/json/value.h	/^		static const std::string EMPTY_STRING;$/;"	m	class:JsonBox::Value
+INTEGER	snnlib/util/json/value.h	/^		    INTEGER,$/;"	e	enum:JsonBox::Value::Type
+JB_VALUE_H	snnlib/util/json/value.h	5;"	d
+JsonBox	snnlib/util/json/value.h	/^namespace JsonBox {$/;"	n
+NULL_VALUE	snnlib/util/json/value.h	/^			NULL_VALUE,$/;"	e	enum:JsonBox::Value::Type
+OBJECT	snnlib/util/json/value.h	/^		    OBJECT,$/;"	e	enum:JsonBox::Value::Type
+STRING	snnlib/util/json/value.h	/^		    STRING,$/;"	e	enum:JsonBox::Value::Type
+Type	snnlib/util/json/value.h	/^		enum Type {$/;"	g	class:JsonBox::Value
+UNKNOWN	snnlib/util/json/value.h	/^			UNKNOWN$/;"	e	enum:JsonBox::Value::Type
+Value	snnlib/util/json/value.h	/^	class Value {$/;"	c	namespace:JsonBox
+ValueDataPointer	snnlib/util/json/value.h	/^		union ValueDataPointer {$/;"	u	class:JsonBox::Value
+arrayValue	snnlib/util/json/value.h	/^			Array *arrayValue;$/;"	m	union:JsonBox::Value::ValueDataPointer
+boolValue	snnlib/util/json/value.h	/^			bool *boolValue;$/;"	m	union:JsonBox::Value::ValueDataPointer
+data	snnlib/util/json/value.h	/^		ValueDataPointer data;$/;"	m	class:JsonBox::Value
+doubleValue	snnlib/util/json/value.h	/^			double *doubleValue;$/;"	m	union:JsonBox::Value::ValueDataPointer
+intValue	snnlib/util/json/value.h	/^			int *intValue;$/;"	m	union:JsonBox::Value::ValueDataPointer
+objectValue	snnlib/util/json/value.h	/^			Object *objectValue;$/;"	m	union:JsonBox::Value::ValueDataPointer
+stringValue	snnlib/util/json/value.h	/^			std::string *stringValue;$/;"	m	union:JsonBox::Value::ValueDataPointer
+type	snnlib/util/json/value.h	/^		Type type;$/;"	m	class:JsonBox::Value
+Matrix	snnlib/util/matrix.h	/^    Matrix() : nrow(0), ncol(0) {$/;"	f	class:Matrix
+Matrix	snnlib/util/matrix.h	/^    Matrix(size_t nr, size_t nc) : nrow(nr), ncol(nc) {$/;"	f	class:Matrix
+Matrix	snnlib/util/matrix.h	/^class Matrix {$/;"	c
+allocate	snnlib/util/matrix.h	/^    void allocate(size_t nr, size_t nc) {$/;"	f	class:Matrix
+fill	snnlib/util/matrix.h	/^    void fill(T val) {$/;"	f	class:Matrix
+fill_from_json	snnlib/util/matrix.h	/^    void fill_from_json(JsonBox::Array a) {$/;"	f	class:Matrix
+getElement	snnlib/util/matrix.h	/^    T getElement(size_t i, size_t j) const {$/;"	f	class:Matrix
+ncol	snnlib/util/matrix.h	/^    size_t ncol;$/;"	m	class:Matrix
+nrow	snnlib/util/matrix.h	/^    size_t nrow;$/;"	m	class:Matrix
+operator <<	snnlib/util/matrix.h	/^    friend std::ostream& operator<<(std::ostream& str, Matrix<T> const& data) {$/;"	f	class:Matrix
+setElement	snnlib/util/matrix.h	/^    void setElement(size_t i, size_t j, T val) {$/;"	f	class:Matrix
+vals	snnlib/util/matrix.h	/^    T *vals;$/;"	m	class:Matrix
+~Matrix	snnlib/util/matrix.h	/^    ~Matrix() {$/;"	f	class:Matrix
+Arg	snnlib/util/optionparser/opt.h	/^struct Arg: public option::Arg$/;"	s
+NonEmpty	snnlib/util/optionparser/opt.h	/^  static option::ArgStatus NonEmpty(const option::Option& option, bool msg)$/;"	f	struct:Arg
+Numeric	snnlib/util/optionparser/opt.h	/^  static option::ArgStatus Numeric(const option::Option& option, bool msg)$/;"	f	struct:Arg
+Required	snnlib/util/optionparser/opt.h	/^  static option::ArgStatus Required(const option::Option& option, bool msg)$/;"	f	struct:Arg
+Unknown	snnlib/util/optionparser/opt.h	/^  static option::ArgStatus Unknown(const option::Option& option, bool msg)$/;"	f	struct:Arg
+printError	snnlib/util/optionparser/opt.h	/^  static void printError(const char* msg1, const option::Option& opt, const char* msg2)$/;"	f	struct:Arg
+ARG_IGNORE	snnlib/util/optionparser/optionparser.h	/^  ARG_IGNORE,$/;"	e	enum:option::ArgStatus
+ARG_ILLEGAL	snnlib/util/optionparser/optionparser.h	/^  ARG_ILLEGAL$/;"	e	enum:option::ArgStatus
+ARG_NONE	snnlib/util/optionparser/optionparser.h	/^  ARG_NONE,$/;"	e	enum:option::ArgStatus
+ARG_OK	snnlib/util/optionparser/optionparser.h	/^  ARG_OK,$/;"	e	enum:option::ArgStatus
+Action	snnlib/util/optionparser/optionparser.h	/^struct Parser::Action$/;"	s	class:option::Parser
+Arg	snnlib/util/optionparser/optionparser.h	/^struct Arg$/;"	s	namespace:option
+ArgStatus	snnlib/util/optionparser/optionparser.h	/^enum ArgStatus$/;"	g	namespace:option
+CheckArg	snnlib/util/optionparser/optionparser.h	/^typedef ArgStatus (*CheckArg)(const Option& option, bool msg);$/;"	t	namespace:option
+CountOptionsAction	snnlib/util/optionparser/optionparser.h	/^  CountOptionsAction(unsigned* buffer_max_) :$/;"	f	class:option::Stats::CountOptionsAction
+CountOptionsAction	snnlib/util/optionparser/optionparser.h	/^class Stats::CountOptionsAction: public Parser::Action$/;"	c	class:option::Stats
+Descriptor	snnlib/util/optionparser/optionparser.h	/^struct Descriptor$/;"	s	namespace:option
+FunctionWriter	snnlib/util/optionparser/optionparser.h	/^    FunctionWriter(Function* w) :$/;"	f	struct:option::PrintUsageImplementation::FunctionWriter
+FunctionWriter	snnlib/util/optionparser/optionparser.h	/^  struct FunctionWriter: public IStringWriter$/;"	s	struct:option::PrintUsageImplementation
+IStringWriter	snnlib/util/optionparser/optionparser.h	/^  struct IStringWriter$/;"	s	struct:option::PrintUsageImplementation
+LinePartIterator	snnlib/util/optionparser/optionparser.h	/^    LinePartIterator(const Descriptor usage[]) :$/;"	f	class:option::PrintUsageImplementation::LinePartIterator
+LinePartIterator	snnlib/util/optionparser/optionparser.h	/^  class LinePartIterator$/;"	c	struct:option::PrintUsageImplementation
+LineWrapper	snnlib/util/optionparser/optionparser.h	/^    LineWrapper(int x1, int x2) :$/;"	f	class:option::PrintUsageImplementation::LineWrapper
+LineWrapper	snnlib/util/optionparser/optionparser.h	/^  class LineWrapper$/;"	c	struct:option::PrintUsageImplementation
+MSC_Builtin_CLZ	snnlib/util/optionparser/optionparser.h	/^struct MSC_Builtin_CLZ$/;"	s	namespace:option
+None	snnlib/util/optionparser/optionparser.h	/^  static ArgStatus None(const Option&, bool)$/;"	f	struct:option::Arg
+OPTIONPARSER_H_	snnlib/util/optionparser/optionparser.h	215;"	d
+OStreamWriter	snnlib/util/optionparser/optionparser.h	/^    OStreamWriter(OStream& o) :$/;"	f	struct:option::PrintUsageImplementation::OStreamWriter
+OStreamWriter	snnlib/util/optionparser/optionparser.h	/^  struct OStreamWriter: public IStringWriter$/;"	s	struct:option::PrintUsageImplementation
+Option	snnlib/util/optionparser/optionparser.h	/^  Option() :$/;"	f	class:option::Option
+Option	snnlib/util/optionparser/optionparser.h	/^  Option(const Descriptor* desc_, const char* name_, const char* arg_)$/;"	f	class:option::Option
+Option	snnlib/util/optionparser/optionparser.h	/^  Option(const Option& orig)$/;"	f	class:option::Option
+Option	snnlib/util/optionparser/optionparser.h	/^class Option$/;"	c	namespace:option
+Optional	snnlib/util/optionparser/optionparser.h	/^  static ArgStatus Optional(const Option& option, bool)$/;"	f	struct:option::Arg
+Parser	snnlib/util/optionparser/optionparser.h	/^  Parser() :$/;"	f	class:option::Parser
+Parser	snnlib/util/optionparser/optionparser.h	/^  Parser(bool gnu, const Descriptor usage[], int argc, char** argv, Option options[], Option buffer[],$/;"	f	class:option::Parser
+Parser	snnlib/util/optionparser/optionparser.h	/^  Parser(bool gnu, const Descriptor usage[], int argc, const char** argv, Option options[], Option buffer[],$/;"	f	class:option::Parser
+Parser	snnlib/util/optionparser/optionparser.h	/^  Parser(const Descriptor usage[], int argc, char** argv, Option options[], Option buffer[], int min_abbr_len = 0,$/;"	f	class:option::Parser
+Parser	snnlib/util/optionparser/optionparser.h	/^  Parser(const Descriptor usage[], int argc, const char** argv, Option options[], Option buffer[], int min_abbr_len = 0,$/;"	f	class:option::Parser
+Parser	snnlib/util/optionparser/optionparser.h	/^class Parser$/;"	c	namespace:option
+PrintUsageImplementation	snnlib/util/optionparser/optionparser.h	/^struct PrintUsageImplementation$/;"	s	namespace:option
+Stats	snnlib/util/optionparser/optionparser.h	/^  Stats() :$/;"	f	struct:option::Stats
+Stats	snnlib/util/optionparser/optionparser.h	/^  Stats(bool gnu, const Descriptor usage[], int argc, char** argv, int min_abbr_len = 0, \/\/$/;"	f	struct:option::Stats
+Stats	snnlib/util/optionparser/optionparser.h	/^  Stats(bool gnu, const Descriptor usage[], int argc, const char** argv, int min_abbr_len = 0, \/\/$/;"	f	struct:option::Stats
+Stats	snnlib/util/optionparser/optionparser.h	/^  Stats(const Descriptor usage[], int argc, char** argv, int min_abbr_len = 0, \/\/$/;"	f	struct:option::Stats
+Stats	snnlib/util/optionparser/optionparser.h	/^  Stats(const Descriptor usage[], int argc, const char** argv, int min_abbr_len = 0, \/\/$/;"	f	struct:option::Stats
+Stats	snnlib/util/optionparser/optionparser.h	/^struct Stats$/;"	s	namespace:option
+StoreOptionAction	snnlib/util/optionparser/optionparser.h	/^  StoreOptionAction(Parser& parser_, Option options_[], Option buffer_[], int bufmax_) :$/;"	f	class:option::Parser::StoreOptionAction
+StoreOptionAction	snnlib/util/optionparser/optionparser.h	/^class Parser::StoreOptionAction: public Parser::Action$/;"	c	class:option::Parser
+StreamWriter	snnlib/util/optionparser/optionparser.h	/^    StreamWriter(Function* w, Stream* s) :$/;"	f	struct:option::PrintUsageImplementation::StreamWriter
+StreamWriter	snnlib/util/optionparser/optionparser.h	/^  struct StreamWriter: public IStringWriter$/;"	s	struct:option::PrintUsageImplementation
+SyscallWriter	snnlib/util/optionparser/optionparser.h	/^    SyscallWriter(Syscall* w, int f) :$/;"	f	struct:option::PrintUsageImplementation::SyscallWriter
+SyscallWriter	snnlib/util/optionparser/optionparser.h	/^  struct SyscallWriter: public IStringWriter$/;"	s	struct:option::PrintUsageImplementation
+TemporaryWriter	snnlib/util/optionparser/optionparser.h	/^    TemporaryWriter(const Temporary& u) :$/;"	f	struct:option::PrintUsageImplementation::TemporaryWriter
+TemporaryWriter	snnlib/util/optionparser/optionparser.h	/^  struct TemporaryWriter: public IStringWriter$/;"	s	struct:option::PrintUsageImplementation
+__builtin_clz	snnlib/util/optionparser/optionparser.h	233;"	d
+add	snnlib/util/optionparser/optionparser.h	/^  void add(bool gnu, const Descriptor usage[], int argc, char** argv, int min_abbr_len = 0, \/\/$/;"	f	struct:option::Stats
+add	snnlib/util/optionparser/optionparser.h	/^  void add(const Descriptor usage[], int argc, char** argv, int min_abbr_len = 0, \/\/$/;"	f	struct:option::Stats
+add	snnlib/util/optionparser/optionparser.h	/^  void add(const Descriptor usage[], int argc, const char** argv, int min_abbr_len = 0, \/\/$/;"	f	struct:option::Stats
+add	snnlib/util/optionparser/optionparser.h	/^inline void Stats::add(bool gnu, const Descriptor usage[], int argc, const char** argv, int min_abbr_len,$/;"	f	class:option::Stats
+append	snnlib/util/optionparser/optionparser.h	/^  void append(Option* new_last)$/;"	f	class:option::Option
+arg	snnlib/util/optionparser/optionparser.h	/^  const char* arg;$/;"	m	class:option::Option
+buf_empty	snnlib/util/optionparser/optionparser.h	/^    bool buf_empty()$/;"	f	class:option::PrintUsageImplementation::LineWrapper
+buf_full	snnlib/util/optionparser/optionparser.h	/^    bool buf_full()$/;"	f	class:option::PrintUsageImplementation::LineWrapper
+buf_next	snnlib/util/optionparser/optionparser.h	/^    void buf_next()$/;"	f	class:option::PrintUsageImplementation::LineWrapper
+buf_store	snnlib/util/optionparser/optionparser.h	/^    void buf_store(const char* data, int len)$/;"	f	class:option::PrintUsageImplementation::LineWrapper
+buffer	snnlib/util/optionparser/optionparser.h	/^  Option* buffer;$/;"	m	class:option::Parser::StoreOptionAction
+buffer_max	snnlib/util/optionparser/optionparser.h	/^  unsigned buffer_max;$/;"	m	struct:option::Stats
+buffer_max	snnlib/util/optionparser/optionparser.h	/^  unsigned* buffer_max;$/;"	m	class:option::Stats::CountOptionsAction
+bufmask	snnlib/util/optionparser/optionparser.h	/^    static const int bufmask = 15; \/\/!< Must be a power of 2 minus 1.$/;"	m	class:option::PrintUsageImplementation::LineWrapper
+bufmax	snnlib/util/optionparser/optionparser.h	/^  int bufmax; \/\/! Number of slots in @c buffer. @c -1 means "large enough".$/;"	m	class:option::Parser::StoreOptionAction
+builtin_clz	snnlib/util/optionparser/optionparser.h	/^  static int builtin_clz(unsigned x)$/;"	f	struct:option::MSC_Builtin_CLZ
+check_arg	snnlib/util/optionparser/optionparser.h	/^  const CheckArg check_arg;$/;"	m	struct:option::Descriptor
+col	snnlib/util/optionparser/optionparser.h	/^    int col; \/\/!< Index of current column.$/;"	m	class:option::PrintUsageImplementation::LinePartIterator
+column	snnlib/util/optionparser/optionparser.h	/^    int column()$/;"	f	class:option::PrintUsageImplementation::LinePartIterator
+count	snnlib/util/optionparser/optionparser.h	/^  int count()$/;"	f	class:option::Option
+data	snnlib/util/optionparser/optionparser.h	/^    const char* data()$/;"	f	class:option::PrintUsageImplementation::LinePartIterator
+datbuf	snnlib/util/optionparser/optionparser.h	/^    const char* datbuf[bufmask + 1];$/;"	m	class:option::PrintUsageImplementation::LineWrapper
+desc	snnlib/util/optionparser/optionparser.h	/^  const Descriptor* desc;$/;"	m	class:option::Option
+err	snnlib/util/optionparser/optionparser.h	/^  bool err; \/\/!< @internal @brief see error()$/;"	m	class:option::Parser
+error	snnlib/util/optionparser/optionparser.h	/^  bool error()$/;"	f	class:option::Parser
+fd	snnlib/util/optionparser/optionparser.h	/^    int fd;$/;"	m	struct:option::PrintUsageImplementation::SyscallWriter
+finished	snnlib/util/optionparser/optionparser.h	/^  bool finished(int numargs, const char** args)$/;"	f	class:option::Parser::StoreOptionAction
+finished	snnlib/util/optionparser/optionparser.h	/^  virtual bool finished(int numargs, const char** args)$/;"	f	struct:option::Parser::Action
+first	snnlib/util/optionparser/optionparser.h	/^  Option* first()$/;"	f	class:option::Option
+flush	snnlib/util/optionparser/optionparser.h	/^    void flush(IStringWriter& write)$/;"	f	class:option::PrintUsageImplementation::LineWrapper
+fwrite	snnlib/util/optionparser/optionparser.h	/^    Function* fwrite;$/;"	m	struct:option::PrintUsageImplementation::StreamWriter
+head	snnlib/util/optionparser/optionparser.h	/^    int head; \/\/!< @brief index for next write$/;"	m	class:option::PrintUsageImplementation::LineWrapper
+help	snnlib/util/optionparser/optionparser.h	/^  const char* help;$/;"	m	struct:option::Descriptor
+hit_target_line	snnlib/util/optionparser/optionparser.h	/^    bool hit_target_line; \/\/!< Flag whether we encountered a part with line index target_line_in_block in the current cell.$/;"	m	class:option::PrintUsageImplementation::LinePartIterator
+indent	snnlib/util/optionparser/optionparser.h	/^  static void indent(IStringWriter& write, int& x, int want_x)$/;"	f	struct:option::PrintUsageImplementation
+index	snnlib/util/optionparser/optionparser.h	/^  const unsigned index;$/;"	m	struct:option::Descriptor
+index	snnlib/util/optionparser/optionparser.h	/^  int index() const$/;"	f	class:option::Option
+init	snnlib/util/optionparser/optionparser.h	/^  void init(const Descriptor* desc_, const char* name_, const char* arg_)$/;"	f	class:option::Option
+instr	snnlib/util/optionparser/optionparser.h	/^  static bool instr(char ch, const char* st)$/;"	f	class:option::Parser
+isFirst	snnlib/util/optionparser/optionparser.h	/^  bool isFirst() const$/;"	f	class:option::Option
+isLast	snnlib/util/optionparser/optionparser.h	/^  bool isLast() const$/;"	f	class:option::Option
+isTagged	snnlib/util/optionparser/optionparser.h	/^  static bool isTagged(Option* ptr)$/;"	f	class:option::Option
+isWideChar	snnlib/util/optionparser/optionparser.h	/^  static bool isWideChar(unsigned ch)$/;"	f	struct:option::PrintUsageImplementation
+last	snnlib/util/optionparser/optionparser.h	/^  Option* last()$/;"	f	class:option::Option
+len	snnlib/util/optionparser/optionparser.h	/^    int len; \/\/!< Length of the current part (that ptr points at) in BYTES$/;"	m	class:option::PrintUsageImplementation::LinePartIterator
+lenbuf	snnlib/util/optionparser/optionparser.h	/^    int lenbuf[bufmask + 1];$/;"	m	class:option::PrintUsageImplementation::LineWrapper
+length	snnlib/util/optionparser/optionparser.h	/^    int length()$/;"	f	class:option::PrintUsageImplementation::LinePartIterator
+line	snnlib/util/optionparser/optionparser.h	/^    int line()$/;"	f	class:option::PrintUsageImplementation::LinePartIterator
+line_in_block	snnlib/util/optionparser/optionparser.h	/^    int line_in_block; \/\/!< Line index within the current cell of the current part.$/;"	m	class:option::PrintUsageImplementation::LinePartIterator
+longopt	snnlib/util/optionparser/optionparser.h	/^  const char* const longopt;$/;"	m	struct:option::Descriptor
+max_line_in_block	snnlib/util/optionparser/optionparser.h	/^    int max_line_in_block; \/\/!< Greatest index of a line within the block. This is the number of \\\\v within the cell with the most \\\\vs.$/;"	m	class:option::PrintUsageImplementation::LinePartIterator
+name	snnlib/util/optionparser/optionparser.h	/^  const char* name;$/;"	m	class:option::Option
+namelen	snnlib/util/optionparser/optionparser.h	/^  int namelen;$/;"	m	class:option::Option
+next	snnlib/util/optionparser/optionparser.h	/^    bool next()$/;"	f	class:option::PrintUsageImplementation::LinePartIterator
+next	snnlib/util/optionparser/optionparser.h	/^  Option* next()$/;"	f	class:option::Option
+nextRow	snnlib/util/optionparser/optionparser.h	/^    bool nextRow()$/;"	f	class:option::PrintUsageImplementation::LinePartIterator
+nextTable	snnlib/util/optionparser/optionparser.h	/^    bool nextTable()$/;"	f	class:option::PrintUsageImplementation::LinePartIterator
+next_	snnlib/util/optionparser/optionparser.h	/^  Option* next_;$/;"	m	class:option::Option
+nextwrap	snnlib/util/optionparser/optionparser.h	/^  Option* nextwrap()$/;"	f	class:option::Option
+nonOption	snnlib/util/optionparser/optionparser.h	/^  const char* nonOption(int i)$/;"	f	class:option::Parser
+nonOptions	snnlib/util/optionparser/optionparser.h	/^  const char** nonOptions()$/;"	f	class:option::Parser
+nonOptionsCount	snnlib/util/optionparser/optionparser.h	/^  int nonOptionsCount()$/;"	f	class:option::Parser
+nonop_args	snnlib/util/optionparser/optionparser.h	/^  const char** nonop_args; \/\/!< @internal @brief see nonOptions()$/;"	m	class:option::Parser
+nonop_count	snnlib/util/optionparser/optionparser.h	/^  int nonop_count; \/\/!< @internal @brief see nonOptionsCount()$/;"	m	class:option::Parser
+op_count	snnlib/util/optionparser/optionparser.h	/^  int op_count; \/\/!< @internal @brief see optionsCount()$/;"	m	class:option::Parser
+operator ()	snnlib/util/optionparser/optionparser.h	/^    virtual void operator()(const char* str, int size)$/;"	f	struct:option::PrintUsageImplementation::FunctionWriter
+operator ()	snnlib/util/optionparser/optionparser.h	/^    virtual void operator()(const char* str, int size)$/;"	f	struct:option::PrintUsageImplementation::OStreamWriter
+operator ()	snnlib/util/optionparser/optionparser.h	/^    virtual void operator()(const char* str, int size)$/;"	f	struct:option::PrintUsageImplementation::StreamWriter
+operator ()	snnlib/util/optionparser/optionparser.h	/^    virtual void operator()(const char* str, int size)$/;"	f	struct:option::PrintUsageImplementation::SyscallWriter
+operator ()	snnlib/util/optionparser/optionparser.h	/^    virtual void operator()(const char* str, int size)$/;"	f	struct:option::PrintUsageImplementation::TemporaryWriter
+operator ()	snnlib/util/optionparser/optionparser.h	/^    virtual void operator()(const char*, int)$/;"	f	struct:option::PrintUsageImplementation::IStringWriter
+operator =	snnlib/util/optionparser/optionparser.h	/^  void operator=(const Option& orig)$/;"	f	class:option::Option
+operator Option*	snnlib/util/optionparser/optionparser.h	/^  operator Option*()$/;"	f	class:option::Option
+operator const Option*	snnlib/util/optionparser/optionparser.h	/^  operator const Option*() const$/;"	f	class:option::Option
+option	snnlib/util/optionparser/optionparser.h	/^namespace option$/;"	n
+options	snnlib/util/optionparser/optionparser.h	/^  Option* options;$/;"	m	class:option::Parser::StoreOptionAction
+optionsCount	snnlib/util/optionparser/optionparser.h	/^  int optionsCount()$/;"	f	class:option::Parser
+options_max	snnlib/util/optionparser/optionparser.h	/^  unsigned options_max;$/;"	m	struct:option::Stats
+ostream	snnlib/util/optionparser/optionparser.h	/^    OStream& ostream;$/;"	m	struct:option::PrintUsageImplementation::OStreamWriter
+output	snnlib/util/optionparser/optionparser.h	/^    void output(IStringWriter& write, const char* data, int len)$/;"	f	class:option::PrintUsageImplementation::LineWrapper
+parse	snnlib/util/optionparser/optionparser.h	/^  void parse(bool gnu, const Descriptor usage[], int argc, char** argv, Option options[], Option buffer[],$/;"	f	class:option::Parser
+parse	snnlib/util/optionparser/optionparser.h	/^  void parse(const Descriptor usage[], int argc, char** argv, Option options[], Option buffer[], int min_abbr_len = 0,$/;"	f	class:option::Parser
+parse	snnlib/util/optionparser/optionparser.h	/^  void parse(const Descriptor usage[], int argc, const char** argv, Option options[], Option buffer[],$/;"	f	class:option::Parser
+parse	snnlib/util/optionparser/optionparser.h	/^inline void Parser::parse(bool gnu, const Descriptor usage[], int argc, const char** argv, Option options[],$/;"	f	class:option::Parser
+parser	snnlib/util/optionparser/optionparser.h	/^  Parser& parser;$/;"	m	class:option::Parser::StoreOptionAction
+perform	snnlib/util/optionparser/optionparser.h	/^  bool perform(Option& option)$/;"	f	class:option::Parser::StoreOptionAction
+perform	snnlib/util/optionparser/optionparser.h	/^  bool perform(Option&)$/;"	f	class:option::Stats::CountOptionsAction
+perform	snnlib/util/optionparser/optionparser.h	/^  virtual bool perform(Option&)$/;"	f	struct:option::Parser::Action
+prev	snnlib/util/optionparser/optionparser.h	/^  Option* prev()$/;"	f	class:option::Option
+prev_	snnlib/util/optionparser/optionparser.h	/^  Option* prev_;$/;"	m	class:option::Option
+prevwrap	snnlib/util/optionparser/optionparser.h	/^  Option* prevwrap()$/;"	f	class:option::Option
+printUsage	snnlib/util/optionparser/optionparser.h	/^  static void printUsage(IStringWriter& write, const Descriptor usage[], int width = 80, \/\/$/;"	f	struct:option::PrintUsageImplementation
+printUsage	snnlib/util/optionparser/optionparser.h	/^void printUsage(Function* prn, Stream* stream, const Descriptor usage[], int width = 80, int last_column_min_percent =$/;"	f	namespace:option
+printUsage	snnlib/util/optionparser/optionparser.h	/^void printUsage(Function* prn, const Descriptor usage[], int width = 80, int last_column_min_percent = 50,$/;"	f	namespace:option
+printUsage	snnlib/util/optionparser/optionparser.h	/^void printUsage(OStream& prn, const Descriptor usage[], int width = 80, int last_column_min_percent = 50,$/;"	f	namespace:option
+printUsage	snnlib/util/optionparser/optionparser.h	/^void printUsage(Syscall* prn, int fd, const Descriptor usage[], int width = 80, int last_column_min_percent = 50,$/;"	f	namespace:option
+printUsage	snnlib/util/optionparser/optionparser.h	/^void printUsage(const Temporary& prn, const Descriptor usage[], int width = 80, int last_column_min_percent = 50,$/;"	f	namespace:option
+process	snnlib/util/optionparser/optionparser.h	/^    void process(IStringWriter& write, const char* data, int len)$/;"	f	class:option::PrintUsageImplementation::LineWrapper
+ptr	snnlib/util/optionparser/optionparser.h	/^    const char* ptr; \/\/!< Ptr to current part within the current row.$/;"	m	class:option::PrintUsageImplementation::LinePartIterator
+restartRow	snnlib/util/optionparser/optionparser.h	/^    void restartRow()$/;"	f	class:option::PrintUsageImplementation::LinePartIterator
+restartTable	snnlib/util/optionparser/optionparser.h	/^    void restartTable()$/;"	f	class:option::PrintUsageImplementation::LinePartIterator
+rowdesc	snnlib/util/optionparser/optionparser.h	/^    const Descriptor* rowdesc; \/\/!< The Descriptor that contains the current row.$/;"	m	class:option::PrintUsageImplementation::LinePartIterator
+rowstart	snnlib/util/optionparser/optionparser.h	/^    const char* rowstart; \/\/!< Ptr to 1st character of current row within rowdesc->help.$/;"	m	class:option::PrintUsageImplementation::LinePartIterator
+screenLength	snnlib/util/optionparser/optionparser.h	/^    int screenLength()$/;"	f	class:option::PrintUsageImplementation::LinePartIterator
+screenlen	snnlib/util/optionparser/optionparser.h	/^    int screenlen; \/\/!< Length of the current part in screen columns (taking narrow\/wide chars into account).$/;"	m	class:option::PrintUsageImplementation::LinePartIterator
+shift	snnlib/util/optionparser/optionparser.h	/^  static void shift(const char** args, int count)$/;"	f	class:option::Parser
+shortopt	snnlib/util/optionparser/optionparser.h	/^  const char* const shortopt;$/;"	m	struct:option::Descriptor
+stream	snnlib/util/optionparser/optionparser.h	/^    Stream* stream;$/;"	m	struct:option::PrintUsageImplementation::StreamWriter
+streq	snnlib/util/optionparser/optionparser.h	/^  static bool streq(const char* st1, const char* st2)$/;"	f	class:option::Parser
+streqabbr	snnlib/util/optionparser/optionparser.h	/^  static bool streqabbr(const char* st1, const char* st2, long long min)$/;"	f	class:option::Parser
+tablestart	snnlib/util/optionparser/optionparser.h	/^    const Descriptor* tablestart; \/\/!< The 1st descriptor of the current table.$/;"	m	class:option::PrintUsageImplementation::LinePartIterator
+tag	snnlib/util/optionparser/optionparser.h	/^  static Option* tag(Option* ptr)$/;"	f	class:option::Option
+tail	snnlib/util/optionparser/optionparser.h	/^    int tail; \/\/!< @brief index for next read - 1 (i.e. increment tail BEFORE read)$/;"	m	class:option::PrintUsageImplementation::LineWrapper
+target_line_in_block	snnlib/util/optionparser/optionparser.h	/^    int target_line_in_block; \/\/!< Line index of the parts we should return to the user on this iteration.$/;"	m	class:option::PrintUsageImplementation::LinePartIterator
+type	snnlib/util/optionparser/optionparser.h	/^  const int type;$/;"	m	struct:option::Descriptor
+type	snnlib/util/optionparser/optionparser.h	/^  int type() const$/;"	f	class:option::Option
+untag	snnlib/util/optionparser/optionparser.h	/^  static Option* untag(Option* ptr)$/;"	f	class:option::Option
+update_length	snnlib/util/optionparser/optionparser.h	/^    void update_length()$/;"	f	class:option::PrintUsageImplementation::LinePartIterator
+upmax	snnlib/util/optionparser/optionparser.h	/^  static void upmax(int& i1, int i2)$/;"	f	struct:option::PrintUsageImplementation
+userstream	snnlib/util/optionparser/optionparser.h	/^    const Temporary& userstream;$/;"	m	struct:option::PrintUsageImplementation::TemporaryWriter
+width	snnlib/util/optionparser/optionparser.h	/^    int width;$/;"	m	class:option::PrintUsageImplementation::LineWrapper
+workhorse	snnlib/util/optionparser/optionparser.h	/^inline bool Parser::workhorse(bool gnu, const Descriptor usage[], int numargs, const char** args, Action& action,$/;"	f	class:option::Parser
+write	snnlib/util/optionparser/optionparser.h	/^    Function* write;$/;"	m	struct:option::PrintUsageImplementation::FunctionWriter
+write	snnlib/util/optionparser/optionparser.h	/^    Syscall* write;$/;"	m	struct:option::PrintUsageImplementation::SyscallWriter
+write_one_line	snnlib/util/optionparser/optionparser.h	/^    void write_one_line(IStringWriter& write)$/;"	f	class:option::PrintUsageImplementation::LineWrapper
+wrote_something	snnlib/util/optionparser/optionparser.h	/^    bool wrote_something;$/;"	m	class:option::PrintUsageImplementation::LineWrapper
+x	snnlib/util/optionparser/optionparser.h	/^    int x;$/;"	m	class:option::PrintUsageImplementation::LineWrapper
+CASE	snnlib/util/str_switch.h	7;"	d
+DEFAULT	snnlib/util/str_switch.h	10;"	d
+MAX_LEN	snnlib/util/str_switch.h	/^    const uchar MAX_LEN = 20;$/;"	m	namespace:s_s
+N_HASH	snnlib/util/str_switch.h	/^    const ullong N_HASH = static_cast<ullong>(-1);$/;"	m	namespace:s_s
+STR_SWITCH_H	snnlib/util/str_switch.h	2;"	d
+SWITCH	snnlib/util/str_switch.h	6;"	d
+raise_128_to	snnlib/util/str_switch.h	/^    constexpr ullong raise_128_to(const uchar power)$/;"	f	namespace:s_s
+s_s	snnlib/util/str_switch.h	/^namespace s_s$/;"	n
+str_hash	snnlib/util/str_switch.h	/^    constexpr ullong str_hash(const char* const str, const uchar current_len)$/;"	f	namespace:s_s
+str_hash_for_switch	snnlib/util/str_switch.h	/^    inline ullong str_hash_for_switch(const char* const str)$/;"	f	namespace:s_s
+str_hash_for_switch	snnlib/util/str_switch.h	/^    inline ullong str_hash_for_switch(const std::string& str)$/;"	f	namespace:s_s
+str_is_correct	snnlib/util/str_switch.h	/^    constexpr bool str_is_correct(const char* const str)$/;"	f	namespace:s_s
+str_len	snnlib/util/str_switch.h	/^    constexpr uchar str_len(const char* const str)$/;"	f	namespace:s_s
+uchar	snnlib/util/str_switch.h	/^    typedef unsigned char uchar;$/;"	t	namespace:s_s
+ullong	snnlib/util/str_switch.h	/^    typedef unsigned long long ullong;$/;"	t	namespace:s_s
+LabeledTimeSeries	snnlib/util/time_series.h	/^class LabeledTimeSeries : public Printable {$/;"	c
+LabeledTimeSeriesList	snnlib/util/time_series.h	/^    LabeledTimeSeriesList() {}$/;"	f	class:LabeledTimeSeriesList
+LabeledTimeSeriesList	snnlib/util/time_series.h	/^    LabeledTimeSeriesList(const string &fname) {$/;"	f	class:LabeledTimeSeriesList
+LabeledTimeSeriesList	snnlib/util/time_series.h	/^class LabeledTimeSeriesList : public Printable {$/;"	c
+TimeSeries	snnlib/util/time_series.h	/^class TimeSeries : public Printable {$/;"	c
+data	snnlib/util/time_series.h	/^    vector<double> data;$/;"	m	class:TimeSeries
+deserialize	snnlib/util/time_series.h	/^    void deserialize(const Protos::LabeledTimeSeries &m) {$/;"	f	class:LabeledTimeSeries
+deserialize	snnlib/util/time_series.h	/^    void deserialize(const Protos::TimeSeries &m) {$/;"	f	class:TimeSeries
+deserializeFromFile	snnlib/util/time_series.h	/^    void deserializeFromFile(const string &fname) {$/;"	f	class:LabeledTimeSeriesList
+label	snnlib/util/time_series.h	/^    string label;$/;"	m	class:LabeledTimeSeries
+print	snnlib/util/time_series.h	/^    void print(std::ostream& str) const {$/;"	f	class:LabeledTimeSeries
+print	snnlib/util/time_series.h	/^    void print(std::ostream& str) const {$/;"	f	class:LabeledTimeSeriesList
+print	snnlib/util/time_series.h	/^    void print(std::ostream& str) const {$/;"	f	class:TimeSeries
+size	snnlib/util/time_series.h	/^    size_t size() const {$/;"	f	class:LabeledTimeSeriesList
+ts	snnlib/util/time_series.h	/^    TimeSeries ts;$/;"	m	class:LabeledTimeSeries
+ts	snnlib/util/time_series.h	/^    vector<LabeledTimeSeries> ts;$/;"	m	class:LabeledTimeSeriesList
+getExp	snnlib/util/util.cpp	/^double getExp(double rate) {$/;"	f
+getLogNorm	snnlib/util/util.cpp	/^double getLogNorm(double logmean, double logsd) {$/;"	f
+getNorm	snnlib/util/util.cpp	/^double getNorm() {$/;"	f
+getUnif	snnlib/util/util.cpp	/^double getUnif() {$/;"	f
+getUnifBetween	snnlib/util/util.cpp	/^double getUnifBetween(double low, double high) {$/;"	f
+normal_distr_var	snnlib/util/util.cpp	/^double normal_distr_var = -1;$/;"	v
+split	snnlib/util/util.cpp	/^vector<string> split(const string &s, char delim) {$/;"	f
+split_into	snnlib/util/util.cpp	/^vector<string> split_into(const string &s, char delim, vector<string> &elems) {$/;"	f
+swapInd	snnlib/util/util.cpp	/^void swapInd(size_t *l, size_t *r) {$/;"	f
+trim	snnlib/util/util.cpp	/^void trim(string &str) {$/;"	f
+PI	snnlib/util/util.h	12;"	d
+ARG_HELP	tools/dumptool/dumptool.cpp	/^enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_UCR_TS, ARG_LAB_TS_PB };$/;"	e	enum:optionIndex	file:
+ARG_LAB_TS_PB	tools/dumptool/dumptool.cpp	/^enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_UCR_TS, ARG_LAB_TS_PB };$/;"	e	enum:optionIndex	file:
+ARG_UCR_TS	tools/dumptool/dumptool.cpp	/^enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_UCR_TS, ARG_LAB_TS_PB };$/;"	e	enum:optionIndex	file:
+ARG_UNKNOWN	tools/dumptool/dumptool.cpp	/^enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_UCR_TS, ARG_LAB_TS_PB };$/;"	e	enum:optionIndex	file:
+main	tools/dumptool/dumptool.cpp	/^int main(int argc, char **argv) {$/;"	f
+optionIndex	tools/dumptool/dumptool.cpp	/^enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_UCR_TS, ARG_LAB_TS_PB };$/;"	g	file:
+parseOptions	tools/dumptool/dumptool.cpp	/^void parseOptions(option::Option* options, option::Stats &stats,  int argc, char **argv) {$/;"	f
+usage	tools/dumptool/dumptool.cpp	/^const option::Descriptor usage[] =$/;"	v
+convertUcrTimeSeriesLine	tools/dumptool/ucr_ts.h	/^Protos::LabeledTimeSeries convertUcrTimeSeriesLine(const string &line) {$/;"	f
+ARG_CONSTANTS	tools/sim/snn_sim.cpp	/^enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_CONSTANTS, ARG_INPUT_TS };$/;"	e	enum:optionIndex	file:
+ARG_HELP	tools/sim/snn_sim.cpp	/^enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_CONSTANTS, ARG_INPUT_TS };$/;"	e	enum:optionIndex	file:
+ARG_INPUT_TS	tools/sim/snn_sim.cpp	/^enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_CONSTANTS, ARG_INPUT_TS };$/;"	e	enum:optionIndex	file:
+ARG_UNKNOWN	tools/sim/snn_sim.cpp	/^enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_CONSTANTS, ARG_INPUT_TS };$/;"	e	enum:optionIndex	file:
+main	tools/sim/snn_sim.cpp	/^int main(int argc, char **argv) {$/;"	f
+optionIndex	tools/sim/snn_sim.cpp	/^enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_CONSTANTS, ARG_INPUT_TS };$/;"	g	file:
+parseOptions	tools/sim/snn_sim.cpp	/^void parseOptions(option::Option* options, option::Stats &stats,  int argc, char **argv) {$/;"	f
+usage	tools/sim/snn_sim.cpp	/^const option::Descriptor usage[] =$/;"	v

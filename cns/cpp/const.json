@@ -1,14 +1,17 @@
 {
+    "tuning_curves" : {
+        "SigmaTuningCurve" : {
+            "sigma" : [2.0, 2.0],
+            "intercept" : [-1, 1.0],
+            "gain" : [50,50]
+
+        }
+    },
     "net_layers" : {
         "SRMLayer" : {
             "tau_refr"  : 2.0,       
             "amp_refr"  : 200.0,     
             "u_rest"    : 0.0       
-        }
-    },
-    "input_layers" : {
-        "SigmaTCLayer" : {
-            "sigma" : 2.0
         }
     },
     "synapses" : {
@@ -45,20 +48,21 @@
     "sim_configuration" : {
         "input_layers_conf" : [
             {
-                "size" : 100,
-                "type" : "SigmaTCLayer",
-                "act_func" : "Determ"                    
+                "size" : 10,
+                "type" : "SRMLayer",
+                "tuning_curve" : "SigmaTuningCurve",
+                "act_func" : "Determ"
             },                
         ],
         "net_layers_conf" : [
             {
-                "size" : 100,
+                "size" : 5,
                 "type" : "SRMLayer",
                 "learning_rule" : "OptimalStdp",
                 "act_func" : "ExpHennequin"
             },                    
             {
-                "size" : 100,
+                "size" : 5,
                 "type" : "SRMLayer",
                 "learning_rule" : "OptimalStdp",
                 "act_func" : "ExpHennequin"
@@ -76,5 +80,8 @@
                 { "prob" : 1.0, "weight" : 4.0, "type" : "Synapse_Inh"  }
             ]
         },
+        "time_series_map_conf" : {
+            "dt" : 2.0                
+        }
     }
 }
