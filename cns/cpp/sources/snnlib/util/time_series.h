@@ -8,7 +8,9 @@
 class TimeSeries { // : public Printable {
 public:    
     vector<double> data;
-
+    TimeSeries() {
+        pos = 0;
+    }
     void deserialize(const Protos::TimeSeries &m) {
         for(size_t i=0; i<m.data_size(); i++) {
             data.push_back( m.data(i) );
@@ -18,6 +20,8 @@ public:
         print_vector<double>(data, str, ", ");
         str << "\n";
     }
+private:
+    size_t pos;    
 };
 
 
@@ -37,11 +41,17 @@ public:
 };
 
 
+
 class LabeledTimeSeriesList { // : public Printable {
 public:    
-    LabeledTimeSeriesList() {}
-    LabeledTimeSeriesList(const string &fname) {
+    LabeledTimeSeriesList() : null_ret(0) {
+        current_position.first = 0;
+        current_position.second = 0;
+    }
+    LabeledTimeSeriesList(const string &fname) : null_ret(0) {
         deserializeFromFile(fname);
+        current_position.first = 0;
+        current_position.second = 0;
     }
 
     size_t size() const {
@@ -49,7 +59,18 @@ public:
     }
 
     vector<LabeledTimeSeries> ts;
-
+        
+    const double &x pop_value() {
+        const double &ret = ts[current_position.first].ts.data[current_position.second];
+        current_position.second++;
+        if(current_position.second == ts[current_position.first].ts.data.size() ) {
+            current_position.first++;
+            current_position.second = 0;
+            if(current_position.first == ts.size()) {
+                return null_ret;                    
+            }
+        }    
+    }
     void deserializeFromFile(const string &fname) {
         ProtoRw prw(fname, ProtoRw::Read);
         vector<Protos::LabeledTimeSeries> v = prw.readAll<Protos::LabeledTimeSeries>();
@@ -71,6 +92,9 @@ public:
     void print(std::ostream& str) const {
         //print_vector<LabeledTimeSeries>(ts, str, "\n");
     }
+private:    
+    static double null_ret;
+    pair<size_t,size_t> current_position;
 };
 
 

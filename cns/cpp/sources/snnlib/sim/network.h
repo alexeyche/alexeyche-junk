@@ -1,5 +1,7 @@
 #pragma once
 
+typedef priority_queue<SynSpike, vector<SynSpike>, CompareSynSpike> SpikeQueue;
+
 
 struct Conn {
 	size_t l_id;
@@ -25,6 +27,8 @@ public:
 		if(spikes_list) delete []spikes_list;
 	}
 	
+
+	SpikeQueue *queues;	
 	vector<Conn> *conn_map;	
 	vector<double> *spikes_list;
 };

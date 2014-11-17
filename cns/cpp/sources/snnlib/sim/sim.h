@@ -38,10 +38,11 @@ public:
         double dt = 1.0;
         Tmax=1000;
         for(double t=0; t<Tmax; t += dt) {
-            for(auto it=input_layers.begin(); it != input_layers.end(); ++it) {
-                Layer *l = *it;
+            const double &x = lts.pop_value();
+            for(size_t li=0; li<input_layers.size(); li++) {
+                Layer *l = input_layers[li];
                 for(size_t ni=0; ni<l->N; ni++) {
-                    l->neurons[ni]->attachCurrent(10.0);
+                    l->neurons[ni]->attachCurrent(x);
                     l->neurons[ni]->calculateProbability();
                     l->neurons[ni]->calculateDynamics();
                 }

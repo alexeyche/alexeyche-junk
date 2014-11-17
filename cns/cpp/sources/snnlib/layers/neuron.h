@@ -56,7 +56,8 @@ public:
         str << "\ty == " << y;
         str << "\tsynapses: \n";
         for(auto it=syns.begin(); it != syns.end(); ++it) {
-            str << *it << ", ";
+            Synapse *s = *it;
+            str << *s << ", ";
         }
         str << "\n";
     }

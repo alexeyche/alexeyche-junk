@@ -57,7 +57,6 @@ public:
             } else {
                 s->x -= s->x/s->c->epsp_decay;
                 s->fired = 0;
-
                 ++it;
             }
         }
@@ -70,7 +69,7 @@ public:
         str << "\ty == " << y;
         str << "\tsynapses: \n";
         for(auto it=syns.begin(); it != syns.end(); ++it) {
-            str << *it << ", ";
+            str << **it << ", ";
         }
         str << "\n";
     }

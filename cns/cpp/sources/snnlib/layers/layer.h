@@ -13,6 +13,7 @@ static size_t global_layer_index = 0;
 
 #include <snnlib/config/factory.h>
 
+
 class Layer : public Entity {
 protected:
     Layer() {}
@@ -61,10 +62,7 @@ public:
                 if(neurons[ni]->id != l_post[nj]->id) {
                     double prob = getUnif();
                     if( conf.prob > prob ) {
-                        cout << "conf.prob > prob " << conf.prob << " > " << prob << "\n";
-                        cout << conf.type << "\n";
                         Synapse *s = Factory::inst().createSynapse(conf.type, c[conf.type], neurons[ni]->id, conf.weight);
-                        cout << "Adding synapse " << *s << " to neuron " << l_post[nj]->id << "\n";
                         l_post[nj]->addSynapse(s);
                     }
                 }

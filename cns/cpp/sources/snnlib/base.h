@@ -5,7 +5,6 @@
 class Obj {
 public:    
     virtual ~Obj() { 
-        cerr << "Obj is out\n";
     }
 
 };

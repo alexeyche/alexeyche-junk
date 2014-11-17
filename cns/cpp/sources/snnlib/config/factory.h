@@ -19,7 +19,6 @@ class Constants;
 class Factory {
     Factory();
     ~Factory() {
-        cout <<"Destructing\n";
         for(auto it=objects.begin(); it != objects.end(); ++it) {
             delete *it;
         }
