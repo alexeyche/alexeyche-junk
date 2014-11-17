@@ -63,13 +63,17 @@ int main(int argc, char **argv) {
     parseOptions(options, stats, argc, argv); 
 
     Constants c = Constants(options[ARG_CONSTANTS].arg);
-    LabeledTimeSeriesList lts_list(options[ARG_INPUT_TS].arg);
-
     cout << c;
+
     Sim s(c);
     cout << s;
+    
+    {
+        LabeledTimeSeriesList lts_list(options[ARG_INPUT_TS].arg);
+        s.setInputTimeSeries(lts_list);
+    }
+
     s.run();
-//    s.setInputTimeSeries(lts_list);
     
     delete[] options;
 }

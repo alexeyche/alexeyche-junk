@@ -5,7 +5,6 @@
 #include <snnlib/base.h>
 #include <snnlib/config/constants.h>
 
-typedef priority_queue<SynSpike, vector<SynSpike>, CompareSynSpike> SpikeQueue;
 
 class Synapse : public Printable {
 private:

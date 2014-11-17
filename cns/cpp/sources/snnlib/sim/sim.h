@@ -22,11 +22,7 @@ public:
         }
     }
     void setInputTimeSeries(LabeledTimeSeriesList l) {
-        input_ts = l;
-        size_t fullLenght = input_ts.getFullSampleLength();
-        cout << fullLenght << "\n";
-        Tmax = fullLenght * sc.ts_map_conf.dt;
-
+        input_ts = ContLabeledTimeSeries(l, sc.ts_map_conf.dt);
     }
     void precalculateInputLayerSpikes() {
         if(input_ts.size() == 0) {
@@ -38,7 +34,7 @@ public:
         double dt = 1.0;
         Tmax=1000;
         for(double t=0; t<Tmax; t += dt) {
-            const double &x = lts.pop_value();
+            const double &x = input_ts.pop_value();
             for(size_t li=0; li<input_layers.size(); li++) {
                 Layer *l = input_layers[li];
                 for(size_t ni=0; ni<l->N; ni++) {
@@ -55,7 +51,7 @@ public:
 
     Network net;
 
-    LabeledTimeSeriesList input_ts;
+    ContLabeledTimeSeries input_ts;
 
     vector< Layer *> input_layers;
     vector< Layer *> layers;
