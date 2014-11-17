@@ -16,9 +16,9 @@ public:
     }
     void init(const ConstObj *_c) {
         CAST_TYPE(OptimalStdpC, _c)
-        c = shared_ptr<const OptimalStdpC>(cast);
+        c = cast;
     }
 
-    shared_ptr<const OptimalStdpC> c;    
+    const OptimalStdpC *c;
 };
 

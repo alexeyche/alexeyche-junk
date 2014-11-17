@@ -68,7 +68,7 @@ public:
         amp = v["amp"].getDouble();
     }
     void print(std::ostream &str) const {
-        str << "epsp_decay: " << epsp_decay << ", " << "amp: " << amp << "\n"; 
+        str << "epsp_decay: " << epsp_decay << ", " << "amp: " << amp << "\n";
     }
 
 };
@@ -103,7 +103,7 @@ public:
         r0          = v["r0"].getDouble();
     }
     void print(std::ostream &str) const {
-        str << 
+        str <<
             "u_tr: "        <<       u_tr << ", " <<
             "gain_factor: " <<       gain_factor << ", " <<
             "p_rest: "      <<       p_rest << ", " <<
@@ -145,7 +145,7 @@ public:
     string act_func;
     string tuning_curve;
     string learning_rule;
-    
+
     void fill_structure(JsonBox::Value v) {
         act_func = v["act_func"].getString();
         tuning_curve = v["tuning_curve"].getString();
@@ -153,12 +153,12 @@ public:
         neuron = v["neuron"].getString();
     }
     void print(std::ostream &str) const {
-        str << "NeuronConf(" << "learning_rule: "  << learning_rule << ", tuning_curve : " << tuning_curve <<  ", act_func: " << act_func << ")"; 
+        str << "NeuronConf(" << "learning_rule: "  << learning_rule << ", tuning_curve : " << tuning_curve <<  ", act_func: " << act_func << ")";
     }
 };
 
 class LayerConf : public ConstObj {
-public:    
+public:
     size_t size;
     string layer;
 
@@ -196,7 +196,7 @@ public:
     double dt;
     void print(std::ostream &str) const {
         str << "dt : " << dt;
-    }    
+    }
     void fill_structure(JsonBox::Value v) {
         dt = v["dt"].getDouble();
     }
@@ -208,24 +208,24 @@ class SimConfiguration: public ConstObj {
 public:
     vector<LayerConf> input_layers_conf;
     vector<LayerConf> net_layers_conf;
-    
+
     ConnectionMap conn_map;
-    TimeSeriesMapConf ts_map_conf;        
+    TimeSeriesMapConf ts_map_conf;
 
     void fill_structure(JsonBox::Value v) {
-        auto a_input_sizes = v["input_layers_conf"].getArray();      
-        for(auto it=a_input_sizes.begin(); it!=a_input_sizes.end(); ++it) { 
+        auto a_input_sizes = v["input_layers_conf"].getArray();
+        for(auto it=a_input_sizes.begin(); it!=a_input_sizes.end(); ++it) {
             JsonBox::Value v = *it;
             LayerConf conf;
             if(v["neuron_conf"]["tuning_curve"].getString().empty()) {
                 cerr << "Input layer must have a tuning curve\n";
-                terminate();    
+                terminate();
             }
             conf.fill_structure(v);
             input_layers_conf.push_back(conf);
         }
-        auto a_net_sizes = v["net_layers_conf"].getArray();      
-        for(auto it=a_net_sizes.begin(); it!=a_net_sizes.end(); ++it) { 
+        auto a_net_sizes = v["net_layers_conf"].getArray();
+        for(auto it=a_net_sizes.begin(); it!=a_net_sizes.end(); ++it) {
             JsonBox::Value v = *it;
             LayerConf conf;
             conf.fill_structure(v);
@@ -241,7 +241,7 @@ public:
             size_t aff_pre = stoi(aff[0].c_str());
             size_t aff_post = stoi(aff[1].c_str());
             pair<size_t, size_t> aff_p(aff_pre, aff_post);
-            
+
             vector<ConnectionConf> conn_conf_vec;
             JsonBox::Array conn_array = it->second.getArray();
             for(auto conn_it=conn_array.begin(); conn_it != conn_array.end(); ++conn_it) {
@@ -257,27 +257,27 @@ public:
         }
         ts_map_conf.fill_structure(v["time_series_map_conf"]);
     }
-    
+
 
     void print(std::ostream &str) const {
         str << "input_layers_conf: \n";  print_vector<LayerConf>(input_layers_conf, str, ",\n");
         str << "net_layers_conf: \n"; print_vector<LayerConf>(net_layers_conf, str, ",\n");
         for(auto it=conn_map.begin(); it!=conn_map.end(); ++it) {
             pair<size_t,size_t> aff = it->first;
-            str << aff.first << "-" << aff.second << ":\n"; 
+            str << aff.first << "-" << aff.second << ":\n";
             print_vector<ConnectionConf>(it->second, str, "\n");
         }
         str << "time_series_map_conf: " << ts_map_conf << "\n";
-    }    
+    }
 };
 
 
 
 
-typedef map<string, shared_ptr<const ConstObj> > const_map;
+typedef map<string, const ConstObj *> const_map;
 
 class Constants {
-public:    
+public:
     Constants(string filename);
 
     const_map neurons;
@@ -287,24 +287,24 @@ public:
     const_map synapses;
     const_map act_funcs;
     const_map learning_rules;
-        
+
     SimConfiguration sim_conf;
 
-    const ConstObj* operator[](const string &key) const {
-        if(neurons.count(key)) return neurons.at(key).get();
-        if(layers.count(key)) return layers.at(key).get();
-        if(tuning_curves.count(key)) return tuning_curves.at(key).get();
-        if(synapses.count(key)) return synapses.at(key).get();
-        if(act_funcs.count(key)) return act_funcs.at(key).get();
-        if(learning_rules.count(key)) return learning_rules.at(key).get();
+    const ConstObj *operator[](const string &key) const {
+        if(neurons.count(key)) return neurons.at(key);
+        if(layers.count(key)) return layers.at(key);
+        if(tuning_curves.count(key)) return tuning_curves.at(key);
+        if(synapses.count(key)) return synapses.at(key);
+        if(act_funcs.count(key)) return act_funcs.at(key);
+        if(learning_rules.count(key)) return learning_rules.at(key);
 
         cerr << "Couldn't find instance with key in constants: " << key << "\n";
         terminate();
     }
 
     static void print_constants_map(const const_map &m) {
-        for(auto it = m.cbegin(); it != m.cend(); ++it ) { 
-            cout << it->first << " == " << *it->second; 
+        for(auto it = m.cbegin(); it != m.cend(); ++it ) {
+            cout << it->first << " == " << *it->second;
         }
     }
     friend std::ostream& operator<<(std::ostream& str, Constants const& data) {

@@ -7,30 +7,30 @@
 Sim::Sim(const Constants &c) : Tmax(0.0), sc(c.sim_conf) {
     for(size_t l_id = 0; l_id < sc.input_layers_conf.size(); l_id++) {
         LayerConf conf = sc.input_layers_conf[l_id];
-        Layer* l = Factory::inst().createLayer(conf.layer, c[conf.layer], conf.size, conf.nconf, c);
+        Layer *l = Factory::inst().createLayer(conf.layer, c[conf.layer], conf.size, conf.nconf, c);
         input_layers.push_back(l);
     }
     for(size_t l_id = 0; l_id < sc.net_layers_conf.size(); l_id++) {
         LayerConf conf = sc.net_layers_conf[l_id];
-        Layer* l = Factory::inst().createLayer(conf.layer, c[conf.layer], conf.size, conf.nconf, c);
+        Layer *l = Factory::inst().createLayer(conf.layer, c[conf.layer], conf.size, conf.nconf, c);
         layers.push_back(l);
     }
 
     for(auto it=sc.conn_map.begin(); it != sc.conn_map.end(); ++it) {
         pair<size_t, size_t> l_ids = it->first;
-        
+
         Layer *pre = nullptr, *post = nullptr;
         if(l_ids.first < input_layers.size()) { // deducing pre layer (from input or not)
             pre = input_layers[l_ids.first];
         } else
         if(l_ids.first < layers.size()) {
             pre = layers[l_ids.first];
-        } 
+        }
 
         if(l_ids.second < input_layers.size()) {
             cerr << "Can't create connection with input layer\n";
             terminate();
-        } else 
+        } else
         if(l_ids.second < input_layers.size() + layers.size()) {
             post = layers[l_ids.second - input_layers.size()];
         }

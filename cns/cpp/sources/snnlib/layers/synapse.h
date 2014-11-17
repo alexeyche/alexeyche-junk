@@ -5,10 +5,10 @@
 #include <snnlib/base.h>
 #include <snnlib/config/constants.h>
 
-typedef priority_queue<SynSpike, vector<SynSpike>, CompareSynSpike> SpikeQueue; 
+typedef priority_queue<SynSpike, vector<SynSpike>, CompareSynSpike> SpikeQueue;
 
 class Synapse : public Printable {
-private:    
+private:
     Synapse() {}
     friend class Factory;
 public:
@@ -17,19 +17,19 @@ public:
     }
     void init(const ConstObj *_c, size_t _id_pre, double _w) {
         CAST_TYPE(SynapseC, _c)
-        c = shared_ptr<const SynapseC>(cast);
+        c = cast;
         id_pre = _id_pre;
         w = _w;
         x = 0.0;
     }
-    
+
     size_t id_pre;
-    
+
     double x;
     double w;
 
     uchar fired;
-    
+
     SpikeQueue q;
     void propagateSpike() {
         x += c->amp;
@@ -38,5 +38,5 @@ public:
         str << "Synapse(id_pre: " << id_pre << ", x:" << x << ", w: " << w << ")";
     }
 
-    shared_ptr<const SynapseC> c;
+    const SynapseC *c;
 };

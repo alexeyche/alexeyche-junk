@@ -10,12 +10,11 @@ using namespace google::protobuf::io;
 
 Protos::LabeledTimeSeries doubleVectorToLabeledTimeSeries(string label, const vector<double> &data) {
     Protos::LabeledTimeSeries lts;
-    Protos::TimeSeries *ts = new Protos::TimeSeries();
-    lts.set_label(label);
-    lts.set_allocated_ts(ts);
+    Protos::TimeSeries *ts = lts.mutable_ts();
     for(auto it=data.cbegin(); it != data.cend(); ++it) {
         ts->add_data(*it);
     }
+    lts.set_label(label);
     return lts;
 }
 

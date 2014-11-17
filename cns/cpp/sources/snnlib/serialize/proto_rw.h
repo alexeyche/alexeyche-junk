@@ -5,13 +5,13 @@
 #include <google/protobuf/io/coded_stream.h>
 
 #include <fcntl.h>
-
+#include <unistd.h>
 using namespace google::protobuf::io;
 
-
+static int glob_deb = 0;
 
 class ProtoRw {
-public:    
+public:
     #define CHECK_MODE(mode) \
         if(m != mode) {\
             cerr << "Can't do it in that mode\n";\
@@ -21,36 +21,28 @@ public:
     enum Mode {Read, Write};
     ProtoRw(const string &f, Mode _m) : m(_m) {
         if(m == Read) {
-            ifs = new ifstream(f, ios::in | ios::binary);
-            if(!ifs->is_open()) {
-                cerr << "Failed to open file " << f << " for read\n";
-                terminate(); 
+            fd = open(f.c_str(), O_RDONLY);
+            if (fd == -1) {
+                perror("Error while opening file");
+                terminate();
             }
-            zeroIn = new IstreamInputStream(ifs);
-            codedIn = new CodedInputStream(zeroIn);
+
+            ifs_g = new google::protobuf::io::FileInputStream(fd);
+            codedIn = new CodedInputStream(ifs_g);
         } else
         if(m == Write) {
             ofs = new ofstream(f, ios::out | ios::trunc | ios::binary);
-            zeroOut = new OstreamOutputStream(ofs);
-            codedOut = new CodedOutputStream(zeroOut);
         }
     }
     ~ProtoRw() {
         if(m == Read) {
-            ifs->close();
-
+            delete ifs_g;
             delete codedIn;
-            delete zeroIn;
-            
-            delete ifs;            
-            
+
+            close(fd);
         } else
         if(m == Write) {
             ofs->close();
-            
-            delete codedOut;
-            delete zeroOut;
-            
             delete ofs;
         }
 
@@ -73,7 +65,7 @@ public:
     vector<T> readAll() {
         CHECK_MODE(Read);
         vector<T> v;
-        while(!ifs->eof()) {
+        while(true) {
             T el;
             if(!read<T>(el)) {
                 break; // we are at end
@@ -83,46 +75,36 @@ public:
         return v;
     }
 
-private:    
+private:
     void writeMessage(::google::protobuf::Message &message) {
+        zeroOut = new OstreamOutputStream(ofs);
+        codedOut = new CodedOutputStream(zeroOut);
+
         google::protobuf::uint32 size = message.ByteSize();
-        char buffer[size]; 
-        if(!message.SerializeToArray(buffer, size)) {
-            cerr << "Failed to serialize message: \n" << message.DebugString();
-            terminate();
-        }
-        google::protobuf::uint32 magic = 1234;
-        codedOut->WriteLittleEndian32(magic);
+
         codedOut->WriteVarint32(size);
-        codedOut->WriteRaw(buffer, size);
+        message.SerializeToCodedStream(codedOut);
+
+        delete codedOut;
+        delete zeroOut;
     }
     bool readMessage(::google::protobuf::Message &message) {
-        google::protobuf::uint32 magic;
-        if(!codedIn->ReadLittleEndian32(&magic)) {
-            return false;
-        }
-        
+
         google::protobuf::uint32 size;
-        if (!codedIn->ReadVarint32(&size)) { 
+        if(!codedIn->ReadVarint32(&size)) {
             return false;
         }
-        char buffer[size];
-        
-        //cout << size << "\n";
-        if(!codedIn->ReadRaw(buffer, size)) {
-            //cerr << "Can't do ReadRaw of message size " << size << "\n";
-            //terminate();
+        CodedInputStream::Limit limit = codedIn->PushLimit(size);
+        if(!message.ParseFromCodedStream(codedIn)) {
+            cerr << "Can't parse message with size " << size << "\n";
+            terminate();
         }
-        //buffer[size] = '\0';
-        if(!message.ParseFromArray(buffer, size)) {
-            //cerr << "Can't do parse of message size " << size << "\n";
-            //terminate();
-        }
-        //cout << message.DebugString();
+        codedIn->PopLimit(limit);
+
         return true;
     }
 
-
+    int fd;
 
 
     Mode m;
@@ -131,6 +113,8 @@ private:
     CodedOutputStream *codedOut;
 
     ifstream *ifs;
+    google::protobuf::io::FileInputStream* ifs_g;
+
     IstreamInputStream *zeroIn;
     CodedInputStream *codedIn;
 

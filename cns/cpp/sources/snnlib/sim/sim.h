@@ -7,7 +7,7 @@
 #include "network.h"
 
 class Sim: public Printable {
-public: 
+public:
     Sim(const Constants &c);
     ~Sim() {
         input_layers.clear();
@@ -27,13 +27,13 @@ public:
         cout << fullLenght << "\n";
         Tmax = fullLenght * sc.ts_map_conf.dt;
 
-    }   
+    }
     void precalculateInputLayerSpikes() {
         if(input_ts.size() == 0) {
             cerr << "Need set input time series to precalculate spikes\n";
-            terminate(); 
+            terminate();
         }
-    } 
+    }
     void run() {
         double dt = 1.0;
         Tmax=1000;
@@ -46,9 +46,9 @@ public:
                     l->neurons[ni]->calculateDynamics();
                 }
 
-                
+
             }
-        }            
+        }
     }
     double Tmax;
 
@@ -56,8 +56,8 @@ public:
 
     LabeledTimeSeriesList input_ts;
 
-    vector<Layer*> input_layers;
-    vector<Layer*> layers;
+    vector< Layer *> input_layers;
+    vector< Layer *> layers;
 
 
     const SimConfiguration &sc;

@@ -10,13 +10,13 @@ static bool synapseNotActive(const Synapse *s) {
 }
 
 class SRMNeuron : public Neuron {
-protected:    
+protected:
     SRMNeuron() { }
     friend class Factory;
 public:
     SRMNeuron(const ConstObj *_c, ActFunc *_act, LearningRule *_lrule, TuningCurve *_tc) {
         init(_c, _act, _lrule, _tc);
-		CAST_TYPE(SRMNeuronC, Neuron::bc.get())    		
+		CAST_TYPE(SRMNeuronC, bc)
     }
     void init(const ConstObj *_c, ActFunc *_act, LearningRule *_lrule, TuningCurve *_tc) {
         Neuron::init(_c, _act, _lrule, _tc);
@@ -46,7 +46,7 @@ public:
             fired = 1;
             cout << "Neuron " << id << " got a spike\n";
         }
-        
+
         //active_synapses.erase(active_synapses.remove_if(active_synapses.begin(), active_synapses.end(), synapseNotActive), active_synapses.end());
         // to test efficiancy
         auto it=active_synapses.begin();
@@ -57,11 +57,11 @@ public:
             } else {
                 s->x -= s->x/s->c->epsp_decay;
                 s->fired = 0;
-                
+
                 ++it;
             }
         }
-        
+
 
     }
 
@@ -74,28 +74,28 @@ public:
         }
         str << "\n";
     }
-    
-    shared_ptr<const SRMNeuronC> c;
+
+    const SRMNeuronC *c;
 };
 
 
 
 
 class SRMLayer : public Layer {
-protected:    
+protected:
     SRMLayer() { }
     friend class Factory;
 public:
-    
+
     void init(size_t _size, const ConstObj *_c, const NeuronConf &nc, const Constants &glob_c) {
         Layer::init(_size, _c, nc, glob_c);
-        CAST_TYPE(SRMLayerC, Layer::bc.get());
+        CAST_TYPE(SRMLayerC, bc)
     }
 
     void calculate() {
 
     }
-    shared_ptr<const SRMLayerC> c;    
+    const SRMLayerC *c;
 };
 
 

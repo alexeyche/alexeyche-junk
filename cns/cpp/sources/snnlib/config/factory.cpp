@@ -47,11 +47,11 @@ Factory::Factory() {
         base_struct_name = findBaseStructName(name);\
     }\
 
-ConstObj* Factory::createConst(string name, JsonBox::Value v) {
+ConstObj *Factory::createConst(string name, JsonBox::Value v) {
     GET_BASE_NAME(const_map)
     ConstObj *o = dynamic_cast<ConstObj*>(const_map[base_struct_name]());
     if(!o) {
-        cerr << "Error while reading " << name << " and treating like ConstObj\n"; 
+        cerr << "Error while reading " << name << " and treating like ConstObj\n";
         terminate();
     }
     o->fill_structure(v);
@@ -59,7 +59,7 @@ ConstObj* Factory::createConst(string name, JsonBox::Value v) {
     return o;
 }
 
-ActFunc* Factory::createActFunc(string name, const ConstObj *c) {
+ActFunc *Factory::createActFunc(string name, const ConstObj *c) {
     GET_BASE_NAME(entity_map)
     ActFunc *o = dynamic_cast<ActFunc*>(entity_map[base_struct_name]());
     if(!o) { cerr << "Error while reading " << name << " and treating like ActFunc\n"; terminate(); }
@@ -68,7 +68,7 @@ ActFunc* Factory::createActFunc(string name, const ConstObj *c) {
     return o;
 }
 
-LearningRule*  Factory::createLearningRule(string name, const ConstObj *c) {
+LearningRule * Factory::createLearningRule(string name, const ConstObj *c) {
     GET_BASE_NAME(entity_map)
     LearningRule *o = dynamic_cast<LearningRule*>(entity_map[base_struct_name]());
     if(!o) { cerr << "Error while reading " << name << " and treating like LearningRule\n"; terminate(); }
@@ -77,7 +77,7 @@ LearningRule*  Factory::createLearningRule(string name, const ConstObj *c) {
     return o;
 }
 
-Synapse*  Factory::createSynapse(string name, const ConstObj *c, size_t id_pre, double w) {
+Synapse *Factory::createSynapse(string name, const ConstObj *c, size_t id_pre, double w) {
     GET_BASE_NAME(entity_map)
     Synapse *o = dynamic_cast<Synapse*>(entity_map[base_struct_name]());
     if(!o) { cerr << "Error while reading " << name << " and treating like Synapse\n"; terminate(); }
@@ -86,7 +86,7 @@ Synapse*  Factory::createSynapse(string name, const ConstObj *c, size_t id_pre, 
     return o;
 }
 
-Neuron* Factory::createNeuron(string name, const ConstObj *c, ActFunc *act, LearningRule *lr, TuningCurve *tc) {
+Neuron *Factory::createNeuron(string name, const ConstObj *c, ActFunc *act, LearningRule *lr, TuningCurve *tc) {
     GET_BASE_NAME(entity_map)
     Neuron *o = dynamic_cast<Neuron*>(entity_map[base_struct_name]());
     if(!o) { cerr << "Error while reading " << name << " and treating like Neuron\n"; terminate(); }
@@ -95,7 +95,7 @@ Neuron* Factory::createNeuron(string name, const ConstObj *c, ActFunc *act, Lear
     return o;
 }
 
-Layer* Factory::createLayer(string name, const ConstObj* c, size_t size, const NeuronConf &nc, const Constants &glob_c) {
+Layer *Factory::createLayer(string name, const ConstObj *c, size_t size, const NeuronConf &nc, const Constants &glob_c) {
     GET_BASE_NAME(entity_map)
     Layer *o = dynamic_cast<Layer*>(entity_map[base_struct_name]());
     if(!o) { cerr << "Error while reading " << name << " and treating like Layer\n"; terminate(); }
@@ -105,7 +105,7 @@ Layer* Factory::createLayer(string name, const ConstObj* c, size_t size, const N
 }
 
 
-TuningCurve* Factory::createTuningCurve(string name, const ConstObj *c) {
+TuningCurve *Factory::createTuningCurve(string name, const ConstObj *c) {
     GET_BASE_NAME(entity_map)
     TuningCurve *o = dynamic_cast<TuningCurve*>(entity_map[base_struct_name]());
     if(!o) { cerr << "Error while reading " << name << " and treating like TuningCurve\n"; terminate(); }

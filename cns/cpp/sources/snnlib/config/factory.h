@@ -27,15 +27,13 @@ class Factory {
     }
 public:
     template<typename BASE,typename INST> static BASE* createInstance() { return new INST; }
-    ConstObj* createConst(string name, JsonBox::Value v);
-    
-
-    Layer* createLayer(string name, const ConstObj* c, size_t size, const NeuronConf &nc, const Constants &glob_c);
-    Neuron* createNeuron(string name, const ConstObj *c, ActFunc *act, LearningRule *lr, TuningCurve *tc);
-    Synapse*  createSynapse(string name, const ConstObj *c, size_t id_pre, double w);
-    TuningCurve* createTuningCurve(string name, const ConstObj *c);
-    ActFunc* createActFunc(string name, const ConstObj *c);
-    LearningRule*  createLearningRule(string name, const ConstObj *c);
+    ConstObj *createConst(string name, JsonBox::Value v);
+    ActFunc *createActFunc(string name, const ConstObj *c);
+    Synapse *createSynapse(string name, const ConstObj *c, size_t id_pre, double w);
+    Layer *createLayer(string name, const ConstObj *c, size_t size, const NeuronConf &nc, const Constants &glob_c);
+    Neuron *createNeuron(string name, const ConstObj *c, ActFunc *act, LearningRule *lr, TuningCurve *tc);
+    TuningCurve *createTuningCurve(string name, const ConstObj *c);
+    LearningRule * createLearningRule(string name, const ConstObj *c);
 
     string findBaseStructName(string deriv_struct_name) {
         for(auto it=entity_map.begin(); it != entity_map.end(); ++it) {

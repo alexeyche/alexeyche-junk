@@ -87,7 +87,6 @@ ExpHennequin	snnlib/act_funcs/exp_hennequin.h	/^    ExpHennequin() {}$/;"	f	clas
 ExpHennequin	snnlib/act_funcs/exp_hennequin.h	/^    ExpHennequin(const ExpHennequinC *_c) {$/;"	f	class:ExpHennequin
 ExpHennequin	snnlib/act_funcs/exp_hennequin.h	/^class ExpHennequin: public ActFunc {$/;"	c
 ExpHennequinC	snnlib/config/constants.h	/^class ExpHennequinC : public ConstObj {$/;"	c
-FACTORY	snnlib/config/factory.cpp	22;"	d	file:
 FALSE_STRING	snnlib/util/json/grammar.h	/^		const std::string FALSE_STRING = "false";$/;"	m	namespace:JsonBox::Literals
 FORM_FEED	snnlib/util/json/grammar.h	/^				const char FORM_FEED = 'f';$/;"	m	namespace:JsonBox::Strings::Json::Escape
 FORM_FEED	snnlib/util/json/grammar.h	/^			const char FORM_FEED = '\\f';$/;"	m	namespace:JsonBox::Strings::Std
@@ -96,14 +95,16 @@ Factory	snnlib/config/factory.cpp	/^Factory::Factory() {$/;"	f	class:Factory
 Factory	snnlib/config/factory.h	/^class Factory {$/;"	c
 FunctionWriter	snnlib/util/optionparser/optionparser.h	/^    FunctionWriter(Function* w) :$/;"	f	struct:option::PrintUsageImplementation::FunctionWriter
 FunctionWriter	snnlib/util/optionparser/optionparser.h	/^  struct FunctionWriter: public IStringWriter$/;"	s	struct:option::PrintUsageImplementation
-GET_BASE_NAME	snnlib/config/factory.cpp	47;"	d	file:
+GET_BASE_NAME	snnlib/config/factory.cpp	43;"	d	file:
 HORIZONTAL_TAB	snnlib/util/json/grammar.h	/^		const char HORIZONTAL_TAB = '\\t';$/;"	m	namespace:JsonBox::Whitespace
+I	snnlib/layers/neuron_test.h	/^	double I;$/;"	m	class:SimNeuron
 INTEGER	snnlib/util/json/value.h	/^		    INTEGER,$/;"	e	enum:JsonBox::Value::Type
 IStringWriter	snnlib/util/optionparser/optionparser.h	/^  struct IStringWriter$/;"	s	struct:option::PrintUsageImplementation
 IndentCanceller	snnlib/util/json/indent_canceller.cpp	/^	IndentCanceller::IndentCanceller() : afterBackSlash(false), inString(false) {$/;"	f	class:JsonBox::IndentCanceller
 IndentCanceller	snnlib/util/json/indent_canceller.h	/^	class IndentCanceller {$/;"	c	namespace:JsonBox
 Indenter	snnlib/util/json/indenter.cpp	/^	Indenter::Indenter() : atStartOfLine(true) {$/;"	f	class:JsonBox::Indenter
 Indenter	snnlib/util/json/indenter.h	/^	class Indenter {$/;"	c	namespace:JsonBox
+InputModifier	snnlib/layers/neuron_test.h	/^typedef FastDelegate1<const &double> InputModifier;$/;"	t
 JB_ARRAY_H	snnlib/util/json/array.h	2;"	d
 JB_CONVERTER_H	snnlib/util/json/convert.h	5;"	d
 JB_ESCAPER_H	snnlib/util/json/escaper.h	2;"	d
@@ -138,10 +139,10 @@ LINE_FEED	snnlib/util/json/grammar.h	/^				const char LINE_FEED = 'n';$/;"	m	nam
 LINE_FEED	snnlib/util/json/grammar.h	/^			const char LINE_FEED = '\\n';$/;"	m	namespace:JsonBox::Strings::Std
 LINE_FEED	snnlib/util/json/grammar.h	/^			const std::string LINE_FEED = "\\\\n";$/;"	m	namespace:JsonBox::Strings::Json
 LOWER_EXP	snnlib/util/json/grammar.h	/^		const char LOWER_EXP = 'e';$/;"	m	namespace:JsonBox::Numbers
-LabeledTimeSeries	snnlib/util/time_series.h	/^class LabeledTimeSeries : public Printable {$/;"	c
+LabeledTimeSeries	snnlib/util/time_series.h	/^class LabeledTimeSeries { \/\/ : public Printable {$/;"	c
 LabeledTimeSeriesList	snnlib/util/time_series.h	/^    LabeledTimeSeriesList() {}$/;"	f	class:LabeledTimeSeriesList
 LabeledTimeSeriesList	snnlib/util/time_series.h	/^    LabeledTimeSeriesList(const string &fname) {$/;"	f	class:LabeledTimeSeriesList
-LabeledTimeSeriesList	snnlib/util/time_series.h	/^class LabeledTimeSeriesList : public Printable {$/;"	c
+LabeledTimeSeriesList	snnlib/util/time_series.h	/^class LabeledTimeSeriesList { \/\/ : public Printable {$/;"	c
 Layer	snnlib/layers/layer.h	/^    Layer() {}$/;"	f	class:Layer
 Layer	snnlib/layers/layer.h	/^    Layer(size_t _size, const ConstObj *_c, const NeuronConf &nc, const Constants &glob_c) { $/;"	f	class:Layer
 Layer	snnlib/layers/layer.h	/^class Layer : public Entity {$/;"	c
@@ -177,7 +178,7 @@ Network	snnlib/sim/network.h	/^	Network() {$/;"	f	class:Network
 Network	snnlib/sim/network.h	/^	Network(size_t net_size) {$/;"	f	class:Network
 Network	snnlib/sim/network.h	/^class Network {$/;"	c
 Neuron	snnlib/layers/neuron.h	/^    Neuron() {}$/;"	f	class:Neuron
-Neuron	snnlib/layers/neuron.h	/^    Neuron(const ConstObj *_c, const ActFunc *_act, const LearningRule *_lrule, const TuningCurve *_tc) {$/;"	f	class:Neuron
+Neuron	snnlib/layers/neuron.h	/^    Neuron(const ConstObj *_c, ActFunc *_act, LearningRule *_lrule, TuningCurve *_tc) {$/;"	f	class:Neuron
 Neuron	snnlib/layers/neuron.h	/^class Neuron: public Printable {$/;"	c
 NeuronConf	snnlib/config/constants.h	/^class NeuronConf : public ConstObj {$/;"	c
 NonEmpty	snnlib/util/optionparser/opt.h	/^  static option::ArgStatus NonEmpty(const option::Option& option, bool msg)$/;"	f	struct:Arg
@@ -234,14 +235,16 @@ SOLIDUS	snnlib/util/json/grammar.h	/^			const char SOLIDUS = '\/';$/;"	m	namespa
 SOLIDUS	snnlib/util/json/grammar.h	/^			const std::string SOLIDUS = "\\\\\/";$/;"	m	namespace:JsonBox::Strings::Json
 SPACE	snnlib/util/json/grammar.h	/^		const char SPACE = ' ';$/;"	m	namespace:JsonBox::Whitespace
 SRMLayer	snnlib/layers/srm_layer.h	/^    SRMLayer() { }$/;"	f	class:SRMLayer
-SRMLayer	snnlib/layers/srm_layer.h	/^class SRMLayer : public Layer, public SimLayer {$/;"	c
+SRMLayer	snnlib/layers/srm_layer.h	/^class SRMLayer : public Layer {$/;"	c
 SRMLayerC	snnlib/config/constants.h	/^class SRMLayerC: public ConstObj {$/;"	c
-SRMNeuron	snnlib/layers/srm_layer.h	/^    SRMNeuron(size_t _id, const ConstObj *_c, const ActFunc *_act, const LearningRule *_lrule, const TuningCurve *_tc) $/;"	f	class:SRMNeuron
+SRMNeuron	snnlib/layers/srm_layer.h	/^    SRMNeuron() { }$/;"	f	class:SRMNeuron
+SRMNeuron	snnlib/layers/srm_layer.h	/^    SRMNeuron(const ConstObj *_c, ActFunc *_act, LearningRule *_lrule, TuningCurve *_tc) {$/;"	f	class:SRMNeuron
 SRMNeuron	snnlib/layers/srm_layer.h	/^class SRMNeuron : public Neuron {$/;"	c
 SRMNeuronC	snnlib/config/constants.h	/^class SRMNeuronC: public ConstObj {$/;"	c
 STRING	snnlib/util/json/value.h	/^		    STRING,$/;"	e	enum:JsonBox::Value::Type
 STR_SWITCH_H	snnlib/util/str_switch.h	2;"	d
 SWITCH	snnlib/util/str_switch.h	6;"	d
+SYN_ACT_TOL	snnlib/layers/neuron.h	15;"	d
 SigmaTuningCurve	snnlib/tuning_curves/sigma_tuning_curve.h	/^    SigmaTuningCurve() {}$/;"	f	class:SigmaTuningCurve
 SigmaTuningCurve	snnlib/tuning_curves/sigma_tuning_curve.h	/^class SigmaTuningCurve: public TuningCurve {$/;"	c
 SigmaTuningCurveC	snnlib/config/constants.h	/^class SigmaTuningCurveC: public ConstObj {$/;"	c
@@ -251,13 +254,18 @@ SimConfiguration	snnlib/config/constants.h	/^class SimConfiguration: public Cons
 SimInputLayer	snnlib/sim/sim_input_layer.h	/^	SimInputLayer() {}$/;"	f	class:SimInputLayer
 SimInputLayer	snnlib/sim/sim_input_layer.h	/^	SimInputLayer(size_t size) {$/;"	f	class:SimInputLayer
 SimInputLayer	snnlib/sim/sim_input_layer.h	/^class SimInputLayer {$/;"	c
+SimLayer	snnlib/layers/sim_layer_test.h	/^	void SimLayer(Layer *n) {$/;"	f	class:SimLayer
+SimLayer	snnlib/layers/sim_layer_test.h	/^class SimLayer: {$/;"	c
 SimLayer	snnlib/sim/sim_layer.h	/^	SimLayer() {}$/;"	f	class:SimLayer
 SimLayer	snnlib/sim/sim_layer.h	/^class SimLayer {$/;"	c
+SimNeuron	snnlib/layers/neuron_test.h	/^	void SimNeuron(Neuron *n) {$/;"	f	class:SimNeuron
+SimNeuron	snnlib/layers/neuron_test.h	/^class SimNeuron: {$/;"	c
 SimNeuron	snnlib/sim/sim_neuron.h	/^	SimNeuron()  {}$/;"	f	class:SimNeuron
 SimNeuron	snnlib/sim/sim_neuron.h	/^class SimNeuron {$/;"	c
 SolidusEscaper	snnlib/util/json/solidus_escaper.cpp	/^	SolidusEscaper::SolidusEscaper() : afterBackSlash(false), inString(false) {$/;"	f	class:JsonBox::SolidusEscaper
 SolidusEscaper	snnlib/util/json/solidus_escaper.h	/^	class SolidusEscaper {$/;"	c	namespace:JsonBox
 SpikeQueue	snnlib/layers/synapse.h	/^typedef priority_queue<SynSpike, vector<SynSpike>, CompareSynSpike> SpikeQueue; $/;"	t
+StateModifier	snnlib/layers/neuron_test.h	/^typedef FastDelegate0<> StateModifier;$/;"	t
 Stats	snnlib/util/optionparser/optionparser.h	/^  Stats() :$/;"	f	struct:option::Stats
 Stats	snnlib/util/optionparser/optionparser.h	/^  Stats(bool gnu, const Descriptor usage[], int argc, char** argv, int min_abbr_len = 0, \/\/$/;"	f	struct:option::Stats
 Stats	snnlib/util/optionparser/optionparser.h	/^  Stats(bool gnu, const Descriptor usage[], int argc, const char** argv, int min_abbr_len = 0, \/\/$/;"	f	struct:option::Stats
@@ -285,7 +293,7 @@ TAB	snnlib/util/json/grammar.h	/^			const std::string TAB = "\\\\t";$/;"	m	names
 TRUE_STRING	snnlib/util/json/grammar.h	/^		const std::string TRUE_STRING = "true";$/;"	m	namespace:JsonBox::Literals
 TemporaryWriter	snnlib/util/optionparser/optionparser.h	/^    TemporaryWriter(const Temporary& u) :$/;"	f	struct:option::PrintUsageImplementation::TemporaryWriter
 TemporaryWriter	snnlib/util/optionparser/optionparser.h	/^  struct TemporaryWriter: public IStringWriter$/;"	s	struct:option::PrintUsageImplementation
-TimeSeries	snnlib/util/time_series.h	/^class TimeSeries : public Printable {$/;"	c
+TimeSeries	snnlib/util/time_series.h	/^class TimeSeries { \/\/ : public Printable {$/;"	c
 TimeSeriesMapConf	snnlib/config/constants.h	/^class TimeSeriesMapConf : public ConstObj {$/;"	c
 Tmax	snnlib/sim/sim.h	/^    double Tmax;$/;"	m	class:Sim
 TuningCurve	snnlib/tuning_curves/tuning_curve.h	/^class TuningCurve : public Obj {$/;"	c
@@ -317,18 +325,17 @@ Whitespace	snnlib/util/json/grammar.h	/^	namespace Whitespace {$/;"	n	namespace:
 Write	snnlib/serialize/proto_rw.h	/^    enum Mode {Read, Write};$/;"	e	enum:ProtoRw::Mode
 Write	tools/testproto/main.cpp	/^    enum Mode {Read, Write};$/;"	e	enum:ProtoRw::Mode	file:
 __builtin_clz	snnlib/util/optionparser/optionparser.h	233;"	d
-_inst	snnlib/config/factory.cpp	/^Factory* Factory::_inst = nullptr;$/;"	m	class:Factory	file:
 _inst	snnlib/config/factory.h	/^    static Factory *_inst;$/;"	m	class:Factory
-act	snnlib/layers/neuron.h	/^    shared_ptr<const ActFunc> act;$/;"	m	class:Neuron
+act	snnlib/layers/neuron.h	/^    shared_ptr<ActFunc> act;$/;"	m	class:Neuron
 act_func	snnlib/config/constants.h	/^    string act_func;$/;"	m	class:NeuronConf
 act_funcs	snnlib/config/constants.h	/^    const_map act_funcs;$/;"	m	class:Constants
+active_synapses	snnlib/layers/neuron.h	/^    list<Synapse*> active_synapses;$/;"	m	class:Neuron
 active_synapses	snnlib/sim/sim_neuron.h	/^	list<Synapse*> active_synapses;$/;"	m	class:SimNeuron
 add	snnlib/util/optionparser/optionparser.h	/^  void add(bool gnu, const Descriptor usage[], int argc, char** argv, int min_abbr_len = 0, \/\/$/;"	f	struct:option::Stats
 add	snnlib/util/optionparser/optionparser.h	/^  void add(const Descriptor usage[], int argc, char** argv, int min_abbr_len = 0, \/\/$/;"	f	struct:option::Stats
 add	snnlib/util/optionparser/optionparser.h	/^  void add(const Descriptor usage[], int argc, const char** argv, int min_abbr_len = 0, \/\/$/;"	f	struct:option::Stats
 add	snnlib/util/optionparser/optionparser.h	/^inline void Stats::add(bool gnu, const Descriptor usage[], int argc, const char** argv, int min_abbr_len,$/;"	f	class:option::Stats
-addNeuron	snnlib/layers/srm_layer.h	/^    Neuron* addNeuron(const ConstObj *_c, const ActFunc *_act, const LearningRule *_lrule, const TuningCurve *_tc) {$/;"	f	class:SRMLayer
-addSynapse	snnlib/layers/neuron.h	/^    void addSynapse(Synapse s) {$/;"	f	class:Neuron
+addSynapse	snnlib/layers/neuron.h	/^    void addSynapse(Synapse *s) {$/;"	f	class:Neuron
 afterBackSlash	snnlib/util/json/escaper.h	/^		bool afterBackSlash;$/;"	m	class:JsonBox::Escaper
 afterBackSlash	snnlib/util/json/indent_canceller.h	/^		bool afterBackSlash;$/;"	m	class:JsonBox::IndentCanceller
 afterBackSlash	snnlib/util/json/solidus_escaper.h	/^		bool afterBackSlash;$/;"	m	class:JsonBox::SolidusEscaper
@@ -345,6 +352,7 @@ assign	snnlib/util/json/array.h	/^		void assign(InputIterator first, InputIterat
 at	snnlib/util/json/array.cpp	/^	Array::const_reference Array::at(size_type pos) const {$/;"	f	class:JsonBox::Array
 at	snnlib/util/json/array.cpp	/^	Array::reference Array::at(size_type pos) {$/;"	f	class:JsonBox::Array
 atStartOfLine	snnlib/util/json/indenter.h	/^		bool atStartOfLine;$/;"	m	class:JsonBox::Indenter
+attachCurrent	snnlib/layers/srm_layer.h	/^    void attachCurrent(const double &I) {$/;"	f	class:SRMNeuron
 back	snnlib/util/json/array.cpp	/^	Array::const_reference Array::back() const {$/;"	f	class:JsonBox::Array
 back	snnlib/util/json/array.cpp	/^	Array::reference Array::back() {$/;"	f	class:JsonBox::Array
 bc	snnlib/layers/layer.h	/^    shared_ptr<const ConstObj> bc;$/;"	m	class:Layer
@@ -372,10 +380,12 @@ c	snnlib/layers/srm_layer.h	/^    shared_ptr<const SRMNeuronC> c;$/;"	m	class:SR
 c	snnlib/layers/synapse.h	/^    shared_ptr<const SynapseC> c;$/;"	m	class:Synapse
 c	snnlib/learning/optimal_stdp.h	/^    shared_ptr<const OptimalStdpC> c;    $/;"	m	class:OptimalStdp
 c	snnlib/tuning_curves/sigma_tuning_curve.h	/^    shared_ptr<const SigmaTuningCurveC> c;$/;"	m	class:SigmaTuningCurve
+calculate	snnlib/layers/neuron_test.h	/^	void calculate() {$/;"	f	class:SimNeuron
 calculate	snnlib/layers/srm_layer.h	/^    void calculate() {$/;"	f	class:SRMLayer
 calculateDynamics	snnlib/layers/srm_layer.h	/^    void calculateDynamics() {$/;"	f	class:SRMNeuron
 calculateProbability	snnlib/layers/srm_layer.h	/^    void calculateProbability() {$/;"	f	class:SRMNeuron
-calculateResponse	snnlib/tuning_curves/sigma_tuning_curve.h	/^    void calculateResponse(Neuron *n, const double &x) {$/;"	f	class:SigmaTuningCurve
+calculateResponse	snnlib/tuning_curves/sigma_tuning_curve.h	/^    double calculateResponse(const double &x) {$/;"	f	class:SigmaTuningCurve
+calculateResponse	snnlib/tuning_curves/tuning_curve.h	/^	double calculateResponse(const double &I) { return 0.0; }$/;"	f	class:BlankTuningCurve
 capacity	snnlib/util/json/array.cpp	/^	Array::size_type Array::capacity() const {$/;"	f	class:JsonBox::Array
 center	snnlib/tuning_curves/sigma_tuning_curve.h	/^    double center;$/;"	m	class:SigmaTuningCurve
 check_arg	snnlib/util/optionparser/optionparser.h	/^  const CheckArg check_arg;$/;"	m	struct:option::Descriptor
@@ -412,9 +422,9 @@ createActFunc	snnlib/config/factory.cpp	/^ActFunc* Factory::createActFunc(string
 createConst	snnlib/config/factory.cpp	/^ConstObj* Factory::createConst(string name, JsonBox::Value v) {$/;"	f	class:Factory
 createInstance	snnlib/config/factory.h	/^    template<typename BASE,typename INST> static BASE* createInstance() { return new INST; }$/;"	f	class:Factory
 createInstance	snnlib/config/type_maps.h	/^template<typename E,typename T> E* createInstance() { return new T; }$/;"	f
-createLayer	snnlib/config/factory.cpp	/^Layer* Factory::createLayer(string name, const ConstObj* c, size_t size, const NeuronConf &nc) {$/;"	f	class:Factory
+createLayer	snnlib/config/factory.cpp	/^Layer* Factory::createLayer(string name, const ConstObj* c, size_t size, const NeuronConf &nc, const Constants &glob_c) {$/;"	f	class:Factory
 createLearningRule	snnlib/config/factory.cpp	/^LearningRule*  Factory::createLearningRule(string name, const ConstObj *c) {$/;"	f	class:Factory
-createNeuron	snnlib/config/factory.cpp	/^Neuron* Factory::createNeuron(string name, const ConstObj *c, const ActFunc *act, const LearningRule *lr, const TuningCurve *tc) {$/;"	f	class:Factory
+createNeuron	snnlib/config/factory.cpp	/^Neuron* Factory::createNeuron(string name, const ConstObj *c, ActFunc *act, LearningRule *lr, TuningCurve *tc) {$/;"	f	class:Factory
 createSynapse	snnlib/config/factory.cpp	/^Synapse*  Factory::createSynapse(string name, const ConstObj *c, size_t id_pre, double w) {$/;"	f	class:Factory
 createTuningCurve	snnlib/config/factory.cpp	/^TuningCurve* Factory::createTuningCurve(string name, const ConstObj *c) {$/;"	f	class:Factory
 data	snnlib/util/json/array.h	/^		container data;$/;"	m	class:JsonBox::Array
@@ -447,7 +457,7 @@ entity_map	snnlib/base.h	/^typedef map<string, unique_ptr<Entity> > entity_map;$
 entity_map	snnlib/config/factory.h	/^    entity_map_type entity_map;$/;"	m	class:Factory
 entity_map_type	snnlib/config/factory.h	/^typedef map<string, Obj*(*)()> entity_map_type;$/;"	t
 entity_map_type	snnlib/config/type_maps.h	/^typedef map<string, Entity*(*)()> entity_map_type;$/;"	t
-epsp_delay	snnlib/config/constants.h	/^    double epsp_delay;$/;"	m	class:SynapseC
+epsp_decay	snnlib/config/constants.h	/^    double epsp_decay;$/;"	m	class:SynapseC
 equal_range	snnlib/util/json/object.cpp	/^	std::pair<Object::const_iterator, Object::const_iterator> Object::equal_range(const key_type &key) const {$/;"	f	class:JsonBox::Object
 equal_range	snnlib/util/json/object.cpp	/^	std::pair<Object::iterator, Object::iterator> Object::equal_range(const key_type &key) {$/;"	f	class:JsonBox::Object
 erase	snnlib/util/json/array.cpp	/^	Array::iterator Array::erase(iterator first, iterator last) {$/;"	f	class:JsonBox::Array
@@ -529,18 +539,20 @@ index	snnlib/util/optionparser/optionparser.h	/^  int index() const$/;"	f	class:
 init	snnlib/act_funcs/determ.h	/^    void init(const ConstObj *_c) {$/;"	f	class:Determ
 init	snnlib/act_funcs/exp_hennequin.h	/^    void init(const ConstObj *_c) {$/;"	f	class:ExpHennequin
 init	snnlib/layers/layer.h	/^    virtual void init(size_t _size, const ConstObj *_c, const NeuronConf &nc, const Constants &glob_c) {$/;"	f	class:Layer
-init	snnlib/layers/neuron.h	/^    virtual void init(const ConstObj *_c, const ActFunc *_act, const LearningRule *_lrule, const TuningCurve *_tc) {$/;"	f	class:Neuron
-init	snnlib/layers/srm_layer.h	/^    void init(size_t _id, size_t _size, const ConstObj *_c, const ActFunc *_act, const LearningRule *_lrule, const TuningCurve *_tc) {$/;"	f	class:SRMLayer
+init	snnlib/layers/neuron.h	/^    virtual void init(const ConstObj *_c, ActFunc *_act, LearningRule *_lrule, TuningCurve *_tc) {$/;"	f	class:Neuron
+init	snnlib/layers/srm_layer.h	/^    void init(const ConstObj *_c, ActFunc *_act, LearningRule *_lrule, TuningCurve *_tc) {$/;"	f	class:SRMNeuron
+init	snnlib/layers/srm_layer.h	/^    void init(size_t _size, const ConstObj *_c, const NeuronConf &nc, const Constants &glob_c) {$/;"	f	class:SRMLayer
 init	snnlib/layers/synapse.h	/^    void init(const ConstObj *_c, size_t _id_pre, double _w) {$/;"	f	class:Synapse
 init	snnlib/learning/learning_rule.h	/^	void init(const ConstObj *_c) {}	$/;"	f	class:BlankLearningRule
 init	snnlib/learning/optimal_stdp.h	/^    void init(const ConstObj *_c) {$/;"	f	class:OptimalStdp
 init	snnlib/sim/network.h	/^	void init(size_t net_size) {$/;"	f	class:Network
 init	snnlib/sim/sim_input_layer.h	/^    void init(size_t size) {$/;"	f	class:SimInputLayer
 init	snnlib/tuning_curves/sigma_tuning_curve.h	/^    void init(const ConstObj *_c) {$/;"	f	class:SigmaTuningCurve
-init	snnlib/tuning_curves/tuning_curve.h	/^	void init(size_t size, const ConstObj *_c) {}$/;"	f	class:BlankTuningCurve
+init	snnlib/tuning_curves/tuning_curve.h	/^	void init(const ConstObj *_c) {}$/;"	f	class:BlankTuningCurve
 init	snnlib/util/optionparser/optionparser.h	/^  void init(const Descriptor* desc_, const char* name_, const char* arg_)$/;"	f	class:option::Option
 input_layers	snnlib/sim/sim.h	/^    vector<Layer*> input_layers;$/;"	m	class:Sim
 input_layers_conf	snnlib/config/constants.h	/^    vector<LayerConf> input_layers_conf;$/;"	m	class:SimConfiguration
+input_mods	snnlib/layers/neuron_test.h	/^	vector<vector<InputModifier>> input_mods;$/;"	m	class:SimNeuron
 input_ts	snnlib/sim/sim.h	/^    LabeledTimeSeriesList input_ts;$/;"	m	class:Sim
 insert	snnlib/util/json/array.cpp	/^	Array::iterator Array::insert(iterator pos, const_reference value) {$/;"	f	class:JsonBox::Array
 insert	snnlib/util/json/array.cpp	/^	void Array::insert(iterator pos, size_type count, const_reference value) {$/;"	f	class:JsonBox::Array
@@ -549,7 +561,7 @@ insert	snnlib/util/json/object.cpp	/^	Object::iterator Object::insert(iterator h
 insert	snnlib/util/json/object.cpp	/^	std::pair<Object::iterator, bool> Object::insert(const_reference value) {$/;"	f	class:JsonBox::Object
 insert	snnlib/util/json/object.h	/^		void insert(InputIterator first, InputIterator last) {$/;"	f	class:JsonBox::Object
 inserter	snnlib/util/json/output_filter.h	/^		Inserter inserter;$/;"	m	class:JsonBox::OutputFilter
-inst	snnlib/config/factory.cpp	/^Factory* Factory::inst() {$/;"	f	class:Factory
+inst	snnlib/config/factory.cpp	/^Factory& Factory::inst() {$/;"	f	class:Factory
 instr	snnlib/util/optionparser/optionparser.h	/^  static bool instr(char ch, const char* st)$/;"	f	class:option::Parser
 intValue	snnlib/util/json/value.h	/^			int *intValue;$/;"	m	union:JsonBox::Value::ValueDataPointer
 intercept	snnlib/config/constants.h	/^    pair<double,double> intercept;$/;"	m	class:SigmaTuningCurveC
@@ -590,7 +602,7 @@ loadFromString	snnlib/util/json/value.cpp	/^	void Value::loadFromString(std::str
 longopt	snnlib/util/optionparser/optionparser.h	/^  const char* const longopt;$/;"	m	struct:option::Descriptor
 lower_bound	snnlib/util/json/object.cpp	/^	Object::const_iterator Object::lower_bound(const key_type &key) const {$/;"	f	class:JsonBox::Object
 lower_bound	snnlib/util/json/object.cpp	/^	Object::iterator Object::lower_bound(const key_type &key) {$/;"	f	class:JsonBox::Object
-lrule	snnlib/layers/neuron.h	/^    shared_ptr<const LearningRule> lrule;$/;"	m	class:Neuron
+lrule	snnlib/layers/neuron.h	/^    shared_ptr<LearningRule> lrule;$/;"	m	class:Neuron
 m	snnlib/serialize/proto_rw.h	/^    Mode m;$/;"	m	class:ProtoRw
 m	tools/testproto/main.cpp	/^    Mode m;$/;"	m	class:ProtoRw	file:
 main	tools/dumptool/dumptool.cpp	/^int main(int argc, char **argv) {$/;"	f
@@ -607,11 +619,12 @@ name	snnlib/util/optionparser/optionparser.h	/^  const char* name;$/;"	m	class:o
 namelen	snnlib/util/optionparser/optionparser.h	/^  int namelen;$/;"	m	class:option::Option
 ncol	snnlib/util/matrix.h	/^    size_t ncol;$/;"	m	class:Matrix
 nconf	snnlib/config/constants.h	/^    NeuronConf nconf;$/;"	m	class:LayerConf
-net	snnlib/sim/sim.h	/^    NetworkStat net;$/;"	m	class:Sim
+net	snnlib/sim/sim.h	/^    Network net;$/;"	m	class:Sim
 net_layers_conf	snnlib/config/constants.h	/^    vector<LayerConf> net_layers_conf;$/;"	m	class:SimConfiguration
 neuron	snnlib/config/constants.h	/^    string neuron;$/;"	m	class:NeuronConf
 neurons	snnlib/config/constants.h	/^    const_map neurons;$/;"	m	class:Constants
 neurons	snnlib/layers/layer.h	/^    vector< shared_ptr<Neuron> > neurons;$/;"	m	class:Layer
+neurons	snnlib/layers/sim_layer_test.h	/^	vector<Neurons> neurons;$/;"	m	class:SimLayer
 next	snnlib/util/optionparser/optionparser.h	/^    bool next()$/;"	f	class:option::PrintUsageImplementation::LinePartIterator
 next	snnlib/util/optionparser/optionparser.h	/^  Option* next()$/;"	f	class:option::Option
 nextRow	snnlib/util/optionparser/optionparser.h	/^    bool nextRow()$/;"	f	class:option::PrintUsageImplementation::LinePartIterator
@@ -626,6 +639,7 @@ nonop_count	snnlib/util/optionparser/optionparser.h	/^  int nonop_count; \/\/!< 
 normal_distr_var	snnlib/util/util.cpp	/^double normal_distr_var = -1;$/;"	v
 nrow	snnlib/util/matrix.h	/^    size_t nrow;$/;"	m	class:Matrix
 objectValue	snnlib/util/json/value.h	/^			Object *objectValue;$/;"	m	union:JsonBox::Value::ValueDataPointer
+objects	snnlib/config/factory.h	/^    vector<Obj*> objects;$/;"	m	class:Factory
 ofs	snnlib/serialize/proto_rw.h	/^    ofstream *ofs;$/;"	m	class:ProtoRw
 ofs	tools/testproto/main.cpp	/^    ofstream *ofs;$/;"	m	class:ProtoRw	file:
 op_count	snnlib/util/optionparser/optionparser.h	/^  int op_count; \/\/!< @internal @brief see optionsCount()$/;"	m	class:option::Parser
@@ -743,6 +757,8 @@ prob	snnlib/config/constants.h	/^    double prob;$/;"	m	class:ConnectionConf
 probDeriv	snnlib/act_funcs/determ.h	/^    double probDeriv(const double &u) const {$/;"	f	class:Determ
 probDeriv	snnlib/act_funcs/exp_hennequin.h	/^    double probDeriv(const double &u) const {$/;"	f	class:ExpHennequin
 process	snnlib/util/optionparser/optionparser.h	/^    void process(IStringWriter& write, const char* data, int len)$/;"	f	class:option::PrintUsageImplementation::LineWrapper
+propagateSpike	snnlib/layers/synapse.h	/^    void propagateSpike() {$/;"	f	class:Synapse
+propagateSynSpike	snnlib/layers/srm_layer.h	/^    void propagateSynSpike(const SynSpike &sp) {$/;"	f	class:SRMNeuron
 ptr	snnlib/util/optionparser/optionparser.h	/^    const char* ptr; \/\/!< Ptr to current part within the current row.$/;"	m	class:option::PrintUsageImplementation::LinePartIterator
 push_back	snnlib/util/json/array.cpp	/^	void Array::push_back(const_reference value) {$/;"	f	class:JsonBox::Array
 q	snnlib/layers/synapse.h	/^    SpikeQueue q;$/;"	m	class:Synapse
@@ -811,6 +827,7 @@ split	snnlib/util/util.cpp	/^vector<string> split(const string &s, char delim) {
 split	tools/testproto/main.cpp	/^vector<string> split(const string &s, char delim) {$/;"	f
 split_into	snnlib/util/util.cpp	/^vector<string> split_into(const string &s, char delim, vector<string> &elems) {$/;"	f
 split_into	tools/testproto/main.cpp	/^vector<string> split_into(const string &s, char delim, vector<string> &elems) {$/;"	f
+state_mods	snnlib/layers/neuron_test.h	/^	vector<vector<StateModifier>> state_mods;	$/;"	m	class:SimNeuron
 str_hash	snnlib/util/str_switch.h	/^    constexpr ullong str_hash(const char* const str, const uchar current_len)$/;"	f	namespace:s_s
 str_hash_for_switch	snnlib/util/str_switch.h	/^    inline ullong str_hash_for_switch(const char* const str)$/;"	f	namespace:s_s
 str_hash_for_switch	snnlib/util/str_switch.h	/^    inline ullong str_hash_for_switch(const std::string& str)$/;"	f	namespace:s_s
@@ -828,7 +845,7 @@ syn_id	snnlib/sim/network.h	/^	size_t syn_id;$/;"	m	struct:Conn
 synapseNotActive	snnlib/layers/srm_layer.h	/^static bool synapseNotActive(const Synapse *s) {$/;"	f
 synapses	snnlib/config/constants.h	/^    const_map synapses;$/;"	m	class:Constants
 sync	snnlib/util/json/output_filter.h	/^		virtual int_type sync() {$/;"	f	class:JsonBox::OutputFilter
-syns	snnlib/layers/neuron.h	/^    vector<Synapse> syns;$/;"	m	class:Neuron
+syns	snnlib/layers/neuron.h	/^    vector<Synapse*> syns;$/;"	m	class:Neuron
 t	snnlib/base.h	/^	double t;$/;"	m	struct:SynSpike
 tablestart	snnlib/util/optionparser/optionparser.h	/^    const Descriptor* tablestart; \/\/!< The 1st descriptor of the current table.$/;"	m	class:option::PrintUsageImplementation::LinePartIterator
 tag	snnlib/util/optionparser/optionparser.h	/^  static Option* tag(Option* ptr)$/;"	f	class:option::Option
@@ -838,7 +855,7 @@ target_rate	snnlib/config/constants.h	/^    double target_rate;$/;"	m	class:Opti
 target_rate_factor	snnlib/config/constants.h	/^    double target_rate_factor;$/;"	m	class:OptimalStdpC
 tau_c	snnlib/config/constants.h	/^    double tau_c;$/;"	m	class:OptimalStdpC
 tau_refr	snnlib/config/constants.h	/^    double tau_refr;$/;"	m	class:SRMNeuronC
-tc	snnlib/layers/neuron.h	/^    shared_ptr<const TuningCurve> tc;$/;"	m	class:Neuron
+tc	snnlib/layers/neuron.h	/^    shared_ptr<TuningCurve> tc;$/;"	m	class:Neuron
 trim	snnlib/util/util.cpp	/^void trim(string &str) {$/;"	f
 trim	tools/testproto/main.cpp	/^void trim(string &str) {$/;"	f
 ts	snnlib/util/time_series.h	/^    TimeSeries ts;$/;"	m	class:LabeledTimeSeries
@@ -890,9 +907,10 @@ zeroIn	snnlib/serialize/proto_rw.h	/^    IstreamInputStream *zeroIn;$/;"	m	class
 zeroIn	tools/testproto/main.cpp	/^    IstreamInputStream *zeroIn;$/;"	m	class:ProtoRw	file:
 zeroOut	snnlib/serialize/proto_rw.h	/^    OstreamOutputStream *zeroOut;$/;"	m	class:ProtoRw
 zeroOut	tools/testproto/main.cpp	/^    OstreamOutputStream *zeroOut;$/;"	m	class:ProtoRw	file:
+~Factory	snnlib/config/factory.h	/^    ~Factory() {$/;"	f	class:Factory
 ~Matrix	snnlib/util/matrix.h	/^    ~Matrix() {$/;"	f	class:Matrix
 ~Network	snnlib/sim/network.h	/^	~Network() {$/;"	f	class:Network
-~Obj	snnlib/base.h	/^    virtual ~Obj() {}$/;"	f	class:Obj
+~Obj	snnlib/base.h	/^    virtual ~Obj() { $/;"	f	class:Obj
 ~OutputFilter	snnlib/util/json/output_filter.h	/^		virtual ~OutputFilter() {$/;"	f	class:JsonBox::OutputFilter
 ~ProtoRw	snnlib/serialize/proto_rw.h	/^    ~ProtoRw() {$/;"	f	class:ProtoRw
 ~ProtoRw	tools/testproto/main.cpp	/^    ~ProtoRw() {$/;"	f	class:ProtoRw
