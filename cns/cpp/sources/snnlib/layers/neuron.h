@@ -12,34 +12,45 @@ static size_t global_neuron_index = 0;
 #include <snnlib/tuning_curves/tuning_curve.h>
 
 
+#define SYN_ACT_TOL 0.0001
+
 class Neuron: public Printable {
+protected:
+    Neuron() {}
+    friend class Factory;
 public:
-    Neuron(size_t _id, const ConstObj *_c, const ActFunc *_act, const LearningRule *_lrule, const TuningCurve *_tc) {
-        id = _id;
+    Neuron(const ConstObj *_c, ActFunc *_act, LearningRule *_lrule, TuningCurve *_tc) {
+        init(_c, _act, _lrule, _tc);    
+    }
+    virtual void init(const ConstObj *_c, ActFunc *_act, LearningRule *_lrule, TuningCurve *_tc) {
+        id = ++global_neuron_index;
         bc = shared_ptr<const ConstObj>(_c);
-        act = shared_ptr<const ActFunc>(_act);
-        lrule = shared_ptr<const LearningRule>(_lrule);
-        tc = shared_ptr<const TuningCurve>(_tc);
+        act = shared_ptr<ActFunc>(_act);
+        lrule = shared_ptr<LearningRule>(_lrule);
+        tc = shared_ptr<TuningCurve>(_tc);
 
         y = 0.0;
         p = 0.0;
         fired = 0;
     }
-    
+
     size_t id;
     
     double y;
     double p;
     uchar fired;
 
-    vector<Synapse> syns;
+    vector<Synapse*> syns;
     
-    void addSynapse(Synapse s) {
+    void addSynapse(Synapse *s) {
         syns.push_back(s);
     }
     virtual void calculateProbability() = 0;
     virtual void calculateDynamics() = 0;
-    
+    virtual void attachCurrent(const double &I) = 0;
+
+
+
     void print(std::ostream& str) const {
         str << "Neuron(" << id << ")\n";
         str << "\ty == " << y;
@@ -50,10 +61,12 @@ public:
         str << "\n";
     }
 protected:    
+    list<Synapse*> active_synapses;
+
     shared_ptr<const ConstObj> bc;
-    shared_ptr<const ActFunc> act;
-    shared_ptr<const LearningRule> lrule;
-    shared_ptr<const TuningCurve> tc;
+    shared_ptr<ActFunc> act;
+    shared_ptr<LearningRule> lrule;
+    shared_ptr<TuningCurve> tc;
 };
 
 

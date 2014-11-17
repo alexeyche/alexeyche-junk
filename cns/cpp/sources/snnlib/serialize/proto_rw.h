@@ -108,7 +108,7 @@ private:
         }
         char buffer[size];
         
-        cout << size << "\n";
+        //cout << size << "\n";
         if(!codedIn->ReadRaw(buffer, size)) {
             //cerr << "Can't do ReadRaw of message size " << size << "\n";
             //terminate();
@@ -118,7 +118,7 @@ private:
             //cerr << "Can't do parse of message size " << size << "\n";
             //terminate();
         }
-        cout << message.DebugString();
+        //cout << message.DebugString();
         return true;
     }
 

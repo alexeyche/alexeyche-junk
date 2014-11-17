@@ -4,7 +4,10 @@
 
 class Obj {
 public:    
-    virtual ~Obj() {}
+    virtual ~Obj() { 
+        cerr << "Obj is out\n";
+    }
+
 };
 
 class Printable: public Obj {

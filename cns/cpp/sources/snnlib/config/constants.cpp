@@ -11,7 +11,7 @@
     for(auto inner_it = inner_o.begin(); inner_it != inner_o.end(); inner_it++) {   \
         string struct_name = inner_it->first;                                        \
         const JsonBox::Value &v = inner_it->second;                                 \
-        name[struct_name] = shared_ptr<ConstObj>(Factory::inst()->createConst(struct_name, v)); \
+        name[struct_name] = shared_ptr<ConstObj>(Factory::inst().createConst(struct_name, v)); \
     }\
 }\
 
@@ -25,8 +25,11 @@ Constants::Constants(string filename) {
             if(const_field == "tuning_curves") {
                 PARSE_CONST_STRUCTURE(tuning_curves)
             } else 
-            if(const_field == "net_layers") {
-                PARSE_CONST_STRUCTURE(net_layers)
+            if(const_field == "neurons") {
+                PARSE_CONST_STRUCTURE(neurons)
+            } else 
+            if(const_field == "layers") {
+                PARSE_CONST_STRUCTURE(layers)
             } else 
             if(const_field == "synapses") {
                 PARSE_CONST_STRUCTURE(synapses)

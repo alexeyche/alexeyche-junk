@@ -31,7 +31,9 @@ public:
     uchar fired;
     
     SpikeQueue q;
-
+    void propagateSpike() {
+        x += c->amp;
+    }
     void print(std::ostream& str) const {
         str << "Synapse(id_pre: " << id_pre << ", x:" << x << ", w: " << w << ")";
     }

@@ -2,6 +2,8 @@
 
 #include "neuron.h"
 
+static size_t global_layer_index = 0;
+
 #include <snnlib/act_funcs/act_func.h>
 #include <snnlib/learning/learning_rule.h>
 #include <snnlib/config/constants.h>
@@ -16,20 +18,35 @@ protected:
     Layer() {}
     friend class Factory;
 public:
-    Layer(size_t _id, size_t _size, const ConstObj *_c, const ActFunc *_act, const LearningRule *_lrule, const TuningCurve *_tc) { 
-        init(_id,_size,_c,_act, _lrule, _tc);
+    Layer(size_t _size, const ConstObj *_c, const NeuronConf &nc, const Constants &glob_c) { 
+        init(_size, _c, nc, glob_c);
     }
 
-    virtual Neuron* addNeuron(const ConstObj *_c, const ActFunc *_act, const LearningRule *_lrule, const TuningCurve *_tc) {
-        return new Neuron(global_neuron_index++, _c, _act, _lrule, _tc);
-    }
-    virtual void init(size_t _id, size_t _size, const ConstObj *_c, const ActFunc *_act, const LearningRule *_lrule, const TuningCurve *_tc) {
-        id = _id;
+    virtual void init(size_t _size, const ConstObj *_c, const NeuronConf &nc, const Constants &glob_c) {
+        id = global_layer_index++;
         N = _size;
-        for(size_t i=0; i<N; i++) {
-            neurons.push_back( shared_ptr<Neuron>(addNeuron(_c, _act, _lrule, _tc)) );
+        bc = shared_ptr<const ConstObj>(_c);
+        for(size_t ni=0; ni<N; ni++) {
+            ActFunc* act = Factory::inst().createActFunc(nc.act_func, glob_c[nc.act_func]);
+            
+            LearningRule *lr;
+            if(nc.learning_rule.empty()) { 
+                lr = Factory::inst().createLearningRule("BlankLearningRule", nullptr);
+            } else {
+                lr = Factory::inst().createLearningRule(nc.learning_rule, glob_c[nc.learning_rule]);
+            }
+            TuningCurve *tc;
+            if(nc.tuning_curve.empty()) { 
+                tc = Factory::inst().createTuningCurve("BlankTuningCurve", nullptr);    
+            } else {
+                tc = Factory::inst().createTuningCurve(nc.tuning_curve, glob_c[nc.tuning_curve]);    
+            }
+                     
+            Neuron* n = Factory::inst().createNeuron(nc.neuron, glob_c[nc.neuron], act, lr, tc);
+            neurons.push_back( shared_ptr<Neuron>(n) );
         }
-    }
+    } 
+    
     virtual void calculate() = 0;
     
     size_t size() {
@@ -44,10 +61,14 @@ public:
                 if(neurons[ni]->id != l_post[nj]->id) {
                     double prob = getUnif();
                     if( conf.prob > prob ) {
-                        //cout << "conf.prob > prob " << conf.prob << " > " << prob << "\n";
-                        Synapse* s = Factory::inst()->createSynapse(conf.type, c[conf.type], neurons[ni]->id, conf.weight);
-                        //cout << "Adding synapse " << *s << " to neuron " << (*l_post)[nj]->id << "\n";
-                        l_post[nj]->addSynapse(*s);
+                        cout << "conf.prob > prob " << conf.prob << " > " << prob << "\n";
+                        cout << conf.type << "\n";
+                        cout << *(SynapseC*)c[conf.type] << "\n";
+                        const SynapseC* ll = dynamic_cast<const SynapseC*>(c[conf.type]);
+                        cout << ll->epsp_decay << "\n";
+                        Synapse* s = Factory::inst().createSynapse(conf.type, c[conf.type], neurons[ni]->id, conf.weight);
+                        cout << "Adding synapse " << *s << " to neuron " << l_post[nj]->id << "\n";
+                        l_post[nj]->addSynapse(s);
                         delete s;
                     }
                 }
@@ -62,6 +83,7 @@ public:
     }
 
 //protected:    
+    shared_ptr<const ConstObj> bc;
     size_t id;
     size_t N;
     vector< shared_ptr<Neuron> > neurons;

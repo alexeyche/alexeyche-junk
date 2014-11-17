@@ -5,7 +5,7 @@
 #include <snnlib/serialize/serialize.h>
 #include <snnlib/serialize/proto_rw.h>
 
-class TimeSeries : public Printable {
+class TimeSeries { // : public Printable {
 public:    
     vector<double> data;
 
@@ -21,7 +21,7 @@ public:
 };
 
 
-class LabeledTimeSeries : public Printable {
+class LabeledTimeSeries { // : public Printable {
 public:    
     string label;
     TimeSeries ts;
@@ -32,12 +32,12 @@ public:
     }
     void print(std::ostream& str) const {
         str << "label: " << label << "\n";
-        str << "data: " << ts;
+        //str << "data: " << ts;
     }
 };
 
 
-class LabeledTimeSeriesList : public Printable {
+class LabeledTimeSeriesList { // : public Printable {
 public:    
     LabeledTimeSeriesList() {}
     LabeledTimeSeriesList(const string &fname) {
@@ -63,13 +63,13 @@ public:
         size_t acc = 0;
         for(auto it=ts.begin(); it != ts.end(); ++it) {
             acc += it->ts.data.size();
-            cout << acc << "\n";
+            //cout << acc << "\n";
         }
         return acc;
     }
 
     void print(std::ostream& str) const {
-        print_vector<LabeledTimeSeries>(ts, str, "\n");
+        //print_vector<LabeledTimeSeries>(ts, str, "\n");
     }
 };
 

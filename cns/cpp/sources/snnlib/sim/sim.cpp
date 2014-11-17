@@ -5,19 +5,14 @@
 #include <snnlib/layers/srm_layer.h>
 
 Sim::Sim(const Constants &c) : Tmax(0.0), sc(c.sim_conf) {
-    size_t l_id = 0;
-    for(; l_id < sc.input_layers_conf.size(); l_id++) {
-        InputLayersConf conf = sc.input_layers_conf[l_id];
-        ActFunc *af = Factory::inst()->createActFunc(conf.act_func, c[conf.act_func]);
-        TuningCurve *tc = Factory::inst()->createTuningCurve(conf.tuning_curve, conf.size, c[conf.tuning_curve]);
-        Layer* l = Factory::inst()->createInputLayer(conf.type, l_id, conf.size, c[conf.type], af, tc);
+    for(size_t l_id = 0; l_id < sc.input_layers_conf.size(); l_id++) {
+        LayerConf conf = sc.input_layers_conf[l_id];
+        Layer* l = Factory::inst().createLayer(conf.layer, c[conf.layer], conf.size, conf.nconf, c);
         input_layers.push_back(l);
     }
-    for(; l_id-input_layers.size() < sc.net_layers_conf.size(); l_id++) {
-        NetLayersConf conf = sc.net_layers_conf[l_id-input_layers.size()];
-        ActFunc *af = Factory::inst()->createActFunc(conf.act_func, c[conf.act_func]);
-        LearningRule *lr = Factory::inst()->createLearningRule(conf.learning_rule, c[conf.learning_rule]);
-        Layer* l = Factory::inst()->createLayer(conf.type, l_id, conf.size, c[conf.type], af, lr);
+    for(size_t l_id = 0; l_id < sc.net_layers_conf.size(); l_id++) {
+        LayerConf conf = sc.net_layers_conf[l_id];
+        Layer* l = Factory::inst().createLayer(conf.layer, c[conf.layer], conf.size, conf.nconf, c);
         layers.push_back(l);
     }
 

@@ -12,17 +12,28 @@ class Synapse;
 class ActFunc;
 class LearningRule;
 class TuningCurve;
+class Neuron;
+class NeuronConf;
+class Constants;
 
 class Factory {
     Factory();
+    ~Factory() {
+        cout <<"Destructing\n";
+        for(auto it=objects.begin(); it != objects.end(); ++it) {
+            delete *it;
+        }
+        objects.clear();
+    }
 public:
     template<typename BASE,typename INST> static BASE* createInstance() { return new INST; }
     ConstObj* createConst(string name, JsonBox::Value v);
+    
 
-    Layer* createLayer(string name, size_t id, size_t size, const ConstObj *c, const ActFunc *act, const LearningRule *lrule);
-    Layer* createInputLayer(string name, size_t id, size_t size, const ConstObj *c, const ActFunc *act, const TuningCurve *tc);  
+    Layer* createLayer(string name, const ConstObj* c, size_t size, const NeuronConf &nc, const Constants &glob_c);
+    Neuron* createNeuron(string name, const ConstObj *c, ActFunc *act, LearningRule *lr, TuningCurve *tc);
     Synapse*  createSynapse(string name, const ConstObj *c, size_t id_pre, double w);
-    TuningCurve* createTuningCurve(string name, size_t size, const ConstObj *c);
+    TuningCurve* createTuningCurve(string name, const ConstObj *c);
     ActFunc* createActFunc(string name, const ConstObj *c);
     LearningRule*  createLearningRule(string name, const ConstObj *c);
 
@@ -42,11 +53,12 @@ public:
         cerr << "Unrecognized typename: " << deriv_struct_name << "\n";
         terminate();
     }
-    static Factory* inst();
+    static Factory& inst();
 private:
     entity_map_type entity_map;
     entity_map_type const_map;
     static Factory *_inst;
+    vector<Obj*> objects;
 };
 
 

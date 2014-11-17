@@ -36,16 +36,23 @@ public:
     } 
     void run() {
         double dt = 1.0;
+        Tmax=1000;
         for(double t=0; t<Tmax; t += dt) {
             for(auto it=input_layers.begin(); it != input_layers.end(); ++it) {
                 Layer *l = *it;
-                l->calculate();
+                for(size_t ni=0; ni<l->N; ni++) {
+                    l->neurons[ni]->attachCurrent(10.0);
+                    l->neurons[ni]->calculateProbability();
+                    l->neurons[ni]->calculateDynamics();
+                }
+
+                
             }
         }            
     }
     double Tmax;
 
-    NetworkStat net;
+    Network net;
 
     LabeledTimeSeriesList input_ts;
 
