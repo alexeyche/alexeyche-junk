@@ -12,10 +12,19 @@
             "tau_refr"  : 2.0,       
             "amp_refr"  : 200.0,     
             "u_rest"    : 0.0       
+        },
+        "AdExNeuron" : {
+            "C" : 20,
+            "t_ref" : 2,
+            "gL" : 1,
+            "EL" : 0,
+            "slope" : 0,
+            "tau_a" : 100,
+            "a" : 0,
+            "b" : 0,
+            "u_rest" : 0,
+            "u_tr" : 1
         }
-    },
-    "layers" : {
-        "SRMLayer" : {}
     },
     "synapses" : {
         "Synapse" : {
@@ -29,7 +38,7 @@
     },
     "act_funcs" : {
         "Determ" : {
-            "u_tr" : 15.0
+            "u_tr" : 1.0
         },
         "ExpHennequin" : {
             "gain_factor" : 12.5, 
@@ -52,18 +61,16 @@
         "input_layers_conf" : [
             {
                 "size" : 10,
-                "layer" : "SRMLayer",
                 "neuron_conf" : {
-                    "neuron" : "SRMNeuron",
+                    "neuron" : "AdExNeuron",
                     "tuning_curve" : "SigmaTuningCurve",
-                    "act_func" : "ExpHennequin"
+                    "act_func" : "Determ"
                 }
             },                
         ],
         "net_layers_conf" : [
             {
                 "size" : 5,
-                "layer" : "SRMLayer",
                 "neuron_conf" : {
                     "neuron" : "SRMNeuron",
                     "learning_rule" : "OptimalStdp",
@@ -72,7 +79,6 @@
             },                    
             {
                 "size" : 5,
-                "layer" : "SRMLayer",
                 "neuron_conf" : {
                     "neuron" : "SRMNeuron",
                     "learning_rule" : "OptimalStdp",

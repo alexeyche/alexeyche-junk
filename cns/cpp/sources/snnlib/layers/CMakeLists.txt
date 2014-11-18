@@ -14,6 +14,8 @@ endforeach()
 
 set(SOURCES
     layer.cpp
+    neuron_stat.cpp
+    adex_neuron.cpp
 )
 
 # add directory name to sources

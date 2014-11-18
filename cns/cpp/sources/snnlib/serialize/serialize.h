@@ -8,8 +8,8 @@
 
 using namespace google::protobuf::io;
 
-enum ESerializableClass { ENeuronStat, ESpikesList, ELabeledTimeSeries, ELabeledTimeSeriesList };
-static const char* ESerializableClass_str[] = { "NeuronStat", "SpikesList", "LabeledTimeSeries", "LabeledTimeSeriesList" };
+enum ESerializableClass { ENeuronStat, ESpikesList, ELabeledTimeSeries, ELabeledTimeSeriesList, EAdExNeuronStat };
+static const char* ESerializableClass_str[] = { "NeuronStat", "SpikesList", "LabeledTimeSeries", "LabeledTimeSeriesList", "AdExNeuronStat" };
 
 
 #include <snnlib/base.h>

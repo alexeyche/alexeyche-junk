@@ -19,36 +19,37 @@ protected:
     Layer() {}
     friend class Factory;
 public:
-    Layer(size_t _size, const ConstObj *_c, const NeuronConf &nc, const Constants &glob_c) {
-        init(_size, _c, nc, glob_c);
+    Layer(size_t _size, const NeuronConf &nc, const Constants &glob_c) {
+        init(_size, nc, glob_c);
     }
 
-    virtual void init(size_t _size, const ConstObj *_c, const NeuronConf &nc, const Constants &glob_c) {
+    virtual void init(size_t _size, const NeuronConf &nc, const Constants &glob_c) {
         id = global_layer_index++;
         N = _size;
-        bc = _c;
         for(size_t ni=0; ni<N; ni++) {
-            ActFunc *act = Factory::inst().createActFunc(nc.act_func, glob_c[nc.act_func]);
+            Neuron *n = Factory::inst().createNeuron(nc.neuron, glob_c[nc.neuron]);
+
+            ActFunc *act = Factory::inst().createActFunc(nc.act_func, glob_c[nc.act_func], n);
 
             LearningRule *lr;
             if(nc.learning_rule.empty()) {
-                lr = Factory::inst().createLearningRule("BlankLearningRule", nullptr);
+                lr = Factory::inst().createLearningRule("BlankLearningRule", nullptr, nullptr);
             } else {
-                lr = Factory::inst().createLearningRule(nc.learning_rule, glob_c[nc.learning_rule]);
+                lr = Factory::inst().createLearningRule(nc.learning_rule, glob_c[nc.learning_rule], n);
             }
             TuningCurve *tc;
             if(nc.tuning_curve.empty()) {
-                tc = Factory::inst().createTuningCurve("BlankTuningCurve", nullptr);
+                tc = Factory::inst().createTuningCurve("BlankTuningCurve", nullptr, nullptr);
             } else {
-                tc = Factory::inst().createTuningCurve(nc.tuning_curve, glob_c[nc.tuning_curve]);
+                tc = Factory::inst().createTuningCurve(nc.tuning_curve, glob_c[nc.tuning_curve], n);
             }
 
-            Neuron *n = Factory::inst().createNeuron(nc.neuron, glob_c[nc.neuron], act, lr, tc);
+            
             neurons.push_back(n);
         }
     }
 
-    virtual void calculate() = 0;
+
 
     size_t size() {
         return neurons.size();
@@ -76,8 +77,6 @@ public:
         }
     }
 
-//protected:
-    const ConstObj *bc;
     size_t id;
     size_t N;
     vector< Neuron *> neurons;

@@ -40,7 +40,7 @@ public:
     }
     ~ProtoRw() {
         if(m == Read) {
-            ifs->close();
+            //ifs->close();
 
             delete codedIn;
             delete zeroIn;
@@ -49,7 +49,7 @@ public:
             
         } else
         if(m == Write) {
-            ofs->close();
+            //ofs->close();
             
             delete codedOut;
             delete zeroOut;

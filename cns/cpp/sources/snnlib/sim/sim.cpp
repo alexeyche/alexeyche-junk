@@ -2,20 +2,20 @@
 #include "sim.h"
 
 #include <snnlib/config/factory.h>
-#include <snnlib/layers/srm_layer.h>
+#include <snnlib/layers/srm_neuron.h>
 
 Sim::Sim(const Constants &c) : sc(c.sim_conf) {
     size_t input_neurons_count = 0;
     for(size_t l_id = 0; l_id < sc.input_layers_conf.size(); l_id++) {
         LayerConf conf = sc.input_layers_conf[l_id];
-        Layer *l = Factory::inst().createLayer(conf.layer, c[conf.layer], conf.size, conf.nconf, c);
+        Layer *l = Factory::inst().createLayer(conf.size, conf.nconf, c);
         input_layers.push_back(l);
         input_neurons_count += l->N;
     }
     size_t net_neurons_count = 0;
     for(size_t l_id = 0; l_id < sc.net_layers_conf.size(); l_id++) {
         LayerConf conf = sc.net_layers_conf[l_id];
-        Layer *l = Factory::inst().createLayer(conf.layer, c[conf.layer], conf.size, conf.nconf, c);
+        Layer *l = Factory::inst().createLayer(conf.size, conf.nconf, c);
         layers.push_back(l);
         input_neurons_count += l->N;
     }

@@ -10,12 +10,14 @@ protected:
     Determ() {}
     friend class Factory;
 public:
-    Determ(const ConstObj *_c) {
-        init(_c);
+    Determ(const ConstObj *_c, Neuron *_n) {
+        init(_c, _n);
     }
-    void init(const ConstObj *_c) {
+    void init(const ConstObj *_c, Neuron *_n) {
         CAST_TYPE(DetermC, _c)
         c = cast;
+        n = _n;
+        n->setActFunc(this);
     }
 
     double prob(const double &u) const {

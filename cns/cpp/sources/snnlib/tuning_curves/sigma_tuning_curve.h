@@ -13,10 +13,11 @@ protected:
     SigmaTuningCurve() {}
     friend class Factory;
 public:
-    void init(const ConstObj *_c) {
+    void init(const ConstObj *_c, Neuron *_n) {
         CAST_TYPE(SigmaTuningCurveC, _c)
         c = cast;
-
+        n = _n;
+        n->setTuningCurve(this);
         center = getUnifBetween(c->intercept.first, c->intercept.second);
         gain = getUnifBetween(c->gain.first, c->gain.second);
         sigma = getUnifBetween(c->sigma.first, c->sigma.second);
@@ -26,13 +27,14 @@ public:
     ~SigmaTuningCurve() {
     }
 
-    double calculateResponse(const double &x) {
-        return gain*exp( - (x - center)*(x - center) / ( 2 * sigma_square ));
+    void calculateResponse(const double &x) {
+        n->y = gain*exp( - (x - center)*(x - center) / ( 2 * sigma_square ));
     }
 
 
 
 private:
+    Neuron *n;
     double center;
     double gain;
     double sigma;

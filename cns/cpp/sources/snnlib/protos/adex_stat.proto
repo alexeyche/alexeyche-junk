@@ -1,0 +1,8 @@
+package Protos;
+
+import "stat.proto";
+
+message AdExNeuronStat {
+	required NeuronStat stat = 1;
+	repeated double a = 2 [packed=true];
+}

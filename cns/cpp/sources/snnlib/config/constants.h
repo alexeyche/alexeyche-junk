@@ -27,13 +27,47 @@ public:
         str << "tau_refr: " << tau_refr << ", amp_refr: " << amp_refr << ", u_rest: " << u_rest <<"\n";
     }
 };
-class SRMLayerC: public ConstObj {
+
+class AdExNeuronC: public ConstObj {
 public:
+    double C;
+    double t_ref;
+    double gL;
+    double EL;
+    double slope;
+    double tau_a;
+    double a;
+    double b;
+    double u_rest;
+    double u_tr;
+
     void fill_structure(JsonBox::Value v) {
+        C = v["C"].getDouble();
+        t_ref = v["t_ref"].getDouble();
+        gL = v["gL"].getDouble();
+        EL = v["EL"].getDouble();
+        slope = v["slope"].getDouble();
+        tau_a = v["tau_a"].getDouble();
+        a = v["a"].getDouble();
+        b = v["b"].getDouble();
+        u_rest = v["u_rest"].getDouble();
+        u_tr = v["u_tr"].getDouble();
     }
     void print(std::ostream &str) const {
+        str << "C: " << C;
+        str << ", t_ref: " << t_ref;
+        str << ", gL: " << gL;
+        str << ", EL: " << EL;
+        str << ", slope: " << slope;
+        str << ", tau_a: " << tau_a;
+        str << ", a: " << a;
+        str << ", b: " << b;
+        str << ", u_rest: " << u_rest;
+        str << ", u_tr: " << u_tr;
+        str << "\n";
     }
 };
+
 
 pair<double,double> readLowAndHigh(JsonBox::Array a);
 void printDoublePair(pair<double,double> p, std::ostream &str);
@@ -160,17 +194,15 @@ public:
 class LayerConf : public ConstObj {
 public:
     size_t size;
-    string layer;
 
     NeuronConf nconf;
 
     void fill_structure(JsonBox::Value v) {
         size = v["size"].getInt();
-        layer = v["layer"].getString();
         nconf.fill_structure(v["neuron_conf"]);
     }
     void print(std::ostream &str) const {
-        str << "LayerConf(size: " << size << ", layer: " << layer << ", " << nconf << ")";
+        str << "LayerConf(size: " << size << ", " << nconf << ")";
     }
 };
 

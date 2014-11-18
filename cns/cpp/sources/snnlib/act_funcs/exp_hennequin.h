@@ -10,12 +10,14 @@ protected:
     ExpHennequin() {}
     friend class Factory;
 public:
-    ExpHennequin(const ConstObj *_c) {
-        init(_c);
+    ExpHennequin(const ConstObj *_c, Neuron *_n) {
+        init(_c, _n);
     }
-    void init(const ConstObj *_c) {
+    void init(const ConstObj *_c, Neuron *_n) {
         CAST_TYPE(ExpHennequinC, _c)
         c = cast;
+        n = _n;
+        n->setActFunc(this);
     }
     double prob(const double &u) const {
         double p = (c->p_rest + c->r0 * log(1 + exp( c->beta*(u - c->u_tr) )))/1000;

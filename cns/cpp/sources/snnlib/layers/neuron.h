@@ -11,44 +11,10 @@ static size_t global_neuron_index = 0;
 #include <snnlib/config/constants.h>
 #include <snnlib/tuning_curves/tuning_curve.h>
 
-#include <snnlib/protos/stat.pb.h>
 
 #include <snnlib/serialize/serialize.h>
 
-struct NeuronStat : public Serializable {
-    NeuronStat() : Serializable(ENeuronStat) {}
-
-    vector<vector<double>> syns;
-    vector<double> p;
-    vector<double> u;
-
-    virtual Protos::NeuronStat *serialize() {
-        Protos::NeuronStat *stat = getNew();
-        for(auto it=p.begin(); it != p.end(); ++it) {
-            stat->add_p(*it);
-        }
-        for(auto it=u.begin(); it != u.end(); ++it) {
-            stat->add_u(*it);
-        }
-        for(auto it=syns.begin(); it != syns.end(); ++it) {
-            Protos::SynStat* syn_stat = stat->add_syns();
-            for(auto it_val=it->begin(); it_val != it->end(); ++it_val) {
-                syn_stat->add_x(*it_val);
-            }
-        }
-        return stat;
-    }
-    virtual void deserialize() {
-        cerr << "Why you need that?\n";
-        terminate();
-    }
-    virtual Protos::NeuronStat* getNew(google::protobuf::Message* m = nullptr) {
-        return getNewSerializedMessage<Protos::NeuronStat>(m);
-    }
-    void print(std::ostream& str) const {
-    }
-};
-
+#include "neuron_stat.h"
 
 #define SYN_ACT_TOL 0.0001
 
@@ -57,20 +23,20 @@ protected:
     Neuron() {}
     friend class Factory;
 public:
-    Neuron(const ConstObj *_c, ActFunc *_act, LearningRule *_lrule, TuningCurve *_tc) {
-        init(_c, _act, _lrule, _tc);
+    Neuron(const ConstObj *_c) {
+        init(_c);
     }
     ~Neuron() {
         if(collectStatistics) {
             delete stat;
         }
     }
-    virtual void init(const ConstObj *_c, ActFunc *_act, LearningRule *_lrule, TuningCurve *_tc) {
+    virtual void init(const ConstObj *_c) {
         id = ++global_neuron_index;
         bc = _c;
-        act = _act;
-        lrule = _lrule;
-        tc = _tc;
+        act = nullptr;
+        lrule = nullptr;
+        tc = nullptr;
 
         y = 0.0;
         p = 0.0;
@@ -79,7 +45,15 @@ public:
         collectStatistics = false;
         stat = nullptr;
     }
-
+    void setActFunc(ActFunc *_act) {
+        act = _act;
+    }
+    void setLearningRule(LearningRule *_lrule) {
+        lrule = _lrule;
+    }
+    void setTuningCurve(TuningCurve *_tc) {
+        tc = _tc;
+    }
     size_t id;
 
     double y;
@@ -96,10 +70,7 @@ public:
     }
     void enableCollectStatistics() {
         collectStatistics = true;
-        stat = new NeuronStat();
-        for(size_t syn_i=0; syn_i<syns.size(); syn_i++) {
-            stat->syns.push_back(vector<double>());
-        }
+        stat = new NeuronStat(this);
     }
 
     virtual void calculateProbability() = 0;
@@ -118,6 +89,7 @@ public:
         }
         str << "\n";
     }
+    
     NeuronStat *stat;
 protected:
     list< Synapse *> active_synapses;

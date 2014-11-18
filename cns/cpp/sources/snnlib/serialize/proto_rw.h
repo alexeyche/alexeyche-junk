@@ -22,28 +22,29 @@ public:
     enum Mode {Read, Write};
     ProtoRw(const string &f, Mode _m) : filename(f), m(_m) {
         if(m == Read) {
-            fd = open(filename.c_str(), O_RDONLY);
-            if (fd == -1) {
-                cerr << "Error while opening file " << filename << "\n";
-                terminate();
+            ifs = new ifstream(f, ios::in | ios::binary);
+            if(!ifs->is_open()) {
+                cerr << "Failed to open file " << f << " for read\n";
+                terminate(); 
             }
-
-            ifs_g = new google::protobuf::io::FileInputStream(fd);
-            codedIn = new CodedInputStream(ifs_g);
+            zeroIn = new IstreamInputStream(ifs);
+            codedIn = new CodedInputStream(zeroIn);
         } else
         if(m == Write) {
-            ofs = new ofstream(filename, ios::out | ios::trunc | ios::binary);
+            ofs = new ofstream(f, ios::out | ios::trunc | ios::binary);
+            zeroOut = new OstreamOutputStream(ofs);
+            codedOut = new CodedOutputStream(zeroOut);
         }
     }
     ~ProtoRw() {
         if(m == Read) {
-            close(fd);
             delete codedIn;
-            delete ifs_g;
-
+            delete zeroIn;
+            delete ifs;
         } else
         if(m == Write) {
-            ofs->close();
+            delete codedOut;
+            delete zeroOut;
             delete ofs;
         }
 
@@ -115,19 +116,12 @@ public:
 
 private:
     void writeMessage(::google::protobuf::Message *message) {
-        zeroOut = new OstreamOutputStream(ofs);
-        codedOut = new CodedOutputStream(zeroOut);
-
         google::protobuf::uint32 size = message->ByteSize();
 
         codedOut->WriteVarint32(size);
         message->SerializeToCodedStream(codedOut);
-
-        delete codedOut;
-        delete zeroOut;
     }
     bool readMessage(::google::protobuf::Message &message) {
-
         google::protobuf::uint32 size;
         if(!codedIn->ReadVarint32(&size)) {
             return false;
@@ -138,21 +132,17 @@ private:
             terminate();
         }
         codedIn->PopLimit(limit);
-
         return true;
     }
 
-    int fd;
-
 
     Mode m;
+
     ofstream *ofs;
     OstreamOutputStream *zeroOut;
     CodedOutputStream *codedOut;
 
     ifstream *ifs;
-    google::protobuf::io::FileInputStream* ifs_g;
-
     IstreamInputStream *zeroIn;
     CodedInputStream *codedIn;
 

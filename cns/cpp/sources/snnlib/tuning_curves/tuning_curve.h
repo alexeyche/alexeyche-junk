@@ -5,13 +5,13 @@
 
 class TuningCurve : public Obj {
 public:
-	virtual void init(const ConstObj *_c) = 0;
-	virtual double calculateResponse(const double &I) = 0;
+	virtual void init(const ConstObj *_c, Neuron *_n) = 0;
+	virtual void calculateResponse(const double &I) = 0;
 };
 
 class BlankTuningCurve : public TuningCurve {
 public:
-	void init(const ConstObj *_c) {}
-	double calculateResponse(const double &I) { return 0.0; }
+	void init(const ConstObj *_c, Neuron *_n) {}
+	void calculateResponse(const double &I) { }
 };
 

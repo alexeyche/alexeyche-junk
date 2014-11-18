@@ -5,18 +5,19 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 ActFunc	snnlib/act_funcs/act_func.h	/^class ActFunc: public Obj  {$/;"	c
+n	snnlib/act_funcs/act_func.h	/^	Neuron *n;    $/;"	m	class:ActFunc
 Determ	snnlib/act_funcs/determ.h	/^    Determ() {}$/;"	f	class:Determ
-Determ	snnlib/act_funcs/determ.h	/^    Determ(const ConstObj *_c) {$/;"	f	class:Determ
+Determ	snnlib/act_funcs/determ.h	/^    Determ(const ConstObj *_c, Neuron *_n) {$/;"	f	class:Determ
 Determ	snnlib/act_funcs/determ.h	/^class Determ : public ActFunc {$/;"	c
 c	snnlib/act_funcs/determ.h	/^    const DetermC *c;$/;"	m	class:Determ
-init	snnlib/act_funcs/determ.h	/^    void init(const ConstObj *_c) {$/;"	f	class:Determ
+init	snnlib/act_funcs/determ.h	/^    void init(const ConstObj *_c, Neuron *_n) {$/;"	f	class:Determ
 prob	snnlib/act_funcs/determ.h	/^    double prob(const double &u) const {$/;"	f	class:Determ
 probDeriv	snnlib/act_funcs/determ.h	/^    double probDeriv(const double &u) const {$/;"	f	class:Determ
 ExpHennequin	snnlib/act_funcs/exp_hennequin.h	/^    ExpHennequin() {}$/;"	f	class:ExpHennequin
-ExpHennequin	snnlib/act_funcs/exp_hennequin.h	/^    ExpHennequin(const ConstObj *_c) {$/;"	f	class:ExpHennequin
+ExpHennequin	snnlib/act_funcs/exp_hennequin.h	/^    ExpHennequin(const ConstObj *_c, Neuron *_n) {$/;"	f	class:ExpHennequin
 ExpHennequin	snnlib/act_funcs/exp_hennequin.h	/^class ExpHennequin: public ActFunc {$/;"	c
 c	snnlib/act_funcs/exp_hennequin.h	/^    const ExpHennequinC *c;$/;"	m	class:ExpHennequin
-init	snnlib/act_funcs/exp_hennequin.h	/^    void init(const ConstObj *_c) {$/;"	f	class:ExpHennequin
+init	snnlib/act_funcs/exp_hennequin.h	/^    void init(const ConstObj *_c, Neuron *_n) {$/;"	f	class:ExpHennequin
 prob	snnlib/act_funcs/exp_hennequin.h	/^    double prob(const double &u) const {$/;"	f	class:ExpHennequin
 probDeriv	snnlib/act_funcs/exp_hennequin.h	/^    double probDeriv(const double &u) const {$/;"	f	class:ExpHennequin
 CompareSynSpike	snnlib/base.h	/^class CompareSynSpike {$/;"	c
@@ -37,47 +38,51 @@ Constants	snnlib/config/constants.cpp	/^Constants::Constants(string filename) {$
 PARSE_CONST_STRUCTURE	snnlib/config/constants.cpp	9;"	d	file:
 printDoublePair	snnlib/config/constants.cpp	/^void printDoublePair(pair<double,double> p, std::ostream &str) {$/;"	f
 readLowAndHigh	snnlib/config/constants.cpp	/^pair<double,double> readLowAndHigh(JsonBox::Array a) {$/;"	f
+AdExNeuronC	snnlib/config/constants.h	/^class AdExNeuronC: public ConstObj {$/;"	c
+C	snnlib/config/constants.h	/^    double C;$/;"	m	class:AdExNeuronC
 ConnectionConf	snnlib/config/constants.h	/^class ConnectionConf: public ConstObj {$/;"	c
 ConnectionMap	snnlib/config/constants.h	/^typedef map< pair<size_t, size_t>, vector<ConnectionConf> > ConnectionMap;$/;"	t
 ConstObj	snnlib/config/constants.h	/^class ConstObj: public Entity {$/;"	c
 Constants	snnlib/config/constants.h	/^class Constants {$/;"	c
 DetermC	snnlib/config/constants.h	/^class DetermC : public ConstObj {$/;"	c
+EL	snnlib/config/constants.h	/^    double EL;$/;"	m	class:AdExNeuronC
 ExpHennequinC	snnlib/config/constants.h	/^class ExpHennequinC : public ConstObj {$/;"	c
 LayerConf	snnlib/config/constants.h	/^class LayerConf : public ConstObj {$/;"	c
 NeuronConf	snnlib/config/constants.h	/^class NeuronConf : public ConstObj {$/;"	c
 OptimalStdpC	snnlib/config/constants.h	/^class OptimalStdpC: public ConstObj {$/;"	c
-SRMLayerC	snnlib/config/constants.h	/^class SRMLayerC: public ConstObj {$/;"	c
 SRMNeuronC	snnlib/config/constants.h	/^class SRMNeuronC: public ConstObj {$/;"	c
 SigmaTuningCurveC	snnlib/config/constants.h	/^class SigmaTuningCurveC: public ConstObj {$/;"	c
 SimConfiguration	snnlib/config/constants.h	/^class SimConfiguration: public ConstObj {$/;"	c
 SynapseC	snnlib/config/constants.h	/^class SynapseC : public ConstObj {$/;"	c
 TimeSeriesMapConf	snnlib/config/constants.h	/^class TimeSeriesMapConf : public ConstObj {$/;"	c
+a	snnlib/config/constants.h	/^    double a;$/;"	m	class:AdExNeuronC
 act_func	snnlib/config/constants.h	/^    string act_func;$/;"	m	class:NeuronConf
 act_funcs	snnlib/config/constants.h	/^    const_map act_funcs;$/;"	m	class:Constants
 amp	snnlib/config/constants.h	/^    double amp;$/;"	m	class:SynapseC
 amp_refr	snnlib/config/constants.h	/^    double amp_refr;$/;"	m	class:SRMNeuronC
+b	snnlib/config/constants.h	/^    double b;$/;"	m	class:AdExNeuronC
 beta	snnlib/config/constants.h	/^    double beta;$/;"	m	class:ExpHennequinC
 conn_map	snnlib/config/constants.h	/^    ConnectionMap conn_map;$/;"	m	class:SimConfiguration
 const_map	snnlib/config/constants.h	/^typedef map<string, const ConstObj *> const_map;$/;"	t
 dt	snnlib/config/constants.h	/^    double dt;$/;"	m	class:TimeSeriesMapConf
 epsp_decay	snnlib/config/constants.h	/^    double epsp_decay;$/;"	m	class:SynapseC
+fill_structure	snnlib/config/constants.h	/^    void fill_structure(JsonBox::Value v) {$/;"	f	class:AdExNeuronC
 fill_structure	snnlib/config/constants.h	/^    void fill_structure(JsonBox::Value v) {$/;"	f	class:ConnectionConf
 fill_structure	snnlib/config/constants.h	/^    void fill_structure(JsonBox::Value v) {$/;"	f	class:DetermC
 fill_structure	snnlib/config/constants.h	/^    void fill_structure(JsonBox::Value v) {$/;"	f	class:ExpHennequinC
 fill_structure	snnlib/config/constants.h	/^    void fill_structure(JsonBox::Value v) {$/;"	f	class:LayerConf
 fill_structure	snnlib/config/constants.h	/^    void fill_structure(JsonBox::Value v) {$/;"	f	class:NeuronConf
 fill_structure	snnlib/config/constants.h	/^    void fill_structure(JsonBox::Value v) {$/;"	f	class:OptimalStdpC
-fill_structure	snnlib/config/constants.h	/^    void fill_structure(JsonBox::Value v) {$/;"	f	class:SRMLayerC
 fill_structure	snnlib/config/constants.h	/^    void fill_structure(JsonBox::Value v) {$/;"	f	class:SRMNeuronC
 fill_structure	snnlib/config/constants.h	/^    void fill_structure(JsonBox::Value v) {$/;"	f	class:SigmaTuningCurveC
 fill_structure	snnlib/config/constants.h	/^    void fill_structure(JsonBox::Value v) {$/;"	f	class:SimConfiguration
 fill_structure	snnlib/config/constants.h	/^    void fill_structure(JsonBox::Value v) {$/;"	f	class:SynapseC
 fill_structure	snnlib/config/constants.h	/^    void fill_structure(JsonBox::Value v) {$/;"	f	class:TimeSeriesMapConf
+gL	snnlib/config/constants.h	/^    double gL;$/;"	m	class:AdExNeuronC
 gain	snnlib/config/constants.h	/^    pair<double,double> gain;$/;"	m	class:SigmaTuningCurveC
 gain_factor	snnlib/config/constants.h	/^    double gain_factor;$/;"	m	class:ExpHennequinC
 input_layers_conf	snnlib/config/constants.h	/^    vector<LayerConf> input_layers_conf;$/;"	m	class:SimConfiguration
 intercept	snnlib/config/constants.h	/^    pair<double,double> intercept;$/;"	m	class:SigmaTuningCurveC
-layer	snnlib/config/constants.h	/^    string layer;$/;"	m	class:LayerConf
 layers	snnlib/config/constants.h	/^    const_map layers;$/;"	m	class:Constants
 learning_rule	snnlib/config/constants.h	/^    string learning_rule;$/;"	m	class:NeuronConf
 learning_rules	snnlib/config/constants.h	/^    const_map learning_rules;$/;"	m	class:Constants
@@ -90,13 +95,13 @@ neurons_to_listen	snnlib/config/constants.h	/^    vector<size_t> neurons_to_list
 operator <<	snnlib/config/constants.h	/^    friend std::ostream& operator<<(std::ostream& str, Constants const& data) {$/;"	f	class:Constants
 operator []	snnlib/config/constants.h	/^    const ConstObj *operator[](const string &key) const {$/;"	f	class:Constants
 p_rest	snnlib/config/constants.h	/^    double p_rest;$/;"	m	class:ExpHennequinC
+print	snnlib/config/constants.h	/^    void print(std::ostream &str) const {$/;"	f	class:AdExNeuronC
 print	snnlib/config/constants.h	/^    void print(std::ostream &str) const {$/;"	f	class:ConnectionConf
 print	snnlib/config/constants.h	/^    void print(std::ostream &str) const {$/;"	f	class:DetermC
 print	snnlib/config/constants.h	/^    void print(std::ostream &str) const {$/;"	f	class:ExpHennequinC
 print	snnlib/config/constants.h	/^    void print(std::ostream &str) const {$/;"	f	class:LayerConf
 print	snnlib/config/constants.h	/^    void print(std::ostream &str) const {$/;"	f	class:NeuronConf
 print	snnlib/config/constants.h	/^    void print(std::ostream &str) const {$/;"	f	class:OptimalStdpC
-print	snnlib/config/constants.h	/^    void print(std::ostream &str) const {$/;"	f	class:SRMLayerC
 print	snnlib/config/constants.h	/^    void print(std::ostream &str) const {$/;"	f	class:SRMNeuronC
 print	snnlib/config/constants.h	/^    void print(std::ostream &str) const {$/;"	f	class:SigmaTuningCurveC
 print	snnlib/config/constants.h	/^    void print(std::ostream &str) const {$/;"	f	class:SimConfiguration
@@ -108,9 +113,12 @@ r0	snnlib/config/constants.h	/^    double r0;$/;"	m	class:ExpHennequinC
 sigma	snnlib/config/constants.h	/^    pair<double,double> sigma;$/;"	m	class:SigmaTuningCurveC
 sim_conf	snnlib/config/constants.h	/^    SimConfiguration sim_conf;$/;"	m	class:Constants
 size	snnlib/config/constants.h	/^    size_t size;$/;"	m	class:LayerConf
+slope	snnlib/config/constants.h	/^    double slope;$/;"	m	class:AdExNeuronC
 synapses	snnlib/config/constants.h	/^    const_map synapses;$/;"	m	class:Constants
+t_ref	snnlib/config/constants.h	/^    double t_ref;$/;"	m	class:AdExNeuronC
 target_rate	snnlib/config/constants.h	/^    double target_rate;$/;"	m	class:OptimalStdpC
 target_rate_factor	snnlib/config/constants.h	/^    double target_rate_factor;$/;"	m	class:OptimalStdpC
+tau_a	snnlib/config/constants.h	/^    double tau_a;$/;"	m	class:AdExNeuronC
 tau_c	snnlib/config/constants.h	/^    double tau_c;$/;"	m	class:OptimalStdpC
 tau_refr	snnlib/config/constants.h	/^    double tau_refr;$/;"	m	class:SRMNeuronC
 ts_map_conf	snnlib/config/constants.h	/^    TimeSeriesMapConf ts_map_conf;$/;"	m	class:SimConfiguration
@@ -123,14 +131,14 @@ u_tr	snnlib/config/constants.h	/^    double u_tr;$/;"	m	class:ExpHennequinC
 weight	snnlib/config/constants.h	/^    double weight;$/;"	m	class:ConnectionConf
 weight_decay	snnlib/config/constants.h	/^    double weight_decay;$/;"	m	class:OptimalStdpC
 Factory	snnlib/config/factory.cpp	/^Factory::Factory() {$/;"	f	class:Factory
-GET_BASE_NAME	snnlib/config/factory.cpp	43;"	d	file:
-createActFunc	snnlib/config/factory.cpp	/^ActFunc *Factory::createActFunc(string name, const ConstObj *c) {$/;"	f	class:Factory
+GET_BASE_NAME	snnlib/config/factory.cpp	44;"	d	file:
+createActFunc	snnlib/config/factory.cpp	/^ActFunc *Factory::createActFunc(string name, const ConstObj *c, Neuron *n) {$/;"	f	class:Factory
 createConst	snnlib/config/factory.cpp	/^ConstObj *Factory::createConst(string name, JsonBox::Value v) {$/;"	f	class:Factory
-createLayer	snnlib/config/factory.cpp	/^Layer *Factory::createLayer(string name, const ConstObj *c, size_t size, const NeuronConf &nc, const Constants &glob_c) {$/;"	f	class:Factory
-createLearningRule	snnlib/config/factory.cpp	/^LearningRule * Factory::createLearningRule(string name, const ConstObj *c) {$/;"	f	class:Factory
-createNeuron	snnlib/config/factory.cpp	/^Neuron *Factory::createNeuron(string name, const ConstObj *c, ActFunc *act, LearningRule *lr, TuningCurve *tc) {$/;"	f	class:Factory
+createLayer	snnlib/config/factory.cpp	/^Layer *Factory::createLayer(size_t size, const NeuronConf &nc, const Constants &glob_c) {$/;"	f	class:Factory
+createLearningRule	snnlib/config/factory.cpp	/^LearningRule * Factory::createLearningRule(string name, const ConstObj *c, Neuron *n) {$/;"	f	class:Factory
+createNeuron	snnlib/config/factory.cpp	/^Neuron *Factory::createNeuron(string name, const ConstObj *c) {$/;"	f	class:Factory
 createSynapse	snnlib/config/factory.cpp	/^Synapse *Factory::createSynapse(string name, const ConstObj *c, size_t id_pre, double w) {$/;"	f	class:Factory
-createTuningCurve	snnlib/config/factory.cpp	/^TuningCurve *Factory::createTuningCurve(string name, const ConstObj *c) {$/;"	f	class:Factory
+createTuningCurve	snnlib/config/factory.cpp	/^TuningCurve *Factory::createTuningCurve(string name, const ConstObj *c, Neuron *n) {$/;"	f	class:Factory
 inst	snnlib/config/factory.cpp	/^Factory& Factory::inst() {$/;"	f	class:Factory
 Factory	snnlib/config/factory.h	/^class Factory {$/;"	c
 _inst	snnlib/config/factory.h	/^    static Factory *_inst;$/;"	m	class:Factory
@@ -141,32 +149,40 @@ entity_map_type	snnlib/config/factory.h	/^typedef map<string, Obj*(*)()> entity_
 findBaseStructName	snnlib/config/factory.h	/^    string findBaseStructName(string deriv_struct_name) {$/;"	f	class:Factory
 objects	snnlib/config/factory.h	/^    vector<Obj*> objects;$/;"	m	class:Factory
 ~Factory	snnlib/config/factory.h	/^    ~Factory() {$/;"	f	class:Factory
-const_map_type	snnlib/config/type_maps.h	/^typedef map<string, ConstObj*(*)()> const_map_type;$/;"	t
-createInstance	snnlib/config/type_maps.h	/^template<typename E,typename T> E* createInstance() { return new T; }$/;"	f
-entity_map_type	snnlib/config/type_maps.h	/^typedef map<string, Entity*(*)()> entity_map_type;$/;"	t
-generateConstMapType	snnlib/config/type_maps.h	/^const_map_type generateConstMapType() {$/;"	f
-generateEntityMapType	snnlib/config/type_maps.h	/^entity_map_type generateEntityMapType() {$/;"	f
 uchar	snnlib/core.h	/^typedef unsigned char uchar;$/;"	t
+AdExNeuron	snnlib/layers/adex_neuron.h	/^    AdExNeuron() { }$/;"	f	class:AdExNeuron
+AdExNeuron	snnlib/layers/adex_neuron.h	/^    AdExNeuron(const ConstObj *_c) {$/;"	f	class:AdExNeuron
+AdExNeuron	snnlib/layers/adex_neuron.h	/^class AdExNeuron : public Neuron {$/;"	c
+AdExNeuronStat	snnlib/layers/adex_neuron.h	/^struct AdExNeuronStat : public NeuronStat {$/;"	s
+a	snnlib/layers/adex_neuron.h	/^    double a;$/;"	m	class:AdExNeuron
+attachCurrent	snnlib/layers/adex_neuron.h	/^    void attachCurrent(const double &I) {$/;"	f	class:AdExNeuron
+c	snnlib/layers/adex_neuron.h	/^    const AdExNeuronC *c;$/;"	m	class:AdExNeuron
+calculateDynamics	snnlib/layers/adex_neuron.h	/^    void calculateDynamics() {$/;"	f	class:AdExNeuron
+calculateProbability	snnlib/layers/adex_neuron.h	/^    void calculateProbability() {$/;"	f	class:AdExNeuron
+enableCollectStatistics	snnlib/layers/adex_neuron.h	/^    void enableCollectStatistics() {$/;"	f	class:AdExNeuron
+init	snnlib/layers/adex_neuron.h	/^    void init(const ConstObj *_c) {$/;"	f	class:AdExNeuron
+print	snnlib/layers/adex_neuron.h	/^    void print(std::ostream& str) const {$/;"	f	class:AdExNeuron
+propagateSynSpike	snnlib/layers/adex_neuron.h	/^    void propagateSynSpike(const SynSpike &sp) {$/;"	f	class:AdExNeuron
+refr	snnlib/layers/adex_neuron.h	/^    double refr;$/;"	m	class:AdExNeuron
 CAST_TYPE	snnlib/layers/common.h	4;"	d
 Layer	snnlib/layers/layer.h	/^    Layer() {}$/;"	f	class:Layer
-Layer	snnlib/layers/layer.h	/^    Layer(size_t _size, const ConstObj *_c, const NeuronConf &nc, const Constants &glob_c) {$/;"	f	class:Layer
+Layer	snnlib/layers/layer.h	/^    Layer(size_t _size, const NeuronConf &nc, const Constants &glob_c) {$/;"	f	class:Layer
 Layer	snnlib/layers/layer.h	/^class Layer : public Entity {$/;"	c
 N	snnlib/layers/layer.h	/^    size_t N;$/;"	m	class:Layer
-bc	snnlib/layers/layer.h	/^    const ConstObj *bc;$/;"	m	class:Layer
 connect	snnlib/layers/layer.h	/^    void connect(Layer &l_post, const ConnectionConf &conf, const Constants &c) {$/;"	f	class:Layer
 global_layer_index	snnlib/layers/layer.h	/^static size_t global_layer_index = 0;$/;"	v
 id	snnlib/layers/layer.h	/^    size_t id;$/;"	m	class:Layer
-init	snnlib/layers/layer.h	/^    virtual void init(size_t _size, const ConstObj *_c, const NeuronConf &nc, const Constants &glob_c) {$/;"	f	class:Layer
+init	snnlib/layers/layer.h	/^    virtual void init(size_t _size, const NeuronConf &nc, const Constants &glob_c) {$/;"	f	class:Layer
 neurons	snnlib/layers/layer.h	/^    vector< Neuron *> neurons;$/;"	m	class:Layer
 operator []	snnlib/layers/layer.h	/^    Neuron *operator[](size_t i) {$/;"	f	class:Layer
 print	snnlib/layers/layer.h	/^    void print(std::ostream& str) const {$/;"	f	class:Layer
 size	snnlib/layers/layer.h	/^    size_t size() {$/;"	f	class:Layer
 Neuron	snnlib/layers/neuron.h	/^    Neuron() {}$/;"	f	class:Neuron
-Neuron	snnlib/layers/neuron.h	/^    Neuron(const ConstObj *_c, ActFunc *_act, LearningRule *_lrule, TuningCurve *_tc) {$/;"	f	class:Neuron
+Neuron	snnlib/layers/neuron.h	/^    Neuron(const ConstObj *_c) {$/;"	f	class:Neuron
 Neuron	snnlib/layers/neuron.h	/^class Neuron: public Printable {$/;"	c
-NeuronStat	snnlib/layers/neuron.h	/^    NeuronStat() : Serializable(ENeuronStat) {}$/;"	f	struct:NeuronStat
+NeuronStat	snnlib/layers/neuron.h	/^    NeuronStat(Neuron *n) : Serializable(ENeuronStat) {$/;"	f	struct:NeuronStat
 NeuronStat	snnlib/layers/neuron.h	/^struct NeuronStat : public Serializable {$/;"	s
-SYN_ACT_TOL	snnlib/layers/neuron.h	51;"	d
+SYN_ACT_TOL	snnlib/layers/neuron.h	57;"	d
 act	snnlib/layers/neuron.h	/^    ActFunc *act;$/;"	m	class:Neuron
 active_synapses	snnlib/layers/neuron.h	/^    list< Synapse *> active_synapses;$/;"	m	class:Neuron
 addSynapse	snnlib/layers/neuron.h	/^    void addSynapse(Synapse *s) {$/;"	f	class:Neuron
@@ -178,12 +194,16 @@ fired	snnlib/layers/neuron.h	/^    uchar fired;$/;"	m	class:Neuron
 getNew	snnlib/layers/neuron.h	/^    virtual Protos::NeuronStat* getNew(google::protobuf::Message* m = nullptr) {$/;"	f	struct:NeuronStat
 global_neuron_index	snnlib/layers/neuron.h	/^static size_t global_neuron_index = 0;$/;"	v
 id	snnlib/layers/neuron.h	/^    size_t id;$/;"	m	class:Neuron
-init	snnlib/layers/neuron.h	/^    virtual void init(const ConstObj *_c, ActFunc *_act, LearningRule *_lrule, TuningCurve *_tc) {$/;"	f	class:Neuron
+init	snnlib/layers/neuron.h	/^    virtual void init(const ConstObj *_c) {$/;"	f	class:Neuron
 lrule	snnlib/layers/neuron.h	/^    LearningRule *lrule;$/;"	m	class:Neuron
 p	snnlib/layers/neuron.h	/^    double p;$/;"	m	class:Neuron
 p	snnlib/layers/neuron.h	/^    vector<double> p;$/;"	m	struct:NeuronStat
 print	snnlib/layers/neuron.h	/^    void print(std::ostream& str) const {$/;"	f	class:Neuron
-serialize	snnlib/layers/neuron.h	/^     virtual Protos::NeuronStat *serialize() {$/;"	f	struct:NeuronStat
+print	snnlib/layers/neuron.h	/^    void print(std::ostream& str) const {$/;"	f	struct:NeuronStat
+serialize	snnlib/layers/neuron.h	/^    virtual Protos::NeuronStat *serialize() {$/;"	f	struct:NeuronStat
+setActFunc	snnlib/layers/neuron.h	/^    void setActFunc(ActFunc *_act) {$/;"	f	class:Neuron
+setLearningRule	snnlib/layers/neuron.h	/^    void setLearningRule(LearningRule *_lrule) {$/;"	f	class:Neuron
+setTuningCurve	snnlib/layers/neuron.h	/^    void setTuningCurve(TuningCurve *_tc) {$/;"	f	class:Neuron
 stat	snnlib/layers/neuron.h	/^    NeuronStat *stat;$/;"	m	class:Neuron
 syns	snnlib/layers/neuron.h	/^    vector<Synapse*> syns;$/;"	m	class:Neuron
 syns	snnlib/layers/neuron.h	/^    vector<vector<double>> syns;$/;"	m	struct:NeuronStat
@@ -202,21 +222,16 @@ state_mods	snnlib/layers/neuron_test.h	/^	vector<vector<StateModifier>> state_mo
 SimLayer	snnlib/layers/sim_layer_test.h	/^	void SimLayer(Layer *n) {$/;"	f	class:SimLayer
 SimLayer	snnlib/layers/sim_layer_test.h	/^class SimLayer: {$/;"	c
 neurons	snnlib/layers/sim_layer_test.h	/^	vector<Neurons> neurons;$/;"	m	class:SimLayer
-SRMLayer	snnlib/layers/srm_layer.h	/^    SRMLayer() { }$/;"	f	class:SRMLayer
-SRMLayer	snnlib/layers/srm_layer.h	/^class SRMLayer : public Layer {$/;"	c
-SRMNeuron	snnlib/layers/srm_layer.h	/^    SRMNeuron() { }$/;"	f	class:SRMNeuron
-SRMNeuron	snnlib/layers/srm_layer.h	/^    SRMNeuron(const ConstObj *_c, ActFunc *_act, LearningRule *_lrule, TuningCurve *_tc) {$/;"	f	class:SRMNeuron
-SRMNeuron	snnlib/layers/srm_layer.h	/^class SRMNeuron : public Neuron {$/;"	c
-attachCurrent	snnlib/layers/srm_layer.h	/^    void attachCurrent(const double &I) {$/;"	f	class:SRMNeuron
-c	snnlib/layers/srm_layer.h	/^    const SRMLayerC *c;$/;"	m	class:SRMLayer
-c	snnlib/layers/srm_layer.h	/^    const SRMNeuronC *c;$/;"	m	class:SRMNeuron
-calculate	snnlib/layers/srm_layer.h	/^    void calculate() {$/;"	f	class:SRMLayer
-calculateDynamics	snnlib/layers/srm_layer.h	/^    void calculateDynamics() {$/;"	f	class:SRMNeuron
-calculateProbability	snnlib/layers/srm_layer.h	/^    void calculateProbability() {$/;"	f	class:SRMNeuron
-init	snnlib/layers/srm_layer.h	/^    void init(const ConstObj *_c, ActFunc *_act, LearningRule *_lrule, TuningCurve *_tc) {$/;"	f	class:SRMNeuron
-init	snnlib/layers/srm_layer.h	/^    void init(size_t _size, const ConstObj *_c, const NeuronConf &nc, const Constants &glob_c) {$/;"	f	class:SRMLayer
-print	snnlib/layers/srm_layer.h	/^    void print(std::ostream& str) const {$/;"	f	class:SRMNeuron
-propagateSynSpike	snnlib/layers/srm_layer.h	/^    void propagateSynSpike(const SynSpike &sp) {$/;"	f	class:SRMNeuron
+SRMNeuron	snnlib/layers/srm_neuron.h	/^    SRMNeuron() { }$/;"	f	class:SRMNeuron
+SRMNeuron	snnlib/layers/srm_neuron.h	/^    SRMNeuron(const ConstObj *_c) {$/;"	f	class:SRMNeuron
+SRMNeuron	snnlib/layers/srm_neuron.h	/^class SRMNeuron : public Neuron {$/;"	c
+attachCurrent	snnlib/layers/srm_neuron.h	/^    void attachCurrent(const double &I) {$/;"	f	class:SRMNeuron
+c	snnlib/layers/srm_neuron.h	/^    const SRMNeuronC *c;$/;"	m	class:SRMNeuron
+calculateDynamics	snnlib/layers/srm_neuron.h	/^    void calculateDynamics() {$/;"	f	class:SRMNeuron
+calculateProbability	snnlib/layers/srm_neuron.h	/^    void calculateProbability() {$/;"	f	class:SRMNeuron
+init	snnlib/layers/srm_neuron.h	/^    void init(const ConstObj *_c) {$/;"	f	class:SRMNeuron
+print	snnlib/layers/srm_neuron.h	/^    void print(std::ostream& str) const {$/;"	f	class:SRMNeuron
+propagateSynSpike	snnlib/layers/srm_neuron.h	/^    void propagateSynSpike(const SynSpike &sp) {$/;"	f	class:SRMNeuron
 Synapse	snnlib/layers/synapse.h	/^    Synapse() {}$/;"	f	class:Synapse
 Synapse	snnlib/layers/synapse.h	/^    Synapse(const ConstObj *_c, size_t _id_pre, double _w) {$/;"	f	class:Synapse
 Synapse	snnlib/layers/synapse.h	/^class Synapse : public Printable {$/;"	c
@@ -230,12 +245,13 @@ w	snnlib/layers/synapse.h	/^    double w;$/;"	m	class:Synapse
 x	snnlib/layers/synapse.h	/^    double x;$/;"	m	class:Synapse
 BlankLearningRule	snnlib/learning/learning_rule.h	/^class BlankLearningRule: public LearningRule {$/;"	c
 LearningRule	snnlib/learning/learning_rule.h	/^class LearningRule : public Obj {$/;"	c
-init	snnlib/learning/learning_rule.h	/^	void init(const ConstObj *_c) {}$/;"	f	class:BlankLearningRule
+init	snnlib/learning/learning_rule.h	/^	void init(const ConstObj *_c, Neuron *_n) {}$/;"	f	class:BlankLearningRule
 OptimalStdp	snnlib/learning/optimal_stdp.h	/^    OptimalStdp() {}$/;"	f	class:OptimalStdp
-OptimalStdp	snnlib/learning/optimal_stdp.h	/^    OptimalStdp(const OptimalStdpC *_c) {$/;"	f	class:OptimalStdp
+OptimalStdp	snnlib/learning/optimal_stdp.h	/^    OptimalStdp(const OptimalStdpC *_c, Neuron *_n) {$/;"	f	class:OptimalStdp
 OptimalStdp	snnlib/learning/optimal_stdp.h	/^class OptimalStdp : public LearningRule {$/;"	c
 c	snnlib/learning/optimal_stdp.h	/^    const OptimalStdpC *c;$/;"	m	class:OptimalStdp
-init	snnlib/learning/optimal_stdp.h	/^    void init(const ConstObj *_c) {$/;"	f	class:OptimalStdp
+init	snnlib/learning/optimal_stdp.h	/^    void init(const ConstObj *_c, Neuron *_n) {$/;"	f	class:OptimalStdp
+n	snnlib/learning/optimal_stdp.h	/^    Neuron *n;$/;"	m	class:OptimalStdp
 CHECK_MODE	snnlib/serialize/proto_rw.h	16;"	d
 Mode	snnlib/serialize/proto_rw.h	/^    enum Mode {Read, Write};$/;"	g	class:ProtoRw
 ProtoRw	snnlib/serialize/proto_rw.h	/^    ProtoRw(const string &f, Mode _m) : filename(f), m(_m) {$/;"	f	class:ProtoRw
@@ -244,22 +260,24 @@ Read	snnlib/serialize/proto_rw.h	/^    enum Mode {Read, Write};$/;"	e	enum:Proto
 Write	snnlib/serialize/proto_rw.h	/^    enum Mode {Read, Write};$/;"	e	enum:ProtoRw::Mode
 codedIn	snnlib/serialize/proto_rw.h	/^    CodedInputStream *codedIn;$/;"	m	class:ProtoRw
 codedOut	snnlib/serialize/proto_rw.h	/^    CodedOutputStream *codedOut;$/;"	m	class:ProtoRw
-fd	snnlib/serialize/proto_rw.h	/^    int fd;$/;"	m	class:ProtoRw
 filename	snnlib/serialize/proto_rw.h	/^    string filename;$/;"	m	class:ProtoRw
 glob_deb	snnlib/serialize/proto_rw.h	/^static int glob_deb = 0;$/;"	v
 ifs	snnlib/serialize/proto_rw.h	/^    ifstream *ifs;$/;"	m	class:ProtoRw
-ifs_g	snnlib/serialize/proto_rw.h	/^    google::protobuf::io::FileInputStream* ifs_g;$/;"	m	class:ProtoRw
 m	snnlib/serialize/proto_rw.h	/^    Mode m;$/;"	m	class:ProtoRw
 ofs	snnlib/serialize/proto_rw.h	/^    ofstream *ofs;$/;"	m	class:ProtoRw
 read	snnlib/serialize/proto_rw.h	/^    bool read(Serializable *s) {$/;"	f	class:ProtoRw
 readAll	snnlib/serialize/proto_rw.h	/^    vector<T> readAll() {$/;"	f	class:ProtoRw
+readAndPrintAny	snnlib/serialize/proto_rw.h	/^    void readAndPrintAny() {$/;"	f	class:ProtoRw
+readAny	snnlib/serialize/proto_rw.h	/^    Serializable* readAny() {$/;"	f	class:ProtoRw
 readMessage	snnlib/serialize/proto_rw.h	/^    bool readMessage(::google::protobuf::Message &message) {$/;"	f	class:ProtoRw
 write	snnlib/serialize/proto_rw.h	/^    void write(Serializable *s) {$/;"	f	class:ProtoRw
 writeMessage	snnlib/serialize/proto_rw.h	/^    void writeMessage(::google::protobuf::Message *message) {$/;"	f	class:ProtoRw
 zeroIn	snnlib/serialize/proto_rw.h	/^    IstreamInputStream *zeroIn;$/;"	m	class:ProtoRw
 zeroOut	snnlib/serialize/proto_rw.h	/^    OstreamOutputStream *zeroOut;$/;"	m	class:ProtoRw
 ~ProtoRw	snnlib/serialize/proto_rw.h	/^    ~ProtoRw() {$/;"	f	class:ProtoRw
+create	snnlib/serialize/serialize.cpp	/^Serializable* SerializableFactory::create(const string &name) {$/;"	f	class:SerializableFactory
 doubleVectorToLabeledTimeSeries	snnlib/serialize/serialize.cpp	/^Protos::LabeledTimeSeries doubleVectorToLabeledTimeSeries(string label, const vector<double> &data) {$/;"	f
+inst	snnlib/serialize/serialize.cpp	/^SerializableFactory& SerializableFactory::inst() {$/;"	f	class:SerializableFactory
 ELabeledTimeSeries	snnlib/serialize/serialize.h	/^enum ESerializableClass { ENeuronStat, ESpikesList, ELabeledTimeSeries, ELabeledTimeSeriesList };$/;"	e	enum:ESerializableClass
 ELabeledTimeSeriesList	snnlib/serialize/serialize.h	/^enum ESerializableClass { ENeuronStat, ESpikesList, ELabeledTimeSeries, ELabeledTimeSeriesList };$/;"	e	enum:ESerializableClass
 ENeuronStat	snnlib/serialize/serialize.h	/^enum ESerializableClass { ENeuronStat, ESpikesList, ELabeledTimeSeries, ELabeledTimeSeriesList };$/;"	e	enum:ESerializableClass
@@ -268,32 +286,33 @@ ESerializableClass_str	snnlib/serialize/serialize.h	/^static const char* ESerial
 ESpikesList	snnlib/serialize/serialize.h	/^enum ESerializableClass { ENeuronStat, ESpikesList, ELabeledTimeSeries, ELabeledTimeSeriesList };$/;"	e	enum:ESerializableClass
 Serializable	snnlib/serialize/serialize.h	/^    Serializable(ESerializableClass ename) {$/;"	f	class:Serializable
 Serializable	snnlib/serialize/serialize.h	/^    Serializable(const Serializable &another) {$/;"	f	class:Serializable
-Serializable	snnlib/serialize/serialize.h	/^class Serializable {$/;"	c
+Serializable	snnlib/serialize/serialize.h	/^class Serializable : public Printable {$/;"	c
+SerializableFactory	snnlib/serialize/serialize.h	/^    SerializableFactory() {}$/;"	f	class:SerializableFactory
 SerializableFactory	snnlib/serialize/serialize.h	/^class SerializableFactory {$/;"	c
 castSerializableType	snnlib/serialize/serialize.h	/^    CT* castSerializableType(google::protobuf::Message* mess) {$/;"	f	class:Serializable
 clean	snnlib/serialize/serialize.h	/^    void clean() {$/;"	f	class:Serializable
 copyFrom	snnlib/serialize/serialize.h	/^    void copyFrom(const Serializable &another) {$/;"	f	class:Serializable
-createByName	snnlib/serialize/serialize.h	/^    const Serializable* createByName(const string &name) {$/;"	f	class:SerializableFactory
-created	snnlib/serialize/serialize.h	/^    vector<Serializable*> created;$/;"	m	class:SerializableFactory
 getName	snnlib/serialize/serialize.h	/^    const string& getName() {$/;"	f	class:Serializable
 getNewSerializedMessage	snnlib/serialize/serialize.h	/^    T* getNewSerializedMessage(google::protobuf::Message* m = nullptr) {$/;"	f	class:Serializable
 name	snnlib/serialize/serialize.h	/^    string name;$/;"	m	class:Serializable
+objects	snnlib/serialize/serialize.h	/^    vector<Serializable*> objects;$/;"	m	class:SerializableFactory
 serialized_message	snnlib/serialize/serialize.h	/^    ::google::protobuf::Message *serialized_message;$/;"	m	class:Serializable
 ~Serializable	snnlib/serialize/serialize.h	/^    ~Serializable() {$/;"	f	class:Serializable
+~SerializableFactory	snnlib/serialize/serialize.h	/^    ~SerializableFactory() {$/;"	f	class:SerializableFactory
 Conn	snnlib/sim/network.h	/^struct Conn {$/;"	s
 Network	snnlib/sim/network.h	/^	Network() {$/;"	f	class:Network
 Network	snnlib/sim/network.h	/^	Network(size_t input_size, size_t net_size) {$/;"	f	class:Network
 Network	snnlib/sim/network.h	/^class Network {$/;"	c
 SpikeQueue	snnlib/sim/network.h	/^typedef priority_queue<SynSpike, vector<SynSpike>, CompareSynSpike> SpikeQueue;$/;"	t
-conn_map	snnlib/sim/network.h	/^	vector<Conn> *conn_map;	$/;"	m	class:Network
+conn_map	snnlib/sim/network.h	/^	vector<Conn> *conn_map;$/;"	m	class:Network
 init	snnlib/sim/network.h	/^	void init(size_t input_size, size_t _net_size) {$/;"	f	class:Network
-input_queues	snnlib/sim/network.h	/^	SpikeQueue *input_queues;	$/;"	m	class:Network
+input_queues	snnlib/sim/network.h	/^	SpikeQueue *input_queues;$/;"	m	class:Network
 l_id	snnlib/sim/network.h	/^	size_t l_id;$/;"	m	struct:Conn
 n_id	snnlib/sim/network.h	/^	size_t n_id;$/;"	m	struct:Conn
 net_queues	snnlib/sim/network.h	/^	SpikeQueue *net_queues;$/;"	m	class:Network
 net_size	snnlib/sim/network.h	/^	size_t net_size;$/;"	m	class:Network
 propagateSpike	snnlib/sim/network.h	/^	void propagateSpike(const size_t &global_id, const double &t) {$/;"	f	class:Network
-spikes_list	snnlib/sim/network.h	/^	vector<double> *spikes_list;$/;"	m	class:Network
+spikes_list	snnlib/sim/network.h	/^	SpikesList spikes_list;$/;"	m	class:Network
 syn_id	snnlib/sim/network.h	/^	size_t syn_id;$/;"	m	struct:Conn
 total_size	snnlib/sim/network.h	/^	size_t total_size;$/;"	m	class:Network
 ~Network	snnlib/sim/network.h	/^	~Network() {$/;"	f	class:Network
@@ -305,11 +324,13 @@ input_ts	snnlib/sim/sim.h	/^    ContLabeledTimeSeries input_ts;$/;"	m	class:Sim
 layers	snnlib/sim/sim.h	/^    vector< Layer *> layers;$/;"	m	class:Sim
 monitorStat	snnlib/sim/sim.h	/^    void monitorStat(const string &filename) {$/;"	f	class:Sim
 net	snnlib/sim/sim.h	/^    Network net;$/;"	m	class:Sim
+output_spikes_file	snnlib/sim/sim.h	/^    string output_spikes_file;$/;"	m	class:Sim
 precalculateInputLayerSpikes	snnlib/sim/sim.h	/^    void precalculateInputLayerSpikes() {$/;"	f	class:Sim
 print	snnlib/sim/sim.h	/^    void print(std::ostream& str) const {$/;"	f	class:Sim
 run	snnlib/sim/sim.h	/^    void run() {$/;"	f	class:Sim
 sc	snnlib/sim/sim.h	/^    const SimConfiguration &sc;$/;"	m	class:Sim
 setInputTimeSeries	snnlib/sim/sim.h	/^    void setInputTimeSeries(LabeledTimeSeriesList l) {$/;"	f	class:Sim
+setOutputSpikesFile	snnlib/sim/sim.h	/^    void setOutputSpikesFile(const string &filename) {$/;"	f	class:Sim
 statistics_file	snnlib/sim/sim.h	/^    string statistics_file;$/;"	m	class:Sim
 ~Sim	snnlib/sim/sim.h	/^    ~Sim() {$/;"	f	class:Sim
 SimInputLayer	snnlib/sim/sim_input_layer.h	/^	SimInputLayer() {}$/;"	f	class:SimInputLayer
@@ -325,17 +346,18 @@ active_synapses	snnlib/sim/sim_neuron.h	/^	list<Synapse*> active_synapses;$/;"	m
 SigmaTuningCurve	snnlib/tuning_curves/sigma_tuning_curve.h	/^    SigmaTuningCurve() {}$/;"	f	class:SigmaTuningCurve
 SigmaTuningCurve	snnlib/tuning_curves/sigma_tuning_curve.h	/^class SigmaTuningCurve: public TuningCurve {$/;"	c
 c	snnlib/tuning_curves/sigma_tuning_curve.h	/^    const SigmaTuningCurveC *c;$/;"	m	class:SigmaTuningCurve
-calculateResponse	snnlib/tuning_curves/sigma_tuning_curve.h	/^    double calculateResponse(const double &x) {$/;"	f	class:SigmaTuningCurve
+calculateResponse	snnlib/tuning_curves/sigma_tuning_curve.h	/^    void calculateResponse(const double &x) {$/;"	f	class:SigmaTuningCurve
 center	snnlib/tuning_curves/sigma_tuning_curve.h	/^    double center;$/;"	m	class:SigmaTuningCurve
 gain	snnlib/tuning_curves/sigma_tuning_curve.h	/^    double gain;$/;"	m	class:SigmaTuningCurve
-init	snnlib/tuning_curves/sigma_tuning_curve.h	/^    void init(const ConstObj *_c) {$/;"	f	class:SigmaTuningCurve
+init	snnlib/tuning_curves/sigma_tuning_curve.h	/^    void init(const ConstObj *_c, Neuron *_n) {$/;"	f	class:SigmaTuningCurve
+n	snnlib/tuning_curves/sigma_tuning_curve.h	/^    Neuron *n;$/;"	m	class:SigmaTuningCurve
 sigma	snnlib/tuning_curves/sigma_tuning_curve.h	/^    double sigma;$/;"	m	class:SigmaTuningCurve
 sigma_square	snnlib/tuning_curves/sigma_tuning_curve.h	/^    double sigma_square;$/;"	m	class:SigmaTuningCurve
 ~SigmaTuningCurve	snnlib/tuning_curves/sigma_tuning_curve.h	/^    ~SigmaTuningCurve() {$/;"	f	class:SigmaTuningCurve
 BlankTuningCurve	snnlib/tuning_curves/tuning_curve.h	/^class BlankTuningCurve : public TuningCurve {$/;"	c
 TuningCurve	snnlib/tuning_curves/tuning_curve.h	/^class TuningCurve : public Obj {$/;"	c
-calculateResponse	snnlib/tuning_curves/tuning_curve.h	/^	double calculateResponse(const double &I) { return 0.0; }$/;"	f	class:BlankTuningCurve
-init	snnlib/tuning_curves/tuning_curve.h	/^	void init(const ConstObj *_c) {}$/;"	f	class:BlankTuningCurve
+calculateResponse	snnlib/tuning_curves/tuning_curve.h	/^	void calculateResponse(const double &I) { }$/;"	f	class:BlankTuningCurve
+init	snnlib/tuning_curves/tuning_curve.h	/^	void init(const ConstObj *_c, Neuron *_n) {}$/;"	f	class:BlankTuningCurve
 Array	snnlib/util/json/array.cpp	/^	Array::Array(const Array &other) : data(other.data) {$/;"	f	class:JsonBox::Array
 Array	snnlib/util/json/array.cpp	/^	Array::Array(const allocator_type &alloc) : data(alloc) {$/;"	f	class:JsonBox::Array
 Array	snnlib/util/json/array.cpp	/^	Array::Array(size_type count, const_reference value, const allocator_type &alloc) : data(count, value, alloc) {$/;"	f	class:JsonBox::Array
@@ -876,6 +898,19 @@ write	snnlib/util/optionparser/optionparser.h	/^    Syscall* write;$/;"	m	struct
 write_one_line	snnlib/util/optionparser/optionparser.h	/^    void write_one_line(IStringWriter& write)$/;"	f	class:option::PrintUsageImplementation::LineWrapper
 wrote_something	snnlib/util/optionparser/optionparser.h	/^    bool wrote_something;$/;"	m	class:option::PrintUsageImplementation::LineWrapper
 x	snnlib/util/optionparser/optionparser.h	/^    int x;$/;"	m	class:option::PrintUsageImplementation::LineWrapper
+N	snnlib/util/spikes_list.h	/^    size_t N;$/;"	m	class:SpikesList
+SpikesList	snnlib/util/spikes_list.h	/^    SpikesList() : Serializable(ESpikesList), sp_list(nullptr) {}$/;"	f	class:SpikesList
+SpikesList	snnlib/util/spikes_list.h	/^    SpikesList(const SpikesList &another) : Serializable(ESpikesList)  {$/;"	f	class:SpikesList
+SpikesList	snnlib/util/spikes_list.h	/^    SpikesList(size_t _N) : Serializable(ESpikesList), N(_N) {$/;"	f	class:SpikesList
+SpikesList	snnlib/util/spikes_list.h	/^class SpikesList: public Serializable {$/;"	c
+deserialize	snnlib/util/spikes_list.h	/^    virtual void deserialize() {$/;"	f	class:SpikesList
+getNew	snnlib/util/spikes_list.h	/^    virtual Protos::SpikesList* getNew(google::protobuf::Message* m = nullptr) {$/;"	f	class:SpikesList
+init	snnlib/util/spikes_list.h	/^    void init(size_t _N)  {$/;"	f	class:SpikesList
+operator []	snnlib/util/spikes_list.h	/^    vector<double>& operator[](size_t ni) {$/;"	f	class:SpikesList
+print	snnlib/util/spikes_list.h	/^    void print(std::ostream& str) const {$/;"	f	class:SpikesList
+serialize	snnlib/util/spikes_list.h	/^    virtual Protos::SpikesList* serialize() {$/;"	f	class:SpikesList
+sp_list	snnlib/util/spikes_list.h	/^    vector<double> *sp_list;$/;"	m	class:SpikesList
+~SpikesList	snnlib/util/spikes_list.h	/^    ~SpikesList() {$/;"	f	class:SpikesList
 CASE	snnlib/util/str_switch.h	7;"	d
 DEFAULT	snnlib/util/str_switch.h	10;"	d
 MAX_LEN	snnlib/util/str_switch.h	/^    const uchar MAX_LEN = 20;$/;"	m	namespace:s_s
@@ -898,11 +933,11 @@ LabeledTimeSeries	snnlib/util/time_series.h	/^    LabeledTimeSeries() : Serializ
 LabeledTimeSeries	snnlib/util/time_series.h	/^    LabeledTimeSeries(const LabeledTimeSeries &another) : Serializable(ELabeledTimeSeries), ts(another.ts), label(another.label) {$/;"	f	class:LabeledTimeSeries
 LabeledTimeSeries	snnlib/util/time_series.h	/^    LabeledTimeSeries(const Protos::LabeledTimeSeries &m) : Serializable(ELabeledTimeSeries) {$/;"	f	class:LabeledTimeSeries
 LabeledTimeSeries	snnlib/util/time_series.h	/^    LabeledTimeSeries(const vector<double> &data, string _label) : Serializable(ELabeledTimeSeries), ts(data), label(_label) { }$/;"	f	class:LabeledTimeSeries
-LabeledTimeSeries	snnlib/util/time_series.h	/^class LabeledTimeSeries  : public Printable, public Serializable {$/;"	c
+LabeledTimeSeries	snnlib/util/time_series.h	/^class LabeledTimeSeries  :  public Serializable {$/;"	c
 LabeledTimeSeriesList	snnlib/util/time_series.h	/^    LabeledTimeSeriesList() : Serializable(ELabeledTimeSeriesList) {$/;"	f	class:LabeledTimeSeriesList
 LabeledTimeSeriesList	snnlib/util/time_series.h	/^    LabeledTimeSeriesList(const LabeledTimeSeriesList &l) : Serializable(ELabeledTimeSeriesList), ts(l.ts) {$/;"	f	class:LabeledTimeSeriesList
 LabeledTimeSeriesList	snnlib/util/time_series.h	/^    LabeledTimeSeriesList(const string &fname) : Serializable(ELabeledTimeSeriesList) {$/;"	f	class:LabeledTimeSeriesList
-LabeledTimeSeriesList	snnlib/util/time_series.h	/^class LabeledTimeSeriesList  : public Printable, public Serializable {$/;"	c
+LabeledTimeSeriesList	snnlib/util/time_series.h	/^class LabeledTimeSeriesList  : public Serializable {$/;"	c
 TimeSeries	snnlib/util/time_series.h	/^    TimeSeries() {}$/;"	f	class:TimeSeries
 TimeSeries	snnlib/util/time_series.h	/^    TimeSeries(const vector<double> &_data) : data(_data) {}$/;"	f	class:TimeSeries
 TimeSeries	snnlib/util/time_series.h	/^class TimeSeries : public Printable {$/;"	c
@@ -945,22 +980,24 @@ split_into	snnlib/util/util.cpp	/^vector<string> split_into(const string &s, cha
 swapInd	snnlib/util/util.cpp	/^void swapInd(size_t *l, size_t *r) {$/;"	f
 trim	snnlib/util/util.cpp	/^void trim(string &str) {$/;"	f
 PI	snnlib/util/util.h	12;"	d
-ARG_HELP	tools/dumptool/dumptool.cpp	/^enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_UCR_TS, ARG_LAB_TS_PB };$/;"	e	enum:optionIndex	file:
-ARG_LAB_TS_PB	tools/dumptool/dumptool.cpp	/^enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_UCR_TS, ARG_LAB_TS_PB };$/;"	e	enum:optionIndex	file:
-ARG_UCR_TS	tools/dumptool/dumptool.cpp	/^enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_UCR_TS, ARG_LAB_TS_PB };$/;"	e	enum:optionIndex	file:
-ARG_UNKNOWN	tools/dumptool/dumptool.cpp	/^enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_UCR_TS, ARG_LAB_TS_PB };$/;"	e	enum:optionIndex	file:
+ARG_HELP	tools/dumptool/dumptool.cpp	/^enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_UCR_TS, ARG_LAB_TS_PB, ARG_PB };$/;"	e	enum:optionIndex	file:
+ARG_LAB_TS_PB	tools/dumptool/dumptool.cpp	/^enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_UCR_TS, ARG_LAB_TS_PB, ARG_PB };$/;"	e	enum:optionIndex	file:
+ARG_PB	tools/dumptool/dumptool.cpp	/^enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_UCR_TS, ARG_LAB_TS_PB, ARG_PB };$/;"	e	enum:optionIndex	file:
+ARG_UCR_TS	tools/dumptool/dumptool.cpp	/^enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_UCR_TS, ARG_LAB_TS_PB, ARG_PB };$/;"	e	enum:optionIndex	file:
+ARG_UNKNOWN	tools/dumptool/dumptool.cpp	/^enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_UCR_TS, ARG_LAB_TS_PB, ARG_PB };$/;"	e	enum:optionIndex	file:
 main	tools/dumptool/dumptool.cpp	/^int main(int argc, char **argv) {$/;"	f
-optionIndex	tools/dumptool/dumptool.cpp	/^enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_UCR_TS, ARG_LAB_TS_PB };$/;"	g	file:
+optionIndex	tools/dumptool/dumptool.cpp	/^enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_UCR_TS, ARG_LAB_TS_PB, ARG_PB };$/;"	g	file:
 parseOptions	tools/dumptool/dumptool.cpp	/^void parseOptions(option::Option* options, option::Stats &stats,  int argc, char **argv) {$/;"	f
 usage	tools/dumptool/dumptool.cpp	/^const option::Descriptor usage[] =$/;"	v
 convertUcrTimeSeriesLine	tools/dumptool/ucr_ts.h	/^LabeledTimeSeries convertUcrTimeSeriesLine(const string &line) {$/;"	f
-ARG_CONSTANTS	tools/sim/snn_sim.cpp	/^enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_CONSTANTS, ARG_INPUT_TS, ARG_OUT_STAT };$/;"	e	enum:optionIndex	file:
-ARG_HELP	tools/sim/snn_sim.cpp	/^enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_CONSTANTS, ARG_INPUT_TS, ARG_OUT_STAT };$/;"	e	enum:optionIndex	file:
-ARG_INPUT_TS	tools/sim/snn_sim.cpp	/^enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_CONSTANTS, ARG_INPUT_TS, ARG_OUT_STAT };$/;"	e	enum:optionIndex	file:
-ARG_OUT_STAT	tools/sim/snn_sim.cpp	/^enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_CONSTANTS, ARG_INPUT_TS, ARG_OUT_STAT };$/;"	e	enum:optionIndex	file:
-ARG_UNKNOWN	tools/sim/snn_sim.cpp	/^enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_CONSTANTS, ARG_INPUT_TS, ARG_OUT_STAT };$/;"	e	enum:optionIndex	file:
+ARG_CONSTANTS	tools/sim/snn_sim.cpp	/^enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_CONSTANTS, ARG_INPUT_TS, ARG_OUT_STAT, ARG_OUT_SPIKES };$/;"	e	enum:optionIndex	file:
+ARG_HELP	tools/sim/snn_sim.cpp	/^enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_CONSTANTS, ARG_INPUT_TS, ARG_OUT_STAT, ARG_OUT_SPIKES };$/;"	e	enum:optionIndex	file:
+ARG_INPUT_TS	tools/sim/snn_sim.cpp	/^enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_CONSTANTS, ARG_INPUT_TS, ARG_OUT_STAT, ARG_OUT_SPIKES };$/;"	e	enum:optionIndex	file:
+ARG_OUT_SPIKES	tools/sim/snn_sim.cpp	/^enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_CONSTANTS, ARG_INPUT_TS, ARG_OUT_STAT, ARG_OUT_SPIKES };$/;"	e	enum:optionIndex	file:
+ARG_OUT_STAT	tools/sim/snn_sim.cpp	/^enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_CONSTANTS, ARG_INPUT_TS, ARG_OUT_STAT, ARG_OUT_SPIKES };$/;"	e	enum:optionIndex	file:
+ARG_UNKNOWN	tools/sim/snn_sim.cpp	/^enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_CONSTANTS, ARG_INPUT_TS, ARG_OUT_STAT, ARG_OUT_SPIKES };$/;"	e	enum:optionIndex	file:
 main	tools/sim/snn_sim.cpp	/^int main(int argc, char **argv) {$/;"	f
-optionIndex	tools/sim/snn_sim.cpp	/^enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_CONSTANTS, ARG_INPUT_TS, ARG_OUT_STAT };$/;"	g	file:
+optionIndex	tools/sim/snn_sim.cpp	/^enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_CONSTANTS, ARG_INPUT_TS, ARG_OUT_STAT, ARG_OUT_SPIKES };$/;"	g	file:
 parseOptions	tools/sim/snn_sim.cpp	/^void parseOptions(option::Option* options, option::Stats &stats,  int argc, char **argv) {$/;"	f
 usage	tools/sim/snn_sim.cpp	/^const option::Descriptor usage[] =$/;"	v
 CHECK_MODE	tools/testproto/main.cpp	18;"	d	file:
@@ -988,3 +1025,126 @@ writeMessage	tools/testproto/main.cpp	/^    void writeMessage(::google::protobuf
 zeroIn	tools/testproto/main.cpp	/^    IstreamInputStream *zeroIn;$/;"	m	class:ProtoRw	file:
 zeroOut	tools/testproto/main.cpp	/^    OstreamOutputStream *zeroOut;$/;"	m	class:ProtoRw	file:
 ~ProtoRw	tools/testproto/main.cpp	/^    ~ProtoRw() {$/;"	f	class:ProtoRw
+]�?������M���{���m��1m� �9� g���4X� �;⿚ܿ�	tools/testproto/out.pb	/^]�?/;"	l
+ByteSize	tools/testproto/time_series.pb.cc	/^int LabeledTimeSeries::ByteSize() const {$/;"	f	class:Protos::LabeledTimeSeries
+ByteSize	tools/testproto/time_series.pb.cc	/^int TimeSeries::ByteSize() const {$/;"	f	class:Protos::TimeSeries
+Clear	tools/testproto/time_series.pb.cc	/^void LabeledTimeSeries::Clear() {$/;"	f	class:Protos::LabeledTimeSeries
+Clear	tools/testproto/time_series.pb.cc	/^void TimeSeries::Clear() {$/;"	f	class:Protos::TimeSeries
+CopyFrom	tools/testproto/time_series.pb.cc	/^void LabeledTimeSeries::CopyFrom(const ::google::protobuf::Message& from) {$/;"	f	class:Protos::LabeledTimeSeries
+CopyFrom	tools/testproto/time_series.pb.cc	/^void LabeledTimeSeries::CopyFrom(const LabeledTimeSeries& from) {$/;"	f	class:Protos::LabeledTimeSeries
+CopyFrom	tools/testproto/time_series.pb.cc	/^void TimeSeries::CopyFrom(const ::google::protobuf::Message& from) {$/;"	f	class:Protos::TimeSeries
+CopyFrom	tools/testproto/time_series.pb.cc	/^void TimeSeries::CopyFrom(const TimeSeries& from) {$/;"	f	class:Protos::TimeSeries
+DO_	tools/testproto/time_series.pb.cc	190;"	d	file:
+DO_	tools/testproto/time_series.pb.cc	234;"	d	file:
+DO_	tools/testproto/time_series.pb.cc	447;"	d	file:
+DO_	tools/testproto/time_series.pb.cc	503;"	d	file:
+GetMetadata	tools/testproto/time_series.pb.cc	/^::google::protobuf::Metadata LabeledTimeSeries::GetMetadata() const {$/;"	f	class:Protos::LabeledTimeSeries
+GetMetadata	tools/testproto/time_series.pb.cc	/^::google::protobuf::Metadata TimeSeries::GetMetadata() const {$/;"	f	class:Protos::TimeSeries
+INTERNAL_SUPPRESS_PROTOBUF_FIELD_DEPRECATION	tools/testproto/time_series.pb.cc	4;"	d	file:
+InitAsDefaultInstance	tools/testproto/time_series.pb.cc	/^void LabeledTimeSeries::InitAsDefaultInstance() {$/;"	f	class:Protos::LabeledTimeSeries
+InitAsDefaultInstance	tools/testproto/time_series.pb.cc	/^void TimeSeries::InitAsDefaultInstance() {$/;"	f	class:Protos::TimeSeries
+IsInitialized	tools/testproto/time_series.pb.cc	/^bool LabeledTimeSeries::IsInitialized() const {$/;"	f	class:Protos::LabeledTimeSeries
+IsInitialized	tools/testproto/time_series.pb.cc	/^bool TimeSeries::IsInitialized() const {$/;"	f	class:Protos::TimeSeries
+LabeledTimeSeries	tools/testproto/time_series.pb.cc	/^LabeledTimeSeries::LabeledTimeSeries()$/;"	f	class:Protos::LabeledTimeSeries
+LabeledTimeSeries	tools/testproto/time_series.pb.cc	/^LabeledTimeSeries::LabeledTimeSeries(const LabeledTimeSeries& from)$/;"	f	class:Protos::LabeledTimeSeries
+LabeledTimeSeries_descriptor_	tools/testproto/time_series.pb.cc	/^const ::google::protobuf::Descriptor* LabeledTimeSeries_descriptor_ = NULL;$/;"	m	namespace:Protos::__anon1	file:
+LabeledTimeSeries_reflection_	tools/testproto/time_series.pb.cc	/^  LabeledTimeSeries_reflection_ = NULL;$/;"	m	namespace:Protos::__anon1	file:
+MergeFrom	tools/testproto/time_series.pb.cc	/^void LabeledTimeSeries::MergeFrom(const ::google::protobuf::Message& from) {$/;"	f	class:Protos::LabeledTimeSeries
+MergeFrom	tools/testproto/time_series.pb.cc	/^void LabeledTimeSeries::MergeFrom(const LabeledTimeSeries& from) {$/;"	f	class:Protos::LabeledTimeSeries
+MergeFrom	tools/testproto/time_series.pb.cc	/^void TimeSeries::MergeFrom(const ::google::protobuf::Message& from) {$/;"	f	class:Protos::TimeSeries
+MergeFrom	tools/testproto/time_series.pb.cc	/^void TimeSeries::MergeFrom(const TimeSeries& from) {$/;"	f	class:Protos::TimeSeries
+MergePartialFromCodedStream	tools/testproto/time_series.pb.cc	/^bool LabeledTimeSeries::MergePartialFromCodedStream($/;"	f	class:Protos::LabeledTimeSeries
+MergePartialFromCodedStream	tools/testproto/time_series.pb.cc	/^bool TimeSeries::MergePartialFromCodedStream($/;"	f	class:Protos::TimeSeries
+New	tools/testproto/time_series.pb.cc	/^LabeledTimeSeries* LabeledTimeSeries::New() const {$/;"	f	class:Protos::LabeledTimeSeries
+New	tools/testproto/time_series.pb.cc	/^TimeSeries* TimeSeries::New() const {$/;"	f	class:Protos::TimeSeries
+Protos	tools/testproto/time_series.pb.cc	/^namespace Protos {$/;"	n	file:
+SerializeWithCachedSizes	tools/testproto/time_series.pb.cc	/^void LabeledTimeSeries::SerializeWithCachedSizes($/;"	f	class:Protos::LabeledTimeSeries
+SerializeWithCachedSizes	tools/testproto/time_series.pb.cc	/^void TimeSeries::SerializeWithCachedSizes($/;"	f	class:Protos::TimeSeries
+SerializeWithCachedSizesToArray	tools/testproto/time_series.pb.cc	/^::google::protobuf::uint8* LabeledTimeSeries::SerializeWithCachedSizesToArray($/;"	f	class:Protos::LabeledTimeSeries
+SerializeWithCachedSizesToArray	tools/testproto/time_series.pb.cc	/^::google::protobuf::uint8* TimeSeries::SerializeWithCachedSizesToArray($/;"	f	class:Protos::TimeSeries
+SetCachedSize	tools/testproto/time_series.pb.cc	/^void LabeledTimeSeries::SetCachedSize(int size) const {$/;"	f	class:Protos::LabeledTimeSeries
+SetCachedSize	tools/testproto/time_series.pb.cc	/^void TimeSeries::SetCachedSize(int size) const {$/;"	f	class:Protos::TimeSeries
+SharedCtor	tools/testproto/time_series.pb.cc	/^void LabeledTimeSeries::SharedCtor() {$/;"	f	class:Protos::LabeledTimeSeries
+SharedCtor	tools/testproto/time_series.pb.cc	/^void TimeSeries::SharedCtor() {$/;"	f	class:Protos::TimeSeries
+SharedDtor	tools/testproto/time_series.pb.cc	/^void LabeledTimeSeries::SharedDtor() {$/;"	f	class:Protos::LabeledTimeSeries
+SharedDtor	tools/testproto/time_series.pb.cc	/^void TimeSeries::SharedDtor() {$/;"	f	class:Protos::TimeSeries
+StaticDescriptorInitializer_time_5fseries_2eproto	tools/testproto/time_series.pb.cc	/^  StaticDescriptorInitializer_time_5fseries_2eproto() {$/;"	f	struct:Protos::StaticDescriptorInitializer_time_5fseries_2eproto
+StaticDescriptorInitializer_time_5fseries_2eproto	tools/testproto/time_series.pb.cc	/^struct StaticDescriptorInitializer_time_5fseries_2eproto {$/;"	s	namespace:Protos	file:
+Swap	tools/testproto/time_series.pb.cc	/^void LabeledTimeSeries::Swap(LabeledTimeSeries* other) {$/;"	f	class:Protos::LabeledTimeSeries
+Swap	tools/testproto/time_series.pb.cc	/^void TimeSeries::Swap(TimeSeries* other) {$/;"	f	class:Protos::TimeSeries
+TimeSeries	tools/testproto/time_series.pb.cc	/^TimeSeries::TimeSeries()$/;"	f	class:Protos::TimeSeries
+TimeSeries	tools/testproto/time_series.pb.cc	/^TimeSeries::TimeSeries(const TimeSeries& from)$/;"	f	class:Protos::TimeSeries
+TimeSeries_descriptor_	tools/testproto/time_series.pb.cc	/^const ::google::protobuf::Descriptor* TimeSeries_descriptor_ = NULL;$/;"	m	namespace:Protos::__anon1	file:
+TimeSeries_reflection_	tools/testproto/time_series.pb.cc	/^  TimeSeries_reflection_ = NULL;$/;"	m	namespace:Protos::__anon1	file:
+default_instance	tools/testproto/time_series.pb.cc	/^const LabeledTimeSeries& LabeledTimeSeries::default_instance() {$/;"	f	class:Protos::LabeledTimeSeries
+default_instance	tools/testproto/time_series.pb.cc	/^const TimeSeries& TimeSeries::default_instance() {$/;"	f	class:Protos::TimeSeries
+default_instance_	tools/testproto/time_series.pb.cc	/^LabeledTimeSeries* LabeledTimeSeries::default_instance_ = NULL;$/;"	m	class:Protos::LabeledTimeSeries	file:
+default_instance_	tools/testproto/time_series.pb.cc	/^TimeSeries* TimeSeries::default_instance_ = NULL;$/;"	m	class:Protos::TimeSeries	file:
+descriptor	tools/testproto/time_series.pb.cc	/^const ::google::protobuf::Descriptor* LabeledTimeSeries::descriptor() {$/;"	f	class:Protos::LabeledTimeSeries
+descriptor	tools/testproto/time_series.pb.cc	/^const ::google::protobuf::Descriptor* TimeSeries::descriptor() {$/;"	f	class:Protos::TimeSeries
+kDataFieldNumber	tools/testproto/time_series.pb.cc	/^const int TimeSeries::kDataFieldNumber;$/;"	m	class:Protos::TimeSeries	file:
+kLabelFieldNumber	tools/testproto/time_series.pb.cc	/^const int LabeledTimeSeries::kLabelFieldNumber;$/;"	m	class:Protos::LabeledTimeSeries	file:
+kTsFieldNumber	tools/testproto/time_series.pb.cc	/^const int LabeledTimeSeries::kTsFieldNumber;$/;"	m	class:Protos::LabeledTimeSeries	file:
+protobuf_AddDesc_time_5fseries_2eproto	tools/testproto/time_series.pb.cc	/^void protobuf_AddDesc_time_5fseries_2eproto() {$/;"	f	namespace:Protos
+protobuf_AssignDesc_time_5fseries_2eproto	tools/testproto/time_series.pb.cc	/^void protobuf_AssignDesc_time_5fseries_2eproto() {$/;"	f	namespace:Protos
+protobuf_AssignDescriptorsOnce	tools/testproto/time_series.pb.cc	/^inline void protobuf_AssignDescriptorsOnce() {$/;"	f	namespace:Protos::__anon2
+protobuf_RegisterTypes	tools/testproto/time_series.pb.cc	/^void protobuf_RegisterTypes(const ::std::string&) {$/;"	f	namespace:Protos::__anon2
+protobuf_ShutdownFile_time_5fseries_2eproto	tools/testproto/time_series.pb.cc	/^void protobuf_ShutdownFile_time_5fseries_2eproto() {$/;"	f	namespace:Protos
+static_descriptor_initializer_time_5fseries_2eproto_	tools/testproto/time_series.pb.cc	/^} static_descriptor_initializer_time_5fseries_2eproto_;$/;"	m	namespace:Protos	typeref:struct:Protos::StaticDescriptorInitializer_time_5fseries_2eproto	file:
+~LabeledTimeSeries	tools/testproto/time_series.pb.cc	/^LabeledTimeSeries::~LabeledTimeSeries() {$/;"	f	class:Protos::LabeledTimeSeries
+~TimeSeries	tools/testproto/time_series.pb.cc	/^TimeSeries::~TimeSeries() {$/;"	f	class:Protos::TimeSeries
+GetCachedSize	tools/testproto/time_series.pb.h	/^  int GetCachedSize() const { return _cached_size_; }$/;"	f	class:Protos::LabeledTimeSeries
+GetCachedSize	tools/testproto/time_series.pb.h	/^  int GetCachedSize() const { return _cached_size_; }$/;"	f	class:Protos::TimeSeries
+LabeledTimeSeries	tools/testproto/time_series.pb.h	/^class LabeledTimeSeries : public ::google::protobuf::Message {$/;"	c	namespace:Protos
+PROTOBUF_time_5fseries_2eproto__INCLUDED	tools/testproto/time_series.pb.h	5;"	d
+Protos	tools/testproto/time_series.pb.h	/^namespace Protos {$/;"	n
+TimeSeries	tools/testproto/time_series.pb.h	/^class TimeSeries : public ::google::protobuf::Message {$/;"	c	namespace:Protos
+_cached_size_	tools/testproto/time_series.pb.h	/^  mutable int _cached_size_;$/;"	m	class:Protos::LabeledTimeSeries
+_cached_size_	tools/testproto/time_series.pb.h	/^  mutable int _cached_size_;$/;"	m	class:Protos::TimeSeries
+_data_cached_byte_size_	tools/testproto/time_series.pb.h	/^  mutable int _data_cached_byte_size_;$/;"	m	class:Protos::TimeSeries
+_has_bits_	tools/testproto/time_series.pb.h	/^  ::google::protobuf::uint32 _has_bits_[1];$/;"	m	class:Protos::LabeledTimeSeries
+_has_bits_	tools/testproto/time_series.pb.h	/^  ::google::protobuf::uint32 _has_bits_[1];$/;"	m	class:Protos::TimeSeries
+_unknown_fields_	tools/testproto/time_series.pb.h	/^  ::google::protobuf::UnknownFieldSet _unknown_fields_;$/;"	m	class:Protos::LabeledTimeSeries
+_unknown_fields_	tools/testproto/time_series.pb.h	/^  ::google::protobuf::UnknownFieldSet _unknown_fields_;$/;"	m	class:Protos::TimeSeries
+add_data	tools/testproto/time_series.pb.h	/^inline void TimeSeries::add_data(double value) {$/;"	f	class:Protos::TimeSeries
+clear_data	tools/testproto/time_series.pb.h	/^inline void TimeSeries::clear_data() {$/;"	f	class:Protos::TimeSeries
+clear_has_label	tools/testproto/time_series.pb.h	/^inline void LabeledTimeSeries::clear_has_label() {$/;"	f	class:Protos::LabeledTimeSeries
+clear_has_ts	tools/testproto/time_series.pb.h	/^inline void LabeledTimeSeries::clear_has_ts() {$/;"	f	class:Protos::LabeledTimeSeries
+clear_label	tools/testproto/time_series.pb.h	/^inline void LabeledTimeSeries::clear_label() {$/;"	f	class:Protos::LabeledTimeSeries
+clear_ts	tools/testproto/time_series.pb.h	/^inline void LabeledTimeSeries::clear_ts() {$/;"	f	class:Protos::LabeledTimeSeries
+data	tools/testproto/time_series.pb.h	/^TimeSeries::data() const {$/;"	f	class:Protos::TimeSeries
+data	tools/testproto/time_series.pb.h	/^inline double TimeSeries::data(int index) const {$/;"	f	class:Protos::TimeSeries
+data_	tools/testproto/time_series.pb.h	/^  ::google::protobuf::RepeatedField< double > data_;$/;"	m	class:Protos::TimeSeries
+data_size	tools/testproto/time_series.pb.h	/^inline int TimeSeries::data_size() const {$/;"	f	class:Protos::TimeSeries
+default_instance_	tools/testproto/time_series.pb.h	/^  static LabeledTimeSeries* default_instance_;$/;"	m	class:Protos::LabeledTimeSeries
+default_instance_	tools/testproto/time_series.pb.h	/^  static TimeSeries* default_instance_;$/;"	m	class:Protos::TimeSeries
+google	tools/testproto/time_series.pb.h	/^namespace google {$/;"	n
+has_label	tools/testproto/time_series.pb.h	/^inline bool LabeledTimeSeries::has_label() const {$/;"	f	class:Protos::LabeledTimeSeries
+has_ts	tools/testproto/time_series.pb.h	/^inline bool LabeledTimeSeries::has_ts() const {$/;"	f	class:Protos::LabeledTimeSeries
+kDataFieldNumber	tools/testproto/time_series.pb.h	/^  static const int kDataFieldNumber = 1;$/;"	m	class:Protos::TimeSeries
+kLabelFieldNumber	tools/testproto/time_series.pb.h	/^  static const int kLabelFieldNumber = 2;$/;"	m	class:Protos::LabeledTimeSeries
+kTsFieldNumber	tools/testproto/time_series.pb.h	/^  static const int kTsFieldNumber = 3;$/;"	m	class:Protos::LabeledTimeSeries
+label	tools/testproto/time_series.pb.h	/^inline const ::std::string& LabeledTimeSeries::label() const {$/;"	f	class:Protos::LabeledTimeSeries
+label_	tools/testproto/time_series.pb.h	/^  ::std::string* label_;$/;"	m	class:Protos::LabeledTimeSeries
+mutable_data	tools/testproto/time_series.pb.h	/^TimeSeries::mutable_data() {$/;"	f	class:Protos::TimeSeries
+mutable_label	tools/testproto/time_series.pb.h	/^inline ::std::string* LabeledTimeSeries::mutable_label() {$/;"	f	class:Protos::LabeledTimeSeries
+mutable_ts	tools/testproto/time_series.pb.h	/^inline ::Protos::TimeSeries* LabeledTimeSeries::mutable_ts() {$/;"	f	class:Protos::LabeledTimeSeries
+mutable_unknown_fields	tools/testproto/time_series.pb.h	/^  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {$/;"	f	class:Protos::LabeledTimeSeries
+mutable_unknown_fields	tools/testproto/time_series.pb.h	/^  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {$/;"	f	class:Protos::TimeSeries
+operator =	tools/testproto/time_series.pb.h	/^  inline LabeledTimeSeries& operator=(const LabeledTimeSeries& from) {$/;"	f	class:Protos::LabeledTimeSeries
+operator =	tools/testproto/time_series.pb.h	/^  inline TimeSeries& operator=(const TimeSeries& from) {$/;"	f	class:Protos::TimeSeries
+protobuf	tools/testproto/time_series.pb.h	/^namespace protobuf {$/;"	n	namespace:google
+release_label	tools/testproto/time_series.pb.h	/^inline ::std::string* LabeledTimeSeries::release_label() {$/;"	f	class:Protos::LabeledTimeSeries
+release_ts	tools/testproto/time_series.pb.h	/^inline ::Protos::TimeSeries* LabeledTimeSeries::release_ts() {$/;"	f	class:Protos::LabeledTimeSeries
+set_allocated_label	tools/testproto/time_series.pb.h	/^inline void LabeledTimeSeries::set_allocated_label(::std::string* label) {$/;"	f	class:Protos::LabeledTimeSeries
+set_allocated_ts	tools/testproto/time_series.pb.h	/^inline void LabeledTimeSeries::set_allocated_ts(::Protos::TimeSeries* ts) {$/;"	f	class:Protos::LabeledTimeSeries
+set_data	tools/testproto/time_series.pb.h	/^inline void TimeSeries::set_data(int index, double value) {$/;"	f	class:Protos::TimeSeries
+set_has_label	tools/testproto/time_series.pb.h	/^inline void LabeledTimeSeries::set_has_label() {$/;"	f	class:Protos::LabeledTimeSeries
+set_has_ts	tools/testproto/time_series.pb.h	/^inline void LabeledTimeSeries::set_has_ts() {$/;"	f	class:Protos::LabeledTimeSeries
+set_label	tools/testproto/time_series.pb.h	/^inline void LabeledTimeSeries::set_label(const ::std::string& value) {$/;"	f	class:Protos::LabeledTimeSeries
+set_label	tools/testproto/time_series.pb.h	/^inline void LabeledTimeSeries::set_label(const char* value) {$/;"	f	class:Protos::LabeledTimeSeries
+set_label	tools/testproto/time_series.pb.h	/^inline void LabeledTimeSeries::set_label(const char* value, size_t size) {$/;"	f	class:Protos::LabeledTimeSeries
+ts	tools/testproto/time_series.pb.h	/^inline const ::Protos::TimeSeries& LabeledTimeSeries::ts() const {$/;"	f	class:Protos::LabeledTimeSeries
+ts_	tools/testproto/time_series.pb.h	/^  ::Protos::TimeSeries* ts_;$/;"	m	class:Protos::LabeledTimeSeries
+unknown_fields	tools/testproto/time_series.pb.h	/^  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {$/;"	f	class:Protos::LabeledTimeSeries
+unknown_fields	tools/testproto/time_series.pb.h	/^  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {$/;"	f	class:Protos::TimeSeries

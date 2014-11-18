@@ -4,6 +4,7 @@
 
 #include <snnlib/util/time_series.h>
 #include <snnlib/layers/neuron.h>
+#include <snnlib/layers/adex_neuron.h>
 #include <snnlib/util/spikes_list.h>
 
 SerializableFactory& SerializableFactory::inst() {
@@ -13,6 +14,9 @@ SerializableFactory& SerializableFactory::inst() {
 
 Serializable* SerializableFactory::create(const string &name) {
     Serializable *s = nullptr;
+    if(name == "AdExNeuronStat") {
+        s = new AdExNeuronStat();
+    } else
     if(name == "NeuronStat") {
         s = new NeuronStat();
     } else

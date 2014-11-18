@@ -9,13 +9,13 @@
 class SRMNeuron : public Neuron {
 protected:
     SRMNeuron() { }
-    friend class Factory;
+    friend class Factory;    
 public:
-    SRMNeuron(const ConstObj *_c, ActFunc *_act, LearningRule *_lrule, TuningCurve *_tc) {
-        init(_c, _act, _lrule, _tc);
+    SRMNeuron(const ConstObj *_c) {
+        init(_c);
     }
-    void init(const ConstObj *_c, ActFunc *_act, LearningRule *_lrule, TuningCurve *_tc) {
-        Neuron::init(_c, _act, _lrule, _tc);
+    void init(const ConstObj *_c) {
+        Neuron::init(_c);
         CAST_TYPE(SRMNeuronC, bc)
         c = cast;
 
@@ -36,16 +36,12 @@ public:
         }
         p = act->prob(u);
         if(collectStatistics) {
-            stat->p.push_back(p);
-            stat->u.push_back(u);
-            for(size_t syn_i=0; syn_i<syns.size(); syn_i++) {
-                stat->syns[syn_i].push_back(syns[syn_i]->x);
-            }
+            stat->collect(this);
         }
     }
 
     void attachCurrent(const double &I) {
-        y = tc->calculateResponse(I);
+        tc->calculateResponse(I);
     }
 
     void calculateDynamics() {
@@ -80,27 +76,6 @@ public:
 
     const SRMNeuronC *c;
 
-};
-
-
-
-
-class SRMLayer : public Layer {
-protected:
-    SRMLayer() { }
-    friend class Factory;
-public:
-
-    void init(size_t _size, const ConstObj *_c, const NeuronConf &nc, const Constants &glob_c) {
-        Layer::init(_size, _c, nc, glob_c);
-        CAST_TYPE(SRMLayerC, bc)
-        c = cast;
-    }
-
-    void calculate() {
-
-    }
-    const SRMLayerC *c;
 };
 
 

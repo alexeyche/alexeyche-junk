@@ -28,9 +28,6 @@ Constants::Constants(string filename) {
             if(const_field == "neurons") {
                 PARSE_CONST_STRUCTURE(neurons)
             } else
-            if(const_field == "layers") {
-                PARSE_CONST_STRUCTURE(layers)
-            } else
             if(const_field == "synapses") {
                 PARSE_CONST_STRUCTURE(synapses)
             } else
