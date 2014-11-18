@@ -1,9 +1,12 @@
 #pragma once
 
-Protos::LabeledTimeSeries convertUcrTimeSeriesLine(const string &line) {
+
+#include <snnlib/util/time_series.h>
+
+LabeledTimeSeries convertUcrTimeSeriesLine(const string &line) {
     vector<string> els = split(line, ' ');
     assert(els.size() > 0);
-    
+
     string lab;
     vector<double> ts_data;
     for(size_t i=0; i<els.size(); i++) {
@@ -18,7 +21,7 @@ Protos::LabeledTimeSeries convertUcrTimeSeriesLine(const string &line) {
             ts_data.push_back(stof(els[i]));
         }
     }
-    
-    Protos::LabeledTimeSeries ts = doubleVectorToLabeledTimeSeries(lab, ts_data);
-    return ts;
+
+    LabeledTimeSeries lts_local(ts_data, lab);
+    return lts_local;
 }

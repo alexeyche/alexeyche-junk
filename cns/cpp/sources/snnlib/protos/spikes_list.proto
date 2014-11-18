@@ -1,0 +1,12 @@
+
+package Protos;
+
+message SpikesSequence {
+    repeated double seq = 1 [packed=true];
+}
+
+
+message SpikesList {
+    repeated SpikesSequence spikes_list = 1;
+}
+

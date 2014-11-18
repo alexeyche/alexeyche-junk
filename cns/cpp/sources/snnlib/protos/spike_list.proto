@@ -1,6 +1,0 @@
-
-message SpikeList {
-    repeated int32 idx = 1;
-    repeated double spike_times = 2;
-}
-

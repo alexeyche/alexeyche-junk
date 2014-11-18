@@ -56,7 +56,7 @@
                 "neuron_conf" : {
                     "neuron" : "SRMNeuron",
                     "tuning_curve" : "SigmaTuningCurve",
-                    "act_func" : "Determ"
+                    "act_func" : "ExpHennequin"
                 }
             },                
         ],

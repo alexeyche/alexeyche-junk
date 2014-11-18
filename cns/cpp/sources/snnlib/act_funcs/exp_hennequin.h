@@ -18,12 +18,14 @@ public:
         c = cast;
     }
     double prob(const double &u) const {
-        if(u <= c->u_tr) return 0.0;
-        return 1.0;
+        double p = (c->p_rest + c->r0 * log(1 + exp( c->beta*(u - c->u_tr) )))/1000;
+        if(p>1.0) return 1.0;
+        return p;
     };
 
     double probDeriv(const double &u) const {
-        return 0.0;
+        double part = exp(c->beta*(u - c->u_tr));
+        return part;
     };
 
     const ExpHennequinC *c;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <snnlib/protos/time_series.pb.h>
+#include <snnlib/protos/common.pb.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 #include <google/protobuf/io/coded_stream.h>
 
@@ -19,11 +20,11 @@ public:
         }\
 
     enum Mode {Read, Write};
-    ProtoRw(const string &f, Mode _m) : m(_m) {
+    ProtoRw(const string &f, Mode _m) : filename(f), m(_m) {
         if(m == Read) {
-            fd = open(f.c_str(), O_RDONLY);
+            fd = open(filename.c_str(), O_RDONLY);
             if (fd == -1) {
-                perror("Error while opening file");
+                cerr << "Error while opening file " << filename << "\n";
                 terminate();
             }
 
@@ -31,15 +32,15 @@ public:
             codedIn = new CodedInputStream(ifs_g);
         } else
         if(m == Write) {
-            ofs = new ofstream(f, ios::out | ios::trunc | ios::binary);
+            ofs = new ofstream(filename, ios::out | ios::trunc | ios::binary);
         }
     }
     ~ProtoRw() {
         if(m == Read) {
-            delete ifs_g;
-            delete codedIn;
-
             close(fd);
+            delete codedIn;
+            delete ifs_g;
+
         } else
         if(m == Write) {
             ofs->close();
@@ -47,19 +48,56 @@ public:
         }
 
     }
-    template <typename T>
-    bool read(T &el) {
+    Serializable* readAny() {
         CHECK_MODE(Read);
-        if(!readMessage(el)) {
+        Protos::ClassName cl;
+        if(!readMessage(cl)) {
+            cerr << "Can't read ClassName from " << filename << "\n";
+            terminate();
+        }
+        Serializable *s = SerializableFactory::inst().create(cl.name());
+        google::protobuf::Message *mess = s->getNew();
+        readMessage(*mess);
+        s->deserialize();
+        return s;
+    }
+    void readAndPrintAny() {
+        CHECK_MODE(Read);
+        Protos::ClassName cl;
+        if(!readMessage(cl)) {
+            cerr << "Can't read ClassName from " << filename << "\n";
+            terminate();
+        }
+        Serializable *s = SerializableFactory::inst().create(cl.name());
+        google::protobuf::Message *mess = s->getNew();
+        readMessage(*mess);
+        cout << mess->DebugString();
+    }
+    bool read(Serializable *s) {
+        CHECK_MODE(Read);
+        Protos::ClassName cl;
+        if(!readMessage(cl)) {
             return false;
         }
+        if(cl.name() != s->getName()) {
+            cerr << "Trying to read " << cl.name() << " as " << s->getName() << "\n";
+            terminate();
+        }
+        google::protobuf::Message *mess = s->getNew();
+        readMessage(*mess);
+        s->deserialize();
         return true;
     }
-    template <typename T>
-    void write(T &lts) {
+
+    void write(Serializable *s) {
         CHECK_MODE(Write);
-        writeMessage(lts);
+        Protos::ClassName cl;
+        cl.set_name(s->getName());
+        writeMessage(&cl);
+        ::google::protobuf::Message *mess = s->serialize();
+        writeMessage(mess);
     }
+
 
     template <typename T>
     vector<T> readAll() {
@@ -67,7 +105,7 @@ public:
         vector<T> v;
         while(true) {
             T el;
-            if(!read<T>(el)) {
+            if(!read(el)) {
                 break; // we are at end
             }
             v.push_back(el);
@@ -76,14 +114,14 @@ public:
     }
 
 private:
-    void writeMessage(::google::protobuf::Message &message) {
+    void writeMessage(::google::protobuf::Message *message) {
         zeroOut = new OstreamOutputStream(ofs);
         codedOut = new CodedOutputStream(zeroOut);
 
-        google::protobuf::uint32 size = message.ByteSize();
+        google::protobuf::uint32 size = message->ByteSize();
 
         codedOut->WriteVarint32(size);
-        message.SerializeToCodedStream(codedOut);
+        message->SerializeToCodedStream(codedOut);
 
         delete codedOut;
         delete zeroOut;
@@ -117,5 +155,7 @@ private:
 
     IstreamInputStream *zeroIn;
     CodedInputStream *codedIn;
+
+    string filename;
 
 };

@@ -13,26 +13,39 @@ static size_t global_neuron_index = 0;
 
 #include <snnlib/protos/stat.pb.h>
 
-struct NeuronStat {
+#include <snnlib/serialize/serialize.h>
+
+struct NeuronStat : public Serializable {
+    NeuronStat() : Serializable(ENeuronStat) {}
+
     vector<vector<double>> syns;
     vector<double> p;
     vector<double> u;
 
-    Protos::NeuronStat serialize() {
-        Protos::NeuronStat stat;
+    virtual Protos::NeuronStat *serialize() {
+        Protos::NeuronStat *stat = getNew();
         for(auto it=p.begin(); it != p.end(); ++it) {
-            stat.add_p(*it);
+            stat->add_p(*it);
         }
         for(auto it=u.begin(); it != u.end(); ++it) {
-            stat.add_u(*it);
+            stat->add_u(*it);
         }
         for(auto it=syns.begin(); it != syns.end(); ++it) {
-            Protos::SynStat* syn_stat = stat.add_syns();
+            Protos::SynStat* syn_stat = stat->add_syns();
             for(auto it_val=it->begin(); it_val != it->end(); ++it_val) {
                 syn_stat->add_x(*it_val);
             }
         }
         return stat;
+    }
+    virtual void deserialize() {
+        cerr << "Why you need that?\n";
+        terminate();
+    }
+    virtual Protos::NeuronStat* getNew(google::protobuf::Message* m = nullptr) {
+        return getNewSerializedMessage<Protos::NeuronStat>(m);
+    }
+    void print(std::ostream& str) const {
     }
 };
 

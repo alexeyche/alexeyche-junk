@@ -9,22 +9,26 @@
 class Sim: public Printable {
 public:
     Sim(const Constants &c);
-    
+
     ~Sim() {
         if(!statistics_file.empty()) {
             ProtoRw prw(statistics_file, ProtoRw::Write);
             for(auto it=sc.neurons_to_listen.begin(); it != sc.neurons_to_listen.end(); ++it) {
                 Neuron *n = accessByGlobalId(*it);
                 if(n->stat) {
-                    Protos::NeuronStat stat = n->stat->serialize();
-                    prw.write<Protos::NeuronStat>(stat); 
+                    prw.write(n->stat);
                 }
             }
         }
+        if(!output_spikes_file.empty()){
+            ProtoRw prw(output_spikes_file, ProtoRw::Write);
+            prw.write(&net.spikes_list);
+        }
+
         input_layers.clear();
         layers.clear();
     }
-    
+
     void print(std::ostream& str) const {
         for(auto it=input_layers.begin(); it!=input_layers.end(); ++it) {
             str << **it;
@@ -36,7 +40,10 @@ public:
     void setInputTimeSeries(LabeledTimeSeriesList l) {
         input_ts = ContLabeledTimeSeries(l, sc.ts_map_conf.dt);
     }
-    
+    void setOutputSpikesFile(const string &filename) {
+        output_spikes_file = filename;
+    }
+
     Neuron* accessByGlobalId(size_t id) {
         size_t acc = 0;
         for(size_t li=0; li<input_layers.size(); li++) {
@@ -62,8 +69,8 @@ public:
     void monitorStat(const string &filename) {
         statistics_file = filename;
         for(auto it=sc.neurons_to_listen.begin(); it != sc.neurons_to_listen.end(); ++it) {
-            accessByGlobalId(*it)->enableCollectStatistics();    
-        }        
+            accessByGlobalId(*it)->enableCollectStatistics();
+        }
     }
 
     void precalculateInputLayerSpikes() {
@@ -73,7 +80,7 @@ public:
         }
         for(double t=0; t<=input_ts.Tmax; t += sc.ts_map_conf.dt) {
             const double &x = input_ts.pop_value();
-            cout << t << ":" << x << "\n";
+            //cout << t << ":" << x << "\n";
             for(size_t li=0; li<input_layers.size(); li++) {
                 Layer *l = input_layers[li];
                 for(size_t ni=0; ni<l->N; ni++) {
@@ -81,20 +88,20 @@ public:
                     l->neurons[ni]->calculateProbability();
                     l->neurons[ni]->calculateDynamics();
                     if(l->neurons[ni]->fired) {
-                        net.propagateSpike(l->id, t);
+                        net.propagateSpike(l->neurons[ni]->id, t);
                         l->neurons[ni]->fired = 0;
                     }
                 }
             }
         }
     }
-    
+
 
     void run() {
         precalculateInputLayerSpikes();
-        
+
     }
-    
+
     Network net;
 
     ContLabeledTimeSeries input_ts;
@@ -103,6 +110,7 @@ public:
     vector< Layer *> layers;
 
     string statistics_file;
+    string output_spikes_file;
 
     const SimConfiguration &sc;
 };

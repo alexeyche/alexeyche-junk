@@ -2,13 +2,17 @@
 package Protos;
 
 
-message TimeSeries {	
+message TimeSeries {
   	repeated double data = 1 [packed=true];
 }
 
-message LabeledTimeSeries {    
+message LabeledTimeSeries {
     required string label = 2;
 	required TimeSeries ts = 3;
+}
+
+message LabeledTimeSeriesList {
+    repeated LabeledTimeSeries list = 1;
 }
 
 

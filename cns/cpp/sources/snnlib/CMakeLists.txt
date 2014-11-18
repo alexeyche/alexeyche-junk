@@ -12,7 +12,7 @@ set(DIRS
     protos
     tuning_curves
     act_funcs
-    #prep
+    serialize
     #filt
     #    conn
 )
@@ -26,10 +26,10 @@ include_directories(${CMAKE_BINARY_DIR}/protos)
 
 SET_TARGET_PROPERTIES(snn_sim PROPERTIES COMPILE_FLAGS "-fPIC")
 
-target_link_libraries(snn_sim 
+target_link_libraries(snn_sim
     protos
     ${PROTOBUF_LIBRARY}
-    ${CMAKE_THREAD_LIBS_INIT} 
+    ${CMAKE_THREAD_LIBS_INIT}
     m
 
 )
