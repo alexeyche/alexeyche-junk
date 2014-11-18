@@ -211,7 +211,8 @@ public:
 
     ConnectionMap conn_map;
     TimeSeriesMapConf ts_map_conf;
-
+    vector<size_t> neurons_to_listen;
+    
     void fill_structure(JsonBox::Value v) {
         auto a_input_sizes = v["input_layers_conf"].getArray();
         for(auto it=a_input_sizes.begin(); it!=a_input_sizes.end(); ++it) {
@@ -256,6 +257,10 @@ public:
             conn_map[aff_p] = conn_conf_vec;
         }
         ts_map_conf.fill_structure(v["time_series_map_conf"]);
+        JsonBox::Array a = v["neurons_to_listen"].getArray();
+        for(auto it=a.begin(); it!=a.end(); ++it) {
+            neurons_to_listen.push_back(it->getInt());
+        }
     }
 
 
@@ -268,6 +273,7 @@ public:
             print_vector<ConnectionConf>(it->second, str, "\n");
         }
         str << "time_series_map_conf: " << ts_map_conf << "\n";
+        str << "neurons_to_listen: "; print_vector<size_t>(neurons_to_listen, str, ","); str << "\n";
     }
 };
 

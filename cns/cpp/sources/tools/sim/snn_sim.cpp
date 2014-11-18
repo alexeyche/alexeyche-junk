@@ -11,13 +11,15 @@ using namespace std;
 
 #include <snnlib/util/time_series.h>
 
-enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_CONSTANTS, ARG_INPUT_TS };
+enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_CONSTANTS, ARG_INPUT_TS, ARG_OUT_STAT };
 const option::Descriptor usage[] =
 {
  {ARG_UNKNOWN, 0, "", "",Arg::None, "USAGE: example [options]\n\n"
                                         "Options:" },
  {ARG_HELP, 0,"h", "help",Arg::None, "  --help  \tPrint usage and exit." },
  {ARG_CONSTANTS, 0,"c","constants",Arg::NonEmpty, "  --constants, -c  \tConstants filename." },
+ {ARG_OUT_STAT, 0,"","stat",Arg::NonEmpty, "  --stat  \tFile name with detailed statistics." },
+
  {ARG_INPUT_TS, 0,"i","input-ts",Arg::NonEmpty, "  --input-ts, -i  \tInput time series protobuf file." },
  {ARG_UNKNOWN, 0, "", "",Arg::None, "\nExamples:\n"
                                "% Need to fill %" },
@@ -72,7 +74,10 @@ int main(int argc, char **argv) {
         LabeledTimeSeriesList lts_list(options[ARG_INPUT_TS].arg);
         s.setInputTimeSeries(lts_list);
     }
-
+    if(options[ARG_OUT_STAT].count()>0) { 
+        s.monitorStat(options[ARG_OUT_STAT].arg);
+    }
+    
     s.run();
     
     delete[] options;

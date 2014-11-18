@@ -3,7 +3,7 @@
         "SigmaTuningCurve" : {
             "sigma" : [2.0, 2.0],
             "intercept" : [-1, 1.0],
-            "gain" : [50,50]
+            "gain" : [10,10]
 
         }
     },
@@ -94,6 +94,7 @@
         },
         "time_series_map_conf" : {
             "dt" : 2.0                
-        }
+        },
+        "neurons_to_listen" : [0, 1, 2]
     }
 }

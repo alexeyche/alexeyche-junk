@@ -25,6 +25,12 @@ void print_vector(vector<T> v, ostream &str, string sep) {
     std::copy(v.cbegin(), v.cend(), ostream_iterator<T>(str, sep.c_str()));
     str << "\n";
 }
+template <typename T>
+void print_deque(deque<T> v, ostream &str, string sep) {
+    std::copy(v.cbegin(), v.cend(), ostream_iterator<T>(str, sep.c_str()));
+    str << "\n";
+}
+
 
 class Entity : public Printable {
 };

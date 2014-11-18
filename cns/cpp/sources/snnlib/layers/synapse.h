@@ -29,7 +29,6 @@ public:
 
     uchar fired;
 
-    SpikeQueue q;
     void propagateSpike() {
         x += c->amp;
     }

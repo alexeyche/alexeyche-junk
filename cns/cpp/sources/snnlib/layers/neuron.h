@@ -11,6 +11,31 @@ static size_t global_neuron_index = 0;
 #include <snnlib/config/constants.h>
 #include <snnlib/tuning_curves/tuning_curve.h>
 
+#include <snnlib/protos/stat.pb.h>
+
+struct NeuronStat {
+    vector<vector<double>> syns;
+    vector<double> p;
+    vector<double> u;
+
+    Protos::NeuronStat serialize() {
+        Protos::NeuronStat stat;
+        for(auto it=p.begin(); it != p.end(); ++it) {
+            stat.add_p(*it);
+        }
+        for(auto it=u.begin(); it != u.end(); ++it) {
+            stat.add_u(*it);
+        }
+        for(auto it=syns.begin(); it != syns.end(); ++it) {
+            Protos::SynStat* syn_stat = stat.add_syns();
+            for(auto it_val=it->begin(); it_val != it->end(); ++it_val) {
+                syn_stat->add_x(*it_val);
+            }
+        }
+        return stat;
+    }
+};
+
 
 #define SYN_ACT_TOL 0.0001
 
@@ -22,6 +47,11 @@ public:
     Neuron(const ConstObj *_c, ActFunc *_act, LearningRule *_lrule, TuningCurve *_tc) {
         init(_c, _act, _lrule, _tc);
     }
+    ~Neuron() {
+        if(collectStatistics) {
+            delete stat;
+        }
+    }
     virtual void init(const ConstObj *_c, ActFunc *_act, LearningRule *_lrule, TuningCurve *_tc) {
         id = ++global_neuron_index;
         bc = _c;
@@ -32,6 +62,9 @@ public:
         y = 0.0;
         p = 0.0;
         fired = 0;
+
+        collectStatistics = false;
+        stat = nullptr;
     }
 
     size_t id;
@@ -44,7 +77,18 @@ public:
 
     void addSynapse(Synapse *s) {
         syns.push_back(s);
+        if(collectStatistics) {
+            stat->syns.push_back(vector<double>());
+        }
     }
+    void enableCollectStatistics() {
+        collectStatistics = true;
+        stat = new NeuronStat();
+        for(size_t syn_i=0; syn_i<syns.size(); syn_i++) {
+            stat->syns.push_back(vector<double>());
+        }
+    }
+
     virtual void calculateProbability() = 0;
     virtual void calculateDynamics() = 0;
     virtual void attachCurrent(const double &I) = 0;
@@ -61,6 +105,7 @@ public:
         }
         str << "\n";
     }
+    NeuronStat *stat;
 protected:
     list< Synapse *> active_synapses;
 
@@ -68,6 +113,9 @@ protected:
     ActFunc *act;
     LearningRule *lrule;
     TuningCurve *tc;
+
+    bool collectStatistics;
+
 };
 
 

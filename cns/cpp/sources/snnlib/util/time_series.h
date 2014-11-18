@@ -86,6 +86,13 @@ private:
     static double null_ret;
 };
 
+template <typename V>
+void pop_front(V & v)
+{
+    assert(!v.empty());
+    v.erase(v.begin());
+}
+
 class ContLabeledTimeSeries : public Printable {
 public:
     ContLabeledTimeSeries() {}
@@ -94,27 +101,37 @@ public:
     }
     
     void init(LabeledTimeSeriesList &lst, const double &dt) {
+        double acc_time = 0;
         for(auto it=lst.ts.begin(); it != lst.ts.end(); ++it) {
             for(auto it_val=it->ts.data.begin(); it_val != it->ts.data.end(); ++it_val) {
-                ts.push_back(*it_val);                
+                data.push_back(*it_val);                
             }
             labels.push_back(it->label);
-            timeline.push_back(dt*(double)it->ts.size());
+            acc_time += dt*(double)it->ts.size();
+            timeline.push_back(acc_time);
          }
          Tmax = timeline.back();
-
+         current_position = 0;
     }
     const double & pop_value() {
-        ts.data.back();            
+        const double &x = *data.begin();
+        data.pop_front();
+        return x;
     }
     size_t size() const {
-        return ts.data.size();
+        return data.size();
     }    
     void print(std::ostream& str) const {
+        str << "data: "; print_deque<double>(data, str,","); str << "\n";
+        str << "labels: "; print_vector<string>(labels, str,","); str << "\n";
+        str << "timeline: "; print_vector<double>(timeline,str,","); str << "\n";
+        str << "Tmax: " << Tmax << "\n";
     }
+
+    size_t current_position;
     double Tmax;
 
-    TimeSeries ts;
+    deque<double> data;
     vector<string> labels;
     vector<double> timeline;    
 };

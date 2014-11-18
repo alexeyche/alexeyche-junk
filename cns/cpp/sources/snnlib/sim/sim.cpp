@@ -4,7 +4,7 @@
 #include <snnlib/config/factory.h>
 #include <snnlib/layers/srm_layer.h>
 
-Sim::Sim(const Constants &c) : Tmax(0.0), sc(c.sim_conf) {
+Sim::Sim(const Constants &c) : sc(c.sim_conf) {
     for(size_t l_id = 0; l_id < sc.input_layers_conf.size(); l_id++) {
         LayerConf conf = sc.input_layers_conf[l_id];
         Layer *l = Factory::inst().createLayer(conf.layer, c[conf.layer], conf.size, conf.nconf, c);
@@ -44,6 +44,6 @@ Sim::Sim(const Constants &c) : Tmax(0.0), sc(c.sim_conf) {
         }
     }
 
-    net.init(input_layers.size() + layers.size());
+    net.init(input_layers.size(), layers.size());
 }
 
