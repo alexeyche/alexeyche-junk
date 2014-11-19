@@ -14,9 +14,6 @@ public:
     NeuronStat(Neuron *n);
     
 
-    vector<vector<double>> syns;
-    vector<double> p;
-    vector<double> u;
     
     void collect(Neuron *n);
 
@@ -35,5 +32,9 @@ public:
     
     void print(std::ostream& str) const {
     }
+
+    vector<vector<double>> syns;
+    vector<double> p;
+    vector<double> u;
 };
 

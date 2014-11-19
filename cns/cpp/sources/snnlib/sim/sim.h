@@ -15,8 +15,9 @@ public:
             ProtoRw prw(statistics_file, ProtoRw::Write);
             for(auto it=sc.neurons_to_listen.begin(); it != sc.neurons_to_listen.end(); ++it) {
                 Neuron *n = accessByGlobalId(*it);
-                if(n->stat) {
-                    prw.write(n->stat);
+                Serializable *st = n->getStat();
+                if(st) {
+                    prw.write(st);
                 }
             }
         }

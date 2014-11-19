@@ -27,16 +27,15 @@ public:
         init(_c);
     }
     ~Neuron() {
-        if(collectStatistics) {
+        if(stat) {
             delete stat;
         }
     }
     virtual void init(const ConstObj *_c) {
         id = ++global_neuron_index;
         bc = _c;
-        act = nullptr;
-        lrule = nullptr;
-        tc = nullptr;
+
+        act = nullptr; lrule = nullptr; tc = nullptr;
 
         y = 0.0;
         p = 0.0;
@@ -68,16 +67,22 @@ public:
             stat->syns.push_back(vector<double>());
         }
     }
-    void enableCollectStatistics() {
-        collectStatistics = true;
-        stat = new NeuronStat(this);
-    }
-
+    
+    //runtime 
     virtual void calculateProbability() = 0;
     virtual void calculateDynamics() = 0;
     virtual void attachCurrent(const double &I) = 0;
-
-
+    
+    // stat funcs
+    virtual Serializable* getStat() {
+        return stat;
+    }
+    virtual void enableCollectStatistics() {
+        collectStatistics = true;
+        stat = new NeuronStat(this);
+    }
+    virtual vector<string> getDependentConstantsNames() { return vector<string>(); }
+    virtual void setDependentConstants(const vector<const ConstObj*> &constants) { }
 
     void print(std::ostream& str) const {
         str << "Neuron(" << id << ")\n";

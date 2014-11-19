@@ -53,8 +53,7 @@ public:
         CHECK_MODE(Read);
         Protos::ClassName cl;
         if(!readMessage(cl)) {
-            cerr << "Can't read ClassName from " << filename << "\n";
-            terminate();
+            return nullptr;
         }
         Serializable *s = SerializableFactory::inst().create(cl.name());
         google::protobuf::Message *mess = s->getNew();
@@ -62,17 +61,17 @@ public:
         s->deserialize();
         return s;
     }
-    void readAndPrintAny() {
+    bool readAndPrintAny() {
         CHECK_MODE(Read);
         Protos::ClassName cl;
         if(!readMessage(cl)) {
-            cerr << "Can't read ClassName from " << filename << "\n";
-            terminate();
+            return false;
         }
         Serializable *s = SerializableFactory::inst().create(cl.name());
         google::protobuf::Message *mess = s->getNew();
         readMessage(*mess);
         cout << mess->DebugString();
+        return true;
     }
     bool read(Serializable *s) {
         CHECK_MODE(Read);

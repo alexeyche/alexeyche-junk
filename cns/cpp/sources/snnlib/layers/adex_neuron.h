@@ -1,7 +1,7 @@
 #pragma once
 
 #include "neuron.h"
-#include <snnlib/protos/adex_stat.pb.h>
+#include <snnlib/protos/stat.pb.h>
 
 class AdExNeuron;
 
@@ -19,12 +19,18 @@ public:
 
     void collect(AdExNeuron *n);
 
-    AdExNeuronStat(const AdExNeuronStat &another) : Serializable(EAdExNeuronStat), ns(another.ns), a(another.a) {
+    AdExNeuronStat(const AdExNeuronStat &another) : Serializable(EAdExNeuronStat), a(another.a) {
         copyFrom(another);
+        ns = new NeuronStat(*another.ns);
     }
     virtual Protos::AdExNeuronStat *serialize() {
         Protos::AdExNeuronStat *stat = getNew();
-
+        Protos::NeuronStat *nstat = ns->serialize();
+        stat->set_allocated_stat(new Protos::NeuronStat(*nstat));
+        for(auto it=a.begin(); it != a.end(); ++it) {
+            stat->add_a(*it);
+        }
+        return stat;
     
     }
     virtual void deserialize() {
@@ -34,6 +40,7 @@ public:
     virtual Protos::AdExNeuronStat* getNew(google::protobuf::Message* m = nullptr) {
         return getNewSerializedMessage<Protos::AdExNeuronStat>(m);
     }
+
     void print(std::ostream& str) const {
     }
 
@@ -51,8 +58,20 @@ public:
         init(_c);
     }
     ~AdExNeuron() {
-        if(collectStatistics) {
+        if(adex_stat) {
             delete adex_stat;
+        }
+    }
+    vector<string> getDependentConstantsNames() {
+        vector<string> v;
+        v.push_back("Global");
+        return v;
+    }
+    void setDependentConstants(const vector<const ConstObj*> &constants) { 
+        glob_c = dynamic_cast<const GlobalC*>(constants[0]);
+        if(!glob_c) {
+            cerr << "Error while getting dependent constants for AdExNeuron\n";
+            terminate();
         }
     }
     void init(const ConstObj *_c) {
@@ -64,6 +83,7 @@ public:
         refr = 0.0;
 
         adex_stat = nullptr;
+        glob_c = nullptr;
     }
     void enableCollectStatistics() {
         collectStatistics = true;
@@ -78,7 +98,7 @@ public:
 
     void calculateProbability() {
         if(fabs(refr) > 0.000001) {
-            refr -= 1;
+            refr -= glob_c->dt;
         } else {
             double dV = c->u_rest + y;
             for(auto it=active_synapses.begin(); it != active_synapses.end(); ++it) {
@@ -91,8 +111,8 @@ public:
             }
             double da = c->a * ( y - c->EL ) - a; 
             
-            y += dV/c->C;
-            a += da/c->tau_a;
+            y += glob_c->dt * ( dV/c->C );
+            a += glob_c->dt * ( da/c->tau_a );
 
             p = act->prob(y);
         }
@@ -129,6 +149,9 @@ public:
 
 
     }
+    Serializable* getStat() {
+        return adex_stat;
+    }
     void print(std::ostream& str) const {
         str << "AdExNeuron(" << id << ")\n";
         str << "\ty == " << y;
@@ -140,6 +163,7 @@ public:
     }
 
     const AdExNeuronC *c;
+    const GlobalC *glob_c;
 
     double a;
     double refr;

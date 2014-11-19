@@ -27,21 +27,21 @@ public:
         id = global_layer_index++;
         N = _size;
         for(size_t ni=0; ni<N; ni++) {
-            Neuron *n = Factory::inst().createNeuron(nc.neuron, glob_c[nc.neuron]);
+            Neuron *n = Factory::inst().createNeuron(nc.neuron, glob_c);
 
-            ActFunc *act = Factory::inst().createActFunc(nc.act_func, glob_c[nc.act_func], n);
+            ActFunc *act = Factory::inst().createActFunc(nc.act_func, glob_c, n);
 
             LearningRule *lr;
             if(nc.learning_rule.empty()) {
-                lr = Factory::inst().createLearningRule("BlankLearningRule", nullptr, nullptr);
+                lr = Factory::inst().createLearningRule("BlankLearningRule", glob_c, nullptr);
             } else {
-                lr = Factory::inst().createLearningRule(nc.learning_rule, glob_c[nc.learning_rule], n);
+                lr = Factory::inst().createLearningRule(nc.learning_rule, glob_c, n);
             }
             TuningCurve *tc;
             if(nc.tuning_curve.empty()) {
-                tc = Factory::inst().createTuningCurve("BlankTuningCurve", nullptr, nullptr);
+                tc = Factory::inst().createTuningCurve("BlankTuningCurve", glob_c, nullptr);
             } else {
-                tc = Factory::inst().createTuningCurve(nc.tuning_curve, glob_c[nc.tuning_curve], n);
+                tc = Factory::inst().createTuningCurve(nc.tuning_curve, glob_c, n);
             }
 
             
@@ -63,7 +63,7 @@ public:
                 if(neurons[ni]->id != l_post[nj]->id) {
                     double prob = getUnif();
                     if( conf.prob > prob ) {
-                        Synapse *s = Factory::inst().createSynapse(conf.type, c[conf.type], neurons[ni]->id, conf.weight);
+                        Synapse *s = Factory::inst().createSynapse(conf.type, c, neurons[ni]->id, conf.weight);
                         l_post[nj]->addSynapse(s);
                     }
                 }

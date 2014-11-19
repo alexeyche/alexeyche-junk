@@ -29,12 +29,12 @@ public:
     }
 
     void calculateProbability() {
-        double u = c->u_rest + y;
+        y = c->u_rest + y;
         for(auto it=active_synapses.begin(); it != active_synapses.end(); ++it) {
             Synapse *s = *it;
-            u += s->w * s->x;
+            y += s->w * s->x;
         }
-        p = act->prob(u);
+        p = act->prob(y);
         if(collectStatistics) {
             stat->collect(this);
         }

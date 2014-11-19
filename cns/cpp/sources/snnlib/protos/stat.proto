@@ -10,3 +10,8 @@ message NeuronStat {
 	repeated double u = 2 [packed=true];
 	repeated SynStat syns = 3;
 }
+
+message AdExNeuronStat {
+	required NeuronStat stat = 1;
+	repeated double a = 2 [packed=true];
+}

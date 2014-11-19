@@ -1,9 +1,14 @@
 {
+    "globals" : {
+        "Global" : {
+            "dt" : 1
+        }
+    },
     "tuning_curves" : {
         "SigmaTuningCurve" : {
-            "sigma" : [2.0, 2.0],
+            "sigma" : [0.1, 0.1],
             "intercept" : [-1, 1.0],
-            "gain" : [10,10]
+            "gain" : [1,1]
 
         }
     },
@@ -38,7 +43,7 @@
     },
     "act_funcs" : {
         "Determ" : {
-            "u_tr" : 1.0
+            "u_tr" : 1
         },
         "ExpHennequin" : {
             "gain_factor" : 12.5, 

@@ -85,7 +85,7 @@ int main(int argc, char **argv) {
     } else
     if(options[ARG_PB].count() > 0) {
         ProtoRw prw(options[ARG_PB].arg, ProtoRw::Read);
-        prw.readAndPrintAny();
+        while(prw.readAndPrintAny()) {}
     } else {
         option::printUsage(cout, usage);
     }

@@ -12,6 +12,19 @@ public:
 };
 
 
+class GlobalC: public ConstObj {
+public:
+    double dt;
+
+    void fill_structure(JsonBox::Value v) {
+        dt = v["dt"].getDouble();
+    }
+    void print(std::ostream &str) const {
+        str << "dt: " << dt << "\n";
+    }
+};
+
+
 class SRMNeuronC: public ConstObj {
 public:
     double tau_refr;
@@ -321,6 +334,7 @@ public:
     const_map neurons;
     const_map layers;
 
+    const_map globals;
     const_map tuning_curves;
     const_map synapses;
     const_map act_funcs;
@@ -328,14 +342,20 @@ public:
 
     SimConfiguration sim_conf;
 
+    static string blank_prefix;
+    
     const ConstObj *operator[](const string &key) const {
+        if(globals.count(key)) return globals.at(key);
         if(neurons.count(key)) return neurons.at(key);
         if(layers.count(key)) return layers.at(key);
         if(tuning_curves.count(key)) return tuning_curves.at(key);
         if(synapses.count(key)) return synapses.at(key);
         if(act_funcs.count(key)) return act_funcs.at(key);
         if(learning_rules.count(key)) return learning_rules.at(key);
-
+        
+        if(key.substr(0, blank_prefix.size()) == blank_prefix) { // starts with Blank -- ignore
+            return nullptr;
+        }
         cerr << "Couldn't find instance with key in constants: " << key << "\n";
         terminate();
     }
@@ -347,6 +367,7 @@ public:
     }
     friend std::ostream& operator<<(std::ostream& str, Constants const& data) {
         str << "== Sim Constants ==\n";
+        print_constants_map(data.globals);
         print_constants_map(data.neurons);
         print_constants_map(data.layers);
         print_constants_map(data.tuning_curves);

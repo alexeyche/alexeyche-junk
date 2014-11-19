@@ -15,6 +15,8 @@
     }\
 }\
 
+string Constants::blank_prefix = string("Blank");
+
 Constants::Constants(string filename) {
     JsonBox::Value v;
 	v.loadFromFile(filename);
@@ -22,6 +24,9 @@ Constants::Constants(string filename) {
         const JsonBox::Object &o = v.getObject();
         for(auto it = o.begin(); it != o.end(); it++) {
             const string &const_field = it->first;
+            if(const_field == "globals") {
+                PARSE_CONST_STRUCTURE(globals)
+            } else
             if(const_field == "tuning_curves") {
                 PARSE_CONST_STRUCTURE(tuning_curves)
             } else

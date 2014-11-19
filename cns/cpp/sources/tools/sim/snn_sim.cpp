@@ -84,7 +84,8 @@ int main(int argc, char **argv) {
     if(options[ARG_OUT_STAT].count()>0) {
         s.monitorStat(options[ARG_OUT_STAT].arg);
     }
-
+    string stt;
+    
     s.run();
 
     delete[] options;
