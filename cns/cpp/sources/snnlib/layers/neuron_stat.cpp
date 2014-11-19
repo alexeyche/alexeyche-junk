@@ -1,8 +1,8 @@
 
-#include "neuron_stat.h"
-
-#include "neuron.h"
 #include <snnlib/protos/stat.pb.h>
+
+#include "neuron_stat.h"
+#include "neuron.h"
 
 NeuronStat::NeuronStat(Neuron *n) : Serializable(ENeuronStat) {
     if(n) {

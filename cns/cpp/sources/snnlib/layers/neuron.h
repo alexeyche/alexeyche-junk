@@ -23,16 +23,16 @@ protected:
     Neuron() {}
     friend class Factory;
 public:
-    Neuron(const ConstObj *_c) {
-        init(_c);
+    Neuron(const ConstObj *_c, double _axon_delay = 0) {
+        init(_c, _axon_delay);
     }
     ~Neuron() {
         if(stat) {
             delete stat;
         }
     }
-    virtual void init(const ConstObj *_c) {
-        id = ++global_neuron_index;
+    virtual void init(const ConstObj *_c, double _axon_delay = 0) {
+        id = global_neuron_index++;
         bc = _c;
 
         act = nullptr; lrule = nullptr; tc = nullptr;
@@ -43,6 +43,7 @@ public:
 
         collectStatistics = false;
         stat = nullptr;
+        axon_delay = _axon_delay;
     }
     void setActFunc(ActFunc *_act) {
         act = _act;
@@ -58,6 +59,7 @@ public:
     double y;
     double p;
     uchar fired;
+    double axon_delay;
 
     vector<Synapse*> syns;
 
@@ -67,12 +69,14 @@ public:
             stat->syns.push_back(vector<double>());
         }
     }
-    
-    //runtime 
+
+    //runtime
     virtual void calculateProbability() = 0;
     virtual void calculateDynamics() = 0;
     virtual void attachCurrent(const double &I) = 0;
-    
+
+    virtual void provideDelegates(RunTimeDelegates &rtd) {}
+
     // stat funcs
     virtual Serializable* getStat() {
         return stat;
@@ -86,15 +90,14 @@ public:
 
     void print(std::ostream& str) const {
         str << "Neuron(" << id << ")\n";
-        str << "\ty == " << y;
-        str << "\tsynapses: \n";
+        str << "\ty == " << y << ", axon_delay: " << axon_delay << ", synapses\n";
         for(auto it=syns.begin(); it != syns.end(); ++it) {
             Synapse *s = *it;
             str << *s << ", ";
         }
         str << "\n";
     }
-    
+
     NeuronStat *stat;
 protected:
     list< Synapse *> active_synapses;

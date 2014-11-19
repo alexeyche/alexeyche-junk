@@ -9,7 +9,6 @@
             "sigma" : [0.1, 0.1],
             "intercept" : [-1, 1.0],
             "gain" : [1,1]
-
         }
     },
     "neurons" : {
@@ -34,7 +33,7 @@
     "synapses" : {
         "Synapse" : {
             "epsp_decay" : 20.0,
-            "amp" : 1.0    
+            "amp" : 1.0
         },
         "Synapse_Inh" : {
             "epsp_decay" : 20.0,
@@ -69,7 +68,8 @@
                 "neuron_conf" : {
                     "neuron" : "AdExNeuron",
                     "tuning_curve" : "SigmaTuningCurve",
-                    "act_func" : "Determ"
+                    "act_func" : "Determ",
+                    "axon_delay_distr" : [0, 0]
                 }
             },                
         ],
@@ -79,7 +79,9 @@
                 "neuron_conf" : {
                     "neuron" : "SRMNeuron",
                     "learning_rule" : "OptimalStdp",
-                    "act_func" : "ExpHennequin"
+                    "act_func" : "ExpHennequin",
+                    "axon_delay_distr" : [0, 0]
+
                 }
             },                    
             {
@@ -87,20 +89,21 @@
                 "neuron_conf" : {
                     "neuron" : "SRMNeuron",
                     "learning_rule" : "OptimalStdp",
-                    "act_func" : "ExpHennequin"
+                    "act_func" : "ExpHennequin",
+                    "axon_delay_distr" : [0, 0]
                 }
             },                    
         ],
         "conn_map" : {
             "0-1" : [
-                { "prob" : 1.0, "weight" : 4.0, "type" : "Synapse"  }
+                { "prob" : 1.0, "weight" : 4.0, "type" : "Synapse", "dendrite_delay_distr" : [0, 0] }
             ],
             "1-2" : [
-                { "prob" : 0.5, "weight" : 4.0, "type" : "Synapse"  },
-                { "prob" : 0.5, "weight" : 4.0, "type" : "Synapse_Inh"  }
+                { "prob" : 0.5, "weight" : 4.0, "type" : "Synapse", "dendrite_delay_distr" : [0, 0] },
+                { "prob" : 0.5, "weight" : 4.0, "type" : "Synapse_Inh", "dendrite_delay_distr" : [0, 0] }
             ],
             "1-1" : [
-                { "prob" : 1.0, "weight" : 4.0, "type" : "Synapse_Inh"  }
+                { "prob" : 1.0, "weight" : 4.0, "type" : "Synapse_Inh", "dendrite_delay_distr" : [0, 0] }
             ]
         },
         "time_series_map_conf" : {

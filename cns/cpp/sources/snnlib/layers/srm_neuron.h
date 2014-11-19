@@ -9,7 +9,7 @@
 class SRMNeuron : public Neuron {
 protected:
     SRMNeuron() { }
-    friend class Factory;    
+    friend class Factory;
 public:
     SRMNeuron(const ConstObj *_c) {
         init(_c);
@@ -66,8 +66,7 @@ public:
     }
     void print(std::ostream& str) const {
         str << "SRMNeuron(" << id << ")\n";
-        str << "\ty == " << y;
-        str << "\tsynapses: \n";
+        str << "\ty == " << y << ", axon_delay: " << axon_delay << ", synapses\n";
         for(auto it=syns.begin(); it != syns.end(); ++it) {
             str << **it << ", ";
         }

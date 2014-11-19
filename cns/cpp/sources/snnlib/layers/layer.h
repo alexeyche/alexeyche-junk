@@ -27,7 +27,8 @@ public:
         id = global_layer_index++;
         N = _size;
         for(size_t ni=0; ni<N; ni++) {
-            Neuron *n = Factory::inst().createNeuron(nc.neuron, glob_c);
+            double axon_delay = sampleDelay(nc.axon_delay_gain, nc.axon_delay_rate);
+            Neuron *n = Factory::inst().createNeuron(nc.neuron, glob_c, axon_delay);
 
             ActFunc *act = Factory::inst().createActFunc(nc.act_func, glob_c, n);
 
@@ -44,7 +45,7 @@ public:
                 tc = Factory::inst().createTuningCurve(nc.tuning_curve, glob_c, n);
             }
 
-            
+
             neurons.push_back(n);
         }
     }
@@ -63,7 +64,8 @@ public:
                 if(neurons[ni]->id != l_post[nj]->id) {
                     double prob = getUnif();
                     if( conf.prob > prob ) {
-                        Synapse *s = Factory::inst().createSynapse(conf.type, c, neurons[ni]->id, conf.weight);
+                        double dendrite_delay = sampleDelay(conf.dendrite_delay_gain, conf.dendrite_delay_rate);
+                        Synapse *s = Factory::inst().createSynapse(conf.type, c, neurons[ni]->id, conf.weight, dendrite_delay);
                         l_post[nj]->addSynapse(s);
                     }
                 }

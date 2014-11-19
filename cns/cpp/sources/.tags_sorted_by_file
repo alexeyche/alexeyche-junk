@@ -86,6 +86,7 @@ fill_structure	snnlib/config/constants.h	/^    void fill_structure(JsonBox::Valu
 gL	snnlib/config/constants.h	/^    double gL;$/;"	m	class:AdExNeuronC
 gain	snnlib/config/constants.h	/^    pair<double,double> gain;$/;"	m	class:SigmaTuningCurveC
 gain_factor	snnlib/config/constants.h	/^    double gain_factor;$/;"	m	class:ExpHennequinC
+globals	snnlib/config/constants.h	/^    const_map globals;$/;"	m	class:Constants
 input_layers_conf	snnlib/config/constants.h	/^    vector<LayerConf> input_layers_conf;$/;"	m	class:SimConfiguration
 intercept	snnlib/config/constants.h	/^    pair<double,double> intercept;$/;"	m	class:SigmaTuningCurveC
 layers	snnlib/config/constants.h	/^    const_map layers;$/;"	m	class:Constants
@@ -158,13 +159,14 @@ findBaseStructName	snnlib/config/factory.h	/^    string findBaseStructName(strin
 objects	snnlib/config/factory.h	/^    vector<Obj*> objects;$/;"	m	class:Factory
 ~Factory	snnlib/config/factory.h	/^    ~Factory() {$/;"	f	class:Factory
 uchar	snnlib/core.h	/^typedef unsigned char uchar;$/;"	t
+AdExNeuronStat	snnlib/layers/adex_neuron.cpp	/^AdExNeuronStat::AdExNeuronStat(const AdExNeuronStat &another) : Serializable(EAdExNeuronStat), a(another.a) {$/;"	f	class:AdExNeuronStat
 collect	snnlib/layers/adex_neuron.cpp	/^void AdExNeuronStat::collect(AdExNeuron *n) {$/;"	f	class:AdExNeuronStat
+serialize	snnlib/layers/adex_neuron.cpp	/^Protos::AdExNeuronStat *AdExNeuronStat::serialize() {$/;"	f	class:AdExNeuronStat
 AdExNeuron	snnlib/layers/adex_neuron.h	/^    AdExNeuron() { }$/;"	f	class:AdExNeuron
 AdExNeuron	snnlib/layers/adex_neuron.h	/^    AdExNeuron(const ConstObj *_c) {$/;"	f	class:AdExNeuron
 AdExNeuron	snnlib/layers/adex_neuron.h	/^class AdExNeuron : public Neuron {$/;"	c
 AdExNeuronStat	snnlib/layers/adex_neuron.h	/^    AdExNeuronStat() : Serializable(EAdExNeuronStat), ns(nullptr) { }$/;"	f	class:AdExNeuronStat
 AdExNeuronStat	snnlib/layers/adex_neuron.h	/^    AdExNeuronStat(Neuron *n) : Serializable(EAdExNeuronStat) {$/;"	f	class:AdExNeuronStat
-AdExNeuronStat	snnlib/layers/adex_neuron.h	/^    AdExNeuronStat(const AdExNeuronStat &another) : Serializable(EAdExNeuronStat), a(another.a) {$/;"	f	class:AdExNeuronStat
 AdExNeuronStat	snnlib/layers/adex_neuron.h	/^class AdExNeuronStat : public Serializable {$/;"	c
 a	snnlib/layers/adex_neuron.h	/^    double a;$/;"	m	class:AdExNeuron
 a	snnlib/layers/adex_neuron.h	/^    vector<double> a;$/;"	m	class:AdExNeuronStat
@@ -175,15 +177,17 @@ calculateDynamics	snnlib/layers/adex_neuron.h	/^    void calculateDynamics() {$/
 calculateProbability	snnlib/layers/adex_neuron.h	/^    void calculateProbability() {$/;"	f	class:AdExNeuron
 deserialize	snnlib/layers/adex_neuron.h	/^    virtual void deserialize() {$/;"	f	class:AdExNeuronStat
 enableCollectStatistics	snnlib/layers/adex_neuron.h	/^    void enableCollectStatistics() {$/;"	f	class:AdExNeuron
+getDependentConstantsNames	snnlib/layers/adex_neuron.h	/^    vector<string> getDependentConstantsNames() {$/;"	f	class:AdExNeuron
 getNew	snnlib/layers/adex_neuron.h	/^    virtual Protos::AdExNeuronStat* getNew(google::protobuf::Message* m = nullptr) {$/;"	f	class:AdExNeuronStat
 getStat	snnlib/layers/adex_neuron.h	/^    Serializable* getStat() {$/;"	f	class:AdExNeuron
+glob_c	snnlib/layers/adex_neuron.h	/^    const GlobalC *glob_c;$/;"	m	class:AdExNeuron
 init	snnlib/layers/adex_neuron.h	/^    void init(const ConstObj *_c) {$/;"	f	class:AdExNeuron
 ns	snnlib/layers/adex_neuron.h	/^    NeuronStat *ns;$/;"	m	class:AdExNeuronStat
 print	snnlib/layers/adex_neuron.h	/^    void print(std::ostream& str) const {$/;"	f	class:AdExNeuron
-print	snnlib/layers/adex_neuron.h	/^    void print(std::ostream& str) const {$/;"	f	class:AdExNeuronStat
+print	snnlib/layers/adex_neuron.h	/^    void print(std::ostream& str) const {}$/;"	f	class:AdExNeuronStat
 propagateSynSpike	snnlib/layers/adex_neuron.h	/^    void propagateSynSpike(const SynSpike &sp) {$/;"	f	class:AdExNeuron
 refr	snnlib/layers/adex_neuron.h	/^    double refr;$/;"	m	class:AdExNeuron
-serialize	snnlib/layers/adex_neuron.h	/^    virtual Protos::AdExNeuronStat *serialize() {$/;"	f	class:AdExNeuronStat
+setDependentConstants	snnlib/layers/adex_neuron.h	/^    void setDependentConstants(const vector<const ConstObj*> &constants) {$/;"	f	class:AdExNeuron
 ~AdExNeuron	snnlib/layers/adex_neuron.h	/^    ~AdExNeuron() {$/;"	f	class:AdExNeuron
 ~AdExNeuronStat	snnlib/layers/adex_neuron.h	/^    ~AdExNeuronStat() {$/;"	f	class:AdExNeuronStat
 CAST_TYPE	snnlib/layers/common.h	4;"	d
@@ -218,7 +222,9 @@ init	snnlib/layers/neuron.h	/^    virtual void init(const ConstObj *_c) {$/;"	f	
 lrule	snnlib/layers/neuron.h	/^    LearningRule *lrule;$/;"	m	class:Neuron
 p	snnlib/layers/neuron.h	/^    double p;$/;"	m	class:Neuron
 print	snnlib/layers/neuron.h	/^    void print(std::ostream& str) const {$/;"	f	class:Neuron
+provideDelegates	snnlib/layers/neuron.h	/^    virtual void provideDelegates(RunTimeDelegates &rtd) {}$/;"	f	class:Neuron
 setActFunc	snnlib/layers/neuron.h	/^    void setActFunc(ActFunc *_act) {$/;"	f	class:Neuron
+setDependentConstants	snnlib/layers/neuron.h	/^    virtual void setDependentConstants(const vector<const ConstObj*> &constants) { }$/;"	f	class:Neuron
 setLearningRule	snnlib/layers/neuron.h	/^    void setLearningRule(LearningRule *_lrule) {$/;"	f	class:Neuron
 setTuningCurve	snnlib/layers/neuron.h	/^    void setTuningCurve(TuningCurve *_tc) {$/;"	f	class:Neuron
 stat	snnlib/layers/neuron.h	/^    NeuronStat *stat;$/;"	m	class:Neuron
@@ -345,21 +351,18 @@ syn_id	snnlib/sim/network.h	/^	size_t syn_id;$/;"	m	struct:Conn
 total_size	snnlib/sim/network.h	/^	size_t total_size;$/;"	m	class:Network
 ~Network	snnlib/sim/network.h	/^	~Network() {$/;"	f	class:Network
 Sim	snnlib/sim/sim.cpp	/^Sim::Sim(const Constants &c) : sc(c.sim_conf) {$/;"	f	class:Sim
+RunTimeDelegates	snnlib/sim/sim.h	/^struct RunTimeDelegates {$/;"	s
 Sim	snnlib/sim/sim.h	/^class Sim: public Printable {$/;"	c
 accessByGlobalId	snnlib/sim/sim.h	/^    Neuron* accessByGlobalId(size_t id) {$/;"	f	class:Sim
-input_layers	snnlib/sim/sim.h	/^    vector< Layer *> input_layers;$/;"	m	class:Sim
-input_ts	snnlib/sim/sim.h	/^    ContLabeledTimeSeries input_ts;$/;"	m	class:Sim
-layers	snnlib/sim/sim.h	/^    vector< Layer *> layers;$/;"	m	class:Sim
+input_dg	snnlib/sim/sim.h	/^    vector<neuronInputDelegate> input_dg;$/;"	m	struct:RunTimeDelegates
 monitorStat	snnlib/sim/sim.h	/^    void monitorStat(const string &filename) {$/;"	f	class:Sim
-net	snnlib/sim/sim.h	/^    Network net;$/;"	m	class:Sim
-output_spikes_file	snnlib/sim/sim.h	/^    string output_spikes_file;$/;"	m	class:Sim
+neuronInputDelegate	snnlib/sim/sim.h	/^typedef FastDelegate1<const double&> neuronInputDelegate;$/;"	t
+neuronStateDelegate	snnlib/sim/sim.h	/^typedef FastDelegate0<> neuronStateDelegate;$/;"	t
 precalculateInputLayerSpikes	snnlib/sim/sim.h	/^    void precalculateInputLayerSpikes() {$/;"	f	class:Sim
 print	snnlib/sim/sim.h	/^    void print(std::ostream& str) const {$/;"	f	class:Sim
-run	snnlib/sim/sim.h	/^    void run() {$/;"	f	class:Sim
-sc	snnlib/sim/sim.h	/^    const SimConfiguration &sc;$/;"	m	class:Sim
 setInputTimeSeries	snnlib/sim/sim.h	/^    void setInputTimeSeries(LabeledTimeSeriesList l) {$/;"	f	class:Sim
 setOutputSpikesFile	snnlib/sim/sim.h	/^    void setOutputSpikesFile(const string &filename) {$/;"	f	class:Sim
-statistics_file	snnlib/sim/sim.h	/^    string statistics_file;$/;"	m	class:Sim
+state_dg	snnlib/sim/sim.h	/^    vector<neuronStateDelegate> state_dg;$/;"	m	struct:RunTimeDelegates
 ~Sim	snnlib/sim/sim.h	/^    ~Sim() {$/;"	f	class:Sim
 SimInputLayer	snnlib/sim/sim_input_layer.h	/^	SimInputLayer() {}$/;"	f	class:SimInputLayer
 SimInputLayer	snnlib/sim/sim_input_layer.h	/^	SimInputLayer(size_t size) {$/;"	f	class:SimInputLayer
@@ -386,6 +389,472 @@ BlankTuningCurve	snnlib/tuning_curves/tuning_curve.h	/^class BlankTuningCurve : 
 TuningCurve	snnlib/tuning_curves/tuning_curve.h	/^class TuningCurve : public Obj {$/;"	c
 calculateResponse	snnlib/tuning_curves/tuning_curve.h	/^	void calculateResponse(const double &I) { }$/;"	f	class:BlankTuningCurve
 init	snnlib/tuning_curves/tuning_curve.h	/^	void init(const ConstObj *_c, Neuron *_n) {}$/;"	f	class:BlankTuningCurve
+BaseType	snnlib/util/fast_delegate.h	/^  typedef FastDelegate0 < R > BaseType;$/;"	t	class:fastdelegate::FastDelegate
+BaseType	snnlib/util/fast_delegate.h	/^  typedef FastDelegate1 < Param1, R > BaseType;$/;"	t	class:fastdelegate::FastDelegate
+BaseType	snnlib/util/fast_delegate.h	/^  typedef FastDelegate2 < Param1, Param2, R > BaseType;$/;"	t	class:fastdelegate::FastDelegate
+BaseType	snnlib/util/fast_delegate.h	/^  typedef FastDelegate3 < Param1, Param2, Param3, R > BaseType;$/;"	t	class:fastdelegate::FastDelegate
+BaseType	snnlib/util/fast_delegate.h	/^  typedef FastDelegate4 < Param1, Param2, Param3, Param4, R > BaseType;$/;"	t	class:fastdelegate::FastDelegate
+BaseType	snnlib/util/fast_delegate.h	/^  typedef FastDelegate5 < Param1, Param2, Param3, Param4, Param5, R > BaseType;$/;"	t	class:fastdelegate::FastDelegate
+BaseType	snnlib/util/fast_delegate.h	/^  typedef FastDelegate6 < Param1, Param2, Param3, Param4, Param5, Param6, R > BaseType;$/;"	t	class:fastdelegate::FastDelegate
+BaseType	snnlib/util/fast_delegate.h	/^  typedef FastDelegate7 < Param1, Param2, Param3, Param4, Param5, Param6, Param7, R > BaseType;$/;"	t	class:fastdelegate::FastDelegate
+BaseType	snnlib/util/fast_delegate.h	/^  typedef FastDelegate8 < Param1, Param2, Param3, Param4, Param5, Param6, Param7, Param8, R > BaseType;$/;"	t	class:fastdelegate::FastDelegate
+ClosurePtr	snnlib/util/fast_delegate.h	/^class ClosurePtr : public DelegateMemento {$/;"	c	namespace:fastdelegate::detail
+ClosureType	snnlib/util/fast_delegate.h	/^	typedef detail::ClosurePtr<GenericMemFn, StaticFunctionPtr, UnvoidStaticFunctionPtr> ClosureType;$/;"	t	class:fastdelegate::FastDelegate0
+ClosureType	snnlib/util/fast_delegate.h	/^	typedef detail::ClosurePtr<GenericMemFn, StaticFunctionPtr, UnvoidStaticFunctionPtr> ClosureType;$/;"	t	class:fastdelegate::FastDelegate1
+ClosureType	snnlib/util/fast_delegate.h	/^	typedef detail::ClosurePtr<GenericMemFn, StaticFunctionPtr, UnvoidStaticFunctionPtr> ClosureType;$/;"	t	class:fastdelegate::FastDelegate2
+ClosureType	snnlib/util/fast_delegate.h	/^	typedef detail::ClosurePtr<GenericMemFn, StaticFunctionPtr, UnvoidStaticFunctionPtr> ClosureType;$/;"	t	class:fastdelegate::FastDelegate3
+ClosureType	snnlib/util/fast_delegate.h	/^	typedef detail::ClosurePtr<GenericMemFn, StaticFunctionPtr, UnvoidStaticFunctionPtr> ClosureType;$/;"	t	class:fastdelegate::FastDelegate4
+ClosureType	snnlib/util/fast_delegate.h	/^	typedef detail::ClosurePtr<GenericMemFn, StaticFunctionPtr, UnvoidStaticFunctionPtr> ClosureType;$/;"	t	class:fastdelegate::FastDelegate5
+ClosureType	snnlib/util/fast_delegate.h	/^	typedef detail::ClosurePtr<GenericMemFn, StaticFunctionPtr, UnvoidStaticFunctionPtr> ClosureType;$/;"	t	class:fastdelegate::FastDelegate6
+ClosureType	snnlib/util/fast_delegate.h	/^	typedef detail::ClosurePtr<GenericMemFn, StaticFunctionPtr, UnvoidStaticFunctionPtr> ClosureType;$/;"	t	class:fastdelegate::FastDelegate7
+ClosureType	snnlib/util/fast_delegate.h	/^	typedef detail::ClosurePtr<GenericMemFn, StaticFunctionPtr, UnvoidStaticFunctionPtr> ClosureType;$/;"	t	class:fastdelegate::FastDelegate8
+Convert	snnlib/util/fast_delegate.h	/^	inline static GenericClass *Convert(X *pthis, XFuncType function_to_bind, $/;"	f	struct:fastdelegate::detail::SimplifyMemFunc
+CopyFrom	snnlib/util/fast_delegate.h	/^	inline void CopyFrom (DerivedClass *pParent, const DelegateMemento &right) {$/;"	f	class:fastdelegate::detail::ClosurePtr
+CopyFrom	snnlib/util/fast_delegate.h	/^	inline void CopyFrom (DerivedClass *pParent, const DelegateMemento &x) {$/;"	f	class:fastdelegate::detail::ClosurePtr
+DefaultVoid	snnlib/util/fast_delegate.h	/^typedef const void * DefaultVoid;$/;"	t	namespace:fastdelegate::detail
+DefaultVoid	snnlib/util/fast_delegate.h	/^typedef void DefaultVoid;$/;"	t	namespace:fastdelegate::detail
+DefaultVoidToVoid	snnlib/util/fast_delegate.h	/^struct DefaultVoidToVoid { typedef T type; };$/;"	s	namespace:fastdelegate::detail
+DefaultVoidToVoid	snnlib/util/fast_delegate.h	/^struct DefaultVoidToVoid<DefaultVoid> {	typedef void type; };$/;"	s	namespace:fastdelegate::detail
+DelegateMemento	snnlib/util/fast_delegate.h	/^	DelegateMemento (const DelegateMemento &right)  : $/;"	f	class:fastdelegate::DelegateMemento
+DelegateMemento	snnlib/util/fast_delegate.h	/^	DelegateMemento() : m_pthis(0), m_pFunction(0) {};$/;"	f	class:fastdelegate::DelegateMemento
+DelegateMemento	snnlib/util/fast_delegate.h	/^	DelegateMemento() : m_pthis(0), m_pFunction(0), m_pStaticFunction(0) {};$/;"	f	class:fastdelegate::DelegateMemento
+DelegateMemento	snnlib/util/fast_delegate.h	/^class DelegateMemento {$/;"	c	namespace:fastdelegate
+DesiredRetType	snnlib/util/fast_delegate.h	/^	typedef typename detail::DefaultVoidToVoid<RetType>::type DesiredRetType;$/;"	t	class:fastdelegate::FastDelegate0
+DesiredRetType	snnlib/util/fast_delegate.h	/^	typedef typename detail::DefaultVoidToVoid<RetType>::type DesiredRetType;$/;"	t	class:fastdelegate::FastDelegate1
+DesiredRetType	snnlib/util/fast_delegate.h	/^	typedef typename detail::DefaultVoidToVoid<RetType>::type DesiredRetType;$/;"	t	class:fastdelegate::FastDelegate2
+DesiredRetType	snnlib/util/fast_delegate.h	/^	typedef typename detail::DefaultVoidToVoid<RetType>::type DesiredRetType;$/;"	t	class:fastdelegate::FastDelegate3
+DesiredRetType	snnlib/util/fast_delegate.h	/^	typedef typename detail::DefaultVoidToVoid<RetType>::type DesiredRetType;$/;"	t	class:fastdelegate::FastDelegate4
+DesiredRetType	snnlib/util/fast_delegate.h	/^	typedef typename detail::DefaultVoidToVoid<RetType>::type DesiredRetType;$/;"	t	class:fastdelegate::FastDelegate5
+DesiredRetType	snnlib/util/fast_delegate.h	/^	typedef typename detail::DefaultVoidToVoid<RetType>::type DesiredRetType;$/;"	t	class:fastdelegate::FastDelegate6
+DesiredRetType	snnlib/util/fast_delegate.h	/^	typedef typename detail::DefaultVoidToVoid<RetType>::type DesiredRetType;$/;"	t	class:fastdelegate::FastDelegate7
+DesiredRetType	snnlib/util/fast_delegate.h	/^	typedef typename detail::DefaultVoidToVoid<RetType>::type DesiredRetType;$/;"	t	class:fastdelegate::FastDelegate8
+FASTDELEGATEDECLARE	snnlib/util/fast_delegate.h	191;"	d
+FASTDELEGATE_ALLOW_FUNCTION_TYPE_SYNTAX	snnlib/util/fast_delegate.h	105;"	d
+FASTDELEGATE_ALLOW_FUNCTION_TYPE_SYNTAX	snnlib/util/fast_delegate.h	110;"	d
+FASTDELEGATE_ALLOW_FUNCTION_TYPE_SYNTAX	snnlib/util/fast_delegate.h	115;"	d
+FASTDELEGATE_GCC_BUG_8271	snnlib/util/fast_delegate.h	120;"	d
+FASTDELEGATE_H	snnlib/util/fast_delegate.h	49;"	d
+FASTDELEGATE_USESTATICFUNCTIONHACK	snnlib/util/fast_delegate.h	195;"	d
+FASTDELEGATE_USESTATICFUNCTIONHACK	snnlib/util/fast_delegate.h	67;"	d
+FASTDLGT_HASINHERITANCE_KEYWORDS	snnlib/util/fast_delegate.h	99;"	d
+FASTDLGT_ISMSVC	snnlib/util/fast_delegate.h	81;"	d
+FASTDLGT_MICROSOFT_MFP	snnlib/util/fast_delegate.h	95;"	d
+FASTDLGT_RETTYPE	snnlib/util/fast_delegate.h	1997;"	d
+FASTDLGT_RETTYPE	snnlib/util/fast_delegate.h	1999;"	d
+FASTDLGT_RETTYPE	snnlib/util/fast_delegate.h	2103;"	d
+FASTDLGT_VC6	snnlib/util/fast_delegate.h	84;"	d
+FastDelegate	snnlib/util/fast_delegate.h	/^  FastDelegate() : BaseType() { }$/;"	f	class:fastdelegate::FastDelegate
+FastDelegate	snnlib/util/fast_delegate.h	/^  FastDelegate(R (*function_to_bind)(  ))$/;"	f	class:fastdelegate::FastDelegate
+FastDelegate	snnlib/util/fast_delegate.h	/^  FastDelegate(R (*function_to_bind)( Param1 p1 ))$/;"	f	class:fastdelegate::FastDelegate
+FastDelegate	snnlib/util/fast_delegate.h	/^  FastDelegate(R (*function_to_bind)( Param1 p1, Param2 p2 ))$/;"	f	class:fastdelegate::FastDelegate
+FastDelegate	snnlib/util/fast_delegate.h	/^  FastDelegate(R (*function_to_bind)( Param1 p1, Param2 p2, Param3 p3 ))$/;"	f	class:fastdelegate::FastDelegate
+FastDelegate	snnlib/util/fast_delegate.h	/^  FastDelegate(R (*function_to_bind)( Param1 p1, Param2 p2, Param3 p3, Param4 p4 ))$/;"	f	class:fastdelegate::FastDelegate
+FastDelegate	snnlib/util/fast_delegate.h	/^  FastDelegate(R (*function_to_bind)( Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5 ))$/;"	f	class:fastdelegate::FastDelegate
+FastDelegate	snnlib/util/fast_delegate.h	/^  FastDelegate(R (*function_to_bind)( Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6 ))$/;"	f	class:fastdelegate::FastDelegate
+FastDelegate	snnlib/util/fast_delegate.h	/^  FastDelegate(R (*function_to_bind)( Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6, Param7 p7 ))$/;"	f	class:fastdelegate::FastDelegate
+FastDelegate	snnlib/util/fast_delegate.h	/^  FastDelegate(R (*function_to_bind)( Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6, Param7 p7, Param8 p8 ))$/;"	f	class:fastdelegate::FastDelegate
+FastDelegate	snnlib/util/fast_delegate.h	/^  FastDelegate(Y * pthis, $/;"	f	class:fastdelegate::FastDelegate
+FastDelegate	snnlib/util/fast_delegate.h	/^  FastDelegate(const Y *pthis,$/;"	f	class:fastdelegate::FastDelegate
+FastDelegate	snnlib/util/fast_delegate.h	/^class FastDelegate< R (  ) >$/;"	c	namespace:fastdelegate
+FastDelegate	snnlib/util/fast_delegate.h	/^class FastDelegate< R ( Param1 ) >$/;"	c	namespace:fastdelegate
+FastDelegate	snnlib/util/fast_delegate.h	/^class FastDelegate< R ( Param1, Param2 ) >$/;"	c	namespace:fastdelegate
+FastDelegate	snnlib/util/fast_delegate.h	/^class FastDelegate< R ( Param1, Param2, Param3 ) >$/;"	c	namespace:fastdelegate
+FastDelegate	snnlib/util/fast_delegate.h	/^class FastDelegate< R ( Param1, Param2, Param3, Param4 ) >$/;"	c	namespace:fastdelegate
+FastDelegate	snnlib/util/fast_delegate.h	/^class FastDelegate< R ( Param1, Param2, Param3, Param4, Param5 ) >$/;"	c	namespace:fastdelegate
+FastDelegate	snnlib/util/fast_delegate.h	/^class FastDelegate< R ( Param1, Param2, Param3, Param4, Param5, Param6 ) >$/;"	c	namespace:fastdelegate
+FastDelegate	snnlib/util/fast_delegate.h	/^class FastDelegate< R ( Param1, Param2, Param3, Param4, Param5, Param6, Param7 ) >$/;"	c	namespace:fastdelegate
+FastDelegate	snnlib/util/fast_delegate.h	/^class FastDelegate< R ( Param1, Param2, Param3, Param4, Param5, Param6, Param7, Param8 ) >$/;"	c	namespace:fastdelegate
+FastDelegate0	snnlib/util/fast_delegate.h	/^	FastDelegate0() { clear(); }$/;"	f	class:fastdelegate::FastDelegate0
+FastDelegate0	snnlib/util/fast_delegate.h	/^	FastDelegate0(DesiredRetType (*function_to_bind)() ) {$/;"	f	class:fastdelegate::FastDelegate0
+FastDelegate0	snnlib/util/fast_delegate.h	/^	FastDelegate0(Y *pthis, DesiredRetType (X::* function_to_bind)() ) {$/;"	f	class:fastdelegate::FastDelegate0
+FastDelegate0	snnlib/util/fast_delegate.h	/^	FastDelegate0(const FastDelegate0 &x) {$/;"	f	class:fastdelegate::FastDelegate0
+FastDelegate0	snnlib/util/fast_delegate.h	/^	FastDelegate0(const Y *pthis, DesiredRetType (X::* function_to_bind)() const) {$/;"	f	class:fastdelegate::FastDelegate0
+FastDelegate0	snnlib/util/fast_delegate.h	/^class FastDelegate0 {$/;"	c	namespace:fastdelegate
+FastDelegate1	snnlib/util/fast_delegate.h	/^	FastDelegate1() { clear(); }$/;"	f	class:fastdelegate::FastDelegate1
+FastDelegate1	snnlib/util/fast_delegate.h	/^	FastDelegate1(DesiredRetType (*function_to_bind)(Param1 p1) ) {$/;"	f	class:fastdelegate::FastDelegate1
+FastDelegate1	snnlib/util/fast_delegate.h	/^	FastDelegate1(Y *pthis, DesiredRetType (X::* function_to_bind)(Param1 p1) ) {$/;"	f	class:fastdelegate::FastDelegate1
+FastDelegate1	snnlib/util/fast_delegate.h	/^	FastDelegate1(const FastDelegate1 &x) {$/;"	f	class:fastdelegate::FastDelegate1
+FastDelegate1	snnlib/util/fast_delegate.h	/^	FastDelegate1(const Y *pthis, DesiredRetType (X::* function_to_bind)(Param1 p1) const) {$/;"	f	class:fastdelegate::FastDelegate1
+FastDelegate1	snnlib/util/fast_delegate.h	/^class FastDelegate1 {$/;"	c	namespace:fastdelegate
+FastDelegate2	snnlib/util/fast_delegate.h	/^	FastDelegate2() { clear(); }$/;"	f	class:fastdelegate::FastDelegate2
+FastDelegate2	snnlib/util/fast_delegate.h	/^	FastDelegate2(DesiredRetType (*function_to_bind)(Param1 p1, Param2 p2) ) {$/;"	f	class:fastdelegate::FastDelegate2
+FastDelegate2	snnlib/util/fast_delegate.h	/^	FastDelegate2(Y *pthis, DesiredRetType (X::* function_to_bind)(Param1 p1, Param2 p2) ) {$/;"	f	class:fastdelegate::FastDelegate2
+FastDelegate2	snnlib/util/fast_delegate.h	/^	FastDelegate2(const FastDelegate2 &x) {$/;"	f	class:fastdelegate::FastDelegate2
+FastDelegate2	snnlib/util/fast_delegate.h	/^	FastDelegate2(const Y *pthis, DesiredRetType (X::* function_to_bind)(Param1 p1, Param2 p2) const) {$/;"	f	class:fastdelegate::FastDelegate2
+FastDelegate2	snnlib/util/fast_delegate.h	/^class FastDelegate2 {$/;"	c	namespace:fastdelegate
+FastDelegate3	snnlib/util/fast_delegate.h	/^	FastDelegate3() { clear(); }$/;"	f	class:fastdelegate::FastDelegate3
+FastDelegate3	snnlib/util/fast_delegate.h	/^	FastDelegate3(DesiredRetType (*function_to_bind)(Param1 p1, Param2 p2, Param3 p3) ) {$/;"	f	class:fastdelegate::FastDelegate3
+FastDelegate3	snnlib/util/fast_delegate.h	/^	FastDelegate3(Y *pthis, DesiredRetType (X::* function_to_bind)(Param1 p1, Param2 p2, Param3 p3) ) {$/;"	f	class:fastdelegate::FastDelegate3
+FastDelegate3	snnlib/util/fast_delegate.h	/^	FastDelegate3(const FastDelegate3 &x) {$/;"	f	class:fastdelegate::FastDelegate3
+FastDelegate3	snnlib/util/fast_delegate.h	/^	FastDelegate3(const Y *pthis, DesiredRetType (X::* function_to_bind)(Param1 p1, Param2 p2, Param3 p3) const) {$/;"	f	class:fastdelegate::FastDelegate3
+FastDelegate3	snnlib/util/fast_delegate.h	/^class FastDelegate3 {$/;"	c	namespace:fastdelegate
+FastDelegate4	snnlib/util/fast_delegate.h	/^	FastDelegate4() { clear(); }$/;"	f	class:fastdelegate::FastDelegate4
+FastDelegate4	snnlib/util/fast_delegate.h	/^	FastDelegate4(DesiredRetType (*function_to_bind)(Param1 p1, Param2 p2, Param3 p3, Param4 p4) ) {$/;"	f	class:fastdelegate::FastDelegate4
+FastDelegate4	snnlib/util/fast_delegate.h	/^	FastDelegate4(Y *pthis, DesiredRetType (X::* function_to_bind)(Param1 p1, Param2 p2, Param3 p3, Param4 p4) ) {$/;"	f	class:fastdelegate::FastDelegate4
+FastDelegate4	snnlib/util/fast_delegate.h	/^	FastDelegate4(const FastDelegate4 &x) {$/;"	f	class:fastdelegate::FastDelegate4
+FastDelegate4	snnlib/util/fast_delegate.h	/^	FastDelegate4(const Y *pthis, DesiredRetType (X::* function_to_bind)(Param1 p1, Param2 p2, Param3 p3, Param4 p4) const) {$/;"	f	class:fastdelegate::FastDelegate4
+FastDelegate4	snnlib/util/fast_delegate.h	/^class FastDelegate4 {$/;"	c	namespace:fastdelegate
+FastDelegate5	snnlib/util/fast_delegate.h	/^	FastDelegate5() { clear(); }$/;"	f	class:fastdelegate::FastDelegate5
+FastDelegate5	snnlib/util/fast_delegate.h	/^	FastDelegate5(DesiredRetType (*function_to_bind)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5) ) {$/;"	f	class:fastdelegate::FastDelegate5
+FastDelegate5	snnlib/util/fast_delegate.h	/^	FastDelegate5(Y *pthis, DesiredRetType (X::* function_to_bind)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5) ) {$/;"	f	class:fastdelegate::FastDelegate5
+FastDelegate5	snnlib/util/fast_delegate.h	/^	FastDelegate5(const FastDelegate5 &x) {$/;"	f	class:fastdelegate::FastDelegate5
+FastDelegate5	snnlib/util/fast_delegate.h	/^	FastDelegate5(const Y *pthis, DesiredRetType (X::* function_to_bind)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5) const) {$/;"	f	class:fastdelegate::FastDelegate5
+FastDelegate5	snnlib/util/fast_delegate.h	/^class FastDelegate5 {$/;"	c	namespace:fastdelegate
+FastDelegate6	snnlib/util/fast_delegate.h	/^	FastDelegate6() { clear(); }$/;"	f	class:fastdelegate::FastDelegate6
+FastDelegate6	snnlib/util/fast_delegate.h	/^	FastDelegate6(DesiredRetType (*function_to_bind)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6) ) {$/;"	f	class:fastdelegate::FastDelegate6
+FastDelegate6	snnlib/util/fast_delegate.h	/^	FastDelegate6(Y *pthis, DesiredRetType (X::* function_to_bind)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6) ) {$/;"	f	class:fastdelegate::FastDelegate6
+FastDelegate6	snnlib/util/fast_delegate.h	/^	FastDelegate6(const FastDelegate6 &x) {$/;"	f	class:fastdelegate::FastDelegate6
+FastDelegate6	snnlib/util/fast_delegate.h	/^	FastDelegate6(const Y *pthis, DesiredRetType (X::* function_to_bind)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6) const) {$/;"	f	class:fastdelegate::FastDelegate6
+FastDelegate6	snnlib/util/fast_delegate.h	/^class FastDelegate6 {$/;"	c	namespace:fastdelegate
+FastDelegate7	snnlib/util/fast_delegate.h	/^	FastDelegate7() { clear(); }$/;"	f	class:fastdelegate::FastDelegate7
+FastDelegate7	snnlib/util/fast_delegate.h	/^	FastDelegate7(DesiredRetType (*function_to_bind)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6, Param7 p7) ) {$/;"	f	class:fastdelegate::FastDelegate7
+FastDelegate7	snnlib/util/fast_delegate.h	/^	FastDelegate7(Y *pthis, DesiredRetType (X::* function_to_bind)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6, Param7 p7) ) {$/;"	f	class:fastdelegate::FastDelegate7
+FastDelegate7	snnlib/util/fast_delegate.h	/^	FastDelegate7(const FastDelegate7 &x) {$/;"	f	class:fastdelegate::FastDelegate7
+FastDelegate7	snnlib/util/fast_delegate.h	/^	FastDelegate7(const Y *pthis, DesiredRetType (X::* function_to_bind)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6, Param7 p7) const) {$/;"	f	class:fastdelegate::FastDelegate7
+FastDelegate7	snnlib/util/fast_delegate.h	/^class FastDelegate7 {$/;"	c	namespace:fastdelegate
+FastDelegate8	snnlib/util/fast_delegate.h	/^	FastDelegate8() { clear(); }$/;"	f	class:fastdelegate::FastDelegate8
+FastDelegate8	snnlib/util/fast_delegate.h	/^	FastDelegate8(DesiredRetType (*function_to_bind)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6, Param7 p7, Param8 p8) ) {$/;"	f	class:fastdelegate::FastDelegate8
+FastDelegate8	snnlib/util/fast_delegate.h	/^	FastDelegate8(Y *pthis, DesiredRetType (X::* function_to_bind)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6, Param7 p7, Param8 p8) ) {$/;"	f	class:fastdelegate::FastDelegate8
+FastDelegate8	snnlib/util/fast_delegate.h	/^	FastDelegate8(const FastDelegate8 &x) {$/;"	f	class:fastdelegate::FastDelegate8
+FastDelegate8	snnlib/util/fast_delegate.h	/^	FastDelegate8(const Y *pthis, DesiredRetType (X::* function_to_bind)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6, Param7 p7, Param8 p8) const) {$/;"	f	class:fastdelegate::FastDelegate8
+FastDelegate8	snnlib/util/fast_delegate.h	/^class FastDelegate8 {$/;"	c	namespace:fastdelegate
+GenericClass	snnlib/util/fast_delegate.h	/^	class GenericClass {};$/;"	c	namespace:fastdelegate::detail
+GenericClass	snnlib/util/fast_delegate.h	/^	class __single_inheritance GenericClass;$/;"	m	namespace:fastdelegate::detail	typeref:class:fastdelegate::detail::__single_inheritance
+GenericFuncPtr	snnlib/util/fast_delegate.h	/^	typedef void (*GenericFuncPtr)(); \/\/ arbitrary code pointer$/;"	t	class:fastdelegate::DelegateMemento
+GenericMemFn	snnlib/util/fast_delegate.h	/^	typedef RetType (detail::GenericClass::*GenericMemFn)();$/;"	t	class:fastdelegate::FastDelegate0
+GenericMemFn	snnlib/util/fast_delegate.h	/^	typedef RetType (detail::GenericClass::*GenericMemFn)(Param1 p1);$/;"	t	class:fastdelegate::FastDelegate1
+GenericMemFn	snnlib/util/fast_delegate.h	/^	typedef RetType (detail::GenericClass::*GenericMemFn)(Param1 p1, Param2 p2);$/;"	t	class:fastdelegate::FastDelegate2
+GenericMemFn	snnlib/util/fast_delegate.h	/^	typedef RetType (detail::GenericClass::*GenericMemFn)(Param1 p1, Param2 p2, Param3 p3);$/;"	t	class:fastdelegate::FastDelegate3
+GenericMemFn	snnlib/util/fast_delegate.h	/^	typedef RetType (detail::GenericClass::*GenericMemFn)(Param1 p1, Param2 p2, Param3 p3, Param4 p4);$/;"	t	class:fastdelegate::FastDelegate4
+GenericMemFn	snnlib/util/fast_delegate.h	/^	typedef RetType (detail::GenericClass::*GenericMemFn)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5);$/;"	t	class:fastdelegate::FastDelegate5
+GenericMemFn	snnlib/util/fast_delegate.h	/^	typedef RetType (detail::GenericClass::*GenericMemFn)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6);$/;"	t	class:fastdelegate::FastDelegate6
+GenericMemFn	snnlib/util/fast_delegate.h	/^	typedef RetType (detail::GenericClass::*GenericMemFn)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6, Param7 p7);$/;"	t	class:fastdelegate::FastDelegate7
+GenericMemFn	snnlib/util/fast_delegate.h	/^	typedef RetType (detail::GenericClass::*GenericMemFn)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6, Param7 p7, Param8 p8);$/;"	t	class:fastdelegate::FastDelegate8
+GenericMemFuncType	snnlib/util/fast_delegate.h	/^	typedef void (detail::GenericClass::*GenericMemFuncType)(); \/\/ arbitrary MFP.$/;"	t	class:fastdelegate::DelegateMemento
+GenericVirtualClass	snnlib/util/fast_delegate.h	/^struct GenericVirtualClass : virtual public GenericClass$/;"	s	namespace:fastdelegate::detail
+GetClosureMemPtr	snnlib/util/fast_delegate.h	/^	inline GenericMemFunc GetClosureMemPtr() const { return reinterpret_cast<GenericMemFunc>(m_pFunction); }$/;"	f	class:fastdelegate::detail::ClosurePtr
+GetClosureThis	snnlib/util/fast_delegate.h	/^	inline GenericClass *GetClosureThis() const { return m_pthis; }$/;"	f	class:fastdelegate::detail::ClosurePtr
+GetMemento	snnlib/util/fast_delegate.h	/^	const DelegateMemento & GetMemento() { return m_Closure; }$/;"	f	class:fastdelegate::FastDelegate0
+GetMemento	snnlib/util/fast_delegate.h	/^	const DelegateMemento & GetMemento() { return m_Closure; }$/;"	f	class:fastdelegate::FastDelegate1
+GetMemento	snnlib/util/fast_delegate.h	/^	const DelegateMemento & GetMemento() { return m_Closure; }$/;"	f	class:fastdelegate::FastDelegate2
+GetMemento	snnlib/util/fast_delegate.h	/^	const DelegateMemento & GetMemento() { return m_Closure; }$/;"	f	class:fastdelegate::FastDelegate3
+GetMemento	snnlib/util/fast_delegate.h	/^	const DelegateMemento & GetMemento() { return m_Closure; }$/;"	f	class:fastdelegate::FastDelegate4
+GetMemento	snnlib/util/fast_delegate.h	/^	const DelegateMemento & GetMemento() { return m_Closure; }$/;"	f	class:fastdelegate::FastDelegate5
+GetMemento	snnlib/util/fast_delegate.h	/^	const DelegateMemento & GetMemento() { return m_Closure; }$/;"	f	class:fastdelegate::FastDelegate6
+GetMemento	snnlib/util/fast_delegate.h	/^	const DelegateMemento & GetMemento() { return m_Closure; }$/;"	f	class:fastdelegate::FastDelegate7
+GetMemento	snnlib/util/fast_delegate.h	/^	const DelegateMemento & GetMemento() { return m_Closure; }$/;"	f	class:fastdelegate::FastDelegate8
+GetStaticFunction	snnlib/util/fast_delegate.h	/^	inline UnvoidStaticFuncPtr GetStaticFunction() const { $/;"	f	class:fastdelegate::detail::ClosurePtr
+GetStaticFunction	snnlib/util/fast_delegate.h	/^	inline UnvoidStaticFuncPtr GetStaticFunction() const {$/;"	f	class:fastdelegate::detail::ClosurePtr
+GetThis	snnlib/util/fast_delegate.h	/^	GenericVirtualClass * GetThis() { return this; }$/;"	f	struct:fastdelegate::detail::GenericVirtualClass
+InvokeStaticFunction	snnlib/util/fast_delegate.h	/^	RetType InvokeStaticFunction() const {$/;"	f	class:fastdelegate::FastDelegate0
+InvokeStaticFunction	snnlib/util/fast_delegate.h	/^	RetType InvokeStaticFunction(Param1 p1) const {$/;"	f	class:fastdelegate::FastDelegate1
+InvokeStaticFunction	snnlib/util/fast_delegate.h	/^	RetType InvokeStaticFunction(Param1 p1, Param2 p2) const {$/;"	f	class:fastdelegate::FastDelegate2
+InvokeStaticFunction	snnlib/util/fast_delegate.h	/^	RetType InvokeStaticFunction(Param1 p1, Param2 p2, Param3 p3) const {$/;"	f	class:fastdelegate::FastDelegate3
+InvokeStaticFunction	snnlib/util/fast_delegate.h	/^	RetType InvokeStaticFunction(Param1 p1, Param2 p2, Param3 p3, Param4 p4) const {$/;"	f	class:fastdelegate::FastDelegate4
+InvokeStaticFunction	snnlib/util/fast_delegate.h	/^	RetType InvokeStaticFunction(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5) const {$/;"	f	class:fastdelegate::FastDelegate5
+InvokeStaticFunction	snnlib/util/fast_delegate.h	/^	RetType InvokeStaticFunction(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6) const {$/;"	f	class:fastdelegate::FastDelegate6
+InvokeStaticFunction	snnlib/util/fast_delegate.h	/^	RetType InvokeStaticFunction(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6, Param7 p7) const {$/;"	f	class:fastdelegate::FastDelegate7
+InvokeStaticFunction	snnlib/util/fast_delegate.h	/^	RetType InvokeStaticFunction(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6, Param7 p7, Param8 p8) const {$/;"	f	class:fastdelegate::FastDelegate8
+IsEqual	snnlib/util/fast_delegate.h	/^	inline bool IsEqual (const DelegateMemento &x) const{$/;"	f	class:fastdelegate::DelegateMemento
+IsEqualToStaticFuncPtr	snnlib/util/fast_delegate.h	/^	inline bool IsEqualToStaticFuncPtr(StaticFuncPtr funcptr){$/;"	f	class:fastdelegate::detail::ClosurePtr
+IsLess	snnlib/util/fast_delegate.h	/^	inline bool IsLess(const DelegateMemento &right) const {$/;"	f	class:fastdelegate::DelegateMemento
+MakeDelegate	snnlib/util/fast_delegate.h	/^FastDelegate0<FASTDLGT_RETTYPE> MakeDelegate(Y* x, RetType (X::*func)() const) { $/;"	f	namespace:fastdelegate
+MakeDelegate	snnlib/util/fast_delegate.h	/^FastDelegate0<FASTDLGT_RETTYPE> MakeDelegate(Y* x, RetType (X::*func)()) { $/;"	f	namespace:fastdelegate
+MakeDelegate	snnlib/util/fast_delegate.h	/^FastDelegate1<Param1, FASTDLGT_RETTYPE> MakeDelegate(Y* x, RetType (X::*func)(Param1 p1) const) { $/;"	f	namespace:fastdelegate
+MakeDelegate	snnlib/util/fast_delegate.h	/^FastDelegate1<Param1, FASTDLGT_RETTYPE> MakeDelegate(Y* x, RetType (X::*func)(Param1 p1)) { $/;"	f	namespace:fastdelegate
+MakeDelegate	snnlib/util/fast_delegate.h	/^FastDelegate2<Param1, Param2, FASTDLGT_RETTYPE> MakeDelegate(Y* x, RetType (X::*func)(Param1 p1, Param2 p2) const) { $/;"	f	namespace:fastdelegate
+MakeDelegate	snnlib/util/fast_delegate.h	/^FastDelegate2<Param1, Param2, FASTDLGT_RETTYPE> MakeDelegate(Y* x, RetType (X::*func)(Param1 p1, Param2 p2)) { $/;"	f	namespace:fastdelegate
+MakeDelegate	snnlib/util/fast_delegate.h	/^FastDelegate3<Param1, Param2, Param3, FASTDLGT_RETTYPE> MakeDelegate(Y* x, RetType (X::*func)(Param1 p1, Param2 p2, Param3 p3) const) { $/;"	f	namespace:fastdelegate
+MakeDelegate	snnlib/util/fast_delegate.h	/^FastDelegate3<Param1, Param2, Param3, FASTDLGT_RETTYPE> MakeDelegate(Y* x, RetType (X::*func)(Param1 p1, Param2 p2, Param3 p3)) { $/;"	f	namespace:fastdelegate
+MakeDelegate	snnlib/util/fast_delegate.h	/^FastDelegate4<Param1, Param2, Param3, Param4, FASTDLGT_RETTYPE> MakeDelegate(Y* x, RetType (X::*func)(Param1 p1, Param2 p2, Param3 p3, Param4 p4) const) { $/;"	f	namespace:fastdelegate
+MakeDelegate	snnlib/util/fast_delegate.h	/^FastDelegate4<Param1, Param2, Param3, Param4, FASTDLGT_RETTYPE> MakeDelegate(Y* x, RetType (X::*func)(Param1 p1, Param2 p2, Param3 p3, Param4 p4)) { $/;"	f	namespace:fastdelegate
+MakeDelegate	snnlib/util/fast_delegate.h	/^FastDelegate5<Param1, Param2, Param3, Param4, Param5, FASTDLGT_RETTYPE> MakeDelegate(Y* x, RetType (X::*func)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5) const) { $/;"	f	namespace:fastdelegate
+MakeDelegate	snnlib/util/fast_delegate.h	/^FastDelegate5<Param1, Param2, Param3, Param4, Param5, FASTDLGT_RETTYPE> MakeDelegate(Y* x, RetType (X::*func)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5)) { $/;"	f	namespace:fastdelegate
+MakeDelegate	snnlib/util/fast_delegate.h	/^FastDelegate6<Param1, Param2, Param3, Param4, Param5, Param6, FASTDLGT_RETTYPE> MakeDelegate(Y* x, RetType (X::*func)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6) const) { $/;"	f	namespace:fastdelegate
+MakeDelegate	snnlib/util/fast_delegate.h	/^FastDelegate6<Param1, Param2, Param3, Param4, Param5, Param6, FASTDLGT_RETTYPE> MakeDelegate(Y* x, RetType (X::*func)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6)) { $/;"	f	namespace:fastdelegate
+MakeDelegate	snnlib/util/fast_delegate.h	/^FastDelegate7<Param1, Param2, Param3, Param4, Param5, Param6, Param7, FASTDLGT_RETTYPE> MakeDelegate(Y* x, RetType (X::*func)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6, Param7 p7) const) { $/;"	f	namespace:fastdelegate
+MakeDelegate	snnlib/util/fast_delegate.h	/^FastDelegate7<Param1, Param2, Param3, Param4, Param5, Param6, Param7, FASTDLGT_RETTYPE> MakeDelegate(Y* x, RetType (X::*func)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6, Param7 p7)) { $/;"	f	namespace:fastdelegate
+MakeDelegate	snnlib/util/fast_delegate.h	/^FastDelegate8<Param1, Param2, Param3, Param4, Param5, Param6, Param7, Param8, FASTDLGT_RETTYPE> MakeDelegate(Y* x, RetType (X::*func)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6, Param7 p7, Param8 p8) const) { $/;"	f	namespace:fastdelegate
+MakeDelegate	snnlib/util/fast_delegate.h	/^FastDelegate8<Param1, Param2, Param3, Param4, Param5, Param6, Param7, Param8, FASTDLGT_RETTYPE> MakeDelegate(Y* x, RetType (X::*func)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6, Param7 p7, Param8 p8)) { $/;"	f	namespace:fastdelegate
+MicrosoftVirtualMFP	snnlib/util/fast_delegate.h	/^struct MicrosoftVirtualMFP {$/;"	s	namespace:fastdelegate::detail
+ProbePtrType	snnlib/util/fast_delegate.h	/^	typedef GenericVirtualClass * (GenericVirtualClass::*ProbePtrType)();$/;"	t	struct:fastdelegate::detail::GenericVirtualClass
+SINGLE_MEMFUNCPTR_SIZE	snnlib/util/fast_delegate.h	/^const int SINGLE_MEMFUNCPTR_SIZE = sizeof(void (GenericClass::*)());$/;"	m	namespace:fastdelegate::detail
+SafeBoolStruct	snnlib/util/fast_delegate.h	/^	typedef struct SafeBoolStruct {$/;"	s	class:fastdelegate::FastDelegate0
+SafeBoolStruct	snnlib/util/fast_delegate.h	/^	typedef struct SafeBoolStruct {$/;"	s	class:fastdelegate::FastDelegate1
+SafeBoolStruct	snnlib/util/fast_delegate.h	/^	typedef struct SafeBoolStruct {$/;"	s	class:fastdelegate::FastDelegate2
+SafeBoolStruct	snnlib/util/fast_delegate.h	/^	typedef struct SafeBoolStruct {$/;"	s	class:fastdelegate::FastDelegate3
+SafeBoolStruct	snnlib/util/fast_delegate.h	/^	typedef struct SafeBoolStruct {$/;"	s	class:fastdelegate::FastDelegate4
+SafeBoolStruct	snnlib/util/fast_delegate.h	/^	typedef struct SafeBoolStruct {$/;"	s	class:fastdelegate::FastDelegate5
+SafeBoolStruct	snnlib/util/fast_delegate.h	/^	typedef struct SafeBoolStruct {$/;"	s	class:fastdelegate::FastDelegate6
+SafeBoolStruct	snnlib/util/fast_delegate.h	/^	typedef struct SafeBoolStruct {$/;"	s	class:fastdelegate::FastDelegate7
+SafeBoolStruct	snnlib/util/fast_delegate.h	/^	typedef struct SafeBoolStruct {$/;"	s	class:fastdelegate::FastDelegate8
+SelfType	snnlib/util/fast_delegate.h	/^  typedef FastDelegate SelfType;$/;"	t	class:fastdelegate::FastDelegate
+SetMemento	snnlib/util/fast_delegate.h	/^	void SetMemento(const DelegateMemento &any) { m_Closure.CopyFrom(this, any); }$/;"	f	class:fastdelegate::FastDelegate0
+SetMemento	snnlib/util/fast_delegate.h	/^	void SetMemento(const DelegateMemento &any) { m_Closure.CopyFrom(this, any); }$/;"	f	class:fastdelegate::FastDelegate1
+SetMemento	snnlib/util/fast_delegate.h	/^	void SetMemento(const DelegateMemento &any) { m_Closure.CopyFrom(this, any); }$/;"	f	class:fastdelegate::FastDelegate2
+SetMemento	snnlib/util/fast_delegate.h	/^	void SetMemento(const DelegateMemento &any) { m_Closure.CopyFrom(this, any); }$/;"	f	class:fastdelegate::FastDelegate3
+SetMemento	snnlib/util/fast_delegate.h	/^	void SetMemento(const DelegateMemento &any) { m_Closure.CopyFrom(this, any); }$/;"	f	class:fastdelegate::FastDelegate4
+SetMemento	snnlib/util/fast_delegate.h	/^	void SetMemento(const DelegateMemento &any) { m_Closure.CopyFrom(this, any); }$/;"	f	class:fastdelegate::FastDelegate5
+SetMemento	snnlib/util/fast_delegate.h	/^	void SetMemento(const DelegateMemento &any) { m_Closure.CopyFrom(this, any); }$/;"	f	class:fastdelegate::FastDelegate6
+SetMemento	snnlib/util/fast_delegate.h	/^	void SetMemento(const DelegateMemento &any) { m_Closure.CopyFrom(this, any); }$/;"	f	class:fastdelegate::FastDelegate7
+SetMemento	snnlib/util/fast_delegate.h	/^	void SetMemento(const DelegateMemento &any) { m_Closure.CopyFrom(this, any); }$/;"	f	class:fastdelegate::FastDelegate8
+SetMementoFrom	snnlib/util/fast_delegate.h	/^	void SetMementoFrom(const DelegateMemento &right)  {$/;"	f	class:fastdelegate::DelegateMemento
+SimplifyMemFunc	snnlib/util/fast_delegate.h	/^struct SimplifyMemFunc {$/;"	s	namespace:fastdelegate::detail
+SimplifyMemFunc	snnlib/util/fast_delegate.h	/^struct SimplifyMemFunc< SINGLE_MEMFUNCPTR_SIZE + sizeof(int) >  {$/;"	s	namespace:fastdelegate::detail
+SimplifyMemFunc	snnlib/util/fast_delegate.h	/^struct SimplifyMemFunc<SINGLE_MEMFUNCPTR_SIZE + 2*sizeof(int) >$/;"	s	namespace:fastdelegate::detail
+SimplifyMemFunc	snnlib/util/fast_delegate.h	/^struct SimplifyMemFunc<SINGLE_MEMFUNCPTR_SIZE + 3*sizeof(int) >$/;"	s	namespace:fastdelegate::detail
+SimplifyMemFunc	snnlib/util/fast_delegate.h	/^struct SimplifyMemFunc<SINGLE_MEMFUNCPTR_SIZE>  {	$/;"	s	namespace:fastdelegate::detail
+StaticFunctionPtr	snnlib/util/fast_delegate.h	/^	typedef DesiredRetType (*StaticFunctionPtr)();$/;"	t	class:fastdelegate::FastDelegate0
+StaticFunctionPtr	snnlib/util/fast_delegate.h	/^	typedef DesiredRetType (*StaticFunctionPtr)(Param1 p1);$/;"	t	class:fastdelegate::FastDelegate1
+StaticFunctionPtr	snnlib/util/fast_delegate.h	/^	typedef DesiredRetType (*StaticFunctionPtr)(Param1 p1, Param2 p2);$/;"	t	class:fastdelegate::FastDelegate2
+StaticFunctionPtr	snnlib/util/fast_delegate.h	/^	typedef DesiredRetType (*StaticFunctionPtr)(Param1 p1, Param2 p2, Param3 p3);$/;"	t	class:fastdelegate::FastDelegate3
+StaticFunctionPtr	snnlib/util/fast_delegate.h	/^	typedef DesiredRetType (*StaticFunctionPtr)(Param1 p1, Param2 p2, Param3 p3, Param4 p4);$/;"	t	class:fastdelegate::FastDelegate4
+StaticFunctionPtr	snnlib/util/fast_delegate.h	/^	typedef DesiredRetType (*StaticFunctionPtr)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5);$/;"	t	class:fastdelegate::FastDelegate5
+StaticFunctionPtr	snnlib/util/fast_delegate.h	/^	typedef DesiredRetType (*StaticFunctionPtr)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6);$/;"	t	class:fastdelegate::FastDelegate6
+StaticFunctionPtr	snnlib/util/fast_delegate.h	/^	typedef DesiredRetType (*StaticFunctionPtr)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6, Param7 p7);$/;"	t	class:fastdelegate::FastDelegate7
+StaticFunctionPtr	snnlib/util/fast_delegate.h	/^	typedef DesiredRetType (*StaticFunctionPtr)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6, Param7 p7, Param8 p8);$/;"	t	class:fastdelegate::FastDelegate8
+UnvoidStaticFunctionPtr	snnlib/util/fast_delegate.h	/^	typedef RetType (*UnvoidStaticFunctionPtr)();$/;"	t	class:fastdelegate::FastDelegate0
+UnvoidStaticFunctionPtr	snnlib/util/fast_delegate.h	/^	typedef RetType (*UnvoidStaticFunctionPtr)(Param1 p1);$/;"	t	class:fastdelegate::FastDelegate1
+UnvoidStaticFunctionPtr	snnlib/util/fast_delegate.h	/^	typedef RetType (*UnvoidStaticFunctionPtr)(Param1 p1, Param2 p2);$/;"	t	class:fastdelegate::FastDelegate2
+UnvoidStaticFunctionPtr	snnlib/util/fast_delegate.h	/^	typedef RetType (*UnvoidStaticFunctionPtr)(Param1 p1, Param2 p2, Param3 p3);$/;"	t	class:fastdelegate::FastDelegate3
+UnvoidStaticFunctionPtr	snnlib/util/fast_delegate.h	/^	typedef RetType (*UnvoidStaticFunctionPtr)(Param1 p1, Param2 p2, Param3 p3, Param4 p4);$/;"	t	class:fastdelegate::FastDelegate4
+UnvoidStaticFunctionPtr	snnlib/util/fast_delegate.h	/^	typedef RetType (*UnvoidStaticFunctionPtr)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5);$/;"	t	class:fastdelegate::FastDelegate5
+UnvoidStaticFunctionPtr	snnlib/util/fast_delegate.h	/^	typedef RetType (*UnvoidStaticFunctionPtr)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6);$/;"	t	class:fastdelegate::FastDelegate6
+UnvoidStaticFunctionPtr	snnlib/util/fast_delegate.h	/^	typedef RetType (*UnvoidStaticFunctionPtr)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6, Param7 p7);$/;"	t	class:fastdelegate::FastDelegate7
+UnvoidStaticFunctionPtr	snnlib/util/fast_delegate.h	/^	typedef RetType (*UnvoidStaticFunctionPtr)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6, Param7 p7, Param8 p8);$/;"	t	class:fastdelegate::FastDelegate8
+UselessTypedef	snnlib/util/fast_delegate.h	/^	} UselessTypedef;$/;"	t	class:fastdelegate::FastDelegate0	typeref:struct:fastdelegate::FastDelegate0::SafeBoolStruct
+UselessTypedef	snnlib/util/fast_delegate.h	/^	} UselessTypedef;$/;"	t	class:fastdelegate::FastDelegate1	typeref:struct:fastdelegate::FastDelegate1::SafeBoolStruct
+UselessTypedef	snnlib/util/fast_delegate.h	/^	} UselessTypedef;$/;"	t	class:fastdelegate::FastDelegate2	typeref:struct:fastdelegate::FastDelegate2::SafeBoolStruct
+UselessTypedef	snnlib/util/fast_delegate.h	/^	} UselessTypedef;$/;"	t	class:fastdelegate::FastDelegate3	typeref:struct:fastdelegate::FastDelegate3::SafeBoolStruct
+UselessTypedef	snnlib/util/fast_delegate.h	/^	} UselessTypedef;$/;"	t	class:fastdelegate::FastDelegate4	typeref:struct:fastdelegate::FastDelegate4::SafeBoolStruct
+UselessTypedef	snnlib/util/fast_delegate.h	/^	} UselessTypedef;$/;"	t	class:fastdelegate::FastDelegate5	typeref:struct:fastdelegate::FastDelegate5::SafeBoolStruct
+UselessTypedef	snnlib/util/fast_delegate.h	/^	} UselessTypedef;$/;"	t	class:fastdelegate::FastDelegate6	typeref:struct:fastdelegate::FastDelegate6::SafeBoolStruct
+UselessTypedef	snnlib/util/fast_delegate.h	/^	} UselessTypedef;$/;"	t	class:fastdelegate::FastDelegate7	typeref:struct:fastdelegate::FastDelegate7::SafeBoolStruct
+UselessTypedef	snnlib/util/fast_delegate.h	/^	} UselessTypedef;$/;"	t	class:fastdelegate::FastDelegate8	typeref:struct:fastdelegate::FastDelegate8::SafeBoolStruct
+VoidToDefaultVoid	snnlib/util/fast_delegate.h	/^struct VoidToDefaultVoid { typedef T type; };$/;"	s	namespace:fastdelegate::detail
+VoidToDefaultVoid	snnlib/util/fast_delegate.h	/^struct VoidToDefaultVoid<void> { typedef DefaultVoid type; };$/;"	s	namespace:fastdelegate::detail
+a_data_pointer_to_this_is_0_on_buggy_compilers	snnlib/util/fast_delegate.h	/^		int a_data_pointer_to_this_is_0_on_buggy_compilers;$/;"	m	struct:fastdelegate::FastDelegate0::SafeBoolStruct
+a_data_pointer_to_this_is_0_on_buggy_compilers	snnlib/util/fast_delegate.h	/^		int a_data_pointer_to_this_is_0_on_buggy_compilers;$/;"	m	struct:fastdelegate::FastDelegate1::SafeBoolStruct
+a_data_pointer_to_this_is_0_on_buggy_compilers	snnlib/util/fast_delegate.h	/^		int a_data_pointer_to_this_is_0_on_buggy_compilers;$/;"	m	struct:fastdelegate::FastDelegate2::SafeBoolStruct
+a_data_pointer_to_this_is_0_on_buggy_compilers	snnlib/util/fast_delegate.h	/^		int a_data_pointer_to_this_is_0_on_buggy_compilers;$/;"	m	struct:fastdelegate::FastDelegate3::SafeBoolStruct
+a_data_pointer_to_this_is_0_on_buggy_compilers	snnlib/util/fast_delegate.h	/^		int a_data_pointer_to_this_is_0_on_buggy_compilers;$/;"	m	struct:fastdelegate::FastDelegate4::SafeBoolStruct
+a_data_pointer_to_this_is_0_on_buggy_compilers	snnlib/util/fast_delegate.h	/^		int a_data_pointer_to_this_is_0_on_buggy_compilers;$/;"	m	struct:fastdelegate::FastDelegate5::SafeBoolStruct
+a_data_pointer_to_this_is_0_on_buggy_compilers	snnlib/util/fast_delegate.h	/^		int a_data_pointer_to_this_is_0_on_buggy_compilers;$/;"	m	struct:fastdelegate::FastDelegate6::SafeBoolStruct
+a_data_pointer_to_this_is_0_on_buggy_compilers	snnlib/util/fast_delegate.h	/^		int a_data_pointer_to_this_is_0_on_buggy_compilers;$/;"	m	struct:fastdelegate::FastDelegate7::SafeBoolStruct
+a_data_pointer_to_this_is_0_on_buggy_compilers	snnlib/util/fast_delegate.h	/^		int a_data_pointer_to_this_is_0_on_buggy_compilers;$/;"	m	struct:fastdelegate::FastDelegate8::SafeBoolStruct
+bind	snnlib/util/fast_delegate.h	/^	inline void bind(DesiredRetType (*function_to_bind)()) {$/;"	f	class:fastdelegate::FastDelegate0
+bind	snnlib/util/fast_delegate.h	/^	inline void bind(DesiredRetType (*function_to_bind)(Param1 p1)) {$/;"	f	class:fastdelegate::FastDelegate1
+bind	snnlib/util/fast_delegate.h	/^	inline void bind(DesiredRetType (*function_to_bind)(Param1 p1, Param2 p2)) {$/;"	f	class:fastdelegate::FastDelegate2
+bind	snnlib/util/fast_delegate.h	/^	inline void bind(DesiredRetType (*function_to_bind)(Param1 p1, Param2 p2, Param3 p3)) {$/;"	f	class:fastdelegate::FastDelegate3
+bind	snnlib/util/fast_delegate.h	/^	inline void bind(DesiredRetType (*function_to_bind)(Param1 p1, Param2 p2, Param3 p3, Param4 p4)) {$/;"	f	class:fastdelegate::FastDelegate4
+bind	snnlib/util/fast_delegate.h	/^	inline void bind(DesiredRetType (*function_to_bind)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5)) {$/;"	f	class:fastdelegate::FastDelegate5
+bind	snnlib/util/fast_delegate.h	/^	inline void bind(DesiredRetType (*function_to_bind)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6)) {$/;"	f	class:fastdelegate::FastDelegate6
+bind	snnlib/util/fast_delegate.h	/^	inline void bind(DesiredRetType (*function_to_bind)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6, Param7 p7)) {$/;"	f	class:fastdelegate::FastDelegate7
+bind	snnlib/util/fast_delegate.h	/^	inline void bind(DesiredRetType (*function_to_bind)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6, Param7 p7, Param8 p8)) {$/;"	f	class:fastdelegate::FastDelegate8
+bind	snnlib/util/fast_delegate.h	/^	inline void bind(Y *pthis, DesiredRetType (X::* function_to_bind)()) {$/;"	f	class:fastdelegate::FastDelegate0
+bind	snnlib/util/fast_delegate.h	/^	inline void bind(Y *pthis, DesiredRetType (X::* function_to_bind)(Param1 p1)) {$/;"	f	class:fastdelegate::FastDelegate1
+bind	snnlib/util/fast_delegate.h	/^	inline void bind(Y *pthis, DesiredRetType (X::* function_to_bind)(Param1 p1, Param2 p2)) {$/;"	f	class:fastdelegate::FastDelegate2
+bind	snnlib/util/fast_delegate.h	/^	inline void bind(Y *pthis, DesiredRetType (X::* function_to_bind)(Param1 p1, Param2 p2, Param3 p3)) {$/;"	f	class:fastdelegate::FastDelegate3
+bind	snnlib/util/fast_delegate.h	/^	inline void bind(Y *pthis, DesiredRetType (X::* function_to_bind)(Param1 p1, Param2 p2, Param3 p3, Param4 p4)) {$/;"	f	class:fastdelegate::FastDelegate4
+bind	snnlib/util/fast_delegate.h	/^	inline void bind(Y *pthis, DesiredRetType (X::* function_to_bind)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5)) {$/;"	f	class:fastdelegate::FastDelegate5
+bind	snnlib/util/fast_delegate.h	/^	inline void bind(Y *pthis, DesiredRetType (X::* function_to_bind)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6)) {$/;"	f	class:fastdelegate::FastDelegate6
+bind	snnlib/util/fast_delegate.h	/^	inline void bind(Y *pthis, DesiredRetType (X::* function_to_bind)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6, Param7 p7)) {$/;"	f	class:fastdelegate::FastDelegate7
+bind	snnlib/util/fast_delegate.h	/^	inline void bind(Y *pthis, DesiredRetType (X::* function_to_bind)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6, Param7 p7, Param8 p8)) {$/;"	f	class:fastdelegate::FastDelegate8
+bind	snnlib/util/fast_delegate.h	/^	inline void bind(const Y *pthis, DesiredRetType (X::* function_to_bind)() const) {$/;"	f	class:fastdelegate::FastDelegate0
+bind	snnlib/util/fast_delegate.h	/^	inline void bind(const Y *pthis, DesiredRetType (X::* function_to_bind)(Param1 p1) const) {$/;"	f	class:fastdelegate::FastDelegate1
+bind	snnlib/util/fast_delegate.h	/^	inline void bind(const Y *pthis, DesiredRetType (X::* function_to_bind)(Param1 p1, Param2 p2) const) {$/;"	f	class:fastdelegate::FastDelegate2
+bind	snnlib/util/fast_delegate.h	/^	inline void bind(const Y *pthis, DesiredRetType (X::* function_to_bind)(Param1 p1, Param2 p2, Param3 p3) const) {$/;"	f	class:fastdelegate::FastDelegate3
+bind	snnlib/util/fast_delegate.h	/^	inline void bind(const Y *pthis, DesiredRetType (X::* function_to_bind)(Param1 p1, Param2 p2, Param3 p3, Param4 p4) const) {$/;"	f	class:fastdelegate::FastDelegate4
+bind	snnlib/util/fast_delegate.h	/^	inline void bind(const Y *pthis, DesiredRetType (X::* function_to_bind)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5) const) {$/;"	f	class:fastdelegate::FastDelegate5
+bind	snnlib/util/fast_delegate.h	/^	inline void bind(const Y *pthis, DesiredRetType (X::* function_to_bind)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6) const) {$/;"	f	class:fastdelegate::FastDelegate6
+bind	snnlib/util/fast_delegate.h	/^	inline void bind(const Y *pthis, DesiredRetType (X::* function_to_bind)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6, Param7 p7) const) {$/;"	f	class:fastdelegate::FastDelegate7
+bind	snnlib/util/fast_delegate.h	/^	inline void bind(const Y *pthis, DesiredRetType (X::* function_to_bind)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6, Param7 p7, Param8 p8) const) {$/;"	f	class:fastdelegate::FastDelegate8
+bindconstmemfunc	snnlib/util/fast_delegate.h	/^	inline void bindconstmemfunc(const X *pthis, XMemFunc function_to_bind) {$/;"	f	class:fastdelegate::detail::ClosurePtr
+bindmemfunc	snnlib/util/fast_delegate.h	/^	inline void bindmemfunc(X *pthis, XMemFunc function_to_bind ) {$/;"	f	class:fastdelegate::detail::ClosurePtr
+bindmemfunc	snnlib/util/fast_delegate.h	/^	inline void bindmemfunc(const X *pthis, XMemFunc function_to_bind) {$/;"	f	class:fastdelegate::detail::ClosurePtr
+bindstaticfunc	snnlib/util/fast_delegate.h	/^	inline void bindstaticfunc(DerivedClass *pParent, ParentInvokerSig static_function_invoker, $/;"	f	class:fastdelegate::detail::ClosurePtr
+clear	snnlib/util/fast_delegate.h	/^	void clear() {	m_pthis=0; m_pFunction=0;	}$/;"	f	class:fastdelegate::DelegateMemento
+clear	snnlib/util/fast_delegate.h	/^	void clear() { m_Closure.clear();}$/;"	f	class:fastdelegate::FastDelegate0
+clear	snnlib/util/fast_delegate.h	/^	void clear() { m_Closure.clear();}$/;"	f	class:fastdelegate::FastDelegate1
+clear	snnlib/util/fast_delegate.h	/^	void clear() { m_Closure.clear();}$/;"	f	class:fastdelegate::FastDelegate2
+clear	snnlib/util/fast_delegate.h	/^	void clear() { m_Closure.clear();}$/;"	f	class:fastdelegate::FastDelegate3
+clear	snnlib/util/fast_delegate.h	/^	void clear() { m_Closure.clear();}$/;"	f	class:fastdelegate::FastDelegate4
+clear	snnlib/util/fast_delegate.h	/^	void clear() { m_Closure.clear();}$/;"	f	class:fastdelegate::FastDelegate5
+clear	snnlib/util/fast_delegate.h	/^	void clear() { m_Closure.clear();}$/;"	f	class:fastdelegate::FastDelegate6
+clear	snnlib/util/fast_delegate.h	/^	void clear() { m_Closure.clear();}$/;"	f	class:fastdelegate::FastDelegate7
+clear	snnlib/util/fast_delegate.h	/^	void clear() { m_Closure.clear();}$/;"	f	class:fastdelegate::FastDelegate8
+clear	snnlib/util/fast_delegate.h	/^	void clear() {$/;"	f	class:fastdelegate::DelegateMemento
+codeptr	snnlib/util/fast_delegate.h	/^	void (GenericClass::*codeptr)(); \/\/ points to the actual member function$/;"	m	struct:fastdelegate::detail::MicrosoftVirtualMFP
+delta	snnlib/util/fast_delegate.h	/^	int delta;		\/\/ #bytes to be added to the 'this' pointer$/;"	m	struct:fastdelegate::detail::MicrosoftVirtualMFP
+detail	snnlib/util/fast_delegate.h	/^namespace detail {	\/\/ we'll hide the implementation details in a nested namespace.$/;"	n	namespace:fastdelegate
+detail	snnlib/util/fast_delegate.h	/^namespace detail {$/;"	n	namespace:fastdelegate
+empty	snnlib/util/fast_delegate.h	/^	inline bool empty() const		\/\/ Is it bound to anything?$/;"	f	class:fastdelegate::DelegateMemento
+empty	snnlib/util/fast_delegate.h	/^	inline bool empty() const	{$/;"	f	class:fastdelegate::FastDelegate0
+empty	snnlib/util/fast_delegate.h	/^	inline bool empty() const	{$/;"	f	class:fastdelegate::FastDelegate1
+empty	snnlib/util/fast_delegate.h	/^	inline bool empty() const	{$/;"	f	class:fastdelegate::FastDelegate2
+empty	snnlib/util/fast_delegate.h	/^	inline bool empty() const	{$/;"	f	class:fastdelegate::FastDelegate3
+empty	snnlib/util/fast_delegate.h	/^	inline bool empty() const	{$/;"	f	class:fastdelegate::FastDelegate4
+empty	snnlib/util/fast_delegate.h	/^	inline bool empty() const	{$/;"	f	class:fastdelegate::FastDelegate5
+empty	snnlib/util/fast_delegate.h	/^	inline bool empty() const	{$/;"	f	class:fastdelegate::FastDelegate6
+empty	snnlib/util/fast_delegate.h	/^	inline bool empty() const	{$/;"	f	class:fastdelegate::FastDelegate7
+empty	snnlib/util/fast_delegate.h	/^	inline bool empty() const	{$/;"	f	class:fastdelegate::FastDelegate8
+fastdelegate	snnlib/util/fast_delegate.h	/^namespace fastdelegate {$/;"	n
+horrible_cast	snnlib/util/fast_delegate.h	/^inline OutputClass horrible_cast(const InputClass input){$/;"	f	namespace:fastdelegate::detail
+horrible_union	snnlib/util/fast_delegate.h	/^union horrible_union{$/;"	u	namespace:fastdelegate::detail
+implicit_cast	snnlib/util/fast_delegate.h	/^inline OutputClass implicit_cast(InputClass input){$/;"	f	namespace:fastdelegate::detail
+in	snnlib/util/fast_delegate.h	/^	InputClass in;$/;"	m	union:fastdelegate::detail::horrible_union
+m_Closure	snnlib/util/fast_delegate.h	/^	ClosureType m_Closure;$/;"	m	class:fastdelegate::FastDelegate0
+m_Closure	snnlib/util/fast_delegate.h	/^	ClosureType m_Closure;$/;"	m	class:fastdelegate::FastDelegate1
+m_Closure	snnlib/util/fast_delegate.h	/^	ClosureType m_Closure;$/;"	m	class:fastdelegate::FastDelegate2
+m_Closure	snnlib/util/fast_delegate.h	/^	ClosureType m_Closure;$/;"	m	class:fastdelegate::FastDelegate3
+m_Closure	snnlib/util/fast_delegate.h	/^	ClosureType m_Closure;$/;"	m	class:fastdelegate::FastDelegate4
+m_Closure	snnlib/util/fast_delegate.h	/^	ClosureType m_Closure;$/;"	m	class:fastdelegate::FastDelegate5
+m_Closure	snnlib/util/fast_delegate.h	/^	ClosureType m_Closure;$/;"	m	class:fastdelegate::FastDelegate6
+m_Closure	snnlib/util/fast_delegate.h	/^	ClosureType m_Closure;$/;"	m	class:fastdelegate::FastDelegate7
+m_Closure	snnlib/util/fast_delegate.h	/^	ClosureType m_Closure;$/;"	m	class:fastdelegate::FastDelegate8
+m_nonzero	snnlib/util/fast_delegate.h	/^		StaticFunctionPtr m_nonzero;$/;"	m	struct:fastdelegate::FastDelegate0::SafeBoolStruct
+m_nonzero	snnlib/util/fast_delegate.h	/^		StaticFunctionPtr m_nonzero;$/;"	m	struct:fastdelegate::FastDelegate1::SafeBoolStruct
+m_nonzero	snnlib/util/fast_delegate.h	/^		StaticFunctionPtr m_nonzero;$/;"	m	struct:fastdelegate::FastDelegate2::SafeBoolStruct
+m_nonzero	snnlib/util/fast_delegate.h	/^		StaticFunctionPtr m_nonzero;$/;"	m	struct:fastdelegate::FastDelegate3::SafeBoolStruct
+m_nonzero	snnlib/util/fast_delegate.h	/^		StaticFunctionPtr m_nonzero;$/;"	m	struct:fastdelegate::FastDelegate4::SafeBoolStruct
+m_nonzero	snnlib/util/fast_delegate.h	/^		StaticFunctionPtr m_nonzero;$/;"	m	struct:fastdelegate::FastDelegate5::SafeBoolStruct
+m_nonzero	snnlib/util/fast_delegate.h	/^		StaticFunctionPtr m_nonzero;$/;"	m	struct:fastdelegate::FastDelegate6::SafeBoolStruct
+m_nonzero	snnlib/util/fast_delegate.h	/^		StaticFunctionPtr m_nonzero;$/;"	m	struct:fastdelegate::FastDelegate7::SafeBoolStruct
+m_nonzero	snnlib/util/fast_delegate.h	/^		StaticFunctionPtr m_nonzero;$/;"	m	struct:fastdelegate::FastDelegate8::SafeBoolStruct
+m_pFunction	snnlib/util/fast_delegate.h	/^	GenericMemFuncType m_pFunction;$/;"	m	class:fastdelegate::DelegateMemento
+m_pStaticFunction	snnlib/util/fast_delegate.h	/^	GenericFuncPtr m_pStaticFunction;$/;"	m	class:fastdelegate::DelegateMemento
+m_pthis	snnlib/util/fast_delegate.h	/^	detail::GenericClass *m_pthis;$/;"	m	class:fastdelegate::DelegateMemento
+operator !	snnlib/util/fast_delegate.h	/^	inline bool operator ! () const		\/\/ Is it bound to anything?$/;"	f	class:fastdelegate::DelegateMemento
+operator !	snnlib/util/fast_delegate.h	/^	inline bool operator ! () const	{	\/\/ Is it bound to anything?$/;"	f	class:fastdelegate::FastDelegate0
+operator !	snnlib/util/fast_delegate.h	/^	inline bool operator ! () const	{	\/\/ Is it bound to anything?$/;"	f	class:fastdelegate::FastDelegate1
+operator !	snnlib/util/fast_delegate.h	/^	inline bool operator ! () const	{	\/\/ Is it bound to anything?$/;"	f	class:fastdelegate::FastDelegate2
+operator !	snnlib/util/fast_delegate.h	/^	inline bool operator ! () const	{	\/\/ Is it bound to anything?$/;"	f	class:fastdelegate::FastDelegate3
+operator !	snnlib/util/fast_delegate.h	/^	inline bool operator ! () const	{	\/\/ Is it bound to anything?$/;"	f	class:fastdelegate::FastDelegate4
+operator !	snnlib/util/fast_delegate.h	/^	inline bool operator ! () const	{	\/\/ Is it bound to anything?$/;"	f	class:fastdelegate::FastDelegate5
+operator !	snnlib/util/fast_delegate.h	/^	inline bool operator ! () const	{	\/\/ Is it bound to anything?$/;"	f	class:fastdelegate::FastDelegate6
+operator !	snnlib/util/fast_delegate.h	/^	inline bool operator ! () const	{	\/\/ Is it bound to anything?$/;"	f	class:fastdelegate::FastDelegate7
+operator !	snnlib/util/fast_delegate.h	/^	inline bool operator ! () const	{	\/\/ Is it bound to anything?$/;"	f	class:fastdelegate::FastDelegate8
+operator !=	snnlib/util/fast_delegate.h	/^	bool operator !=(const FastDelegate0 &x) const {$/;"	f	class:fastdelegate::FastDelegate0
+operator !=	snnlib/util/fast_delegate.h	/^	bool operator !=(const FastDelegate1 &x) const {$/;"	f	class:fastdelegate::FastDelegate1
+operator !=	snnlib/util/fast_delegate.h	/^	bool operator !=(const FastDelegate2 &x) const {$/;"	f	class:fastdelegate::FastDelegate2
+operator !=	snnlib/util/fast_delegate.h	/^	bool operator !=(const FastDelegate3 &x) const {$/;"	f	class:fastdelegate::FastDelegate3
+operator !=	snnlib/util/fast_delegate.h	/^	bool operator !=(const FastDelegate4 &x) const {$/;"	f	class:fastdelegate::FastDelegate4
+operator !=	snnlib/util/fast_delegate.h	/^	bool operator !=(const FastDelegate5 &x) const {$/;"	f	class:fastdelegate::FastDelegate5
+operator !=	snnlib/util/fast_delegate.h	/^	bool operator !=(const FastDelegate6 &x) const {$/;"	f	class:fastdelegate::FastDelegate6
+operator !=	snnlib/util/fast_delegate.h	/^	bool operator !=(const FastDelegate7 &x) const {$/;"	f	class:fastdelegate::FastDelegate7
+operator !=	snnlib/util/fast_delegate.h	/^	bool operator !=(const FastDelegate8 &x) const {$/;"	f	class:fastdelegate::FastDelegate8
+operator !=	snnlib/util/fast_delegate.h	/^	inline bool operator!=(StaticFunctionPtr funcptr) { $/;"	f	class:fastdelegate::FastDelegate0
+operator !=	snnlib/util/fast_delegate.h	/^	inline bool operator!=(StaticFunctionPtr funcptr) { $/;"	f	class:fastdelegate::FastDelegate1
+operator !=	snnlib/util/fast_delegate.h	/^	inline bool operator!=(StaticFunctionPtr funcptr) { $/;"	f	class:fastdelegate::FastDelegate2
+operator !=	snnlib/util/fast_delegate.h	/^	inline bool operator!=(StaticFunctionPtr funcptr) { $/;"	f	class:fastdelegate::FastDelegate3
+operator !=	snnlib/util/fast_delegate.h	/^	inline bool operator!=(StaticFunctionPtr funcptr) { $/;"	f	class:fastdelegate::FastDelegate4
+operator !=	snnlib/util/fast_delegate.h	/^	inline bool operator!=(StaticFunctionPtr funcptr) { $/;"	f	class:fastdelegate::FastDelegate5
+operator !=	snnlib/util/fast_delegate.h	/^	inline bool operator!=(StaticFunctionPtr funcptr) { $/;"	f	class:fastdelegate::FastDelegate6
+operator !=	snnlib/util/fast_delegate.h	/^	inline bool operator!=(StaticFunctionPtr funcptr) { $/;"	f	class:fastdelegate::FastDelegate7
+operator !=	snnlib/util/fast_delegate.h	/^	inline bool operator!=(StaticFunctionPtr funcptr) { $/;"	f	class:fastdelegate::FastDelegate8
+operator ()	snnlib/util/fast_delegate.h	/^	RetType operator() () const {$/;"	f	class:fastdelegate::FastDelegate0
+operator ()	snnlib/util/fast_delegate.h	/^	RetType operator() (Param1 p1) const {$/;"	f	class:fastdelegate::FastDelegate1
+operator ()	snnlib/util/fast_delegate.h	/^	RetType operator() (Param1 p1, Param2 p2) const {$/;"	f	class:fastdelegate::FastDelegate2
+operator ()	snnlib/util/fast_delegate.h	/^	RetType operator() (Param1 p1, Param2 p2, Param3 p3) const {$/;"	f	class:fastdelegate::FastDelegate3
+operator ()	snnlib/util/fast_delegate.h	/^	RetType operator() (Param1 p1, Param2 p2, Param3 p3, Param4 p4) const {$/;"	f	class:fastdelegate::FastDelegate4
+operator ()	snnlib/util/fast_delegate.h	/^	RetType operator() (Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5) const {$/;"	f	class:fastdelegate::FastDelegate5
+operator ()	snnlib/util/fast_delegate.h	/^	RetType operator() (Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6) const {$/;"	f	class:fastdelegate::FastDelegate6
+operator ()	snnlib/util/fast_delegate.h	/^	RetType operator() (Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6, Param7 p7) const {$/;"	f	class:fastdelegate::FastDelegate7
+operator ()	snnlib/util/fast_delegate.h	/^	RetType operator() (Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6, Param7 p7, Param8 p8) const {$/;"	f	class:fastdelegate::FastDelegate8
+operator <	snnlib/util/fast_delegate.h	/^	bool operator <(const FastDelegate0 &x) const {$/;"	f	class:fastdelegate::FastDelegate0
+operator <	snnlib/util/fast_delegate.h	/^	bool operator <(const FastDelegate1 &x) const {$/;"	f	class:fastdelegate::FastDelegate1
+operator <	snnlib/util/fast_delegate.h	/^	bool operator <(const FastDelegate2 &x) const {$/;"	f	class:fastdelegate::FastDelegate2
+operator <	snnlib/util/fast_delegate.h	/^	bool operator <(const FastDelegate3 &x) const {$/;"	f	class:fastdelegate::FastDelegate3
+operator <	snnlib/util/fast_delegate.h	/^	bool operator <(const FastDelegate4 &x) const {$/;"	f	class:fastdelegate::FastDelegate4
+operator <	snnlib/util/fast_delegate.h	/^	bool operator <(const FastDelegate5 &x) const {$/;"	f	class:fastdelegate::FastDelegate5
+operator <	snnlib/util/fast_delegate.h	/^	bool operator <(const FastDelegate6 &x) const {$/;"	f	class:fastdelegate::FastDelegate6
+operator <	snnlib/util/fast_delegate.h	/^	bool operator <(const FastDelegate7 &x) const {$/;"	f	class:fastdelegate::FastDelegate7
+operator <	snnlib/util/fast_delegate.h	/^	bool operator <(const FastDelegate8 &x) const {$/;"	f	class:fastdelegate::FastDelegate8
+operator <	snnlib/util/fast_delegate.h	/^	inline bool operator <(const DelegateMemento &right) {$/;"	f	class:fastdelegate::DelegateMemento
+operator =	snnlib/util/fast_delegate.h	/^	DelegateMemento & operator = (const DelegateMemento &right)  {$/;"	f	class:fastdelegate::DelegateMemento
+operator =	snnlib/util/fast_delegate.h	/^	void operator = (DesiredRetType (*function_to_bind)() ) {$/;"	f	class:fastdelegate::FastDelegate0
+operator =	snnlib/util/fast_delegate.h	/^	void operator = (DesiredRetType (*function_to_bind)(Param1 p1) ) {$/;"	f	class:fastdelegate::FastDelegate1
+operator =	snnlib/util/fast_delegate.h	/^	void operator = (DesiredRetType (*function_to_bind)(Param1 p1, Param2 p2) ) {$/;"	f	class:fastdelegate::FastDelegate2
+operator =	snnlib/util/fast_delegate.h	/^	void operator = (DesiredRetType (*function_to_bind)(Param1 p1, Param2 p2, Param3 p3) ) {$/;"	f	class:fastdelegate::FastDelegate3
+operator =	snnlib/util/fast_delegate.h	/^	void operator = (DesiredRetType (*function_to_bind)(Param1 p1, Param2 p2, Param3 p3, Param4 p4) ) {$/;"	f	class:fastdelegate::FastDelegate4
+operator =	snnlib/util/fast_delegate.h	/^	void operator = (DesiredRetType (*function_to_bind)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5) ) {$/;"	f	class:fastdelegate::FastDelegate5
+operator =	snnlib/util/fast_delegate.h	/^	void operator = (DesiredRetType (*function_to_bind)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6) ) {$/;"	f	class:fastdelegate::FastDelegate6
+operator =	snnlib/util/fast_delegate.h	/^	void operator = (DesiredRetType (*function_to_bind)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6, Param7 p7) ) {$/;"	f	class:fastdelegate::FastDelegate7
+operator =	snnlib/util/fast_delegate.h	/^	void operator = (DesiredRetType (*function_to_bind)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6, Param7 p7, Param8 p8) ) {$/;"	f	class:fastdelegate::FastDelegate8
+operator =	snnlib/util/fast_delegate.h	/^	void operator = (const FastDelegate0 &x)  {$/;"	f	class:fastdelegate::FastDelegate0
+operator =	snnlib/util/fast_delegate.h	/^	void operator = (const FastDelegate1 &x)  {$/;"	f	class:fastdelegate::FastDelegate1
+operator =	snnlib/util/fast_delegate.h	/^	void operator = (const FastDelegate2 &x)  {$/;"	f	class:fastdelegate::FastDelegate2
+operator =	snnlib/util/fast_delegate.h	/^	void operator = (const FastDelegate3 &x)  {$/;"	f	class:fastdelegate::FastDelegate3
+operator =	snnlib/util/fast_delegate.h	/^	void operator = (const FastDelegate4 &x)  {$/;"	f	class:fastdelegate::FastDelegate4
+operator =	snnlib/util/fast_delegate.h	/^	void operator = (const FastDelegate5 &x)  {$/;"	f	class:fastdelegate::FastDelegate5
+operator =	snnlib/util/fast_delegate.h	/^	void operator = (const FastDelegate6 &x)  {$/;"	f	class:fastdelegate::FastDelegate6
+operator =	snnlib/util/fast_delegate.h	/^	void operator = (const FastDelegate7 &x)  {$/;"	f	class:fastdelegate::FastDelegate7
+operator =	snnlib/util/fast_delegate.h	/^	void operator = (const FastDelegate8 &x)  {$/;"	f	class:fastdelegate::FastDelegate8
+operator =	snnlib/util/fast_delegate.h	/^  void operator = (const BaseType &x)  {	  $/;"	f	class:fastdelegate::FastDelegate
+operator ==	snnlib/util/fast_delegate.h	/^	bool operator ==(const FastDelegate0 &x) const {$/;"	f	class:fastdelegate::FastDelegate0
+operator ==	snnlib/util/fast_delegate.h	/^	bool operator ==(const FastDelegate1 &x) const {$/;"	f	class:fastdelegate::FastDelegate1
+operator ==	snnlib/util/fast_delegate.h	/^	bool operator ==(const FastDelegate2 &x) const {$/;"	f	class:fastdelegate::FastDelegate2
+operator ==	snnlib/util/fast_delegate.h	/^	bool operator ==(const FastDelegate3 &x) const {$/;"	f	class:fastdelegate::FastDelegate3
+operator ==	snnlib/util/fast_delegate.h	/^	bool operator ==(const FastDelegate4 &x) const {$/;"	f	class:fastdelegate::FastDelegate4
+operator ==	snnlib/util/fast_delegate.h	/^	bool operator ==(const FastDelegate5 &x) const {$/;"	f	class:fastdelegate::FastDelegate5
+operator ==	snnlib/util/fast_delegate.h	/^	bool operator ==(const FastDelegate6 &x) const {$/;"	f	class:fastdelegate::FastDelegate6
+operator ==	snnlib/util/fast_delegate.h	/^	bool operator ==(const FastDelegate7 &x) const {$/;"	f	class:fastdelegate::FastDelegate7
+operator ==	snnlib/util/fast_delegate.h	/^	bool operator ==(const FastDelegate8 &x) const {$/;"	f	class:fastdelegate::FastDelegate8
+operator ==	snnlib/util/fast_delegate.h	/^	inline bool operator==(StaticFunctionPtr funcptr) {$/;"	f	class:fastdelegate::FastDelegate0
+operator ==	snnlib/util/fast_delegate.h	/^	inline bool operator==(StaticFunctionPtr funcptr) {$/;"	f	class:fastdelegate::FastDelegate1
+operator ==	snnlib/util/fast_delegate.h	/^	inline bool operator==(StaticFunctionPtr funcptr) {$/;"	f	class:fastdelegate::FastDelegate2
+operator ==	snnlib/util/fast_delegate.h	/^	inline bool operator==(StaticFunctionPtr funcptr) {$/;"	f	class:fastdelegate::FastDelegate3
+operator ==	snnlib/util/fast_delegate.h	/^	inline bool operator==(StaticFunctionPtr funcptr) {$/;"	f	class:fastdelegate::FastDelegate4
+operator ==	snnlib/util/fast_delegate.h	/^	inline bool operator==(StaticFunctionPtr funcptr) {$/;"	f	class:fastdelegate::FastDelegate5
+operator ==	snnlib/util/fast_delegate.h	/^	inline bool operator==(StaticFunctionPtr funcptr) {$/;"	f	class:fastdelegate::FastDelegate6
+operator ==	snnlib/util/fast_delegate.h	/^	inline bool operator==(StaticFunctionPtr funcptr) {$/;"	f	class:fastdelegate::FastDelegate7
+operator ==	snnlib/util/fast_delegate.h	/^	inline bool operator==(StaticFunctionPtr funcptr) {$/;"	f	class:fastdelegate::FastDelegate8
+operator >	snnlib/util/fast_delegate.h	/^	bool operator >(const FastDelegate0 &x) const {$/;"	f	class:fastdelegate::FastDelegate0
+operator >	snnlib/util/fast_delegate.h	/^	bool operator >(const FastDelegate1 &x) const {$/;"	f	class:fastdelegate::FastDelegate1
+operator >	snnlib/util/fast_delegate.h	/^	bool operator >(const FastDelegate2 &x) const {$/;"	f	class:fastdelegate::FastDelegate2
+operator >	snnlib/util/fast_delegate.h	/^	bool operator >(const FastDelegate3 &x) const {$/;"	f	class:fastdelegate::FastDelegate3
+operator >	snnlib/util/fast_delegate.h	/^	bool operator >(const FastDelegate4 &x) const {$/;"	f	class:fastdelegate::FastDelegate4
+operator >	snnlib/util/fast_delegate.h	/^	bool operator >(const FastDelegate5 &x) const {$/;"	f	class:fastdelegate::FastDelegate5
+operator >	snnlib/util/fast_delegate.h	/^	bool operator >(const FastDelegate6 &x) const {$/;"	f	class:fastdelegate::FastDelegate6
+operator >	snnlib/util/fast_delegate.h	/^	bool operator >(const FastDelegate7 &x) const {$/;"	f	class:fastdelegate::FastDelegate7
+operator >	snnlib/util/fast_delegate.h	/^	bool operator >(const FastDelegate8 &x) const {$/;"	f	class:fastdelegate::FastDelegate8
+operator >	snnlib/util/fast_delegate.h	/^	inline bool operator >(const DelegateMemento &right) {$/;"	f	class:fastdelegate::DelegateMemento
+operator unspecified_bool_type	snnlib/util/fast_delegate.h	/^	operator unspecified_bool_type() const {$/;"	f	class:fastdelegate::FastDelegate0
+operator unspecified_bool_type	snnlib/util/fast_delegate.h	/^	operator unspecified_bool_type() const {$/;"	f	class:fastdelegate::FastDelegate1
+operator unspecified_bool_type	snnlib/util/fast_delegate.h	/^	operator unspecified_bool_type() const {$/;"	f	class:fastdelegate::FastDelegate2
+operator unspecified_bool_type	snnlib/util/fast_delegate.h	/^	operator unspecified_bool_type() const {$/;"	f	class:fastdelegate::FastDelegate3
+operator unspecified_bool_type	snnlib/util/fast_delegate.h	/^	operator unspecified_bool_type() const {$/;"	f	class:fastdelegate::FastDelegate4
+operator unspecified_bool_type	snnlib/util/fast_delegate.h	/^	operator unspecified_bool_type() const {$/;"	f	class:fastdelegate::FastDelegate5
+operator unspecified_bool_type	snnlib/util/fast_delegate.h	/^	operator unspecified_bool_type() const {$/;"	f	class:fastdelegate::FastDelegate6
+operator unspecified_bool_type	snnlib/util/fast_delegate.h	/^	operator unspecified_bool_type() const {$/;"	f	class:fastdelegate::FastDelegate7
+operator unspecified_bool_type	snnlib/util/fast_delegate.h	/^	operator unspecified_bool_type() const {$/;"	f	class:fastdelegate::FastDelegate8
+out	snnlib/util/fast_delegate.h	/^	OutputClass out;$/;"	m	union:fastdelegate::detail::horrible_union
+type	snnlib/util/fast_delegate.h	/^	typedef FastDelegate0 type;$/;"	t	class:fastdelegate::FastDelegate0
+type	snnlib/util/fast_delegate.h	/^	typedef FastDelegate1 type;$/;"	t	class:fastdelegate::FastDelegate1
+type	snnlib/util/fast_delegate.h	/^	typedef FastDelegate2 type;$/;"	t	class:fastdelegate::FastDelegate2
+type	snnlib/util/fast_delegate.h	/^	typedef FastDelegate3 type;$/;"	t	class:fastdelegate::FastDelegate3
+type	snnlib/util/fast_delegate.h	/^	typedef FastDelegate4 type;$/;"	t	class:fastdelegate::FastDelegate4
+type	snnlib/util/fast_delegate.h	/^	typedef FastDelegate5 type;$/;"	t	class:fastdelegate::FastDelegate5
+type	snnlib/util/fast_delegate.h	/^	typedef FastDelegate6 type;$/;"	t	class:fastdelegate::FastDelegate6
+type	snnlib/util/fast_delegate.h	/^	typedef FastDelegate7 type;$/;"	t	class:fastdelegate::FastDelegate7
+type	snnlib/util/fast_delegate.h	/^	typedef FastDelegate8 type;$/;"	t	class:fastdelegate::FastDelegate8
+type	snnlib/util/fast_delegate.h	/^struct DefaultVoidToVoid { typedef T type; };$/;"	t	struct:fastdelegate::detail::DefaultVoidToVoid
+type	snnlib/util/fast_delegate.h	/^struct DefaultVoidToVoid<DefaultVoid> {	typedef void type; };$/;"	t	struct:fastdelegate::detail::DefaultVoidToVoid
+type	snnlib/util/fast_delegate.h	/^struct VoidToDefaultVoid { typedef T type; };$/;"	t	struct:fastdelegate::detail::VoidToDefaultVoid
+type	snnlib/util/fast_delegate.h	/^struct VoidToDefaultVoid<void> { typedef DefaultVoid type; };$/;"	t	struct:fastdelegate::detail::VoidToDefaultVoid
+unspecified_bool_type	snnlib/util/fast_delegate.h	/^    typedef StaticFunctionPtr SafeBoolStruct::*unspecified_bool_type;$/;"	t	class:fastdelegate::FastDelegate0::SafeBoolStruct
+unspecified_bool_type	snnlib/util/fast_delegate.h	/^    typedef StaticFunctionPtr SafeBoolStruct::*unspecified_bool_type;$/;"	t	class:fastdelegate::FastDelegate1::SafeBoolStruct
+unspecified_bool_type	snnlib/util/fast_delegate.h	/^    typedef StaticFunctionPtr SafeBoolStruct::*unspecified_bool_type;$/;"	t	class:fastdelegate::FastDelegate2::SafeBoolStruct
+unspecified_bool_type	snnlib/util/fast_delegate.h	/^    typedef StaticFunctionPtr SafeBoolStruct::*unspecified_bool_type;$/;"	t	class:fastdelegate::FastDelegate3::SafeBoolStruct
+unspecified_bool_type	snnlib/util/fast_delegate.h	/^    typedef StaticFunctionPtr SafeBoolStruct::*unspecified_bool_type;$/;"	t	class:fastdelegate::FastDelegate4::SafeBoolStruct
+unspecified_bool_type	snnlib/util/fast_delegate.h	/^    typedef StaticFunctionPtr SafeBoolStruct::*unspecified_bool_type;$/;"	t	class:fastdelegate::FastDelegate5::SafeBoolStruct
+unspecified_bool_type	snnlib/util/fast_delegate.h	/^    typedef StaticFunctionPtr SafeBoolStruct::*unspecified_bool_type;$/;"	t	class:fastdelegate::FastDelegate6::SafeBoolStruct
+unspecified_bool_type	snnlib/util/fast_delegate.h	/^    typedef StaticFunctionPtr SafeBoolStruct::*unspecified_bool_type;$/;"	t	class:fastdelegate::FastDelegate7::SafeBoolStruct
+unspecified_bool_type	snnlib/util/fast_delegate.h	/^    typedef StaticFunctionPtr SafeBoolStruct::*unspecified_bool_type;$/;"	t	class:fastdelegate::FastDelegate8::SafeBoolStruct
+vtable_index	snnlib/util/fast_delegate.h	/^	int vtable_index; \/\/ or 0 if no virtual inheritance$/;"	m	struct:fastdelegate::detail::MicrosoftVirtualMFP
+FASTDELEGATEBIND_H	snnlib/util/fast_delegate_bind.h	19;"	d
+fastdelegate	snnlib/util/fast_delegate_bind.h	/^namespace fastdelegate {$/;"	n
+y	snnlib/util/fast_delegate_bind.h	/^    Y * y,$/;"	m	namespace:fastdelegate
 Array	snnlib/util/json/array.cpp	/^	Array::Array(const Array &other) : data(other.data) {$/;"	f	class:JsonBox::Array
 Array	snnlib/util/json/array.cpp	/^	Array::Array(const allocator_type &alloc) : data(alloc) {$/;"	f	class:JsonBox::Array
 Array	snnlib/util/json/array.cpp	/^	Array::Array(size_type count, const_reference value, const allocator_type &alloc) : data(count, value, alloc) {$/;"	f	class:JsonBox::Array

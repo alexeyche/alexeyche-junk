@@ -25,7 +25,7 @@ public:
             ifs = new ifstream(f, ios::in | ios::binary);
             if(!ifs->is_open()) {
                 cerr << "Failed to open file " << f << " for read\n";
-                terminate(); 
+                terminate();
             }
             zeroIn = new IstreamInputStream(ifs);
             codedIn = new CodedInputStream(zeroIn);

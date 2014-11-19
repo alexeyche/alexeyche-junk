@@ -17,6 +17,7 @@ set(SOURCES
     matrix.h
     util.h
     util.cpp
+    spikes_list.cpp
 )
 
 # add directory name to sources

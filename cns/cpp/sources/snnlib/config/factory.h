@@ -28,9 +28,9 @@ public:
     template<typename BASE,typename INST> static BASE* createInstance() { return new INST; }
     ConstObj *createConst(string name, JsonBox::Value v);
     ActFunc *createActFunc(string name, const Constants &c, Neuron *n);
-    Synapse *createSynapse(string name, const Constants &c, size_t id_pre, double w);
+    Synapse *createSynapse(string name, const Constants &c, size_t id_pre, double w, double dendrite_delay);
     Layer *createLayer(size_t size, const NeuronConf &nc, const Constants &glob_c);
-    Neuron *createNeuron(string name, const Constants &c);
+    Neuron *createNeuron(string name, const Constants &c, double axon_delay);
     TuningCurve *createTuningCurve(string name, const Constants &c, Neuron *n);
     LearningRule * createLearningRule(string name, const Constants &c, Neuron *n);
 

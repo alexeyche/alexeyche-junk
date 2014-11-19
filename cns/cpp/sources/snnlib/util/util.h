@@ -15,6 +15,8 @@ void trim(string &str);
 double getUnif();
 double getUnifBetween(double low, double high);
 double getExp(double rate);
+
+double sampleDelay(double gain, double rate);
 double getNorm();
 
 

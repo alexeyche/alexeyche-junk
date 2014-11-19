@@ -2,6 +2,8 @@
 
 #include <snnlib/protos/spikes_list.pb.h>
 
+#include <snnlib/serialize/serialize.h>
+
 class SpikesList: public Serializable {
 public:
     SpikesList() : Serializable(ESpikesList), sp_list(nullptr) {}
@@ -46,6 +48,9 @@ public:
         sp_list = new vector<double>[N];
     }
     vector<double>& operator[](size_t ni) {
+        return sp_list[ni];
+    }
+    const vector<double>& operator[](size_t ni) const {
         return sp_list[ni];
     }
     void print(std::ostream& str) const {

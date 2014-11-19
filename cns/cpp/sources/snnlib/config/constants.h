@@ -192,15 +192,21 @@ public:
     string act_func;
     string tuning_curve;
     string learning_rule;
+    double axon_delay_gain;
+    double axon_delay_rate;
 
     void fill_structure(JsonBox::Value v) {
         act_func = v["act_func"].getString();
         tuning_curve = v["tuning_curve"].getString();
         learning_rule = v["learning_rule"].getString();
         neuron = v["neuron"].getString();
+        JsonBox::Array a = v["axon_delay_distr"].getArray();
+        axon_delay_gain = a[0].getDouble();
+        axon_delay_rate = a[1].getDouble();
     }
     void print(std::ostream &str) const {
-        str << "NeuronConf(" << "learning_rule: "  << learning_rule << ", tuning_curve : " << tuning_curve <<  ", act_func: " << act_func << ")";
+        str << "NeuronConf(" << "learning_rule: "  << learning_rule << ", tuning_curve : " << tuning_curve <<  ", act_func: " << act_func <<
+            ", axon_delay_gain: " << axon_delay_gain  << ", axon_delay_rate: " << axon_delay_rate << ")";
     }
 };
 
@@ -225,14 +231,23 @@ public:
     double prob;
     double weight;
     string type;
+    double dendrite_delay_gain;
+    double dendrite_delay_rate;
+
 
     void fill_structure(JsonBox::Value v) {
         prob = v["prob"].getDouble();
         type = v["type"].getString();
         weight = v["weight"].getDouble();
+        JsonBox::Array ad = v["dendrite_delay_distr"].getArray();
+        dendrite_delay_gain = ad[0].getDouble();
+        dendrite_delay_rate = ad[1].getDouble();
     }
+
     void print(std::ostream &str) const {
-        str << "ConnectionConf(" << "prob: " << prob << ", weight: " << weight << ", type: " << type << ")";
+        str << "ConnectionConf(" << "prob: " << prob << ", weight: " << weight << ", type: " <<   type <<
+            ", dendrite_delay_gain: " << dendrite_delay_gain  << ", dendrite_delay_rate: " << dendrite_delay_rate << ")";
+
     }
 };
 
@@ -257,7 +272,7 @@ public:
     ConnectionMap conn_map;
     TimeSeriesMapConf ts_map_conf;
     vector<size_t> neurons_to_listen;
-    
+
     void fill_structure(JsonBox::Value v) {
         auto a_input_sizes = v["input_layers_conf"].getArray();
         for(auto it=a_input_sizes.begin(); it!=a_input_sizes.end(); ++it) {
@@ -343,7 +358,7 @@ public:
     SimConfiguration sim_conf;
 
     static string blank_prefix;
-    
+
     const ConstObj *operator[](const string &key) const {
         if(globals.count(key)) return globals.at(key);
         if(neurons.count(key)) return neurons.at(key);
@@ -352,7 +367,7 @@ public:
         if(synapses.count(key)) return synapses.at(key);
         if(act_funcs.count(key)) return act_funcs.at(key);
         if(learning_rules.count(key)) return learning_rules.at(key);
-        
+
         if(key.substr(0, blank_prefix.size()) == blank_prefix) { // starts with Blank -- ignore
             return nullptr;
         }

@@ -79,27 +79,27 @@ LearningRule * Factory::createLearningRule(string name, const Constants &c, Neur
     return o;
 }
 
-Synapse *Factory::createSynapse(string name, const Constants &c, size_t id_pre, double w) {
+Synapse *Factory::createSynapse(string name, const Constants &c, size_t id_pre, double w, double dendrite_delay) {
     GET_BASE_NAME(entity_map)
     Synapse *o = dynamic_cast<Synapse*>(entity_map[base_struct_name]());
     if(!o) { cerr << "Error while reading " << name << " and treating like Synapse\n"; terminate(); }
-    o->init(c[name], id_pre, w);
+    o->init(c[name], id_pre, w, dendrite_delay);
     objects.push_back(o);
     return o;
 }
 
-Neuron *Factory::createNeuron(string name, const Constants &c) {
+Neuron *Factory::createNeuron(string name, const Constants &c, double axon_delay) {
     GET_BASE_NAME(entity_map)
     Neuron *o = dynamic_cast<Neuron*>(entity_map[base_struct_name]());
     if(!o) { cerr << "Error while reading " << name << " and treating like Neuron\n"; terminate(); }
-    o->init(c[name]);
+    o->init(c[name], axon_delay);
     vector<string> dep_c = o->getDependentConstantsNames();
     if(dep_c.size()>0) {
         vector<const ConstObj *> provided_constants;
         for(auto it=dep_c.begin(); it != dep_c.end(); ++it) {
-            provided_constants.push_back( c[*it] );                
+            provided_constants.push_back( c[*it] );
         }
-        o->setDependentConstants(provided_constants); 
+        o->setDependentConstants(provided_constants);
     }
     objects.push_back(o);
     return o;

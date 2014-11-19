@@ -46,6 +46,7 @@ public:
             cerr << mess->DebugString();
             terminate();
         }
+        return d;
     }
 
     Serializable(const Serializable &another) {
