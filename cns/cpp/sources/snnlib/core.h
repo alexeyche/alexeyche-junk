@@ -15,6 +15,21 @@
 #include <list>
 #include <queue>
 
-using namespace std;
+using std::string;
+using std::vector;
+using std::priority_queue;
+using std::ostream;
+using std::map;
+using std::unique_ptr;
+using std::shared_ptr;
+using std::deque;
+using std::ostream_iterator;
+using std::cout;
+using std::cerr;
+using std::terminate;
+using std::stringstream;
+using std::ifstream;
+using std::ofstream;
+using std::ios;
 
 typedef unsigned char uchar;

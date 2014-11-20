@@ -1,8 +1,6 @@
 
 #include "mod.h"
 
-#include "RConstants.h"
-#include "RSim.h"
 
 RCPP_MODULE(snnMod) {
     Rcpp::class_<RSim>("RSim")
@@ -11,5 +9,10 @@ RCPP_MODULE(snnMod) {
     Rcpp::class_<RConstants>("RConstants")
     .constructor<std::string>()
     .method("print", &RConstants::print, "Print constants")
+    ;
+    Rcpp::class_<RProto>("RProto")
+    .constructor<std::string>()
+    .method("read", &RProto::read, "Reading protobuf")
+    .method("print", &RProto::print, "Print proto instance")
     ;
 }

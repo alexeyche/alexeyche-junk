@@ -1,12 +1,14 @@
 #ifndef RSIM_H
 #define RSIM_H
 
-#include <Rcpp.h>
 
+#include <snnlib/sim/sim.h>
+
+#define STRICT_R_HEADERS
+#include <Rcpp.h>
 
 #include "RConstants.h"
 
-#include <snnlib/sim/sim.h>
 
 
 class RSim : public Sim {

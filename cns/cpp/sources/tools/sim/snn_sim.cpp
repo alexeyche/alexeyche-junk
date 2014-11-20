@@ -77,7 +77,9 @@ SnnSimOpts parseOptions(option::Option* options, option::Stats &stats,  int argc
     if(options[ARG_JOBS].count()>0) {
         sopt.jobs = atoi(options[ARG_JOBS].arg);
     }
-    sopt.out_stat_file = options[ARG_OUT_STAT].arg;
+    if(options[ARG_OUT_STAT].count()>0) {
+        sopt.out_stat_file = options[ARG_OUT_STAT].arg;
+    }
     return sopt;
 }
 

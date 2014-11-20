@@ -3,6 +3,7 @@
 
 #include <snnlib/config/constants.h>
 
+#define STRICT_R_HEADERS
 #include <Rcpp.h>
 
 
@@ -13,6 +14,7 @@ public:
     RConstants(std::string _const_filename) : Constants(_const_filename) { 
     }
     void print() {
+        cout << *this;
     }
 };
 
