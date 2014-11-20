@@ -36,3 +36,5 @@ target_link_libraries(snn_sim
 install(TARGETS snn_sim  DESTINATION lib/ COMPONENT)
 install(DIRECTORY ../snnlib DESTINATION include
     FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp")
+install(DIRECTORY ${CMAKE_BINARY_DIR}/snnlib/protos DESTINATION include/snnlib
+    FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp")
