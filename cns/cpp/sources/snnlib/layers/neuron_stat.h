@@ -9,12 +9,12 @@ class Neuron;
 class NeuronStat : public Serializable {
 protected:
     NeuronStat() : Serializable(ENeuronStat) { }
-    friend class SerializableFactory;    
-public:    
+    friend class SerializableFactory;
+public:
     NeuronStat(Neuron *n);
-    
 
-    
+
+
     void collect(Neuron *n);
 
     NeuronStat(const NeuronStat &another) : Serializable(ENeuronStat), syns(another.syns), p(another.p), u(another.u) {
@@ -23,13 +23,34 @@ public:
     virtual Protos::NeuronStat *serialize();
 
     virtual void deserialize() {
-        cerr << "Why you need that?\n";
-        terminate();
+        Protos::NeuronStat * m = castSerializableType<Protos::NeuronStat>(serialized_message);
+        for(size_t i=0; m->p_size(); i++) {
+            cout << i;
+            p.push_back(m->p(i));
+        }
+        cout << "\n";
+        for(size_t i=0; m->u_size(); i++) {
+            cout << i;
+            u.push_back(m->u(i));
+        }
+        cout << "\n";
+        for(size_t i=0; m->syns_size(); i++) {
+            cout << i;
+            Protos::SynStat syn_m = m->syns(i);
+
+            vector<double> x_v;
+            for(size_t j=0; syn_m.x_size(); j++) {
+                cout << j;
+                x_v.push_back(syn_m.x(j));
+            }
+
+            syns.push_back(x_v);
+        }
     }
     virtual Protos::NeuronStat* getNew(google::protobuf::Message* m = nullptr) {
         return getNewSerializedMessage<Protos::NeuronStat>(m);
     }
-    
+
     void print(std::ostream& str) const {
     }
 

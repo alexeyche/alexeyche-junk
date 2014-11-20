@@ -24,8 +24,13 @@ public:
     AdExNeuronStat(const AdExNeuronStat &another);
     virtual Protos::AdExNeuronStat *serialize();
     virtual void deserialize() {
-        cerr << "Why you need that?\n";
-        terminate();
+        Protos::AdExNeuronStat * m = castSerializableType<Protos::AdExNeuronStat>(serialized_message);
+        for(size_t i=0; m->a_size(); i++) {
+            a.push_back(m->a(i));
+        }
+        ns->setSerializedMessage(m->mutable_stat());
+        ns->deserialize();
+        ns->cleanRaw();
     }
     virtual Protos::AdExNeuronStat* getNew(google::protobuf::Message* m = nullptr) {
         return getNewSerializedMessage<Protos::AdExNeuronStat>(m);

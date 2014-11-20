@@ -24,13 +24,14 @@ public:
             vector<Serializable*> v;
             v.push_back(o);
             
-            while(true) {
-                Serializable *o = rw.readAny();
-                if(!o) break;
-                cout << "reading " << o->getName() << "\n";
-                v.push_back(o);
-            }
+            //while(true) {
+            //    Serializable *o = rw.readAny();
+            //    if(!o) break;
+            //    cout << "reading " << o->getName() << "\n";
+            //    v.push_back(o);
+            //}
             if(v.size() == 1) {
+                cout << v[0]->DebugString();
                 values = convert(v[0]);
             } else {
                 Rcpp::List read_values(v.size());

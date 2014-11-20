@@ -87,6 +87,11 @@ public:
             serialized_message = nullptr;
         }
     }
+    void cleanRaw() {
+        if(serialized_message) {
+            serialized_message = nullptr;
+        }
+    }
 
     ~Serializable() {
         clean();
@@ -94,6 +99,9 @@ public:
 
     const string& getName() {
         return name;
+    }
+    void setSerializedMessage(google::protobuf::Message *_serialized_message) {
+        serialized_message = _serialized_message;
     }
 
 protected:
