@@ -2,7 +2,7 @@
 
 #include <snnlib/util/spikes_list.h>
 
-typedef priority_queue<SynSpike, vector<SynSpike>, CompareSynSpike> SpikeQueue;
+typedef priority_queue<shared_ptr<SynSpike>, vector<shared_ptr<SynSpike>>, CompareSynSpike> SpikeQueue;
 
 
 class Sim;
@@ -31,6 +31,17 @@ public:
 	void configureConnMap(const Sim *s);
 	void propagateSpike(const size_t &global_id, const double &t);
 	void dispathSpikes(const SpikesList &sl);
+	
+	inline const SynSpike* getSpike(const size_t& global_id, const double &t) {
+		if(!net_queues[global_id].empty()) {
+			if(net_queues[global_id].top()->t <= t) {
+				const SynSpike* sp = net_queues[global_id].top().get();
+				net_queues[global_id].pop();
+				return sp;
+			}
+		}
+		return nullptr;
+	}
 
 	~Network() {
 		if(conn_map) delete []conn_map;
@@ -49,7 +60,7 @@ public:
 			SpikeQueue net_queue_copy(net_queues[i]);
 			str << "queue of " << i << ": ";
 			for(size_t el_i=0; el_i < net_queue_copy.size(); el_i++) {
-				str << net_queue_copy.top() << ", ";
+				str << *net_queue_copy.top() << ", ";
 				net_queue_copy.pop();
 			}
 			str << "\n";

@@ -28,5 +28,10 @@ print(p1)
 
 if(file.exists(stat_file)) {
     stat = RProto$new(stat_file)$read()
+    nst = stat[[1]]
+    par(mfrow=c(2,1))
     
+    plot(nst[["u"]][1:1000], type="l")
+    plot(nst[["p"]][1:1000], type="l")
 }
+

@@ -93,7 +93,7 @@ int main(int argc, char **argv) {
     Constants c = Constants(sopt.const_file);
     cout << c;
 
-    Sim s(c);
+    Sim s(c, sopt.jobs);
 
 
     s.setOutputSpikesFile(sopt.out_spikes);
@@ -105,9 +105,9 @@ int main(int argc, char **argv) {
     if(!sopt.out_stat_file.empty()) {
         s.monitorStat(sopt.out_stat_file);
     }
-
+    
     s.run();
-    cout << s;
+//    cout << s;
 
 
     delete[] options;

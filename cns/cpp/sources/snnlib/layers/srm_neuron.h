@@ -11,25 +11,25 @@ protected:
     SRMNeuron() { }
     friend class Factory;
 public:
-    SRMNeuron(const ConstObj *_c) {
-        init(_c);
+    SRMNeuron(const ConstObj *_c, const RuntimeGlobals *_glob_c, double _axon_delay) {
+        init(_c, _glob_c, _axon_delay);
     }
-    void init(const ConstObj *_c) {
-        Neuron::init(_c);
-        CAST_TYPE(SRMNeuronC, bc)
+    void init(const ConstObj *_c, const RuntimeGlobals *_glob_c, double _axon_delay) {
+        Neuron::init(_c, _glob_c, _axon_delay);
+        CAST_TYPE(SRMNeuronC, bc);
         c = cast;
 
     }
 
-    void propagateSynSpike(const SynSpike &sp) {
-        if( fabs(syns[sp.syn_id]->x) < SYN_ACT_TOL ) {
-            active_synapses.push_back(syns[sp.syn_id]);
+    void propagateSynSpike(const SynSpike *sp) {
+        if( fabs(syns[sp->syn_id]->x) < SYN_ACT_TOL ) {
+            active_synapses.push_back(syns[sp->syn_id]);
         }
-        syns[sp.syn_id]->propagateSpike();
+        syns[sp->syn_id]->propagateSpike();
     }
 
     void calculateProbability() {
-        y = c->u_rest + y;
+        y = c->u_rest;
         for(auto it=active_synapses.begin(); it != active_synapses.end(); ++it) {
             Synapse *s = *it;
             y += s->w * s->x;
@@ -47,7 +47,6 @@ public:
     void calculateDynamics() {
         if(p > getUnif()) {
             fired = 1;
-            cout << "Neuron " << id << " got a spike\n";
         }
 
         auto it=active_synapses.begin();

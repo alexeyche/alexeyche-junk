@@ -1,14 +1,16 @@
 
 #include "sim.h"
 
+#include <pthread.h>
+
 #include <snnlib/config/factory.h>
 #include <snnlib/layers/srm_neuron.h>
 
-Sim::Sim(const Constants &c) : sc(c.sim_conf) {
+Sim::Sim(const Constants &c, size_t _jobs) : jobs(_jobs), sc(c.sim_conf) {
     input_neurons_count = 0;
     for(size_t l_id = 0; l_id < sc.input_layers_conf.size(); l_id++) {
         LayerConf conf = sc.input_layers_conf[l_id];
-        Layer *l = Factory::inst().createLayer(conf.size, conf.nconf, c);
+        Layer *l = Factory::inst().createLayer(conf.size, conf.nconf, c, &rg);
         layers.push_back(l);
         input_neurons_count += l->N;
     }
@@ -18,7 +20,7 @@ Sim::Sim(const Constants &c) : sc(c.sim_conf) {
     net_neurons_count = 0;
     for(size_t l_id = 0; l_id < sc.net_layers_conf.size(); l_id++) {
         LayerConf conf = sc.net_layers_conf[l_id];
-        Layer *l = Factory::inst().createLayer(conf.size, conf.nconf, c);
+        Layer *l = Factory::inst().createLayer(conf.size, conf.nconf, c, &rg);
         layers.push_back(l);
         net_neurons_count += l->N;
     }
@@ -64,7 +66,9 @@ void Sim::precalculateInputLayerSpikes() {
         cerr << "Need set input time series to precalculate spikes\n";
         terminate();
     }
-    for(double t=0; t<=input_ts.Tmax; t += sc.ts_map_conf.dt) {
+    
+    rg.setDt(sc.ts_map_conf.dt);
+    for(double t=0; t<=input_ts.Tmax; t += rg.Dt()) {
         const double &x = input_ts.pop_value();
 
         for(size_t li=0; li<input_layers_count; li++) {
@@ -82,4 +86,63 @@ void Sim::precalculateInputLayerSpikes() {
             }
         }
     }
+}
+
+pthread_barrier_t barrier;
+
+void* Sim::runWorker(void *context) {
+    Sim::SimWorker *sw = static_cast<Sim::SimWorker*>(context);
+    Sim *s = sw->s;
+
+    for(double t=0; t<=sw->s->input_ts.Tmax; t += s->rg.Dt()) {
+        for(size_t li=s->input_layers_count; li<s->layers.size(); li++) {
+            Layer *l = s->layers[li];
+            for(size_t ni=sw->first; ni<sw->last; ni++) {
+                while(const SynSpike* sp = s->net.getSpike(l->neurons[ni]->id, t)) {
+                    l->neurons[ni]->propagateSynSpike(sp);
+                }
+                
+                l->neurons[ni]->calculateProbability();
+                l->neurons[ni]->calculateDynamics();
+
+                if(l->neurons[ni]->fired) {
+                    s->net.propagateSpike(l->neurons[ni]->id, t);
+                    l->neurons[ni]->fired = 0;
+                }
+            }
+        }
+    }
+}
+
+void Sim::run() {
+    precalculateInputLayerSpikes();
+    net.dispathSpikes(net.spikes_list);
+    rg.setDt(sc.sim_run_c.dt);
+    
+    size_t num_neurons = net_neurons_count;
+
+    if(num_neurons < jobs) {
+        jobs = num_neurons;
+    }
+    pthread_t *threads = new pthread_t[jobs];
+    Sim::SimWorker *workers = new Sim::SimWorker[jobs];
+
+    for(size_t ti=0; ti < jobs; ti++) {
+        workers[ti].thread_id = ti;
+        workers[ti].s = this;
+        int neuron_per_thread = (num_neurons + jobs - 1) / jobs;
+        workers[ti].first = min( ti    * neuron_per_thread, num_neurons );
+        workers[ti].last  = min( (ti+1) * neuron_per_thread, num_neurons );
+    }
+
+    pthread_attr_t attr;
+    P( pthread_attr_init( &attr ) );
+    P( pthread_barrier_init( &barrier, NULL, jobs ) );
+    for( int i = 1; i < jobs; i++ )  {
+        P( pthread_create( &threads[i], &attr, &Sim::runWorker, &workers[i]) );
+    }
+    runWorker(&workers[0]);
+
+    delete []workers;
+    delete []threads;
 }

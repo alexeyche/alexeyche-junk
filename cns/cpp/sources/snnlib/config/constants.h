@@ -12,17 +12,6 @@ public:
 };
 
 
-class GlobalC: public ConstObj {
-public:
-    double dt;
-
-    void fill_structure(JsonBox::Value v) {
-        dt = v["dt"].getDouble();
-    }
-    void print(std::ostream &str) const {
-        str << "dt: " << dt << "\n";
-    }
-};
 
 
 class SRMNeuronC: public ConstObj {
@@ -205,7 +194,7 @@ public:
         axon_delay_rate = a[1].getDouble();
     }
     void print(std::ostream &str) const {
-        str << "NeuronConf(" << "learning_rule: "  << learning_rule << ", tuning_curve : " << tuning_curve <<  ", act_func: " << act_func <<
+        str << "NeuronConf(neuron: " << neuron << ", learning_rule: "  << learning_rule << ", tuning_curve : " << tuning_curve <<  ", act_func: " << act_func <<
             ", axon_delay_gain: " << axon_delay_gain  << ", axon_delay_rate: " << axon_delay_rate << ")";
     }
 };
@@ -261,6 +250,19 @@ public:
         dt = v["dt"].getDouble();
     }
 };
+class SimRunConf: public ConstObj {
+public:
+    double dt;
+
+    void fill_structure(JsonBox::Value v) {
+        dt = v["dt"].getDouble();
+    }
+    void print(std::ostream &str) const {
+        str << "dt: " << dt << "\n";
+    }
+};
+
+
 
 typedef map< pair<size_t, size_t>, vector<ConnectionConf> > ConnectionMap;
 
@@ -272,6 +274,7 @@ public:
     ConnectionMap conn_map;
     TimeSeriesMapConf ts_map_conf;
     vector<size_t> neurons_to_listen;
+    SimRunConf sim_run_c;
 
     void fill_structure(JsonBox::Value v) {
         auto a_input_sizes = v["input_layers_conf"].getArray();
@@ -321,6 +324,7 @@ public:
         for(auto it=a.begin(); it!=a.end(); ++it) {
             neurons_to_listen.push_back(it->getInt());
         }
+        sim_run_c.fill_structure(v["sim_run_conf"]);
     }
 
 
@@ -333,6 +337,7 @@ public:
             print_vector<ConnectionConf>(it->second, str, "\n");
         }
         str << "time_series_map_conf: " << ts_map_conf << "\n";
+        str << "sim_run_conf: " << sim_run_c << "\n";
         str << "neurons_to_listen: "; print_vector<size_t>(neurons_to_listen, str, ","); str << "\n";
     }
 };

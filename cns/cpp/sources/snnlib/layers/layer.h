@@ -19,32 +19,31 @@ protected:
     Layer() {}
     friend class Factory;
 public:
-    Layer(size_t _size, const NeuronConf &nc, const Constants &glob_c) {
-        init(_size, nc, glob_c);
+    Layer(size_t _size, const NeuronConf &nc, const Constants &c, const RuntimeGlobals *run_glob_c) {
+        init(_size, nc, c, run_glob_c);
     }
 
-    virtual void init(size_t _size, const NeuronConf &nc, const Constants &glob_c) {
+    virtual void init(size_t _size, const NeuronConf &nc, const Constants &c, const RuntimeGlobals *run_glob_c) {
         id = global_layer_index++;
         N = _size;
         for(size_t ni=0; ni<N; ni++) {
             double axon_delay = sampleDelay(nc.axon_delay_gain, nc.axon_delay_rate);
-            Neuron *n = Factory::inst().createNeuron(nc.neuron, glob_c, axon_delay);
+            Neuron *n = Factory::inst().createNeuron(nc.neuron, c, run_glob_c, axon_delay);
 
-            ActFunc *act = Factory::inst().createActFunc(nc.act_func, glob_c, n);
+            ActFunc *act = Factory::inst().createActFunc(nc.act_func, c, n);
 
             LearningRule *lr;
             if(nc.learning_rule.empty()) {
-                lr = Factory::inst().createLearningRule("BlankLearningRule", glob_c, nullptr);
+                lr = Factory::inst().createLearningRule("BlankLearningRule", c, nullptr);
             } else {
-                lr = Factory::inst().createLearningRule(nc.learning_rule, glob_c, n);
+                lr = Factory::inst().createLearningRule(nc.learning_rule, c, n);
             }
             TuningCurve *tc;
             if(nc.tuning_curve.empty()) {
-                tc = Factory::inst().createTuningCurve("BlankTuningCurve", glob_c, nullptr);
+                tc = Factory::inst().createTuningCurve("BlankTuningCurve", c, nullptr);
             } else {
-                tc = Factory::inst().createTuningCurve(nc.tuning_curve, glob_c, n);
+                tc = Factory::inst().createTuningCurve(nc.tuning_curve, c, n);
             }
-
 
             neurons.push_back(n);
         }

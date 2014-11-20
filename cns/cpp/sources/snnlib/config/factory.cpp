@@ -10,7 +10,7 @@
 #include <snnlib/layers/srm_neuron.h>
 #include <snnlib/layers/adex_neuron.h>
 #include <snnlib/layers/neuron.h>
-
+#include <snnlib/sim/runtime_globals.h>
 
 
 Factory& Factory::inst() {
@@ -20,7 +20,6 @@ Factory& Factory::inst() {
 
 
 Factory::Factory() {
-    const_map["Global"]     =   &createInstance<Obj, GlobalC>;
     const_map["SRMNeuron"]     =   &createInstance<Obj, SRMNeuronC>;
     const_map["AdExNeuron"]     =   &createInstance<Obj, AdExNeuronC>;
     const_map["Synapse"]      =   &createInstance<Obj, SynapseC>;
@@ -88,26 +87,26 @@ Synapse *Factory::createSynapse(string name, const Constants &c, size_t id_pre, 
     return o;
 }
 
-Neuron *Factory::createNeuron(string name, const Constants &c, double axon_delay) {
+Neuron *Factory::createNeuron(string name, const Constants &c, const RuntimeGlobals *run_glob_c, double axon_delay) {
     GET_BASE_NAME(entity_map)
     Neuron *o = dynamic_cast<Neuron*>(entity_map[base_struct_name]());
     if(!o) { cerr << "Error while reading " << name << " and treating like Neuron\n"; terminate(); }
-    o->init(c[name], axon_delay);
-    vector<string> dep_c = o->getDependentConstantsNames();
-    if(dep_c.size()>0) {
-        vector<const ConstObj *> provided_constants;
-        for(auto it=dep_c.begin(); it != dep_c.end(); ++it) {
-            provided_constants.push_back( c[*it] );
-        }
-        o->setDependentConstants(provided_constants);
-    }
+    o->init(c[name], run_glob_c, axon_delay);
+    // vector<string> dep_c = o->getDependentConstantsNames();
+    // if(dep_c.size()>0) {
+    //     vector<const ConstObj *> provided_constants;
+    //     for(auto it=dep_c.begin(); it != dep_c.end(); ++it) {
+    //         provided_constants.push_back( c[*it] );
+    //     }
+    //     o->setDependentConstants(provided_constants);
+    // }
     objects.push_back(o);
     return o;
 }
 
-Layer *Factory::createLayer(size_t size, const NeuronConf &nc, const Constants &c) {
+Layer *Factory::createLayer(size_t size, const NeuronConf &nc, const Constants &c, const RuntimeGlobals *run_glob_c) {
     Layer *o = new Layer();
-    o->init(size, nc, c);
+    o->init(size, nc, c, run_glob_c);
     objects.push_back(o);
     return o;
 }

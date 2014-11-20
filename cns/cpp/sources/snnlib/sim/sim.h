@@ -7,9 +7,22 @@
 
 #include "network.h"
 
+#define P( condition ) {if( (condition) != 0 ) { printf( "\n FAILURE in %s, line %d\n", __FILE__, __LINE__ );exit( 1 );}}
+
+
+typedef NeuronAddress pair<size_t, size_t>;
+
+
 class Sim: public Printable {
 public:
-    Sim(const Constants &c);
+    Sim(const Constants &c, size_t _jobs=1);
+    
+    struct SimWorker {
+        Sim *s;
+        size_t thread_id;
+        int first;
+        int last;
+    };
 
     ~Sim() {
         if(!statistics_file.empty()) {
@@ -65,25 +78,28 @@ public:
         }
     }
     void precalculateInputLayerSpikes();
+   
+    static void* runWorker(void *context);
+    void run();
 
-    void run() {
-        precalculateInputLayerSpikes();
-        net.dispathSpikes(net.spikes_list);
-    }
-
+    size_t jobs;
     Network net;
 
     ContLabeledTimeSeries input_ts;
 
     size_t input_layers_count;
+    
     size_t input_neurons_count;
     size_t net_neurons_count;
 
     vector< Layer *> layers;
+    vector<NeuronAddress> na;
 
     string statistics_file;
     string output_spikes_file;
 
     const SimConfiguration &sc;
+
+    RuntimeGlobals rg;
 };
 

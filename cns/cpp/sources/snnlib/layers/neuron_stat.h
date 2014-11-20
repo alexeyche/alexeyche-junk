@@ -24,26 +24,19 @@ public:
 
     virtual void deserialize() {
         Protos::NeuronStat * m = castSerializableType<Protos::NeuronStat>(serialized_message);
-        for(size_t i=0; m->p_size(); i++) {
-            cout << i;
+        for(size_t i=0; i<m->p_size(); i++) {
             p.push_back(m->p(i));
         }
-        cout << "\n";
-        for(size_t i=0; m->u_size(); i++) {
-            cout << i;
+        for(size_t i=0; i<m->u_size(); i++) {
             u.push_back(m->u(i));
         }
-        cout << "\n";
-        for(size_t i=0; m->syns_size(); i++) {
-            cout << i;
+        for(size_t i=0; i<m->syns_size(); i++) {
             Protos::SynStat syn_m = m->syns(i);
-
+                
             vector<double> x_v;
-            for(size_t j=0; syn_m.x_size(); j++) {
-                cout << j;
+            for(size_t j=0; j<syn_m.x_size(); j++) {
                 x_v.push_back(syn_m.x(j));
             }
-
             syns.push_back(x_v);
         }
     }

@@ -18,5 +18,6 @@ double getExp(double rate);
 
 double sampleDelay(double gain, double rate);
 double getNorm();
-
+string strip_white(const string& input);
+string strip_comments(const string& input, const string& delimiters);
 

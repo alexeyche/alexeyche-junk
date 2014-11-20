@@ -17,9 +17,23 @@
 
 string Constants::blank_prefix = string("Blank");
 
+string preprocessAndReadConstJson(string filename) {
+    string out;
+
+    ifstream f(filename);
+    string line;
+    while(getline(f, line)) {
+        string proc_line = strip_comments(line, "#;//");
+        out += proc_line + "\n";
+    }
+    return out;
+}
+
 Constants::Constants(string filename) {
+    string content = preprocessAndReadConstJson(filename);
+	
     JsonBox::Value v;
-	v.loadFromFile(filename);
+    v.loadFromString(content);
     if(v.isObject()) {
         const JsonBox::Object &o = v.getObject();
         for(auto it = o.begin(); it != o.end(); it++) {

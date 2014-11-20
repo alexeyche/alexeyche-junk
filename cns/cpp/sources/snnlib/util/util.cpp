@@ -73,3 +73,15 @@ double sampleDelay(double gain, double rate) {
     if(gain == 0.0) return 0.0;
     return gain*getExp(rate);
 }
+
+string strip_white(const string& input)
+{
+   size_t b = input.find_first_not_of(' ');
+   if (b == string::npos) b = 0;
+   return input.substr(b, input.find_last_not_of(' ') + 1 - b);
+}
+ 
+string strip_comments(const string& input, const string& delimiters)
+{
+   return strip_white(input.substr(0, input.find_first_of(delimiters)));
+}

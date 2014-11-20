@@ -68,6 +68,11 @@ public:
     virtual void deserialize() = 0;
     virtual ::google::protobuf::Message* getNew(google::protobuf::Message* m = nullptr) = 0;
 
+    void deserializeFromPtr(google::protobuf::Message* m) {
+        serialized_message = m;
+        deserialize();
+        serialized_message = nullptr;
+    }
 
     template <typename T>
     T* getNewSerializedMessage(google::protobuf::Message* m = nullptr) {
@@ -84,11 +89,6 @@ public:
     void clean() {
         if(serialized_message) {
             delete serialized_message;
-            serialized_message = nullptr;
-        }
-    }
-    void cleanRaw() {
-        if(serialized_message) {
             serialized_message = nullptr;
         }
     }

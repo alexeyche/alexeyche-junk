@@ -1,9 +1,4 @@
 {
-    "globals" : {
-        "Global" : {
-            "dt" : 1
-        }
-    },
     "tuning_curves" : {
         "SigmaTuningCurve" : {
             "sigma" : [0.1, 0.1],
@@ -64,7 +59,7 @@
     "sim_configuration" : {
         "input_layers_conf" : [
             {
-                "size" : 10,
+                "size" : 50,
                 "neuron_conf" : {
                     "neuron" : "AdExNeuron",
                     "tuning_curve" : "SigmaTuningCurve",
@@ -75,7 +70,7 @@
         ],
         "net_layers_conf" : [
             {
-                "size" : 5,
+                "size" : 50,
                 "neuron_conf" : {
                     "neuron" : "SRMNeuron",
                     "learning_rule" : "OptimalStdp",
@@ -85,7 +80,7 @@
                 }
             },                    
             {
-                "size" : 5,
+                "size" : 50,
                 "neuron_conf" : {
                     "neuron" : "SRMNeuron",
                     "learning_rule" : "OptimalStdp",
@@ -96,19 +91,22 @@
         ],
         "conn_map" : {
             "0-1" : [
-                { "prob" : 1.0, "weight" : 4.0, "type" : "Synapse", "dendrite_delay_distr" : [0, 0] }
+                { "prob" : 1.0, "weight" : 1, "type" : "Synapse", "dendrite_delay_distr" : [0, 0] }
             ],
             "1-2" : [
-                { "prob" : 0.5, "weight" : 4.0, "type" : "Synapse", "dendrite_delay_distr" : [0, 0] },
-                { "prob" : 0.5, "weight" : 4.0, "type" : "Synapse_Inh", "dendrite_delay_distr" : [0, 0] }
+                { "prob" : 0.5, "weight" : 1, "type" : "Synapse", "dendrite_delay_distr" : [0, 0] },
+                { "prob" : 0.5, "weight" : 1, "type" : "Synapse_Inh", "dendrite_delay_distr" : [0, 0] }
             ],
             "1-1" : [
-                { "prob" : 1.0, "weight" : 4.0, "type" : "Synapse_Inh", "dendrite_delay_distr" : [0, 0] }
+                { "prob" : 1.0, "weight" : 1, "type" : "Synapse_Inh", "dendrite_delay_distr" : [0, 0] }
             ]
         },
         "time_series_map_conf" : {
-            "dt" : 2.0                
+            "dt" : 2.0          // ms
         },
-        "neurons_to_listen" : [0, 1, 2]
+        "sim_run_conf" : {
+            "dt" : 1            // ms
+        },
+        "neurons_to_listen" : [10, 11]
     }
 }

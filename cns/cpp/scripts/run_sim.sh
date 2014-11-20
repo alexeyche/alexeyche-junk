@@ -74,7 +74,7 @@ if [ "$AUTO" == "no" ]; then
                 break
             elif [ "$RESP" == "n" ]; then
                 rm -rf $WORK_DIR/*
-                cp ../constants.ini $WORK_DIR
+                cp ../const.json $WORK_DIR
                 break
             else 
                 read -p "$(basename $WORK_DIR) already exists and $LAST_EP epochs was done here. Continue learning? (y/n): " RESP

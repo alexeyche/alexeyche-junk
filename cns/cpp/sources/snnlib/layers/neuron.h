@@ -11,6 +11,7 @@ static size_t global_neuron_index = 0;
 #include <snnlib/config/constants.h>
 #include <snnlib/tuning_curves/tuning_curve.h>
 
+#include <snnlib/sim/runtime_globals.h>
 
 #include <snnlib/serialize/serialize.h>
 
@@ -23,18 +24,19 @@ protected:
     Neuron() {}
     friend class Factory;
 public:
-    Neuron(const ConstObj *_c, double _axon_delay = 0) {
-        init(_c, _axon_delay);
+    Neuron(const ConstObj *_c, const RuntimeGlobals *_glob_c, double _axon_delay) {
+        init(_c, _glob_c, _axon_delay);
     }
     ~Neuron() {
         if(stat) {
             delete stat;
         }
     }
-    virtual void init(const ConstObj *_c, double _axon_delay = 0) {
+    virtual void init(const ConstObj *_c, const RuntimeGlobals *_glob_c, double _axon_delay) {
         id = global_neuron_index++;
         bc = _c;
-
+        glob_c = _glob_c;
+        
         act = nullptr; lrule = nullptr; tc = nullptr;
 
         y = 0.0;
@@ -74,7 +76,7 @@ public:
     virtual void calculateProbability() = 0;
     virtual void calculateDynamics() = 0;
     virtual void attachCurrent(const double &I) = 0;
-
+    virtual void propagateSynSpike(const SynSpike *sp) = 0;
     virtual void provideDelegates(RunTimeDelegates &rtd) {}
 
     // stat funcs
@@ -85,8 +87,9 @@ public:
         collectStatistics = true;
         stat = new NeuronStat(this);
     }
-    virtual vector<string> getDependentConstantsNames() { return vector<string>(); }
-    virtual void setDependentConstants(const vector<const ConstObj*> &constants) { }
+
+    //virtual vector<string> getDependentConstantsNames() { return vector<string>(); }
+    //virtual void setDependentConstants(const vector<const ConstObj*> &constants) { }
 
     void print(std::ostream& str) const {
         str << "Neuron(" << id << ")\n";
@@ -103,6 +106,8 @@ protected:
     list< Synapse *> active_synapses;
 
     const ConstObj *bc;
+    const RuntimeGlobals *glob_c;
+
     ActFunc *act;
     LearningRule *lrule;
     TuningCurve *tc;
