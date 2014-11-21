@@ -2,12 +2,14 @@
 
 #include <snnlib/core.h>
 
+typedef pair<size_t, size_t> NeuronAddress;
+
+
 class SimNeuron {
-protected:
-	SimNeuron()  {}
 public:
-	virtual void calculateProbability() = 0;
-	virtual void calculateDynamics() = 0;
-protected:
-	list<Synapse*> active_synapses;
+	SimNeuron(Neuron *_n, size_t l_id, size_t n_id) : na(l_id, n_id), n(_n) {
+
+    }
+    NeuronAddress na;
+    Neuron *n;
 };

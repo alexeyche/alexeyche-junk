@@ -36,7 +36,7 @@ public:
         id = global_neuron_index++;
         bc = _c;
         glob_c = _glob_c;
-        
+
         act = nullptr; lrule = nullptr; tc = nullptr;
 
         y = 0.0;

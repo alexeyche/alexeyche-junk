@@ -31,5 +31,6 @@ using std::stringstream;
 using std::ifstream;
 using std::ofstream;
 using std::ios;
+using std::list;
 
 typedef unsigned char uchar;

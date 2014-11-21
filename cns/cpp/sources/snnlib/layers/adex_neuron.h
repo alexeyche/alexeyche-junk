@@ -9,7 +9,7 @@ class AdExNeuron;
 
 class AdExNeuronStat : public Serializable {
 protected:
-    AdExNeuronStat() : Serializable(EAdExNeuronStat) { 
+    AdExNeuronStat() : Serializable(EAdExNeuronStat) {
         ns = new NeuronStat(nullptr);
     }
     friend class SerializableFactory;
@@ -52,7 +52,7 @@ public:
         init(_c, _glob_c, _axon_delay);
     }
     void init(const ConstObj *_c, const RuntimeGlobals *_glob_c, double _axon_delay) {
-        Neuron::init(_c, _glob_c, axon_delay);
+        Neuron::init(_c, _glob_c, _axon_delay);
         CAST_TYPE(AdExNeuronC, bc)
         c = cast;
 

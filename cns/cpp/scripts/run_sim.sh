@@ -8,10 +8,11 @@ pushd $CWD &> /dev/null
 . common.sh
 
 function usage {
-    echo "$0 -w WORK_DIR -s -l -e EPOCHS -v TEST_SPIKES.BIN INPUT_FILE1 [INPUT_FILE2]"
+    echo "$0 -s -l -e EPOCHS -v TEST_SPIKES.BIN INPUT_FILE1 [INPUT_FILE2]"
 }
 
 ulimit -c unlimited
+set -x
 
 INPUT_FILES=
 WORK_DIR=

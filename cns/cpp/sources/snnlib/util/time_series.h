@@ -150,12 +150,13 @@ public:
          }
          current_position = 0;
     }
-    const double & pop_value() {
-        const double &x = *data.begin();
+    inline void pop_value() {
         data.pop_front();
-        return x;
     }
-    size_t size() const {
+    inline const double& top_value() {
+        return *data.begin();
+    }
+    inline size_t size() const {
         return data.size();
     }
     void print(std::ostream& str) const {

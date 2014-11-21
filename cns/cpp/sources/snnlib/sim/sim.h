@@ -3,20 +3,19 @@
 
 #include <snnlib/layers/layer.h>
 #include <snnlib/util/time_series.h>
-
+#include <snnlib/util/spinning_barrier.h>
 
 #include "network.h"
 
 #define P( condition ) {if( (condition) != 0 ) { printf( "\n FAILURE in %s, line %d\n", __FILE__, __LINE__ );exit( 1 );}}
 
 
-typedef NeuronAddress pair<size_t, size_t>;
-
+#include "sim_neuron.h"
 
 class Sim: public Printable {
 public:
     Sim(const Constants &c, size_t _jobs=1);
-    
+
     struct SimWorker {
         Sim *s;
         size_t thread_id;
@@ -77,10 +76,12 @@ public:
             accessByGlobalId(*it)->enableCollectStatistics();
         }
     }
-    void precalculateInputLayerSpikes();
-   
-    static void* runWorker(void *context);
+
+
+    static void runWorker(size_t thread_id, Sim *s, size_t neuron_first_id, size_t neuron_last_id);
+    void runSimOnSubset(size_t left_neuron_id, size_t right_neuron_id);
     void run();
+
 
     size_t jobs;
     Network net;
@@ -88,12 +89,12 @@ public:
     ContLabeledTimeSeries input_ts;
 
     size_t input_layers_count;
-    
+
     size_t input_neurons_count;
     size_t net_neurons_count;
 
     vector< Layer *> layers;
-    vector<NeuronAddress> na;
+    vector<SimNeuron> sim_neurons;
 
     string statistics_file;
     string output_spikes_file;

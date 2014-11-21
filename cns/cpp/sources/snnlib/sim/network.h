@@ -1,8 +1,9 @@
 #pragma once
 
 #include <snnlib/util/spikes_list.h>
+#include <snnlib/util/spikes_queue.h>
 
-typedef priority_queue<shared_ptr<SynSpike>, vector<shared_ptr<SynSpike>>, CompareSynSpike> SpikeQueue;
+//typedef priority_queue<SynSpike, vector<SynSpike>, CompareSynSpike> SpikeQueue;
 
 
 class Sim;
@@ -30,18 +31,9 @@ public:
 	void init(const Sim *s);
 	void configureConnMap(const Sim *s);
 	void propagateSpike(const size_t &global_id, const double &t);
-	void dispathSpikes(const SpikesList &sl);
-	
-	inline const SynSpike* getSpike(const size_t& global_id, const double &t) {
-		if(!net_queues[global_id].empty()) {
-			if(net_queues[global_id].top()->t <= t) {
-				const SynSpike* sp = net_queues[global_id].top().get();
-				net_queues[global_id].pop();
-				return sp;
-			}
-		}
-		return nullptr;
-	}
+	void dispathInputSpikes(const SpikesList &sl);
+
+	const SynSpike* getSpike(const size_t& global_id, const double &t);
 
 	~Network() {
 		if(conn_map) delete []conn_map;
@@ -55,15 +47,9 @@ public:
 			cout << "neuron " << i << " cause spike in: ";
 			print_vector<Conn>(conn_map[i], str, ",");
 		}
-		str << "net_queue: \n";
+		str << "input_queue: \n";
 		for(size_t i=0; i<total_size; i++) {
-			SpikeQueue net_queue_copy(net_queues[i]);
-			str << "queue of " << i << ": ";
-			for(size_t el_i=0; el_i < net_queue_copy.size(); el_i++) {
-				str << *net_queue_copy.top() << ", ";
-				net_queue_copy.pop();
-			}
-			str << "\n";
+			str << input_queues[i];
 		}
 
 
@@ -73,8 +59,11 @@ public:
 	const Sim *s;
 	size_t total_size;
 
-	SpikeQueue *input_queues;
-	SpikeQueue *net_queues;
+	SpikesQueue *input_queues;
+	SpikesQueue *net_queues;
+
+	//SpikeQueue *input_queues;
+	//SpikeQueue *net_queues;
 	vector<Conn> *conn_map;
 	SpikesList spikes_list;
 };

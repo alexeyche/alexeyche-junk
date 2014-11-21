@@ -53,18 +53,9 @@ public:
 	double t;
 	size_t n_id;
 	size_t syn_id;
-    
+
     void print(std::ostream& str) const {
         str << "SynSpike(" << t << " from " << n_id << " in synapse " << syn_id << ")";
     }
 };
 
-
-class CompareSynSpike {
-    public:
-    bool operator()(shared_ptr<SynSpike>& s1, shared_ptr<SynSpike>& s2) // Returns true if t1 is later than t2
-    {
-    	if (s1->t > s2->t) return true;
-       	return false;
-    }
-};

@@ -374,9 +374,9 @@ namespace JsonBox {
 			type = ARRAY;
 			data.arrayValue = new Array(index + 1);
 		}
-        
+
         assert(index <= (*data.arrayValue).size());
-        
+
         if(index == (*data.arrayValue).size())
         {
             (*data.arrayValue).push_back(Value());
@@ -453,7 +453,7 @@ namespace JsonBox {
 	double Value::getDouble() const {
 		if(type == DOUBLE) {
 			return *data.doubleValue;
-		} else 
+		} else
 		if(type == INTEGER) {
 			return *data.intValue;
 		} else {

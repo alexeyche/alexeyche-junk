@@ -25,6 +25,7 @@ public:
         if( fabs(syns[sp->syn_id]->x) < SYN_ACT_TOL ) {
             active_synapses.push_back(syns[sp->syn_id]);
         }
+        //cout << "Propagating syns " << sp.syn_id << " (" << syns.size() << ")\n";
         syns[sp->syn_id]->propagateSpike();
     }
 

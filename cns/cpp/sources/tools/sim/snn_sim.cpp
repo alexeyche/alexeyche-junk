@@ -105,7 +105,7 @@ int main(int argc, char **argv) {
     if(!sopt.out_stat_file.empty()) {
         s.monitorStat(sopt.out_stat_file);
     }
-    
+
     s.run();
 //    cout << s;
 
