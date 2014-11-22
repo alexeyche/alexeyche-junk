@@ -7,7 +7,7 @@
 #include <snnlib/config/factory.h>
 #include <snnlib/layers/srm_neuron.h>
 
-Sim::Sim(const Constants &c, size_t _jobs) : jobs(_jobs), sc(c.sim_conf) {
+Sim::Sim(const Constants &c, size_t _jobs) : Tmax(0), jobs(_jobs), sc(c.sim_conf) {
     input_neurons_count = 0;
     for(size_t l_id = 0; l_id < sc.input_layers_conf.size(); l_id++) {
         LayerConf conf = sc.input_layers_conf[l_id];
@@ -71,24 +71,27 @@ Sim::Sim(const Constants &c, size_t _jobs) : jobs(_jobs), sc(c.sim_conf) {
 
 
 
+pthread_barrier_t *barrier;
 
 
-pthread_barrier_t barrier;
 
-void Sim::runWorker(size_t thread_id, Sim *s, size_t neuron_first_id, size_t neuron_last_id) {
-    cout << "thread " << thread_id << " started on neurons " << neuron_first_id << "-" << neuron_last_id << "\n";
+void* Sim::runWorker(void *content) {
+    SimWorker *sw = static_cast<SimWorker*>(content);
+    cout << "thread " << sw->thread_id << " started on neurons " << sw->first << "-" << sw->last << "\n";
+    Sim *s = sw->s;
 
-    for(double t=0; t<=s->input_ts.Tmax; t += s->rg.Dt()) {
+    for(double t=0; t<=s->Tmax; t += s->rg.Dt()) {
         double x = 0.0;
-        if(neuron_last_id <= s->input_neurons_count){
+        if(sw->last <= s->input_neurons_count){
             if(s->input_ts.size()>0) {
                 x = s->input_ts.top_value();
             }
-            if(thread_id == 0) {
+            if(sw->thread_id == 0) {
                 s->input_ts.pop_value();
             }
         }
-        for(size_t ni=neuron_first_id; ni<neuron_last_id; ni++) {
+        for(size_t ni=sw->first; ni<sw->last; ni++) {
+            // cout << "simulating " << ni << " at " << t << "\n";
             Neuron *n = s->sim_neurons[ni].n;
             if(ni<s->input_neurons_count) {
                 n->attachCurrent(x);
@@ -106,10 +109,9 @@ void Sim::runWorker(size_t thread_id, Sim *s, size_t neuron_first_id, size_t neu
             }
 
         }
-        pthread_barrier_wait( &barrier );
-
+        pthread_barrier_wait( barrier );
     }
-    cout << "thread " << thread_id << " exited\n";
+    cout << "thread " << sw->thread_id << " exited\n";
 }
 
 
@@ -120,32 +122,47 @@ void Sim::runSimOnSubset(size_t left_neuron_id, size_t right_neuron_id) {
     if(num_neurons < jobs) {
         jobs = num_neurons;
     }
-    P( pthread_barrier_init( &barrier, NULL, jobs ) );
 
-    std::vector<std::thread> v;
+    barrier = new pthread_barrier_t();
+    P( pthread_barrier_init( barrier, NULL, jobs ) );
+
+    pthread_t threads[jobs];
+    Sim::SimWorker workers[jobs];
+
     for (size_t ji = 0; ji < jobs; ++ji) {
         int neuron_per_thread = (num_neurons + jobs - 1) / jobs;
         size_t first = min( ji    * neuron_per_thread, num_neurons ) + left_neuron_id;
         size_t last  = min( (ji+1) * neuron_per_thread, num_neurons ) + left_neuron_id;
 
-        v.emplace_back(Sim::runWorker, ji, this, first, last);
+        workers[ji].first = first;
+        workers[ji].last = last;
+        workers[ji].thread_id = ji;
+        workers[ji].s = this;
+        P( pthread_create( &threads[ji], NULL, Sim::runWorker,  &workers[ji]) );
     }
-    for (auto& t : v) {
-        t.join();
+    
+    for (size_t ji = 0; ji < jobs; ++ji) {
+        pthread_join(threads[ji], NULL);
     }
-    P( pthread_barrier_destroy(&barrier) );
-}
 
-void Sim::run() {
+    P( pthread_barrier_destroy(barrier) );
+    delete barrier;
+}
+void Sim::precalculateInputSpikes() {
     if(input_ts.size() == 0) {
         cerr << "Need set input time series to precalculate spikes\n";
         terminate();
     }
-    // rg.setDt(sc.ts_map_conf.dt);
-    // runSimOnSubset(0, input_neurons_count);
-    // net.dispathInputSpikes(net.spikes_list);
+    rg.setDt(sc.ts_map_conf.dt);
+    runSimOnSubset(0, input_neurons_count);
+    net.dispathInputSpikes(net.spikes_list);
+}
+
+void Sim::run() {
+    if(input_ts.size() != 0) {
+        precalculateInputSpikes();
+    }
 
     rg.setDt(sc.sim_run_c.dt);
-    //runSimOnSubset(input_neurons_count, input_neurons_count+net_neurons_count);
-    runSimOnSubset(0, input_neurons_count+net_neurons_count);
+    runSimOnSubset(input_neurons_count, input_neurons_count+net_neurons_count);
 }

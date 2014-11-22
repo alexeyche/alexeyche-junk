@@ -218,7 +218,7 @@ public:
 class ConnectionConf: public ConstObj {
 public:
     double prob;
-    double weight;
+    double weight_per_neuron;
     string type;
     double dendrite_delay_gain;
     double dendrite_delay_rate;
@@ -227,14 +227,14 @@ public:
     void fill_structure(JsonBox::Value v) {
         prob = v["prob"].getDouble();
         type = v["type"].getString();
-        weight = v["weight"].getDouble();
+        weight_per_neuron = v["weight_per_neuron"].getDouble();
         JsonBox::Array ad = v["dendrite_delay_distr"].getArray();
         dendrite_delay_gain = ad[0].getDouble();
         dendrite_delay_rate = ad[1].getDouble();
     }
 
     void print(std::ostream &str) const {
-        str << "ConnectionConf(" << "prob: " << prob << ", weight: " << weight << ", type: " <<   type <<
+        str << "ConnectionConf(" << "prob: " << prob << ", weight_per_neuron: " << weight_per_neuron << ", type: " <<   type <<
             ", dendrite_delay_gain: " << dendrite_delay_gain  << ", dendrite_delay_rate: " << dendrite_delay_rate << ")";
 
     }

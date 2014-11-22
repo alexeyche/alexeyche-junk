@@ -1,9 +1,9 @@
 {
     "tuning_curves" : {
         "SigmaTuningCurve" : {
-            "sigma" : [0.1, 0.1],
-            "intercept" : [-1, 1.0],
-            "gain" : [3,3]
+            "sigma" : [0.03, 0.03],
+            "intercept" : [-2.4, 2.4],
+            "gain" : [4,4]
         }
     },
     "neurons" : {
@@ -59,7 +59,7 @@
     "sim_configuration" : {
         "input_layers_conf" : [
             {
-                "size" : 10,
+                "size" : 100,
                 "neuron_conf" : {
                     "neuron" : "AdExNeuron",
                     "tuning_curve" : "SigmaTuningCurve",
@@ -70,7 +70,7 @@
         ],
         "net_layers_conf" : [
             {
-                "size" : 10,
+                "size" : 100,
                 "neuron_conf" : {
                     "neuron" : "SRMNeuron",
                     "learning_rule" : "OptimalStdp",
@@ -80,7 +80,7 @@
                 }
             },                    
             {
-                "size" : 10,
+                "size" : 100,
                 "neuron_conf" : {
                     "neuron" : "SRMNeuron",
                     "learning_rule" : "OptimalStdp",
@@ -91,13 +91,10 @@
         ],
         "conn_map" : {
             "0-1" : [
-                { "prob" : 1.0, "weight" : 0.1, "type" : "Synapse", "dendrite_delay_distr" : [0, 0] }
+                { "prob" : 1.0, "weight_per_neuron" : 15, "type" : "Synapse", "dendrite_delay_distr" : [0, 0] }
             ],
             "1-2" : [
-                { "prob" : 1.0, "weight" : 0.1, "type" : "Synapse", "dendrite_delay_distr" : [0, 0] },
-            ],
-            "1-1" : [
-                { "prob" : 1.0, "weight" : 0.1, "type" : "Synapse", "dendrite_delay_distr" : [0, 0] }
+                { "prob" : 1.0, "weight_per_neuron" : 15, "type" : "Synapse", "dendrite_delay_distr" : [0, 0] },
             ]
         },
         "time_series_map_conf" : {
@@ -106,6 +103,6 @@
         "sim_run_conf" : {
             "dt" : 1            // ms
         },
-        "neurons_to_listen" : [1,6,11]
+        "neurons_to_listen" : [51, 101, 102]
     }
 }

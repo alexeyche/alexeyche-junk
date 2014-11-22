@@ -8,6 +8,8 @@ class Factory;
 
 #include <snnlib/layers/neuron.h>
 
+static size_t sigma_id = 0;
+
 class SigmaTuningCurve: public TuningCurve {
 protected:
     SigmaTuningCurve() {}
@@ -18,10 +20,11 @@ public:
         c = cast;
         n = _n;
         n->setTuningCurve(this);
-        center = getUnifBetween(c->intercept.first, c->intercept.second);
+        center = c->intercept.first + (sigma_id/100.0)*(c->intercept.second-c->intercept.first);
         gain = getUnifBetween(c->gain.first, c->gain.second);
         sigma = getUnifBetween(c->sigma.first, c->sigma.second);
         sigma_square = sigma*sigma;
+        sigma_id++;
     }
 
     ~SigmaTuningCurve() {

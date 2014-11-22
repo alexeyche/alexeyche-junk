@@ -29,6 +29,7 @@ public:
             }
             zeroIn = new IstreamInputStream(ifs);
             codedIn = new CodedInputStream(zeroIn);
+            codedIn->SetTotalBytesLimit(100.0 * 1024 * 1024,100.0 * 1024 * 1024);
         } else
         if(m == Write) {
             ofs = new ofstream(f, ios::out | ios::trunc | ios::binary);

@@ -49,11 +49,12 @@ void Network::propagateSpike(const size_t &global_id, const double &t) {
         SynSpike sp;
         sp.n_id = global_id;
         sp.syn_id = conn_map[global_id][con_i].syn_id;
-
+        sp.sim = 0;
         Neuron *afferent_neuron = s->layers[ conn_map[global_id][con_i].l_id ]->neurons[ conn_map[global_id][con_i].n_id ];
         size_t glob_afferent_id = afferent_neuron->id;
         sp.t = t  + axon_delay + afferent_neuron->syns[sp.syn_id]->dendrite_delay;
-
+        
+        
         net_queues[glob_afferent_id].asyncPush(sp);
         // if(conn_map[global_id][con_i].l_id == 2) {
         //     cout << "Propagating spike from " << global_id << " to " << glob_afferent_id << "\n";
@@ -87,6 +88,7 @@ void Network::dispathInputSpikes(const SpikesList &sl) {
             for(size_t sp_i=0; sp_i<sl[ni].size(); sp_i++) {
                 SynSpike sp;
                 sp.n_id = ni;
+                sp.sim = 0;
                 sp.syn_id = conn_map[ni][con_i].syn_id;
                 Neuron *afferent_neuron = s->layers[ conn_map[ni][con_i].l_id ]->neurons[ conn_map[ni][con_i].n_id ];
                 size_t glob_afferent_id = afferent_neuron->id;

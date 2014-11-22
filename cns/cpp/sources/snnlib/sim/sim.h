@@ -50,6 +50,18 @@ public:
     }
     void setInputTimeSeries(LabeledTimeSeriesList l) {
         input_ts = ContLabeledTimeSeries(l, sc.ts_map_conf.dt);
+        Tmax = input_ts.Tmax;
+    }
+    void setInputSpikesList(SpikesList l) {
+        if(l.N < input_neurons_count) {
+            cerr << "Input spikes list is inconsistent with const.json\n";
+            terminate();
+        }
+        for(size_t ni=0; ni<input_neurons_count; ni++) {
+            net.spikes_list[ni] = l[ni];
+        }
+        net.dispathInputSpikes(net.spikes_list);
+        Tmax = net.spikes_list.getMaxSpikeTime();
     }
     void setOutputSpikesFile(const string &filename) {
         output_spikes_file = filename;
@@ -78,10 +90,12 @@ public:
     }
 
 
-    static void runWorker(size_t thread_id, Sim *s, size_t neuron_first_id, size_t neuron_last_id);
+    static void* runWorker(void *content);
     void runSimOnSubset(size_t left_neuron_id, size_t right_neuron_id);
+    void precalculateInputSpikes();
     void run();
 
+    double Tmax;
 
     size_t jobs;
     Network net;

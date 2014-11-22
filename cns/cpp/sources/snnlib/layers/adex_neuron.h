@@ -94,7 +94,7 @@ public:
     }
 
     void calculateProbability() {
-        if(fabs(refr) > 0.000001) {
+        if(refr > 0.000001) {
             refr -= glob_c->Dt();
         } else {
             double dV = c->u_rest + y;

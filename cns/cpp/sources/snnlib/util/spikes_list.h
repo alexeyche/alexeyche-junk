@@ -65,6 +65,19 @@ public:
             delete []sp_list;
         }
     }
+    double getMaxSpikeTime() {
+        double max_t = 0;
+        for(size_t ni=0; ni<N; ni++) {
+            if(sp_list[ni].size()>0) {
+                auto it = std::max_element(std::begin(sp_list[ni]), std::end(sp_list[ni]));
+                if(*it > max_t) {
+                    max_t = *it;
+                } 
+            }
+        }
+        return max_t;
+    }
+
 
     size_t N;
     vector<double> *sp_list;

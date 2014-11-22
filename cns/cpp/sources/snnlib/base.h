@@ -50,12 +50,12 @@ typedef map<string, unique_ptr<Entity> > entity_map;
 
 class SynSpike: public Printable {
 public:
-	double t;
+    double t;
 	size_t n_id;
 	size_t syn_id;
-
+    int sim;
     void print(std::ostream& str) const {
-        str << "SynSpike(" << t << " from " << n_id << " in synapse " << syn_id << ")";
+        str << "SynSpike(at " << t << " from " << n_id << " in synapse " << syn_id << " sim: "  << sim << ")";
     }
 };
 

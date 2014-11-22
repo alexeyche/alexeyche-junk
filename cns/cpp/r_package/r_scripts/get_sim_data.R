@@ -26,12 +26,23 @@ p1 = prast(net,T0=Ti*Trange,Tmax=(Ti+1)*Trange)
 #print(p1, position=c(0, 0.6, 1, 1)), more=TRUE)
 print(p1)
 
+
+
 if(file.exists(stat_file)) {
     stat = RProto$new(stat_file)$read()
-    nst = stat[[3]]
-    par(mfrow=c(2,1))
+    nid=1
+    t_plot = 1:100
     
-    plot(nst[["u"]][1:10000], type="l")
-    plot(nst[["p"]][1:1000], type="l")
+    nst = stat[[nid]]
+    par(mfrow=c(3,1))
+    plot(nst[["u"]][t_plot], type="l")
+    plot(nst[["p"]][t_plot], type="l")
+    syns = nst[["syns"]]
+    if(length(syns)>0) {
+        plot(syns[[1]][t_plot],type="l", ylim=c(0,3))
+        for(i in 2:length(syns)) {
+            lines(syns[[i]][t_plot])
+        }
+    }
 }
 

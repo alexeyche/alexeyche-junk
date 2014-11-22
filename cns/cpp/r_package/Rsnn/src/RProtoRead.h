@@ -15,29 +15,34 @@ public:
     }
     Rcpp::List read() {
         if(values.size() == 0) {
-            ProtoRw rw(protofile, ProtoRw::Read);
-            Serializable *o = rw.readAny();
-            if(!o) {
+            try {
+                ProtoRw rw(protofile, ProtoRw::Read);
+
+                Serializable *o = rw.readAny();
+                if(!o) {
+                    ERR("Can't read protofile " << protofile << "\n");
+                }
+                
+                vector<Serializable*> v;
+                v.push_back(o);
+                
+                while(true) {
+                    Serializable *o = rw.readAny();
+                    if(!o) break;
+                    v.push_back(o);
+                }
+                if(v.size() == 1) {
+                    values = convert(v[0]);
+                } else {
+                    Rcpp::List read_values(v.size());
+                    for(size_t vi=0; vi<v.size(); vi++) {
+                        read_values[vi] = convert(v[vi]);
+                    }
+                    values = read_values;
+                }                
+            } catch(...) {
                 ERR("Can't read protofile " << protofile << "\n");
             }
-            
-            vector<Serializable*> v;
-            v.push_back(o);
-            
-            while(true) {
-                Serializable *o = rw.readAny();
-                if(!o) break;
-                v.push_back(o);
-            }
-            if(v.size() == 1) {
-                values = convert(v[0]);
-            } else {
-                Rcpp::List read_values(v.size());
-                for(size_t vi=0; vi<v.size(); vi++) {
-                    read_values[vi] = convert(v[vi]);
-                }
-                values = read_values;
-            }                
         }            
         return values;
     }

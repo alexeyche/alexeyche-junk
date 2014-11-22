@@ -64,10 +64,17 @@ public:
                     double prob = getUnif();
                     if( conf.prob > prob ) {
                         double dendrite_delay = sampleDelay(conf.dendrite_delay_gain, conf.dendrite_delay_rate);
-                        Synapse *s = Factory::inst().createSynapse(conf.type, c, neurons[ni]->id, conf.weight, dendrite_delay);
+                        Synapse *s = Factory::inst().createSynapse(conf.type, c, neurons[ni]->id, 0, dendrite_delay);
                         l_post[nj]->addSynapse(s);
                     }
                 }
+            }
+        }
+        for(size_t ni=0; ni<l_post.N; ni++) {
+            Neuron *n = l_post.neurons[ni];
+            for(size_t con_i=0; con_i<n->syns.size(); con_i++) {
+                Synapse *s = n->syns[con_i];
+                s->w = conf.weight_per_neuron/((double)n->syns.size());
             }
         }
     }
@@ -82,4 +89,3 @@ public:
     size_t N;
     vector< Neuron *> neurons;
 };
-
