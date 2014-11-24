@@ -2,8 +2,7 @@
 
 #include "learning_rule.h"
 
-#include <snnlib/layers/common.h>
-#include <snnlib/layers/neuron.h>
+#include <snnlib/neurons/neuron.h>
 
 class Factory;
 

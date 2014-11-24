@@ -1,21 +1,19 @@
 #pragma once
 
 #include <snnlib/base.h>
-
-static size_t global_neuron_index = 0;
-
-#include "synapse.h"
-
 #include <snnlib/act_funcs/act_func.h>
 #include <snnlib/learning/learning_rule.h>
 #include <snnlib/config/constants.h>
 #include <snnlib/tuning_curves/tuning_curve.h>
-
 #include <snnlib/sim/runtime_globals.h>
-
 #include <snnlib/serialize/serialize.h>
 
+#include "synapse.h"
 #include "neuron_stat.h"
+#include "neuron_model.h"
+
+static size_t global_neuron_index = 0;
+
 
 #define SYN_ACT_TOL 0.0001
 
@@ -31,6 +29,9 @@ public:
         if(stat) {
             delete stat;
         }
+        if(model) {
+            delete model;
+        }
     }
     virtual void init(const ConstObj *_c, const RuntimeGlobals *_glob_c, double _axon_delay) {
         id = global_neuron_index++;
@@ -44,7 +45,8 @@ public:
         fired = 0;
 
         collectStatistics = false;
-        stat = nullptr;
+        stat = nullptr; 
+        model = nullptr;
         axon_delay = _axon_delay;
     }
     void setActFunc(ActFunc *_act) {
@@ -56,14 +58,6 @@ public:
     void setTuningCurve(TuningCurve *_tc) {
         tc = _tc;
     }
-    size_t id;
-
-    double y;
-    double p;
-    uchar fired;
-    double axon_delay;
-
-    vector<Synapse*> syns;
 
     void addSynapse(Synapse *s) {
         syns.push_back(s);
@@ -71,6 +65,17 @@ public:
             stat->syns.push_back(vector<double>());
         }
     }
+
+    size_t id;
+
+    double y;
+    double p;
+    uchar fired;
+
+    double axon_delay;
+
+    vector<Synapse*> syns;
+
 
     //runtime
     virtual void calculateProbability() = 0;
@@ -80,13 +85,24 @@ public:
     virtual void provideDelegates(RunTimeDelegates &rtd) {}
 
     // stat funcs
-    virtual vector<Serializable*> getStats() {
-        vector<Serializable*> s({stat});
+    virtual SerialFamily getStats() {
+        SerialFamily s({stat});
         if(lrule->getStat()) {
             s.push_back(lrule->getStat());
         }
         return s;
     }
+    
+    virtual SerialFamily saveModel() {
+        model = new NeuronModel(this);
+        SerialFamily s({model});
+        SerialFamily lrule_m = lrule->saveModel();
+        if(lrule_m) {
+            s.push_back(lrule_m);
+        }
+        return s
+    }
+
     virtual void enableCollectStatistics() {
         collectStatistics = true;
         stat = new NeuronStat(this);
@@ -106,6 +122,7 @@ public:
     }
 
     NeuronStat *stat;
+    NeuronModel *model;
 protected:
     list< Synapse *> active_synapses;
 
@@ -117,7 +134,7 @@ protected:
     TuningCurve *tc;
 
     bool collectStatistics;
-
 };
+
 
 

@@ -13,6 +13,7 @@ set(DIRS
     tuning_curves
     act_funcs
     serialize
+	neurons
     #filt
     #    conn
 )

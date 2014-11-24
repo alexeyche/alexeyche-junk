@@ -140,8 +140,8 @@ public:
 
 
     }
-    vector<Serializable*> getStats() {
-        vector<Serializable*> s({Neuron::stat, adex_stat});
+    SerialFamily getStats() {
+        SerialFamily s({Neuron::stat, adex_stat});
         if(lrule->getStat()) {
             s.push_back(lrule->getStat());
         }

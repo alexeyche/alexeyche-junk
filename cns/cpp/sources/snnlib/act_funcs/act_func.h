@@ -1,6 +1,7 @@
 #pragma once
 
 #include <snnlib/base.h>
+#include <snnlib/config/constants.h>
 
 class Neuron;
 

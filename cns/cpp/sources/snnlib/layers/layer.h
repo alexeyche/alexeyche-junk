@@ -1,33 +1,40 @@
 #pragma once
 
-#include "neuron.h"
-
-static size_t global_layer_index = 0;
-
+#include <snnlib/base.h>
+#include <snnlib/neurons/neuron.h>
 #include <snnlib/act_funcs/act_func.h>
 #include <snnlib/learning/learning_rule.h>
 #include <snnlib/config/constants.h>
 #include <snnlib/tuning_curves/tuning_curve.h>
-
-#include "common.h"
-
 #include <snnlib/config/factory.h>
 
+static size_t global_layer_index = 0;
+
+#include "layer_info.h"
 
 class Layer : public Entity {
 protected:
     Layer() {}
     friend class Factory;
+    friend class LayerInfo;
 public:
     Layer(size_t _size, const NeuronConf &nc, const Constants &c, const RuntimeGlobals *run_glob_c) {
         init(_size, nc, c, run_glob_c);
     }
-
+    ~Layer() {
+        if(layer_info) {
+            delete layer_info;
+        }
+    }
     virtual void init(size_t _size, const NeuronConf &nc, const Constants &c, const RuntimeGlobals *run_glob_c) {
         id = global_layer_index++;
         N = _size;
+        neuron_conf = &nc;
+        layer_info = nullptr;
+
         for(size_t ni=0; ni<N; ni++) {
             double axon_delay = sampleDelay(nc.axon_delay_gain, nc.axon_delay_rate);
+            
             Neuron *n = Factory::inst().createNeuron(nc.neuron, c, run_glob_c, axon_delay);
 
             ActFunc *act = Factory::inst().createActFunc(nc.act_func, c, n);
@@ -84,8 +91,21 @@ public:
             str << **it;
         }
     }
+    SerialPack saveModel() {
+        SerialPack p;
+        
+        layer_info = new LayerInfo(this);
+        p.push_back(SerialFamily({layer_info}));
 
+        for(size_t ni=0; ni<N; ni++) {
+            p.push_back(neurons[ni]->saveModel());
+        }
+        return p;
+    }
     size_t id;
     size_t N;
     vector< Neuron *> neurons;
+private:    
+    const NeuronConf *neuron_conf;
+    LayerInfo *layer_info;
 };

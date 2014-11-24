@@ -1,7 +1,5 @@
 #pragma once
 
-#include "layer.h"
-
 #include "neuron.h"
 
 

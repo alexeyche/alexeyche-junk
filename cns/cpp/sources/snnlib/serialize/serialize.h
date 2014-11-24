@@ -8,11 +8,32 @@
 
 using namespace google::protobuf::io;
 
-enum ESerializableClass { ENeuronStat, ESpikesList, ELabeledTimeSeries, ELabeledTimeSeriesList, EAdExNeuronStat };
-static const char* ESerializableClass_str[] = { "NeuronStat", "SpikesList", "LabeledTimeSeries", "LabeledTimeSeriesList", "AdExNeuronStat" };
+enum ESerializableClass { 
+                            ENeuronStat, 
+                            ESpikesList, 
+                            ELabeledTimeSeries, 
+                            ELabeledTimeSeriesList, 
+                            EAdExNeuronStat,
+                            ENeuronModel,
+                            ELayerInfo
+                        };
+                        
+static const char* ESerializableClass_str[] = 
+                                            { 
+                                                "NeuronStat", 
+                                                "SpikesList", 
+                                                "LabeledTimeSeries", 
+                                                "LabeledTimeSeriesList", 
+                                                "AdExNeuronStat",
+                                                "NeuronModel",
+                                                "LayerInfo"
+                                            };
 
 
 #include <snnlib/base.h>
+
+
+
 
 class Serializable : public Printable {
 // To make inheritance from that class need to do methods:
@@ -110,6 +131,8 @@ protected:
 };
 
 
+typedef vector<Serializable*> SerialFamily;
+typedef vector<SerialFamily> SerialPack;
 
 
 class SerializableFactory {
@@ -125,7 +148,7 @@ private:
         objects.clear();
     }
 
-    vector<Serializable*> objects;
+    SerialFamily objects;
 };
 
 

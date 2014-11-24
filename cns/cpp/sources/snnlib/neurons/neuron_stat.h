@@ -13,6 +13,8 @@ protected:
 public:
     NeuronStat(Neuron *n);
 
+
+
     void collect(Neuron *n);
 
     NeuronStat(const NeuronStat &another) : Serializable(ENeuronStat), syns(another.syns), p(another.p), u(another.u) {

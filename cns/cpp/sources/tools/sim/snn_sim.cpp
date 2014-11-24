@@ -103,7 +103,7 @@ int main(int argc, char **argv) {
     s.setOutputSpikesFile(sopt.out_spikes);
 
     ProtoRw prw(sopt.input, ProtoRw::Read);
-    vector<Serializable*> inp = prw.readAny();
+    SerialFamily inp = prw.readAny();
     if(inp[0]->getName() == "LabeledTimeSeriesList") {
         LabeledTimeSeriesList *lst = static_cast<LabeledTimeSeriesList*>(inp[0]);
         s.setInputTimeSeries(*lst);

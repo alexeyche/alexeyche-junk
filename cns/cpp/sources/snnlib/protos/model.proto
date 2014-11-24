@@ -1,0 +1,30 @@
+package Protos;
+
+
+message NeuronInfo {
+	required string neuron = 1;
+	optional string learning_rule = 2;
+	required string act_func = 3;
+	optional string tuning_curve = 4;
+}
+
+message LayerInfo {
+	required uint32 size = 1;
+	required uint32 id = 2;
+	required NeuronInfo neuron = 3;
+};
+
+message NeuronModel {
+	message Syn {
+		required double w = 1;
+		required uint32 id_pre = 2;
+		required double dendrite_delay = 3;
+	}
+	repeated Syn syns = 4;
+	required double axon_delay = 5;
+}
+
+
+message Layer {
+	repeated NeuronModel neurons = 1;
+}

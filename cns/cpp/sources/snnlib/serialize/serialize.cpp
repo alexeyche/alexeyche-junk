@@ -3,8 +3,8 @@
 
 
 #include <snnlib/util/time_series.h>
-#include <snnlib/layers/neuron.h>
-#include <snnlib/layers/adex_neuron.h>
+#include <snnlib/neurons/neuron.h>
+#include <snnlib/neurons/adex_neuron.h>
 #include <snnlib/util/spikes_list.h>
 
 SerializableFactory& SerializableFactory::inst() {
@@ -19,6 +19,9 @@ Serializable* SerializableFactory::create(const string &name) {
     } else
     if(name == "NeuronStat") {
         s = new NeuronStat();
+    } else
+    if(name == "NeuronModel") {
+        s = new NeuronModel();
     } else
     if(name == "SpikesList") {
         s = new SpikesList();

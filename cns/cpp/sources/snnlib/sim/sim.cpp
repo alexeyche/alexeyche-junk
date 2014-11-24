@@ -5,7 +5,7 @@
 #include <mutex>
 
 #include <snnlib/config/factory.h>
-#include <snnlib/layers/srm_neuron.h>
+#include <snnlib/neurons/srm_neuron.h>
 
 Sim::Sim(const Constants &c, size_t _jobs) : Tmax(0), jobs(_jobs), sc(c.sim_conf) {
     input_neurons_count = 0;

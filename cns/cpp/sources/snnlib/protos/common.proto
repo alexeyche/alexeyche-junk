@@ -4,6 +4,6 @@ package Protos;
 message ClassName {
     required string name = 1;
 }
-message Pack {
+message Family {
     repeated ClassName names = 1;
 }

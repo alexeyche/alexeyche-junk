@@ -28,7 +28,7 @@ public:
             ProtoRw prw(statistics_file, ProtoRw::Write);
             for(auto it=sc.neurons_to_listen.begin(); it != sc.neurons_to_listen.end(); ++it) {
                 Neuron *n = accessByGlobalId(*it);
-                vector<Serializable*> st = n->getStats();
+                SerialFamily st = n->getStats();
                 prw.write(st);
             }
         }

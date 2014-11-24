@@ -86,7 +86,7 @@ int main(int argc, char **argv) {
     if(options[ARG_PB].count() > 0) {
         ProtoRw prw(options[ARG_PB].arg, ProtoRw::Read);
         while(true) {
-            vector<Serializable*> v = prw.readAny(true);
+            SerialFamily v = prw.readAny(true);
             if(v.size() == 0) break;
         }
     } else {

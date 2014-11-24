@@ -1,15 +1,16 @@
 
 #include "factory.h"
 
+#include <snnlib/layers/layer.h>
 #include <snnlib/config/constants.h>
 #include <snnlib/learning/optimal_stdp.h>
 #include <snnlib/act_funcs/determ.h>
 #include <snnlib/act_funcs/exp_hennequin.h>
-#include <snnlib/layers/synapse.h>
+#include <snnlib/neurons/synapse.h>
 #include <snnlib/tuning_curves/sigma_tuning_curve.h>
-#include <snnlib/layers/srm_neuron.h>
-#include <snnlib/layers/adex_neuron.h>
-#include <snnlib/layers/neuron.h>
+#include <snnlib/neurons/srm_neuron.h>
+#include <snnlib/neurons/adex_neuron.h>
+#include <snnlib/neurons/neuron.h>
 #include <snnlib/sim/runtime_globals.h>
 
 

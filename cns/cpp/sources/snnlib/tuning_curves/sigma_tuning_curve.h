@@ -6,7 +6,7 @@ class Factory;
 
 #include "tuning_curve.h"
 
-#include <snnlib/layers/neuron.h>
+#include <snnlib/neurons/neuron.h>
 
 class SigmaTuningCurve: public TuningCurve {
 protected:

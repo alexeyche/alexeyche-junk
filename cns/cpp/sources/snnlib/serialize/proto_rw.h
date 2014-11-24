@@ -50,13 +50,13 @@ public:
         }
 
     }
-    vector<Serializable*> readAny(bool print=false) {
+    SerialFamily readAny(bool print=false) {
         CHECK_MODE(Read);
-        Protos::Pack pack;
+        Protos::Family pack;
         if(!readMessage(pack)) {
-            return vector<Serializable*>();
+            return SerialFamily();
         }
-        vector<Serializable*> ps;
+        SerialFamily ps;
         for(size_t mi=0; mi<pack.names_size(); mi++) {
             Protos::ClassName cl = pack.names(mi);
             Serializable *s = SerializableFactory::inst().create(cl.name());
@@ -72,9 +72,9 @@ public:
     }
 
 
-    bool read(vector<Serializable*> ps) {
+    bool read(SerialFamily ps) {
         CHECK_MODE(Read);
-        Protos::Pack pack;
+        Protos::Family pack;
         if(!readMessage(pack)) {
             return false;
         }
@@ -97,12 +97,12 @@ public:
         return true;
     }
     bool read(Serializable* s) {
-        return read(vector<Serializable*>({s}));
+        return read(SerialFamily({s}));
     }
 
-    void write(vector<Serializable*> ps) {
+    void write(SerialFamily ps) {
         CHECK_MODE(Write);
-        Protos::Pack pack;
+        Protos::Family pack;
         for(size_t mi=0; mi<ps.size(); mi++) {
             Serializable *s = ps[mi];
             Protos::ClassName *cl = pack.add_names();
@@ -116,7 +116,7 @@ public:
         }
     }
     void write(Serializable* s) {
-        write(vector<Serializable*>({s}));
+        write(SerialFamily({s}));
     }
 
     template <typename T>
