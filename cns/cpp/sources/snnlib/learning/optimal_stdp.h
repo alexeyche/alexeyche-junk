@@ -11,7 +11,7 @@ class OptimalStdp : public LearningRule {
 protected:
     OptimalStdp() {}
     friend class Factory;
-    
+
 public:
     OptimalStdp(const OptimalStdpC *_c, Neuron *_n) {
     	init(_c, _n);
@@ -22,6 +22,11 @@ public:
         n = _n;
         n->setLearningRule(this);
     }
+
+    void calculateWeightsDynamics()  {
+
+    }
+    Serializable* getStat() { return nullptr; }
 
     const OptimalStdpC *c;
     Neuron *n;

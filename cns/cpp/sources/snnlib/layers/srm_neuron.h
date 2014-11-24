@@ -18,7 +18,6 @@ public:
         Neuron::init(_c, _glob_c, _axon_delay);
         CAST_TYPE(SRMNeuronC, bc);
         c = cast;
-
     }
 
     void propagateSynSpike(const SynSpike *sp) {
@@ -49,6 +48,7 @@ public:
         if(p > getUnif()) {
             fired = 1;
         }
+        lrule->calculateWeightsDynamics();
 
         auto it=active_synapses.begin();
         while(it != active_synapses.end()) {
@@ -61,8 +61,6 @@ public:
                 ++it;
             }
         }
-
-
     }
     void print(std::ostream& str) const {
         str << "SRMNeuron(" << id << ")\n";

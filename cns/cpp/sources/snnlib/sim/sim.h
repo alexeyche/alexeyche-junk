@@ -28,10 +28,8 @@ public:
             ProtoRw prw(statistics_file, ProtoRw::Write);
             for(auto it=sc.neurons_to_listen.begin(); it != sc.neurons_to_listen.end(); ++it) {
                 Neuron *n = accessByGlobalId(*it);
-                Serializable *st = n->getStat();
-                if(st) {
-                    prw.write(st);
-                }
+                vector<Serializable*> st = n->getStats();
+                prw.write(st);
             }
         }
         if(!output_spikes_file.empty()){
@@ -50,7 +48,6 @@ public:
     }
     void setInputTimeSeries(LabeledTimeSeriesList l) {
         input_ts = ContLabeledTimeSeries(l, sc.ts_map_conf.dt);
-        Tmax = input_ts.Tmax;
     }
     void setInputSpikesList(SpikesList l) {
         if(l.N < input_neurons_count) {
@@ -60,8 +57,6 @@ public:
         for(size_t ni=0; ni<input_neurons_count; ni++) {
             net.spikes_list[ni] = l[ni];
         }
-        net.dispathInputSpikes(net.spikes_list);
-        Tmax = net.spikes_list.getMaxSpikeTime();
     }
     void setOutputSpikesFile(const string &filename) {
         output_spikes_file = filename;

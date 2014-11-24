@@ -103,16 +103,16 @@ int main(int argc, char **argv) {
     s.setOutputSpikesFile(sopt.out_spikes);
 
     ProtoRw prw(sopt.input, ProtoRw::Read);
-    Serializable* inp = prw.readAny();
-    if(inp->getName() == "LabeledTimeSeriesList") {
-        LabeledTimeSeriesList *lst = static_cast<LabeledTimeSeriesList*>(inp);
+    vector<Serializable*> inp = prw.readAny();
+    if(inp[0]->getName() == "LabeledTimeSeriesList") {
+        LabeledTimeSeriesList *lst = static_cast<LabeledTimeSeriesList*>(inp[0]);
         s.setInputTimeSeries(*lst);
-    } else 
-    if(inp->getName() == "SpikesList") {
-        SpikesList *sl = static_cast<SpikesList*>(inp);
+    } else
+    if(inp[0]->getName() == "SpikesList") {
+        SpikesList *sl = static_cast<SpikesList*>(inp[0]);
         s.setInputSpikesList(*sl);
     } else {
-        cerr << "Inappropriate input file " << inp->getName() << "\n";
+        cerr << "Inappropriate input file " << inp[0]->getName() << "\n";
         terminate();
     }
 
@@ -123,8 +123,8 @@ int main(int argc, char **argv) {
     if(sopt.precalc) {
         s.precalculateInputSpikes();
     } else {
-        s.run();    
+        s.run();
     }
-    
+
     delete[] options;
 }

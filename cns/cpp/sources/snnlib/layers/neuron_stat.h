@@ -31,8 +31,8 @@ public:
             u.push_back(m->u(i));
         }
         for(size_t i=0; i<m->syns_size(); i++) {
-            Protos::SynStat syn_m = m->syns(i);
-                
+            Protos::NeuronStat::SynStat syn_m = m->syns(i);
+
             vector<double> x_v;
             for(size_t j=0; j<syn_m.x_size(); j++) {
                 x_v.push_back(syn_m.x(j));

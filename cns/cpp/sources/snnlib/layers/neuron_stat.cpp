@@ -30,7 +30,7 @@ Protos::NeuronStat *NeuronStat::serialize() {
         stat->add_u(*it);
     }
     for(auto it=syns.begin(); it != syns.end(); ++it) {
-        Protos::SynStat* syn_stat = stat->add_syns();
+        Protos::NeuronStat::SynStat* syn_stat = stat->add_syns();
         for(auto it_val=it->begin(); it_val != it->end(); ++it_val) {
             syn_stat->add_x(*it_val);
         }

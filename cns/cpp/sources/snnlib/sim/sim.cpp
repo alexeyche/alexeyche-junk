@@ -140,7 +140,7 @@ void Sim::runSimOnSubset(size_t left_neuron_id, size_t right_neuron_id) {
         workers[ji].s = this;
         P( pthread_create( &threads[ji], NULL, Sim::runWorker,  &workers[ji]) );
     }
-    
+
     for (size_t ji = 0; ji < jobs; ++ji) {
         pthread_join(threads[ji], NULL);
     }
@@ -153,16 +153,20 @@ void Sim::precalculateInputSpikes() {
         cerr << "Need set input time series to precalculate spikes\n";
         terminate();
     }
+    Tmax = input_ts.Tmax;
     rg.setDt(sc.ts_map_conf.dt);
     runSimOnSubset(0, input_neurons_count);
-    net.dispathInputSpikes(net.spikes_list);
 }
 
 void Sim::run() {
     if(input_ts.size() != 0) {
         precalculateInputSpikes();
     }
+    net.configureConnMap();
+    net.dispathInputSpikes(net.spikes_list);
+    Tmax = net.spikes_list.getMaxSpikeTime();
 
     rg.setDt(sc.sim_run_c.dt);
+
     runSimOnSubset(input_neurons_count, input_neurons_count+net_neurons_count);
 }

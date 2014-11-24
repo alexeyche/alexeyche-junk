@@ -29,7 +29,7 @@ public:
 		init(s);
 	}
 	void init(const Sim *s);
-	void configureConnMap(const Sim *s);
+	void configureConnMap();
 	void propagateSpike(const size_t &global_id, const double &t);
 	void dispathInputSpikes(const SpikesList &sl);
 
@@ -51,7 +51,8 @@ public:
 		for(size_t i=0; i<total_size; i++) {
 			str << input_queues[i];
 		}
-
+		str << "spikes list: \n";
+		str << spikes_list;
 
 
 	}

@@ -53,9 +53,10 @@ public:
     double t;
 	size_t n_id;
 	size_t syn_id;
-    int sim;
+    // int sim;
+
     void print(std::ostream& str) const {
-        str << "SynSpike(at " << t << " from " << n_id << " in synapse " << syn_id << " sim: "  << sim << ")";
+        str << "SynSpike(at " << t << " from " << n_id << " in synapse " << syn_id << ")"; // " sim: " << sim << ")";
     }
 };
 

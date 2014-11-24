@@ -50,55 +50,74 @@ public:
         }
 
     }
-    Serializable* readAny() {
+    vector<Serializable*> readAny(bool print=false) {
         CHECK_MODE(Read);
-        Protos::ClassName cl;
-        if(!readMessage(cl)) {
-            return nullptr;
+        Protos::Pack pack;
+        if(!readMessage(pack)) {
+            return vector<Serializable*>();
         }
-        Serializable *s = SerializableFactory::inst().create(cl.name());
-        google::protobuf::Message *mess = s->getNew();
-        readMessage(*mess);
-        s->deserialize();
-        return s;
+        vector<Serializable*> ps;
+        for(size_t mi=0; mi<pack.names_size(); mi++) {
+            Protos::ClassName cl = pack.names(mi);
+            Serializable *s = SerializableFactory::inst().create(cl.name());
+            google::protobuf::Message *mess = s->getNew();
+            readMessage(*mess);
+            if(print) {
+                cout << mess->DebugString();
+            }
+            s->deserialize();
+            ps.push_back(s);
+        }
+        return ps;
     }
-    bool readAndPrintAny() {
+
+
+    bool read(vector<Serializable*> ps) {
         CHECK_MODE(Read);
-        Protos::ClassName cl;
-        if(!readMessage(cl)) {
+        Protos::Pack pack;
+        if(!readMessage(pack)) {
             return false;
         }
-        Serializable *s = SerializableFactory::inst().create(cl.name());
-        google::protobuf::Message *mess = s->getNew();
-        readMessage(*mess);
-        cout << mess->DebugString();
-        return true;
-    }
-    bool read(Serializable *s) {
-        CHECK_MODE(Read);
-        Protos::ClassName cl;
-        if(!readMessage(cl)) {
-            return false;
-        }
-        if(cl.name() != s->getName()) {
-            cerr << "Trying to read " << cl.name() << " as " << s->getName() << "\n";
+
+        if(ps.size() != pack.names_size()) {
+            cerr << "Trying to read pack of messages with different size " << ps.size() << " != " << pack.names_size() << "\n";
             terminate();
         }
-        google::protobuf::Message *mess = s->getNew();
-        readMessage(*mess);
-        s->deserialize();
+        for(size_t mi=0; mi<pack.names_size(); mi++) {
+            Serializable *s = ps[mi];
+            Protos::ClassName cl = pack.names(mi);
+            if(cl.name() != s->getName()) {
+                cerr << "Trying to read " << cl.name() << " as " << s->getName() << "\n";
+                terminate();
+            }
+            google::protobuf::Message *mess = s->getNew();
+            readMessage(*mess);
+            s->deserialize();
+        }
         return true;
     }
-
-    void write(Serializable *s) {
-        CHECK_MODE(Write);
-        Protos::ClassName cl;
-        cl.set_name(s->getName());
-        writeMessage(&cl);
-        ::google::protobuf::Message *mess = s->serialize();
-        writeMessage(mess);
+    bool read(Serializable* s) {
+        return read(vector<Serializable*>({s}));
     }
 
+    void write(vector<Serializable*> ps) {
+        CHECK_MODE(Write);
+        Protos::Pack pack;
+        for(size_t mi=0; mi<ps.size(); mi++) {
+            Serializable *s = ps[mi];
+            Protos::ClassName *cl = pack.add_names();
+            cl->set_name(s->getName());
+        }
+        writeMessage(&pack);
+        for(size_t mi=0; mi<ps.size(); mi++) {
+            Serializable *s = ps[mi];
+            ::google::protobuf::Message *mess = s->serialize();
+            writeMessage(mess);
+        }
+    }
+    void write(Serializable* s) {
+        write(vector<Serializable*>({s}));
+    }
 
     template <typename T>
     vector<T> readAll() {

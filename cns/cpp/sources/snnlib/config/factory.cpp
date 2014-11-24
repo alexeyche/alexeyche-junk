@@ -112,11 +112,11 @@ Layer *Factory::createLayer(size_t size, const NeuronConf &nc, const Constants &
 }
 
 
-TuningCurve *Factory::createTuningCurve(string name, const Constants &c, Neuron *n) {
+TuningCurve *Factory::createTuningCurve(string name, const Constants &c,  size_t layer_size, size_t neuron_id, Neuron *n) {
     GET_BASE_NAME(entity_map)
     TuningCurve *o = dynamic_cast<TuningCurve*>(entity_map[base_struct_name]());
     if(!o) { cerr << "Error while reading " << name << " and treating like TuningCurve\n"; terminate(); }
-    o->init(c[name], n);
+    o->init(c[name], layer_size, neuron_id, n);
     objects.push_back(o);
     return o;
 }

@@ -8,19 +8,9 @@ class AdExNeuron;
 
 
 class AdExNeuronStat : public Serializable {
-protected:
-    AdExNeuronStat() : Serializable(EAdExNeuronStat) {
-        ns = new NeuronStat(nullptr);
-    }
-    friend class SerializableFactory;
 public:
-    AdExNeuronStat(Neuron *n) : Serializable(EAdExNeuronStat) {
-        ns = new NeuronStat(n);
+    AdExNeuronStat() : Serializable(EAdExNeuronStat) {
     }
-    ~AdExNeuronStat() {
-        if(ns) delete ns;
-    }
-
     void collect(AdExNeuron *n);
 
     AdExNeuronStat(const AdExNeuronStat &another);
@@ -30,15 +20,12 @@ public:
         for(size_t i=0; i<m->a_size(); i++) {
             a.push_back(m->a(i));
         }
-        ns->deserializeFromPtr(m->mutable_stat());
     }
     virtual Protos::AdExNeuronStat* getNew(google::protobuf::Message* m = nullptr) {
         return getNewSerializedMessage<Protos::AdExNeuronStat>(m);
     }
 
     void print(std::ostream& str) const {}
-
-    NeuronStat *ns;
 
     vector<double> a;
 };
@@ -82,8 +69,9 @@ public:
     // }
 
     void enableCollectStatistics() {
+        Neuron::enableCollectStatistics();
         collectStatistics = true;
-        adex_stat = new AdExNeuronStat(this);
+        adex_stat = new AdExNeuronStat();
     }
     // Runtime
     void propagateSynSpike(const SynSpike *sp) {
@@ -114,6 +102,7 @@ public:
             p = act->prob(y);
         }
         if(collectStatistics) {
+            Neuron::stat->collect(this);
             adex_stat->collect(this);
         }
     }
@@ -151,8 +140,12 @@ public:
 
 
     }
-    Serializable* getStat() {
-        return adex_stat;
+    vector<Serializable*> getStats() {
+        vector<Serializable*> s({Neuron::stat, adex_stat});
+        if(lrule->getStat()) {
+            s.push_back(lrule->getStat());
+        }
+        return s;
     }
     void print(std::ostream& str) const {
         str << "AdExNeuron(" << id << ")\n";

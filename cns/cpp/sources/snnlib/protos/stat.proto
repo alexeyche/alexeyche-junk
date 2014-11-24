@@ -1,17 +1,23 @@
 package Protos;
 
-message SynStat {
-	repeated double x = 1 [packed=true];
-}
-
 
 message NeuronStat {
+    message SynStat {
+        repeated double x = 1 [packed=true];
+    }
 	repeated double p = 1 [packed=true];
 	repeated double u = 2 [packed=true];
 	repeated SynStat syns = 3;
 }
 
 message AdExNeuronStat {
-	required NeuronStat stat = 1;
 	repeated double a = 2 [packed=true];
+}
+
+message OptimalStdpStat {
+    message CStat {
+        repeated double C = 1 [packed=true];
+    }
+    repeated double B = 2 [packed=true];
+    repeated CStat Cvals = 3;
 }

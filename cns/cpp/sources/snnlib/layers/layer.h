@@ -40,9 +40,9 @@ public:
             }
             TuningCurve *tc;
             if(nc.tuning_curve.empty()) {
-                tc = Factory::inst().createTuningCurve("BlankTuningCurve", c, nullptr);
+                tc = Factory::inst().createTuningCurve("BlankTuningCurve", c, N, ni, nullptr);
             } else {
-                tc = Factory::inst().createTuningCurve(nc.tuning_curve, c, n);
+                tc = Factory::inst().createTuningCurve(nc.tuning_curve, c, N, ni, n);
             }
 
             neurons.push_back(n);

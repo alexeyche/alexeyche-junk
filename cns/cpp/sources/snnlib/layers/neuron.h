@@ -80,8 +80,12 @@ public:
     virtual void provideDelegates(RunTimeDelegates &rtd) {}
 
     // stat funcs
-    virtual Serializable* getStat() {
-        return stat;
+    virtual vector<Serializable*> getStats() {
+        vector<Serializable*> s({stat});
+        if(lrule->getStat()) {
+            s.push_back(lrule->getStat());
+        }
+        return s;
     }
     virtual void enableCollectStatistics() {
         collectStatistics = true;

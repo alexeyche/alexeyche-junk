@@ -85,7 +85,10 @@ int main(int argc, char **argv) {
     } else
     if(options[ARG_PB].count() > 0) {
         ProtoRw prw(options[ARG_PB].arg, ProtoRw::Read);
-        while(prw.readAndPrintAny()) {}
+        while(true) {
+            vector<Serializable*> v = prw.readAny(true);
+            if(v.size() == 0) break;
+        }
     } else {
         option::printUsage(cout, usage);
     }
