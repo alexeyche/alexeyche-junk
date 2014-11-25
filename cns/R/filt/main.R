@@ -23,10 +23,10 @@ Xi = 1:100
 
 
 X = NULL
-labels = loadMatrix("~/prog/sim/ts/synthetic_control/synthetic_control_TRAIN_120_labels",1)
+labels = loadMatrix("~/prog/sim/ts/synthetic_control/synthetic_control_TRAIN_60_labels",1)
 ulabels = unique(labels)
 for(i in Xi) {    
-    X = c(X, loadMatrix("~/prog/sim/ts/synthetic_control/synthetic_control_TRAIN_120",i)[1,])
+    X = c(X, loadMatrix("~/prog/sim/ts/synthetic_control/synthetic_control_TRAIN_60",i)[1,])
     timeline = c(timeline, length(X))
 }
 

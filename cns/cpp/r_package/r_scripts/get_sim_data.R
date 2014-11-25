@@ -28,21 +28,21 @@ print(p1)
 
 # 
 # 
-# if(file.exists(stat_file)) {
-#     stat = RProto$new(stat_file)$read()
-#     nid=1
-#     t_plot = 1:100
-#     
-#     nst = stat[[nid]]
-#     par(mfrow=c(3,1))
-#     plot(nst[["u"]][t_plot], type="l")
-#     plot(nst[["p"]][t_plot], type="l")
-#     syns = nst[["syns"]]
-#     if(length(syns)>0) {
-#         plot(syns[[1]][t_plot],type="l", ylim=c(0,3))
-#         for(i in 2:length(syns)) {
-#             lines(syns[[i]][t_plot])
-#         }
-#     }
-# }
+if(file.exists(stat_file)) {
+    stat = RProto$new(stat_file)$read()
+    nid=1
+    t_plot = 1:100
+    
+    nst = stat[[nid]]
+    par(mfrow=c(3,1))
+    plot(nst[["u"]][t_plot], type="l")
+    plot(nst[["p"]][t_plot], type="l")
+    syns = nst[["syns"]]
+    if(length(syns)>0) {
+        plot(syns[[1]][t_plot],type="l", ylim=c(0,3))
+        for(i in 2:length(syns)) {
+            lines(syns[[i]][t_plot])
+        }
+    }
+}
 
