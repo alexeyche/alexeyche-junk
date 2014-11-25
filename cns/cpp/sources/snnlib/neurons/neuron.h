@@ -14,6 +14,7 @@
 
 static size_t global_neuron_index = 0;
 
+#define STAT_COLLECT_LIMIT 10000
 
 #define SYN_ACT_TOL 0.0001
 

@@ -12,19 +12,6 @@ M = nrow(spikes_bin)
 w = matrix(0, nrow=M, ncol=L) # default filter
 
 
-cut_window_mat = function(i,x) {
-    w_i = rev((i-L+1):i)
-    w_i = w_i[w_i>0]
-    
-    return(matrix(x[,w_i], nrow=M, ncol=length(w_i)))
-}
-
-conv_mat = Vectorize(function(i, y, w) {
-    yc = cut_window_mat(i,y)
-    wc = matrix(w[1:length(yc)], nrow=M, ncol=ncol(yc))
-    
-    sum(sapply(1:M, function(i) t(wc[i, ]) %*% yc[i,]))
-}, "i")
 
 E_vec = Vectorize(function(i, x, y, w) {
     (x[i]- conv_mat(i,y,w))^2
@@ -52,7 +39,7 @@ m_dEdw = function(w) {
 #require(lbfgs)
 #out = lbfgs(m_E, m_dEdw, w)
 #w_opt = out$par
-w_opt = loadMatrix("/home/alexeyche/prog/alexeyche-junk/cns/c/out.bin",1)
+w_opt = loadMatrix("~/prog/snn_sim/build/wopt.bin",1)
 
 #opt_res = optim(w, m_E, m_dEdw, method="BFGS",control=list(trace=1), hessian=FALSE)
 #w_opt = opt_res$par

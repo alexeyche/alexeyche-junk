@@ -68,4 +68,4 @@ public:
     }
 
 
-#define STAT_COLLECT_LIMIT 10
+

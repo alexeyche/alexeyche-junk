@@ -53,3 +53,18 @@ conv = Vectorize(function(i, y, w, shift=0) {
 conv_spike_matrix = function(sp_m, w) {
     t(sapply(1:nrow(sp_m), function(i) filter(sp_m[i,], w, circular=TRUE)))
 }
+
+cut_window_mat = function(i,x) {
+    w_i = rev((i-L+1):i)
+    w_i = w_i[w_i>0]
+    
+    return(matrix(x[,w_i], nrow=M, ncol=length(w_i)))
+}
+
+conv_mat = Vectorize(function(i, y, w) {
+    yc = cut_window_mat(i,y)
+    wc = matrix(w[1:length(yc)], nrow=M, ncol=ncol(yc))
+    
+    sum(sapply(1:M, function(i) t(wc[i, ]) %*% yc[i,]))
+}, "i")
+
