@@ -85,22 +85,15 @@ public:
     virtual void provideDelegates(RunTimeDelegates &rtd) {}
 
     // stat funcs
-    virtual SerialFamily getStats() {
-        SerialFamily s({stat});
-        if(lrule->getStat()) {
-            s.push_back(lrule->getStat());
-        }
-        return s;
+    virtual void saveStat(SerialPack &p) {
+        p.push_back(SerialFamily({stat}));
+        lrule->saveStat(p);
     }
     
-    virtual SerialFamily saveModel() {
+    virtual void saveModel(SerialPack &p) {
         model = new NeuronModel(this);
-        SerialFamily s({model});
-        SerialFamily lrule_m = lrule->saveModel();
-        if(lrule_m) {
-            s.push_back(lrule_m);
-        }
-        return s
+        p.push_back(SerialFamily({model});
+        lrule->saveModel(p);
     }
 
     virtual void enableCollectStatistics() {

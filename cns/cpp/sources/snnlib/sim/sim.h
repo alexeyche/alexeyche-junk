@@ -26,11 +26,12 @@ public:
     ~Sim() {
         if(!statistics_file.empty()) {
             ProtoRw prw(statistics_file, ProtoRw::Write);
+            SerialFamily st;
             for(auto it=sc.neurons_to_listen.begin(); it != sc.neurons_to_listen.end(); ++it) {
                 Neuron *n = accessByGlobalId(*it);
-                SerialFamily st = n->getStats();
-                prw.write(st);
+                n->saveStat(st);
             }
+            prw.write(st);
         }
         if(!output_spikes_file.empty()){
             ProtoRw prw(output_spikes_file, ProtoRw::Write);

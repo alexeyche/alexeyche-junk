@@ -98,7 +98,7 @@ public:
         p.push_back(SerialFamily({layer_info}));
 
         for(size_t ni=0; ni<N; ni++) {
-            p.push_back(neurons[ni]->saveModel());
+            neurons[ni]->saveModel(p);
         }
         return p;
     }

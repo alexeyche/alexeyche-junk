@@ -140,13 +140,11 @@ public:
 
 
     }
-    SerialFamily getStats() {
-        SerialFamily s({Neuron::stat, adex_stat});
-        if(lrule->getStat()) {
-            s.push_back(lrule->getStat());
-        }
-        return s;
+    void saveStat(SerialPack &p) {
+        p.push_back(SerialFamily({Neuron::stat, adex_stat}));
+        lrule->saveStat(p)
     }
+    
     void print(std::ostream& str) const {
         str << "AdExNeuron(" << id << ")\n";
         str << "\ty == " << y << ", axon_delay: " << axon_delay << ", synapses\n";

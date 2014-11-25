@@ -25,7 +25,7 @@ public:
     void calculateWeightsDynamics()  {
 
     }
-    Serializable* getStat() { return nullptr; }
+    void getStat(SerialPack &p) {  }
 
     const OptimalStdpC *c;
     Neuron *n;
