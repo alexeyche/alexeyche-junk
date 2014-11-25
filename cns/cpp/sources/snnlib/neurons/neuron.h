@@ -45,7 +45,7 @@ public:
         fired = 0;
 
         collectStatistics = false;
-        stat = nullptr; 
+        stat = nullptr;
         model = nullptr;
         axon_delay = _axon_delay;
     }
@@ -77,7 +77,7 @@ public:
     vector<Synapse*> syns;
 
 
-    //runtime
+    // runtime
     virtual void calculateProbability() = 0;
     virtual void calculateDynamics() = 0;
     virtual void attachCurrent(const double &I) = 0;
@@ -89,7 +89,7 @@ public:
         p.push_back(SerialFamily({stat}));
         lrule->saveStat(p);
     }
-    
+
     virtual void saveModel(SerialPack &p) {
         model = new NeuronModel(this);
         p.push_back(SerialFamily({model}));

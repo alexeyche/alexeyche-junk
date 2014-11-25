@@ -5,16 +5,15 @@
 
 class AdExNeuron;
 
-
-
-class AdExNeuronStat : public Serializable {
+class AdExNeuronStat : public Serializable  {
 public:
     AdExNeuronStat() : Serializable(EAdExNeuronStat) {
     }
-    void collect(AdExNeuron *n);
+    virtual void collect(AdExNeuron *n);
 
     AdExNeuronStat(const AdExNeuronStat &another);
     virtual Protos::AdExNeuronStat *serialize();
+
     virtual void deserialize() {
         Protos::AdExNeuronStat * m = castSerializableType<Protos::AdExNeuronStat>(serialized_message);
         for(size_t i=0; i<m->a_size(); i++) {
@@ -144,7 +143,7 @@ public:
         p.push_back(SerialFamily({Neuron::stat, adex_stat}));
         lrule->saveStat(p);
     }
-    
+
     void print(std::ostream& str) const {
         str << "AdExNeuron(" << id << ")\n";
         str << "\ty == " << y << ", axon_delay: " << axon_delay << ", synapses\n";

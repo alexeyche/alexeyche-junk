@@ -3,6 +3,7 @@
 #include <snnlib/protos/stat.pb.h>
 #include <snnlib/serialize/serialize.h>
 
+#define STAT_LIMIT 10000
 
 class Neuron;
 
@@ -13,12 +14,16 @@ protected:
 public:
     NeuronStat(Neuron *n);
 
-    void collect(Neuron *n);
+    virtual void collect(Neuron *n);
 
     NeuronStat(const NeuronStat &another) : Serializable(ENeuronStat), syns(another.syns), p(another.p), u(another.u) {
         copyFrom(another);
     }
     virtual Protos::NeuronStat *serialize();
+
+    bool readyCollect() {
+        return p.size() < STAT_LIMIT;
+    }
 
     virtual void deserialize() {
         Protos::NeuronStat * m = castSerializableType<Protos::NeuronStat>(serialized_message);
@@ -38,7 +43,7 @@ public:
             syns.push_back(x_v);
         }
     }
-    
+
 
     virtual Protos::NeuronStat* getNew(google::protobuf::Message* m = nullptr) {
         return getNewSerializedMessage<Protos::NeuronStat>(m);

@@ -66,3 +66,6 @@ public:
         cerr << "Instance was created with constants different type\n";\
         terminate();\
     }
+
+
+#define STAT_COLLECT_LIMIT 10

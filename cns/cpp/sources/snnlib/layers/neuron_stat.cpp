@@ -14,11 +14,14 @@ NeuronStat::NeuronStat(Neuron *n) : Serializable(ENeuronStat) {
 
 
 void NeuronStat::collect(Neuron *n) {
+    if(p.size()>STAT_COLLECT_LIMIT) return;
+
     p.push_back(n->p);
     u.push_back(n->y);
     for(size_t syn_i=0; syn_i<n->syns.size(); syn_i++) {
         syns[syn_i].push_back(n->syns[syn_i]->x);
     }
+
 }
 
 Protos::NeuronStat *NeuronStat::serialize() {
