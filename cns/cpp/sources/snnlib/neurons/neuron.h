@@ -87,14 +87,17 @@ public:
 
     // stat funcs
     virtual void saveStat(SerialPack &p) {
-        p.push_back(SerialFamily({stat}));
-        lrule->saveStat(p);
+        SerialFamily f({stat});
+        lrule->saveStat(f);
+        p.push_back(f);
     }
 
     virtual void saveModel(SerialPack &p) {
         model = new NeuronModel(this);
-        p.push_back(SerialFamily({model}));
-        lrule->saveModel(p);
+        SerialFamily f({model});
+        lrule->saveModel(f);
+        p.push_back(f);
+        
     }
 
     virtual void enableCollectStatistics() {

@@ -40,6 +40,12 @@ public:
 
         layers.clear();
     }
+    
+    void loadModel(string f) {
+        ProtoRw prw(f,ProtoRw::Read);
+        // read sim info
+        
+    }
 
     void print(std::ostream& str) const {
         for(auto it=layers.begin(); it!=layers.end(); ++it) {

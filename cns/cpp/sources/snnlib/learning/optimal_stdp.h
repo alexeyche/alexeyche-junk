@@ -24,8 +24,8 @@ public:
     void calculateWeightsDynamics()  {
 
     }
-    void saveStat(SerialPack &p) {  }
-    void saveModel(SerialPack &p) {  }
+    void saveStat(SerialFamily &p) {  }
+    void saveModel(SerialFamily &p) {  }
     
     const OptimalStdpC *c;
     Neuron *n;

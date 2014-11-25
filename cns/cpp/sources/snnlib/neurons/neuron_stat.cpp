@@ -15,7 +15,6 @@ NeuronStat::NeuronStat(Neuron *n) : Serializable(ENeuronStat) {
 
 void NeuronStat::collect(Neuron *n) {
     if(p.size()>STAT_COLLECT_LIMIT) return;
-    cout << p.size() << "\n";
     p.push_back(n->p);
     u.push_back(n->y);
     for(size_t syn_i=0; syn_i<n->syns.size(); syn_i++) {

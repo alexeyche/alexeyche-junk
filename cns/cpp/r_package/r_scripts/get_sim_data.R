@@ -20,7 +20,7 @@ stat_file = sprintf("%s/%sstat.pb", workdir, ep_str)
 
 net = RProto$new(output_spikes)$read()
 
-Ti=1
+Ti=0
 Trange=1000
 p1 = prast(net,T0=Ti*Trange,Tmax=(Ti+1)*Trange)
 #print(p1, position=c(0, 0.6, 1, 1)), more=TRUE)

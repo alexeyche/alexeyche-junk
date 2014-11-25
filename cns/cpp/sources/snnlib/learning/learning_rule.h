@@ -9,8 +9,8 @@ class LearningRule : public Obj {
 public:
 	virtual void init(const ConstObj *_c, Neuron *_n) = 0;
     virtual void calculateWeightsDynamics() = 0;
-    virtual void saveStat(SerialPack &p) = 0;
-    virtual void saveModel(SerialPack &p) = 0;
+    virtual void saveStat(SerialFamily &p) = 0;
+    virtual void saveModel(SerialFamily &p) = 0;
 protected:
 	Neuron *n;    
 };
@@ -21,6 +21,6 @@ public:
         n = _n;
 	}
     void calculateWeightsDynamics() {}
-    void saveStat(SerialPack &p) {  }
-    void saveModel(SerialPack &p) {  }
+    void saveStat(SerialFamily &p) {  }
+    void saveModel(SerialFamily &p) {  }
 };

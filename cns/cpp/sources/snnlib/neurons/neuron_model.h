@@ -15,12 +15,24 @@ public:
     }
     virtual Protos::NeuronModel *serialize() {
         Protos::NeuronModel *stat = getNew();
-
+        for(auto it=n->syns.begin(); it != n->syns.end(); ++it) {
+            Synapse *s = *it;
+            Protos::NeuronModel::Syns *syns = stat->add_syns();
+            syns->set_w(s->w);
+            syns->set_id_pre(s->id_pre);
+            syns->set_dendrite_delay(s->dendrite_delay);
+        }
+        stat->set_axon_delay(n->axon_delay);
+        return stat;
     }
 
     virtual void deserialize() {
         Protos::NeuronModel *m = castSerializableType<Protos::NeuronModel>(serialized_message);
-        
+        n->syns.clear();
+        for(size_t si=0; si<m->syns_size(); si++) {
+            
+            n->syns
+        }    
     }
     virtual Protos::NeuronModel* getNew(google::protobuf::Message* m = nullptr) {
         return getNewSerializedMessage<Protos::NeuronModel>(m);
@@ -30,6 +42,6 @@ public:
     }
 
 
-    const Neuron *n;
+    Neuron *n;
 };
 
