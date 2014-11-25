@@ -19,14 +19,14 @@ public:
         CAST_TYPE(OptimalStdpC, _c)
         c = cast;
         n = _n;
-        n->setLearningRule(this);
     }
 
     void calculateWeightsDynamics()  {
 
     }
-    void getStat(SerialPack &p) {  }
-
+    void saveStat(SerialPack &p) {  }
+    void saveModel(SerialPack &p) {  }
+    
     const OptimalStdpC *c;
     Neuron *n;
 };

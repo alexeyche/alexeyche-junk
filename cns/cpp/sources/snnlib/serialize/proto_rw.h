@@ -99,7 +99,11 @@ public:
     bool read(Serializable* s) {
         return read(SerialFamily({s}));
     }
-
+    void write(SerialPack &ps) {
+        for(auto it=ps.begin(); it != ps.end(); ++it) {
+            write(*it);
+        }
+    }
     void write(SerialFamily ps) {
         CHECK_MODE(Write);
         Protos::Family pack;

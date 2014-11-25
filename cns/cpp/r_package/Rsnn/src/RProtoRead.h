@@ -7,7 +7,7 @@
 #include "common.h"
 
 #include <snnlib/serialize/proto_rw.h>
-#include <snnlib/layers/adex_neuron.h>
+#include <snnlib/neurons/adex_neuron.h>
 
 class RProto {
 public:
@@ -18,17 +18,17 @@ public:
             try {
                 ProtoRw rw(protofile, ProtoRw::Read);
 
-                Serializable *o = rw.readAny();
-                if(!o) {
+                SerialFamily o = rw.readAny();
+                if(o.size() == 0) {
                     ERR("Can't read protofile " << protofile << "\n");
                 }
                 
-                vector<Serializable*> v;
+                SerialPack v;
                 v.push_back(o);
                 
                 while(true) {
-                    Serializable *o = rw.readAny();
-                    if(!o) break;
+                    SerialFamily o = rw.readAny();
+                    if(o.size() == 0) break;
                     v.push_back(o);
                 }
                 if(v.size() == 1) {
@@ -49,38 +49,38 @@ public:
     void print() {
         cout << "RProto instance. run instance$read() method to read protobuf\n";
     }
-    Rcpp::List convert(Serializable *s) {
-        if(s->getName() == "SpikesList") {
-            SpikesList *sl = dynamic_cast<SpikesList*>(s);
-            if(!sl) { ERR("Can't cast"); }
-            Rcpp::List sl_r(sl->N);
-            for(size_t ni=0; ni<sl_r.size(); ni++) {
-                sl_r[ni] = Rcpp::NumericVector(Rcpp::wrap(sl->sp_list[ni]));
+    Rcpp::List convert(SerialFamily &f) {
+        Rcpp::List out;
+        for(auto it=f.begin(); it != f.end(); ++it) {
+            Serializable *s = *it;
+            if(s->getName() == "SpikesList") {
+                SpikesList *sl = dynamic_cast<SpikesList*>(s);
+                if(!sl) { ERR("Can't cast"); }
+                for(size_t ni=0; ni<sl->N; ni++) {
+                    stringstream ss;
+                    ss << ni;
+                    out[ss.str()] = Rcpp::NumericVector(Rcpp::wrap(sl->sp_list[ni]));
+                }
+            } else 
+            if(s->getName() == "NeuronStat") {
+                NeuronStat *st = dynamic_cast<NeuronStat*>(s);
+                if(!st) { ERR("Can't cast"); }
+                out["p"] = Rcpp::wrap(st->p);
+                out["u"] = Rcpp::wrap(st->u);
+                out["syns"] = Rcpp::wrap(st->syns);
+            } else 
+            if(s->getName() == "AdExNeuronStat") {
+                AdExNeuronStat *st = dynamic_cast<AdExNeuronStat*>(s);
+                if(!st) { ERR("Can't cast"); }
+                out["a"] = Rcpp::wrap(st->a);
+            } else {
+                ERR("Unknown serializable name: " << s->getName() << "\n");
             }
-            return sl_r;
-        } else 
-        if(s->getName() == "NeuronStat") {
-            NeuronStat *st = dynamic_cast<NeuronStat*>(s);
-            if(!st) { ERR("Can't cast"); }
-            Rcpp::NumericVector p(Rcpp::wrap(st->p));
-            Rcpp::NumericVector u(Rcpp::wrap(st->u));
-            Rcpp::List syns(Rcpp::wrap(st->syns));
-            return Rcpp::List::create( Rcpp::Named("p") = p, Rcpp::Named("u") = u, Rcpp::Named("syns") = syns );
-        } else 
-        if(s->getName() == "AdExNeuronStat") {
-            AdExNeuronStat *st = dynamic_cast<AdExNeuronStat*>(s);
-            if(!st) { ERR("Can't cast"); }
-            Rcpp::NumericVector p(Rcpp::wrap(st->ns->p));
-            Rcpp::NumericVector u(Rcpp::wrap(st->ns->u));
-            Rcpp::NumericVector a(Rcpp::wrap(st->a));
-            Rcpp::List syns(Rcpp::wrap(st->ns->syns));
-            return Rcpp::List::create( Rcpp::Named("p") = p, Rcpp::Named("u") = u, Rcpp::Named("syns") = syns, Rcpp::Named("a") = a );
-        } else {
-            ERR("Unknown serializable name: " << s->getName() << "\n");
         }
+        return out;
     }
     
-        Rcpp::List values;
+    Rcpp::List values;
     std::string protofile;
 };
 

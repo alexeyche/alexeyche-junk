@@ -253,12 +253,15 @@ public:
 class SimRunConf: public ConstObj {
 public:
     double dt;
+    int seed;
 
     void fill_structure(JsonBox::Value v) {
         dt = v["dt"].getDouble();
+        seed = v["seed"].getInt();
     }
+
     void print(std::ostream &str) const {
-        str << "dt: " << dt << "\n";
+        str << "dt: " << dt << " seed: " << seed << "\n";
     }
 };
 

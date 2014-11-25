@@ -25,6 +25,3 @@ message NeuronModel {
 }
 
 
-message Layer {
-	repeated NeuronModel neurons = 1;
-}

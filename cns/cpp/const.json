@@ -91,16 +91,17 @@
         ],
         "conn_map" : {
             "0-1" : [
-                { "prob" : 1.0, "weight_per_neuron" : 75, "type" : "Synapse", "dendrite_delay_distr" : [0, 0] }
+                { "prob" : 1.0, "weight_per_neuron" : 100, "type" : "Synapse", "dendrite_delay_distr" : [0, 0] }
             ],
             "1-2" : [
-                { "prob" : 1.0, "weight_per_neuron" : 75, "type" : "Synapse", "dendrite_delay_distr" : [0, 0] },
+                { "prob" : 1.0, "weight_per_neuron" : 120, "type" : "Synapse", "dendrite_delay_distr" : [0, 0] },
             ]
         },
         "time_series_map_conf" : {
             "dt" : 2.0          // ms
         },
         "sim_run_conf" : {
+            "seed" : 1,
             "dt" : 1            // ms
         },
         "neurons_to_listen" : [51, 101]

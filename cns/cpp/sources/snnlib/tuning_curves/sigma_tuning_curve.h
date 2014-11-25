@@ -17,7 +17,6 @@ public:
         CAST_TYPE(SigmaTuningCurveC, _c)
         c = cast;
         n = _n;
-        n->setTuningCurve(this);
         center = c->intercept.first + ((double)neuron_id/layer_size)*(c->intercept.second-c->intercept.first);
         gain = getUnifBetween(c->gain.first, c->gain.second);
         sigma = getUnifBetween(c->sigma.first, c->sigma.second);

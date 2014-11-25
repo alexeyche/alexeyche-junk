@@ -36,20 +36,17 @@ public:
             double axon_delay = sampleDelay(nc.axon_delay_gain, nc.axon_delay_rate);
             
             Neuron *n = Factory::inst().createNeuron(nc.neuron, c, run_glob_c, axon_delay);
-
-            ActFunc *act = Factory::inst().createActFunc(nc.act_func, c, n);
-
-            LearningRule *lr;
+            n->setActFunc(Factory::inst().createActFunc(nc.act_func, c, n));
+            
             if(nc.learning_rule.empty()) {
-                lr = Factory::inst().createLearningRule("BlankLearningRule", c, nullptr);
+                n->setLearningRule(Factory::inst().createLearningRule("BlankLearningRule", c, nullptr));
             } else {
-                lr = Factory::inst().createLearningRule(nc.learning_rule, c, n);
+                n->setLearningRule(Factory::inst().createLearningRule(nc.learning_rule, c, n));
             }
-            TuningCurve *tc;
             if(nc.tuning_curve.empty()) {
-                tc = Factory::inst().createTuningCurve("BlankTuningCurve", c, N, ni, nullptr);
+                n->setTuningCurve(Factory::inst().createTuningCurve("BlankTuningCurve", c, N, ni, nullptr));
             } else {
-                tc = Factory::inst().createTuningCurve(nc.tuning_curve, c, N, ni, n);
+                n->setTuningCurve(Factory::inst().createTuningCurve(nc.tuning_curve, c, N, ni, n));
             }
 
             neurons.push_back(n);
@@ -100,6 +97,7 @@ public:
         for(size_t ni=0; ni<N; ni++) {
             neurons[ni]->saveModel(p);
         }
+        
         return p;
     }
     size_t id;

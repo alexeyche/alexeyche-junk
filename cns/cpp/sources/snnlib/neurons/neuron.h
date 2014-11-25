@@ -92,7 +92,7 @@ public:
     
     virtual void saveModel(SerialPack &p) {
         model = new NeuronModel(this);
-        p.push_back(SerialFamily({model});
+        p.push_back(SerialFamily({model}));
         lrule->saveModel(p);
     }
 

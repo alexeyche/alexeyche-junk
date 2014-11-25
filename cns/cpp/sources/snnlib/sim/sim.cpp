@@ -8,6 +8,12 @@
 #include <snnlib/neurons/srm_neuron.h>
 
 Sim::Sim(const Constants &c, size_t _jobs) : Tmax(0), jobs(_jobs), sc(c.sim_conf) {
+    if(sc.sim_run_c.seed<0) {
+        std::srand ( unsigned ( std::time(0) ) );
+    } else {
+        std::srand (sc.sim_run_c.seed);
+    }
+    
     input_neurons_count = 0;
     for(size_t l_id = 0; l_id < sc.input_layers_conf.size(); l_id++) {
         LayerConf conf = sc.input_layers_conf[l_id];

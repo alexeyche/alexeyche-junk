@@ -137,6 +137,9 @@ public:
 
     void init(LabeledTimeSeriesList &lst, const double &dt) {
         double acc_time = 0;
+        auto engine = std::default_random_engine{};
+        std::random_shuffle(lst.ts.begin(), lst.ts.end());
+        
         for(auto it=lst.ts.begin(); it != lst.ts.end(); ++it) {
             for(auto it_val=it->ts.data.begin(); it_val != it->ts.data.end(); ++it_val) {
                 data.push_back(*it_val);

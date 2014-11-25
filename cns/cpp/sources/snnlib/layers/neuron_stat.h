@@ -38,6 +38,8 @@ public:
             syns.push_back(x_v);
         }
     }
+    
+
     virtual Protos::NeuronStat* getNew(google::protobuf::Message* m = nullptr) {
         return getNewSerializedMessage<Protos::NeuronStat>(m);
     }
