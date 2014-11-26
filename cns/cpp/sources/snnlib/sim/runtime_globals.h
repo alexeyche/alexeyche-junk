@@ -4,13 +4,17 @@
 
 class RuntimeGlobals {
 public:
-	RuntimeGlobals() {}
+	RuntimeGlobals(const Constants &_c) : c(_c) {}
 	void setDt(double _dt) {
 		dt = _dt;
 	}
 	inline const double& Dt() const {
 		return dt;
 	}
-private:	
+    inline const Constants& C() const {
+        return c;
+    }
+private:
 	double dt;
+    const Constants &c;
 };

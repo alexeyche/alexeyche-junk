@@ -8,24 +8,24 @@
 
 using namespace google::protobuf::io;
 
-enum ESerializableClass { 
-                            ENeuronStat, 
-                            ESpikesList, 
-                            ELabeledTimeSeries, 
-                            ELabeledTimeSeriesList, 
+enum ESerializableClass {
+                            ENeuronStat,
+                            ESpikesList,
+                            ELabeledTimeSeries,
+                            ELabeledTimeSeriesList,
                             EAdExNeuronStat,
-                            ENeuronModel,
+                            ENeuron,
                             ELayerInfo
                         };
-                        
-static const char* ESerializableClass_str[] = 
-                                            { 
-                                                "NeuronStat", 
-                                                "SpikesList", 
-                                                "LabeledTimeSeries", 
-                                                "LabeledTimeSeriesList", 
+
+static const char* ESerializableClass_str[] =
+                                            {
+                                                "NeuronStat",
+                                                "SpikesList",
+                                                "LabeledTimeSeries",
+                                                "LabeledTimeSeriesList",
                                                 "AdExNeuronStat",
-                                                "NeuronModel",
+                                                "Neuron",
                                                 "LayerInfo"
                                             };
 
@@ -80,8 +80,14 @@ public:
             serialized_message = getNew(another.serialized_message);
         }
     }
-
+    Serializable() {
+        serialized_message = nullptr;
+    }
     Serializable(ESerializableClass ename) {
+        init(ename);
+    }
+
+    void init(ESerializableClass ename) {
         name = string(ESerializableClass_str[ename]);
         serialized_message = nullptr;
     }
@@ -119,6 +125,10 @@ public:
     }
 
     const string& getName() {
+        if(name.empty()) {
+            cerr << "Trying to get name from uninitialized Serializable object\n";
+            terminate();
+        }
         return name;
     }
     void setSerializedMessage(google::protobuf::Message *_serialized_message) {

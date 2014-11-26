@@ -6,59 +6,57 @@
 #include <snnlib/config/constants.h>
 #include <snnlib/tuning_curves/tuning_curve.h>
 #include <snnlib/sim/runtime_globals.h>
-#include <snnlib/serialize/serialize.h>
+#include <snnlib/serialize/proto_rw.h>
 #include <snnlib/config/factory.h>
 
 #include "synapse.h"
 #include "neuron_stat.h"
-#include "neuron_model.h"
+
+#include <snnlib/protos/model.pb.h>
+//#include "neuron_model.h"
 
 static size_t global_neuron_index = 0;
+
+
+class ProtoRw;
 
 #define STAT_COLLECT_LIMIT 10000
 
 #define SYN_ACT_TOL 0.0001
 
-class Neuron: public Printable {
+class Neuron: public Serializable {
 protected:
     Neuron() {}
     friend class Factory;
 public:
-    Neuron(const ConstObj *_c, const RuntimeGlobals *_glob_c, double _axon_delay) {
-        init(_c, _glob_c, _axon_delay);
-    }
-    
-    virtual void init(const ConstObj *_c, const RuntimeGlobals *_glob_c, double _axon_delay) {
-        id = global_neuron_index++;
-        bc = _c;
-        glob_c = _glob_c;
+    Neuron(const ConstObj *_c, const RuntimeGlobals *_glob_c, double _axon_delay);
+    Neuron(const Neuron &another);
 
-        act = nullptr; lrule = nullptr; tc = nullptr;
+    // init
+    virtual void init(const ConstObj *_c, const RuntimeGlobals *_glob_c, double _axon_delay);
+    void setActFunc(ActFunc *_act);
+    void setLearningRule(LearningRule *_lrule);
+    void setTuningCurve(TuningCurve *_tc);
+    void addSynapse(Synapse *s);
 
-        y = 0.0;
-        p = 0.0;
-        fired = 0;
+    // serialize
+    virtual void deserialize();
+    virtual Protos::Neuron* getNew(google::protobuf::Message* m);
+    virtual Protos::Neuron *serialize();
+    void readModel(ProtoRw &rw);
 
-        collectStatistics = false;
-        stat = nullptr;
-        axon_delay = _axon_delay;
-    }
-    void setActFunc(ActFunc *_act) {
-        act = _act;
-    }
-    void setLearningRule(LearningRule *_lrule) {
-        lrule = _lrule;
-    }
-    void setTuningCurve(TuningCurve *_tc) {
-        tc = _tc;
-    }
+    // runtime
+    virtual void calculateProbability() = 0;
+    virtual void calculateDynamics() = 0;
+    virtual void attachCurrent(const double &I) = 0;
+    virtual void propagateSynSpike(const SynSpike *sp) = 0;
+    virtual void provideDelegates(RunTimeDelegates &rtd) {}
 
-    void addSynapse(Synapse *s) {
-        syns.push_back(s);
-        if(collectStatistics) {
-            stat->syns.push_back(vector<double>());
-        }
-    }
+    // stat funcs
+    virtual void saveStat(SerialPack &p);
+    virtual void enableCollectStatistics();
+
+    void print(std::ostream& str) const;
 
     size_t id;
 
@@ -69,47 +67,6 @@ public:
     double axon_delay;
 
     vector<Synapse*> syns;
-
-
-    // runtime
-    virtual void calculateProbability() = 0;
-    virtual void calculateDynamics() = 0;
-    virtual void attachCurrent(const double &I) = 0;
-    virtual void propagateSynSpike(const SynSpike *sp) = 0;
-    virtual void provideDelegates(RunTimeDelegates &rtd) {}
-
-    // stat funcs
-    virtual void saveStat(SerialPack &p) {
-        SerialFamily f({stat});
-        lrule->saveStat(f);
-        p.push_back(f);
-    }
-
-    virtual void saveModel(SerialPack &p) {
-        NeuronModel *model = Factory::inst().registerObj<NeuronModel>(new NeuronModel(this));
-        SerialFamily f({model});
-        lrule->saveModel(f);
-        p.push_back(f);
-    }
-
-    virtual void enableCollectStatistics() {
-        collectStatistics = true;
-        stat = Factory::inst().registerObj<NeuronStat>(new NeuronStat(this));
-    }
-
-    //virtual vector<string> getDependentConstantsNames() { return vector<string>(); }
-    //virtual void setDependentConstants(const vector<const ConstObj*> &constants) { }
-
-    void print(std::ostream& str) const {
-        str << "Neuron(" << id << ")\n";
-        str << "\ty == " << y << ", axon_delay: " << axon_delay << ", synapses\n";
-        for(auto it=syns.begin(); it != syns.end(); ++it) {
-            Synapse *s = *it;
-            str << *s << ", ";
-        }
-        str << "\n";
-    }
-
 protected:
     NeuronStat *stat;
 

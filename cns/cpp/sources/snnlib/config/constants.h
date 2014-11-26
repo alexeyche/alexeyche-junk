@@ -6,16 +6,28 @@
 #include <snnlib/base.h>
 #include <snnlib/util/util.h>
 
-class ConstObj: public Entity {
+class ConfObj: public Entity {
 public:
     virtual void fill_structure(JsonBox::Value v) = 0;
 };
+
+
+class ConstObj: public Entity {
+public:
+    ConstObj(string _name) : name(_name) {}
+    virtual void fill_structure(JsonBox::Value v) = 0;
+    virtual const string& getName() const { return name; }
+private:
+    string name;
+};
+
 
 
 
 
 class SRMNeuronC: public ConstObj {
 public:
+    SRMNeuronC(string name) : ConstObj(name) {}
     double tau_refr;
     double amp_refr;
     double u_rest;
@@ -32,6 +44,7 @@ public:
 
 class AdExNeuronC: public ConstObj {
 public:
+    AdExNeuronC(string name) : ConstObj(name) {}
     double C;
     double t_ref;
     double gL;
@@ -76,6 +89,7 @@ void printDoublePair(pair<double,double> p, std::ostream &str);
 
 class SigmaTuningCurveC: public ConstObj {
 public:
+    SigmaTuningCurveC(string name) : ConstObj(name) {}
     pair<double,double> sigma;
     pair<double,double> intercept;
     pair<double,double> gain;
@@ -96,6 +110,7 @@ public:
 
 class SynapseC : public ConstObj {
 public:
+    SynapseC(string name) : ConstObj(name) {}
     double epsp_decay;
     double amp;
 
@@ -112,6 +127,7 @@ public:
 
 class DetermC : public ConstObj {
 public:
+    DetermC(string name) : ConstObj(name) {}
     double u_tr;
 
     void fill_structure(JsonBox::Value v) {
@@ -125,6 +141,7 @@ public:
 
 class ExpHennequinC : public ConstObj {
 public:
+    ExpHennequinC(string name) : ConstObj(name) {}
     double u_tr;
     double gain_factor;
     double p_rest;
@@ -152,6 +169,7 @@ public:
 
 class OptimalStdpC: public ConstObj {
 public:
+    OptimalStdpC(string name) : ConstObj(name) {}
     double tau_c;
     double mean_p_dur;
     double target_rate;
@@ -175,7 +193,7 @@ public:
     }
 };
 
-class NeuronConf : public ConstObj {
+class NeuronConf : public ConfObj {
 public:
     string neuron;
     string act_func;
@@ -199,7 +217,7 @@ public:
     }
 };
 
-class LayerConf : public ConstObj {
+class LayerConf : public ConfObj {
 public:
     size_t size;
 
@@ -215,7 +233,7 @@ public:
 };
 
 
-class ConnectionConf: public ConstObj {
+class ConnectionConf: public ConfObj {
 public:
     double prob;
     double weight_per_neuron;
@@ -240,7 +258,7 @@ public:
     }
 };
 
-class TimeSeriesMapConf : public ConstObj {
+class TimeSeriesMapConf : public ConfObj {
 public:
     double dt;
     void print(std::ostream &str) const {
@@ -250,7 +268,7 @@ public:
         dt = v["dt"].getDouble();
     }
 };
-class SimRunConf: public ConstObj {
+class SimRunConf: public ConfObj {
 public:
     double dt;
     int seed;
@@ -269,7 +287,7 @@ public:
 
 typedef map< pair<size_t, size_t>, vector<ConnectionConf> > ConnectionMap;
 
-class SimConfiguration: public ConstObj {
+class SimConfiguration: public ConfObj {
 public:
     vector<LayerConf> input_layers_conf;
     vector<LayerConf> net_layers_conf;

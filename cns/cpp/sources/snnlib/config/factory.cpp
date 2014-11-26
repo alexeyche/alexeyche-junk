@@ -21,13 +21,13 @@ Factory& Factory::inst() {
 
 
 Factory::Factory() {
-    const_map["SRMNeuron"]     =   &createInstance<Obj, SRMNeuronC>;
-    const_map["AdExNeuron"]     =   &createInstance<Obj, AdExNeuronC>;
-    const_map["Synapse"]      =   &createInstance<Obj, SynapseC>;
-    const_map["Determ"]       =   &createInstance<Obj, DetermC>;
-    const_map["ExpHennequin"] =   &createInstance<Obj, ExpHennequinC>;
-    const_map["OptimalStdp"]  =   &createInstance<Obj, OptimalStdpC>;
-    const_map["SigmaTuningCurve"]  =  &createInstance<Obj, SigmaTuningCurveC>;
+    const_map["SRMNeuron"]     =   &createConstInstance<Obj, SRMNeuronC>;
+    const_map["AdExNeuron"]     =   &createConstInstance<Obj, AdExNeuronC>;
+    const_map["Synapse"]      =   &createConstInstance<Obj, SynapseC>;
+    const_map["Determ"]       =   &createConstInstance<Obj, DetermC>;
+    const_map["ExpHennequin"] =   &createConstInstance<Obj, ExpHennequinC>;
+    const_map["OptimalStdp"]  =   &createConstInstance<Obj, OptimalStdpC>;
+    const_map["SigmaTuningCurve"]  =  &createConstInstance<Obj, SigmaTuningCurveC>;
 
     entity_map["SRMNeuron"]     =   &createInstance<Obj, SRMNeuron>;
     entity_map["AdExNeuron"]     =   &createInstance<Obj, AdExNeuron>;
@@ -51,7 +51,7 @@ Factory::Factory() {
 
 ConstObj *Factory::createConst(string name, JsonBox::Value v) {
     GET_BASE_NAME(const_map)
-    ConstObj *o = dynamic_cast<ConstObj*>(const_map[base_struct_name]());
+    ConstObj *o = dynamic_cast<ConstObj*>(const_map[base_struct_name](name));
     if(!o) {
         cerr << "Error while reading " << name << " and treating like ConstObj\n";
         terminate();

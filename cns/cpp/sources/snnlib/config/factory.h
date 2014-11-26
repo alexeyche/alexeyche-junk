@@ -4,6 +4,7 @@
 #include <snnlib/util/json/json_box.h>
 
 typedef map<string, Obj*(*)()> entity_map_type;
+typedef map<string, Obj*(*)(string)> const_map_type;
 
 
 class ConstObj;
@@ -26,6 +27,7 @@ class Factory {
         objects.clear();
     }
 public:
+    template<typename BASE,typename INST> static BASE* createConstInstance(string name) { return new INST(name); }
     template<typename BASE,typename INST> static BASE* createInstance() { return new INST; }
     ConstObj *createConst(string name, JsonBox::Value v);
     ActFunc *createActFunc(string name, const Constants &c, Neuron *n);
@@ -34,7 +36,7 @@ public:
     Neuron *createNeuron(string name, const Constants &c, const RuntimeGlobals *run_glob_c, double axon_delay);
     TuningCurve *createTuningCurve(string name, const Constants &c,  size_t layer_size, size_t neuron_id, Neuron *n);
     LearningRule * createLearningRule(string name, const Constants &c, Neuron *n);
-    
+
     template <typename T>
     T* registerObj(T *o) {
         objects.push_back(o);
@@ -60,7 +62,7 @@ public:
     static Factory& inst();
 private:
     entity_map_type entity_map;
-    entity_map_type const_map;
+    const_map_type const_map;
     static Factory *_inst;
     vector<Obj*> objects;
 };

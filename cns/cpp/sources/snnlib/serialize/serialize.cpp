@@ -20,8 +20,9 @@ Serializable* SerializableFactory::create(const string &name) {
     if(name == "NeuronStat") {
         s = new NeuronStat();
     } else
-    if(name == "NeuronModel") {
-        s = new NeuronModel();
+    if(name == "Neuron") {
+        cerr << "Can't create such instance: " << name << "\n";
+        terminate();
     } else
     if(name == "SpikesList") {
         s = new SpikesList();

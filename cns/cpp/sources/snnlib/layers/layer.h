@@ -7,6 +7,7 @@
 #include <snnlib/config/constants.h>
 #include <snnlib/tuning_curves/tuning_curve.h>
 #include <snnlib/config/factory.h>
+#include <snnlib/serialize/proto_rw.h>
 
 static size_t global_layer_index = 0;
 
@@ -34,10 +35,10 @@ public:
 
         for(size_t ni=0; ni<N; ni++) {
             double axon_delay = sampleDelay(nc.axon_delay_gain, nc.axon_delay_rate);
-            
+
             Neuron *n = Factory::inst().createNeuron(nc.neuron, c, run_glob_c, axon_delay);
             n->setActFunc(Factory::inst().createActFunc(nc.act_func, c, n));
-            
+
             if(nc.learning_rule.empty()) {
                 n->setLearningRule(Factory::inst().createLearningRule("BlankLearningRule", c, nullptr));
             } else {
@@ -52,7 +53,11 @@ public:
             neurons.push_back(n);
         }
     }
-
+    void deserialize(ProtoRw &prw) {
+        for(size_t ni=0; ni<N; ni++) {
+            neurons[ni]->readModel(prw);
+        }
+    }
 
 
     size_t size() {
@@ -88,22 +93,11 @@ public:
             str << **it;
         }
     }
-    SerialPack saveModel() {
-        SerialPack p;
-        
-        layer_info = new LayerInfo(this);
-        p.push_back(SerialFamily({layer_info}));
 
-        for(size_t ni=0; ni<N; ni++) {
-            neurons[ni]->saveModel(p);
-        }
-        
-        return p;
-    }
     size_t id;
     size_t N;
     vector< Neuron *> neurons;
-private:    
+private:
     const NeuronConf *neuron_conf;
     LayerInfo *layer_info;
 };
