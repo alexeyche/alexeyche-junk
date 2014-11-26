@@ -118,6 +118,7 @@ void* Sim::runWorker(void *content) {
         pthread_barrier_wait( barrier );
     }
     cout << "thread " << sw->thread_id << " exited\n";
+    return NULL;
 }
 
 

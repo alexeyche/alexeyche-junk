@@ -34,6 +34,12 @@ public:
     Neuron *createNeuron(string name, const Constants &c, const RuntimeGlobals *run_glob_c, double axon_delay);
     TuningCurve *createTuningCurve(string name, const Constants &c,  size_t layer_size, size_t neuron_id, Neuron *n);
     LearningRule * createLearningRule(string name, const Constants &c, Neuron *n);
+    
+    template <typename T>
+    T* registerObj(T *o) {
+        objects.push_back(o);
+        return o;
+    }
 
     string findBaseStructName(string deriv_struct_name) {
         for(auto it=entity_map.begin(); it != entity_map.end(); ++it) {

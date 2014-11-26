@@ -7,6 +7,7 @@
 #include <snnlib/tuning_curves/tuning_curve.h>
 #include <snnlib/sim/runtime_globals.h>
 #include <snnlib/serialize/serialize.h>
+#include <snnlib/config/factory.h>
 
 #include "synapse.h"
 #include "neuron_stat.h"
@@ -26,14 +27,7 @@ public:
     Neuron(const ConstObj *_c, const RuntimeGlobals *_glob_c, double _axon_delay) {
         init(_c, _glob_c, _axon_delay);
     }
-    ~Neuron() {
-        if(stat) {
-            delete stat;
-        }
-        if(model) {
-            delete model;
-        }
-    }
+    
     virtual void init(const ConstObj *_c, const RuntimeGlobals *_glob_c, double _axon_delay) {
         id = global_neuron_index++;
         bc = _c;
@@ -47,7 +41,6 @@ public:
 
         collectStatistics = false;
         stat = nullptr;
-        model = nullptr;
         axon_delay = _axon_delay;
     }
     void setActFunc(ActFunc *_act) {
@@ -93,16 +86,15 @@ public:
     }
 
     virtual void saveModel(SerialPack &p) {
-        model = new NeuronModel(this);
+        NeuronModel *model = Factory::inst().registerObj<NeuronModel>(new NeuronModel(this));
         SerialFamily f({model});
         lrule->saveModel(f);
         p.push_back(f);
-        
     }
 
     virtual void enableCollectStatistics() {
         collectStatistics = true;
-        stat = new NeuronStat(this);
+        stat = Factory::inst().registerObj<NeuronStat>(new NeuronStat(this));
     }
 
     //virtual vector<string> getDependentConstantsNames() { return vector<string>(); }
@@ -118,9 +110,9 @@ public:
         str << "\n";
     }
 
-    NeuronStat *stat;
-    NeuronModel *model;
 protected:
+    NeuronStat *stat;
+
     list< Synapse *> active_synapses;
 
     const ConstObj *bc;

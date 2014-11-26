@@ -79,7 +79,7 @@ void Network::dispathInputSpikes(const SpikesList &sl) {
         cerr << "Can't dispatcher spikes list with different from network size\n";
         terminate();
     }
-    vector<SynSpike> syn_spikes[sl.N];
+    vector<SynSpike> *syn_spikes = new vector<SynSpike>[sl.N];
 
     for(size_t ni=0; ni<sl.N; ni++) {
         for(size_t con_i=0; con_i < conn_map[ni].size(); con_i++) {
@@ -98,5 +98,5 @@ void Network::dispathInputSpikes(const SpikesList &sl) {
     for(size_t ni=0; ni<sl.N; ni++) {
         input_queues[ni].push_and_sort(syn_spikes[ni]);
     }
-
+    delete []syn_spikes;
 }

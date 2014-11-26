@@ -46,7 +46,11 @@ public:
         // read sim info
         
     }
-
+    void saveModel(string f) {
+        ProtoRw prw(f,ProtoRw::Write);
+        // read sim info
+        
+    }
     void print(std::ostream& str) const {
         for(auto it=layers.begin(); it!=layers.end(); ++it) {
             str << **it;

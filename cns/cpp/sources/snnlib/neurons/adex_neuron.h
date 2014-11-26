@@ -140,8 +140,9 @@ public:
 
     }
     void saveStat(SerialPack &p) {
-        p.push_back(SerialFamily({Neuron::stat, adex_stat}));
-        lrule->saveStat(p);
+        SerialFamily f({Neuron::stat, adex_stat});
+        lrule->saveStat(f);
+        p.push_back(f);
     }
 
     void print(std::ostream& str) const {
