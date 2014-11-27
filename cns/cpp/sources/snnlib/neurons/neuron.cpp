@@ -13,6 +13,7 @@ Neuron::Neuron(const Neuron &another) : Serializable(ENeuron) {
 
 // init
 void Neuron::init(const ConstObj *_c, const RuntimeGlobals *_glob_c, double _axon_delay) {
+    Serializable::init(ENeuron);
     id = global_neuron_index++;
     bc = _c;
     glob_c = _glob_c;
@@ -26,8 +27,8 @@ void Neuron::init(const ConstObj *_c, const RuntimeGlobals *_glob_c, double _axo
     collectStatistics = false;
     stat = nullptr;
     axon_delay = _axon_delay;
-    Serializable::init(ENeuron);
 }
+
 void Neuron::setActFunc(ActFunc *_act) {
     act = _act;
 }
@@ -62,10 +63,15 @@ Protos::Neuron *Neuron::serialize() {
     n_ser->set_id(id);
     return n_ser;
 }
+
 void Neuron::deserialize() {
     Protos::Neuron *n_ser = castSerializableType<Protos::Neuron>(serialized_message);
+    id = n_ser->id();
+    axon_delay = n_ser->axon_delay();
+    
     Synapse *s = Factory::inst().createSynapse(syns[0]->c->getName(), glob_c->C(), 0, 0, 0);
 }
+
 void Neuron::readModel(ProtoRw &rw) {
     //rw.read(this);
     //rw.read(lrule);
