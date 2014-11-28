@@ -16,8 +16,7 @@ public:
     	init(_c, _n);
     }
     void init(const ConstObj *_c, Neuron *_n) {
-        CAST_TYPE(OptimalStdpC, _c)
-        c = cast;
+        c = castType<OptimalStdpC>(_c);
         n = _n;
     }
 
@@ -26,7 +25,7 @@ public:
     }
     void saveStat(SerialFamily &p) {  }
     void saveModel(SerialFamily &p) {  }
-    
+
     const OptimalStdpC *c;
     Neuron *n;
 };

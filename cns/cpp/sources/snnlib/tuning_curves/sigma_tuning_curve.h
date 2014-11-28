@@ -14,8 +14,7 @@ protected:
     friend class Factory;
 public:
     void init(const ConstObj *_c, size_t layer_size, size_t neuron_id, Neuron *_n) {
-        CAST_TYPE(SigmaTuningCurveC, _c)
-        c = cast;
+        c = castType<SigmaTuningCurveC>(_c);
         n = _n;
         center = c->intercept.first + ((double)neuron_id/layer_size)*(c->intercept.second-c->intercept.first);
         gain = getUnifBetween(c->gain.first, c->gain.second);

@@ -13,7 +13,7 @@ static size_t global_layer_index = 0;
 
 #include "layer_info.h"
 
-class Layer : public Entity {
+class Layer : public SerializableModel {
 protected:
     Layer() {}
     friend class Factory;
@@ -32,7 +32,7 @@ public:
         N = _size;
         neuron_conf = &nc;
         layer_info = nullptr;
-
+        glob_c = run_glob_c;
         for(size_t ni=0; ni<N; ni++) {
             double axon_delay = sampleDelay(nc.axon_delay_gain, nc.axon_delay_rate);
 
@@ -53,9 +53,27 @@ public:
             neurons.push_back(n);
         }
     }
-    void deserialize(ProtoRw &prw) {
-        for(size_t ni=0; ni<N; ni++) {
-            neurons[ni]->readModel(prw);
+
+    // serialize
+    void saveModel(ProtoRw &rw) {
+        Protos::Neuron n_ser;
+        n_ser.set_axon_delay(axon_delay);
+        n_ser.set_id(id);
+        n_ser.set_num_of_synapses(syns.size());
+        rw.writeMessage(&n_ser);
+
+        for(auto it=syns.begin(); it != syns.end(); ++it) {
+            it->save(rw);
+        }
+    }
+
+    void loadModel(ProtoRw &rw) {
+        Protos::Neuron n_ser;
+        rw.readMessage(&n_ser);
+        id = n_ser->id();
+        axon_delay = n_ser->axon_delay();
+        for(auto it=syns.begin(); it != syns.end(); ++it) {
+            it->load(rw);
         }
     }
 
@@ -73,7 +91,7 @@ public:
                     double prob = getUnif();
                     if( conf.prob > prob ) {
                         double dendrite_delay = sampleDelay(conf.dendrite_delay_gain, conf.dendrite_delay_rate);
-                        Synapse *s = Factory::inst().createSynapse(conf.type, c, neurons[ni]->id, 0, dendrite_delay);
+                        Synapse *s = Factory::inst().createSynapse(conf.type, c, glob_c, neurons[ni]->id, 0, dendrite_delay);
                         l_post[nj]->addSynapse(s);
                     }
                 }
@@ -99,5 +117,6 @@ public:
     vector< Neuron *> neurons;
 private:
     const NeuronConf *neuron_conf;
+    const RuntimeGlobals *glob_c;
     LayerInfo *layer_info;
 };

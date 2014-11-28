@@ -24,7 +24,7 @@ class ProtoRw;
 
 #define SYN_ACT_TOL 0.0001
 
-class Neuron: public Serializable {
+class Neuron: public SerializableModel {
 protected:
     Neuron() {}
     friend class Factory;
@@ -39,12 +39,8 @@ public:
     void setTuningCurve(TuningCurve *_tc);
     void addSynapse(Synapse *s);
 
-    // serialize
-    virtual void deserialize();
-    virtual Protos::Neuron* getNew(google::protobuf::Message* m);
-    virtual Protos::Neuron *serialize();
-    void readModel(ProtoRw &rw);
-
+    void loadModel(ProtoRw &rw);
+    void saveModel(ProtoRw &rw);
     // runtime
     virtual void calculateProbability() = 0;
     virtual void calculateDynamics() = 0;

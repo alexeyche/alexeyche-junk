@@ -14,15 +14,19 @@ message LayerInfo {
 	required NeuronInfo neuron = 3;
 };
 
+
 message Neuron {
-	message Syn {
-		required double w = 1;
-		required uint32 id_pre = 2;
-		required double dendrite_delay = 3;
-	}
-	required uint32 id = 4;
-	repeated Syn syns = 5;
-	required double axon_delay = 6;
+	required uint32 id = 1;
+	required double axon_delay = 2;
+	required uint32 num_of_synapses = 3;
 }
+
+message Synapse {
+	required double w = 1;
+	required uint32 id_pre = 2;
+	required double dendrite_delay = 3;
+	required string const_name = 4;
+}
+
 
 

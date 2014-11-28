@@ -14,8 +14,7 @@ public:
         init(_c, _n);
     }
     void init(const ConstObj *_c, Neuron *_n) {
-        CAST_TYPE(DetermC, _c)
-        c = cast;
+        c = castType<DetermC>(_c);
         n = _n;
         n->setActFunc(this);
     }

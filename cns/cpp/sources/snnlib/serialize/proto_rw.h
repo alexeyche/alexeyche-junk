@@ -5,11 +5,15 @@
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 #include <google/protobuf/io/coded_stream.h>
 
+#include <snnlib/config/factory.h>
+
 #include <fcntl.h>
 #include <unistd.h>
 using namespace google::protobuf::io;
 
 static int glob_deb = 0;
+
+typedef vector<google::protobuf::Message*> ProtoPack;
 
 class ProtoRw {
 public:
@@ -50,6 +54,7 @@ public:
         }
 
     }
+
     SerialFamily readAny(bool print=false) {
         CHECK_MODE(Read);
         Protos::Family pack;
@@ -59,7 +64,7 @@ public:
         SerialFamily ps;
         for(size_t mi=0; mi<pack.names_size(); mi++) {
             Protos::ClassName cl = pack.names(mi);
-            Serializable *s = SerializableFactory::inst().create(cl.name());
+            Serializable *s = Factory::inst().createSerializable(cl.name());
             google::protobuf::Message *mess = s->getNew();
             readMessage(*mess);
             if(print) {
@@ -137,7 +142,7 @@ public:
         return v;
     }
 
-private:
+
     void writeMessage(::google::protobuf::Message *message) {
         google::protobuf::uint32 size = message->ByteSize();
 
@@ -157,7 +162,7 @@ private:
         codedIn->PopLimit(limit);
         return true;
     }
-
+private:
 
     Mode m;
 

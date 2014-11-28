@@ -17,6 +17,7 @@ class Neuron;
 class NeuronConf;
 class Constants;
 class RuntimeGlobals;
+class Serializable;
 
 class Factory {
     Factory();
@@ -26,16 +27,18 @@ class Factory {
         }
         objects.clear();
     }
+    friend class ProtoRw;
 public:
     template<typename BASE,typename INST> static BASE* createConstInstance(string name) { return new INST(name); }
     template<typename BASE,typename INST> static BASE* createInstance() { return new INST; }
     ConstObj *createConst(string name, JsonBox::Value v);
     ActFunc *createActFunc(string name, const Constants &c, Neuron *n);
-    Synapse *createSynapse(string name, const Constants &c, size_t id_pre, double w, double dendrite_delay);
+    Synapse *createSynapse(string name, const Constants &c, const RuntimeGlobals *run_glob_c, size_t id_pre, double w, double dendrite_delay);
     Layer *createLayer(size_t size, const NeuronConf &nc, const Constants &glob_c, const RuntimeGlobals *run_glob_c);
     Neuron *createNeuron(string name, const Constants &c, const RuntimeGlobals *run_glob_c, double axon_delay);
     TuningCurve *createTuningCurve(string name, const Constants &c,  size_t layer_size, size_t neuron_id, Neuron *n);
     LearningRule * createLearningRule(string name, const Constants &c, Neuron *n);
+    Serializable* createSerializable(const string &name);
 
     template <typename T>
     T* registerObj(T *o) {
@@ -61,6 +64,8 @@ public:
     }
     static Factory& inst();
 private:
+
+
     entity_map_type entity_map;
     const_map_type const_map;
     static Factory *_inst;

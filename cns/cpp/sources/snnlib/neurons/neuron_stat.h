@@ -9,7 +9,7 @@ class Neuron;
 class NeuronStat : public Serializable {
 protected:
     NeuronStat() : Serializable(ENeuronStat) { }
-    friend class SerializableFactory;
+    friend class Factory;
 public:
     NeuronStat(Neuron *n);
 

@@ -8,6 +8,7 @@ set(SOURCES
     adex_neuron.cpp
     neuron_stat.cpp
     neuron.cpp
+    synapse.cpp
 )
 
 # add directory name to sources

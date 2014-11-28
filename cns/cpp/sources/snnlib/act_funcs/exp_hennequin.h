@@ -14,8 +14,7 @@ public:
         init(_c, _n);
     }
     void init(const ConstObj *_c, Neuron *_n) {
-        CAST_TYPE(ExpHennequinC, _c)
-        c = cast;
+        c = castType<ExpHennequinC>(_c);
         n = _n;
         n->setActFunc(this);
     }

@@ -9,10 +9,10 @@ class Neuron;
 class NeuronModel : public Serializable {
 protected:
     NeuronModel() : Serializable(ENeuronModel) { }
-    friend class SerializableFactory;
+    friend class Factory;
 public:
     NeuronModel(Neuron *_n) : Serializable(ENeuronModel), n(_n) {}
-    
+
     NeuronModel(const NeuronModel &another) : Serializable(ENeuronModel) {
         copyFrom(another);
     }

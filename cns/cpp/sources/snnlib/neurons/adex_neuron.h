@@ -39,8 +39,7 @@ public:
     }
     void init(const ConstObj *_c, const RuntimeGlobals *_glob_c, double _axon_delay) {
         Neuron::init(_c, _glob_c, _axon_delay);
-        CAST_TYPE(AdExNeuronC, bc)
-        c = cast;
+        c = castType<AdExNeuronC>(bc);
 
         a = 0.0;
         refr = 0.0;

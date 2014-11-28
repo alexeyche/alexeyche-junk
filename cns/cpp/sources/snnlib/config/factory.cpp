@@ -12,7 +12,8 @@
 #include <snnlib/neurons/adex_neuron.h>
 #include <snnlib/neurons/neuron.h>
 #include <snnlib/sim/runtime_globals.h>
-
+#include <snnlib/util/spikes_list.h>
+#include <snnlib/util/time_series.h>
 
 Factory& Factory::inst() {
     static Factory _inst;
@@ -49,6 +50,31 @@ Factory::Factory() {
         base_struct_name = findBaseStructName(name);\
     }\
 
+
+Serializable* Factory::createSerializable(const string &name) {
+    Serializable *s = nullptr;
+    if(name == "AdExNeuronStat") {
+        s = new AdExNeuronStat();
+    } else
+    if(name == "NeuronStat") {
+        s = new NeuronStat();
+    } else
+    if(name == "SpikesList") {
+        s = new SpikesList();
+    } else
+    if(name == "LabeledTimeSeries") {
+        s = new LabeledTimeSeries();
+    } else
+    if(name == "LabeledTimeSeriesList") {
+        s = new LabeledTimeSeriesList();
+    } else {
+        cerr << "Unkown Serializable name " << name << "\n";
+        terminate();
+    }
+    objects.push_back(s);
+    return s;
+}
+
 ConstObj *Factory::createConst(string name, JsonBox::Value v) {
     GET_BASE_NAME(const_map)
     ConstObj *o = dynamic_cast<ConstObj*>(const_map[base_struct_name](name));
@@ -79,11 +105,11 @@ LearningRule * Factory::createLearningRule(string name, const Constants &c, Neur
     return o;
 }
 
-Synapse *Factory::createSynapse(string name, const Constants &c, size_t id_pre, double w, double dendrite_delay) {
+Synapse *Factory::createSynapse(string name, const Constants &c, const RuntimeGlobals *run_glob_c, size_t id_pre, double w, double dendrite_delay) {
     GET_BASE_NAME(entity_map)
     Synapse *o = dynamic_cast<Synapse*>(entity_map[base_struct_name]());
     if(!o) { cerr << "Error while reading " << name << " and treating like Synapse\n"; terminate(); }
-    o->init(c[name], id_pre, w, dendrite_delay);
+    o->init(c[name], run_glob_c, id_pre, w, dendrite_delay);
     objects.push_back(o);
     return o;
 }

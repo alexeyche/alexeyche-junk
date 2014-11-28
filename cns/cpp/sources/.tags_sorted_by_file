@@ -319,7 +319,7 @@ print	snnlib/neurons/srm_neuron.h	/^    void print(std::ostream& str) const {$/;
 propagateSynSpike	snnlib/neurons/srm_neuron.h	/^    void propagateSynSpike(const SynSpike *sp) {$/;"	f	class:SRMNeuron
 Synapse	snnlib/neurons/synapse.h	/^    Synapse() {}$/;"	f	class:Synapse
 Synapse	snnlib/neurons/synapse.h	/^    Synapse(const ConstObj *_c, size_t _id_pre, double _w, double _dendrite_delay) {$/;"	f	class:Synapse
-Synapse	snnlib/neurons/synapse.h	/^class Synapse : public Printable {$/;"	c
+Synapse	snnlib/neurons/synapse.h	/^class Synapse : public Serializable {$/;"	c
 c	snnlib/neurons/synapse.h	/^    const SynapseC *c;$/;"	m	class:Synapse
 dendrite_delay	snnlib/neurons/synapse.h	/^    double dendrite_delay;$/;"	m	class:Synapse
 fired	snnlib/neurons/synapse.h	/^    uchar fired;$/;"	m	class:Synapse

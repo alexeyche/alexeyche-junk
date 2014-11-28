@@ -144,21 +144,9 @@ protected:
 typedef vector<Serializable*> SerialFamily;
 typedef vector<SerialFamily> SerialPack;
 
-
-class SerializableFactory {
-public:
-    static SerializableFactory& inst();
-    Serializable* create(const string &name);
-private:
-    SerializableFactory() {}
-    ~SerializableFactory() {
-        for(auto it=objects.begin(); it != objects.end(); ++it) {
-            delete *it;
-        }
-        objects.clear();
-    }
-
-    SerialFamily objects;
+class SerializableModel : public Printable {
+    virtual void loadModel(ProtoRw &rw);
+    virtual void saveModel(ProtoRw &rw);
 };
 
 

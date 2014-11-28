@@ -47,35 +47,28 @@ void Neuron::addSynapse(Synapse *s) {
 
 /////////////////////////////////////////////////////////////////////////////
 // serialize
-Protos::Neuron* Neuron::getNew(google::protobuf::Message* m = nullptr) {
-    return getNewSerializedMessage<Protos::Neuron>(m);
-}
-Protos::Neuron *Neuron::serialize() {
-    Protos::Neuron *n_ser = getNew();
+void Neuron::saveModel(ProtoRw &rw) {
+    Protos::Neuron n_ser;
+    n_ser.set_axon_delay(axon_delay);
+    n_ser.set_id(id);
+    n_ser.set_num_of_synapses(syns.size());
+    rw.writeMessage(&n_ser);
+
     for(auto it=syns.begin(); it != syns.end(); ++it) {
-        Synapse *s = *it;
-        Protos::Neuron::Syn *syn = n_ser->add_syns();
-        syn->set_w(s->w);
-        syn->set_id_pre(s->id_pre);
-        syn->set_dendrite_delay(s->dendrite_delay);
+        it->save(rw);
     }
-    n_ser->set_axon_delay(axon_delay);
-    n_ser->set_id(id);
-    return n_ser;
 }
 
-void Neuron::deserialize() {
-    Protos::Neuron *n_ser = castSerializableType<Protos::Neuron>(serialized_message);
+void Neuron::loadModel(ProtoRw &rw) {
+    Protos::Neuron n_ser;
+    rw.readMessage(&n_ser);
     id = n_ser->id();
     axon_delay = n_ser->axon_delay();
-    
-    Synapse *s = Factory::inst().createSynapse(syns[0]->c->getName(), glob_c->C(), 0, 0, 0);
+    for(size_t syn_i=0; syn_i<num_of_synapses; syn_i++) {
+
+    }
 }
 
-void Neuron::readModel(ProtoRw &rw) {
-    //rw.read(this);
-    //rw.read(lrule);
-}
 ////////////////////////////////////////////////////////////////////////////
 // stat funcs
 void Neuron::saveStat(SerialPack &p) {

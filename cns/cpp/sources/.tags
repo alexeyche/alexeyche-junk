@@ -631,7 +631,7 @@ Swap	tools/testproto/time_series.pb.cc	/^void TimeSeries::Swap(TimeSeries* other
 SynSpike	snnlib/base.h	/^class SynSpike: public Printable {$/;"	c
 Synapse	snnlib/neurons/synapse.h	/^    Synapse() {}$/;"	f	class:Synapse
 Synapse	snnlib/neurons/synapse.h	/^    Synapse(const ConstObj *_c, size_t _id_pre, double _w, double _dendrite_delay) {$/;"	f	class:Synapse
-Synapse	snnlib/neurons/synapse.h	/^class Synapse : public Printable {$/;"	c
+Synapse	snnlib/neurons/synapse.h	/^class Synapse : public Serializable {$/;"	c
 SynapseC	snnlib/config/constants.h	/^    SynapseC(string name) : ConstObj(name) {}$/;"	f	class:SynapseC
 SynapseC	snnlib/config/constants.h	/^class SynapseC : public ConstObj {$/;"	c
 SyscallWriter	snnlib/util/optionparser/optionparser.h	/^    SyscallWriter(Syscall* w, int f) :$/;"	f	struct:option::PrintUsageImplementation::SyscallWriter

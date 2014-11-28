@@ -14,8 +14,7 @@ public:
     }
     void init(const ConstObj *_c, const RuntimeGlobals *_glob_c, double _axon_delay) {
         Neuron::init(_c, _glob_c, _axon_delay);
-        CAST_TYPE(SRMNeuronC, bc);
-        c = cast;
+        c = castType<SRMNeuronC>(bc);
     }
 
     void propagateSynSpike(const SynSpike *sp) {
