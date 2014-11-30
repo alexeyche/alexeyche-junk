@@ -23,10 +23,10 @@
 #     cat(sprintf("Can't find refration mode %s\n", refr_mode))
 # }
 
-# epsp <- Vectorize(function(s) {
-#   if((s<0)||(s == Inf)) { return(0) }
-#   e0*(exp(-s/tm)-exp(-s/ts))
-# })
+epsp2 <- Vectorize(function(s) {
+  if((s<0)||(s == Inf)) { return(0) }
+  e0*(exp(-s/tm)-exp(-s/ts))
+})
 epsp <- Vectorize(function(s) {
   if((s<0)||(s == Inf)) { return(0) }
   exp(-s/tm)
@@ -77,6 +77,18 @@ g2 = Vectorize(function(u) {
 
 u=seq(0,100, length.out=1000)
 plot(u, g2(u),type="l", xlim=c(0,20), ylim=c(0,20), lwd=2.5, las=1)
+
+e0=4
+tm=10 
+ts=5
+u=seq(0,100, length.out=1000)
+plot(u, epsp2(u),type="l", xlim=c(0,100), ylim=c(0,1), lwd=2.5, las=1, xlab="t, мс", ylab="I")
+
+e0=2.60
+tm=30 
+ts=10
+u=seq(0,100, length.out=1000)
+lines(u, epsp2(u),lwd=2.5, las=1)
 
 
 
