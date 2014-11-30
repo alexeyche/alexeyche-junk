@@ -6,9 +6,11 @@
 
 class Factory;
 
-class OptimalStdp : public LearningRule {
+class OptimalStdp : public LearningRule  {
 protected:
-    OptimalStdp() {}
+    OptimalStdp() {
+        Serializable::init(EOptimalStdp);
+    }
     friend class Factory;
 
 public:
@@ -18,13 +20,30 @@ public:
     void init(const ConstObj *_c, Neuron *_n) {
         c = castType<OptimalStdpC>(_c);
         n = _n;
+        p_acc = 0.0;
+
+        Serializable::init(EOptimalStdp);
     }
 
     void calculateWeightsDynamics()  {
 
     }
-    void saveStat(SerialFamily &p) {  }
-    void saveModel(SerialFamily &p) {  }
+    void deserialize() {
+        Protos::OptimalStdp *mess = getSerializedMessage<Protos::OptimalStdp>();
+        p_acc = mess->p_acc();
+    }
+    ProtoPack serialize() { 
+        Protos::OptimalStdp *mess = getNewMessage<Protos::OptimalStdp>();
+        mess->set_p_acc(p_acc);
+        return ProtoPack({mess}); 
+    }
+    ProtoPack getNew() { 
+        return ProtoPack({ getNewMessage<Protos::OptimalStdp>() }); 
+    }
+    
+    void print(std::ostream& str) const { }
+
+    double p_acc;
 
     const OptimalStdpC *c;
     Neuron *n;

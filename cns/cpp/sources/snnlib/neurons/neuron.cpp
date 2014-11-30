@@ -4,16 +4,13 @@
 
 
 
-Neuron::Neuron(const ConstObj *_c, const RuntimeGlobals *_glob_c, double _axon_delay) {
+Neuron::Neuron(const ConstObj *_c, const RuntimeGlobals *_glob_c, double _axon_delay) : Serializable(ENeuron) {
     init(_c, _glob_c, _axon_delay);
-}
-Neuron::Neuron(const Neuron &another) : Serializable(ENeuron) {
-    copyFrom(another);
 }
 
 // init
 void Neuron::init(const ConstObj *_c, const RuntimeGlobals *_glob_c, double _axon_delay) {
-    Serializable::init(ENeuron);
+    //Serializable::init(ENeuron);
     id = global_neuron_index++;
     bc = _c;
     glob_c = _glob_c;
@@ -47,34 +44,52 @@ void Neuron::addSynapse(Synapse *s) {
 
 /////////////////////////////////////////////////////////////////////////////
 // serialize
-void Neuron::saveModel(ProtoRw &rw) {
-    Protos::Neuron n_ser;
-    n_ser.set_axon_delay(axon_delay);
-    n_ser.set_id(id);
-    n_ser.set_num_of_synapses(syns.size());
-    rw.writeMessage(&n_ser);
 
-    for(auto it=syns.begin(); it != syns.end(); ++it) {
-        it->save(rw);
+ProtoPack Neuron::serialize() {
+    Protos::Neuron *n_ser = getNewMessage();
+    n_ser->set_axon_delay(axon_delay);
+    n_ser->set_id(id);
+    n_ser->set_num_of_synapses(syns.size());
+    return ProtoPack({n_ser});
+}
+void Neuron::deserialize() {
+    Protos::Neuron *mess = getSerializedMessage();
+    id = mess->id();
+    axon_delay = mess->axon_delay();
+    if(syns.size()>0) {
+        for(size_t syn_i=0; syn_i<syns.size(); syn_i++) {
+            Factory::inst().cleanObj(syns[syn_i]);
+        }
+        syns.clear();
+    }
+    syns.resize(mess->num_of_synapses());
+}
+    
+void Neuron::saveModel(ProtoRw &rw) {
+    rw.write(this);
+    for(size_t syn_i=0; syn_i<syns.size(); syn_i++) {
+        rw.write(syns[syn_i]);
+    }
+    if(!lrule->isBlank()) {
+        rw.write(lrule);
     }
 }
 
 void Neuron::loadModel(ProtoRw &rw) {
-    Protos::Neuron n_ser;
-    rw.readMessage(&n_ser);
-    id = n_ser->id();
-    axon_delay = n_ser->axon_delay();
-    for(size_t syn_i=0; syn_i<num_of_synapses; syn_i++) {
-
+    rw.readAllocated(this);
+    for(size_t syn_i=0; syn_i<syns.size(); syn_i++) {
+        syns[syn_i] = rw.read()->castSerializable<Synapse>();
+    }
+    if(!lrule->isBlank()) {
+        rw.readAllocated(lrule);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////
 // stat funcs
 void Neuron::saveStat(SerialPack &p) {
-    SerialFamily f({stat});
-    lrule->saveStat(f);
-    p.push_back(f);
+    p.push_back(stat);
+//    lrule->saveStat(p);
 }
 
 void Neuron::enableCollectStatistics() {
@@ -90,5 +105,6 @@ void Neuron::print(std::ostream& str) const {
         Synapse *s = *it;
         str << *s << ", ";
     }
+    str << "lrule: " << lrule->getName() << "\n";
     str << "\n";
 }

@@ -31,7 +31,7 @@ public:
 };
 
 
-class LabeledTimeSeries  :  public Serializable {
+class LabeledTimeSeries  :  public Serializable<Protos::LabeledTimeSeries> {
 public:
     string label;
     TimeSeries ts;
@@ -50,69 +50,49 @@ public:
     }
 
     // Serializable:
-    LabeledTimeSeries(const LabeledTimeSeries &another) : Serializable(ELabeledTimeSeries), ts(another.ts), label(another.label) {
-        copyFrom(another);
-    }
-    virtual Protos::LabeledTimeSeries* serialize() {
-        Protos::LabeledTimeSeries *stat = getNew();
+    ProtoPack serialize() {
+        Protos::LabeledTimeSeries *stat = getNewMessage();
         Protos::TimeSeries *new_ts = stat->mutable_ts();
         for(auto it=ts.data.begin(); it != ts.data.end(); ++it) {
             new_ts->add_data(*it);
         }
         stat->set_label(label);
-        return stat;
+        return ProtoPack({stat});
     }
-    virtual void deserialize() {
-        Protos::LabeledTimeSeries * m = castSerializableType<Protos::LabeledTimeSeries>(serialized_message);
+    void deserialize() {
+        Protos::LabeledTimeSeries * m = getSerializedMessage();
         label = m->label();
         ts.deserialize(m->ts());
-        //clean();
-    }
-    virtual Protos::LabeledTimeSeries* getNew(google::protobuf::Message* m = nullptr) {
-        return getNewSerializedMessage<Protos::LabeledTimeSeries>(m);
-    }
+    }    
     // end Serializable
 
 };
 
 
 
-class LabeledTimeSeriesList  : public Serializable {
+class LabeledTimeSeriesList  : public Serializable<Protos::LabeledTimeSeriesList> {
 public:
-    LabeledTimeSeriesList() : Serializable(ELabeledTimeSeriesList) {
-    }
-    LabeledTimeSeriesList(const string &fname) : Serializable(ELabeledTimeSeriesList) {
-        deserializeFromFile(fname);
-    }
-
+    LabeledTimeSeriesList() : Serializable(ELabeledTimeSeriesList) {}
+    
     // Serializable:
-    LabeledTimeSeriesList(const LabeledTimeSeriesList &l) : Serializable(ELabeledTimeSeriesList), ts(l.ts) {
-        copyFrom(l);
-    }
-    virtual Protos::LabeledTimeSeriesList* serialize() {
-        Protos::LabeledTimeSeriesList *l = getNew();
+    ProtoPack serialize() {
+        Protos::LabeledTimeSeriesList *l = getNewMessage();
         for(auto it=ts.begin(); it != ts.end(); ++it) {
-            Protos::LabeledTimeSeries* lts = l->add_list();
-            *lts = *it->serialize();
+            Protos::LabeledTimeSeries *lts = l->add_list();
+            Protos::LabeledTimeSeries *lts_serial = castProtoMessage<Protos::LabeledTimeSeries>(it->serialize().front());
+            *lts = *lts_serial;
         }
-        return l;
+        return ProtoPack({l});
     }
 
-    virtual Protos::LabeledTimeSeriesList* getNew(google::protobuf::Message* m = nullptr) {
-        return getNewSerializedMessage<Protos::LabeledTimeSeriesList>(m);
-    }
-    virtual void deserialize() {
-        Protos::LabeledTimeSeriesList * m = castSerializableType<Protos::LabeledTimeSeriesList>(serialized_message);
+    void deserialize() {
+        Protos::LabeledTimeSeriesList *m = getSerializedMessage();
         for(size_t li=0; li < m->list_size(); li++) {
             push_back(m->list(li));
         }
     }
     // end Serializable
 
-    void deserializeFromFile(const string &fname) {
-        ProtoRw prw(fname, ProtoRw::Read);
-        prw.read(this);
-    }
     void push_back(LabeledTimeSeries lst) {
         ts.push_back(lst);
     }

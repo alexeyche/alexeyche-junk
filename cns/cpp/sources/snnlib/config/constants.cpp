@@ -17,7 +17,7 @@
 
 string Constants::blank_prefix = string("Blank");
 
-string preprocessAndReadConstJson(string filename) {
+string Constants::preprocessAndReadConstJson(string filename) {
     string out;
 
     ifstream f(filename);
@@ -29,11 +29,12 @@ string preprocessAndReadConstJson(string filename) {
     return out;
 }
 
-Constants::Constants(string filename) {
-    string content = preprocessAndReadConstJson(filename);
-	
+Constants* Constants::glob_inst = nullptr;
+
+
+void Constants::parse() {
     JsonBox::Value v;
-    v.loadFromString(content);
+    v.loadFromString(json_content);
     if(v.isObject()) {
         const JsonBox::Object &o = v.getObject();
         for(auto it = o.begin(); it != o.end(); it++) {
@@ -67,7 +68,7 @@ Constants::Constants(string filename) {
 
         }
     } else {
-        cerr << "Failed to find main object in constants json file " << filename << "\n";
+        cerr << "Failed to find main object in constants json file:\n" << json_content << "\n";
     }
 }
 

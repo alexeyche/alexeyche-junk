@@ -3,8 +3,8 @@
 
 #include "layer.h"
 
-Protos::LayerInfo *LayerInfo::serialize() {
-    Protos::LayerInfo *info = getNew();
+ProtoPack LayerInfo::serialize() {
+    Protos::LayerInfo *info = getNewMessage();
     Protos::NeuronInfo *ninfo = new Protos::NeuronInfo();
     ninfo->set_neuron(l->neuron_conf->neuron);
     ninfo->set_act_func(l->neuron_conf->act_func);
@@ -17,5 +17,5 @@ Protos::LayerInfo *LayerInfo::serialize() {
     info->set_size(l->N);   
     info->set_id(l->id);
     info->set_allocated_neuron(ninfo);
-    return info;
+    return ProtoPack({info});
 }

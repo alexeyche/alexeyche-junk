@@ -4,36 +4,33 @@
 
 #include <snnlib/serialize/serialize.h>
 
-class SpikesList: public Serializable {
+class SpikesList: public Serializable<Protos::SpikesList> {
 public:
-    SpikesList() : Serializable(ESpikesList), sp_list(nullptr) {}
-    SpikesList(size_t _N) : Serializable(ESpikesList), N(_N) {
+    SpikesList() : Serializable<Protos::SpikesList>(ESpikesList), sp_list(nullptr) {}
+    SpikesList(size_t _N) : Serializable<Protos::SpikesList>(ESpikesList), N(_N) {
         init(N);
     }
     SpikesList(const SpikesList &another) : Serializable(ESpikesList)  {
-        copyFrom(another);
+        Serializable<Protos::SpikesList>::copyFrom(another);
         init(another.N);
         for(size_t ni=0; ni<N; ni++) {
             sp_list[ni] = another.sp_list[ni];
         }
     }
-    virtual Protos::SpikesList* serialize() {
-        Protos::SpikesList *l = getNew();
+    virtual ProtoPack serialize() {
+        Protos::SpikesList *l = getNewMessage();
         for(size_t ni=0; ni<N; ni++) {
             Protos::SpikesSequence* seq = l->add_spikes_list();
             for(auto it=sp_list[ni].begin(); it != sp_list[ni].end(); ++it) {
                 seq->add_seq(*it);
             }
         }
-        return l;
+        return ProtoPack({l});
     }
 
-    virtual Protos::SpikesList* getNew(google::protobuf::Message* m = nullptr) {
-        return getNewSerializedMessage<Protos::SpikesList>(m);
-    }
 
     virtual void deserialize() {
-        Protos::SpikesList * m = castSerializableType<Protos::SpikesList>(serialized_message);
+        Protos::SpikesList * m = getSerializedMessage();
         init(m->spikes_list_size());
         for(size_t ni=0; ni<N; ni++) {
             Protos::SpikesSequence s = m->spikes_list(ni);

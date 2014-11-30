@@ -14,7 +14,6 @@ endforeach()
 
 set(SOURCES
     layer.cpp
-    layer_info.cpp
 )
 
 # add directory name to sources

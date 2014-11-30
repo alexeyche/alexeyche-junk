@@ -5,16 +5,17 @@
 
 void AdExNeuronStat::collect(AdExNeuron *n) {
     if(a.size()>STAT_COLLECT_LIMIT) return;
+    NeuronStat::collect(n);
     a.push_back(n->a);
 }
-AdExNeuronStat::AdExNeuronStat(const AdExNeuronStat &another) : Serializable(EAdExNeuronStat), a(another.a) {
-    copyFrom(another);
-}
-Protos::AdExNeuronStat *AdExNeuronStat::serialize() {
-    Protos::AdExNeuronStat *stat = getNew();
+
+ProtoPack AdExNeuronStat::serialize() {
+    ProtoPack p = NeuronStat::serialize();
+    Protos::AdExNeuronStat *stat = getNewMessage<Protos::AdExNeuronStat>();
     for(auto it=a.begin(); it != a.end(); ++it) {
         stat->add_a(*it);
     }
-    return stat;
+    p.push_back(stat);
+    return p;
 
 }

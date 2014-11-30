@@ -23,8 +23,8 @@ void NeuronStat::collect(Neuron *n) {
 
 }
 
-Protos::NeuronStat *NeuronStat::serialize() {
-    Protos::NeuronStat *stat = getNew();
+ProtoPack NeuronStat::serialize() {
+    Protos::NeuronStat *stat = getNewMessage();
     for(auto it=p.begin(); it != p.end(); ++it) {
         stat->add_p(*it);
     }
@@ -37,6 +37,6 @@ Protos::NeuronStat *NeuronStat::serialize() {
             syn_stat->add_x(*it_val);
         }
     }
-    return stat;
+    return ProtoPack({stat});
 }
 

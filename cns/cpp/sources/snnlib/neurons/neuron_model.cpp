@@ -18,7 +18,7 @@ Protos::NeuronModel *NeuronModel::serialize() {
 }
 
 void NeuronModel::deserialize() {
-    Protos::NeuronModel *m = castSerializableType<Protos::NeuronModel>(serialized_message);
+    Protos::NeuronModel *m = castProtoMessage<Protos::NeuronModel>(serialized_message);
     n->syns.clear();
     for(size_t si=0; si<m->syns_size(); si++) {
         

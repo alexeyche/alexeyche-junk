@@ -1,20 +1,21 @@
 
 #include "synapse.h"
 
-// serialize
-void loadModel(ProtoRw &rw) {
-    Protos::Synapse syn;
-    rw.readMessage(&syn);
-    w = syn->w();
+// // serialize
+
+void Synapse::deserialize() {
+	Protos::Synapse *syn = getSerializedMessage();
+	w = syn->w();
     id_pre = syn->id_pre();
     dendrite_delay = syn->dendrite_delay();
+    c = castType<SynapseC>(Constants::globalInstance()[syn->const_name()]);
+}
+ProtoPack Synapse::serialize() {
+	Protos::Synapse *syn = getNewMessage();
+    syn->set_w(w);
+    syn->set_id_pre(id_pre);
+    syn->set_dendrite_delay(dendrite_delay);
+    syn->set_const_name(c->getName());
+    return ProtoPack({syn});
 }
 
-void saveModel(ProtoRw &rw) {
-    Protos::Synapse syn;
-    syn.set_w(w);
-    syn.set_id_pre(id_pre);
-    syn.set_dendrite_delay(dendrite_delay);
-    syn.set_const_name(c->getName());
-    rw.writeMessage(&syn);
-}

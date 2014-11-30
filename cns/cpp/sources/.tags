@@ -72,8 +72,7 @@ CARRIAGE_RETURN	snnlib/util/json/grammar.h	/^			const char CARRIAGE_RETURN = '\\
 CARRIAGE_RETURN	snnlib/util/json/grammar.h	/^			const std::string CARRIAGE_RETURN = "\\\\r";$/;"	m	namespace:JsonBox::Strings::Json
 CARRIAGE_RETURN	snnlib/util/json/grammar.h	/^		const char CARRIAGE_RETURN = '\\r';$/;"	m	namespace:JsonBox::Whitespace
 CASE	snnlib/util/str_switch.h	7;"	d
-CAST_TYPE	snnlib/base.h	63;"	d
-CHECK_MODE	snnlib/serialize/proto_rw.h	16;"	d
+CHECK_MODE	snnlib/serialize/proto_rw.h	20;"	d
 CHECK_MODE	tools/testproto/main.cpp	18;"	d	file:
 CheckArg	snnlib/util/optionparser/optionparser.h	/^typedef ArgStatus (*CheckArg)(const Option& option, bool msg);$/;"	t	namespace:option
 Clear	tools/testproto/time_series.pb.cc	/^void LabeledTimeSeries::Clear() {$/;"	f	class:Protos::LabeledTimeSeries
@@ -271,7 +270,7 @@ FastDelegate8	snnlib/util/fast_delegate.h	/^	FastDelegate8(const Y *pthis, Desir
 FastDelegate8	snnlib/util/fast_delegate.h	/^class FastDelegate8 {$/;"	c	namespace:fastdelegate
 FunctionWriter	snnlib/util/optionparser/optionparser.h	/^    FunctionWriter(Function* w) :$/;"	f	struct:option::PrintUsageImplementation::FunctionWriter
 FunctionWriter	snnlib/util/optionparser/optionparser.h	/^  struct FunctionWriter: public IStringWriter$/;"	s	struct:option::PrintUsageImplementation
-GET_BASE_NAME	snnlib/config/factory.cpp	45;"	d	file:
+GET_BASE_NAME	snnlib/config/factory.cpp	46;"	d	file:
 GenericClass	snnlib/util/fast_delegate.h	/^	class GenericClass {};$/;"	c	namespace:fastdelegate::detail
 GenericClass	snnlib/util/fast_delegate.h	/^	class __single_inheritance GenericClass;$/;"	m	namespace:fastdelegate::detail	typeref:class:fastdelegate::detail::__single_inheritance
 GenericFuncPtr	snnlib/util/fast_delegate.h	/^	typedef void (*GenericFuncPtr)(); \/\/ arbitrary code pointer$/;"	t	class:fastdelegate::DelegateMemento
@@ -378,7 +377,7 @@ LabeledTimeSeries_descriptor_	tools/testproto/time_series.pb.cc	/^const ::google
 LabeledTimeSeries_reflection_	tools/testproto/time_series.pb.cc	/^  LabeledTimeSeries_reflection_ = NULL;$/;"	m	namespace:Protos::__anon1	file:
 Layer	snnlib/layers/layer.h	/^    Layer() {}$/;"	f	class:Layer
 Layer	snnlib/layers/layer.h	/^    Layer(size_t _size, const NeuronConf &nc, const Constants &c, const RuntimeGlobals *run_glob_c) {$/;"	f	class:Layer
-Layer	snnlib/layers/layer.h	/^class Layer : public Entity {$/;"	c
+Layer	snnlib/layers/layer.h	/^class Layer : public SerializableModel {$/;"	c
 LayerConf	snnlib/config/constants.h	/^class LayerConf : public ConfObj {$/;"	c
 LayerInfo	snnlib/layers/layer_info.h	/^    LayerInfo() : Serializable(ELayerInfo) { }$/;"	f	class:LayerInfo
 LayerInfo	snnlib/layers/layer_info.h	/^    LayerInfo(Layer *_l) : Serializable(ELayerInfo), l(_l) {}$/;"	f	class:LayerInfo
@@ -443,7 +442,7 @@ Network	snnlib/sim/network.h	/^class Network : public Printable {$/;"	c
 Neuron	snnlib/neurons/neuron.cpp	/^Neuron::Neuron(const ConstObj *_c, const RuntimeGlobals *_glob_c, double _axon_delay) {$/;"	f	class:Neuron
 Neuron	snnlib/neurons/neuron.cpp	/^Neuron::Neuron(const Neuron &another) : Serializable(ENeuron) {$/;"	f	class:Neuron
 Neuron	snnlib/neurons/neuron.h	/^    Neuron() {}$/;"	f	class:Neuron
-Neuron	snnlib/neurons/neuron.h	/^class Neuron: public Serializable {$/;"	c
+Neuron	snnlib/neurons/neuron.h	/^class Neuron: public SerializableModel {$/;"	c
 NeuronAddress	snnlib/sim/sim_neuron.h	/^typedef pair<size_t, size_t> NeuronAddress;$/;"	t
 NeuronConf	snnlib/config/constants.h	/^class NeuronConf : public ConfObj {$/;"	c
 NeuronModel	snnlib/neurons/neuron_model.h	/^    NeuronModel() : Serializable(ENeuronModel) { }$/;"	f	class:NeuronModel
@@ -496,6 +495,7 @@ Parser	snnlib/util/optionparser/optionparser.h	/^class Parser$/;"	c	namespace:op
 PrintUsageImplementation	snnlib/util/optionparser/optionparser.h	/^struct PrintUsageImplementation$/;"	s	namespace:option
 Printable	snnlib/base.h	/^class Printable: public Obj {$/;"	c
 ProbePtrType	snnlib/util/fast_delegate.h	/^	typedef GenericVirtualClass * (GenericVirtualClass::*ProbePtrType)();$/;"	t	struct:fastdelegate::detail::GenericVirtualClass
+ProtoPack	snnlib/serialize/proto_rw.h	/^typedef vector<google::protobuf::Message*> ProtoPack;$/;"	t
 ProtoRw	snnlib/serialize/proto_rw.h	/^    ProtoRw(const string &f, Mode _m) : filename(f), m(_m) {$/;"	f	class:ProtoRw
 ProtoRw	snnlib/serialize/proto_rw.h	/^class ProtoRw {$/;"	c
 ProtoRw	tools/testproto/main.cpp	/^    ProtoRw(const string &f, Mode _m) : m(_m) {$/;"	f	class:ProtoRw
@@ -545,8 +545,6 @@ Serializable	snnlib/serialize/serialize.h	/^    Serializable() {$/;"	f	class:Ser
 Serializable	snnlib/serialize/serialize.h	/^    Serializable(ESerializableClass ename) {$/;"	f	class:Serializable
 Serializable	snnlib/serialize/serialize.h	/^    Serializable(const Serializable &another) {$/;"	f	class:Serializable
 Serializable	snnlib/serialize/serialize.h	/^class Serializable : public Printable {$/;"	c
-SerializableFactory	snnlib/serialize/serialize.h	/^    SerializableFactory() {}$/;"	f	class:SerializableFactory
-SerializableFactory	snnlib/serialize/serialize.h	/^class SerializableFactory {$/;"	c
 SerializeWithCachedSizes	tools/testproto/time_series.pb.cc	/^void LabeledTimeSeries::SerializeWithCachedSizes($/;"	f	class:Protos::LabeledTimeSeries
 SerializeWithCachedSizes	tools/testproto/time_series.pb.cc	/^void TimeSeries::SerializeWithCachedSizes($/;"	f	class:Protos::TimeSeries
 SerializeWithCachedSizesToArray	tools/testproto/time_series.pb.cc	/^::google::protobuf::uint8* LabeledTimeSeries::SerializeWithCachedSizesToArray($/;"	f	class:Protos::LabeledTimeSeries
@@ -629,9 +627,8 @@ Structural	snnlib/util/json/grammar.h	/^	namespace Structural {$/;"	n	namespace:
 Swap	tools/testproto/time_series.pb.cc	/^void LabeledTimeSeries::Swap(LabeledTimeSeries* other) {$/;"	f	class:Protos::LabeledTimeSeries
 Swap	tools/testproto/time_series.pb.cc	/^void TimeSeries::Swap(TimeSeries* other) {$/;"	f	class:Protos::TimeSeries
 SynSpike	snnlib/base.h	/^class SynSpike: public Printable {$/;"	c
-Synapse	snnlib/neurons/synapse.h	/^    Synapse() {}$/;"	f	class:Synapse
-Synapse	snnlib/neurons/synapse.h	/^    Synapse(const ConstObj *_c, size_t _id_pre, double _w, double _dendrite_delay) {$/;"	f	class:Synapse
-Synapse	snnlib/neurons/synapse.h	/^class Synapse : public Serializable {$/;"	c
+Synapse	snnlib/neurons/synapse.h	/^    Synapse(const ConstObj *_c, const RuntimeGlobals *_glob_c, size_t _id_pre, double _w, double _dendrite_delay) {$/;"	f	class:Synapse
+Synapse	snnlib/neurons/synapse.h	/^class Synapse : public SerializableModel {$/;"	c
 SynapseC	snnlib/config/constants.h	/^    SynapseC(string name) : ConstObj(name) {}$/;"	f	class:SynapseC
 SynapseC	snnlib/config/constants.h	/^class SynapseC : public ConstObj {$/;"	c
 SyscallWriter	snnlib/util/optionparser/optionparser.h	/^    SyscallWriter(Syscall* w, int f) :$/;"	f	struct:option::PrintUsageImplementation::SyscallWriter
@@ -830,6 +827,7 @@ calculateWeightsDynamics	snnlib/learning/learning_rule.h	/^    void calculateWei
 calculateWeightsDynamics	snnlib/learning/optimal_stdp.h	/^    void calculateWeightsDynamics()  {$/;"	f	class:OptimalStdp
 capacity	snnlib/util/json/array.cpp	/^	Array::size_type Array::capacity() const {$/;"	f	class:JsonBox::Array
 castSerializableType	snnlib/serialize/serialize.h	/^    CT* castSerializableType(google::protobuf::Message* mess) {$/;"	f	class:Serializable
+castType	snnlib/base.h	/^const T* castType(const Obj* o) {$/;"	f
 center	snnlib/tuning_curves/sigma_tuning_curve.h	/^    double center;$/;"	m	class:SigmaTuningCurve
 check_arg	snnlib/util/optionparser/optionparser.h	/^  const CheckArg check_arg;$/;"	m	struct:option::Descriptor
 clean	snnlib/serialize/serialize.h	/^    void clean() {$/;"	f	class:Serializable
@@ -886,7 +884,6 @@ convertUcrTimeSeriesLine	tools/testproto/main.cpp	/^Protos::LabeledTimeSeries co
 copyFrom	snnlib/serialize/serialize.h	/^    void copyFrom(const Serializable &another) {$/;"	f	class:Serializable
 count	snnlib/util/json/object.cpp	/^	Object::size_type Object::count(const key_type &key) const {$/;"	f	class:JsonBox::Object
 count	snnlib/util/optionparser/optionparser.h	/^  int count()$/;"	f	class:option::Option
-create	snnlib/serialize/serialize.cpp	/^Serializable* SerializableFactory::create(const string &name) {$/;"	f	class:SerializableFactory
 createActFunc	snnlib/config/factory.cpp	/^ActFunc *Factory::createActFunc(string name, const Constants &c, Neuron *n) {$/;"	f	class:Factory
 createConst	snnlib/config/factory.cpp	/^ConstObj *Factory::createConst(string name, JsonBox::Value v) {$/;"	f	class:Factory
 createConstInstance	snnlib/config/factory.h	/^    template<typename BASE,typename INST> static BASE* createConstInstance(string name) { return new INST(name); }$/;"	f	class:Factory
@@ -894,7 +891,8 @@ createInstance	snnlib/config/factory.h	/^    template<typename BASE,typename INS
 createLayer	snnlib/config/factory.cpp	/^Layer *Factory::createLayer(size_t size, const NeuronConf &nc, const Constants &c, const RuntimeGlobals *run_glob_c) {$/;"	f	class:Factory
 createLearningRule	snnlib/config/factory.cpp	/^LearningRule * Factory::createLearningRule(string name, const Constants &c, Neuron *n) {$/;"	f	class:Factory
 createNeuron	snnlib/config/factory.cpp	/^Neuron *Factory::createNeuron(string name, const Constants &c, const RuntimeGlobals *run_glob_c, double axon_delay) {$/;"	f	class:Factory
-createSynapse	snnlib/config/factory.cpp	/^Synapse *Factory::createSynapse(string name, const Constants &c, size_t id_pre, double w, double dendrite_delay) {$/;"	f	class:Factory
+createSerializable	snnlib/config/factory.cpp	/^Serializable* Factory::createSerializable(const string &name) {$/;"	f	class:Factory
+createSynapse	snnlib/config/factory.cpp	/^Synapse *Factory::createSynapse(string name, const Constants &c, const RuntimeGlobals *run_glob_c, size_t id_pre, double w, double dendrite_delay) {$/;"	f	class:Factory
 createTuningCurve	snnlib/config/factory.cpp	/^TuningCurve *Factory::createTuningCurve(string name, const Constants &c,  size_t layer_size, size_t neuron_id, Neuron *n) {$/;"	f	class:Factory
 current_position	snnlib/util/time_series.h	/^    size_t current_position;$/;"	m	class:ContLabeledTimeSeries
 data	snnlib/util/json/array.h	/^		container data;$/;"	m	class:JsonBox::Array
@@ -923,10 +921,8 @@ dendrite_delay_rate	snnlib/config/constants.h	/^    double dendrite_delay_rate;$
 desc	snnlib/util/optionparser/optionparser.h	/^  const Descriptor* desc;$/;"	m	class:option::Option
 descriptor	tools/testproto/time_series.pb.cc	/^const ::google::protobuf::Descriptor* LabeledTimeSeries::descriptor() {$/;"	f	class:Protos::LabeledTimeSeries
 descriptor	tools/testproto/time_series.pb.cc	/^const ::google::protobuf::Descriptor* TimeSeries::descriptor() {$/;"	f	class:Protos::TimeSeries
-deserialize	snnlib/layers/layer.h	/^    void deserialize(ProtoRw &prw) {$/;"	f	class:Layer
 deserialize	snnlib/layers/layer_info.h	/^    virtual void deserialize() {$/;"	f	class:LayerInfo
 deserialize	snnlib/neurons/adex_neuron.h	/^    virtual void deserialize() {$/;"	f	class:AdExNeuronStat
-deserialize	snnlib/neurons/neuron.cpp	/^void Neuron::deserialize() {$/;"	f	class:Neuron
 deserialize	snnlib/neurons/neuron_model.cpp	/^void NeuronModel::deserialize() {$/;"	f	class:NeuronModel
 deserialize	snnlib/neurons/neuron_stat.h	/^    virtual void deserialize() {$/;"	f	class:NeuronStat
 deserialize	snnlib/util/spikes_list.h	/^    virtual void deserialize() {$/;"	f	class:SpikesList
@@ -1032,7 +1028,6 @@ getName	snnlib/config/constants.h	/^    virtual const string& getName() const { 
 getName	snnlib/serialize/serialize.h	/^    const string& getName() {$/;"	f	class:Serializable
 getNew	snnlib/layers/layer_info.h	/^    virtual Protos::LayerInfo* getNew(google::protobuf::Message* m = nullptr) {$/;"	f	class:LayerInfo
 getNew	snnlib/neurons/adex_neuron.h	/^    virtual Protos::AdExNeuronStat* getNew(google::protobuf::Message* m = nullptr) {$/;"	f	class:AdExNeuronStat
-getNew	snnlib/neurons/neuron.cpp	/^Protos::Neuron* Neuron::getNew(google::protobuf::Message* m = nullptr) {$/;"	f	class:Neuron
 getNew	snnlib/neurons/neuron_model.h	/^    virtual Protos::NeuronModel* getNew(google::protobuf::Message* m = nullptr) {$/;"	f	class:NeuronModel
 getNew	snnlib/neurons/neuron_stat.h	/^    virtual Protos::NeuronStat* getNew(google::protobuf::Message* m = nullptr) {$/;"	f	class:NeuronStat
 getNew	snnlib/util/spikes_list.h	/^    virtual Protos::SpikesList* getNew(google::protobuf::Message* m = nullptr) {$/;"	f	class:SpikesList
@@ -1049,7 +1044,9 @@ getUnif	snnlib/util/util.cpp	/^double getUnif() {$/;"	f
 getUnifBetween	snnlib/util/util.cpp	/^double getUnifBetween(double low, double high) {$/;"	f
 get_allocator	snnlib/util/json/array.cpp	/^	Array::allocator_type Array::get_allocator() const {$/;"	f	class:JsonBox::Array
 get_allocator	snnlib/util/json/object.cpp	/^	Object::allocator_type Object::get_allocator() const {$/;"	f	class:JsonBox::Object
+glob_c	snnlib/layers/layer.h	/^    const RuntimeGlobals *glob_c;$/;"	m	class:Layer
 glob_c	snnlib/neurons/neuron.h	/^    const RuntimeGlobals *glob_c;$/;"	m	class:Neuron
+glob_c	snnlib/neurons/synapse.h	/^    const RuntimeGlobals *glob_c;$/;"	m	class:Synapse
 glob_deb	snnlib/serialize/proto_rw.h	/^static int glob_deb = 0;$/;"	v
 global_layer_index	snnlib/layers/layer.h	/^static size_t global_layer_index = 0;$/;"	v
 global_neuron_index	snnlib/neurons/neuron.h	/^static size_t global_neuron_index = 0;$/;"	v
@@ -1083,7 +1080,7 @@ init	snnlib/learning/optimal_stdp.h	/^    void init(const ConstObj *_c, Neuron *
 init	snnlib/neurons/adex_neuron.h	/^    void init(const ConstObj *_c, const RuntimeGlobals *_glob_c, double _axon_delay) {$/;"	f	class:AdExNeuron
 init	snnlib/neurons/neuron.cpp	/^void Neuron::init(const ConstObj *_c, const RuntimeGlobals *_glob_c, double _axon_delay) {$/;"	f	class:Neuron
 init	snnlib/neurons/srm_neuron.h	/^    void init(const ConstObj *_c, const RuntimeGlobals *_glob_c, double _axon_delay) {$/;"	f	class:SRMNeuron
-init	snnlib/neurons/synapse.h	/^    void init(const ConstObj *_c, size_t _id_pre, double _w, double _dendrite_delay) {$/;"	f	class:Synapse
+init	snnlib/neurons/synapse.h	/^    void init(const ConstObj *_c, const RuntimeGlobals *_glob_c, size_t _id_pre, double _w, double _dendrite_delay) {$/;"	f	class:Synapse
 init	snnlib/serialize/serialize.h	/^    void init(ESerializableClass ename) {$/;"	f	class:Serializable
 init	snnlib/sim/network.cpp	/^void Network::init(const Sim *_s) {$/;"	f	class:Network
 init	snnlib/sim/sim_input_layer.h	/^    void init(size_t size) {$/;"	f	class:SimInputLayer
@@ -1107,7 +1104,6 @@ insert	snnlib/util/json/object.cpp	/^	std::pair<Object::iterator, bool> Object::
 insert	snnlib/util/json/object.h	/^		void insert(InputIterator first, InputIterator last) {$/;"	f	class:JsonBox::Object
 inserter	snnlib/util/json/output_filter.h	/^		Inserter inserter;$/;"	m	class:JsonBox::OutputFilter
 inst	snnlib/config/factory.cpp	/^Factory& Factory::inst() {$/;"	f	class:Factory
-inst	snnlib/serialize/serialize.cpp	/^SerializableFactory& SerializableFactory::inst() {$/;"	f	class:SerializableFactory
 instr	snnlib/util/optionparser/optionparser.h	/^  static bool instr(char ch, const char* st)$/;"	f	class:option::Parser
 intValue	snnlib/util/json/value.h	/^			int *intValue;$/;"	m	union:JsonBox::Value::ValueDataPointer
 intercept	snnlib/config/constants.h	/^    pair<double,double> intercept;$/;"	m	class:SigmaTuningCurveC
@@ -1160,6 +1156,9 @@ line_in_block	snnlib/util/optionparser/optionparser.h	/^    int line_in_block; \
 loadFromFile	snnlib/util/json/value.cpp	/^	void Value::loadFromFile(const std::string &filePath) {$/;"	f	class:JsonBox::Value
 loadFromStream	snnlib/util/json/value.cpp	/^	void Value::loadFromStream(std::istream &input) {$/;"	f	class:JsonBox::Value
 loadFromString	snnlib/util/json/value.cpp	/^	void Value::loadFromString(std::string const &json) {$/;"	f	class:JsonBox::Value
+loadModel	snnlib/layers/layer.h	/^    void loadModel(ProtoRw &rw) {$/;"	f	class:Layer
+loadModel	snnlib/neurons/neuron.cpp	/^void Neuron::loadModel(ProtoRw &rw) {$/;"	f	class:Neuron
+loadModel	snnlib/neurons/synapse.cpp	/^void loadModel(ProtoRw &rw) {$/;"	f
 loadModel	snnlib/sim/sim.h	/^    void loadModel(string f) {$/;"	f	class:Sim
 lock	snnlib/util/spikes_queue.h	/^    pthread_spinlock_t lock;$/;"	m	class:SpikesQueue
 lock	snnlib/util/spinlock.h	/^    void lock()$/;"	f	class:SpinLock
@@ -1249,7 +1248,6 @@ nrow	snnlib/util/matrix.h	/^    size_t nrow;$/;"	m	class:Matrix
 nwait_	snnlib/util/spinning_barrier.h	/^    std::atomic<unsigned int> nwait_;$/;"	m	class:SpinningBarrier
 objectValue	snnlib/util/json/value.h	/^			Object *objectValue;$/;"	m	union:JsonBox::Value::ValueDataPointer
 objects	snnlib/config/factory.h	/^    vector<Obj*> objects;$/;"	m	class:Factory
-objects	snnlib/serialize/serialize.h	/^    SerialFamily objects;$/;"	m	class:SerializableFactory
 ofs	snnlib/serialize/proto_rw.h	/^    ofstream *ofs;$/;"	m	class:ProtoRw
 ofs	tools/testproto/main.cpp	/^    ofstream *ofs;$/;"	m	class:ProtoRw	file:
 op_count	snnlib/util/optionparser/optionparser.h	/^  int op_count; \/\/!< @internal @brief see optionsCount()$/;"	m	class:option::Parser
@@ -1529,7 +1527,6 @@ readArray	snnlib/util/json/value.cpp	/^	void Value::readArray(std::istream &inpu
 readLowAndHigh	snnlib/config/constants.cpp	/^pair<double,double> readLowAndHigh(JsonBox::Array a) {$/;"	f
 readMessage	snnlib/serialize/proto_rw.h	/^    bool readMessage(::google::protobuf::Message &message) {$/;"	f	class:ProtoRw
 readMessage	tools/testproto/main.cpp	/^    bool readMessage(::google::protobuf::Message &message) {$/;"	f	class:ProtoRw	file:
-readModel	snnlib/neurons/neuron.cpp	/^void Neuron::readModel(ProtoRw &rw) {$/;"	f	class:Neuron
 readNumber	snnlib/util/json/value.cpp	/^	void Value::readNumber(std::istream &input, JsonBox::Value &result) {$/;"	f	class:JsonBox::Value
 readObject	snnlib/util/json/value.cpp	/^	void Value::readObject(std::istream &input, Object &result) {$/;"	f	class:JsonBox::Value
 readString	snnlib/util/json/value.cpp	/^	void Value::readString(std::istream &input, std::string &result) {$/;"	f	class:JsonBox::Value
@@ -1560,8 +1557,11 @@ s	snnlib/sim/network.h	/^	const Sim *s;$/;"	m	class:Network
 s	snnlib/sim/sim.h	/^        Sim *s;$/;"	m	struct:Sim::SimWorker
 s_s	snnlib/util/str_switch.h	/^namespace s_s$/;"	n
 sampleDelay	snnlib/util/util.cpp	/^double sampleDelay(double gain, double rate) {$/;"	f
+saveModel	snnlib/layers/layer.h	/^    void saveModel(ProtoRw &rw) {$/;"	f	class:Layer
 saveModel	snnlib/learning/learning_rule.h	/^    void saveModel(SerialFamily &p) {  }$/;"	f	class:BlankLearningRule
 saveModel	snnlib/learning/optimal_stdp.h	/^    void saveModel(SerialFamily &p) {  }$/;"	f	class:OptimalStdp
+saveModel	snnlib/neurons/neuron.cpp	/^void Neuron::saveModel(ProtoRw &rw) {$/;"	f	class:Neuron
+saveModel	snnlib/neurons/synapse.cpp	/^void saveModel(ProtoRw &rw) {$/;"	f
 saveModel	snnlib/sim/sim.h	/^    void saveModel(string f) {$/;"	f	class:Sim
 saveStat	snnlib/learning/learning_rule.h	/^    void saveStat(SerialFamily &p) {  }$/;"	f	class:BlankLearningRule
 saveStat	snnlib/learning/optimal_stdp.h	/^    void saveStat(SerialFamily &p) {  }$/;"	f	class:OptimalStdp
@@ -1573,13 +1573,12 @@ screenlen	snnlib/util/optionparser/optionparser.h	/^    int screenlen; \/\/!< Le
 seed	snnlib/config/constants.h	/^    int seed;$/;"	m	class:SimRunConf
 serialize	snnlib/layers/layer_info.cpp	/^Protos::LayerInfo *LayerInfo::serialize() {$/;"	f	class:LayerInfo
 serialize	snnlib/neurons/adex_neuron.cpp	/^Protos::AdExNeuronStat *AdExNeuronStat::serialize() {$/;"	f	class:AdExNeuronStat
-serialize	snnlib/neurons/neuron.cpp	/^Protos::Neuron *Neuron::serialize() {$/;"	f	class:Neuron
 serialize	snnlib/neurons/neuron_model.cpp	/^Protos::NeuronModel *NeuronModel::serialize() {$/;"	f	class:NeuronModel
 serialize	snnlib/neurons/neuron_stat.cpp	/^Protos::NeuronStat *NeuronStat::serialize() {$/;"	f	class:NeuronStat
 serialize	snnlib/util/spikes_list.h	/^    virtual Protos::SpikesList* serialize() {$/;"	f	class:SpikesList
 serialize	snnlib/util/time_series.h	/^    virtual Protos::LabeledTimeSeries* serialize() {$/;"	f	class:LabeledTimeSeries
 serialize	snnlib/util/time_series.h	/^    virtual Protos::LabeledTimeSeriesList* serialize() {$/;"	f	class:LabeledTimeSeriesList
-serialized_message	snnlib/serialize/serialize.h	/^    ::google::protobuf::Message *serialized_message;$/;"	m	class:Serializable
+serialized_messages	snnlib/serialize/serialize.h	/^    ProtoPack serialized_messages;$/;"	m	class:Serializable
 setActFunc	snnlib/neurons/neuron.cpp	/^void Neuron::setActFunc(ActFunc *_act) {$/;"	f	class:Neuron
 setArray	snnlib/util/json/value.cpp	/^	void Value::setArray(const Array &newArray) {$/;"	f	class:JsonBox::Value
 setBoolean	snnlib/util/json/value.cpp	/^	void Value::setBoolean(bool newBoolean) {$/;"	f	class:JsonBox::Value
@@ -1767,7 +1766,6 @@ zeroOut	tools/testproto/main.cpp	/^    OstreamOutputStream *zeroOut;$/;"	m	class
 ~ProtoRw	snnlib/serialize/proto_rw.h	/^    ~ProtoRw() {$/;"	f	class:ProtoRw
 ~ProtoRw	tools/testproto/main.cpp	/^    ~ProtoRw() {$/;"	f	class:ProtoRw
 ~Serializable	snnlib/serialize/serialize.h	/^    ~Serializable() {$/;"	f	class:Serializable
-~SerializableFactory	snnlib/serialize/serialize.h	/^    ~SerializableFactory() {$/;"	f	class:SerializableFactory
 ~SigmaTuningCurve	snnlib/tuning_curves/sigma_tuning_curve.h	/^    ~SigmaTuningCurve() {$/;"	f	class:SigmaTuningCurve
 ~Sim	snnlib/sim/sim.h	/^    ~Sim() {$/;"	f	class:Sim
 ~SimInputLayer	snnlib/sim/sim_input_layer.h	/^	~SimInputLayer() {$/;"	f	class:SimInputLayer

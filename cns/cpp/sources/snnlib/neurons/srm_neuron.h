@@ -14,6 +14,7 @@ public:
     }
     void init(const ConstObj *_c, const RuntimeGlobals *_glob_c, double _axon_delay) {
         Neuron::init(_c, _glob_c, _axon_delay);
+        Serializable::init(ESRMNeuron);
         c = castType<SRMNeuronC>(bc);
     }
 
@@ -59,12 +60,20 @@ public:
             }
         }
     }
+    ProtoPack serialize() {
+        return Neuron::serialize();
+    }
+    void deserialize() {
+        Neuron::deserialize();
+    }
+
     void print(std::ostream& str) const {
         str << "SRMNeuron(" << id << ")\n";
         str << "\ty == " << y << ", axon_delay: " << axon_delay << ", synapses\n";
         for(auto it=syns.begin(); it != syns.end(); ++it) {
             str << **it << ", ";
         }
+        str << "lrule: " << lrule->getName() << "\n";
         str << "\n";
     }
 

@@ -6,24 +6,18 @@
 
 class Layer;
 
-class LayerInfo : public Serializable {
+class LayerInfo : public Serializable<Protos::LayerInfo> {
 protected:
-    LayerInfo() : Serializable(ELayerInfo) { }
+    LayerInfo() : Serializable<Protos::LayerInfo>(ELayerInfo) { }
     friend class Factory;
 public:
-    LayerInfo(Layer *_l) : Serializable(ELayerInfo), l(_l) {}
+    LayerInfo(Layer *_l) : Serializable<Protos::LayerInfo>(ELayerInfo), l(_l) {}
 
-    LayerInfo(const LayerInfo &another) : Serializable(ELayerInfo) {
-        copyFrom(another);
-    }
-    virtual Protos::LayerInfo *serialize();
+    virtual ProtoPack serialize();
 
     virtual void deserialize() {
-        Protos::LayerInfo *m = castSerializableType<Protos::LayerInfo>(serialized_message);
+        Protos::LayerInfo *m = getSerializedMessage();
 
-    }
-    virtual Protos::LayerInfo* getNew(google::protobuf::Message* m = nullptr) {
-        return getNewSerializedMessage<Protos::LayerInfo>(m);
     }
     void print(std::ostream& str) const {
         str << "LayerInfo stat\n";

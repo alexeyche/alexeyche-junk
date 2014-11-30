@@ -5,25 +5,26 @@
 
 class AdExNeuron;
 
-class AdExNeuronStat : public Serializable  {
+class AdExNeuronStat : public NeuronStat  {
 public:
-    AdExNeuronStat() : Serializable(EAdExNeuronStat) {
+    AdExNeuronStat() {
+        init(EAdExNeuronStat);
     }
     virtual void collect(AdExNeuron *n);
 
     AdExNeuronStat(const AdExNeuronStat &another);
-    virtual Protos::AdExNeuronStat *serialize();
+    ProtoPack serialize();
 
-    virtual void deserialize() {
-        Protos::AdExNeuronStat * m = castSerializableType<Protos::AdExNeuronStat>(serialized_message);
+    void deserialize() {
+        NeuronStat::deserialize();
+        Protos::AdExNeuronStat * m = getSerializedMessage<Protos::AdExNeuronStat>(1);
         for(size_t i=0; i<m->a_size(); i++) {
             a.push_back(m->a(i));
         }
     }
-    virtual Protos::AdExNeuronStat* getNew(google::protobuf::Message* m = nullptr) {
-        return getNewSerializedMessage<Protos::AdExNeuronStat>(m);
+    ProtoPack getNew() { 
+        return ProtoPack({ getNewMessage(), getNewMessage<Protos::AdExNeuronStat>() }); 
     }
-
     void print(std::ostream& str) const {}
 
     vector<double> a;
@@ -36,9 +37,11 @@ protected:
 public:
     AdExNeuron(const ConstObj *_c, const RuntimeGlobals *_glob_c, double _axon_delay) {
         init(_c, _glob_c, _axon_delay);
+
     }
     void init(const ConstObj *_c, const RuntimeGlobals *_glob_c, double _axon_delay) {
         Neuron::init(_c, _glob_c, _axon_delay);
+        Serializable::init(EAdExNeuron);
         c = castType<AdExNeuronC>(bc);
 
         a = 0.0;
@@ -51,20 +54,6 @@ public:
             delete adex_stat;
         }
     }
-
-    // vector<string> getDependentConstantsNames() {
-    //     vector<string> v;
-    //     v.push_back("Global");
-    //     return v;
-    // }
-
-    // void setDependentConstants(const vector<const ConstObj*> &constants) {
-    //     glob_c = dynamic_cast<const GlobalC*>(constants[0]);
-    //     if(!glob_c) {
-    //         cerr << "Error while getting dependent constants for AdExNeuron\n";
-    //         terminate();
-    //     }
-    // }
 
     void enableCollectStatistics() {
         Neuron::enableCollectStatistics();
@@ -100,7 +89,6 @@ public:
             p = act->prob(y);
         }
         if(collectStatistics) {
-            Neuron::stat->collect(this);
             adex_stat->collect(this);
         }
     }
@@ -138,10 +126,16 @@ public:
 
 
     }
+    ProtoPack serialize() {
+        return Neuron::serialize();
+    }
+    void deserialize() {
+        Neuron::deserialize();
+    }
+
     void saveStat(SerialPack &p) {
-        SerialFamily f({Neuron::stat, adex_stat});
-        lrule->saveStat(f);
-        p.push_back(f);
+        p.push_back(adex_stat);
+        //lrule->saveStat(p);
     }
 
     void print(std::ostream& str) const {

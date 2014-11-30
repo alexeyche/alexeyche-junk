@@ -5,6 +5,8 @@
 #include <snnlib/util/json/json_box.h>
 #include <snnlib/base.h>
 #include <snnlib/util/util.h>
+#include <snnlib/serialize/serialize.h>
+#include <snnlib/protos/model.pb.h>
 
 class ConfObj: public Entity {
 public:
@@ -368,9 +370,49 @@ public:
 
 typedef map<string, const ConstObj *> const_map;
 
-class Constants {
+class Constants : public Serializable<Protos::Constants> {
+    Constants() : Serializable(EConstants) {
+        Serializable::init(EConstants);
+        if(!Constants::glob_inst) {
+            Constants::glob_inst = this;
+        }
+    }
+    friend class Factory;
 public:
-    Constants(string filename);
+    Constants(string filename) : Serializable(EConstants) {
+        Serializable::init(EConstants);
+        json_content = preprocessAndReadConstJson(filename);
+        parse();
+        if(!Constants::glob_inst) {
+            Constants::glob_inst = this;
+        }
+    }
+
+    void parse();
+    static string preprocessAndReadConstJson(string filename);
+
+    bool operator==(const Constants &c) const {
+        if(c.json_content == json_content) {
+            return true;
+        }
+        return false;
+    }
+    bool operator!=(const Constants &c) const {
+        if( *this == c) return false;
+        return true;
+    }
+    void deserialize() {
+        Protos::Constants *c_serial = getSerializedMessage();
+        json_content = c_serial->json_content();
+        parse();
+    }
+
+    ProtoPack serialize() {
+        Protos::Constants *c_serial = getNewMessage();
+        c_serial->set_json_content(json_content);
+        return ProtoPack({c_serial});
+    }
+
 
     const_map neurons;
     const_map layers;
@@ -401,24 +443,41 @@ public:
         terminate();
     }
 
-    static void print_constants_map(const const_map &m) {
+    static void print_constants_map(const const_map &m, std::ostream &str) {
         for(auto it = m.cbegin(); it != m.cend(); ++it ) {
-            cout << it->first << " == " << *it->second;
+            str << it->first << " == " << *it->second;
         }
     }
-    friend std::ostream& operator<<(std::ostream& str, Constants const& data) {
+    void print(std::ostream& str) const {
         str << "== Sim Constants ==\n";
-        print_constants_map(data.globals);
-        print_constants_map(data.neurons);
-        print_constants_map(data.layers);
-        print_constants_map(data.tuning_curves);
-        print_constants_map(data.synapses);
-        print_constants_map(data.act_funcs);
-        print_constants_map(data.learning_rules);
+        print_constants_map(globals, str);
+        print_constants_map(neurons, str);
+        print_constants_map(layers, str);
+        print_constants_map(tuning_curves, str);
+        print_constants_map(synapses, str);
+        print_constants_map(act_funcs, str);
+        print_constants_map(learning_rules, str);
         str << "\n== Sim Configuration ==\n";
-        str << data.sim_conf;
-        return str;
+        str << sim_conf;
     }
+    static const Constants globalInstance() {
+        if(!glob_inst) {
+            cerr << "Trying to access to non-initialized global constants instance\n";
+            terminate();
+        }
+        return *glob_inst;
+    }
+    static bool IsGlobalInstanceCreated() {
+        if(glob_inst) {
+            return true;
+        }
+        return false;
+    }
+
+private:
+    string json_content;
+
+    static Constants *glob_inst;
 };
 
 

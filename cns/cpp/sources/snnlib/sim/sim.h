@@ -14,7 +14,15 @@
 
 class Sim: public Printable {
 public:
-    Sim(const Constants &c, size_t _jobs=1);
+    Sim(Constants &c, size_t _jobs=1);
+    Sim(size_t _jobs=1);
+    void construct(Constants &c);
+
+    #define CHECK_CONSTRUCT() \
+        if(!constructed) {  \
+            cerr << "Need construct sim with constants\n"; \
+            terminate(); \
+        }\
 
     struct SimWorker {
         Sim *s;
@@ -26,12 +34,13 @@ public:
     ~Sim() {
         if(!statistics_file.empty()) {
             ProtoRw prw(statistics_file, ProtoRw::Write);
-        SerialPack st;
+            SerialPack st;
             for(auto it=sc.neurons_to_listen.begin(); it != sc.neurons_to_listen.end(); ++it) {
                 Neuron *n = accessByGlobalId(*it);
                 n->saveStat(st);
             }
             prw.write(st);
+            
         }
         if(!output_spikes_file.empty()){
             ProtoRw prw(output_spikes_file, ProtoRw::Write);
@@ -42,14 +51,27 @@ public:
     }
     
     void loadModel(string f) {
-        ProtoRw prw(f,ProtoRw::Read);
-        // read sim info
-        
+        ProtoRw rw(f,ProtoRw::Read);
+        if(Constants::IsGlobalInstanceCreated()) {
+            Constants* c_serial = rw.read()->castSerializable<Constants>();
+            if(*c_serial != Constants::globalInstance()) {
+                cerr << "Constants in model doesn't equals to constants in -c option\n";
+                terminate();
+            }
+        } else {
+            Constants* c_serial = rw.read()->castSerializable<Constants>();
+            construct(*c_serial);
+        }
+        for(auto it = layers.begin(); it != layers.end(); ++it) {
+            (*it)->loadModel(rw);
+        }
     }
     void saveModel(string f) {
-        ProtoRw prw(f,ProtoRw::Write);
-        // read sim info
-        
+        ProtoRw rw(f,ProtoRw::Write);
+        rw.write(&rg.mut_C());
+        for(auto it = layers.begin(); it != layers.end(); ++it) {
+            (*it)->saveModel(rw);
+        }
     }
     void print(std::ostream& str) const {
         for(auto it=layers.begin(); it!=layers.end(); ++it) {
@@ -58,9 +80,11 @@ public:
         str << net;
     }
     void setInputTimeSeries(LabeledTimeSeriesList l) {
+        CHECK_CONSTRUCT()
         input_ts = ContLabeledTimeSeries(l, sc.ts_map_conf.dt);
     }
     void setInputSpikesList(SpikesList l) {
+        CHECK_CONSTRUCT()
         if(l.N < input_neurons_count) {
             cerr << "Input spikes list is inconsistent with const.json\n";
             terminate();
@@ -70,10 +94,12 @@ public:
         }
     }
     void setOutputSpikesFile(const string &filename) {
+        CHECK_CONSTRUCT()
         output_spikes_file = filename;
     }
 
     Neuron* accessByGlobalId(size_t id) {
+        CHECK_CONSTRUCT()
         size_t acc = 0;
         for(size_t li=0; li<layers.size(); li++) {
             Layer *l = layers[li];
@@ -89,6 +115,7 @@ public:
 
 
     void monitorStat(const string &filename) {
+        CHECK_CONSTRUCT()
         statistics_file = filename;
         for(auto it=sc.neurons_to_listen.begin(); it != sc.neurons_to_listen.end(); ++it) {
             accessByGlobalId(*it)->enableCollectStatistics();
@@ -119,8 +146,8 @@ public:
     string statistics_file;
     string output_spikes_file;
 
-    const SimConfiguration &sc;
-
+    SimConfiguration sc;
     RuntimeGlobals rg;
+    bool constructed; 
 };
 

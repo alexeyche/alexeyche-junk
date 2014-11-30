@@ -15,15 +15,16 @@ const option::Descriptor usage[] =
 {
  {ARG_UNKNOWN, 0, "", "",Arg::None, "USAGE: example [options]\n\n"
                                         "Options:" },
- {ARG_HELP, 0,"h", "help",Arg::None, "  --help  \tPrint usage and exit." },
- {ARG_PRECALC, 0,"", "precalc",Arg::None, "  --precalc  \tOnly precalculate spike on time series." },
- {ARG_MODEL_SAVE, 0,"s","save",Arg::NonEmpty, "  --save, -s  \tSave model." },
- {ARG_MODEL_LOAD, 0,"l","load",Arg::NonEmpty, "  --load, -l  \tLoad model." },
+ {ARG_INPUT, 0,"i","input",Arg::NonEmpty, "  --input, -i  \tInput protobuf file with precalculated spikes or labeled time series." },
+ {ARG_OUT_SPIKES, 0,"o","--output",Arg::NonEmpty, "  --output, -o  \tOutput file with serialized spikes list" },
  {ARG_CONSTANTS, 0,"c","constants",Arg::NonEmpty, "  --constants, -c  \tConstants filename." },
+ {ARG_MODEL_LOAD, 0,"l","load",Arg::NonEmpty, "  --load, -l  \tLoad model." },
+ {ARG_MODEL_SAVE, 0,"s","save",Arg::NonEmpty, "  --save, -s  \tSave model." },
  {ARG_OUT_STAT, 0,"","stat",Arg::NonEmpty, "  --stat  \tFile name with detailed statistics." },
  {ARG_JOBS, 0,"j","jobs",Arg::NonEmpty, "  --jobs  -j \tParallel jobs to run (default 1)" },
- {ARG_OUT_SPIKES, 0,"o","--output",Arg::NonEmpty, "  --output, -o  \tOutput file with serialized spikes list" },
- {ARG_INPUT, 0,"i","input",Arg::NonEmpty, "  --input, -i  \tInput protobuf file with precalculated spikes or labeled time series." },
+ {ARG_PRECALC, 0,"", "precalc",Arg::None, "  --precalc  \tOnly precalculate spike on time series." },
+ {ARG_HELP, 0,"h", "help",Arg::None, "  --help  \tPrint usage and exit." },
+
  {ARG_UNKNOWN, 0, "", "",Arg::None, "\nExamples:\n"
                                "% Need to fill %" },
  {0,0,0,0,0,0}
@@ -41,8 +42,12 @@ struct SnnSimOpts {
     bool precalc;
 };
 
-SnnSimOpts parseOptions(option::Option* options, option::Stats &stats,  int argc, char **argv) {
-    option::Option* buffer  = new option::Option[stats.buffer_max];
+SnnSimOpts parseOptions(int argc, char **argv) {
+    argc-=(argc>0); argv+=(argc>0); // skip program name argv[0] if present
+    option::Stats  stats(usage, argc, argv);
+    option::Option options[stats.options_max];
+    option::Option buffer[stats.buffer_max];
+    
     option::Parser parse(usage, argc, argv, options, buffer);
     if (parse.error())
         exit(1);
@@ -51,10 +56,7 @@ SnnSimOpts parseOptions(option::Option* options, option::Stats &stats,  int argc
         option::printUsage(cout, usage);
         exit(0);
     }
-    if(options[ARG_CONSTANTS].count() != 1) {
-        cerr << "Inappropriate constants filename argument\n";
-        exit(1);
-    }
+    
     if(options[ARG_INPUT].count() != 1) {
         cerr << "Inappropriate input argument\n";
         exit(1);
@@ -74,11 +76,13 @@ SnnSimOpts parseOptions(option::Option* options, option::Stats &stats,  int argc
     }
     if(parse.nonOptionsCount()>0) exit(1);
 
-    delete[] buffer;
+    
     SnnSimOpts sopt;
     sopt.input = options[ARG_INPUT].arg;
     sopt.out_spikes = options[ARG_OUT_SPIKES].arg;
-    sopt.const_file = options[ARG_CONSTANTS].arg;
+    if(options[ARG_CONSTANTS].count()>0) {
+        sopt.const_file = options[ARG_CONSTANTS].arg;
+    }
     if(options[ARG_JOBS].count()>0) {
         sopt.jobs = atoi(options[ARG_JOBS].arg);
     }
@@ -99,49 +103,60 @@ SnnSimOpts parseOptions(option::Option* options, option::Stats &stats,  int argc
 
 
 int main(int argc, char **argv) {
-    argc-=(argc>0); argv+=(argc>0); // skip program name argv[0] if present
-    option::Stats  stats(usage, argc, argv);
-    option::Option* options = new option::Option[stats.options_max];
-    SnnSimOpts sopt = parseOptions(options, stats, argc, argv);
-
-    Constants c = Constants(sopt.const_file);
-    cout << c;
-
-    Sim s(c, sopt.jobs);
-
-    s.setOutputSpikesFile(sopt.out_spikes);
-
-    ProtoRw prw(sopt.input, ProtoRw::Read);
-    SerialFamily inp = prw.readAny();
-    if(inp[0]->getName() == "LabeledTimeSeriesList") {
-        LabeledTimeSeriesList *lst = static_cast<LabeledTimeSeriesList*>(inp[0]);
-        s.setInputTimeSeries(*lst);
-    } else
-    if(inp[0]->getName() == "SpikesList") {
-        SpikesList *sl = static_cast<SpikesList*>(inp[0]);
-        s.setInputSpikesList(*sl);
-    } else {
-        cerr << "Inappropriate input file " << inp[0]->getName() << "\n";
-        terminate();
-    }
-
-    if(!sopt.out_stat_file.empty()) {
-        s.monitorStat(sopt.out_stat_file);
-    }
+    SnnSimOpts sopt = parseOptions(argc, argv);
     
+    Sim s(sopt.jobs);
+    Constants *c = nullptr;
+    if(!sopt.const_file.empty()) {
+        c = new Constants(sopt.const_file);
+        s.construct(*c);
+    } else {
+        if(sopt.model_load.empty()) {
+            cerr << "Need const.json or model for load\n";
+            terminate();
+        }
+    }
     if(!sopt.model_load.empty()) {
         s.loadModel(sopt.model_load);
     }
 
-    if(sopt.precalc) {
-        s.precalculateInputSpikes();
+    s.setOutputSpikesFile(sopt.out_spikes);
+
+    ProtoRw prw(sopt.input, ProtoRw::Read);
+    SerializableBase* inp = prw.read();
+    if(inp->getName() == "LabeledTimeSeriesList") {
+        LabeledTimeSeriesList *lst = static_cast<LabeledTimeSeriesList*>(inp);
+        s.setInputTimeSeries(*lst);
+    } else
+    if(inp->getName() == "SpikesList") {
+        SpikesList *sl = static_cast<SpikesList*>(inp);
+        s.setInputSpikesList(*sl);
     } else {
-        s.run();
+        cerr << "Inappropriate input file " << inp->getName() << "\n";
+        terminate();
     }
+
+    
+    
+
+    if(!sopt.out_stat_file.empty()) {
+        s.monitorStat(sopt.out_stat_file);
+    }
+
+    // if(sopt.precalc) {
+    //     s.precalculateInputSpikes();
+    // } else {
+    //     s.run();
+    // }
+    
+    // if(!sopt.model_save.empty()) {
+    //     s.saveModel(sopt.model_save);
+    // }
     
     if(!sopt.model_save.empty()) {
         s.saveModel(sopt.model_save);
     }
-
-    delete[] options;
+    if(c) {
+        delete c;
+    }
 }

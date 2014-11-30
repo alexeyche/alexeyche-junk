@@ -15,7 +15,13 @@ enum ESerializableClass {
                             ELabeledTimeSeriesList,
                             EAdExNeuronStat,
                             ENeuron,
-                            ELayerInfo
+                            ELayerInfo,
+                            ESynapse,
+                            EBlankModel,
+                            EOptimalStdp,
+                            ESRMNeuron,
+                            EAdExNeuron,
+                            EConstants
                         };
 
 static const char* ESerializableClass_str[] =
@@ -26,41 +32,66 @@ static const char* ESerializableClass_str[] =
                                                 "LabeledTimeSeriesList",
                                                 "AdExNeuronStat",
                                                 "Neuron",
-                                                "LayerInfo"
+                                                "LayerInfo",
+                                                "Synapse",
+                                                "BlankModel",
+                                                "OptimalStdp",
+                                                "SRMNeuron",
+                                                "AdExNeuron",
+                                                "Constants"
                                             };
 
 
 #include <snnlib/base.h>
 
+typedef vector<google::protobuf::Message*> ProtoPack;
 
+class SerializableBase : public Printable {
+public:    
+    SerializableBase() {}
+    SerializableBase(ESerializableClass ename) {
+        init(ename);
+    }
 
+    void init(ESerializableClass ename) {
+        name = string(ESerializableClass_str[ename]);
+    }
 
-class Serializable : public Printable {
-// To make inheritance from that class need to do methods:
-// LabeledTimeSeriesList(const LabeledTimeSeriesList &l) : Serializable(ELabeledTimeSeriesList), ts(l.ts) {
-//     copyFrom(l);
-// }
-// virtual Protos::LabeledTimeSeriesList* serialize() {
-//       Protos::LabeledTimeSeriesList *l = getNew();
-//       for(auto it=ts.begin(); it != ts.end(); ++it) {
-//           Protos::LabeledTimeSeries* lts = l->add_list();
-//           *lts = *it->serialize();
-//       }
-//       return l;
-//   }
+    virtual ProtoPack serialize() = 0;
+    virtual void deserialize() = 0;
+    virtual ProtoPack getNew() = 0;
 
-//   virtual Protos::LabeledTimeSeriesList* getNew(google::protobuf::Message* m = nullptr) {
-//       return getNewSerializedMessage<Protos::LabeledTimeSeriesList>(m);
-//   }
-//   virtual void deserialize() {
-//       Protos::LabeledTimeSeriesList * m = castSerializableType<Protos::LabeledTimeSeriesList>(serialized_message);
-//   }
-
-
-public:
-
+    const string& getName() const {
+        if(name.empty()) {
+            cerr << "Trying to get name from uninitialized Serializable object\n";
+            terminate();
+        }
+        return name;
+    }
     template <typename CT>
-    CT* castSerializableType(google::protobuf::Message* mess) {
+    CT* castSerializable() {
+        CT* d = dynamic_cast<CT*>(this);
+        if(!d) {
+            cerr << "Errors while casting deserialized message treated as " << getName() << ":\n";
+            terminate();
+        }
+        return d;
+    }
+protected:
+    string name;    
+};
+
+typedef vector<SerializableBase*> SerialPack;
+
+
+template <typename T>
+class Serializable : public SerializableBase {
+public:
+    Serializable(ESerializableClass ename) {
+        init(ename);
+    }
+    template <typename CT>
+    CT* castProtoMessage(google::protobuf::Message* mess) {
         CT* d = dynamic_cast<CT*>(mess);
         if(!d) {
             cerr << "Errors while casting deserialized message treated as " << getName() << ":\n";
@@ -69,54 +100,71 @@ public:
         }
         return d;
     }
+    
 
     Serializable(const Serializable &another) {
         copyFrom(another);
     }
-
-    void copyFrom(const Serializable &another) {
-        name = another.name;
-        if(another.serialized_message) {
-            serialized_message = getNew(another.serialized_message);
-        }
-    }
-    Serializable() {
-        serialized_message = nullptr;
-    }
-    Serializable(ESerializableClass ename) {
-        init(ename);
-    }
-
-    void init(ESerializableClass ename) {
-        name = string(ESerializableClass_str[ename]);
-        serialized_message = nullptr;
-    }
-    virtual ::google::protobuf::Message* serialize() = 0;
-    virtual void deserialize() = 0;
-    virtual ::google::protobuf::Message* getNew(google::protobuf::Message* m = nullptr) = 0;
-
-    void deserializeFromPtr(google::protobuf::Message* m) {
-        serialized_message = m;
-        deserialize();
-        serialized_message = nullptr;
-    }
-
-    template <typename T>
-    T* getNewSerializedMessage(google::protobuf::Message* m = nullptr) {
-        T *el;
+    
+    template <typename D>
+    D* getNewSerializedMessage(google::protobuf::Message* m = nullptr) {
+        D *el;
         if(m) {
-            el = new T(*castSerializableType<T>(m));
+            el = new D(*castProtoMessage<D>(m));
         } else {
-            el = new T;
+            el = new D;
         }
-        serialized_message = el;
+        serialized_messages.push_back(el);
         return el;
     }
 
+    T* getNewSerializedMessage(google::protobuf::Message* m = nullptr) {
+        return getNewSerializedMessage<T>(m);
+    }
+    
+    void copyFrom(const Serializable &another) {
+        name = another.name;
+        for(size_t mi=0; mi<another.serialized_messages.size(); mi++) {
+            getNewSerializedMessage(another.serialized_messages[mi]);
+        }
+    }
+
+    
+
+    virtual ProtoPack serialize() = 0;
+    virtual void deserialize() = 0;
+    virtual ProtoPack getNew() { 
+        return ProtoPack({ getNewMessage() }); 
+    }
+    
+    T* getNewMessage() { 
+        return getNewMessage<T>(); 
+    }
+
+    template <typename D>
+    D* getNewMessage() { 
+        return getNewSerializedMessage<D>(); 
+    }
+
+    T* getSerializedMessage(size_t i = 0) { 
+        return getSerializedMessage<T>(i);
+    }
+
+    template <typename D>
+    D* getSerializedMessage(size_t i = 0) { 
+        if(i >= serialized_messages.size()) {
+            cerr << "Trying to get message which haven't been serialized by " << name << "\n";
+            terminate();
+        }
+        return castProtoMessage<D>(serialized_messages[i]); 
+    }
+    
+
     void clean() {
-        if(serialized_message) {
-            delete serialized_message;
-            serialized_message = nullptr;
+        if(serialized_messages.size()>0) {
+            for(auto it=serialized_messages.begin(); it != serialized_messages.end(); ++it) {
+                delete *it;
+            }
         }
     }
 
@@ -124,30 +172,13 @@ public:
         clean();
     }
 
-    const string& getName() {
-        if(name.empty()) {
-            cerr << "Trying to get name from uninitialized Serializable object\n";
-            terminate();
-        }
-        return name;
-    }
-    void setSerializedMessage(google::protobuf::Message *_serialized_message) {
-        serialized_message = _serialized_message;
-    }
-
+    
 protected:
-    string name;
-    ::google::protobuf::Message *serialized_message;
+    
+    ProtoPack serialized_messages;
 };
 
 
-typedef vector<Serializable*> SerialFamily;
-typedef vector<SerialFamily> SerialPack;
-
-class SerializableModel : public Printable {
-    virtual void loadModel(ProtoRw &rw);
-    virtual void saveModel(ProtoRw &rw);
-};
 
 
 Protos::LabeledTimeSeries doubleVectorToLabeledTimeSeries(string label, const vector<double> &data);

@@ -2,25 +2,41 @@
 
 #include <snnlib/base.h>
 #include <snnlib/serialize/serialize.h>
+#include <snnlib/protos/model.pb.h>
 
 class Neuron;
 
-class LearningRule : public Obj {
+class LearningRule : public Serializable<Protos::BlankModel> {
 public:
-	virtual void init(const ConstObj *_c, Neuron *_n) = 0;
+	LearningRule() : Serializable(EBlankModel) {
+		blank = false;
+	}
+	virtual void init(const ConstObj *_c, Neuron *_n)  {
+		
+	}
     virtual void calculateWeightsDynamics() = 0;
-    virtual void saveStat(SerialFamily &p) = 0;
-    virtual void saveModel(SerialFamily &p) = 0;
+    bool isBlank() {
+    	return blank;
+    }
 protected:
+	bool blank;
 	Neuron *n;    
 };
 
-class BlankLearningRule: public LearningRule {
+class BlankLearningRule: public LearningRule  {
 public:
+	BlankLearningRule()  {
+		LearningRule::blank = true;
+	}
 	void init(const ConstObj *_c, Neuron *_n) {
         n = _n;
+        
 	}
+	
+	void deserialize() {}
+    ProtoPack serialize() { return ProtoPack(); } 
+
     void calculateWeightsDynamics() {}
-    void saveStat(SerialFamily &p) {  }
-    void saveModel(SerialFamily &p) {  }
+    void print(std::ostream& str) const { }
+
 };

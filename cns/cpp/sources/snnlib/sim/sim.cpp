@@ -7,7 +7,18 @@
 #include <snnlib/config/factory.h>
 #include <snnlib/neurons/srm_neuron.h>
 
-Sim::Sim(const Constants &c, size_t _jobs) : Tmax(0), jobs(_jobs), sc(c.sim_conf), rg(c) {
+Sim::Sim(size_t _jobs) : Tmax(0), jobs(_jobs), constructed(false) {
+}
+
+
+Sim::Sim(Constants &c, size_t _jobs) : Tmax(0), jobs(_jobs), constructed(false) {
+    construct(c);    
+}
+
+void Sim::construct(Constants &c) {
+    sc = c.sim_conf;
+    rg.setC(c);
+
     if(sc.sim_run_c.seed<0) {
         std::srand ( unsigned ( std::time(0) ) );
     } else {
@@ -63,8 +74,8 @@ Sim::Sim(const Constants &c, size_t _jobs) : Tmax(0), jobs(_jobs), sc(c.sim_conf
     }
 
     net.init(this);
+    constructed = true;
 }
-
 
 
     // RunTimeDelegates rtd;
@@ -156,6 +167,7 @@ void Sim::runSimOnSubset(size_t left_neuron_id, size_t right_neuron_id) {
     delete barrier;
 }
 void Sim::precalculateInputSpikes() {
+    CHECK_CONSTRUCT()
     if(input_ts.size() == 0) {
         cerr << "Need set input time series to precalculate spikes\n";
         terminate();
@@ -166,6 +178,7 @@ void Sim::precalculateInputSpikes() {
 }
 
 void Sim::run() {
+    CHECK_CONSTRUCT()
     if(input_ts.size() != 0) {
         precalculateInputSpikes();
     }

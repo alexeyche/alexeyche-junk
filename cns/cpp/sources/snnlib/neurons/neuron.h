@@ -8,6 +8,7 @@
 #include <snnlib/sim/runtime_globals.h>
 #include <snnlib/serialize/proto_rw.h>
 #include <snnlib/config/factory.h>
+#include <snnlib/serialize/serialize.h>
 
 #include "synapse.h"
 #include "neuron_stat.h"
@@ -24,9 +25,9 @@ class ProtoRw;
 
 #define SYN_ACT_TOL 0.0001
 
-class Neuron: public SerializableModel {
+class Neuron: public Serializable<Protos::Neuron> {
 protected:
-    Neuron() {}
+    Neuron() : Serializable(ENeuron) {}
     friend class Factory;
 public:
     Neuron(const ConstObj *_c, const RuntimeGlobals *_glob_c, double _axon_delay);
@@ -39,8 +40,6 @@ public:
     void setTuningCurve(TuningCurve *_tc);
     void addSynapse(Synapse *s);
 
-    void loadModel(ProtoRw &rw);
-    void saveModel(ProtoRw &rw);
     // runtime
     virtual void calculateProbability() = 0;
     virtual void calculateDynamics() = 0;
@@ -51,6 +50,11 @@ public:
     // stat funcs
     virtual void saveStat(SerialPack &p);
     virtual void enableCollectStatistics();
+    // serialize 
+    void deserialize();
+    ProtoPack serialize();
+    void saveModel(ProtoRw &rw);
+    void loadModel(ProtoRw &rw);
 
     void print(std::ostream& str) const;
 

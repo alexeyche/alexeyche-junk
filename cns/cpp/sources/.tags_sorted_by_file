@@ -20,12 +20,12 @@ c	snnlib/act_funcs/exp_hennequin.h	/^    const ExpHennequinC *c;$/;"	m	class:Exp
 init	snnlib/act_funcs/exp_hennequin.h	/^    void init(const ConstObj *_c, Neuron *_n) {$/;"	f	class:ExpHennequin
 prob	snnlib/act_funcs/exp_hennequin.h	/^    double prob(const double &u) const {$/;"	f	class:ExpHennequin
 probDeriv	snnlib/act_funcs/exp_hennequin.h	/^    double probDeriv(const double &u) const {$/;"	f	class:ExpHennequin
-CAST_TYPE	snnlib/base.h	63;"	d
 Entity	snnlib/base.h	/^class Entity : public Printable {$/;"	c
 Obj	snnlib/base.h	/^class Obj {$/;"	c
 Printable	snnlib/base.h	/^class Printable: public Obj {$/;"	c
 RunTimeDelegates	snnlib/base.h	/^struct RunTimeDelegates {$/;"	s
 SynSpike	snnlib/base.h	/^class SynSpike: public Printable {$/;"	c
+castType	snnlib/base.h	/^const T* castType(const Obj* o) {$/;"	f
 entity_map	snnlib/base.h	/^typedef map<string, unique_ptr<Entity> > entity_map;$/;"	t
 input_dg	snnlib/base.h	/^    vector<neuronInputDelegate> input_dg;$/;"	m	struct:RunTimeDelegates
 n_id	snnlib/base.h	/^	size_t n_id;$/;"	m	class:SynSpike
@@ -163,13 +163,14 @@ u_tr	snnlib/config/constants.h	/^    double u_tr;$/;"	m	class:ExpHennequinC
 weight_decay	snnlib/config/constants.h	/^    double weight_decay;$/;"	m	class:OptimalStdpC
 weight_per_neuron	snnlib/config/constants.h	/^    double weight_per_neuron;$/;"	m	class:ConnectionConf
 Factory	snnlib/config/factory.cpp	/^Factory::Factory() {$/;"	f	class:Factory
-GET_BASE_NAME	snnlib/config/factory.cpp	45;"	d	file:
+GET_BASE_NAME	snnlib/config/factory.cpp	46;"	d	file:
 createActFunc	snnlib/config/factory.cpp	/^ActFunc *Factory::createActFunc(string name, const Constants &c, Neuron *n) {$/;"	f	class:Factory
 createConst	snnlib/config/factory.cpp	/^ConstObj *Factory::createConst(string name, JsonBox::Value v) {$/;"	f	class:Factory
 createLayer	snnlib/config/factory.cpp	/^Layer *Factory::createLayer(size_t size, const NeuronConf &nc, const Constants &c, const RuntimeGlobals *run_glob_c) {$/;"	f	class:Factory
 createLearningRule	snnlib/config/factory.cpp	/^LearningRule * Factory::createLearningRule(string name, const Constants &c, Neuron *n) {$/;"	f	class:Factory
 createNeuron	snnlib/config/factory.cpp	/^Neuron *Factory::createNeuron(string name, const Constants &c, const RuntimeGlobals *run_glob_c, double axon_delay) {$/;"	f	class:Factory
-createSynapse	snnlib/config/factory.cpp	/^Synapse *Factory::createSynapse(string name, const Constants &c, size_t id_pre, double w, double dendrite_delay) {$/;"	f	class:Factory
+createSerializable	snnlib/config/factory.cpp	/^Serializable* Factory::createSerializable(const string &name) {$/;"	f	class:Factory
+createSynapse	snnlib/config/factory.cpp	/^Synapse *Factory::createSynapse(string name, const Constants &c, const RuntimeGlobals *run_glob_c, size_t id_pre, double w, double dendrite_delay) {$/;"	f	class:Factory
 createTuningCurve	snnlib/config/factory.cpp	/^TuningCurve *Factory::createTuningCurve(string name, const Constants &c,  size_t layer_size, size_t neuron_id, Neuron *n) {$/;"	f	class:Factory
 inst	snnlib/config/factory.cpp	/^Factory& Factory::inst() {$/;"	f	class:Factory
 Factory	snnlib/config/factory.h	/^class Factory {$/;"	c
@@ -187,18 +188,20 @@ registerObj	snnlib/config/factory.h	/^    T* registerObj(T *o) {$/;"	f	class:Fac
 uchar	snnlib/core.h	/^typedef unsigned char uchar;$/;"	t
 Layer	snnlib/layers/layer.h	/^    Layer() {}$/;"	f	class:Layer
 Layer	snnlib/layers/layer.h	/^    Layer(size_t _size, const NeuronConf &nc, const Constants &c, const RuntimeGlobals *run_glob_c) {$/;"	f	class:Layer
-Layer	snnlib/layers/layer.h	/^class Layer : public Entity {$/;"	c
+Layer	snnlib/layers/layer.h	/^class Layer : public SerializableModel {$/;"	c
 N	snnlib/layers/layer.h	/^    size_t N;$/;"	m	class:Layer
 connect	snnlib/layers/layer.h	/^    void connect(Layer &l_post, const ConnectionConf &conf, const Constants &c) {$/;"	f	class:Layer
-deserialize	snnlib/layers/layer.h	/^    void deserialize(ProtoRw &prw) {$/;"	f	class:Layer
+glob_c	snnlib/layers/layer.h	/^    const RuntimeGlobals *glob_c;$/;"	m	class:Layer
 global_layer_index	snnlib/layers/layer.h	/^static size_t global_layer_index = 0;$/;"	v
 id	snnlib/layers/layer.h	/^    size_t id;$/;"	m	class:Layer
 init	snnlib/layers/layer.h	/^    virtual void init(size_t _size, const NeuronConf &nc, const Constants &c, const RuntimeGlobals *run_glob_c) {$/;"	f	class:Layer
 layer_info	snnlib/layers/layer.h	/^    LayerInfo *layer_info;$/;"	m	class:Layer
+loadModel	snnlib/layers/layer.h	/^    void loadModel(ProtoRw &rw) {$/;"	f	class:Layer
 neuron_conf	snnlib/layers/layer.h	/^    const NeuronConf *neuron_conf;$/;"	m	class:Layer
 neurons	snnlib/layers/layer.h	/^    vector< Neuron *> neurons;$/;"	m	class:Layer
 operator []	snnlib/layers/layer.h	/^    Neuron *operator[](size_t i) {$/;"	f	class:Layer
 print	snnlib/layers/layer.h	/^    void print(std::ostream& str) const {$/;"	f	class:Layer
+saveModel	snnlib/layers/layer.h	/^    void saveModel(ProtoRw &rw) {$/;"	f	class:Layer
 size	snnlib/layers/layer.h	/^    size_t size() {$/;"	f	class:Layer
 ~Layer	snnlib/layers/layer.h	/^    ~Layer() {$/;"	f	class:Layer
 serialize	snnlib/layers/layer_info.cpp	/^Protos::LayerInfo *LayerInfo::serialize() {$/;"	f	class:LayerInfo
@@ -255,19 +258,17 @@ saveStat	snnlib/neurons/adex_neuron.h	/^    void saveStat(SerialPack &p) {$/;"	f
 Neuron	snnlib/neurons/neuron.cpp	/^Neuron::Neuron(const ConstObj *_c, const RuntimeGlobals *_glob_c, double _axon_delay) {$/;"	f	class:Neuron
 Neuron	snnlib/neurons/neuron.cpp	/^Neuron::Neuron(const Neuron &another) : Serializable(ENeuron) {$/;"	f	class:Neuron
 addSynapse	snnlib/neurons/neuron.cpp	/^void Neuron::addSynapse(Synapse *s) {$/;"	f	class:Neuron
-deserialize	snnlib/neurons/neuron.cpp	/^void Neuron::deserialize() {$/;"	f	class:Neuron
 enableCollectStatistics	snnlib/neurons/neuron.cpp	/^void Neuron::enableCollectStatistics() {$/;"	f	class:Neuron
-getNew	snnlib/neurons/neuron.cpp	/^Protos::Neuron* Neuron::getNew(google::protobuf::Message* m = nullptr) {$/;"	f	class:Neuron
 init	snnlib/neurons/neuron.cpp	/^void Neuron::init(const ConstObj *_c, const RuntimeGlobals *_glob_c, double _axon_delay) {$/;"	f	class:Neuron
+loadModel	snnlib/neurons/neuron.cpp	/^void Neuron::loadModel(ProtoRw &rw) {$/;"	f	class:Neuron
 print	snnlib/neurons/neuron.cpp	/^void Neuron::print(std::ostream& str) const {$/;"	f	class:Neuron
-readModel	snnlib/neurons/neuron.cpp	/^void Neuron::readModel(ProtoRw &rw) {$/;"	f	class:Neuron
+saveModel	snnlib/neurons/neuron.cpp	/^void Neuron::saveModel(ProtoRw &rw) {$/;"	f	class:Neuron
 saveStat	snnlib/neurons/neuron.cpp	/^void Neuron::saveStat(SerialPack &p) {$/;"	f	class:Neuron
-serialize	snnlib/neurons/neuron.cpp	/^Protos::Neuron *Neuron::serialize() {$/;"	f	class:Neuron
 setActFunc	snnlib/neurons/neuron.cpp	/^void Neuron::setActFunc(ActFunc *_act) {$/;"	f	class:Neuron
 setLearningRule	snnlib/neurons/neuron.cpp	/^void Neuron::setLearningRule(LearningRule *_lrule) {$/;"	f	class:Neuron
 setTuningCurve	snnlib/neurons/neuron.cpp	/^void Neuron::setTuningCurve(TuningCurve *_tc) {$/;"	f	class:Neuron
 Neuron	snnlib/neurons/neuron.h	/^    Neuron() {}$/;"	f	class:Neuron
-Neuron	snnlib/neurons/neuron.h	/^class Neuron: public Serializable {$/;"	c
+Neuron	snnlib/neurons/neuron.h	/^class Neuron: public SerializableModel {$/;"	c
 STAT_COLLECT_LIMIT	snnlib/neurons/neuron.h	23;"	d
 SYN_ACT_TOL	snnlib/neurons/neuron.h	25;"	d
 act	snnlib/neurons/neuron.h	/^    ActFunc *act;$/;"	m	class:Neuron
@@ -317,20 +318,23 @@ calculateProbability	snnlib/neurons/srm_neuron.h	/^    void calculateProbability
 init	snnlib/neurons/srm_neuron.h	/^    void init(const ConstObj *_c, const RuntimeGlobals *_glob_c, double _axon_delay) {$/;"	f	class:SRMNeuron
 print	snnlib/neurons/srm_neuron.h	/^    void print(std::ostream& str) const {$/;"	f	class:SRMNeuron
 propagateSynSpike	snnlib/neurons/srm_neuron.h	/^    void propagateSynSpike(const SynSpike *sp) {$/;"	f	class:SRMNeuron
-Synapse	snnlib/neurons/synapse.h	/^    Synapse() {}$/;"	f	class:Synapse
-Synapse	snnlib/neurons/synapse.h	/^    Synapse(const ConstObj *_c, size_t _id_pre, double _w, double _dendrite_delay) {$/;"	f	class:Synapse
-Synapse	snnlib/neurons/synapse.h	/^class Synapse : public Serializable {$/;"	c
+loadModel	snnlib/neurons/synapse.cpp	/^void loadModel(ProtoRw &rw) {$/;"	f
+saveModel	snnlib/neurons/synapse.cpp	/^void saveModel(ProtoRw &rw) {$/;"	f
+Synapse	snnlib/neurons/synapse.h	/^    Synapse(const ConstObj *_c, const RuntimeGlobals *_glob_c, size_t _id_pre, double _w, double _dendrite_delay) {$/;"	f	class:Synapse
+Synapse	snnlib/neurons/synapse.h	/^class Synapse : public SerializableModel {$/;"	c
 c	snnlib/neurons/synapse.h	/^    const SynapseC *c;$/;"	m	class:Synapse
 dendrite_delay	snnlib/neurons/synapse.h	/^    double dendrite_delay;$/;"	m	class:Synapse
 fired	snnlib/neurons/synapse.h	/^    uchar fired;$/;"	m	class:Synapse
+glob_c	snnlib/neurons/synapse.h	/^    const RuntimeGlobals *glob_c;$/;"	m	class:Synapse
 id_pre	snnlib/neurons/synapse.h	/^    size_t id_pre;$/;"	m	class:Synapse
-init	snnlib/neurons/synapse.h	/^    void init(const ConstObj *_c, size_t _id_pre, double _w, double _dendrite_delay) {$/;"	f	class:Synapse
+init	snnlib/neurons/synapse.h	/^    void init(const ConstObj *_c, const RuntimeGlobals *_glob_c, size_t _id_pre, double _w, double _dendrite_delay) {$/;"	f	class:Synapse
 print	snnlib/neurons/synapse.h	/^    void print(std::ostream& str) const {$/;"	f	class:Synapse
 propagateSpike	snnlib/neurons/synapse.h	/^    void propagateSpike() {$/;"	f	class:Synapse
 w	snnlib/neurons/synapse.h	/^    double w;$/;"	m	class:Synapse
 x	snnlib/neurons/synapse.h	/^    double x;$/;"	m	class:Synapse
-CHECK_MODE	snnlib/serialize/proto_rw.h	16;"	d
+CHECK_MODE	snnlib/serialize/proto_rw.h	20;"	d
 Mode	snnlib/serialize/proto_rw.h	/^    enum Mode {Read, Write};$/;"	g	class:ProtoRw
+ProtoPack	snnlib/serialize/proto_rw.h	/^typedef vector<google::protobuf::Message*> ProtoPack;$/;"	t
 ProtoRw	snnlib/serialize/proto_rw.h	/^    ProtoRw(const string &f, Mode _m) : filename(f), m(_m) {$/;"	f	class:ProtoRw
 ProtoRw	snnlib/serialize/proto_rw.h	/^class ProtoRw {$/;"	c
 Read	snnlib/serialize/proto_rw.h	/^    enum Mode {Read, Write};$/;"	e	enum:ProtoRw::Mode
@@ -354,9 +358,7 @@ writeMessage	snnlib/serialize/proto_rw.h	/^    void writeMessage(::google::proto
 zeroIn	snnlib/serialize/proto_rw.h	/^    IstreamInputStream *zeroIn;$/;"	m	class:ProtoRw
 zeroOut	snnlib/serialize/proto_rw.h	/^    OstreamOutputStream *zeroOut;$/;"	m	class:ProtoRw
 ~ProtoRw	snnlib/serialize/proto_rw.h	/^    ~ProtoRw() {$/;"	f	class:ProtoRw
-create	snnlib/serialize/serialize.cpp	/^Serializable* SerializableFactory::create(const string &name) {$/;"	f	class:SerializableFactory
 doubleVectorToLabeledTimeSeries	snnlib/serialize/serialize.cpp	/^Protos::LabeledTimeSeries doubleVectorToLabeledTimeSeries(string label, const vector<double> &data) {$/;"	f
-inst	snnlib/serialize/serialize.cpp	/^SerializableFactory& SerializableFactory::inst() {$/;"	f	class:SerializableFactory
 EAdExNeuronStat	snnlib/serialize/serialize.h	/^                            EAdExNeuronStat,$/;"	e	enum:ESerializableClass
 ELabeledTimeSeries	snnlib/serialize/serialize.h	/^                            ELabeledTimeSeries,$/;"	e	enum:ESerializableClass
 ELabeledTimeSeriesList	snnlib/serialize/serialize.h	/^                            ELabeledTimeSeriesList,$/;"	e	enum:ESerializableClass
@@ -372,8 +374,6 @@ Serializable	snnlib/serialize/serialize.h	/^    Serializable() {$/;"	f	class:Ser
 Serializable	snnlib/serialize/serialize.h	/^    Serializable(ESerializableClass ename) {$/;"	f	class:Serializable
 Serializable	snnlib/serialize/serialize.h	/^    Serializable(const Serializable &another) {$/;"	f	class:Serializable
 Serializable	snnlib/serialize/serialize.h	/^class Serializable : public Printable {$/;"	c
-SerializableFactory	snnlib/serialize/serialize.h	/^    SerializableFactory() {}$/;"	f	class:SerializableFactory
-SerializableFactory	snnlib/serialize/serialize.h	/^class SerializableFactory {$/;"	c
 castSerializableType	snnlib/serialize/serialize.h	/^    CT* castSerializableType(google::protobuf::Message* mess) {$/;"	f	class:Serializable
 clean	snnlib/serialize/serialize.h	/^    void clean() {$/;"	f	class:Serializable
 copyFrom	snnlib/serialize/serialize.h	/^    void copyFrom(const Serializable &another) {$/;"	f	class:Serializable
@@ -382,11 +382,9 @@ getName	snnlib/serialize/serialize.h	/^    const string& getName() {$/;"	f	class
 getNewSerializedMessage	snnlib/serialize/serialize.h	/^    T* getNewSerializedMessage(google::protobuf::Message* m = nullptr) {$/;"	f	class:Serializable
 init	snnlib/serialize/serialize.h	/^    void init(ESerializableClass ename) {$/;"	f	class:Serializable
 name	snnlib/serialize/serialize.h	/^    string name;$/;"	m	class:Serializable
-objects	snnlib/serialize/serialize.h	/^    SerialFamily objects;$/;"	m	class:SerializableFactory
-serialized_message	snnlib/serialize/serialize.h	/^    ::google::protobuf::Message *serialized_message;$/;"	m	class:Serializable
+serialized_messages	snnlib/serialize/serialize.h	/^    ProtoPack serialized_messages;$/;"	m	class:Serializable
 setSerializedMessage	snnlib/serialize/serialize.h	/^    void setSerializedMessage(google::protobuf::Message *_serialized_message) {$/;"	f	class:Serializable
 ~Serializable	snnlib/serialize/serialize.h	/^    ~Serializable() {$/;"	f	class:Serializable
-~SerializableFactory	snnlib/serialize/serialize.h	/^    ~SerializableFactory() {$/;"	f	class:SerializableFactory
 configureConnMap	snnlib/sim/network.cpp	/^void Network::configureConnMap() {$/;"	f	class:Network
 dispathInputSpikes	snnlib/sim/network.cpp	/^void Network::dispathInputSpikes(const SpikesList &sl) {$/;"	f	class:Network
 getSpike	snnlib/sim/network.cpp	/^const SynSpike* Network::getSpike(const size_t& global_id, const double &t) {$/;"	f	class:Network

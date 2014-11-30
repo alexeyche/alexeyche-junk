@@ -1,19 +1,9 @@
 package Protos;
 
 
-message NeuronInfo {
-	required string neuron = 1;
-	optional string learning_rule = 2;
-	required string act_func = 3;
-	optional string tuning_curve = 4;
+message Constants {
+	required string json_content = 1;
 }
-
-message LayerInfo {
-	required uint32 size = 1;
-	required uint32 id = 2;
-	required NeuronInfo neuron = 3;
-};
-
 
 message Neuron {
 	required uint32 id = 1;
@@ -28,5 +18,9 @@ message Synapse {
 	required string const_name = 4;
 }
 
+message BlankModel {}
 
+message OptimalStdp {
+	required double p_acc = 1; 
+}
 

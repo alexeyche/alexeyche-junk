@@ -1,9 +1,8 @@
 
 package Protos;
 
-message ClassName {
-    required string name = 1;
-}
-message Family {
-    repeated ClassName names = 1;
+
+
+message Class {
+    required string instance_class_name = 1;
 }
