@@ -94,10 +94,10 @@ pthread_barrier_t *barrier;
 
 void* Sim::runWorker(void *content) {
     SimWorker *sw = static_cast<SimWorker*>(content);
-    cout << "thread " << sw->thread_id << " started on neurons " << sw->first << "-" << sw->last << "\n";
     Sim *s = sw->s;
-
+    
     for(double t=0; t<=s->Tmax; t += s->rg.Dt()) {
+         
         double x = 0.0;
         if(sw->last <= s->input_neurons_count){
             if(s->input_ts.size()>0) {
@@ -128,7 +128,6 @@ void* Sim::runWorker(void *content) {
         }
         pthread_barrier_wait( barrier );
     }
-    cout << "thread " << sw->thread_id << " exited\n";
     return NULL;
 }
 
@@ -172,9 +171,11 @@ void Sim::precalculateInputSpikes() {
         cerr << "Need set input time series to precalculate spikes\n";
         terminate();
     }
+    cout << "Precalculating spikes...\n";
     Tmax = input_ts.Tmax;
     rg.setDt(sc.ts_map_conf.dt);
     runSimOnSubset(0, input_neurons_count);
+    cout << "Done\n";
 }
 
 void Sim::run() {
@@ -182,11 +183,14 @@ void Sim::run() {
     if(input_ts.size() != 0) {
         precalculateInputSpikes();
     }
+    cout << "Configuring connection map and dispatch spikes on queues...\n";
     net.configureConnMap();
     net.dispathInputSpikes(net.spikes_list);
+    cout << "Done\n";
+
     Tmax = net.spikes_list.getMaxSpikeTime();
-
     rg.setDt(sc.sim_run_c.dt);
-
+    cout << "Running simulation...\n";
     runSimOnSubset(input_neurons_count, input_neurons_count+net_neurons_count);
+    cout << "Done\n";
 }

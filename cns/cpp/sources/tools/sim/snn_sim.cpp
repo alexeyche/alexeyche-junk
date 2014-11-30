@@ -143,15 +143,11 @@ int main(int argc, char **argv) {
         s.monitorStat(sopt.out_stat_file);
     }
 
-    // if(sopt.precalc) {
-    //     s.precalculateInputSpikes();
-    // } else {
-    //     s.run();
-    // }
-    
-    // if(!sopt.model_save.empty()) {
-    //     s.saveModel(sopt.model_save);
-    // }
+    if(sopt.precalc) {
+        s.precalculateInputSpikes();
+    } else {
+        s.run();
+    }
     
     if(!sopt.model_save.empty()) {
         s.saveModel(sopt.model_save);
