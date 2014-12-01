@@ -274,14 +274,16 @@ class SimRunConf: public ConfObj {
 public:
     double dt;
     int seed;
+    double start_rate;
 
     void fill_structure(JsonBox::Value v) {
         dt = v["dt"].getDouble();
         seed = v["seed"].getInt();
+        start_rate = v["start_rate"].getDouble();
     }
 
     void print(std::ostream &str) const {
-        str << "dt: " << dt << " seed: " << seed << "\n";
+        str << "dt: " << dt << " seed: " << seed << " start_rate: " << start_rate << "\n";
     }
 };
 

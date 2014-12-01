@@ -8,7 +8,7 @@ bool compareSynSpike (const SynSpike& s1, const SynSpike& s2) {
 }
 
 
-void SpikesQueue::push_and_sort(const vector<SynSpike> &v) {
+void SpikesQueue::push_and_sort(vector<SynSpike> v) {
     for(auto it=v.begin(); it != v.end(); ++it) {
         l.push_back(*it);
     }

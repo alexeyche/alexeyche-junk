@@ -35,7 +35,9 @@ public:
                     values = convert(v[0]);
                 } else {
                     for(size_t vi=0; vi<v.size(); vi++) {
-                        values[v[vi]->getName()] = convert(v[vi]);
+                        stringstream ss;
+                        ss << v[vi]->getName() << "_" << vi;
+                        values[ss.str()] = convert(v[vi]);
                     }
                 }                
             } catch(...) {

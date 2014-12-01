@@ -22,8 +22,8 @@ public:
             a.push_back(m->a(i));
         }
     }
-    ProtoPack getNew() { 
-        return ProtoPack({ getNewMessage(), getNewMessage<Protos::AdExNeuronStat>() }); 
+    ProtoPack getNew() {
+        return ProtoPack({ getNewMessage(), getNewMessage<Protos::AdExNeuronStat>() });
     }
     void print(std::ostream& str) const {}
 
@@ -32,7 +32,9 @@ public:
 
 class AdExNeuron : public Neuron {
 protected:
-    AdExNeuron() { }
+    AdExNeuron() {
+        adex_stat = nullptr;
+    }
     friend class Factory;
 public:
     AdExNeuron(const ConstObj *_c, const RuntimeGlobals *_glob_c, double _axon_delay) {

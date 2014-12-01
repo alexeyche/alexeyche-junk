@@ -14,9 +14,19 @@ public:
         pthread_spin_init(&lock, 0);
         // __id = __global_id
     }
-    void push_and_sort(const vector<SynSpike> &v);
-
-    const inline void asyncPush(const SynSpike &s) {
+    ~SpikesQueue() {
+        pos = l.end();
+        pthread_spin_destroy(&lock);
+    }
+    SpikesQueue& operator=(const SpikesQueue& another) {
+        l = another.l;
+        return *this;
+    }
+    void push_and_sort(vector<SynSpike> v);
+    void clear() {
+        l.clear();
+    }
+    const inline void asyncPush(const SynSpike s) {
         // if(print) {
         //     cout << __id <<  " asyncPush =============================\n";
         //     cout << *this << "\n";
@@ -86,8 +96,7 @@ public:
                 //         cout << "and now we are on that spike: " << *pos << "\n";
                 //     }
                 // }
-                SynSpike *sp = &*it;
-                return sp;
+                return &(*it);
             }
             it++;
         }

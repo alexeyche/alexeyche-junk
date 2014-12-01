@@ -47,7 +47,7 @@ static const char* ESerializableClass_str[] =
 typedef vector<google::protobuf::Message*> ProtoPack;
 
 class SerializableBase : public Printable {
-public:    
+public:
     SerializableBase() {}
     SerializableBase(ESerializableClass ename) {
         init(ename);
@@ -78,7 +78,7 @@ public:
         return d;
     }
 protected:
-    string name;    
+    string name;
 };
 
 typedef vector<SerializableBase*> SerialPack;
@@ -100,12 +100,17 @@ public:
         }
         return d;
     }
-    
+
 
     Serializable(const Serializable &another) {
         copyFrom(another);
     }
-    
+    Serializable& operator=(const Serializable &another) {
+        copyFrom(another);
+        return *this;
+    }
+
+
     template <typename D>
     D* getNewSerializedMessage(google::protobuf::Message* m = nullptr) {
         D *el;
@@ -121,7 +126,7 @@ public:
     T* getNewSerializedMessage(google::protobuf::Message* m = nullptr) {
         return getNewSerializedMessage<T>(m);
     }
-    
+
     void copyFrom(const Serializable &another) {
         name = another.name;
         for(size_t mi=0; mi<another.serialized_messages.size(); mi++) {
@@ -129,36 +134,36 @@ public:
         }
     }
 
-    
+
 
     virtual ProtoPack serialize() = 0;
     virtual void deserialize() = 0;
-    virtual ProtoPack getNew() { 
-        return ProtoPack({ getNewMessage() }); 
+    virtual ProtoPack getNew() {
+        return ProtoPack({ getNewMessage() });
     }
-    
-    T* getNewMessage() { 
-        return getNewMessage<T>(); 
+
+    T* getNewMessage() {
+        return getNewMessage<T>();
     }
 
     template <typename D>
-    D* getNewMessage() { 
-        return getNewSerializedMessage<D>(); 
+    D* getNewMessage() {
+        return getNewSerializedMessage<D>();
     }
 
-    T* getSerializedMessage(size_t i = 0) { 
+    T* getSerializedMessage(size_t i = 0) {
         return getSerializedMessage<T>(i);
     }
 
     template <typename D>
-    D* getSerializedMessage(size_t i = 0) { 
+    D* getSerializedMessage(size_t i = 0) {
         if(i >= serialized_messages.size()) {
             cerr << "Trying to get message which haven't been serialized by " << name << "\n";
             terminate();
         }
-        return castProtoMessage<D>(serialized_messages[i]); 
+        return castProtoMessage<D>(serialized_messages[i]);
     }
-    
+
 
     void clean() {
         if(serialized_messages.size()>0) {
@@ -172,9 +177,9 @@ public:
         clean();
     }
 
-    
+
 protected:
-    
+
     ProtoPack serialized_messages;
 };
 

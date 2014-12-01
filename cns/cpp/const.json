@@ -8,9 +8,9 @@
     },
     "neurons" : {
         "SRMNeuron" : {
-            "tau_refr"  : 2.0,       
-            "amp_refr"  : 200.0,     
-            "u_rest"    : 0.0       
+            "tau_refr"  : 2.0,
+            "amp_refr"  : 200.0,
+            "u_rest"    : 0.0
         },
         "AdExNeuron" : {
             "C" : 20,
@@ -40,20 +40,20 @@
             "u_tr" : 1
         },
         "ExpHennequin" : {
-            "gain_factor" : 12.5, 
-            "p_rest" : 0.1, 
-            "u_tr" : 15.0, 
-            "beta" : 1.0,  
-            "r0"   : 9.25  
+            "gain_factor" : 12.5,
+            "p_rest" : 0.1,
+            "u_tr" : 15.0,
+            "beta" : 1.0,
+            "r0"   : 9.25
         }
     },
     "learning_rules" : {
         "OptimalStdp" : {
-            "tau_c" : 100, 
+            "tau_c" : 100,
             "mean_p_dur" : 60000,
             "target_rate" : 15,
             "target_rate_factor" : 0,
-            "weight_decay" : 0.026    
+            "weight_decay" : 0.026
         }
     },
     "sim_configuration" : {
@@ -66,7 +66,7 @@
                     "act_func" : "Determ",
                     "axon_delay_distr" : [0, 0]
                 }
-            },                
+            },
         ],
         "net_layers_conf" : [
             {
@@ -78,7 +78,7 @@
                     "axon_delay_distr" : [0, 0]
 
                 }
-            },                    
+            },
             {
                 "size" : 100,
                 "neuron_conf" : {
@@ -87,7 +87,7 @@
                     "act_func" : "ExpHennequin",
                     "axon_delay_distr" : [0, 0]
                 }
-            },                    
+            },
         ],
         "conn_map" : {
             "0-1" : [
@@ -102,8 +102,9 @@
         },
         "sim_run_conf" : {
             "seed" : 1,
-            "dt" : 1            // ms
+            "dt" : 1,            // ms
+            "start_rate" : 10.0    // Hz
         },
-        "neurons_to_listen" : [51, 101]
+        "neurons_to_listen" : [101, 201]
     }
 }

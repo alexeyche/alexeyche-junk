@@ -69,7 +69,7 @@ public:
                 auto it = std::max_element(std::begin(sp_list[ni]), std::end(sp_list[ni]));
                 if(*it > max_t) {
                     max_t = *it;
-                } 
+                }
             }
         }
         return max_t;

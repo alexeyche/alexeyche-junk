@@ -26,8 +26,7 @@ p1 = prast(net,T0=Ti*Trange,Tmax=(Ti+1)*Trange)
 #print(p1, position=c(0, 0.6, 1, 1)), more=TRUE)
 print(p1)
 
-# 
-# 
+
 if(file.exists(stat_file)) {
     stat = RProto$new(stat_file)$read()
     nid=1

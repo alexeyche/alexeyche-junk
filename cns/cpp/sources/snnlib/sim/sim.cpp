@@ -12,7 +12,7 @@ Sim::Sim(size_t _jobs) : Tmax(0), jobs(_jobs), constructed(false) {
 
 
 Sim::Sim(Constants &c, size_t _jobs) : Tmax(0), jobs(_jobs), constructed(false) {
-    construct(c);    
+    construct(c);
 }
 
 void Sim::construct(Constants &c) {
@@ -88,51 +88,69 @@ void Sim::construct(Constants &c) {
 
 
 
-pthread_barrier_t *barrier;
 
+void Sim::simStep(SimWorker *sw, const double &t) {
+    double x = 0.0;
+    Sim *s = sw->s;
+    if(sw->last <= s->input_neurons_count) {
+        if(s->input_ts.size()>0) {
+            x = s->input_ts.top_value();
+        }
+        if(sw->thread_id == 0) {
+            s->input_ts.pop_value();
+        }
+    }
+    for(size_t ni=sw->first; ni<sw->last; ni++) {
+        // cout << "simulating " << ni << " at " << t << "\n";
+        Neuron *n = s->sim_neurons[ni].n;
+        if(ni<s->input_neurons_count) {
+            n->attachCurrent(x);
+        }
+
+        while(const SynSpike *sp = s->net.getSpike(ni, t)) {
+            n->propagateSynSpike(sp);
+        }
+        n->calculateProbability();
+        n->calculateDynamics();
+
+        if(n->fired) {
+            s->net.propagateSpike(n->id, t+s->rg.Dt());
+            n->fired = 0;
+        }
+    }
+}
+
+pthread_barrier_t *barrier;
 
 
 void* Sim::runWorker(void *content) {
     SimWorker *sw = static_cast<SimWorker*>(content);
     Sim *s = sw->s;
-    
     for(double t=0; t<=s->Tmax; t += s->rg.Dt()) {
-         
-        double x = 0.0;
-        if(sw->last <= s->input_neurons_count){
-            if(s->input_ts.size()>0) {
-                x = s->input_ts.top_value();
-            }
-            if(sw->thread_id == 0) {
-                s->input_ts.pop_value();
-            }
-        }
-        for(size_t ni=sw->first; ni<sw->last; ni++) {
-            // cout << "simulating " << ni << " at " << t << "\n";
-            Neuron *n = s->sim_neurons[ni].n;
-            if(ni<s->input_neurons_count) {
-                n->attachCurrent(x);
-            }
-
-            while(const SynSpike *sp = s->net.getSpike(ni, t)) {
-                n->propagateSynSpike(sp);
-            }
-            n->calculateProbability();
-            n->calculateDynamics();
-
-            if(n->fired) {
-                s->net.propagateSpike(n->id, t+s->rg.Dt());
-                n->fired = 0;
-            }
-
-        }
+        simStep(sw, t);
         pthread_barrier_wait( barrier );
     }
     return NULL;
 }
 
+void* Sim::runMeasureWorker(void *content) {
+    SimWorker *sw = static_cast<SimWorker*>(content);
+    Sim *s = sw->s;
 
-void Sim::runSimOnSubset(size_t left_neuron_id, size_t right_neuron_id) {
+    for(double t=0; t<=100; t += s->rg.Dt()) {
+        simStep(sw, t);
+        pthread_barrier_wait( barrier );
+    }
+    if(sw->thread_id == 0) {
+        s->resetSim();
+    }
+
+    return NULL;
+}
+
+
+void Sim::runSimOnSubset(size_t left_neuron_id, size_t right_neuron_id, void* (*sim_func)(void* content)) {
+    CHECK_CONSTRUCT()
     assert(left_neuron_id<right_neuron_id);
     size_t num_neurons = right_neuron_id-left_neuron_id;
 
@@ -155,7 +173,7 @@ void Sim::runSimOnSubset(size_t left_neuron_id, size_t right_neuron_id) {
         workers[ji].last = last;
         workers[ji].thread_id = ji;
         workers[ji].s = this;
-        P( pthread_create( &threads[ji], NULL, Sim::runWorker,  &workers[ji]) );
+        P( pthread_create( &threads[ji], NULL, sim_func,  &workers[ji]) );
     }
 
     for (size_t ji = 0; ji < jobs; ++ji) {
@@ -174,7 +192,7 @@ void Sim::precalculateInputSpikes() {
     cout << "Precalculating spikes...\n";
     Tmax = input_ts.Tmax;
     rg.setDt(sc.ts_map_conf.dt);
-    runSimOnSubset(0, input_neurons_count);
+    runSimOnSubset(0, input_neurons_count, Sim::runWorker);
     cout << "Done\n";
 }
 
@@ -188,9 +206,13 @@ void Sim::run() {
     net.dispathInputSpikes(net.spikes_list);
     cout << "Done\n";
 
+    cout << "Calculating weight factor...\n";
+    runSimOnSubset(input_neurons_count, input_neurons_count+net_neurons_count, Sim::runMeasureWorker);
+    cout << "Done\n";
+
     Tmax = net.spikes_list.getMaxSpikeTime();
     rg.setDt(sc.sim_run_c.dt);
     cout << "Running simulation...\n";
-    runSimOnSubset(input_neurons_count, input_neurons_count+net_neurons_count);
+    runSimOnSubset(input_neurons_count, input_neurons_count+net_neurons_count, Sim::runWorker);
     cout << "Done\n";
 }

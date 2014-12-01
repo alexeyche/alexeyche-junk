@@ -106,7 +106,7 @@ for EP in $EPOCHS; do
         EPOCH_SFX="${EP}_"
         MODEL_TO_LOAD=$WORK_DIR/$((EP-1))_model.bin
         if [ -f "$MODEL_TO_LOAD" ]; then
-            MODEL_TO_LOAD_OPT=" -ml $MODEL_TO_LOAD"
+            MODEL_TO_LOAD_OPT=" -l $MODEL_TO_LOAD"
         fi        
     fi    
     LEARN=yes
@@ -119,7 +119,7 @@ for EP in $EPOCHS; do
         STAT_OPT="--stat $WORK_DIR/${EPOCH_SFX}stat.pb"
     fi    
     INPUT_FILE=$INPUT_FILES_DIR/$(echo $INPUT_FILES_BN | cut -d ' ' -f $INP_ITER)
-    $SNN_SIM -c $WORK_DIR/const.json -i $INPUT_FILE -o $OUTPUT_SPIKES $STAT_OPT -j $JOBS &> $OUTPUT_FILE
+    $SNN_SIM -c $WORK_DIR/const.json -i $INPUT_FILE -o $OUTPUT_SPIKES -s $MODEL_FILE $MODEL_TO_LOAD_OPT $STAT_OPT -j $JOBS &> $OUTPUT_FILE
     if [ "$?" -ne 0 ]; then
         echo "Not null exit code ($?)"
         exit $?

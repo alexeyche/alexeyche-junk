@@ -20,11 +20,13 @@ public:
         id_pre = _id_pre;
         w = _w;
         x = 0.0;
+        w_factor = 0.0;
         dendrite_delay = _dendrite_delay;
     }
 
     size_t id_pre;
 
+    double w_factor;
     double x;
     double w;
     double dendrite_delay;
@@ -32,7 +34,7 @@ public:
     uchar fired;
 
     void propagateSpike() {
-        x += c->amp;
+        x += c->amp ;
     }
     void print(std::ostream& str) const {
         str << "Synapse(id_pre: " << id_pre << ", x:" << x << ", w: " << w << ", dendrite_delay: " << dendrite_delay << ")";

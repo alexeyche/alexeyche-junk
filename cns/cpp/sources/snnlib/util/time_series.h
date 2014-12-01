@@ -63,7 +63,7 @@ public:
         Protos::LabeledTimeSeries * m = getSerializedMessage();
         label = m->label();
         ts.deserialize(m->ts());
-    }    
+    }
     // end Serializable
 
 };
@@ -72,8 +72,9 @@ public:
 
 class LabeledTimeSeriesList  : public Serializable<Protos::LabeledTimeSeriesList> {
 public:
-    LabeledTimeSeriesList() : Serializable(ELabeledTimeSeriesList) {}
-    
+    LabeledTimeSeriesList() : Serializable(ELabeledTimeSeriesList) {
+    }
+
     // Serializable:
     ProtoPack serialize() {
         Protos::LabeledTimeSeriesList *l = getNewMessage();
@@ -111,15 +112,15 @@ public:
 class ContLabeledTimeSeries : public Printable {
 public:
     ContLabeledTimeSeries() {}
-    ContLabeledTimeSeries(LabeledTimeSeriesList &lst, const double &dt) {
+    ContLabeledTimeSeries(LabeledTimeSeriesList lst, const double &dt) {
         init(lst, dt);
     }
 
-    void init(LabeledTimeSeriesList &lst, const double &dt) {
+    void init(LabeledTimeSeriesList lst, const double &dt) {
         double acc_time = 0;
         auto engine = std::default_random_engine{};
         std::random_shuffle(lst.ts.begin(), lst.ts.end());
-        
+
         for(auto it=lst.ts.begin(); it != lst.ts.end(); ++it) {
             for(auto it_val=it->ts.data.begin(); it_val != it->ts.data.end(); ++it_val) {
                 data.push_back(*it_val);

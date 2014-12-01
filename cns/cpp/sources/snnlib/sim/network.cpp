@@ -11,7 +11,10 @@ void Network::init(const Sim *_s) {
 
     total_size = s->input_neurons_count + s->net_neurons_count;
 
-    conn_map = new vector<Conn>[total_size];
+    if(!conn_map) {
+        conn_map = new vector<Conn>[total_size];
+    }
+
     spikes_list.init(total_size);
 
     //input_queues = new SpikeQueue[net_size];

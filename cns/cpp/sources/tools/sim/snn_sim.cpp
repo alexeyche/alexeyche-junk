@@ -47,16 +47,16 @@ SnnSimOpts parseOptions(int argc, char **argv) {
     option::Stats  stats(usage, argc, argv);
     option::Option options[stats.options_max];
     option::Option buffer[stats.buffer_max];
-    
+
     option::Parser parse(usage, argc, argv, options, buffer);
     if (parse.error())
         exit(1);
 
-    if (options[ARG_HELP]) { // || argc == 0) {
+    if ((options[ARG_HELP]) || (argc == 0)) {
         option::printUsage(cout, usage);
         exit(0);
     }
-    
+
     if(options[ARG_INPUT].count() != 1) {
         cerr << "Inappropriate input argument\n";
         exit(1);
@@ -76,7 +76,7 @@ SnnSimOpts parseOptions(int argc, char **argv) {
     }
     if(parse.nonOptionsCount()>0) exit(1);
 
-    
+
     SnnSimOpts sopt;
     sopt.input = options[ARG_INPUT].arg;
     sopt.out_spikes = options[ARG_OUT_SPIKES].arg;
@@ -104,7 +104,7 @@ SnnSimOpts parseOptions(int argc, char **argv) {
 
 int main(int argc, char **argv) {
     SnnSimOpts sopt = parseOptions(argc, argv);
-    
+
     Sim s(sopt.jobs);
     Constants *c = nullptr;
     if(!sopt.const_file.empty()) {
@@ -136,8 +136,8 @@ int main(int argc, char **argv) {
         terminate();
     }
 
-    
-    
+
+
 
     if(!sopt.out_stat_file.empty()) {
         s.monitorStat(sopt.out_stat_file);
@@ -148,7 +148,7 @@ int main(int argc, char **argv) {
     } else {
         s.run();
     }
-    
+
     if(!sopt.model_save.empty()) {
         s.saveModel(sopt.model_save);
     }

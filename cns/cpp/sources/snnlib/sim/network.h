@@ -20,7 +20,7 @@ public:
 
 class Network : public Printable {
 public:
-	Network() {
+	Network() : total_size(0) {
 		conn_map = nullptr;
 		input_queues = nullptr;
 		net_queues = nullptr;
@@ -32,6 +32,16 @@ public:
 	void configureConnMap();
 	void propagateSpike(const size_t &global_id, const double &t);
 	void dispathInputSpikes(const SpikesList &sl);
+
+	void reset(bool reset_input_queue = false) {
+		for(size_t global_id=0; global_id<total_size; ++global_id) {
+			spikes_list[global_id].clear();
+			net_queues[global_id].clear();
+			if((reset_input_queue)&&(input_queues)) {
+				input_queues[global_id].clear();
+			}
+		}
+	}
 
 	const SynSpike* getSpike(const size_t& global_id, const double &t);
 

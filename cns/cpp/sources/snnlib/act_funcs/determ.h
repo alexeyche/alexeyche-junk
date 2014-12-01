@@ -27,7 +27,9 @@ public:
     double probDeriv(const double &u) const {
         return 0.0;
     };
-
+    double probReversed(const double &p) const {
+        return 0.0;
+    }
     const DetermC *c;
 };
 

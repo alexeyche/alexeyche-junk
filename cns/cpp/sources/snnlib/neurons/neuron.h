@@ -47,10 +47,17 @@ public:
     virtual void propagateSynSpike(const SynSpike *sp) = 0;
     virtual void provideDelegates(RunTimeDelegates &rtd) {}
 
+    void incWeightFactors(double f) {
+        for(auto it=syns.begin(); it != syns.end(); ++it) {
+            Synapse *s = *it;
+            s->w_factor += f;
+        }
+    }
+
     // stat funcs
     virtual void saveStat(SerialPack &p);
     virtual void enableCollectStatistics();
-    // serialize 
+    // serialize
     void deserialize();
     ProtoPack serialize();
     void saveModel(ProtoRw &rw);

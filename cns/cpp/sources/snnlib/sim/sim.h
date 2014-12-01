@@ -40,7 +40,7 @@ public:
                 n->saveStat(st);
             }
             prw.write(st);
-            
+
         }
         if(!output_spikes_file.empty()){
             ProtoRw prw(output_spikes_file, ProtoRw::Write);
@@ -49,7 +49,7 @@ public:
 
         layers.clear();
     }
-    
+
     void loadModel(string f) {
         ProtoRw rw(f,ProtoRw::Read);
         if(Constants::IsGlobalInstanceCreated()) {
@@ -81,8 +81,10 @@ public:
     }
     void setInputTimeSeries(LabeledTimeSeriesList l) {
         CHECK_CONSTRUCT()
+        input_ts_list = l;
         input_ts = ContLabeledTimeSeries(l, sc.ts_map_conf.dt);
     }
+
     void setInputSpikesList(SpikesList l) {
         CHECK_CONSTRUCT()
         if(l.N < input_neurons_count) {
@@ -93,6 +95,7 @@ public:
             net.spikes_list[ni] = l[ni];
         }
     }
+
     void setOutputSpikesFile(const string &filename) {
         CHECK_CONSTRUCT()
         output_spikes_file = filename;
@@ -113,6 +116,13 @@ public:
         terminate();
     }
 
+    void resetSim(bool reset_input_stat=false) {
+        CHECK_CONSTRUCT()
+        net.reset(reset_input_stat);
+        if(input_ts_list.size()>0){
+            input_ts = ContLabeledTimeSeries(input_ts_list, sc.ts_map_conf.dt);
+        }
+    }
 
     void monitorStat(const string &filename) {
         CHECK_CONSTRUCT()
@@ -124,7 +134,9 @@ public:
 
 
     static void* runWorker(void *content);
-    void runSimOnSubset(size_t left_neuron_id, size_t right_neuron_id);
+    static void* runMeasureWorker(void *content);
+    static inline void simStep(SimWorker *sw, const double &t);
+    void runSimOnSubset(size_t left_neuron_id, size_t right_neuron_id, void* (*sim_func)(void* content));
     void precalculateInputSpikes();
     void run();
 
@@ -148,6 +160,8 @@ public:
 
     SimConfiguration sc;
     RuntimeGlobals rg;
-    bool constructed; 
+    bool constructed;
+
+    LabeledTimeSeriesList input_ts_list;
 };
 
