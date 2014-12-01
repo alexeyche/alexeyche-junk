@@ -23,8 +23,13 @@ public:
         return *this;
     }
     void push_and_sort(vector<SynSpike> v);
+    
+    void reset() {
+        pos = l.begin();
+    }
     void clear() {
         l.clear();
+        pos = l.begin();
     }
     const inline void asyncPush(const SynSpike s) {
         // if(print) {

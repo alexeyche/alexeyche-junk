@@ -20,6 +20,7 @@ void Neuron::init(const ConstObj *_c, const RuntimeGlobals *_glob_c, double _axo
     y = 0.0;
     p = 0.0;
     fired = 0;
+    weight_factor = 1.0;
 
     collectStatistics = false;
     stat = nullptr;
@@ -50,12 +51,14 @@ ProtoPack Neuron::serialize() {
     n_ser->set_axon_delay(axon_delay);
     n_ser->set_id(id);
     n_ser->set_num_of_synapses(syns.size());
+    n_ser->set_weight_factor(weight_factor);
     return ProtoPack({n_ser});
 }
 void Neuron::deserialize() {
     Protos::Neuron *mess = getSerializedMessage();
     id = mess->id();
     axon_delay = mess->axon_delay();
+    weight_factor = mess->weight_factor();
     if(syns.size()>0) {
         for(size_t syn_i=0; syn_i<syns.size(); syn_i++) {
             Factory::inst().cleanObj(syns[syn_i]);

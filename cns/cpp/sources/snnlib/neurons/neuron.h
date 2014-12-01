@@ -47,12 +47,6 @@ public:
     virtual void propagateSynSpike(const SynSpike *sp) = 0;
     virtual void provideDelegates(RunTimeDelegates &rtd) {}
 
-    void incWeightFactors(double f) {
-        for(auto it=syns.begin(); it != syns.end(); ++it) {
-            Synapse *s = *it;
-            s->w_factor += f;
-        }
-    }
 
     // stat funcs
     virtual void saveStat(SerialPack &p);
@@ -69,6 +63,7 @@ public:
 
     double y;
     double p;
+    double weight_factor;
     uchar fired;
 
     double axon_delay;

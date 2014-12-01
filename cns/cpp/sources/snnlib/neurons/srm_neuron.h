@@ -27,11 +27,13 @@ public:
     }
 
     void calculateProbability() {
-        y = c->u_rest;
+        y = 0.0;
         for(auto it=active_synapses.begin(); it != active_synapses.end(); ++it) {
             Synapse *s = *it;
             y += s->w * s->x;
         }
+        y = c->u_rest + y * weight_factor;
+
         p = act->prob(y);
         if(collectStatistics) {
             stat->collect(this);
