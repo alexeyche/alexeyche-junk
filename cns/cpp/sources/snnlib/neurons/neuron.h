@@ -46,7 +46,7 @@ public:
     virtual void attachCurrent(const double &I) = 0;
     virtual void propagateSynSpike(const SynSpike *sp) = 0;
     virtual void provideDelegates(RunTimeDelegates &rtd) {}
-
+    virtual void reset();
 
     // stat funcs
     virtual void saveStat(SerialPack &p);

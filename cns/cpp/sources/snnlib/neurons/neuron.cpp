@@ -17,9 +17,7 @@ void Neuron::init(const ConstObj *_c, const RuntimeGlobals *_glob_c, double _axo
 
     act = nullptr; lrule = nullptr; tc = nullptr;
 
-    y = 0.0;
-    p = 0.0;
-    fired = 0;
+    reset();
     weight_factor = 1.0;
 
     collectStatistics = false;
@@ -41,6 +39,17 @@ void Neuron::addSynapse(Synapse *s) {
     if(collectStatistics) {
         stat->syns.push_back(vector<double>());
     }
+}
+
+void Neuron::reset() {
+    y = 0.0;
+    p = 0.0;
+    fired = 0;
+    for(auto it=syns.begin(); it != syns.end(); ++it) {
+        Synapse *s = *it;
+        s->reset();
+    }
+    active_synapses.clear();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -67,7 +76,7 @@ void Neuron::deserialize() {
     }
     syns.resize(mess->num_of_synapses());
 }
-    
+
 void Neuron::saveModel(ProtoRw &rw) {
     rw.write(this);
     for(size_t syn_i=0; syn_i<syns.size(); syn_i++) {

@@ -172,46 +172,55 @@ void* Sim::runWorker(void *content) {
     return NULL;
 }
 
+#define EPISODE_LENGTH 30000
+#define NUM_OF_EPISODES 50
+
 void* Sim::runMeasureWorker(void *content) {
     SimWorker *sw = static_cast<SimWorker*>(content);
     Sim *s = sw->s;
 
-    double episode_length = 10000;
-    size_t num_of_episodes = 30;
-    
-    size_t num_n = sw->last-sw->first;
-    
-    size_t rate[num_n];
-    
-    for(size_t ni = 0; ni<num_n; ni++) {
-        rate[ni] = 0;
-    }
+    double episode_length = EPISODE_LENGTH;
+    size_t num_of_episodes = NUM_OF_EPISODES;
 
-    for(double t_ep=0; t_ep<(episode_length*num_of_episodes); t_ep+=episode_length) {
+
+    for(size_t ep_i=0; ep_i < num_of_episodes; ep_i++) {
+        double t_ep = getUnif()*(s->Tmax - episode_length);
+        //cout << "episode " << ep_i << " from " << t_ep << " to " << t_ep+episode_length << "\n";
         for(double t=t_ep; t<=(t_ep+episode_length); t += s->rg.Dt()) {
             simStep(sw, t);
-            pthread_barrier_wait( barrier );    
+            pthread_barrier_wait( barrier );
         }
+        if(sw->thread_id == 0) {
+            for(size_t li=s->input_layers_count; li < s->layers.size(); li++) {
+                Layer *l = s->layers[li];
+                double acc = 0.0;
+                for(auto nit=l->neurons.begin(); nit != l->neurons.end(); ++nit) {
+                    Neuron *n = *nit;
+                    size_t episode_rate = 1000.0*s->net.spikes_list[n->id].size()/episode_length;
+                    acc += episode_rate;
+                }
+
+                double episode_rate = acc/l->neurons.size();
+                double drate = s->sc.sim_run_c.start_rate - episode_rate;
+                //cout << s->sc.sim_run_c.start_rate << " - " << episode_rate << " == " << drate << " : ";
+                for(auto nit=l->neurons.begin(); nit != l->neurons.end(); ++nit) {
+                    Neuron *n = *nit;
+                    n->weight_factor += 0.001*drate;
+                }
+                //cout << l->neurons.back()->weight_factor;
+                //cout << "\n";
+            }
+        }
+        pthread_barrier_wait( barrier );
         for(size_t ni=sw->first; ni<sw->last; ni++) {
-            Neuron *n = s->sim_neurons[ni].n;
-            size_t episode_rate = s->net.spikes_list[n->id].size() - rate[ni-sw->first];
-            cout << s->sc.sim_run_c.start_rate << " - " << 1000.0*episode_rate/episode_length << " == "; 
-            double drate = s->sc.sim_run_c.start_rate - 1000.0*episode_rate/episode_length;
-            
-            n->weight_factor += 0.01*drate;
-            cout << "drate: " << drate << " wf: " << n->weight_factor << " | ";
-
-            rate[ni-sw->first] = s->net.spikes_list[n->id].size();
-
+            s->net.spikes_list[ni].clear();
+            s->net.net_queues[ni].clear();
+            s->net.input_queues[ni].reset();
+            s->sim_neurons[ni].n->reset();
         }
-        //cout << "\n";
         pthread_barrier_wait( barrier );
     }
-    for(size_t ni=sw->first; ni<sw->last; ni++) {
-        s->net.spikes_list[ni].clear();
-        s->net.net_queues[ni].clear();
-        s->net.input_queues[ni].reset();
-    }
+
 
     return NULL;
 }
@@ -232,6 +241,12 @@ void Sim::precalculateInputSpikes() {
     cout << "Done\n";
 }
 
+void Sim::measureWeightFactor() {
+    cout << "Calculating weight factor...\n";
+    runSimOnSubset(input_neurons_count, input_neurons_count+net_neurons_count, Sim::runMeasureWorker);
+    cout << "Done\n";
+}
+
 void Sim::run() {
     CHECK_CONSTRUCT()
     if(input_ts.size() != 0) {
@@ -242,14 +257,12 @@ void Sim::run() {
     net.dispathInputSpikes(net.spikes_list);
     cout << "Done\n";
 
-    //cout << "Calculating weight factor...\n";
-    //runSimOnSubset(input_neurons_count, input_neurons_count+net_neurons_count, Sim::runMeasureWorker);
-    //cout << "Done\n";
-    //cout << *this;
+    Tmax = net.spikes_list.getMaxSpikeTime();
+    rg.setDt(sc.sim_run_c.dt);
 
-   Tmax = net.spikes_list.getMaxSpikeTime();
-   rg.setDt(sc.sim_run_c.dt);
-   cout << "Running simulation...\n";
-   runSimOnSubset(input_neurons_count, input_neurons_count+net_neurons_count, Sim::runWorker);
-   cout << "Done\n";
+    measureWeightFactor();
+
+    cout << "Running simulation...\n";
+    runSimOnSubset(input_neurons_count, input_neurons_count+net_neurons_count, Sim::runWorker);
+    cout << "Done\n";
 }

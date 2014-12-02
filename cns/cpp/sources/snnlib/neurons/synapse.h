@@ -22,7 +22,9 @@ public:
         x = 0.0;
         dendrite_delay = _dendrite_delay;
     }
-
+    virtual void reset() {
+        x = 0;
+    }
     size_t id_pre;
 
     double x;
