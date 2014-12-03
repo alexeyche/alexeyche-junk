@@ -82,7 +82,7 @@ public:
             Neuron *n = l_post.neurons[ni];
             for(size_t con_i=0; con_i<n->syns.size(); con_i++) {
                 Synapse *s = n->syns[con_i];
-                s->w = conf.weight;
+                s->w = conf.weight_per_neuron/n->syns.size();
             }
         }
     }

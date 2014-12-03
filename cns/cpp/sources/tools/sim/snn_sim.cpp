@@ -10,7 +10,9 @@
 
 #include <snnlib/util/time_series.h>
 
-enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_CONSTANTS, ARG_INPUT, ARG_OUT_STAT, ARG_OUT_SPIKES, ARG_JOBS ,ARG_PRECALC, ARG_MODEL_SAVE, ARG_MODEL_LOAD };
+enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_CONSTANTS, ARG_INPUT,
+                    ARG_OUT_STAT, ARG_OUT_SPIKES, ARG_JOBS ,ARG_PRECALC,
+                    ARG_MODEL_SAVE, ARG_MODEL_LOAD, ARG_T_MAX };
 const option::Descriptor usage[] =
 {
  {ARG_UNKNOWN, 0, "", "",Arg::None, "USAGE: example [options]\n\n"
@@ -20,6 +22,7 @@ const option::Descriptor usage[] =
  {ARG_CONSTANTS, 0,"c","constants",Arg::NonEmpty, "  --constants, -c  \tConstants filename." },
  {ARG_MODEL_LOAD, 0,"l","load",Arg::NonEmpty, "  --load, -l  \tLoad model." },
  {ARG_MODEL_SAVE, 0,"s","save",Arg::NonEmpty, "  --save, -s  \tSave model." },
+ {ARG_T_MAX, 0,"T","T-max",Arg::NonEmpty, "  --T-max, -T  \tMaximum simulation time (default: max input length)." },
  {ARG_OUT_STAT, 0,"","stat",Arg::NonEmpty, "  --stat  \tFile name with detailed statistics." },
  {ARG_JOBS, 0,"j","jobs",Arg::NonEmpty, "  --jobs  -j \tParallel jobs to run (default 1)" },
  {ARG_PRECALC, 0,"", "precalc",Arg::None, "  --precalc  \tOnly precalculate spike on time series." },
@@ -31,7 +34,7 @@ const option::Descriptor usage[] =
 };
 
 struct SnnSimOpts {
-    SnnSimOpts() : jobs(1), precalc(false) {}
+    SnnSimOpts() : jobs(1), precalc(false), Tmax(0.0) {}
     string input;
     string const_file;
     string out_spikes;
@@ -40,6 +43,7 @@ struct SnnSimOpts {
     string model_load;
     int jobs;
     bool precalc;
+    double Tmax;
 };
 
 SnnSimOpts parseOptions(int argc, char **argv) {
@@ -98,6 +102,10 @@ SnnSimOpts parseOptions(int argc, char **argv) {
     if(options[ARG_MODEL_LOAD].count()>0) {
         sopt.model_load = options[ARG_MODEL_LOAD].arg;
     }
+    if(options[ARG_T_MAX].count()>0) {
+        sopt.Tmax = atof(options[ARG_T_MAX].arg);
+        cout << sopt.Tmax <<"\n";
+    }
     return sopt;
 }
 
@@ -137,7 +145,7 @@ int main(int argc, char **argv) {
     }
 
 
-
+    s.setTlimit(sopt.Tmax);
 
     if(!sopt.out_stat_file.empty()) {
         s.monitorStat(sopt.out_stat_file);

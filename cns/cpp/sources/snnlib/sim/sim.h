@@ -131,17 +131,18 @@ public:
             accessByGlobalId(*it)->enableCollectStatistics();
         }
     }
-
+    void setTlimit(double _T_limit) {
+        T_limit = _T_limit;
+    }
 
     static void* runWorker(void *content);
-    static void* runMeasureWorker(void *content);
     static inline void simStep(SimWorker *sw, const double &t);
     void runSimOnSubset(size_t left_neuron_id, size_t right_neuron_id, void* (*sim_func)(void* content));
     void precalculateInputSpikes();
-    void measureWeightFactor();
     void run();
 
     double Tmax;
+    double T_limit;
 
     size_t jobs;
     Network net;

@@ -8,11 +8,10 @@ pushd $CWD &> /dev/null
 . common.sh
 
 function usage {
-    echo "$0 -s -l -e EPOCHS -v TEST_SPIKES.BIN INPUT_FILE1 [INPUT_FILE2]"
+    echo "$0 -s -l -e EPOCHS -T TMAX -v TEST_SPIKES.BIN INPUT_FILE1 [INPUT_FILE2]"
 }
 
 ulimit -c unlimited
-set -x
 
 INPUT_FILES=
 WORK_DIR=
@@ -23,14 +22,16 @@ AUTO="no"
 LASTW="no"
 EVALUATE=
 EVAL_EP=1
+TMAX=
 JOBS=$(cat /proc/cpuinfo | grep -E "processor"  | wc -l)
 
 # Enumerating options
-while getopts "j:w:hsle:av:" opt; do
+while getopts "j:w:hsle:av:T:" opt; do
     case "$opt" in
         w) WORK_DIR=${OPTARG} ;;
         s) STAT_SAVE="yes" ;;
         l) LASTW="yes" ;;
+        T) TMAX=${OPTARG} ;;
         e) EPOCH=${OPTARG} ;; 
         a) AUTO="yes" ;; 
         j) JOBS=${OPTARG} ;;
@@ -109,8 +110,12 @@ for EP in $EPOCHS; do
             MODEL_TO_LOAD_OPT=" -l $MODEL_TO_LOAD"
         fi        
     fi    
+    TMAX_OPT=
+    if [ -n $TMAX ]; then
+        TMAX_OPT="-T $TMAX"
+    fi        
     LEARN=yes
-
+    
     OUTPUT_SPIKES=$WORK_DIR/${EPOCH_SFX}output_spikes.pb
     OUTPUT_FILE=$WORK_DIR/${EPOCH_SFX}output.log
     MODEL_FILE=$WORK_DIR/${EPOCH_SFX}model.pb
@@ -119,7 +124,13 @@ for EP in $EPOCHS; do
         STAT_OPT="--stat $WORK_DIR/${EPOCH_SFX}stat.pb"
     fi    
     INPUT_FILE=$INPUT_FILES_DIR/$(echo $INPUT_FILES_BN | cut -d ' ' -f $INP_ITER)
-    $SNN_SIM -c $WORK_DIR/const.json -i $INPUT_FILE -o $OUTPUT_SPIKES -s $MODEL_FILE $MODEL_TO_LOAD_OPT $STAT_OPT -j $JOBS &> $OUTPUT_FILE
+    set -x
+    $SNN_SIM -c $WORK_DIR/const.json -i $INPUT_FILE -o $OUTPUT_SPIKES -s $MODEL_FILE $MODEL_TO_LOAD_OPT $STAT_OPT -j $JOBS $TMAX_OPT &> $OUTPUT_FILE
+    set +x
+    echo $?
+    if [ $? != 0 ]; then
+        cat $OUTPUT_FILE
+    fi        
     if [ "$?" -ne 0 ]; then
         echo "Not null exit code ($?)"
         exit $?

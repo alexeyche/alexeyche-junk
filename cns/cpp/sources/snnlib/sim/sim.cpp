@@ -7,11 +7,11 @@
 #include <snnlib/config/factory.h>
 #include <snnlib/neurons/srm_neuron.h>
 
-Sim::Sim(size_t _jobs) : Tmax(0), jobs(_jobs), constructed(false) {
+Sim::Sim(size_t _jobs) : Tmax(0), jobs(_jobs), constructed(false), T_limit(0.0) {
 }
 
 
-Sim::Sim(Constants &c, size_t _jobs) : Tmax(0), jobs(_jobs), constructed(false) {
+Sim::Sim(Constants &c, size_t _jobs) : Tmax(0), jobs(_jobs), constructed(false), T_limit(0.0) {
     construct(c);
 }
 
@@ -172,59 +172,6 @@ void* Sim::runWorker(void *content) {
     return NULL;
 }
 
-#define EPISODE_LENGTH 30000
-#define NUM_OF_EPISODES 50
-
-void* Sim::runMeasureWorker(void *content) {
-    SimWorker *sw = static_cast<SimWorker*>(content);
-    Sim *s = sw->s;
-
-    double episode_length = EPISODE_LENGTH;
-    size_t num_of_episodes = NUM_OF_EPISODES;
-
-
-    for(size_t ep_i=0; ep_i < num_of_episodes; ep_i++) {
-        double t_ep = getUnif()*(s->Tmax - episode_length);
-        //cout << "episode " << ep_i << " from " << t_ep << " to " << t_ep+episode_length << "\n";
-        for(double t=t_ep; t<=(t_ep+episode_length); t += s->rg.Dt()) {
-            simStep(sw, t);
-            pthread_barrier_wait( barrier );
-        }
-        if(sw->thread_id == 0) {
-            for(size_t li=s->input_layers_count; li < s->layers.size(); li++) {
-                Layer *l = s->layers[li];
-                double acc = 0.0;
-                for(auto nit=l->neurons.begin(); nit != l->neurons.end(); ++nit) {
-                    Neuron *n = *nit;
-                    size_t episode_rate = 1000.0*s->net.spikes_list[n->id].size()/episode_length;
-                    acc += episode_rate;
-                }
-
-                double episode_rate = acc/l->neurons.size();
-                double drate = s->sc.sim_run_c.start_rate - episode_rate;
-                //cout << s->sc.sim_run_c.start_rate << " - " << episode_rate << " == " << drate << " : ";
-                for(auto nit=l->neurons.begin(); nit != l->neurons.end(); ++nit) {
-                    Neuron *n = *nit;
-                    n->weight_factor += 0.001*drate;
-                }
-                //cout << l->neurons.back()->weight_factor;
-                //cout << "\n";
-            }
-        }
-        pthread_barrier_wait( barrier );
-        for(size_t ni=sw->first; ni<sw->last; ni++) {
-            s->net.spikes_list[ni].clear();
-            s->net.net_queues[ni].clear();
-            s->net.input_queues[ni].reset();
-            s->sim_neurons[ni].n->reset();
-        }
-        pthread_barrier_wait( barrier );
-    }
-
-
-    return NULL;
-}
-
 
 
 
@@ -235,17 +182,17 @@ void Sim::precalculateInputSpikes() {
         terminate();
     }
     cout << "Precalculating spikes...\n";
-    Tmax = input_ts.Tmax;
+    if(T_limit >= 1.0) {
+        Tmax = T_limit;
+    } else {
+        Tmax = input_ts.Tmax;
+    }
     rg.setDt(sc.ts_map_conf.dt);
     runSimOnSubset(0, input_neurons_count, Sim::runWorker);
     cout << "Done\n";
 }
 
-void Sim::measureWeightFactor() {
-    cout << "Calculating weight factor...\n";
-    runSimOnSubset(input_neurons_count, input_neurons_count+net_neurons_count, Sim::runMeasureWorker);
-    cout << "Done\n";
-}
+
 
 void Sim::run() {
     CHECK_CONSTRUCT()
@@ -256,11 +203,12 @@ void Sim::run() {
     net.configureConnMap();
     net.dispathInputSpikes(net.spikes_list);
     cout << "Done\n";
-
-    Tmax = net.spikes_list.getMaxSpikeTime();
+    if(T_limit >= 1.0) {
+        Tmax = T_limit;
+    } else {
+        Tmax = net.spikes_list.getMaxSpikeTime();
+    }
     rg.setDt(sc.sim_run_c.dt);
-
-    measureWeightFactor();
 
     cout << "Running simulation...\n";
     runSimOnSubset(input_neurons_count, input_neurons_count+net_neurons_count, Sim::runWorker);
