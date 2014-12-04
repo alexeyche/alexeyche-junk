@@ -4,6 +4,7 @@
 #include <snnlib/layers/layer.h>
 #include <snnlib/config/constants.h>
 #include <snnlib/learning/optimal_stdp.h>
+#include <snnlib/learning/max_likelyhood.h>
 #include <snnlib/act_funcs/determ.h>
 #include <snnlib/act_funcs/exp_hennequin.h>
 #include <snnlib/neurons/synapse.h>
@@ -28,6 +29,7 @@ Factory::Factory() {
     const_map["Determ"]       =   &createConstInstance<Obj, DetermC>;
     const_map["ExpHennequin"] =   &createConstInstance<Obj, ExpHennequinC>;
     const_map["OptimalStdp"]  =   &createConstInstance<Obj, OptimalStdpC>;
+    const_map["MaxLikelihood"]  =   &createConstInstance<Obj, MaxLikelihoodC>;
     const_map["SigmaTuningCurve"]  =  &createConstInstance<Obj, SigmaTuningCurveC>;
 
     entity_map["SRMNeuron"]     =   &createInstance<Obj, SRMNeuron>;
@@ -37,6 +39,7 @@ Factory::Factory() {
     entity_map["ExpHennequin"] =   &createInstance<Obj, ExpHennequin>;
     entity_map["OptimalStdp"]  =   &createInstance<Obj, OptimalStdp>;
     entity_map["SigmaTuningCurve"]  =  &createInstance<Obj, SigmaTuningCurve>;
+    entity_map["MaxLikelihood"]  =   &createInstance<Obj, MaxLikelihood>;
 
     // blank stuff
     entity_map["BlankTuningCurve"]  =  &createInstance<Obj, BlankTuningCurve>;

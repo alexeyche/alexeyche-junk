@@ -483,7 +483,7 @@
 			"file": "sources/tools/sim/snn_sim.cpp",
 			"settings":
 			{
-				"buffer_size": 4922,
+				"buffer_size": 5274,
 				"line_ending": "Unix"
 			}
 		},
@@ -523,7 +523,7 @@
 			"file": "sources/snnlib/sim/sim.cpp",
 			"settings":
 			{
-				"buffer_size": 7880,
+				"buffer_size": 5810,
 				"line_ending": "Unix"
 			}
 		},
@@ -531,7 +531,7 @@
 			"file": "sources/snnlib/layers/layer.h",
 			"settings":
 			{
-				"buffer_size": 3396,
+				"buffer_size": 3422,
 				"line_ending": "Unix"
 			}
 		},
@@ -539,7 +539,7 @@
 			"file": "sources/snnlib/sim/sim.h",
 			"settings":
 			{
-				"buffer_size": 4654,
+				"buffer_size": 4663,
 				"line_ending": "Unix"
 			}
 		},
@@ -611,7 +611,7 @@
 			"file": "const.json",
 			"settings":
 			{
-				"buffer_size": 2916,
+				"buffer_size": 2939,
 				"line_ending": "Unix"
 			}
 		},
@@ -627,7 +627,7 @@
 			"file": "sources/snnlib/config/constants.h",
 			"settings":
 			{
-				"buffer_size": 14597,
+				"buffer_size": 14652,
 				"line_ending": "Unix"
 			}
 		},
@@ -895,9 +895,10 @@
 	},
 	"find_state":
 	{
-		"case_sensitive": true,
+		"case_sensitive": false,
 		"find_history":
 		[
+			"synapse",
 			"lst",
 			"l",
 			"operator",
@@ -995,7 +996,7 @@
 	"groups":
 	[
 		{
-			"selected": 6,
+			"selected": 1,
 			"sheets":
 			[
 				{
@@ -1025,7 +1026,7 @@
 						"translation.y": 955.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 5,
+					"stack_index": 7,
 					"type": "text"
 				},
 				{
@@ -1034,15 +1035,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 4922,
+						"buffer_size": 5274,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								4356,
-								4356
+								3895,
+								3895
 							]
 						],
 						"settings":
@@ -1052,10 +1053,10 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 1583.0,
+						"translation.y": 867.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 6,
+					"stack_index": 0,
 					"type": "text"
 				},
 				{
@@ -1085,7 +1086,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 4,
+					"stack_index": 6,
 					"type": "text"
 				},
 				{
@@ -1115,7 +1116,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 3,
+					"stack_index": 5,
 					"type": "text"
 				},
 				{
@@ -1145,7 +1146,7 @@
 						"translation.y": 326.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 8,
+					"stack_index": 9,
 					"type": "text"
 				},
 				{
@@ -1171,11 +1172,11 @@
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
-						"translation.x": -0.0,
+						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 7,
+					"stack_index": 8,
 					"type": "text"
 				},
 				{
@@ -1184,15 +1185,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 7880,
+						"buffer_size": 5810,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								4760,
-								4760
+								5582,
+								5582
 							]
 						],
 						"settings":
@@ -1202,10 +1203,10 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 2910.0,
+						"translation.y": 1989.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 1,
 					"type": "text"
 				},
 				{
@@ -1214,15 +1215,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 3396,
+						"buffer_size": 3422,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								3283,
-								3283
+								3100,
+								3100
 							]
 						],
 						"settings":
@@ -1232,10 +1233,10 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 765.0,
+						"translation.y": 667.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 3,
 					"type": "text"
 				},
 				{
@@ -1244,15 +1245,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 4654,
+						"buffer_size": 4663,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								4654,
-								4654
+								3943,
+								3943
 							]
 						],
 						"settings":
@@ -1262,7 +1263,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 1755.0,
+						"translation.y": 1071.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 2,
@@ -1295,7 +1296,7 @@
 						"translation.y": 1710.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 9,
+					"stack_index": 10,
 					"type": "text"
 				},
 				{
@@ -1325,7 +1326,7 @@
 						"translation.y": 2180.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 13,
+					"stack_index": 14,
 					"type": "text"
 				},
 				{
@@ -1354,7 +1355,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 10,
+					"stack_index": 11,
 					"type": "text"
 				},
 				{
@@ -1384,7 +1385,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 11,
+					"stack_index": 12,
 					"type": "text"
 				},
 				{
@@ -1414,7 +1415,7 @@
 						"translation.y": 204.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 12,
+					"stack_index": 13,
 					"type": "text"
 				},
 				{
@@ -1442,7 +1443,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 14,
+					"stack_index": 15,
 					"type": "text"
 				},
 				{
@@ -1511,7 +1512,7 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2916,
+						"buffer_size": 2939,
 						"regions":
 						{
 						},
@@ -1532,7 +1533,7 @@
 						"translation.y": 751.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 16,
+					"stack_index": 17,
 					"type": "text"
 				},
 				{
@@ -1560,7 +1561,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 15,
+					"stack_index": 16,
 					"type": "text"
 				},
 				{
@@ -1569,15 +1570,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 14597,
+						"buffer_size": 14652,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								7841,
-								7841
+								7239,
+								7239
 							]
 						],
 						"settings":
@@ -1587,10 +1588,10 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 7126.0,
+						"translation.y": 3775.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 17,
+					"stack_index": 4,
 					"type": "text"
 				},
 				{
@@ -1825,12 +1826,28 @@
 		"selected_items":
 		[
 			[
-				"la",
-				"snnlib/layers/layer.h"
+				"sim.c",
+				"snnlib/sim/sim.cpp"
+			],
+			[
+				"snn_s",
+				"tools/sim/snn_sim.cpp"
 			],
 			[
 				"sim.cp",
 				"snnlib/sim/sim.cpp"
+			],
+			[
+				"sim",
+				"snnlib/sim/sim.cpp"
+			],
+			[
+				"la",
+				"snnlib/layers/layer.h"
+			],
+			[
+				"cons",
+				"snnlib/config/constants.h"
 			],
 			[
 				"neu",
@@ -1879,10 +1896,6 @@
 			[
 				"net",
 				"snnlib/sim/network.cpp"
-			],
-			[
-				"sim.c",
-				"snnlib/sim/sim.cpp"
 			],
 			[
 				"const",
@@ -1941,10 +1954,6 @@
 				"snnlib/sim/sim.h"
 			],
 			[
-				"sim",
-				"snnlib/sim/sim.h"
-			],
-			[
 				"neur",
 				"snnlib/layers/neuron_stat.h"
 			],
@@ -1999,14 +2008,6 @@
 			[
 				"serl",
 				"snnlib/serialize/serialize.h"
-			],
-			[
-				"snn_s",
-				"tools/sim/snn_sim.cpp"
-			],
-			[
-				"cons",
-				"snnlib/config/constants.h"
 			],
 			[
 				"sik",

@@ -21,7 +21,8 @@ enum ESerializableClass {
                             EOptimalStdp,
                             ESRMNeuron,
                             EAdExNeuron,
-                            EConstants
+                            EConstants,
+                            EMaxLikelihood
                         };
 
 static const char* ESerializableClass_str[] =
@@ -38,7 +39,8 @@ static const char* ESerializableClass_str[] =
                                                 "OptimalStdp",
                                                 "SRMNeuron",
                                                 "AdExNeuron",
-                                                "Constants"
+                                                "Constants",
+                                                "MaxLikelihood"
                                             };
 
 

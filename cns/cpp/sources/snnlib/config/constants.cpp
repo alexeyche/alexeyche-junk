@@ -57,6 +57,9 @@ void Constants::parse() {
             if(const_field == "learning_rules") {
                 PARSE_CONST_STRUCTURE(learning_rules)
             } else
+            if(const_field == "reward_modulations") {
+                PARSE_CONST_STRUCTURE(reward_modulations)
+            } else
             if(const_field == "sim_configuration") {
                 JsonBox::Value v = it->second;
                 sim_conf.fill_structure(v);

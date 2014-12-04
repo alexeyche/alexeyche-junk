@@ -195,6 +195,21 @@ public:
     }
 };
 
+class MaxLikelihoodC: public ConstObj {
+public:
+    MaxLikelihoodC(string name) : ConstObj(name) {}
+    double tau_el;
+
+    void fill_structure(JsonBox::Value v) {
+        tau_el               = v["tau_el"].getDouble();
+    }
+    void print(std::ostream &str) const {
+        str <<
+        "tau_el: " << tau_el << "\n";
+    }
+};
+
+
 class NeuronConf : public ConfObj {
 public:
     string neuron;
@@ -424,6 +439,7 @@ public:
     const_map synapses;
     const_map act_funcs;
     const_map learning_rules;
+    const_map reward_modulations;
 
     SimConfiguration sim_conf;
 
