@@ -30,6 +30,7 @@ Factory::Factory() {
     const_map["ExpHennequin"] =   &createConstInstance<Obj, ExpHennequinC>;
     const_map["OptimalStdp"]  =   &createConstInstance<Obj, OptimalStdpC>;
     const_map["MaxLikelihood"]  =   &createConstInstance<Obj, MaxLikelihoodC>;
+    const_map["Likelihood"]  =   &createConstInstance<Obj, LikelihoodC>;
     const_map["SigmaTuningCurve"]  =  &createConstInstance<Obj, SigmaTuningCurveC>;
 
     entity_map["SRMNeuron"]     =   &createInstance<Obj, SRMNeuron>;
@@ -40,6 +41,7 @@ Factory::Factory() {
     entity_map["OptimalStdp"]  =   &createInstance<Obj, OptimalStdp>;
     entity_map["SigmaTuningCurve"]  =  &createInstance<Obj, SigmaTuningCurve>;
     entity_map["MaxLikelihood"]  =   &createInstance<Obj, MaxLikelihood>;
+    entity_map["Likelihood"]  =   &createConstInstance<Obj, Likelihood>;
 
     // blank stuff
     entity_map["BlankTuningCurve"]  =  &createInstance<Obj, BlankTuningCurve>;

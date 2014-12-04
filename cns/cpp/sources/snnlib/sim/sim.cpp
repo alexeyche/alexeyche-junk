@@ -158,10 +158,6 @@ void Sim::simStep(SimWorker *sw, const double &t) {
 
 
 
-
-
-
-
 void* Sim::runWorker(void *content) {
     SimWorker *sw = static_cast<SimWorker*>(content);
     Sim *s = sw->s;

@@ -199,16 +199,31 @@ class MaxLikelihoodC: public ConstObj {
 public:
     MaxLikelihoodC(string name) : ConstObj(name) {}
     double tau_el;
+    bool input_target;
 
     void fill_structure(JsonBox::Value v) {
         tau_el               = v["tau_el"].getDouble();
+        input_target         = v["input_target"].getBoolean();
     }
     void print(std::ostream &str) const {
-        str <<
-        "tau_el: " << tau_el << "\n";
+        str << "tau_el: " << tau_el << ", input_target: " << input_target << "\n";
     }
 };
 
+class LikelihoodC: public ConstObj {
+public:
+    LikelihoodC(string name) : ConstObj(name) {}
+    double tau_rew;
+    double tau_mean_rew;
+
+    void fill_structure(JsonBox::Value v) {
+        tau_rew               = v["tau_rew"].getDouble();
+        tau_mean_rew         = v["tau_mean_rew"].getDouble();
+    }
+    void print(std::ostream &str) const {
+        str << "tau_rew: " << tau_rew << ", tau_mean_rew: " << tau_mean_rew << "\n";
+    }
+};
 
 class NeuronConf : public ConfObj {
 public:

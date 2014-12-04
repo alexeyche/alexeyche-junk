@@ -1,0 +1,78 @@
+This is BibTeX, Version 0.99d (TeX Live 2013/Debian)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: ./review.aux
+The style file: unsrt.bst
+Database file #1: refs.bib
+Name 1 in "Mehdi Adibi, James S. McDonald, Colin W. G. Clifford, and Ehsan Arabzadeh" has a comma at the end for entry Adapt
+while executing---line 944 of file unsrt.bst
+Name 1 in "Guillaume Hennequin, Wulfram Gerstner, and Jean-Pascal Pfister" has a comma at the end for entry TripleAdapt
+while executing---line 944 of file unsrt.bst
+Warning--empty publisher in Zaencev1999
+Too many commas in name 1 of "Markram H, Lubke J, Frotscher M, SakmannB." for entry stdp1
+while executing---line 944 of file unsrt.bst
+Too many commas in name 1 of "Bell C.C., Han V.Z., Sugawara Y., Grant K." for entry stdp3
+while executing---line 944 of file unsrt.bst
+Warning--empty journal in anderson1963
+Warning--empty journal in friedman1973projection
+Name 1 in "Cooper, L. N, Intrator, N., Blais, B. S., and Shouval, H. Z." has a comma at the end for entry bcm_book
+while executing---line 944 of file unsrt.bst
+Too many commas in name 1 of "Cooper, L. N, Intrator, N., Blais, B. S., and Shouval, H. Z." for entry bcm_book
+while executing---line 944 of file unsrt.bst
+Too many commas in name 1 of "Cooper, L. N, Intrator, N., Blais, B. S., and Shouval, H. Z." for entry bcm_book
+while executing---line 944 of file unsrt.bst
+Too many commas in name 1 of "Cooper, L. N, Intrator, N., Blais, B. S., and Shouval, H. Z." for entry bcm_book
+while executing---line 944 of file unsrt.bst
+Name 1 in "Shouval, H. Z., Castellani, G. C., Blais, B. S., Yeung, L. C., and Cooper, L. N" has a comma at the end for entry ShouvalCaBCM
+while executing---line 944 of file unsrt.bst
+Too many commas in name 1 of "Shouval, H. Z., Castellani, G. C., Blais, B. S., Yeung, L. C., and Cooper, L. N" for entry ShouvalCaBCM
+while executing---line 944 of file unsrt.bst
+Too many commas in name 1 of "Shouval, H. Z., Castellani, G. C., Blais, B. S., Yeung, L. C., and Cooper, L. N" for entry ShouvalCaBCM
+while executing---line 944 of file unsrt.bst
+Too many commas in name 1 of "Shouval, H. Z., Castellani, G. C., Blais, B. S., Yeung, L. C., and Cooper, L. N" for entry ShouvalCaBCM
+while executing---line 944 of file unsrt.bst
+Too many commas in name 1 of "Shouval, H. Z., Castellani, G. C., Blais, B. S., Yeung, L. C., and Cooper, L. N" for entry ShouvalCaBCM
+while executing---line 944 of file unsrt.bst
+Too many commas in name 1 of "Shouval, H. Z., Castellani, G. C., Blais, B. S., Yeung, L. C., and Cooper, L. N" for entry ShouvalCaBCM
+while executing---line 944 of file unsrt.bst
+You've used 53 entries,
+            1791 wiz_defined-function locations,
+            784 strings with 12186 characters,
+and the built_in function-call counts, 12566 in all, are:
+= -- 1202
+> -- 400
+< -- 11
++ -- 158
+- -- 105
+* -- 818
+:= -- 1909
+add.period$ -- 165
+call.type$ -- 53
+change.case$ -- 44
+chr.to.int$ -- 0
+cite$ -- 56
+duplicate$ -- 575
+empty$ -- 1290
+format.name$ -- 105
+if$ -- 2861
+int.to.chr$ -- 0
+int.to.str$ -- 53
+missing$ -- 60
+newline$ -- 268
+num.names$ -- 53
+pop$ -- 142
+preamble$ -- 1
+purify$ -- 0
+quote$ -- 0
+skip$ -- 271
+stack$ -- 0
+substring$ -- 1058
+swap$ -- 134
+text.length$ -- 11
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 0
+warning$ -- 3
+while$ -- 124
+width$ -- 55
+write$ -- 581
+(There were 14 error messages)

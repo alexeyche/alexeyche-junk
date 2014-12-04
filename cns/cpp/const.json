@@ -58,9 +58,19 @@
             "weight_decay" : 0.026
         },
         "MaxLikelihood" : {
-            "tau_el" : 100
+            "tau_el" : 100,
+            "input_target" : false
+        },
+        "MaxLikelihood_Input" : {
+            "tau_el" : 100,
+            "input_target" : true
         }
-
+    },
+    "reward_modulations" : {
+        "Likelihood" : {
+            "tau_rew" : 100,
+            "tau_mean_rew" : 1000
+        }
     },
     "sim_configuration" : {
         "input_layers_conf" : [

@@ -1,0 +1,309 @@
+\begin{thebibliography}{10}
+
+\bibitem{BohteReview}
+H.~Paugam-Moisy and S.M. Bohte.
+\newblock Computing with spiking neuron networks.
+\newblock {\em Handbook of Natural Computing}, pages 335--376, 2012.
+
+\bibitem{Phizi}
+Коротько~Г.Ф. Покровский~В.М.
+\newblock {\em Физиология человека}.
+\newblock Москва "Медицина", 2003.
+
+\bibitem{Adapt}
+Colin W. G.~Clifford Mehdi~Adibi, James S.~McDonald and Ehsan Arabzadeh.
+\newblock Adaptation improves neural coding efficiency despite increasing
+  correlations in variability.
+\newblock {\em The Journal of Neuroscience}, 33(5):2108–2120, 2013.
+
+\bibitem{TripleAdapt}
+Wulfram~Gerstner Guillaume~Hennequin and Jean-Pascal Pfister.
+\newblock Stdp in adaptive neurons gives close-to-optimal information
+  transmission.
+\newblock {\em Front Comput Neurosci.}, 143(4), 2010.
+
+\bibitem{Genesis}
+David~Beeman James M.~Bower.
+\newblock {\em The Book of GENESIS: Exploring Realistic Neural Models with the
+  GEneral NEural SImulation System}.
+\newblock Springer, 2nd edition, 1998.
+
+\bibitem{HH}
+A.~L. Hodgkin and A.~F. Huxley.
+\newblock A quantitative description of membrane current and its application to
+  conduction and excitation in nerve.
+\newblock {\em J Physiol.}, 117(4):500–544, 1952.
+
+\bibitem{Zaencev1999}
+И.В. Заенцев.
+\newblock {\em Нейронные сети: основные модели}.
+\newblock 1999.
+
+\bibitem{Lapicque}
+Mark C.W. van~Rossum Nicolas~Brunel.
+\newblock Lapicque’s 1907 paper: from frogs to integrate-and-fire.
+\newblock {\em Biological Cybernetics}, 97(5-6):337--339, 2007.
+
+\bibitem{IzhSimpleModel}
+Eugene~M. Izhikevich.
+\newblock Simple model of spiking neurons.
+\newblock {\em Transactions on Neural Networks}, 14(6), 2003.
+
+\bibitem{IzhTalam}
+Eugene~M. Izhikevich and Gerald~M. Edelman.
+\newblock Large-scale model of mammalian thalamocortical systems.
+\newblock {\em PNAS}, 105:3593--3598, 2008.
+
+\bibitem{AdaptThesis}
+Richard Naud.
+\newblock {\em The Dynamics of Adapting Neurons}.
+\newblock PhD thesis, EPFL Lausanne, 2011.
+
+\bibitem{krogh1995neural}
+Anders Krogh, Jesper Vedelsby, et~al.
+\newblock Neural network ensembles, cross validation, and active learning.
+\newblock {\em Advances in neural information processing systems}, pages
+  231--238, 1995.
+
+\bibitem{Uossermen}
+Уоссермен Ф.
+\newblock {\em Нейрокомпьютерная техника: Теория
+  и практика}.
+\newblock Москва. Мир, 1992.
+
+\bibitem{Hebb1949}
+D.O. Hebb.
+\newblock {\em The Organization of Behavior}.
+\newblock Willey: New York, 1949.
+
+\bibitem{BiPoo}
+Poo~M. Bi~G.
+\newblock Synaptic modification by correlated activity: Hebb's postulate
+  revisited.
+\newblock {\em Annu Rev Neurosci}, 24:139--166, 2001.
+
+\bibitem{stdp1}
+Frotscher M~SakmannB. Markram~H, Lubke~J.
+\newblock Regulation of synaptic efficacy by coincidence of postsynaptic aps
+  and epsps.
+\newblock {\em Science}, 275:213--15, 1997.
+
+\bibitem{stdp2}
+Johnston~D. Magee~J.C.
+\newblock A synaptically controlled, associative signal for hebbian plasticity
+  in hippocampal neurons.
+\newblock {\em Science}, 275:209--13, 1997.
+
+\bibitem{stdp3}
+Sugawara Y. Grant~K. Bell~C.C., Han~V.Z.
+\newblock Synaptic plasticity in a cerebellum-like structure depends on
+  temporal order.
+\newblock {\em Nature}, 387:278--81, 1997.
+
+\bibitem{stdp4}
+Poo~M. Bi~G.
+\newblock Synaptic modifications in cultured hippocampal neurons: Dependence on
+  spike timing, synaptic strength and postsynaptic cell type.
+\newblock {\em Neurosci}, 18:10464–72, 1998.
+
+\bibitem{anderson1963}
+Т~Андерсон.
+\newblock Введение в многомерный
+  статистический анализ.
+\newblock 1963.
+
+\bibitem{NeuralAndAdaptiveSystems}
+W.~Curt~Lefebvre Jose C.~Principe, Neil R.~Euliano.
+\newblock {\em Neural and Adaptive Systems: Fundamentals Through Simulation}.
+\newblock Wiley, 1999.
+
+\bibitem{Cooper}
+L.N. Cooper and M.F. Bear.
+\newblock The bcm theory of synapse modification at 30: interaction of theory
+  with experiment.
+\newblock {\em Nature Reviews Neuroscience}, 13:798--810, 2012.
+
+\bibitem{friedman1973projection}
+Jerome~H Friedman and John~W Tukey.
+\newblock A projection pursuit algorithm for exploratory data analysis.
+\newblock 1973.
+
+\bibitem{bcm_book}
+Intrator N. Blais B.~S. Cooper, L.~N and H.~Z. Shouval.
+\newblock {\em Theory of cortical plasticity}.
+\newblock World Scientific, New Jersey, 2004.
+
+\bibitem{ShouvalCaBCM}
+Castellani G. C. Blais B. S. Yeung L.~C. Shouval, H.~Z. and L.~N Cooper.
+\newblock Converging evidence for a simplified biophysical model of synaptic
+  plasticity.
+\newblock {\em Biol Cybern}, 87(5-6):383–391, 2002.
+
+\bibitem{PfisterTriple}
+J.-P. Pfister and W.~Gerstner.
+\newblock Triplets of spikes in a model of spike timing-dependent plasticity.
+\newblock {\em J. Neurosci.}, 26(38):9673–9682, 2006.
+
+\bibitem{rate_first}
+Adrian~E. D.
+\newblock {\em The basis of sensation: The action of the sense organs}.
+\newblock New York: Norton, 1928.
+
+\bibitem{SongStdp}
+Abbott~L.F. Song~S., Miller~K.D.
+\newblock Competitive hebbian learning through spike-timing-dependent synaptic
+  plasticity.
+\newblock {\em Nat Neurosci}, 3(9):919--926, 2000.
+
+\bibitem{ponulak2010supervised}
+Filip Ponulak and Andrzej Kasinski.
+\newblock Supervised learning in spiking neural networks with resume: sequence
+  learning, classification, and spike shifting.
+\newblock {\em Neural Computation}, 22(2):467--510, 2010.
+
+\bibitem{caporale2008spike}
+Natalia Caporale and Yang Dan.
+\newblock Spike timing-dependent plasticity: a hebbian learning rule.
+\newblock {\em Annu. Rev. Neurosci.}, 31:25--46, 2008.
+
+\bibitem{bi2002temporal}
+Guo-Qiang Bi and Huai-Xing Wang.
+\newblock Temporal asymmetry in spike timing-dependent synaptic plasticity.
+\newblock {\em Physiology \& behavior}, 77(4):551--555, 2002.
+
+\bibitem{froemke2002spike}
+Robert~C Froemke and Yang Dan.
+\newblock Spike-timing-dependent synaptic modification induced by natural spike
+  trains.
+\newblock {\em Nature}, 416(6879):433--438, 2002.
+
+\bibitem{wang2005coactivation}
+Huai-Xing Wang, Richard~C Gerkin, David~W Nauen, and Guo-Qiang Bi.
+\newblock Coactivation and timing-dependent integration of synaptic
+  potentiation and depression.
+\newblock {\em Nature neuroscience}, 8(2):187--193, 2005.
+
+\bibitem{OptStdpFirst}
+Taro Toyoizumi, Jean-Pascal Pfister, Kazuyuki Aihara, and Wulfram Gerstner.
+\newblock Generalized bienenstock--cooper--munro rule for spiking neurons that
+  maximizes information transmission.
+\newblock {\em Proceedings of the National Academy of Sciences of the United
+  States of America}, 102(14):5239, 2005.
+
+\bibitem{OptStdpSecond}
+K.~Aihara T.~Toyoizumi, J.-P.~Pfister and W.~Gerstner.
+\newblock Optimality model of unsupervised spike-timing dependent plasticity:
+  Synaptic memory and weight distribution.
+\newblock {\em Neural Computation}, 19:639--671, 2007.
+
+\bibitem{thorpe2001spike}
+Simon Thorpe, Arnaud Delorme, and Rufin Van~Rullen.
+\newblock Spike-based strategies for rapid processing.
+\newblock {\em Neural networks}, 14(6):715--725, 2001.
+
+\bibitem{guyonneau2004temporal}
+Rudy Guyonneau, Rufin VanRullen, and Simon~J Thorpe.
+\newblock Temporal codes and sparse representations: a key to understanding
+  rapid processing in the visual system.
+\newblock {\em Journal of Physiology-Paris}, 98(4):487--497, 2004.
+
+\bibitem{perrinet2004sparse}
+Laurent Perrinet, Manuel Samuelides, and Simon Thorpe.
+\newblock Sparse spike coding in an asynchronous feed-forward multi-layer
+  neural network using matching pursuit.
+\newblock {\em Neurocomputing}, 57:125--134, 2004.
+
+\bibitem{kornprobst2005could}
+Pierre Kornprobst, T~Vieille, and IK~Dimo.
+\newblock Could early visual processes be sufficient to label motions?
+\newblock In {\em Neural Networks, 2005. IJCNN'05. Proceedings. 2005 IEEE
+  International Joint Conference on}, volume~3, pages 1687--1692. IEEE, 2005.
+
+\bibitem{shin2010recognition}
+Joo-Heon Shin, David Smith, Waldemar Swiercz, Kevin Staley, JTerry Rickard,
+  Javier Montero, Lukasz~A Kurgan, and Krzysztof~J Cios.
+\newblock Recognition of partially occluded and rotated images with a network
+  of spiking neurons.
+\newblock {\em Neural Networks, IEEE Transactions on}, 21(11):1697--1709, 2010.
+
+\bibitem{wysoski2008fast}
+Simei~Gomes Wysoski, Lubica Benuskova, and Nikola Kasabov.
+\newblock Fast and adaptive network of spiking neurons for multi-view visual
+  pattern recognition.
+\newblock {\em Neurocomputing}, 71(13):2563--2575, 2008.
+
+\bibitem{ponulak2006resume}
+Filip Ponulak and Andrzej Kasinski.
+\newblock Resume learning method for spiking neural networks dedicated to
+  neuroprostheses control.
+\newblock In {\em Proceedings of EPFL LATSIS Symposium 2006, Dynamical
+  Principles for Neuroscience and Intelligent Biomimetic Devices}, pages
+  119--120. Citeseer, 2006.
+
+\bibitem{paolo2003a}
+Ezequiel~A Di~Paolo.
+\newblock Evolving spike-timing-dependent plasticity for single-trial learning
+  in robots.
+\newblock {\em Philosophical Transactions of the Royal Society of London.
+  Series A: Mathematical, Physical and Engineering Sciences},
+  361(1811):2299--2319, 2003.
+
+\bibitem{paolo2003b}
+Ezequiel Di~Paolo.
+\newblock Spike-timing dependent plasticity for evolved robots.
+\newblock {\em Adaptive Behavior}, 10(3-4):243--263, 2002.
+
+\bibitem{trhan2012application}
+Peter Trhan.
+\newblock The application of spiking neural networks in autonomous robot
+  control.
+\newblock {\em Computing and Informatics}, 29(5):823--847, 2012.
+
+\bibitem{glackin2008implementing}
+Cornelius Glackin, Liam McDaid, Liam Maguire, and Heather Sayers.
+\newblock Implementing fuzzy reasoning on a spiking neural network.
+\newblock In {\em Artificial Neural Networks-ICANN 2008}, pages 258--267.
+  Springer, 2008.
+
+\bibitem{maass2002paradigms}
+Wolfgang Maass.
+\newblock Paradigms for computing with spiking neurons.
+\newblock In {\em Models of Neural Networks IV}, pages 373--402. Springer,
+  2002.
+
+\bibitem{brody2003simple}
+Carlos~D Brody and JJ~Hopfield.
+\newblock Simple networks for spike-timing-based computation, with application
+  to olfactory processing.
+\newblock {\em Neuron}, 37(5):843--852, 2003.
+
+\bibitem{gutig2009time}
+Robert G{\"u}tig and Haim Sompolinsky.
+\newblock Time-warp--invariant neuronal processing.
+\newblock {\em PLoS biology}, 7(7):e1000141, 2009.
+
+\bibitem{ghosh2009new}
+Samanwoy Ghosh-Dastidar and Hojjat Adeli.
+\newblock A new supervised learning algorithm for multiple spiking neural
+  networks with application in epilepsy and seizure detection.
+\newblock {\em Neural Networks}, 22(10):1419--1431, 2009.
+
+\bibitem{smith2006efficient}
+Evan~C Smith and Michael~S Lewicki.
+\newblock Efficient auditory coding.
+\newblock {\em Nature}, 439(7079):978--982, 2006.
+
+\bibitem{loiselle2005exploration}
+St{\'e}phane Loiselle, Jean Rouat, Daniel Pressnitzer, and Simon Thorpe.
+\newblock Exploration of rank order coding with spiking neural networks for
+  speech recognition.
+\newblock In {\em Neural Networks, 2005. IJCNN'05. Proceedings. 2005 IEEE
+  International Joint Conference on}, volume~4, pages 2076--2080. IEEE, 2005.
+
+\bibitem{wang2005spiking}
+Guoping Wang and Misha Pavel.
+\newblock A spiking neuron representation of auditory signals.
+\newblock In {\em Neural Networks, 2005. IJCNN'05. Proceedings. 2005 IEEE
+  International Joint Conference on}, volume~1, pages 416--421. IEEE, 2005.
+
+\end{thebibliography}
