@@ -215,13 +215,15 @@ public:
     LikelihoodC(string name) : ConstObj(name) {}
     double tau_rew;
     double tau_mean_rew;
+    bool input_target;
 
     void fill_structure(JsonBox::Value v) {
         tau_rew               = v["tau_rew"].getDouble();
         tau_mean_rew         = v["tau_mean_rew"].getDouble();
+        input_target         = v["input_target"].getBoolean();
     }
     void print(std::ostream &str) const {
-        str << "tau_rew: " << tau_rew << ", tau_mean_rew: " << tau_mean_rew << "\n";
+        str << "tau_rew: " << tau_rew << ", tau_mean_rew: " << tau_mean_rew << ", input_target: " << input_target << "\n";
     }
 };
 
@@ -320,6 +322,7 @@ public:
 
 
 typedef map< pair<size_t, size_t>, vector<ConnectionConf> > ConnectionMap;
+typedef vector< pair<size_t, size_t> > RewardConnectionMap;
 
 class SimConfiguration: public ConfObj {
 public:
@@ -330,6 +333,7 @@ public:
     TimeSeriesMapConf ts_map_conf;
     vector<size_t> neurons_to_listen;
     SimRunConf sim_run_c;
+    RewardConnectionMap reinforce_map;
 
     void fill_structure(JsonBox::Value v) {
         auto a_input_sizes = v["input_layers_conf"].getArray();
@@ -374,6 +378,20 @@ public:
             }
             conn_map[aff_p] = conn_conf_vec;
         }
+        JsonBox::Object o_rf = v["reinforce_map"].getObject();
+        for(auto it=o_rf.begin(); it!=o_rf.end(); ++it) {
+            vector<string> aff = split(it->first, '-');
+            if(aff.size() != 2) {
+                cerr << "rew_map configuration not right: need 2 afferent layers separated by \"-\"\n";
+                terminate();
+            }
+            size_t aff_pre = stoi(aff[0].c_str());
+            size_t aff_post = stoi(aff[1].c_str());
+            pair<size_t, size_t> aff_p(aff_pre, aff_post);
+            reinforce_map.push_back(aff_p);
+        }
+
+
         ts_map_conf.fill_structure(v["time_series_map_conf"]);
         JsonBox::Array a = v["neurons_to_listen"].getArray();
         for(auto it=a.begin(); it!=a.end(); ++it) {

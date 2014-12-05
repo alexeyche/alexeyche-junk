@@ -35,8 +35,6 @@
             "amp" : -1.0
         },
     },
-    "reward_modulations" : {
-    },
     "act_funcs" : {
         "Determ" : {
             "u_tr" : 1
@@ -67,9 +65,10 @@
         }
     },
     "reward_modulations" : {
-        "Likelihood" : {
+        "Likelihood_Input" : {
             "tau_rew" : 100,
-            "tau_mean_rew" : 1000
+            "tau_mean_rew" : 1000,
+            "input_target" : true
         }
     },
     "sim_configuration" : {
@@ -89,7 +88,7 @@
                 "size" : 100,
                 "neuron_conf" : {
                     "neuron" : "SRMNeuron",
-                    "learning_rule" : "OptimalStdp",
+                    "learning_rule" : "MaxLikelihood",
                     "act_func" : "ExpHennequin",
                     "axon_delay_distr" : [0, 0]
 
@@ -99,8 +98,9 @@
                 "size" : 100,
                 "neuron_conf" : {
                     "neuron" : "SRMNeuron",
-                    "learning_rule" : "OptimalStdp",
+                    "learning_rule" : "MaxLikelihood_Input",
                     "act_func" : "ExpHennequin",
+                    "reward_modulation" : "Likelihood",
                     "axon_delay_distr" : [0, 0]
                 }
             },
@@ -113,6 +113,7 @@
                 { "prob" : 1.0, "weight_per_neuron" : 40, "type" : "Synapse", "dendrite_delay_distr" : [0, 0] },
             ]
         },
+        "reinforce_map" : ["2-1"],
         "time_series_map_conf" : {
             "dt" : 2.0          // ms
         },

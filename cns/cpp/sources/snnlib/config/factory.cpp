@@ -5,6 +5,8 @@
 #include <snnlib/config/constants.h>
 #include <snnlib/learning/optimal_stdp.h>
 #include <snnlib/learning/max_likelyhood.h>
+#include <snnlib/learning/max_likelyhood.h>
+#include <snnlib/reinforcement/likelyhood.h>
 #include <snnlib/act_funcs/determ.h>
 #include <snnlib/act_funcs/exp_hennequin.h>
 #include <snnlib/neurons/synapse.h>
@@ -41,7 +43,7 @@ Factory::Factory() {
     entity_map["OptimalStdp"]  =   &createInstance<Obj, OptimalStdp>;
     entity_map["SigmaTuningCurve"]  =  &createInstance<Obj, SigmaTuningCurve>;
     entity_map["MaxLikelihood"]  =   &createInstance<Obj, MaxLikelihood>;
-    entity_map["Likelihood"]  =   &createConstInstance<Obj, Likelihood>;
+    entity_map["Likelihood"]  =   &createInstance<Obj, Likelihood>;
 
     // blank stuff
     entity_map["BlankTuningCurve"]  =  &createInstance<Obj, BlankTuningCurve>;
