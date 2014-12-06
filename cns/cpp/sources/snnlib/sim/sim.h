@@ -64,6 +64,7 @@ public:
             Constants* c_serial = rw.read()->castSerializable<Constants>();
             construct(*c_serial);
         }
+        Factory::inst().cleanAllDynamicObj();
         for(auto it = layers.begin(); it != layers.end(); ++it) {
             (*it)->loadModel(rw);
         }

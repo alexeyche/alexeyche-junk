@@ -26,7 +26,11 @@ class Factory {
         for(auto it=objects.begin(); it != objects.end(); ++it) {
             delete *it;
         }
+        for(auto it=dyn_objects.begin(); it != dyn_objects.end(); ++it) {
+           delete *it;
+        }
         objects.clear();
+        dyn_objects.clear();
     }
     friend class ProtoRw;
 public:
@@ -47,6 +51,15 @@ public:
         objects.push_back(o);
         return o;
     }
+    void cleanAllDynamicObj() {
+        auto it=dyn_objects.begin();
+        while(it != dyn_objects.end()) {
+            Obj *o_in = *it;
+            dyn_objects.erase(it);
+            delete o_in;
+        }
+    }
+
     void cleanObj(Obj *o) {
         auto it=objects.begin();
         while(it != objects.end()) {
@@ -82,6 +95,7 @@ private:
     const_map_type const_map;
     static Factory *_inst;
     vector<Obj*> objects;
+    vector<Obj*> dyn_objects;
 };
 
 

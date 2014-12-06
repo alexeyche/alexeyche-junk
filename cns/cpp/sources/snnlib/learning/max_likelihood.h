@@ -29,7 +29,17 @@ public:
     void calculateWeightsDynamics()  {
         for(auto it=n->active_synapses.begin(); it != n->active_synapses.end(); ++it) {
             double dw = SRMMethods::dLLH_dw(n, *it);    
-            (*it)->w += c->learning_rate * dw;
+            if(std::isnan(dw)) {
+                cout << "Found nan dw:\n";
+                cout << *n;
+                terminate();
+            }
+//            (*it)->w += c->learning_rate * dw;
+            if(std::isnan((*it)->w)) {
+                cout << "Found nan w:\n";
+                cout << *n;
+                terminate();
+            }
         }
     }
     void deserialize() {

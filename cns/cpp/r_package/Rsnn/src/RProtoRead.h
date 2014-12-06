@@ -17,17 +17,24 @@ public:
     Rcpp::List read() {
         if(values.size() == 0) {
             try {
-                ProtoRw rw(protofile, ProtoRw::Read);
+                ProtoRw *rw = new ProtoRw(protofile, ProtoRw::Read);
 
-                SerializableBase *o = rw.read();
+                SerializableBase *o = rw->read();
                 if(!o) {
                     ERR("Can't read protofile " << protofile << "\n");
+                }
+
+                if(o->getName() == "Constants") {
+                    delete rw;
+                    Constants *c = static_cast<Constants*>(o);
+                    values = readModel(c);
+                    return values;
                 }
                 
                 SerialPack v({o});
                 
                 while(true) {
-                    SerializableBase *o = rw.read();
+                    SerializableBase *o = rw->read();
                     if(!o) break;
                     v.push_back(o);
                 }
@@ -35,17 +42,13 @@ public:
                 if(v.size() == 1) {
                     values = convert(v[0]);
                 } else {
-                    if(v[0]->getName() == "Constants") {
-                        Constants *c = dynamic_cast<Constants*>(c);
-                        values = readModel(c);
-                    } else {
-                        for(size_t vi=0; vi<v.size(); vi++) {
-                            stringstream ss;
-                            ss << v[vi]->getName() << "_" << vi;
-                            values[ss.str()] = convert(v[vi]);
-                        }
-                    }                        
+                    for(size_t vi=0; vi<v.size(); vi++) {
+                        stringstream ss;
+                        ss << v[vi]->getName() << "_" << vi;
+                        values[ss.str()] = convert(v[vi]);
+                    }
                 }                
+                delete rw;
             } catch(...) {
                 ERR("Can't read protofile " << protofile << "\n");
             }
@@ -56,14 +59,9 @@ public:
         cout << "RProto instance. run instance$read() method to read protobuf\n";
     }
     Rcpp::List readModel(Constants *c) { 
-        Rcpp::List out;
         Sim s(*c);
         s.loadModel(protofile);
-        size_t total_size = 0;
-        for(auto it=s.layers.begin(); it != s.layers.end(); ++it) {
-            Layer *l = *it;
-            total_size += l->N;
-        }
+        size_t total_size = s.input_neurons_count + s.net_neurons_count;
         cout << total_size << "\n";
         Rcpp::NumericMatrix w(total_size, total_size);
         for(auto it=s.layers.begin(); it != s.layers.end(); ++it) {
@@ -76,6 +74,7 @@ public:
                 }
             }
         }        
+        Rcpp::List out;
         out["w"] = w;
         return out;
     }

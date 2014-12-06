@@ -2,7 +2,8 @@
 
 library(Rsnn)
 
-rundir="/home/alexeyche/prog/newsim/runs"
+#rundir="/home/alexeyche/prog/newsim/runs"
+rundir="/home/kayla/alexeyche/sim/runs"
 runname = system(sprintf("ls -t %s | sed -ne '1p'", rundir),intern=TRUE)
 workdir=sprintf("%s/%s", rundir, runname)
 for(ep in 1:1000) {
@@ -29,6 +30,7 @@ print(p1)
 
 if(file.exists(model_file)) {
     model = RProto$new(model_file)$read()
+    w = model[["w"]]
 } 
 if(file.exists(stat_file)) {
     stat = RProto$new(stat_file)$read()

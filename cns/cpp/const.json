@@ -57,12 +57,12 @@
         },
         "MaxLikelihood" : {
             "tau_el" : 100,
-            "learning_rate" : 0.01,
+            "learning_rate" : 0.001,
             "input_target" : false
         },
         "MaxLikelihood_Input" : {
             "tau_el" : 100,
-            "learning_rate" : 0.01,
+            "learning_rate" : 0.001,
             "input_target" : true
         }
     },

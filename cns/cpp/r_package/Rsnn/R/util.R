@@ -52,3 +52,9 @@ plot_rastl <- function(raster, lab="",T0=0, Tmax=Inf, i=-1, plen=-1) {
 }
 
 prast = plot_rastl
+
+gr_pl = function(m) {
+  levelplot(m, col.regions=colorRampPalette(c("black", "white")))
+}
+
+

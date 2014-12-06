@@ -145,7 +145,7 @@ Synapse *Factory::createSynapse(string name, const Constants &c, size_t id_pre, 
     Synapse *o = dynamic_cast<Synapse*>(entity_map[base_struct_name]());
     if(!o) { cerr << "Error while reading " << name << " and treating like Synapse\n"; terminate(); }
     o->init(c[name], id_pre, w, dendrite_delay);
-    objects.push_back(o);
+    dyn_objects.push_back(o);
     return o;
 }
 RewardModulation* Factory::createRewardModulation(string name, const Constants &c, Neuron *n, RuntimeGlobals *run_glob_c) {

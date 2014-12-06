@@ -75,9 +75,6 @@ void Neuron::deserialize() {
     axon_delay = mess->axon_delay();
     weight_factor = mess->weight_factor();
     if(syns.size()>0) {
-        for(size_t syn_i=0; syn_i<syns.size(); syn_i++) {
-            Factory::inst().cleanObj(syns[syn_i]);
-        }
         syns.clear();
     }
     syns.resize(mess->num_of_synapses());

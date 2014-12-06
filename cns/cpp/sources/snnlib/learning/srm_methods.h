@@ -10,6 +10,6 @@ public:
     }
     static inline double dLLH_dw(Neuron *n, Synapse *syn) {
     	double p_stroke = n->act->probDeriv(n->y);
-    	return p_stroke/(n->p/n->M) * (n->fired - n->p) * syn->x;
+    	return (p_stroke/(n->p/n->M)) * (n->fired - n->p) * syn->x;
     }
 };
