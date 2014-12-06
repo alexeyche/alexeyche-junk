@@ -3,6 +3,7 @@
 #include "learning_rule.h"
 
 #include <snnlib/neurons/neuron.h>
+#include <snnlib/learning/srm_methods.h>
 
 class Factory;
 
@@ -26,7 +27,10 @@ public:
     }
 
     void calculateWeightsDynamics()  {
-
+        for(auto it=n->active_synapses.begin(); it != n->active_synapses.end(); ++it) {
+            double dw = SRMMethods::dLLH_dw(n, *it);    
+            (*it)->w += c->learning_rate * dw;
+        }
     }
     void deserialize() {
     }

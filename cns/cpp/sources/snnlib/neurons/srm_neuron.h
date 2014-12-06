@@ -2,7 +2,7 @@
 
 #include "neuron.h"
 
-
+#include <snnlib/util/fastapprox/fastexp.h>
 
 class SRMNeuron : public Neuron {
 protected:
@@ -33,8 +33,8 @@ public:
             y += s->w * s->x;
         }
         y = c->u_rest + y * weight_factor;
-
-        p = act->prob(y);
+        M = fastexp(-gr);
+        p = act->prob(y) * M;
         if(collectStatistics) {
             stat->collect(this);
         }
@@ -47,6 +47,7 @@ public:
     void calculateDynamics() {
         if(p > getUnif()) {
             fired = 1;
+            gr += c->amp_refr;
         }
         lrule->calculateWeightsDynamics();
 
@@ -61,6 +62,8 @@ public:
                 ++it;
             }
         }
+        gr += - gr/c->tau_refr;
+        if(rmod) rmod->modulateReward();
     }
     ProtoPack serialize() {
         return Neuron::serialize();

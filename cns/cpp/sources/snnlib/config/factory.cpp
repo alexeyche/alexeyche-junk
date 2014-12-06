@@ -4,9 +4,9 @@
 #include <snnlib/layers/layer.h>
 #include <snnlib/config/constants.h>
 #include <snnlib/learning/optimal_stdp.h>
-#include <snnlib/learning/max_likelyhood.h>
-#include <snnlib/learning/max_likelyhood.h>
-#include <snnlib/reinforcement/likelyhood.h>
+#include <snnlib/learning/max_likelihood.h>
+#include <snnlib/learning/max_likelihood.h>
+#include <snnlib/reinforcement/likelihood.h>
 #include <snnlib/act_funcs/determ.h>
 #include <snnlib/act_funcs/exp_hennequin.h>
 #include <snnlib/neurons/synapse.h>
@@ -91,6 +91,15 @@ SerializableBase* Factory::createSerializable(const string &name) {
     if(name == "LabeledTimeSeries") {
         s = new LabeledTimeSeries();
     } else
+    if(name == "RewardStat") {
+        s = new RewardStat();
+    } else
+    if(name == "MaxLikelihood") {
+        s = new MaxLikelihood();
+    } else
+    if(name == "Reward") {
+        s = new Reward();
+    } else
     if(name == "LabeledTimeSeriesList") {
         s = new LabeledTimeSeriesList();
     } else {
@@ -139,6 +148,15 @@ Synapse *Factory::createSynapse(string name, const Constants &c, size_t id_pre, 
     objects.push_back(o);
     return o;
 }
+RewardModulation* Factory::createRewardModulation(string name, const Constants &c, Neuron *n, RuntimeGlobals *run_glob_c) {
+    GET_BASE_NAME(entity_map)
+    RewardModulation *o = dynamic_cast<RewardModulation*>(entity_map[base_struct_name]());
+    if(!o) { cerr << "Error while reading " << name << " and treating like RewardModulation\n"; terminate(); }
+    o->init(c[name], n, run_glob_c);
+    objects.push_back(o);
+    return o;
+}
+
 
 Neuron *Factory::createNeuron(string name, const Constants &c, const RuntimeGlobals *run_glob_c, double axon_delay) {
     GET_BASE_NAME(entity_map)
@@ -157,7 +175,7 @@ Neuron *Factory::createNeuron(string name, const Constants &c, const RuntimeGlob
     return o;
 }
 
-Layer *Factory::createLayer(size_t size, const NeuronConf &nc, const Constants &c, const RuntimeGlobals *run_glob_c) {
+Layer *Factory::createLayer(size_t size, const NeuronConf &nc, const Constants &c, RuntimeGlobals *run_glob_c) {
     Layer *o = new Layer();
     o->init(size, nc, c, run_glob_c);
     objects.push_back(o);

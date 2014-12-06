@@ -3,6 +3,9 @@
 
 #include "act_func.h"
 
+#include <snnlib/util/fastapprox/fastlog.h>
+#include <snnlib/util/fastapprox/fastexp.h>
+
 class Factory;
 
 class ExpHennequin: public ActFunc {
@@ -19,7 +22,7 @@ public:
         n->setActFunc(this);
     }
     double prob(const double &u) const {
-        double p = (c->p_rest + c->r0 * log(1 + exp( c->beta*(u - c->u_tr) )))/1000;
+        double p = (c->p_rest + c->r0 * fastlog(1 + fastexp( c->beta*(u - c->u_tr) )))/1000;
         if(p>1.0) return 1.0;
         return p;
     };
@@ -30,11 +33,12 @@ public:
     }
 
     double probDeriv(const double &u) const {
-        double part = exp(c->beta*(u - c->u_tr));
+        double part = fastexp(c->beta*(u - c->u_tr));
         return part;
     };
 
     const ExpHennequinC *c;
 };
+
 
 

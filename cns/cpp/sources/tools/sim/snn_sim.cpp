@@ -23,7 +23,7 @@ const option::Descriptor usage[] =
  {ARG_MODEL_LOAD, 0,"l","load",Arg::NonEmpty, "  --load, -l  \tLoad model." },
  {ARG_MODEL_SAVE, 0,"s","save",Arg::NonEmpty, "  --save, -s  \tSave model." },
  {ARG_T_MAX, 0,"T","T-max",Arg::NonEmpty, "  --T-max, -T  \tMaximum simulation time (default: max input length)." },
- {ARG_OUT_STAT, 0,"","stat",Arg::NonEmpty, "  --stat  \tFile name with detailed statistics." },
+ {ARG_OUT_STAT, 0,"","stat",Arg::NonEmpty, "  --stat  \tFile name to save detailed statistics." },
  {ARG_JOBS, 0,"j","jobs",Arg::NonEmpty, "  --jobs  -j \tParallel jobs to run (default 1)" },
  {ARG_PRECALC, 0,"", "precalc",Arg::None, "  --precalc  \tOnly precalculate spike on time series." },
  {ARG_HELP, 0,"h", "help",Arg::None, "  --help  \tPrint usage and exit." },
@@ -144,13 +144,12 @@ int main(int argc, char **argv) {
         terminate();
     }
 
-
     s.setTlimit(sopt.Tmax);
-
+    
     if(!sopt.out_stat_file.empty()) {
         s.monitorStat(sopt.out_stat_file);
     }
-
+    
     if(sopt.precalc) {
         s.precalculateInputSpikes();
     } else {

@@ -9,6 +9,7 @@
 #include <snnlib/serialize/proto_rw.h>
 #include <snnlib/config/factory.h>
 #include <snnlib/serialize/serialize.h>
+#include <snnlib/reinforcement/reward_modulation.h>
 
 #include "synapse.h"
 #include "neuron_stat.h"
@@ -38,6 +39,8 @@ public:
     void setActFunc(ActFunc *_act);
     void setLearningRule(LearningRule *_lrule);
     void setTuningCurve(TuningCurve *_tc);
+    void setRewardModulation(RewardModulation *_rmod);
+
     void addSynapse(Synapse *s);
 
     // runtime
@@ -63,23 +66,28 @@ public:
 
     double y;
     double p;
+    double M;
+
+    double gr;
     double weight_factor;
-    uchar fired;
+    double fired;
 
     double axon_delay;
 
     vector<Synapse*> syns;
+    list< Synapse *> active_synapses;
+
+    ActFunc *act;
 protected:
     NeuronStat *stat;
-
-    list< Synapse *> active_synapses;
 
     const ConstObj *bc;
     const RuntimeGlobals *glob_c;
 
-    ActFunc *act;
+
     LearningRule *lrule;
     TuningCurve *tc;
+    RewardModulation *rmod;
 
     bool collectStatistics;
 };

@@ -8,7 +8,7 @@
     },
     "neurons" : {
         "SRMNeuron" : {
-            "tau_refr"  : 2.0,
+            "tau_refr"  : 5.0,
             "amp_refr"  : 200.0,
             "u_rest"    : 0.0
         },
@@ -57,17 +57,17 @@
         },
         "MaxLikelihood" : {
             "tau_el" : 100,
+            "learning_rate" : 0.01,
             "input_target" : false
         },
         "MaxLikelihood_Input" : {
             "tau_el" : 100,
+            "learning_rate" : 0.01,
             "input_target" : true
         }
     },
     "reward_modulations" : {
         "Likelihood_Input" : {
-            "tau_rew" : 100,
-            "tau_mean_rew" : 1000,
             "input_target" : true
         }
     },
@@ -100,20 +100,24 @@
                     "neuron" : "SRMNeuron",
                     "learning_rule" : "MaxLikelihood_Input",
                     "act_func" : "ExpHennequin",
-                    "reward_modulation" : "Likelihood",
+                    "reward_modulation" : "Likelihood_Input",
                     "axon_delay_distr" : [0, 0]
                 }
             },
         ],
         "conn_map" : {
-            "0-1" : [
+            "0->1" : [
                 { "prob" : 1.0, "weight_per_neuron" : 100, "type" : "Synapse", "dendrite_delay_distr" : [0, 0] }
             ],
-            "1-2" : [
+            "1->2" : [
                 { "prob" : 1.0, "weight_per_neuron" : 40, "type" : "Synapse", "dendrite_delay_distr" : [0, 0] },
             ]
         },
-        "reinforce_map" : ["2-1"],
+        "reinforce_map" : { 
+            "2 -> 1" : { 
+                "tau_rew" : 100, "tau_mean_rew" : 1000 
+            },
+        },
         "time_series_map_conf" : {
             "dt" : 2.0          // ms
         },
@@ -122,6 +126,7 @@
             "dt" : 1,            // ms
             "start_rate" : 20.0    // Hz
         },
-        "neurons_to_listen" : [101, 201]
+        "neurons_to_listen" : [101, 201],
+        "reward_layers_to_listen" : [2]
     }
 }

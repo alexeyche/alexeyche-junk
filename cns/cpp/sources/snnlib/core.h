@@ -14,6 +14,7 @@
 #include <random>
 #include <list>
 #include <queue>
+#include <tuple>
 
 using std::string;
 using std::vector;
@@ -32,5 +33,6 @@ using std::ifstream;
 using std::ofstream;
 using std::ios;
 using std::list;
+using std::tuple;
 
 typedef unsigned char uchar;

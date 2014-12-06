@@ -39,8 +39,10 @@ public:
                 Neuron *n = accessByGlobalId(*it);
                 n->saveStat(st);
             }
+            rc.saveStat(st);
             prw.write(st);
-
+            
+            
         }
         if(!output_spikes_file.empty()){
             ProtoRw prw(output_spikes_file, ProtoRw::Write);
@@ -65,6 +67,8 @@ public:
         for(auto it = layers.begin(); it != layers.end(); ++it) {
             (*it)->loadModel(rw);
         }
+        rc.loadModel(rw);
+        
     }
     void saveModel(string f) {
         ProtoRw rw(f,ProtoRw::Write);
@@ -72,12 +76,14 @@ public:
         for(auto it = layers.begin(); it != layers.end(); ++it) {
             (*it)->saveModel(rw);
         }
+        rc.saveModel(rw);
     }
     void print(std::ostream& str) const {
         for(auto it=layers.begin(); it!=layers.end(); ++it) {
             str << **it;
         }
         str << net;
+        str << rc;
     }
     void setInputTimeSeries(LabeledTimeSeriesList l) {
         CHECK_CONSTRUCT()
@@ -130,6 +136,9 @@ public:
         for(auto it=sc.neurons_to_listen.begin(); it != sc.neurons_to_listen.end(); ++it) {
             accessByGlobalId(*it)->enableCollectStatistics();
         }
+        for(auto it=sc.reward_layers_to_listen.begin(); it != sc.reward_layers_to_listen.end(); ++it) {
+            rc.enableCollectStatistics(*it);
+        }
     }
     void setTlimit(double _T_limit) {
         T_limit = _T_limit;
@@ -137,6 +146,9 @@ public:
 
     static void* runWorker(void *content);
     static inline void simStep(SimWorker *sw, const double &t);
+    static void* runPrecalculateWorker(void *content);
+    static inline void simPrecalculateStep(SimWorker *sw, const double &t);
+    
     void runSimOnSubset(size_t left_neuron_id, size_t right_neuron_id, void* (*sim_func)(void* content));
     void precalculateInputSpikes();
     void run();
@@ -162,6 +174,8 @@ public:
 
     SimConfiguration sc;
     RuntimeGlobals rg;
+    RewardControl rc;
+    
     bool constructed;
 
     LabeledTimeSeriesList input_ts_list;

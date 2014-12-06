@@ -12,6 +12,7 @@ from config import SNN_SIM
 from config import CONST_JSON
 
 import subprocess as sub
+import time
 
 def runSim(snn_sim_bin, args, log_stdout, verbose=False):
     cmd = [
@@ -20,11 +21,16 @@ def runSim(snn_sim_bin, args, log_stdout, verbose=False):
 
     for k, v in [ (k, args[k]) for k in sorted(args) ]:
         cmd += [k, v]
+    start_time = time.time()
     sp = sub.Popen(cmd, stdout=open(log_stdout, 'w'), stderr=sub.STDOUT, shell=False)
     if verbose:
         print 
         print " ".join(cmd)
+        print 
     sp.communicate()
+    end_time = time.time()
+    if verbose:
+        print "time run: %s sec" % str(end_time-start_time)
     if sp.returncode != 0:
         print "snn_sim failed: "
         with open(log_stdout) as lf:
@@ -79,17 +85,20 @@ def main(args):
             '--input' : args.input,
             '--constants' : const
     }            
-    
-    for ep in xrange(start_ep, start_ep + args.epochs + 1):
+    if args.T_max != 0:
+        common_sim_args['--T-max'] = args.T_max
+    for ep in xrange(start_ep, start_ep + args.epochs):
         sim_args = common_sim_args.copy()
         sim_args['--save'] = wd_file("%s_model.pb" % ep)
         sim_args['--output'] = wd_file("%s_output_spikes.pb" % ep)
+        if args.stat:
+            sim_args['--stat'] = wd_file("%s_stat.pb" % ep)
         if ep>1:
-            model_load = wd_file("%s_model.pb" % ep)
-            if os.path.exists(model_load):
-                raise Exception("Can't find model for previous epoch number %s" % ep)
+            model_load = wd_file("%s_model.pb" % str(ep-1))
+            if not os.path.exists(model_load):
+                raise Exception("Can't find model for previous epoch number %s" % str(ep-1))
             sim_args['--load'] = model_load
-
+        print "Epoch %d" % ep
         runSim(args.snn_sim_bin, sim_args, wd_file("%s_output.log" % ep), verbose = args.verbose)
     
 
@@ -114,11 +123,15 @@ if __name__ == '__main__':
     parser.add_argument('-T', 
                         '--T-max', 
                         required=False,
-                        help='Run only specific amount of simulation time (ms)')
+                        help='Run only specific amount of simulation time (ms)', default=0)
     parser.add_argument('-o', 
                         '--old-dir', 
                         action='store_true',
                         help='Do not create new dir for that simulation')
+    parser.add_argument('-s', 
+                        '--stat',
+                        action='store_true',
+                        help='Save statistics')
     parser.add_argument('-v', 
                         '--verbose', 
                         action='store_true',

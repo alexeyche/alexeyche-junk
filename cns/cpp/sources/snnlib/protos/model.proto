@@ -25,4 +25,9 @@ message OptimalStdp {
 	required double p_acc = 1;
 }
 
+message Reward {
+	required double r = 1;
+	required double mean_r = 2;
+}
+
 

@@ -5,6 +5,7 @@ cmake_minimum_required(VERSION 2.8)
 set(SOURCES
     sim.cpp
     network.cpp
+    reward_control.cpp
 )
 
 # add directory name to sources

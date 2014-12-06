@@ -18,9 +18,11 @@ public:
     bool isBlank() {
     	return blank;
     }
+
 protected:
 	bool blank;
 	Neuron *n;    
+
 };
 
 class BlankLearningRule: public LearningRule  {

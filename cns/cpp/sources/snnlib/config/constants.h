@@ -200,30 +200,28 @@ public:
     MaxLikelihoodC(string name) : ConstObj(name) {}
     double tau_el;
     bool input_target;
+    double learning_rate;
 
     void fill_structure(JsonBox::Value v) {
         tau_el               = v["tau_el"].getDouble();
         input_target         = v["input_target"].getBoolean();
+        learning_rate         = v["learning_rate"].getDouble();    
     }
     void print(std::ostream &str) const {
-        str << "tau_el: " << tau_el << ", input_target: " << input_target << "\n";
+        str << "tau_el: " << tau_el << ", learning_rate: " << learning_rate << ", input_target: " << input_target << "\n";
     }
 };
 
 class LikelihoodC: public ConstObj {
 public:
     LikelihoodC(string name) : ConstObj(name) {}
-    double tau_rew;
-    double tau_mean_rew;
     bool input_target;
 
     void fill_structure(JsonBox::Value v) {
-        tau_rew               = v["tau_rew"].getDouble();
-        tau_mean_rew         = v["tau_mean_rew"].getDouble();
         input_target         = v["input_target"].getBoolean();
     }
     void print(std::ostream &str) const {
-        str << "tau_rew: " << tau_rew << ", tau_mean_rew: " << tau_mean_rew << ", input_target: " << input_target << "\n";
+        str << "input_target: " << input_target << "\n";
     }
 };
 
@@ -233,6 +231,7 @@ public:
     string act_func;
     string tuning_curve;
     string learning_rule;
+    string reward_modulation;
     double axon_delay_gain;
     double axon_delay_rate;
 
@@ -240,6 +239,7 @@ public:
         act_func = v["act_func"].getString();
         tuning_curve = v["tuning_curve"].getString();
         learning_rule = v["learning_rule"].getString();
+        reward_modulation = v["reward_modulation"].getString();
         neuron = v["neuron"].getString();
         JsonBox::Array a = v["axon_delay_distr"].getArray();
         axon_delay_gain = a[0].getDouble();
@@ -247,7 +247,7 @@ public:
     }
     void print(std::ostream &str) const {
         str << "NeuronConf(neuron: " << neuron << ", learning_rule: "  << learning_rule << ", tuning_curve : " << tuning_curve <<  ", act_func: " << act_func <<
-            ", axon_delay_gain: " << axon_delay_gain  << ", axon_delay_rate: " << axon_delay_rate << ")";
+            ", axon_delay_gain: " << axon_delay_gain  << ", axon_delay_rate: " << axon_delay_rate << ", reward_modulation: " << reward_modulation <<  ")";
     }
 };
 
@@ -319,10 +319,23 @@ public:
     }
 };
 
+class RewardModConf: public ConfObj {
+public:
+    double tau_rew;
+    double tau_mean_rew;
 
+    void fill_structure(JsonBox::Value v) {
+        tau_rew = v["tau_rew"].getDouble();
+        tau_mean_rew = v["tau_mean_rew"].getDouble();
+    }
 
-typedef map< pair<size_t, size_t>, vector<ConnectionConf> > ConnectionMap;
-typedef vector< pair<size_t, size_t> > RewardConnectionMap;
+    void print(std::ostream &str) const {
+        str << "tau_rew: " << tau_rew << " tau_mean_rew: " << tau_mean_rew << "\n";
+    }
+};
+
+typedef map< pair<size_t, vector<size_t>>, vector<ConnectionConf> > ConnectionMap;
+typedef map< pair<size_t, vector<size_t>>, RewardModConf> RewardConnectionMap;
 
 class SimConfiguration: public ConfObj {
 public:
@@ -332,6 +345,7 @@ public:
     ConnectionMap conn_map;
     TimeSeriesMapConf ts_map_conf;
     vector<size_t> neurons_to_listen;
+    vector<size_t> reward_layers_to_listen;
     SimRunConf sim_run_c;
     RewardConnectionMap reinforce_map;
 
@@ -356,14 +370,22 @@ public:
         }
         JsonBox::Object o = v["conn_map"].getObject();
         for(auto it=o.begin(); it!=o.end(); ++it) {
-            vector<string> aff = split(it->first, '-');
+            vector<string> aff = splitBySubstr(it->first, "->");
             if(aff.size() != 2) {
-                cerr << "conn_map configuration not right: need 2 afferent layers separated by \"-\"\n";
+                cerr << "conn_map configuration not right: need 2 afferents separated by \"->\"\n";
                 terminate();
             }
-            size_t aff_pre = stoi(aff[0].c_str());
-            size_t aff_post = stoi(aff[1].c_str());
-            pair<size_t, size_t> aff_p(aff_pre, aff_post);
+
+            pair<size_t, vector<size_t> > aff_p;
+
+            aff_p.first = stoi(aff[0].c_str());
+            aff_p.second = vector<size_t>();
+            
+            vector<string> aff_post = split(aff[1],',');
+            for(auto it=aff_post.begin(); it != aff_post.end(); ++it) {
+                aff_p.second.push_back(stoi(it->c_str()));    
+            }
+            
 
             vector<ConnectionConf> conn_conf_vec;
             JsonBox::Array conn_array = it->second.getArray();
@@ -379,16 +401,29 @@ public:
             conn_map[aff_p] = conn_conf_vec;
         }
         JsonBox::Object o_rf = v["reinforce_map"].getObject();
-        for(auto it=o_rf.begin(); it!=o_rf.end(); ++it) {
-            vector<string> aff = split(it->first, '-');
-            if(aff.size() != 2) {
-                cerr << "rew_map configuration not right: need 2 afferent layers separated by \"-\"\n";
-                terminate();
+        try {
+            for(auto it=o_rf.begin(); it!=o_rf.end(); ++it) {
+                vector<string> aff = splitBySubstr(it->first, "->");
+                if(aff.size() != 2) {
+                    cerr << "rew_map configuration not right: need afferent layers separated by \"->\"\n";
+                    terminate();
+                }
+                pair<size_t, vector<size_t> > aff_p(stoi(aff[0].c_str()), vector<size_t>());
+                vector<string> aff_post = split(aff[1], ',');
+                
+                for(auto p_it=aff_post.begin(); p_it != aff_post.end(); ++p_it) {
+                    aff_p.second.push_back(stoi(p_it->c_str()));                        
+                }
+                RewardModConf mod_conf;
+                mod_conf.fill_structure(it->second);
+                reinforce_map[aff_p] = mod_conf;
             }
-            size_t aff_pre = stoi(aff[0].c_str());
-            size_t aff_post = stoi(aff[1].c_str());
-            pair<size_t, size_t> aff_p(aff_pre, aff_post);
-            reinforce_map.push_back(aff_p);
+        } catch (...) {
+            cerr << "Cannot parse reinforce map configuration\n";
+            cerr << "You need to point one pre layer from left side of \"->\" and multiple (or one) post layer(s) from right side, separated by commas\n";
+            cerr << "Reinforce map doesn't support multiple configuration for one connection (like Connection Map)\n";
+            cerr << "\n";
+            throw;
         }
 
 
@@ -397,6 +432,10 @@ public:
         for(auto it=a.begin(); it!=a.end(); ++it) {
             neurons_to_listen.push_back(it->getInt());
         }
+        JsonBox::Array a_l = v["reward_layers_to_listen"].getArray();
+        for(auto it=a_l.begin(); it!=a_l.end(); ++it) {
+            reward_layers_to_listen.push_back(it->getInt());
+        }
         sim_run_c.fill_structure(v["sim_run_conf"]);
     }
 
@@ -404,10 +443,20 @@ public:
     void print(std::ostream &str) const {
         str << "input_layers_conf: \n";  print_vector<LayerConf>(input_layers_conf, str, ",\n");
         str << "net_layers_conf: \n"; print_vector<LayerConf>(net_layers_conf, str, ",\n");
+        str << "conn_map: \n";
         for(auto it=conn_map.begin(); it!=conn_map.end(); ++it) {
-            pair<size_t,size_t> aff = it->first;
-            str << aff.first << "-" << aff.second << ":\n";
+            pair<size_t,vector<size_t>> aff = it->first;
+            cout << aff.first << "->";
+            print_vector<size_t>(aff.second, str, ", ");    
+            str << "\t";
             print_vector<ConnectionConf>(it->second, str, "\n");
+        }
+        str << "reinforce_map: \n";
+        for(auto it=reinforce_map.begin(); it!=reinforce_map.end(); ++it) {
+            pair<size_t,vector<size_t>> aff = it->first;
+            cout << aff.first << "->";
+            print_vector<size_t>(aff.second, str, ", ");
+            str << "\t" << it->second;
         }
         str << "time_series_map_conf: " << ts_map_conf << "\n";
         str << "sim_run_conf: " << sim_run_c << "\n";
@@ -486,6 +535,7 @@ public:
         if(synapses.count(key)) return synapses.at(key);
         if(act_funcs.count(key)) return act_funcs.at(key);
         if(learning_rules.count(key)) return learning_rules.at(key);
+        if(reward_modulations.count(key)) return reward_modulations.at(key);
 
         if(key.substr(0, blank_prefix.size()) == blank_prefix) { // starts with Blank -- ignore
             return nullptr;

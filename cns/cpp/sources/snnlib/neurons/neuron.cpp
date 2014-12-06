@@ -23,6 +23,7 @@ void Neuron::init(const ConstObj *_c, const RuntimeGlobals *_glob_c, double _axo
     collectStatistics = false;
     stat = nullptr;
     axon_delay = _axon_delay;
+    rmod = nullptr;
 }
 
 void Neuron::setActFunc(ActFunc *_act) {
@@ -34,6 +35,9 @@ void Neuron::setLearningRule(LearningRule *_lrule) {
 void Neuron::setTuningCurve(TuningCurve *_tc) {
     tc = _tc;
 }
+void Neuron::setRewardModulation(RewardModulation *_rmod) {
+    rmod = _rmod;
+}
 void Neuron::addSynapse(Synapse *s) {
     syns.push_back(s);
     if(collectStatistics) {
@@ -44,6 +48,8 @@ void Neuron::addSynapse(Synapse *s) {
 void Neuron::reset() {
     y = 0.0;
     p = 0.0;
+    gr = 0.0;
+    M = 0.0;
     fired = 0;
     for(auto it=syns.begin(); it != syns.end(); ++it) {
         Synapse *s = *it;

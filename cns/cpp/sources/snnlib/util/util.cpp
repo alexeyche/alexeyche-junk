@@ -17,6 +17,23 @@ vector<string> split(const string &s, char delim) {
     return elems;
 }
 
+vector<string> splitBySubstr(const string &s_inp, const string &delimiter) {
+    string s(s_inp);
+    vector<string> out;
+
+    size_t pos = 0;
+    std::string token;
+    while ((pos = s.find(delimiter)) != std::string::npos) {
+        token = s.substr(0, pos);
+        trim(token);
+        out.push_back(token);
+        s.erase(0, pos + delimiter.length());
+    }
+    trim(s);
+    out.push_back(s);
+    return out;
+}
+
 void trim(string &str) {
     size_t endpos = str.find_last_not_of(" \t");
     if( string::npos != endpos )

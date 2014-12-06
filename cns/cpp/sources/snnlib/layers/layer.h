@@ -16,11 +16,11 @@ protected:
     Layer() {}
     friend class Factory;
 public:
-    Layer(size_t _size, const NeuronConf &nc, const Constants &c, const RuntimeGlobals *run_glob_c) {
+    Layer(size_t _size, const NeuronConf &nc, const Constants &c, RuntimeGlobals *run_glob_c) {
         init(_size, nc, c, run_glob_c);
     }
 
-    virtual void init(size_t _size, const NeuronConf &nc, const Constants &c, const RuntimeGlobals *run_glob_c) {
+    virtual void init(size_t _size, const NeuronConf &nc, const Constants &c, RuntimeGlobals *run_glob_c) {
         id = global_layer_index++;
         N = _size;
         neuron_conf = &nc;
@@ -30,6 +30,9 @@ public:
 
             Neuron *n = Factory::inst().createNeuron(nc.neuron, c, run_glob_c, axon_delay);
             n->setActFunc(Factory::inst().createActFunc(nc.act_func, c, n));
+            if(!nc.reward_modulation.empty()) {
+                n->setRewardModulation(Factory::inst().createRewardModulation(nc.reward_modulation, c, n, run_glob_c));
+            }
 
             if(nc.learning_rule.empty()) {
                 n->setLearningRule(Factory::inst().createLearningRule("BlankLearningRule", c, nullptr));

@@ -21,3 +21,8 @@ message OptimalStdpStat {
     repeated double B = 2 [packed=true];
     repeated CStat Cvals = 3;
 }
+
+message RewardStat {
+    repeated double r = 1;
+    repeated double mean_r = 2;
+}
