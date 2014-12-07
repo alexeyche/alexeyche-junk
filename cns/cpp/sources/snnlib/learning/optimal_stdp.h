@@ -40,7 +40,12 @@ public:
     ProtoPack getNew() { 
         return ProtoPack({ getNewMessage<Protos::OptimalStdp>() }); 
     }
-    
+    void saveStat(SerialPack &p) {
+
+    }   
+    void enableCollectStatistics() {
+        
+    } 
     void print(std::ostream& str) const { }
 
     double p_acc;

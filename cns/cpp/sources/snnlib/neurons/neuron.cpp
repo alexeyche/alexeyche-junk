@@ -43,6 +43,7 @@ void Neuron::addSynapse(Synapse *s) {
     if(collectStatistics) {
         stat->syns.push_back(vector<double>());
     }
+    lrule->addSynapse(s);
 }
 
 void Neuron::reset() {
@@ -104,12 +105,13 @@ void Neuron::loadModel(ProtoRw &rw) {
 // stat funcs
 void Neuron::saveStat(SerialPack &p) {
     p.push_back(stat);
-//    lrule->saveStat(p);
+    lrule->saveStat(p);
 }
 
 void Neuron::enableCollectStatistics() {
     collectStatistics = true;
     stat = Factory::inst().registerObj<NeuronStat>(new NeuronStat(this));
+    lrule->enableCollectStatistics();
 }
 
 // print

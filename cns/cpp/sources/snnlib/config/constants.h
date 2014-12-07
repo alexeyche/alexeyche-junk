@@ -469,22 +469,23 @@ public:
 
 typedef map<string, const ConstObj *> const_map;
 
+class Constants;
+
+extern Constants* constGlobalInstance;
+
+
 class Constants : public Serializable<Protos::Constants> {
     Constants() : Serializable(EConstants) {
         Serializable::init(EConstants);
-        if(!Constants::glob_inst) {
-            Constants::glob_inst = this;
-        }
+        constGlobalInstance = this;
     }
     friend class Factory;
 public:
     Constants(string filename) : Serializable(EConstants) {
         Serializable::init(EConstants);
         json_content = preprocessAndReadConstJson(filename);
+        constGlobalInstance = this;
         parse();
-        if(!Constants::glob_inst) {
-            Constants::glob_inst = this;
-        }
     }
 
     void parse();
@@ -561,24 +562,8 @@ public:
         str << "\n== Sim Configuration ==\n";
         str << sim_conf;
     }
-    static const Constants globalInstance() {
-        if(!glob_inst) {
-            cerr << "Trying to access to non-initialized global constants instance\n";
-            terminate();
-        }
-        return *glob_inst;
-    }
-    static bool IsGlobalInstanceCreated() {
-        if(glob_inst) {
-            return true;
-        }
-        return false;
-    }
 
 private:
     string json_content;
-
-    static Constants *glob_inst;
 };
-
 

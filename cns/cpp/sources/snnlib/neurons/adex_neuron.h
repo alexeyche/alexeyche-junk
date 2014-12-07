@@ -51,21 +51,15 @@ public:
 
         adex_stat = nullptr;
     }
-    ~AdExNeuron() {
-        if(adex_stat) {
-            delete adex_stat;
-        }
-    }
-
+    
     void enableCollectStatistics() {
-        Neuron::enableCollectStatistics();
         collectStatistics = true;
-        adex_stat = new AdExNeuronStat();
+        adex_stat = Factory::inst().registerObj<AdExNeuronStat>(new AdExNeuronStat());
     }
     // Runtime
     void propagateSynSpike(const SynSpike *sp) {
         if( fabs(syns[sp->syn_id]->x) < SYN_ACT_TOL ) {
-            active_synapses.push_back(syns[sp->syn_id]);
+            active_synapses.push_back(sp->syn_id);
         }
         syns[sp->syn_id]->propagateSpike();
     }
@@ -76,7 +70,7 @@ public:
         } else {
             double dV = c->u_rest + y;
             for(auto it=active_synapses.begin(); it != active_synapses.end(); ++it) {
-                Synapse *s = *it;
+                Synapse *s = syns[*it];
                 dV += s->w * s->x;
             }
             dV -= - c->gL * ( y - c->EL );
@@ -116,7 +110,7 @@ public:
 
         auto it=active_synapses.begin();
         while(it != active_synapses.end()) {
-            Synapse *s = *it;
+            Synapse *s = syns[*it];
             if(fabs(s->x) < SYN_ACT_TOL) {
                 it = active_synapses.erase(it);
             } else {

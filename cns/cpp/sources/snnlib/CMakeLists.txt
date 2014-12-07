@@ -4,7 +4,7 @@ project(snn_sim)
 
 
 set(DIRS
-    #learn
+    learning
     sim
     layers
     util

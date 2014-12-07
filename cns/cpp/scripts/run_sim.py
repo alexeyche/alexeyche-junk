@@ -42,10 +42,11 @@ def runSim(snn_sim_bin, args, log_stdout, verbose=False):
 def main(args):
     const_hex = md5.new(args.const).hexdigest()
     i=0
+    wd = None
     while i<1000:
         new_wd = os.path.join(RUNS_DIR, const_hex + "_%04d" % i)
         if not os.path.exists(new_wd):
-            if not args.old_dir:
+            if not args.old_dir or not wd:
                 wd = new_wd
             break
         wd = new_wd

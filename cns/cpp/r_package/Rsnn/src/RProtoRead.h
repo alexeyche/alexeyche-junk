@@ -9,6 +9,7 @@
 #include <snnlib/serialize/proto_rw.h>
 #include <snnlib/serialize/serialize.h>
 #include <snnlib/neurons/adex_neuron.h>
+#include <snnlib/learning/max_likelihood.h>
 
 class RProto {
 public:
@@ -62,7 +63,6 @@ public:
         Sim s(*c);
         s.loadModel(protofile);
         size_t total_size = s.input_neurons_count + s.net_neurons_count;
-        cout << total_size << "\n";
         Rcpp::NumericMatrix w(total_size, total_size);
         for(auto it=s.layers.begin(); it != s.layers.end(); ++it) {
             Layer *l = *it;
@@ -107,6 +107,11 @@ public:
             if(!st) { ERR("Can't cast"); }
             out["r"] = Rcpp::wrap(st->r);
             out["mean_r"] = Rcpp::wrap(st->mean_r);
+        } else            
+        if(s->getName() == "MaxLikelihoodStat") {
+            MaxLikelihoodStat *st = dynamic_cast<MaxLikelihoodStat*>(s);
+            if(!st) { ERR("Can't cast"); }
+            out["traces"] = Rcpp::wrap(st->eligibility_trace);
         } else {
             ERR("Unknown serializable name: " << s->getName() << "\n");
         }

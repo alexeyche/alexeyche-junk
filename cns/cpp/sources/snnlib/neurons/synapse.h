@@ -30,7 +30,7 @@ public:
     double x;
     double w;
     double dendrite_delay;
-
+    
     uchar fired;
 
     void propagateSpike() {

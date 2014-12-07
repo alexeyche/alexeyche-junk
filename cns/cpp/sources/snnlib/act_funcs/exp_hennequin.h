@@ -22,7 +22,7 @@ public:
         n->setActFunc(this);
     }
     double prob(const double &u) const {
-        double p = (c->p_rest + c->r0 * fastlog(1 + fastexp( c->beta*(u - c->u_tr) )))/1000;
+        double p = (c->p_rest + c->r0 * fastlog(1 + fastexp( c->beta*(u - c->u_tr) )))/1000.0;
         if(p>1.0) return 1.0;
         return p;
     };
@@ -34,7 +34,7 @@ public:
 
     double probDeriv(const double &u) const {
         double part = fastexp(c->beta*(u - c->u_tr));
-        return part;
+        return ( (part*c->r0*c->beta) / ( 1.0+part))/1000.0;
     };
 
     const ExpHennequinC *c;

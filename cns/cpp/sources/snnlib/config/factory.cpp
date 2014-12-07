@@ -78,6 +78,9 @@ SerializableBase* Factory::createSerializable(const string &name) {
     if(name == "SRMNeuron") {
         s = new SRMNeuron();
     } else
+    if(name == "MaxLikelihoodStat") {
+        s = new MaxLikelihoodStat();
+    } else
     if(name == "Constants") {
         s = new Constants();
     } else

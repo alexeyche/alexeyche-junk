@@ -1,7 +1,6 @@
 
 
-#RUNS_DIR="/home/alexeyche/prog/newsim/runs"
-RUNS_DIR="/home/kayla/alexeyche/sim/runs"
+RUNS_DIR="/home/alexeyche/prog/newsim/runs"
 
 SNN_SIM="snn_sim"
 

@@ -75,7 +75,7 @@ public:
     double axon_delay;
 
     vector<Synapse*> syns;
-    list< Synapse *> active_synapses;
+    list<size_t> active_synapses;
 
     ActFunc *act;
 protected:

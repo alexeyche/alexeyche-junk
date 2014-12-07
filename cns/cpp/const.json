@@ -110,7 +110,7 @@
                 { "prob" : 1.0, "weight_per_neuron" : 100, "type" : "Synapse", "dendrite_delay_distr" : [0, 0] }
             ],
             "1->2" : [
-                { "prob" : 1.0, "weight_per_neuron" : 40, "type" : "Synapse", "dendrite_delay_distr" : [0, 0] },
+                { "prob" : 1.0, "weight_per_neuron" : 60, "type" : "Synapse", "dendrite_delay_distr" : [0, 0] },
             ]
         },
         "reinforce_map" : { 
@@ -126,7 +126,7 @@
             "dt" : 1,            // ms
             "start_rate" : 20.0    // Hz
         },
-        "neurons_to_listen" : [101, 201],
+        "neurons_to_listen" : [100, 200],
         "reward_layers_to_listen" : [2]
     }
 }

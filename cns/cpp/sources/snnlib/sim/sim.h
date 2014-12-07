@@ -54,9 +54,9 @@ public:
 
     void loadModel(string f) {
         ProtoRw rw(f,ProtoRw::Read);
-        if(Constants::IsGlobalInstanceCreated()) {
+        if(constGlobalInstance) {
             Constants* c_serial = rw.read()->castSerializable<Constants>();
-            if(*c_serial != Constants::globalInstance()) {
+            if(*c_serial != *constGlobalInstance) {
                 cerr << "Constants in model doesn't equals to constants in -c option\n";
                 terminate();
             }
@@ -69,8 +69,8 @@ public:
             (*it)->loadModel(rw);
         }
         rc.loadModel(rw);
-        
     }
+
     void saveModel(string f) {
         ProtoRw rw(f,ProtoRw::Write);
         rw.write(&rg.mut_C());
@@ -79,6 +79,7 @@ public:
         }
         rc.saveModel(rw);
     }
+
     void print(std::ostream& str) const {
         for(auto it=layers.begin(); it!=layers.end(); ++it) {
             str << **it;

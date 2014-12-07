@@ -20,7 +20,7 @@ public:
 
     void propagateSynSpike(const SynSpike *sp) {
         if( fabs(syns[sp->syn_id]->x) < SYN_ACT_TOL ) {
-            active_synapses.push_back(syns[sp->syn_id]);
+            active_synapses.push_back(sp->syn_id);
         }
         //cout << "Propagating syns " << sp.syn_id << " (" << syns.size() << ")\n";
         syns[sp->syn_id]->propagateSpike();
@@ -29,7 +29,7 @@ public:
     void calculateProbability() {
         y = 0.0;
         for(auto it=active_synapses.begin(); it != active_synapses.end(); ++it) {
-            Synapse *s = *it;
+            Synapse *s = syns[*it];
             y += s->w * s->x;
         }
         y = c->u_rest + y * weight_factor;
@@ -53,7 +53,7 @@ public:
 
         auto it=active_synapses.begin();
         while(it != active_synapses.end()) {
-            Synapse *s = *it;
+            Synapse *s = syns[*it];
             if(fabs(s->x) < SYN_ACT_TOL) {
                 it = active_synapses.erase(it);
             } else {
@@ -74,7 +74,7 @@ public:
 
     void print(std::ostream& str) const {
         str << "SRMNeuron(" << id << ")\n";
-        str << "\ty == " << y << ", axon_delay: " << axon_delay << ", synapses\n";
+        str << "\ty == " << y << ", p == " << p << ", M == " << M << ", gr == " << gr << ", fired == " << fired << ", axon_delay: " << axon_delay << ", synapses\n";
         for(auto it=syns.begin(); it != syns.end(); ++it) {
             str << **it << ", ";
         }

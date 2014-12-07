@@ -8,7 +8,7 @@ void Synapse::deserialize() {
 	w = syn->w();
     id_pre = syn->id_pre();
     dendrite_delay = syn->dendrite_delay();
-    c = castType<SynapseC>(Constants::globalInstance()[syn->const_name()]);
+    c = castType<SynapseC>((*constGlobalInstance)[syn->const_name()]);
 }
 ProtoPack Synapse::serialize() {
 	Protos::Synapse *syn = getNewMessage();

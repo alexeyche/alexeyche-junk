@@ -4,7 +4,7 @@
 
 #include <snnlib/config/factory.h>
 
-
+Constants *constGlobalInstance = nullptr;
 
 #define PARSE_CONST_STRUCTURE(name) {                                               \
     const JsonBox::Object &inner_o = it->second.getObject();                        \
@@ -29,7 +29,6 @@ string Constants::preprocessAndReadConstJson(string filename) {
     return out;
 }
 
-Constants* Constants::glob_inst = nullptr;
 
 
 void Constants::parse() {
