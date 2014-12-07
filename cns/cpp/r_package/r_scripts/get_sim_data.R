@@ -2,8 +2,8 @@
 
 library(Rsnn)
 
-#rundir="/home/alexeyche/prog/newsim/runs"
-rundir="/home/kayla/alexeyche/sim/runs"
+rundir="/home/alexeyche/prog/newsim/runs"
+#rundir="/home/kayla/alexeyche/sim/runs"
 
 runname = system(sprintf("ls -t %s | sed -ne '1p'", rundir),intern=TRUE)
 workdir=sprintf("%s/%s", rundir, runname)
@@ -45,11 +45,11 @@ if(file.exists(stat_file)) {
         t_plot = 1:1000
         
         nst = stat[[nid]]
-        par(mfrow=c(2,1))
+        #par(mfrow=c(2,1))
         #plot(nst[["u"]][t_plot], type="l")
-        plot(nst[["p"]][t_plot], type="l")
-        sp = net[[102]][net[[102]]<1000]
-        plot(sp, rep(1, length(sp)), xlim=c(min(t_plot), max(t_plot)))
+        #plot(nst[["p"]][t_plot], type="l")
+        #sp = net[[102]][net[[102]]<1000]
+        #plot(sp, rep(1, length(sp)), xlim=c(min(t_plot), max(t_plot)))
 #         syns = nst[["syns"]]
 #         if(length(syns)>0) {
 #             plot(syns[[1]][t_plot],type="l", ylim=c(0,3))

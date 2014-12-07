@@ -27,7 +27,10 @@ def runSim(snn_sim_bin, args, log_stdout, verbose=False):
         print 
         print " ".join(cmd)
         print 
-    sp.communicate()
+    try:
+        sp.communicate()
+    except KeyboardInterrupt:
+        print "Bye"
     end_time = time.time()
     if verbose:
         print "time run: %s sec" % str(end_time-start_time)
@@ -57,7 +60,7 @@ def main(args):
         max_ep = -1
         for f in os.listdir(wd):
             f_spl = f.split("_")
-            if len(f_spl) > 1:
+            if len(f_spl) > 1 and "model" in f:
                 max_ep = max(max_ep, int(f_spl[0]))
         if max_ep>0:
             while True:
@@ -116,7 +119,7 @@ if __name__ == '__main__':
     parser.add_argument('-e', 
                         '--epochs', 
                         required=False,
-                        help='Number of epochs to run', default=1)
+                        help='Number of epochs to run', default=1,type=int)
     parser.add_argument('-j', 
                         '--jobs', 
                         required=False,
