@@ -100,6 +100,8 @@ public:
                 terminate();
             }
         }
+        const Reward* rew = n->getReward();
+
         auto it=active_synapses.begin();
         while(it != active_synapses.end()) {
             Synapse *syn = n->syns[*it];
@@ -107,16 +109,14 @@ public:
                 it = active_synapses.erase(it);
             } else {
                 double dw = c->learning_rate * eligibility_trace[*it];
-                if(reinforcement) dw *= 
+                if(rew) {
+                    dw *= (rew->r - rew->mean_r);        
+                }
                 syn->w += dw;
                 eligibility_trace[*it] -= eligibility_trace[*it]/c->tau_el;
                 ++it;
             }
-            if(std::isnan(syn->w)) {
-                cout << "Found nan w:\n";
-                cout << *n;
-                terminate();
-            }
+            
         }
         if(collectStatistics) {
             stat->collect(this);
@@ -134,7 +134,9 @@ public:
     void print(std::ostream& str) const { }
 
     vector<double> eligibility_trace;    
+    
     list<size_t> active_synapses;
+
     const MaxLikelihoodC *c;
     Neuron *n;
 

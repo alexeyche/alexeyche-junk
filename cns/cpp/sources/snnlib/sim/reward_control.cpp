@@ -48,15 +48,14 @@ void RewardControl::init(Sim *s, const RewardConnectionMap &map) {
         if(l_ids.first < s->layers.size()) {
             pre = s->layers[l_ids.first];
         }
-        RewardConfTuple t(pre, Reward(), it->second);
-        active_layers.push_back(t);
+        active_layers.push_back(Reward(pre, it->second));
         for(size_t ni=0; ni<pre->neurons.size(); ni++) {
         	neuron_modulated_reward[pre->neurons[ni]->id] = 0.0;
         }
         for(auto post_id_it = l_ids.second.begin(); post_id_it != l_ids.second.end(); ++post_id_it) {
         	Layer *post = s->layers[*post_id_it];
         	for(size_t ni=0; ni<post->neurons.size(); ni++) {
-        		neuron_prepared_reward[post->neurons[ni]->id] = &get<1>(active_layers.back());
+        		neuron_prepared_reward[post->neurons[ni]->id] = &active_layers.back();
         	}
         }
     }
@@ -65,42 +64,39 @@ void RewardControl::init(Sim *s, const RewardConnectionMap &map) {
 
 void RewardControl::sync() {
 	for(auto it=active_layers.begin(); it != active_layers.end(); ++it) {
-		Layer *l = get<0>(*it);
-		for(size_t ni=0; ni<l->neurons.size(); ni++) {
-			get<1>(*it).r += neuron_modulated_reward[l->neurons[ni]->id];
+        Layer *l = it->l;
+        it->dr = 0.0;
+        for(size_t ni=0; ni<l->neurons.size(); ni++) {
+			it->dr += neuron_modulated_reward[l->neurons[ni]->id];
 		}
 	}
 }
 void RewardControl::simStep(const double &dt) {
 	for(auto it=active_layers.begin(); it != active_layers.end(); ++it) {
-		get<1>(*it).mean_r += dt * ( - get<1>(*it).mean_r/get<2>(*it).tau_mean_rew + get<1>(*it).r);
-		get<1>(*it).r += dt * ( - get<1>(*it).r/get<2>(*it).tau_rew);
-		if(get<1>(*it).collectStatistics) {
-			get<1>(*it).collectStat();
-		}
+		it->calculateDynamics(dt);
 	}
 }
 void RewardControl::saveModel(ProtoRw &rw) {
 	for(auto it = active_layers.begin(); it != active_layers.end(); ++it) {
-    	rw.write(&get<1>(*it));
+    	rw.write(&*it);
     }
 }
 void RewardControl::loadModel(ProtoRw &rw) {
 	for(auto it = active_layers.begin(); it != active_layers.end(); ++it) {
-        rw.readAllocated(&get<1>(*it));
+        rw.readAllocated(&*it);
     }
 }
 
 void RewardControl::print(std::ostream& str) const {
 	for(auto it = active_layers.begin(); it != active_layers.end(); ++it) {
-		str << "Layer " << get<0>(*it)->id << " modulated reward: \n\t" << get<1>(*it) << "\n";
+		str << "Layer " << it->l->id << " modulated reward: \n\t" << *it << "\n";
 	}
 }
 void RewardControl::enableCollectStatistics(const size_t &l_id) {
 	bool found = false;
 	for(auto it = active_layers.begin(); it != active_layers.end(); ++it) {
-		if(get<0>(*it)->id == l_id) {
-			get<1>(*it).enableCollectStatistics();
+		if(it->l->id == l_id) {
+			it->enableCollectStatistics();
 			found = true;				
 		}
 	}
@@ -112,8 +108,8 @@ void RewardControl::enableCollectStatistics(const size_t &l_id) {
 
 void RewardControl::saveStat(SerialPack &p) {
 	for(auto it = active_layers.begin(); it != active_layers.end(); ++it) {
-		if(get<1>(*it).collectStatistics) {
-			get<1>(*it).saveStat(p);
-		}	
+		if(it->collectStatistics) {
+			it->saveStat(p);
+		}
 	}
 }

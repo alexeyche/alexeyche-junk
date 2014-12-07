@@ -25,9 +25,14 @@ public:
     void print(std::ostream& str) const {}
 };
 
+class Factory;
+
 class Reward : public Serializable<Protos::Reward> {
+protected:
+    Reward() : Serializable(EReward) { }
+    friend class Factory;
 public:
-	Reward() : Serializable(EReward), r(0.0), mean_r(0.0), stat(nullptr), collectStatistics(false) {}
+	Reward(Layer *_l, RewardModConf _conf) : Serializable(EReward), r(0.0), mean_r(0.0), l(_l), conf(_conf), stat(nullptr), collectStatistics(false) {}
 	
 	ProtoPack serialize() {
 		Protos::Reward *r_serial = getNewMessage();
@@ -44,25 +49,35 @@ public:
 	void print(std::ostream& str) const {
 		str << "r: " << r << " mean_r: " << mean_r;
 	}
+
 	void enableCollectStatistics() {
 		stat = Factory::inst().registerObj<RewardStat>(new RewardStat());
 		collectStatistics = true;
 	}
-	void collectStat() {
-		stat->collect(this);
-	}
+	
 	void saveStat(SerialPack &p) {
 		p.push_back(stat);
 	}
+	inline void calculateDynamics(const double &dt) {
+		mean_r += dt * ( - (mean_r-r)/conf.tau_mean_rew );
+		r += dt * ( - (r - dr)/conf.tau_rew );
+		if(collectStatistics) {
+			stat->collect(this);
+		}
+	}
 
+	double dr;
 	double r;
 	double mean_r;
 
+	Layer *l;
+	RewardModConf conf;
+
 	RewardStat *stat;
+	
 	bool collectStatistics;	
 };
 
-typedef tuple<Layer*, Reward, RewardModConf> RewardConfTuple;
 
 class RewardControl : public Printable {
 public:
@@ -76,7 +91,7 @@ public:
 	void enableCollectStatistics(const size_t &l_id);
 	void saveStat(SerialPack &p);	
 
-	vector<RewardConfTuple> active_layers;
+	vector<Reward> active_layers;
 	
 	// neurod addresed sim stuff, 
 	vector<double> neuron_modulated_reward;

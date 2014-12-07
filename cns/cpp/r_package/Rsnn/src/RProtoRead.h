@@ -96,6 +96,7 @@ public:
             out["p"] = Rcpp::wrap(st->p);
             out["u"] = Rcpp::wrap(st->u);
             out["syns"] = Rcpp::wrap(st->syns);
+            out["w"] = Rcpp::wrap(st->w);
         } else 
         if(s->getName() == "AdExNeuronStat") {
             AdExNeuronStat *st = dynamic_cast<AdExNeuronStat*>(s);

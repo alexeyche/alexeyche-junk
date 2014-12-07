@@ -31,10 +31,14 @@ public:
             Protos::NeuronStat::SynStat syn_m = m->syns(i);
 
             vector<double> x_v;
+            vector<double> w_v;
+            assert(syn_m.x_size() == syn_m.w_size());
             for(size_t j=0; j<syn_m.x_size(); j++) {
                 x_v.push_back(syn_m.x(j));
+                w_v.push_back(syn_m.w(j));
             }
             syns.push_back(x_v);
+            w.push_back(w_v);
         }
     }
 
@@ -42,6 +46,7 @@ public:
     }
 
     vector<vector<double>> syns;
+    vector<vector<double>> w;
     vector<double> p;
     vector<double> u;
 };

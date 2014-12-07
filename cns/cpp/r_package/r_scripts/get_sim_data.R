@@ -2,7 +2,8 @@
 
 library(Rsnn)
 
-rundir="/home/alexeyche/prog/newsim/runs"
+#rundir="/home/alexeyche/prog/newsim/runs"
+rundir="/home/kayla/alexeyche/sim/runs"
 
 runname = system(sprintf("ls -t %s | sed -ne '1p'", rundir),intern=TRUE)
 workdir=sprintf("%s/%s", rundir, runname)

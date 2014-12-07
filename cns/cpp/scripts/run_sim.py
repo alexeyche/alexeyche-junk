@@ -44,7 +44,7 @@ def main(args):
     i=0
     wd = None
     while i<1000:
-        new_wd = os.path.join(RUNS_DIR, const_hex + "_%04d" % i)
+        new_wd = os.path.join(args.runs_dir, const_hex + "_%04d" % i)
         if not os.path.exists(new_wd):
             if not args.old_dir or not wd:
                 wd = new_wd
@@ -137,6 +137,10 @@ if __name__ == '__main__':
                         '--verbose', 
                         action='store_true',
                         help='Verbose running snn_sim commands')
+    parser.add_argument('-r', 
+                        '--runs-dir', 
+                        required=False,
+                        help='Runs dir (default: %(default)s)', default=RUNS_DIR)
     parser.add_argument('-c', 
                         '--const', 
                         required=False,

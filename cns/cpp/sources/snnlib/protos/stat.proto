@@ -4,6 +4,7 @@ package Protos;
 message NeuronStat {
     message SynStat {
         repeated double x = 1 [packed=true];
+        repeated double w = 2 [packed=true];
     }
 	repeated double p = 1 [packed=true];
 	repeated double u = 2 [packed=true];

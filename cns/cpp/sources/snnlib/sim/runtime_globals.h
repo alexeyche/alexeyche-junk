@@ -24,7 +24,7 @@ public:
     inline void propagateReward(const size_t &ni, double rew) {
         rc->neuron_modulated_reward[ni] = rew;
     }
-    inline const Reward* getReward(const size_t &ni) {
+    inline const Reward* getReward(const size_t &ni) const {
     	return rc->neuron_prepared_reward[ni];
     }
 private:
