@@ -7,11 +7,11 @@
 #include <snnlib/config/factory.h>
 #include <snnlib/neurons/srm_neuron.h>
 
-Sim::Sim(size_t _jobs) : Tmax(0), jobs(_jobs), constructed(false), T_limit(0.0), rg(&rc) {
+Sim::Sim(size_t _jobs) : Tmax(0), jobs(_jobs), constructed(false), T_limit(0.0), rg(&rc, &net) {
 }
 
 
-Sim::Sim(Constants &c, size_t _jobs) : Tmax(0), jobs(_jobs), constructed(false), T_limit(0.0), rg(&rc) {
+Sim::Sim(Constants &c, size_t _jobs) : Tmax(0), jobs(_jobs), constructed(false), T_limit(0.0), rg(&rc, &net) {
     construct(c);
 }
 
@@ -76,8 +76,13 @@ void Sim::construct(Constants &c) {
         }
     }
     rc.init(this, sc.reinforce_map);
-    
+
     net.init(this);
+    if(c.doWeCareAboutInput()) {
+        rg.initInputNeuronsFiringDelivery(this);
+    }
+
+
     constructed = true;
 }
 
@@ -166,6 +171,12 @@ void Sim::simStep(SimWorker *sw, const double &t) {
     for(size_t ni=sw->first; ni<sw->last; ni++) {
         //cout << "simulating " << ni << " at " << t << "\n";
         Neuron *n = s->sim_neurons[ni].n;
+        if( (s->rg.doWeCareAboutInput()) && (s->sim_neurons[ni].na.first == (s->layers.size()-1)) ) {
+            s->rg.setInputNeuronsFiring(n->id, t);
+
+
+        }
+
         while(const SynSpike *sp = s->net.getSpike(ni, t)) {
             n->propagateSynSpike(sp);
         }

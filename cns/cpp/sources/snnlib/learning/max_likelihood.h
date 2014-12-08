@@ -89,13 +89,28 @@ public:
     void calculateWeightsDynamics()  {
         for(auto it=n->active_synapses.begin(); it != n->active_synapses.end(); ++it) {
             Synapse *syn = n->syns[*it];
-            double dw = SRMMethods::dLLH_dw(n, syn);
+            double dw;
+            if(c->input_target) {
+                dw = SRMMethods::dLLH_dw_given_Y(n, syn, n->glob_c->inputNeuronsFiring(n->id));
+            } else {
+                dw = SRMMethods::dLLH_dw(n, syn);
+            }
             if(fabs(eligibility_trace[*it]) < SYN_ACT_TOL) {
                 active_synapses.push_back(*it);
-            } 
+            }
             eligibility_trace[*it] += dw;
             if(std::isnan(dw)) {
                 cout << "Found nan dw:\n";
+                double fired = n->fired;
+                if(c->input_target) {
+                    fired = n->glob_c->inputNeuronsFiring(n->id);
+                }
+                cout << n->act->probDeriv(n->y) << "/(" << n->p  << "/" << n->M << ") * (" << fired << "-" << n->p << ") * " << syn->x << " == ";
+                if(c->input_target) {
+                    cout << SRMMethods::dLLH_dw_given_Y(n, syn, n->glob_c->inputNeuronsFiring(n->id)) << "\n";
+                } else {
+                    cout << SRMMethods::dLLH_dw(n, syn) << "\n";
+                }
                 cout << *n;
                 terminate();
             }
@@ -110,13 +125,13 @@ public:
             } else {
                 double dw = c->learning_rate * eligibility_trace[*it];
                 if(rew) {
-                    dw *= (rew->r - rew->mean_r);        
+                    dw *= (rew->r - rew->mean_r);
                 }
                 syn->w += dw;
                 eligibility_trace[*it] -= eligibility_trace[*it]/c->tau_el;
                 ++it;
             }
-            
+
         }
         if(collectStatistics) {
             stat->collect(this);
@@ -133,8 +148,8 @@ public:
 
     void print(std::ostream& str) const { }
 
-    vector<double> eligibility_trace;    
-    
+    vector<double> eligibility_trace;
+
     list<size_t> active_synapses;
 
     const MaxLikelihoodC *c;

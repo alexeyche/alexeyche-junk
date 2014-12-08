@@ -2,16 +2,18 @@
 
 #include "reward_control.h"
 
+class Network;
+
 class RuntimeGlobals {
 public:
-	RuntimeGlobals(RewardControl *_rc) : rc(_rc) {}
+	RuntimeGlobals(RewardControl *_rc, Network *_net) : rc(_rc), net(_net) {}
 	void setDt(double _dt) {
 		dt = _dt;
 	}
 	void setC(Constants &_c) {
 		c = &_c;
 	}
-	
+
 	inline const double& Dt() const {
 		return dt;
 	}
@@ -27,8 +29,25 @@ public:
     inline const Reward* getReward(const size_t &ni) const {
     	return rc->neuron_prepared_reward[ni];
     }
+
+    void initInputNeuronsFiringDelivery(Sim *s);
+
+    void setInputNeuronsFiring(const size_t &last_layer_neuron_id, const double &t);
+
+    inline const uchar inputNeuronsFiring(const size_t &last_layer_neuron_id) const {
+        return input_neurons_firing[last_layer_neuron_id - last_layer_id_offset];
+    }
+    inline const bool doWeCareAboutInput() const {
+        return input_spikes_iterators.size() != 0;
+    }
+
 private:
 	double dt;
     Constants *c;
     RewardControl *rc;
+    Network *net;
+
+    size_t last_layer_id_offset;
+    vector<size_t> input_spikes_iterators;
+    vector<uchar> input_neurons_firing;
 };

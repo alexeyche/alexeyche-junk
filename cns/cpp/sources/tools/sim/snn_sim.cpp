@@ -145,11 +145,11 @@ int main(int argc, char **argv) {
     }
 
     s.setTlimit(sopt.Tmax);
-    
+
     if(!sopt.out_stat_file.empty()) {
         s.monitorStat(sopt.out_stat_file);
     }
-    
+
     if(sopt.precalc) {
         s.precalculateInputSpikes();
     } else {

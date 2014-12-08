@@ -40,7 +40,7 @@ public:
     void setLearningRule(LearningRule *_lrule);
     void setTuningCurve(TuningCurve *_tc);
     void setRewardModulation(RewardModulation *_rmod);
-    
+
     inline const Reward* getReward() {
         return glob_c->getReward(id);
     }
@@ -81,11 +81,12 @@ public:
     list<size_t> active_synapses;
 
     ActFunc *act;
+    const RuntimeGlobals *glob_c;
 protected:
     NeuronStat *stat;
 
     const ConstObj *bc;
-    const RuntimeGlobals *glob_c;
+
 
 
     LearningRule *lrule;

@@ -40,7 +40,7 @@ public:
                     v.push_back(o);
                 }
                 
-                if(v.size() == 1) {
+                if( (v.size() == 1)&&(v[0]->getName() == "SpikesList")) {
                     values = convert(v[0]);
                 } else {
                     for(size_t vi=0; vi<v.size(); vi++) {

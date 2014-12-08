@@ -33,7 +33,13 @@ public:
     }
 
     double probDeriv(const double &u) const {
-        double part = fastexp(c->beta*(u - c->u_tr));
+        double exp_part = c->beta*(u - c->u_tr);
+        double part;
+        if(exp_part > 10.0) {
+            part = 22026.47;
+        } else {
+            part = fastexp(exp_part);
+        }
         return ( (part*c->r0*c->beta) / ( 1.0+part))/1000.0;
     };
 

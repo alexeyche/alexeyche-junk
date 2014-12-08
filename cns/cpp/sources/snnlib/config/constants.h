@@ -145,14 +145,12 @@ class ExpHennequinC : public ConstObj {
 public:
     ExpHennequinC(string name) : ConstObj(name) {}
     double u_tr;
-    double gain_factor;
     double p_rest;
     double beta;
     double r0;
 
     void fill_structure(JsonBox::Value v) {
         u_tr        = v["u_tr"].getDouble();
-        gain_factor = v["gain_factor"].getDouble();
         p_rest      = v["p_rest"].getDouble();
         beta        = v["beta"].getDouble();
         r0          = v["r0"].getDouble();
@@ -160,7 +158,6 @@ public:
     void print(std::ostream &str) const {
         str <<
             "u_tr: "        <<       u_tr << ", " <<
-            "gain_factor: " <<       gain_factor << ", " <<
             "p_rest: "      <<       p_rest << ", " <<
             "beta: "        <<       beta << ", " <<
             "r0: "          <<       r0 << "\n";
@@ -205,7 +202,7 @@ public:
     void fill_structure(JsonBox::Value v) {
         tau_el               = v["tau_el"].getDouble();
         input_target         = v["input_target"].getBoolean();
-        learning_rate         = v["learning_rate"].getDouble();    
+        learning_rate         = v["learning_rate"].getDouble();
     }
     void print(std::ostream &str) const {
         str << "tau_el: " << tau_el << ", learning_rate: " << learning_rate << ", input_target: " << input_target << "\n";
@@ -380,12 +377,12 @@ public:
 
             aff_p.first = stoi(aff[0].c_str());
             aff_p.second = vector<size_t>();
-            
+
             vector<string> aff_post = split(aff[1],',');
             for(auto it=aff_post.begin(); it != aff_post.end(); ++it) {
-                aff_p.second.push_back(stoi(it->c_str()));    
+                aff_p.second.push_back(stoi(it->c_str()));
             }
-            
+
 
             vector<ConnectionConf> conn_conf_vec;
             JsonBox::Array conn_array = it->second.getArray();
@@ -410,9 +407,9 @@ public:
                 }
                 pair<size_t, vector<size_t> > aff_p(stoi(aff[0].c_str()), vector<size_t>());
                 vector<string> aff_post = split(aff[1], ',');
-                
+
                 for(auto p_it=aff_post.begin(); p_it != aff_post.end(); ++p_it) {
-                    aff_p.second.push_back(stoi(p_it->c_str()));                        
+                    aff_p.second.push_back(stoi(p_it->c_str()));
                 }
                 RewardModConf mod_conf;
                 mod_conf.fill_structure(it->second);
@@ -447,7 +444,7 @@ public:
         for(auto it=conn_map.begin(); it!=conn_map.end(); ++it) {
             pair<size_t,vector<size_t>> aff = it->first;
             cout << aff.first << "->";
-            print_vector<size_t>(aff.second, str, ", ");    
+            print_vector<size_t>(aff.second, str, ", ");
             str << "\t";
             print_vector<ConnectionConf>(it->second, str, "\n");
         }
@@ -549,6 +546,22 @@ public:
         for(auto it = m.cbegin(); it != m.cend(); ++it ) {
             str << it->first << " == " << *it->second;
         }
+    }
+    bool doWeCareAboutInput() {
+        bool input_target = false;
+        for(auto it = learning_rules.begin(); it != learning_rules.end(); ++it) {
+            const ConstObj* co = it->second;
+            if( const MaxLikelihoodC *l = dynamic_cast<const MaxLikelihoodC*>(co)) {
+                if(l->input_target) input_target = true;
+            }
+        }
+        for(auto it = reward_modulations.begin(); it != reward_modulations.end(); ++it) {
+            const ConstObj* co = it->second;
+            if( const LikelihoodC *l = dynamic_cast<const LikelihoodC*>(co)) {
+                if(l->input_target) input_target = true;
+            }
+        }
+        return input_target;
     }
     void print(std::ostream& str) const {
         str << "== Sim Constants ==\n";

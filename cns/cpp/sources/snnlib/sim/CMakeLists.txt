@@ -6,6 +6,7 @@ set(SOURCES
     sim.cpp
     network.cpp
     reward_control.cpp
+    runtime_globals.cpp
 )
 
 # add directory name to sources
