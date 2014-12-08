@@ -22,7 +22,7 @@ public:
     }
 private:
 	static inline double LLH_formula(const double &fired, const double &p) {
-		return fired*fastlog(p+0.001) + (1 - fired) * fastlog(1-p-0.001);
+		return fired*log(p) + (1 - fired) * log(1-p);
 	}
 	static inline double dLLH_dw_formula(const double &p, const double &p_stroke, const double &M, const double &fired, const double &x) {
 		return (p_stroke/(p/M)) * (fired - p) * x;

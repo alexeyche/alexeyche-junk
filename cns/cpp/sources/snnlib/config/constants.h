@@ -407,7 +407,7 @@ public:
                 }
                 pair<size_t, vector<size_t> > aff_p(stoi(aff[0].c_str()), vector<size_t>());
                 vector<string> aff_post = split(aff[1], ',');
-
+                
                 for(auto p_it=aff_post.begin(); p_it != aff_post.end(); ++p_it) {
                     aff_p.second.push_back(stoi(p_it->c_str()));
                 }
@@ -417,7 +417,7 @@ public:
             }
         } catch (...) {
             cerr << "Cannot parse reinforce map configuration\n";
-            cerr << "You need to point one pre layer from left side of \"->\" and multiple (or one) post layer(s) from right side, separated by commas\n";
+            cerr << "You need to point one pre layer from left side of \"->\" and multiple (or one, or none) post layer(s) from right side, separated by commas\n";
             cerr << "Reinforce map doesn't support multiple configuration for one connection (like Connection Map)\n";
             cerr << "\n";
             throw;

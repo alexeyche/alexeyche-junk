@@ -118,6 +118,7 @@ int main(int argc, char **argv) {
     if(!sopt.const_file.empty()) {
         c = new Constants(sopt.const_file);
         s.construct(*c);
+        cout << *c;
     } else {
         if(sopt.model_load.empty()) {
             cerr << "Need const.json or model for load\n";

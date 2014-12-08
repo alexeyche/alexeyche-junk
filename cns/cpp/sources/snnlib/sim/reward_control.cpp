@@ -42,6 +42,7 @@ void RewardControl::init(Sim *s, const RewardConnectionMap &map) {
     	neuron_prepared_reward[i] = nullptr;
     }
 
+        
     for(auto it=map.cbegin(); it != map.cend(); ++it) {
         pair<size_t, vector<size_t> > l_ids = it->first;
         Layer *pre = nullptr;
@@ -50,8 +51,9 @@ void RewardControl::init(Sim *s, const RewardConnectionMap &map) {
         }
         active_layers.push_back(Reward(pre, it->second));
         for(size_t ni=0; ni<pre->neurons.size(); ni++) {
-        	neuron_modulated_reward[pre->neurons[ni]->id] = 0.0;
+            neuron_modulated_reward[pre->neurons[ni]->id] = 0.0;
         }
+        
         for(auto post_id_it = l_ids.second.begin(); post_id_it != l_ids.second.end(); ++post_id_it) {
         	Layer *post = s->layers[*post_id_it];
         	for(size_t ni=0; ni<post->neurons.size(); ni++) {

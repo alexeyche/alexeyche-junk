@@ -30,7 +30,9 @@ p1 = prast(net,T0=Ti*Trange,Tmax=(Ti+1)*Trange)
 #print(p1, position=c(0, 0.6, 1, 1)), more=TRUE)
 model = RProto$new(model_file)$read()
 w = model[["w"]]
+#w = w[1:200,101:300]
 
+#png("sim.png")
 p2 = levelplot(t(w), col.regions=colorRampPalette(c("black", "white")))
 
 print(p1, position=c(0, 0.7, 1, 1), more=TRUE)
@@ -40,9 +42,9 @@ print(p2, position=c(0, 0, 1, 0.7))
 if(file.exists(stat_file)) {
     library(rjson)
     system(sprintf("sed -i -e 's|//.*$||g' %s", const), intern=TRUE)
-    #c = fromJSON(file=const, unexpected.escape ="skip")
+    c = fromJSON(file=const, unexpected.escape ="skip")
     
-    listen_neuron = 1 #c$sim_configuration$neurons_to_listen
+    listen_neuron = c$sim_configuration$neurons_to_listen
     
     stat = RProto$new(stat_file)$read()
     neuron_to_read = 1
@@ -70,19 +72,23 @@ if(file.exists(stat_file)) {
     if(length(rew_stat_id)>0) {
         lid = rew_stat_id[1]
         
-#         rst = list(r=NULL, mean_r=NULL)
-#         for(old_ep in 1:ep) {
-#             old_model_file = sprintf("%s/%s_model.pb", workdir, old_ep)
-#             old_stat = RProto$new(stat_file)$read()
-#             old_rst = old_stat[[lid]]
-#             rst[["r"]] = c(rst[["r"]], old_rst[["r"]])
-#             rst[["mean_r"]] = c(rst[["mean_r"]], old_rst[["mean_r"]])
-#         }            
+        rst = list(r=NULL, mean_r=NULL)
+        for(old_ep in 1:1000) {
+            old_stat_file = sprintf("%s/%s_stat.pb", workdir, old_ep)
+            if(file.exists(old_stat_file)) {
+                old_stat = RProto$new(old_stat_file)$read()
+                old_rst = old_stat[[lid]]
+                rst[["r"]] = c(rst[["r"]], old_rst[["r"]])
+                rst[["mean_r"]] = c(rst[["mean_r"]], old_rst[["mean_r"]])
+            } else {
+                break
+            }
+        }            
        
-        rst = stat[[lid]]
+        #rst = stat[[lid]]
         r = rst[["r"]]
         mean_r = rst[["mean_r"]]
-        #plotl(rst[["r"]]-rst[["mean_r"]])
+        #plotl(r-mean_r)
     }
     maxl_stat_id = grep("MaxLikelihoodStat", names(stat))
     if(length(maxl_stat_id)>0) {
@@ -107,4 +113,4 @@ if(file.exists(stat_file)) {
     }
 }
 
-
+#dev.off()
