@@ -62,7 +62,7 @@
         },
         "MaxLikelihood" : {
             "tau_el" : 100,
-            "learning_rate" : 0.0001,
+            "learning_rate" : 0.003,
             "input_target" : false
         }
     },
@@ -86,17 +86,17 @@
             }
         ],
         "net_layers_conf" : [
-            {
-                "size" : 100,
-                "wta" : false,
-                "neuron_conf" : {
-                    "neuron" : "SRMNeuron",
-                    "learning_rule" : "MaxLikelihood",
-                    "act_func" : "ExpHennequin",
-                    "axon_delay_distr" : [0, 0]
-
-                }
-            },
+//            {
+//                "size" : 100,
+//                "wta" : true,
+//                "neuron_conf" : {
+//                    "neuron" : "SRMNeuron",
+//                    "learning_rule" : "MaxLikelihood",
+//                    "act_func" : "ExpHennequin",
+//                    "axon_delay_distr" : [0, 0]
+//
+//                }
+//            },
             {
                 "size" : 2,
                 "wta" : false,
@@ -117,12 +117,12 @@
 //                { "prob" : 0.1, "weight_per_neuron" : 150, "type" : "Synapse", "dendrite_delay_distr" : [0, 0] },
 //                { "prob" : 0.1, "weight_per_neuron" : 100, "type" : "Synapse_Inh", "dendrite_delay_distr" : [0, 0] }
 //            ],
-            "1->2" : [
-                { "prob" : 1.0, "weight_per_neuron" : 150, "type" : "Synapse", "dendrite_delay_distr" : [0, 0] },
-            ]
+//            "1->2" : [
+//                { "prob" : 1.0, "weight_per_neuron" : 450, "type" : "Synapse", "dendrite_delay_distr" : [0, 0] },
+//            ]
         },
         "reinforce_map" : {
-            "2 -> 1,2" : {
+            "1 -> 1" : {
                 "tau_rew" : 100, "tau_mean_rew" : 1000
             }
         },
@@ -136,6 +136,6 @@
             "wta_max_freq" : 100.0 // Hz                
         },
         "neurons_to_listen" : [],
-        "reward_layers_to_listen" : [2]
+        "reward_layers_to_listen" : [1]
     }
 }

@@ -136,7 +136,7 @@ public:
 
             if(pos<0) {
                 labels.push_back(it->label);
-                pos = labels.size();
+                pos = labels.size()-1;
             }
 
             labels_id_timeline.push_back(pos);

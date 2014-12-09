@@ -24,10 +24,12 @@ public:
     }
     void modulateReward() {
         if(n->fired) {
-            if(n->local_id == *glob_c->current_class_id) {
+            if(n->local_id == *glob_c->current_class_id) {                
                 glob_c->propagateReward(n->id, c->ltp);
+                //cout << c->ltp << "\n";
             } else {
                 glob_c->propagateReward(n->id, c->ltd);
+                //cout << c->ltd << "\n";
             }
         }
     }

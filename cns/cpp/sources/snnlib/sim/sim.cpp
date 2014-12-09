@@ -294,7 +294,6 @@ void Sim::precalculateInputSpikes() {
 
 void Sim::run() {
     CHECK_CONSTRUCT()
-
     if(input_ts.size() != 0) {
         input_ts.reset();
         precalculateInputSpikes();

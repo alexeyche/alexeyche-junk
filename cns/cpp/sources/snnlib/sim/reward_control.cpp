@@ -68,11 +68,14 @@ void RewardControl::sync() {
 	for(auto it=active_layers.begin(); it != active_layers.end(); ++it) {
         Layer *l = it->l;
         it->dr = 0.0;
+        //cout << "\t" << l->id << ":   ";
         for(size_t ni=0; ni<l->neurons.size(); ni++) {
 			it->dr += neuron_modulated_reward[l->neurons[ni]->id];
+            neuron_modulated_reward[l->neurons[ni]->id] = 0.0;
+            //cout << ni << ":" <<  neuron_modulated_reward[l->neurons[ni]->id] << ", ";
 		}
+        //cout << "\n";        
 	}
-    cout << "\n";
 }
 void RewardControl::simStep(const double &dt) {
 	for(auto it=active_layers.begin(); it != active_layers.end(); ++it) {
