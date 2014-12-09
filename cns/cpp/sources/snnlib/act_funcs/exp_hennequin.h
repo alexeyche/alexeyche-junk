@@ -26,11 +26,6 @@ public:
         if(p>1.0) return 1.0;
         return p;
     };
-    double probReversed(const double &p) const {
-        //double u = log(exp((p/1000.0 - c->p_rest)/c->r0) - 1) ;
-        //return u;
-        return 0.0;
-    }
 
     double probDeriv(const double &u) const {
         double exp_part = c->beta*(u - c->u_tr);

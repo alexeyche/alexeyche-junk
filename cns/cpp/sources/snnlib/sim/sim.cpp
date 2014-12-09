@@ -7,11 +7,11 @@
 #include <snnlib/config/factory.h>
 #include <snnlib/neurons/srm_neuron.h>
 
-Sim::Sim(size_t _jobs) : Tmax(0), jobs(_jobs), constructed(false), T_limit(0.0), rg(&rc, &net) {
+Sim::Sim(size_t _jobs) : Tmax(0), jobs(_jobs), constructed(false), wta_regime(false), T_limit(0.0), rg(&rc, &net) {
 }
 
 
-Sim::Sim(Constants &c, size_t _jobs) : Tmax(0), jobs(_jobs), constructed(false), T_limit(0.0), rg(&rc, &net) {
+Sim::Sim(Constants &c, size_t _jobs) : Tmax(0), jobs(_jobs), constructed(false), wta_regime(false), T_limit(0.0), rg(&rc, &net) {
     construct(c);
 }
 
@@ -28,12 +28,16 @@ void Sim::construct(Constants &c) {
     input_neurons_count = 0;
     for(size_t l_id = 0; l_id < sc.input_layers_conf.size(); l_id++) {
         LayerConf conf = sc.input_layers_conf[l_id];
-        Layer *l = Factory::inst().createLayer(conf.size, conf.nconf, c, &rg);
+        if(conf.wta) {
+            cerr << "Can't create input layer with WTA property\n";
+            terminate();
+        }
+        Layer *l = Factory::inst().createLayer(conf.size, false, conf.nconf, c, &rg);
         layers.push_back(l);
         input_neurons_count += l->N;
         for(size_t ni=0; ni<l->N; ni++) {
             Neuron *n = l->neurons[ni];
-            sim_neurons.push_back( SimNeuron(n, layers.size()-1, ni) );
+            sim_neurons.push_back( SimNeuron(l, n, layers.size()-1, ni));
         }
     }
     input_layers_count = sc.input_layers_conf.size();
@@ -42,12 +46,12 @@ void Sim::construct(Constants &c) {
     net_neurons_count = 0;
     for(size_t l_id = 0; l_id < sc.net_layers_conf.size(); l_id++) {
         LayerConf conf = sc.net_layers_conf[l_id];
-        Layer *l = Factory::inst().createLayer(conf.size, conf.nconf, c, &rg);
+        Layer *l = Factory::inst().createLayer(conf.size, conf.wta, conf.nconf, c, &rg);
         layers.push_back(l);
         net_neurons_count += l->N;
         for(size_t ni=0; ni<l->N; ni++) {
             Neuron *n = l->neurons[ni];
-            sim_neurons.push_back( SimNeuron(n, layers.size()-1, ni) );
+            sim_neurons.push_back( SimNeuron(l, n, layers.size()-1, ni) );
         }
     }
 
@@ -81,7 +85,7 @@ void Sim::construct(Constants &c) {
     if(c.doWeCareAboutInput()) {
         rg.initInputNeuronsFiringDelivery(this);
     }
-
+    wta_regime = c.doWeNeedWta();
 
     constructed = true;
 }
@@ -164,17 +168,20 @@ void Sim::simPrecalculateStep(SimWorker *sw, const double &t) {
             n->fired = 0;
         }
     }
+    pthread_barrier_wait( barrier );
 }
 
 void Sim::simStep(SimWorker *sw, const double &t) {
     Sim *s = sw->s;
+    if(sw->thread_id == 0) {
+        s->rg.current_class_id = s->input_ts.getCurrentClassId(t);
+    }
+    pthread_barrier_wait( barrier );
     for(size_t ni=sw->first; ni<sw->last; ni++) {
         //cout << "simulating " << ni << " at " << t << "\n";
         Neuron *n = s->sim_neurons[ni].n;
         if( (s->rg.doWeCareAboutInput()) && (s->sim_neurons[ni].na.first == (s->layers.size()-1)) ) {
             s->rg.setInputNeuronsFiring(n->id, t);
-
-
         }
 
         while(const SynSpike *sp = s->net.getSpike(ni, t)) {
@@ -192,6 +199,50 @@ void Sim::simStep(SimWorker *sw, const double &t) {
         s->rc.sync();
         s->rc.simStep(s->rg.Dt());
     }
+    pthread_barrier_wait( barrier );
+}
+
+void Sim::simWtaStep(SimWorker *sw, const double &t) {
+    Sim *s = sw->s;
+    for(size_t ni=sw->first; ni<sw->last; ni++) {
+        //cout << "simulating " << ni << " at " << t << "\n";
+        Neuron *n = s->sim_neurons[ni].n;
+        Layer *l = s->sim_neurons[ni].l;
+
+        if( (s->rg.doWeCareAboutInput()) && (s->sim_neurons[ni].na.first == (s->layers.size()-1)) ) {
+            s->rg.setInputNeuronsFiring(n->id, t);
+        }
+
+        while(const SynSpike *sp = s->net.getSpike(ni, t)) {
+            n->propagateSynSpike(sp);
+        }
+        n->calculateProbability();
+        if(l->wta) l->p_wta += n->p;
+    }
+    pthread_barrier_wait( barrier );
+    for(size_t ni=sw->first; ni<sw->last; ni++) {
+        Neuron *n = s->sim_neurons[ni].n;
+        Layer *l = s->sim_neurons[ni].l;
+
+        if(l->wta) n->p *= s->sc.sim_run_c.wta_max_freq/(1000.0*l->p_wta);
+
+        n->calculateDynamics();
+
+        if(n->fired) {
+            s->net.propagateSpike(n->id, t+s->rg.Dt());
+            n->fired = 0;
+        }
+    }
+    pthread_barrier_wait( barrier );
+    if(sw->thread_id == 0) {
+        for(auto it=s->layers.begin(); it != s->layers.end(); ++it) {
+            if((*it)->wta) (*it)->p_wta = 0.0;
+        }
+
+        s->rc.sync();
+        s->rc.simStep(s->rg.Dt());
+    }
+    pthread_barrier_wait( barrier );
 }
 
 
@@ -200,7 +251,15 @@ void* Sim::runWorker(void *content) {
     Sim *s = sw->s;
     for(double t=0; t<=s->Tmax; t += s->rg.Dt()) {
         simStep(sw, t);
-        pthread_barrier_wait( barrier );
+    }
+    return NULL;
+}
+
+void* Sim::runWtaWorker(void *content) {
+    SimWorker *sw = static_cast<SimWorker*>(content);
+    Sim *s = sw->s;
+    for(double t=0; t<=s->Tmax; t += s->rg.Dt()) {
+        simWtaStep(sw, t);
     }
     return NULL;
 }
@@ -208,9 +267,8 @@ void* Sim::runWorker(void *content) {
 void* Sim::runPrecalculateWorker(void *content) {
     SimWorker *sw = static_cast<SimWorker*>(content);
     Sim *s = sw->s;
-    for(double t=0; t<=s->Tmax; t += s->rg.Dt()) {
+    for(double t=0; t<s->Tmax; t += s->rg.Dt()) {
         simPrecalculateStep(sw, t);
-        pthread_barrier_wait( barrier );
     }
     return NULL;
 }
@@ -236,7 +294,9 @@ void Sim::precalculateInputSpikes() {
 
 void Sim::run() {
     CHECK_CONSTRUCT()
+
     if(input_ts.size() != 0) {
+        input_ts.reset();
         precalculateInputSpikes();
     }
     cout << "Configuring connection map and dispatch spikes on queues...\n";
@@ -250,7 +310,15 @@ void Sim::run() {
     }
     rg.setDt(sc.sim_run_c.dt);
 
-    cout << "Running simulation...\n";
-    runSimOnSubset(input_neurons_count, input_neurons_count+net_neurons_count, Sim::runWorker);
+    input_ts.reset();
+
+    if(wta_regime) {
+        cout << "Running simulation in WTA regime...\n";
+        runSimOnSubset(input_neurons_count, input_neurons_count+net_neurons_count, Sim::runWtaWorker);
+    } else {
+        cout << "Running simulation...\n";
+        runSimOnSubset(input_neurons_count, input_neurons_count+net_neurons_count, Sim::runWorker);
+    }
+
     cout << "Done\n";
 }

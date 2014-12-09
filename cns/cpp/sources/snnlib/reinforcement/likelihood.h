@@ -23,11 +23,7 @@ public:
         Serializable::init(ELikelihood);
     }
     void modulateReward() {
-        if(c->input_target) {
-            glob_c->propagateReward(n->id, SRMMethods::LLH_given_Y(n, glob_c->inputNeuronsFiring(n->id)));
-        } else {
-            glob_c->propagateReward(n->id, SRMMethods::LLH(n));
-        }
+        glob_c->propagateReward(n->id, SRMMethods::LLH(n));
     }
 
     void deserialize() {}

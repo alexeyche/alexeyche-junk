@@ -39,9 +39,9 @@ public:
     ConstObj *createConst(string name, JsonBox::Value v);
     ActFunc *createActFunc(string name, const Constants &c, Neuron *n);
     Synapse *createSynapse(string name, const Constants &c, size_t id_pre, double w, double dendrite_delay);
-    Layer *createLayer(size_t size, const NeuronConf &nc, const Constants &glob_c, RuntimeGlobals *run_glob_c);
+    Layer *createLayer(size_t size, bool wta, const NeuronConf &nc, const Constants &glob_c, RuntimeGlobals *run_glob_c);
     RewardModulation* createRewardModulation(string name, const Constants &c, Neuron *n, RuntimeGlobals *run_glob_c);
-    Neuron *createNeuron(string name, const Constants &c, const RuntimeGlobals *run_glob_c, double axon_delay);
+    Neuron *createNeuron(string name, size_t local_id, const Constants &c, const RuntimeGlobals *run_glob_c, double axon_delay);
     TuningCurve *createTuningCurve(string name, const Constants &c,  size_t layer_size, size_t neuron_id, Neuron *n);
     LearningRule * createLearningRule(string name, const Constants &c, Neuron *n);
     SerializableBase* createSerializable(const string &name);
@@ -72,7 +72,7 @@ public:
             }
         }
     }
-    
+
     string findBaseStructName(string deriv_struct_name) {
         for(auto it=entity_map.begin(); it != entity_map.end(); ++it) {
             string base_struct_name = it->first;

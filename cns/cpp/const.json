@@ -64,16 +64,13 @@
             "tau_el" : 100,
             "learning_rate" : 0.0001,
             "input_target" : false
-        },
-        "MaxLikelihood_Input" : {
-            "tau_el" : 100,
-            "learning_rate" : 0.0002,
-            "input_target" : true
         }
     },
     "reward_modulations" : {
-        "Likelihood_Input" : {
-            "input_target" : false
+        "Likelihood" : {},
+        "InputClassification" : {
+            "ltp" : 1.0,
+            "ltd" : -1.0
         }
     },
     "sim_configuration" : {
@@ -91,6 +88,7 @@
         "net_layers_conf" : [
             {
                 "size" : 100,
+                "wta" : false,
                 "neuron_conf" : {
                     "neuron" : "SRMNeuron",
                     "learning_rule" : "MaxLikelihood",
@@ -100,31 +98,32 @@
                 }
             },
             {
-                "size" : 100,
+                "size" : 2,
+                "wta" : false,
                 "neuron_conf" : {
                     "neuron" : "SRMNeuron",
-                    "learning_rule" : "MaxLikelihood_Input",
+                    "learning_rule" : "MaxLikelihood",
                     "act_func" : "ExpHennequin",
-                    "reward_modulation" : "Likelihood_Input",
+                    "reward_modulation" : "InputClassification",
                     "axon_delay_distr" : [0, 0]
                 }
             }
         ],
         "conn_map" : {
             "0->1" : [
-                { "prob" : 1.0, "weight_per_neuron" : 300, "type" : "Synapse", "dendrite_delay_distr" : [0, 0] }
+                { "prob" : 1.0, "weight_per_neuron" : 100, "type" : "Synapse", "dendrite_delay_distr" : [0, 0] }
             ],
-            "1->1" : [
-                { "prob" : 0.1, "weight_per_neuron" : 150, "type" : "Synapse", "dendrite_delay_distr" : [0, 0] },
-                { "prob" : 0.1, "weight_per_neuron" : 100, "type" : "Synapse_Inh", "dendrite_delay_distr" : [0, 0] }
-            ],
+//            "1->1" : [
+//                { "prob" : 0.1, "weight_per_neuron" : 150, "type" : "Synapse", "dendrite_delay_distr" : [0, 0] },
+//                { "prob" : 0.1, "weight_per_neuron" : 100, "type" : "Synapse_Inh", "dendrite_delay_distr" : [0, 0] }
+//            ],
             "1->2" : [
-                { "prob" : 1.0, "weight_per_neuron" : 50, "type" : "Synapse", "dendrite_delay_distr" : [0, 0] },
+                { "prob" : 1.0, "weight_per_neuron" : 150, "type" : "Synapse", "dendrite_delay_distr" : [0, 0] },
             ]
         },
-        "reinforce_map" : { 
-            "2 -> 1" : { 
-                "tau_rew" : 100, "tau_mean_rew" : 1000 
+        "reinforce_map" : {
+            "2 -> 1,2" : {
+                "tau_rew" : 100, "tau_mean_rew" : 1000
             }
         },
         "time_series_map_conf" : {
@@ -133,7 +132,8 @@
         "sim_run_conf" : {
             "seed" : 1,
             "dt" : 1,            // ms
-            "start_rate" : 20.0    // Hz
+            "start_rate" : 20.0,    // Hz
+            "wta_max_freq" : 100.0 // Hz                
         },
         "neurons_to_listen" : [],
         "reward_layers_to_listen" : [2]

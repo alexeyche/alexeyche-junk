@@ -41,8 +41,8 @@ public:
             }
             rc.saveStat(st);
             prw.write(st);
-            
-            
+
+
         }
         if(!output_spikes_file.empty()){
             ProtoRw prw(output_spikes_file, ProtoRw::Write);
@@ -147,10 +147,13 @@ public:
     }
 
     static void* runWorker(void *content);
-    static inline void simStep(SimWorker *sw, const double &t);
+    static void* runWtaWorker(void *content);
     static void* runPrecalculateWorker(void *content);
+
+    static inline void simStep(SimWorker *sw, const double &t);
+    static inline void simWtaStep(SimWorker *sw, const double &t);
     static inline void simPrecalculateStep(SimWorker *sw, const double &t);
-    
+
     void runSimOnSubset(size_t left_neuron_id, size_t right_neuron_id, void* (*sim_func)(void* content));
     void precalculateInputSpikes();
     void run();
@@ -177,9 +180,9 @@ public:
     SimConfiguration sc;
     RuntimeGlobals rg;
     RewardControl rc;
-    
-    bool constructed;
 
+    bool constructed;
+    bool wta_regime;
     LabeledTimeSeriesList input_ts_list;
 };
 

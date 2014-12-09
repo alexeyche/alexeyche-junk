@@ -5,8 +5,8 @@
 #include <snnlib/config/constants.h>
 #include <snnlib/learning/optimal_stdp.h>
 #include <snnlib/learning/max_likelihood.h>
-#include <snnlib/learning/max_likelihood.h>
 #include <snnlib/reinforcement/likelihood.h>
+#include <snnlib/reinforcement/input_classification.h>
 #include <snnlib/act_funcs/determ.h>
 #include <snnlib/act_funcs/exp_hennequin.h>
 #include <snnlib/neurons/synapse.h>
@@ -34,6 +34,7 @@ Factory::Factory() {
     const_map["MaxLikelihood"]  =   &createConstInstance<Obj, MaxLikelihoodC>;
     const_map["Likelihood"]  =   &createConstInstance<Obj, LikelihoodC>;
     const_map["SigmaTuningCurve"]  =  &createConstInstance<Obj, SigmaTuningCurveC>;
+    const_map["InputClassification"]  =  &createConstInstance<Obj, InputClassificationC>;
 
     entity_map["SRMNeuron"]     =   &createInstance<Obj, SRMNeuron>;
     entity_map["AdExNeuron"]     =   &createInstance<Obj, AdExNeuron>;
@@ -44,6 +45,7 @@ Factory::Factory() {
     entity_map["SigmaTuningCurve"]  =  &createInstance<Obj, SigmaTuningCurve>;
     entity_map["MaxLikelihood"]  =   &createInstance<Obj, MaxLikelihood>;
     entity_map["Likelihood"]  =   &createInstance<Obj, Likelihood>;
+    entity_map["InputClassification"]  =   &createInstance<Obj, InputClassification>;
 
     // blank stuff
     entity_map["BlankTuningCurve"]  =  &createInstance<Obj, BlankTuningCurve>;
@@ -99,6 +101,9 @@ SerializableBase* Factory::createSerializable(const string &name) {
     } else
     if(name == "MaxLikelihood") {
         s = new MaxLikelihood();
+    } else
+    if(name == "InputClassification") {
+        s = new InputClassification();
     } else
     if(name == "Reward") {
         s = new Reward();
@@ -161,11 +166,11 @@ RewardModulation* Factory::createRewardModulation(string name, const Constants &
 }
 
 
-Neuron *Factory::createNeuron(string name, const Constants &c, const RuntimeGlobals *run_glob_c, double axon_delay) {
+Neuron *Factory::createNeuron(string name, size_t local_id, const Constants &c, const RuntimeGlobals *run_glob_c, double axon_delay) {
     GET_BASE_NAME(entity_map)
     Neuron *o = dynamic_cast<Neuron*>(entity_map[base_struct_name]());
     if(!o) { cerr << "Error while reading " << name << " and treating like Neuron\n"; terminate(); }
-    o->init(c[name], run_glob_c, axon_delay);
+    o->init(c[name], local_id, run_glob_c, axon_delay);
     // vector<string> dep_c = o->getDependentConstantsNames();
     // if(dep_c.size()>0) {
     //     vector<const ConstObj *> provided_constants;
@@ -178,9 +183,9 @@ Neuron *Factory::createNeuron(string name, const Constants &c, const RuntimeGlob
     return o;
 }
 
-Layer *Factory::createLayer(size_t size, const NeuronConf &nc, const Constants &c, RuntimeGlobals *run_glob_c) {
+Layer *Factory::createLayer(size_t size, bool wta, const NeuronConf &nc, const Constants &c, RuntimeGlobals *run_glob_c) {
     Layer *o = new Layer();
-    o->init(size, nc, c, run_glob_c);
+    o->init(size, wta, nc, c, run_glob_c);
     objects.push_back(o);
     return o;
 }

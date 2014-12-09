@@ -31,11 +31,11 @@ protected:
     Neuron() : Serializable(ENeuron) {}
     friend class Factory;
 public:
-    Neuron(const ConstObj *_c, const RuntimeGlobals *_glob_c, double _axon_delay);
+    Neuron(const ConstObj *_c, size_t _local_id, const RuntimeGlobals *_glob_c, double _axon_delay);
     Neuron(const Neuron &another);
 
     // init
-    virtual void init(const ConstObj *_c, const RuntimeGlobals *_glob_c, double _axon_delay);
+    virtual void init(const ConstObj *_c, size_t _local_id, const RuntimeGlobals *_glob_c, double _axon_delay);
     void setActFunc(ActFunc *_act);
     void setLearningRule(LearningRule *_lrule);
     void setTuningCurve(TuningCurve *_tc);
@@ -66,6 +66,7 @@ public:
     void print(std::ostream& str) const;
 
     size_t id;
+    size_t local_id;
 
     double y;
     double p;

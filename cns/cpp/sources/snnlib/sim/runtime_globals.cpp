@@ -32,3 +32,4 @@ void RuntimeGlobals::setInputNeuronsFiring(const size_t &last_layer_neuron_id, c
         input_neurons_firing[input_neuron_id] = 0;
     }
 }
+

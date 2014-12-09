@@ -16,19 +16,21 @@ protected:
     Layer() {}
     friend class Factory;
 public:
-    Layer(size_t _size, const NeuronConf &nc, const Constants &c, RuntimeGlobals *run_glob_c) {
-        init(_size, nc, c, run_glob_c);
+    Layer(size_t _size, bool _wta, const NeuronConf &nc, const Constants &c, RuntimeGlobals *run_glob_c) {
+        init(_size, _wta, nc, c, run_glob_c);
     }
 
-    virtual void init(size_t _size, const NeuronConf &nc, const Constants &c, RuntimeGlobals *run_glob_c) {
+    virtual void init(size_t _size, bool _wta, const NeuronConf &nc, const Constants &c, RuntimeGlobals *run_glob_c) {
         id = global_layer_index++;
         N = _size;
         neuron_conf = &nc;
         glob_c = run_glob_c;
+        p_wta = 0.0;
+        wta = _wta;
         for(size_t ni=0; ni<N; ni++) {
             double axon_delay = sampleDelay(nc.axon_delay_gain, nc.axon_delay_rate);
 
-            Neuron *n = Factory::inst().createNeuron(nc.neuron, c, run_glob_c, axon_delay);
+            Neuron *n = Factory::inst().createNeuron(nc.neuron, ni, c, run_glob_c, axon_delay);
             n->setActFunc(Factory::inst().createActFunc(nc.act_func, c, n));
             if(!nc.reward_modulation.empty()) {
                 n->setRewardModulation(Factory::inst().createRewardModulation(nc.reward_modulation, c, n, run_glob_c));
@@ -98,6 +100,8 @@ public:
 
     size_t id;
     size_t N;
+    double p_wta;
+    bool wta;
     vector< Neuron *> neurons;
 private:
     const NeuronConf *neuron_conf;

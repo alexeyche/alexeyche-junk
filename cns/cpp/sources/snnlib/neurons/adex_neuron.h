@@ -37,12 +37,12 @@ protected:
     }
     friend class Factory;
 public:
-    AdExNeuron(const ConstObj *_c, const RuntimeGlobals *_glob_c, double _axon_delay) {
-        init(_c, _glob_c, _axon_delay);
+    AdExNeuron(const ConstObj *_c, size_t _local_id, const RuntimeGlobals *_glob_c, double _axon_delay) {
+        init(_c, _local_id, _glob_c, _axon_delay);
 
     }
-    void init(const ConstObj *_c, const RuntimeGlobals *_glob_c, double _axon_delay) {
-        Neuron::init(_c, _glob_c, _axon_delay);
+    void init(const ConstObj *_c, size_t _local_id, const RuntimeGlobals *_glob_c, double _axon_delay) {
+        Neuron::init(_c, _local_id, _glob_c, _axon_delay);
         Serializable::init(EAdExNeuron);
         c = castType<AdExNeuronC>(bc);
 
@@ -51,7 +51,7 @@ public:
 
         adex_stat = nullptr;
     }
-    
+
     void enableCollectStatistics() {
         collectStatistics = true;
         adex_stat = Factory::inst().registerObj<AdExNeuronStat>(new AdExNeuronStat());

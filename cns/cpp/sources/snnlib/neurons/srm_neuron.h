@@ -9,11 +9,11 @@ protected:
     SRMNeuron() { }
     friend class Factory;
 public:
-    SRMNeuron(const ConstObj *_c, const RuntimeGlobals *_glob_c, double _axon_delay) {
-        init(_c, _glob_c, _axon_delay);
+    SRMNeuron(const ConstObj *_c, size_t _local_id,  const RuntimeGlobals *_glob_c, double _axon_delay) {
+        init(_c, _local_id, _glob_c, _axon_delay);
     }
-    void init(const ConstObj *_c, const RuntimeGlobals *_glob_c, double _axon_delay) {
-        Neuron::init(_c, _glob_c, _axon_delay);
+    void init(const ConstObj *_c, size_t _local_id,  const RuntimeGlobals *_glob_c, double _axon_delay) {
+        Neuron::init(_c, _local_id, _glob_c, _axon_delay);
         Serializable::init(ESRMNeuron);
         c = castType<SRMNeuronC>(bc);
     }

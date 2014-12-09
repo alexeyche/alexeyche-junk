@@ -42,7 +42,7 @@ void RewardControl::init(Sim *s, const RewardConnectionMap &map) {
     	neuron_prepared_reward[i] = nullptr;
     }
 
-        
+
     for(auto it=map.cbegin(); it != map.cend(); ++it) {
         pair<size_t, vector<size_t> > l_ids = it->first;
         Layer *pre = nullptr;
@@ -53,7 +53,7 @@ void RewardControl::init(Sim *s, const RewardConnectionMap &map) {
         for(size_t ni=0; ni<pre->neurons.size(); ni++) {
             neuron_modulated_reward[pre->neurons[ni]->id] = 0.0;
         }
-        
+
         for(auto post_id_it = l_ids.second.begin(); post_id_it != l_ids.second.end(); ++post_id_it) {
         	Layer *post = s->layers[*post_id_it];
         	for(size_t ni=0; ni<post->neurons.size(); ni++) {
@@ -72,6 +72,7 @@ void RewardControl::sync() {
 			it->dr += neuron_modulated_reward[l->neurons[ni]->id];
 		}
 	}
+    cout << "\n";
 }
 void RewardControl::simStep(const double &dt) {
 	for(auto it=active_layers.begin(); it != active_layers.end(); ++it) {
@@ -99,7 +100,7 @@ void RewardControl::enableCollectStatistics(const size_t &l_id) {
 	for(auto it = active_layers.begin(); it != active_layers.end(); ++it) {
 		if(it->l->id == l_id) {
 			it->enableCollectStatistics();
-			found = true;				
+			found = true;
 		}
 	}
 	if(!found) {

@@ -4,12 +4,12 @@
 
 
 
-Neuron::Neuron(const ConstObj *_c, const RuntimeGlobals *_glob_c, double _axon_delay) : Serializable(ENeuron) {
-    init(_c, _glob_c, _axon_delay);
+Neuron::Neuron(const ConstObj *_c, size_t _local_id, const RuntimeGlobals *_glob_c, double _axon_delay) : Serializable(ENeuron) {
+    init(_c, _local_id, _glob_c, _axon_delay);
 }
 
 // init
-void Neuron::init(const ConstObj *_c, const RuntimeGlobals *_glob_c, double _axon_delay) {
+void Neuron::init(const ConstObj *_c, size_t _local_id, const RuntimeGlobals *_glob_c, double _axon_delay) {
     //Serializable::init(ENeuron);
     id = global_neuron_index++;
     bc = _c;
@@ -24,6 +24,7 @@ void Neuron::init(const ConstObj *_c, const RuntimeGlobals *_glob_c, double _axo
     stat = nullptr;
     axon_delay = _axon_delay;
     rmod = nullptr;
+    local_id = _local_id;
 }
 
 void Neuron::setActFunc(ActFunc *_act) {

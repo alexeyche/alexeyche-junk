@@ -125,15 +125,42 @@ public:
             for(auto it_val=it->ts.data.begin(); it_val != it->ts.data.end(); ++it_val) {
                 data.push_back(*it_val);
             }
-            labels.push_back(it->label);
+
+            int pos = -1;
+            if(labels.size()>0) {
+                auto pos_it = find(labels.begin(), labels.end(), it->label);
+                if(pos_it != labels.end()) {
+                    pos = pos_it - labels.begin();
+                }
+            }
+
+            if(pos<0) {
+                labels.push_back(it->label);
+                pos = labels.size();
+            }
+
+            labels_id_timeline.push_back(pos);
             acc_time += dt*(double)it->ts.size();
             timeline.push_back(acc_time);
          }
+
          if(timeline.size()>0) {
             Tmax = timeline.back();
          }
          current_position = 0;
     }
+
+    const size_t* getCurrentClassId(const double &t) {
+        while(current_position < timeline.size()) {
+            if(t <= timeline[current_position]) {
+                return &labels_id_timeline[current_position];
+            }
+            current_position += 1;
+        }
+        cerr << "Trying to get current class for time bigger than Tmax\n";
+        terminate();
+    }
+
     inline void pop_value() {
         data.pop_front();
     }
@@ -147,7 +174,11 @@ public:
         str << "data: "; print_deque<double>(data, str,","); str << "\n";
         str << "labels: "; print_vector<string>(labels, str,","); str << "\n";
         str << "timeline: "; print_vector<double>(timeline,str,","); str << "\n";
+        str << "labels id timeline: "; print_vector<size_t>(labels_id_timeline,str,","); str << "\n";
         str << "Tmax: " << Tmax << "\n";
+    }
+    void reset() {
+        current_position = 0;
     }
 
     size_t current_position;
@@ -155,6 +186,8 @@ public:
 
     deque<double> data;
     vector<string> labels;
+
+    vector<size_t> labels_id_timeline;
     vector<double> timeline;
 };
 

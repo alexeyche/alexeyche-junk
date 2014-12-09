@@ -209,16 +209,28 @@ public:
     }
 };
 
+class InputClassificationC: public ConstObj {
+public:
+    InputClassificationC(string name) : ConstObj(name) {}
+    double ltp;
+    double ltd;
+
+    void fill_structure(JsonBox::Value v) {
+        ltp               = v["ltp"].getDouble();
+        ltd         = v["ltd"].getDouble();
+    }
+    void print(std::ostream &str) const {
+        str << "ltp: " << ltp << ", ltd: " << ltd << "\n";
+    }
+};
+
 class LikelihoodC: public ConstObj {
 public:
     LikelihoodC(string name) : ConstObj(name) {}
-    bool input_target;
 
     void fill_structure(JsonBox::Value v) {
-        input_target         = v["input_target"].getBoolean();
     }
     void print(std::ostream &str) const {
-        str << "input_target: " << input_target << "\n";
     }
 };
 
@@ -251,15 +263,17 @@ public:
 class LayerConf : public ConfObj {
 public:
     size_t size;
+    bool wta;
 
     NeuronConf nconf;
 
     void fill_structure(JsonBox::Value v) {
         size = v["size"].getInt();
+        wta = v["wta"].getBoolean();
         nconf.fill_structure(v["neuron_conf"]);
     }
     void print(std::ostream &str) const {
-        str << "LayerConf(size: " << size << ", " << nconf << ")";
+        str << "LayerConf(size: " << size << ", " << nconf << ", wta: " << wta << ")";
     }
 };
 
@@ -304,15 +318,16 @@ public:
     double dt;
     int seed;
     double start_rate;
-
+    double wta_max_freq;
     void fill_structure(JsonBox::Value v) {
         dt = v["dt"].getDouble();
         seed = v["seed"].getInt();
         start_rate = v["start_rate"].getDouble();
+        wta_max_freq = v["wta_max_freq"].getDouble();
     }
 
     void print(std::ostream &str) const {
-        str << "dt: " << dt << " seed: " << seed << " start_rate: " << start_rate << "\n";
+        str << "dt: " << dt << " seed: " << seed << " start_rate: " << start_rate << ", wta_max_freq: " << wta_max_freq << "\n";
     }
 };
 
@@ -407,7 +422,7 @@ public:
                 }
                 pair<size_t, vector<size_t> > aff_p(stoi(aff[0].c_str()), vector<size_t>());
                 vector<string> aff_post = split(aff[1], ',');
-                
+
                 for(auto p_it=aff_post.begin(); p_it != aff_post.end(); ++p_it) {
                     aff_p.second.push_back(stoi(p_it->c_str()));
                 }
@@ -555,13 +570,14 @@ public:
                 if(l->input_target) input_target = true;
             }
         }
-        for(auto it = reward_modulations.begin(); it != reward_modulations.end(); ++it) {
-            const ConstObj* co = it->second;
-            if( const LikelihoodC *l = dynamic_cast<const LikelihoodC*>(co)) {
-                if(l->input_target) input_target = true;
-            }
-        }
         return input_target;
+    }
+    bool doWeNeedWta() {
+        bool wta = false;
+        for(auto it = sim_conf.net_layers_conf.begin(); it != sim_conf.net_layers_conf.end(); ++it) {
+            if(it->wta) wta = true;
+        }
+        return wta;
     }
     void print(std::ostream& str) const {
         str << "== Sim Constants ==\n";
@@ -572,6 +588,7 @@ public:
         print_constants_map(synapses, str);
         print_constants_map(act_funcs, str);
         print_constants_map(learning_rules, str);
+        print_constants_map(reward_modulations, str);
         str << "\n== Sim Configuration ==\n";
         str << sim_conf;
     }

@@ -41,6 +41,7 @@ public:
         return input_spikes_iterators.size() != 0;
     }
 
+    const size_t* current_class_id;
 private:
 	double dt;
     Constants *c;
