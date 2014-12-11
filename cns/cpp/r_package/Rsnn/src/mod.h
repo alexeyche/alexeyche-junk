@@ -3,17 +3,17 @@
 
 #include "RConstants.h"
 #include "RSim.h"
-#include "RProtoRead.h"
+#include "RProto.h"
 
 #define STRICT_R_HEADERS
 #include <Rcpp.h>
 
 class RSim;
 class RConstants;
-class RProtoRead;
+class RProto;
 
 RCPP_EXPOSED_CLASS(RSim)
 RCPP_EXPOSED_CLASS(RConstants)
-RCPP_EXPOSED_CLASS(RProtoRead)
+RCPP_EXPOSED_CLASS(RProto)
 
 #endif

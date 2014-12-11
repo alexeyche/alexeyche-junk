@@ -2,7 +2,8 @@
     "tuning_curves" : {
         "SigmaTuningCurve" : {
             "sigma" : [0.03, 0.03],
-            "intercept" : [-2.4, 2.4],
+//            "intercept" : [-2.4, 2.4], // for synthetic control
+            "intercept" : [-1.0, 1.0],   // for test data
             "gain" : [4,4]
         }
     },

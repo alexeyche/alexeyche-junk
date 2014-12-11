@@ -13,6 +13,7 @@ RCPP_MODULE(snnMod) {
     Rcpp::class_<RProto>("RProto")
     .constructor<std::string>()
     .method("read", &RProto::read, "Reading protobuf")
+    .method("write", &RProto::write, "Write protobuf")
     .method("print", &RProto::print, "Print proto instance")
     ;
 }

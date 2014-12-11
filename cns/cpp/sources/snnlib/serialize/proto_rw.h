@@ -98,22 +98,16 @@ public:
         main_inst->deserialize();
         return main_inst;
     }
-    
+
     void write(SerialPack pack) {
         for(auto it=pack.begin(); it != pack.end(); ++it) {
             write(*it);
         }
     }
-        
+
     void write(SerializableBase *mess) {
         CHECK_MODE(Write);
-        Protos::Class cl;
-        cl.set_instance_class_name(mess->getName());
-        writeMessage(&cl);
-        ProtoPack pack = mess->serialize();
-        for(size_t mi=0; mi<pack.size(); mi++) {
-            writeMessage(pack[mi]);
-        }
+        writeProtoPack(mess->getName(), mess->serialize());
     }
 
     template <typename T>
@@ -129,7 +123,14 @@ public:
         }
         return v;
     }
-
+    void writeProtoPack(const string &name, const ProtoPack &pack) {
+        Protos::Class cl;
+        cl.set_instance_class_name(name);
+        writeMessage(&cl);
+        for(size_t mi=0; mi<pack.size(); mi++) {
+            writeMessage(pack[mi]);
+        }
+    }
 private:
     void writeMessage(::google::protobuf::Message *message) {
         google::protobuf::uint32 size = message->ByteSize();

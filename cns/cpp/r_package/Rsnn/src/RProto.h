@@ -59,6 +59,32 @@ public:
     void print() {
         cout << "RProto instance. run instance$read() method to read protobuf\n";
     }
+
+    void write(const string &message_name, const Rcpp::List &list) {
+        ProtoRw rw(protofile, ProtoRw::Write);
+        if(message_name == "LabeledTimeSeriesList") {
+            Protos::LabeledTimeSeriesList lts_mess;
+            Rcpp::List lts_list = list["list"];
+            for(auto it=lts_list.begin(); it != lts_list.end(); ++it) {
+                Protos::LabeledTimeSeries *lts = lts_mess.add_list();
+                Rcpp::List lts_r = *it;
+                const string &label = lts_r["label"];
+                lts->set_label(label);
+
+                Protos::TimeSeries *ts = new Protos::TimeSeries();
+                vector<double> ts_r = lts_r["ts"];
+                for(auto ts_it=ts_r.begin(); ts_it != ts_r.end(); ++ts_it) {
+                    ts->add_data(*ts_it);
+                }
+                lts->set_allocated_ts(ts);
+            }
+            ProtoPack pack({&lts_mess});
+            rw.writeProtoPack(message_name, pack);
+        } else {
+            ERR("Can't recognize serializable name: " << message_name << "\n");
+        }
+    }
+
     Rcpp::List readModel(Constants *c) { 
         Sim s(*c);
         s.loadModel(protofile);
