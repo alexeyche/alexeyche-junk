@@ -172,8 +172,10 @@ public:
     double tau_c;
     double mean_p_dur;
     double target_rate;
+    double __target_rate;
     double target_rate_factor;
     double weight_decay;
+    double learning_rate;
 
     void fill_structure(JsonBox::Value v) {
         tau_c               = v["tau_c"].getDouble();
@@ -181,6 +183,8 @@ public:
         target_rate         = v["target_rate"].getDouble();
         target_rate_factor  = v["target_rate_factor"].getDouble();
         weight_decay        = v["weight_decay"].getDouble();
+        learning_rate               = v["learning_rate"].getDouble();
+        __target_rate = target_rate/1000.0;
     }
     void print(std::ostream &str) const {
         str <<
@@ -188,6 +192,7 @@ public:
         "mean_p_dur: " << mean_p_dur << ", " <<
         "target_rate: " << target_rate << ", " <<
         "target_rate_factor: " << target_rate_factor << ", " <<
+        "learning_rate: " << learning_rate << ", " <<
         "weight_decay: " << weight_decay << "\n";
     }
 };
@@ -208,6 +213,28 @@ public:
         str << "tau_el: " << tau_el << ", learning_rate: " << learning_rate << ", input_target: " << input_target << "\n";
     }
 };
+
+class StdpC: public ConstObj {
+public:
+    StdpC(string name) : ConstObj(name) {}
+    double tau_minus;
+    double tau_plus;
+    double a_plus;
+    double a_minus;
+    double learning_rate;
+
+    void fill_structure(JsonBox::Value v) {
+        tau_minus               = v["tau_minus"].getDouble();
+        tau_plus               = v["tau_plus"].getDouble();
+        a_plus               = v["a_plus"].getDouble();
+        a_minus               = v["a_minus"].getDouble();
+        learning_rate         = v["learning_rate"].getDouble();
+    }
+    void print(std::ostream &str) const {
+        str << "tau_minus: " << tau_minus << ", tau_plus: " << tau_plus << ", a_plus: " << a_plus << ", a_minus: " << a_minus << ", learning_rate: " << learning_rate << "\n";
+    }
+};
+
 
 class InputClassificationC: public ConstObj {
 public:
@@ -234,6 +261,39 @@ public:
     }
 };
 
+class MeanActivityHomeostasisC: public ConstObj {
+public:
+    MeanActivityHomeostasisC(string name) : ConstObj(name) {}
+    double tau_mean_act;
+    double gamma;
+    double scaling_factor;
+
+    void fill_structure(JsonBox::Value v) {
+        tau_mean_act               = v["tau_mean_act"].getDouble();
+        gamma         = v["gamma"].getDouble();
+        scaling_factor         = v["scaling_factor"].getDouble();
+    }
+    void print(std::ostream &str) const {
+        str << "tau_mean_act: " << tau_mean_act << ", gamma: " << gamma << ", scaling_factor: " << scaling_factor <<  "\n";
+    }
+};
+
+class MinMaxC: public ConstObj {
+public:
+    MinMaxC(string name) : ConstObj(name) {}
+    double w_min;
+    double w_max;
+
+    void fill_structure(JsonBox::Value v) {
+        w_min         = v["w_min"].getDouble();
+        w_max         = v["w_max"].getDouble();
+    }
+    void print(std::ostream &str) const {
+        str << "w_min: " << w_min << ", w_max: " << w_max << "\n";
+    }
+};
+
+
 class NeuronConf : public ConfObj {
 public:
     string neuron;
@@ -241,6 +301,7 @@ public:
     string tuning_curve;
     string learning_rule;
     string reward_modulation;
+    string weight_normalization;
     double axon_delay_gain;
     double axon_delay_rate;
 
@@ -249,6 +310,7 @@ public:
         tuning_curve = v["tuning_curve"].getString();
         learning_rule = v["learning_rule"].getString();
         reward_modulation = v["reward_modulation"].getString();
+        weight_normalization = v["weight_normalization"].getString();
         neuron = v["neuron"].getString();
         JsonBox::Array a = v["axon_delay_distr"].getArray();
         axon_delay_gain = a[0].getDouble();
@@ -256,7 +318,8 @@ public:
     }
     void print(std::ostream &str) const {
         str << "NeuronConf(neuron: " << neuron << ", learning_rule: "  << learning_rule << ", tuning_curve : " << tuning_curve <<  ", act_func: " << act_func <<
-            ", axon_delay_gain: " << axon_delay_gain  << ", axon_delay_rate: " << axon_delay_rate << ", reward_modulation: " << reward_modulation <<  ")";
+            ", axon_delay_gain: " << axon_delay_gain  << ", axon_delay_rate: " << axon_delay_rate << 
+            ", reward_modulation: " << reward_modulation << ", weight_normalization: " << weight_normalization << ")";
     }
 };
 
@@ -533,6 +596,7 @@ public:
     const_map tuning_curves;
     const_map synapses;
     const_map act_funcs;
+    const_map weight_normalizations;
     const_map learning_rules;
     const_map reward_modulations;
 
@@ -549,6 +613,7 @@ public:
         if(act_funcs.count(key)) return act_funcs.at(key);
         if(learning_rules.count(key)) return learning_rules.at(key);
         if(reward_modulations.count(key)) return reward_modulations.at(key);
+        if(weight_normalizations.count(key)) return weight_normalizations.at(key);
 
         if(key.substr(0, blank_prefix.size()) == blank_prefix) { // starts with Blank -- ignore
             return nullptr;
@@ -587,6 +652,7 @@ public:
         print_constants_map(tuning_curves, str);
         print_constants_map(synapses, str);
         print_constants_map(act_funcs, str);
+        print_constants_map(weight_normalizations, str);
         print_constants_map(learning_rules, str);
         print_constants_map(reward_modulations, str);
         str << "\n== Sim Configuration ==\n";

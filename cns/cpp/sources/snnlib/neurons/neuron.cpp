@@ -10,7 +10,6 @@ Neuron::Neuron(const ConstObj *_c, size_t _local_id, const RuntimeGlobals *_glob
 
 // init
 void Neuron::init(const ConstObj *_c, size_t _local_id, const RuntimeGlobals *_glob_c, double _axon_delay) {
-    //Serializable::init(ENeuron);
     id = global_neuron_index++;
     bc = _c;
     glob_c = _glob_c;
@@ -24,6 +23,7 @@ void Neuron::init(const ConstObj *_c, size_t _local_id, const RuntimeGlobals *_g
     stat = nullptr;
     axon_delay = _axon_delay;
     rmod = nullptr;
+
     local_id = _local_id;
 }
 
@@ -39,13 +39,22 @@ void Neuron::setTuningCurve(TuningCurve *_tc) {
 void Neuron::setRewardModulation(RewardModulation *_rmod) {
     rmod = _rmod;
 }
+
 void Neuron::addSynapse(Synapse *s) {
-    syns.push_back(s);
+    syns.resize(syns.size() + 1);
+    addSynapseAtPos(s, syns.size()-1);
+}
+void Neuron::addSynapseAtPos(Synapse *s, const size_t &pos_i) {
+    if(pos_i>syns.size()) {
+        cerr << "Can't add synapse at that position\n";
+        terminate(); 
+    }
     if(collectStatistics) {
         stat->syns.push_back(vector<double>());
     }
     lrule->addSynapse(s);
-}
+    syns[pos_i] = s;
+}  
 
 void Neuron::reset() {
     y = 0.0;
@@ -84,21 +93,22 @@ void Neuron::deserialize() {
 
 void Neuron::saveModel(ProtoRw &rw) {
     rw.write(this);
-    for(size_t syn_i=0; syn_i<syns.size(); syn_i++) {
-        rw.write(syns[syn_i]);
-    }
     if(!lrule->isBlank()) {
         rw.write(lrule);
+    }
+    for(size_t syn_i=0; syn_i<syns.size(); syn_i++) {
+    //cout << *syns[syn_i] << "\n";
+        rw.write(syns[syn_i]);
     }
 }
 
 void Neuron::loadModel(ProtoRw &rw) {
     rw.readAllocated(this);
-    for(size_t syn_i=0; syn_i<syns.size(); syn_i++) {
-        syns[syn_i] = rw.read()->castSerializable<Synapse>();
-    }
     if(!lrule->isBlank()) {
         rw.readAllocated(lrule);
+    }
+    for(size_t syn_i=0; syn_i<syns.size(); syn_i++) {
+        addSynapseAtPos(rw.read()->castSerializable<Synapse>(), syn_i);
     }
 }
 

@@ -1,5 +1,9 @@
 package Protos;
 
+message Sim {
+	required double sim_time = 1;
+	required uint32 jobs = 2;
+}
 
 message Constants {
 	required string json_content = 1;

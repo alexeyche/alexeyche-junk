@@ -60,12 +60,13 @@ protected:
     friend class Factory;
 
 public:
-    MaxLikelihood(const MaxLikelihoodC *_c, Neuron *_n) {
-        init(_c, _n);
+    MaxLikelihood(const ConstObj *_c, Neuron *_n, WeightNormalization *_wnorm) {
+        init(_c, _n, _wnorm);
     }
-    void init(const ConstObj *_c, Neuron *_n) {
+    void init(const ConstObj *_c, Neuron *_n, WeightNormalization *_wnorm) {
         c = castType<MaxLikelihoodC>(_c);
         n = _n;
+        wnorm = _wnorm;
         eligibility_trace.resize(n->syns.size());
         fill(eligibility_trace.begin(), eligibility_trace.end(), 0.0);
 

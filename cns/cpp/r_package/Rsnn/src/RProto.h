@@ -10,6 +10,8 @@
 #include <snnlib/serialize/serialize.h>
 #include <snnlib/neurons/adex_neuron.h>
 #include <snnlib/learning/max_likelihood.h>
+#include <snnlib/learning/optimal_stdp.h>
+#include <snnlib/learning/stdp.h>
 
 class RProto {
 public:
@@ -17,42 +19,40 @@ public:
     }
     Rcpp::List read() {
         if(values.size() == 0) {
-            try {
-                ProtoRw *rw = new ProtoRw(protofile, ProtoRw::Read);
+            if(getFileSize(protofile) == 0) return values;
 
-                SerializableBase *o = rw->read();
-                if(!o) {
-                    ERR("Can't read protofile " << protofile << "\n");
-                }
+            ProtoRw *rw = new ProtoRw(protofile, ProtoRw::Read);
 
-                if(o->getName() == "Constants") {
-                    delete rw;
-                    Constants *c = static_cast<Constants*>(o);
-                    values = readModel(c);
-                    return values;
-                }
-                
-                SerialPack v({o});
-                
-                while(true) {
-                    SerializableBase *o = rw->read();
-                    if(!o) break;
-                    v.push_back(o);
-                }
-                
-                if( (v.size() == 1)&&(v[0]->getName() == "SpikesList")) {
-                    values = convert(v[0]);
-                } else {
-                    for(size_t vi=0; vi<v.size(); vi++) {
-                        stringstream ss;
-                        ss << v[vi]->getName() << "_" << vi;
-                        values[ss.str()] = convert(v[vi]);
-                    }
-                }                
-                delete rw;
-            } catch(...) {
+            SerializableBase *o = rw->read();
+            if(!o) {
                 ERR("Can't read protofile " << protofile << "\n");
             }
+
+            if(o->getName() == "Constants") {
+                delete rw;
+                Constants *c = static_cast<Constants*>(o);
+                values = readModel(c);
+                return values;
+            }
+            
+            SerialPack v({o});
+            
+            while(true) {
+                SerializableBase *o = rw->read();
+                if(!o) break;
+                v.push_back(o);
+            }
+            
+            if( (v.size() == 1)&&(v[0]->getName() == "SpikesList")) {
+                values = convert(v[0]);
+            } else {
+                for(size_t vi=0; vi<v.size(); vi++) {
+                    stringstream ss;
+                    ss << v[vi]->getName() << "_" << vi;
+                    values[ss.str()] = convert(v[vi]);
+                }
+            }                
+            delete rw;
         }            
         return values;
     }
@@ -102,6 +102,8 @@ public:
         }        
         Rcpp::List out;
         out["w"] = w;
+        out["sim_time"] = s.rg.getSimTime();
+        Factory::inst().cleanAll();
         return out;
     }
 
@@ -139,6 +141,19 @@ public:
             MaxLikelihoodStat *st = dynamic_cast<MaxLikelihoodStat*>(s);
             if(!st) { ERR("Can't cast"); }
             out["traces"] = Rcpp::wrap(st->eligibility_trace);
+        } else 
+        if(s->getName() == "StdpStat") {
+            StdpStat *st = dynamic_cast<StdpStat*>(s);
+            if(!st) { ERR("Can't cast"); }
+            out["y_trace"] = Rcpp::wrap(st->y_trace);
+            out["x_trace"] = Rcpp::wrap(st->x_trace);
+        } else 
+        if(s->getName() == "OptimalStdpStat") {
+            OptimalStdpStat *st = dynamic_cast<OptimalStdpStat*>(s);
+            if(!st) { ERR("Can't cast"); }
+            out["p_acc"] = Rcpp::wrap(st->p_acc);
+            out["B"] = Rcpp::wrap(st->B);
+            out["C"] = Rcpp::wrap(st->C);
         } else {
             ERR("Unknown serializable name: " << s->getName() << "\n");
         }

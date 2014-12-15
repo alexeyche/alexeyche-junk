@@ -40,12 +40,17 @@ public:
     void setLearningRule(LearningRule *_lrule);
     void setTuningCurve(TuningCurve *_tc);
     void setRewardModulation(RewardModulation *_rmod);
-
+    bool hasConnection(const size_t &id) {
+        for(auto it=syns.begin(); it != syns.end(); ++it) {
+            if((*it)->id_pre == id) return true;
+        }
+        return false;
+    }
     inline const Reward* getReward() {
         return glob_c->getReward(id);
     }
     void addSynapse(Synapse *s);
-
+    void addSynapseAtPos(Synapse *s, const size_t &pos_i);
     // runtime
     virtual void calculateProbability() = 0;
     virtual void calculateDynamics() = 0;
@@ -82,6 +87,7 @@ public:
     list<size_t> active_synapses;
 
     ActFunc *act;
+
     const RuntimeGlobals *glob_c;
 protected:
     NeuronStat *stat;

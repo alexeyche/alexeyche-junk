@@ -14,6 +14,8 @@ endforeach()
 
 set(SOURCES
     max_likelihood.cpp
+    optimal_stdp.cpp
+    stdp.cpp
 )
 
 # add directory name to sources

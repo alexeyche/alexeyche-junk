@@ -27,7 +27,13 @@ enum ESerializableClass {
                             EReward,
                             ERewardStat,
                             EMaxLikelihoodStat,
-                            EInputClassification
+                            EInputClassification,
+                            EMeanActivityHomeostasis,
+                            EMinMax,
+                            ESim,
+                            EOptimalStdpStat,
+                            EStdp,
+                            EStdpStat
                         };
 
 static const char* ESerializableClass_str[] =
@@ -50,7 +56,13 @@ static const char* ESerializableClass_str[] =
                                                 "Reward",
                                                 "RewardStat",
                                                 "MaxLikelihoodStat",
-                                                "InputClassification"
+                                                "InputClassification",
+                                                "MeanActivityHomeostasis",
+                                                "MinMax",
+                                                "Sim",
+                                                "OptimalStdpStat",
+                                                "Stdp",
+                                                "StdpStat"
                                             };
 
 

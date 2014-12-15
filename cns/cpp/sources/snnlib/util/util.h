@@ -1,7 +1,7 @@
 #pragma once
 
 #include <snnlib/base.h>
-
+#include <sys/stat.h>
 
 vector<string> split_into(const string &s, char delim, vector<string> &elems);
 vector<string> split(const string &s, char delim);
@@ -21,4 +21,4 @@ double sampleDelay(double gain, double rate);
 double getNorm();
 string strip_white(const string& input);
 string strip_comments(const string& input, const string& delimiters);
-
+long getFileSize(string filename);

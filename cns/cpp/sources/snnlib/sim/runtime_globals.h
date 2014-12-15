@@ -42,7 +42,18 @@ public:
     }
 
     const size_t* current_class_id;
+    const double& getSimTime() const {
+        return sim_time;
+    }
+    void setSimTime(double t) {
+        sim_time = t;
+    }
+    void incSimTime(double t) {
+        sim_time += t;
+    }
 private:
+    double sim_time;
+
 	double dt;
     Constants *c;
     RewardControl *rc;

@@ -10,11 +10,19 @@ ornstein_uhlenbeck <- function(T, n, nu,lambda,sigma,x0){
 }
 
 set.seed(8)
+<<<<<<< HEAD
 sample_len = 999
 d1 <- ornstein_uhlenbeck(10,sample_len, 0.2, 1, 0.007, 0.15)
 d2 <- ornstein_uhlenbeck(10,sample_len, 0.2, 1, 0.007, 0.15)
 d3 <- ornstein_uhlenbeck(10,sample_len, 0.15, 0.5, 0.01, 0.21)
 d4 <- ornstein_uhlenbeck(10,sample_len, 0.15, 0.5, 0.01, 0.21)
+=======
+len = 249
+d1 <- ornstein_uhlenbeck(10,len, 0.2, 1, 0.007, 0.15)
+d2 <- ornstein_uhlenbeck(10,len, 0.2, 1, 0.007, 0.15)
+d3 <- ornstein_uhlenbeck(10,len, 0.15, 0.5, 0.01, 0.21)
+d4 <- ornstein_uhlenbeck(10,len, 0.15, 0.5, 0.01, 0.21)
+>>>>>>> 9202051767b2238a052ac704a97f334c690d0081
 
 
 
