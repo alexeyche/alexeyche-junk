@@ -17,10 +17,11 @@ message AdExNeuronStat {
 
 message OptimalStdpStat {
     message CStat {
-        repeated double C = 1 [packed=true];
+        repeated double c = 1 [packed=true];
     }
-    repeated double B = 2 [packed=true];
-    repeated CStat Cvals = 3;
+    repeated double b = 2 [packed=true];
+    repeated CStat c_vals = 3;
+    repeated double p_acc = 4;
 }
 
 message RewardStat {
@@ -33,4 +34,12 @@ message MaxLikelihoodStat {
         repeated double x = 1 [packed=true];
     }
     repeated ElTrace el_traces = 1;
+}
+
+message StdpStat {
+    message XTrace {
+        repeated double x = 1 [packed=true];
+    }
+    repeated XTrace x_trace_vals = 1;
+    repeated double y_trace = 2;
 }

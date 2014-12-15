@@ -5,6 +5,9 @@
 #include <snnlib/config/constants.h>
 #include <snnlib/learning/optimal_stdp.h>
 #include <snnlib/learning/max_likelihood.h>
+#include <snnlib/weight_normalizations/min_max.h>
+#include <snnlib/weight_normalizations/mean_activity_homeostasis.h>
+#include <snnlib/learning/stdp.h>
 #include <snnlib/reinforcement/likelihood.h>
 #include <snnlib/reinforcement/input_classification.h>
 #include <snnlib/act_funcs/determ.h>
@@ -15,6 +18,8 @@
 #include <snnlib/neurons/adex_neuron.h>
 #include <snnlib/neurons/neuron.h>
 #include <snnlib/sim/runtime_globals.h>
+#include <snnlib/sim/sim.h>
+
 #include <snnlib/util/spikes_list.h>
 #include <snnlib/util/time_series.h>
 
@@ -35,6 +40,9 @@ Factory::Factory() {
     const_map["Likelihood"]  =   &createConstInstance<Obj, LikelihoodC>;
     const_map["SigmaTuningCurve"]  =  &createConstInstance<Obj, SigmaTuningCurveC>;
     const_map["InputClassification"]  =  &createConstInstance<Obj, InputClassificationC>;
+    const_map["MeanActivityHomeostasis"]  =  &createConstInstance<Obj, MeanActivityHomeostasisC>;
+    const_map["MinMax"]  =  &createConstInstance<Obj, MinMaxC>;
+    const_map["Stdp"]  =  &createConstInstance<Obj, StdpC>;
 
     entity_map["SRMNeuron"]     =   &createInstance<Obj, SRMNeuron>;
     entity_map["AdExNeuron"]     =   &createInstance<Obj, AdExNeuron>;
@@ -46,6 +54,9 @@ Factory::Factory() {
     entity_map["MaxLikelihood"]  =   &createInstance<Obj, MaxLikelihood>;
     entity_map["Likelihood"]  =   &createInstance<Obj, Likelihood>;
     entity_map["InputClassification"]  =   &createInstance<Obj, InputClassification>;
+    entity_map["MeanActivityHomeostasis"]  =  &createInstance<Obj, MeanActivityHomeostasis>;
+    entity_map["MinMax"]  =  &createInstance<Obj, MinMax>;
+    entity_map["Stdp"]  =  &createInstance<Obj, Stdp>;
 
     // blank stuff
     entity_map["BlankTuningCurve"]  =  &createInstance<Obj, BlankTuningCurve>;
@@ -90,7 +101,7 @@ SerializableBase* Factory::createSerializable(const string &name) {
         s = new OptimalStdp();
     } else
     if(name == "Neuron") {
-        cerr << "Neuron is not allow to create by serialization factory\n";
+        cerr << "Neuron is not allow to be created by serialization factory\n";
         terminate();
     } else
     if(name == "LabeledTimeSeries") {
@@ -107,6 +118,18 @@ SerializableBase* Factory::createSerializable(const string &name) {
     } else
     if(name == "Reward") {
         s = new Reward();
+    } else
+    if(name == "Sim") {
+        s = new Sim();
+    } else
+    if(name == "Stdp") {
+        s = new Stdp();
+    } else
+    if(name == "StdpStat") {
+        s = new StdpStat();
+    } else
+    if(name == "OptimalStdpStat") {
+        s = new OptimalStdpStat();
     } else
     if(name == "LabeledTimeSeriesList") {
         s = new LabeledTimeSeriesList();
@@ -139,11 +162,11 @@ ActFunc *Factory::createActFunc(string name, const Constants &c, Neuron *n) {
     return o;
 }
 
-LearningRule * Factory::createLearningRule(string name, const Constants &c, Neuron *n) {
+LearningRule * Factory::createLearningRule(string name, const Constants &c, Neuron *n, WeightNormalization *wnorm) {
     GET_BASE_NAME(entity_map)
     LearningRule *o = dynamic_cast<LearningRule*>(entity_map[base_struct_name]());
     if(!o) { cerr << "Error while reading " << name << " and treating like LearningRule\n"; terminate(); }
-    o->init(c[name], n);
+    o->init(c[name], n, wnorm);
     objects.push_back(o);
     return o;
 }
@@ -165,20 +188,21 @@ RewardModulation* Factory::createRewardModulation(string name, const Constants &
     return o;
 }
 
+WeightNormalization* Factory::createWeightNormalization(string name, const Constants &c, Neuron *n) {
+    GET_BASE_NAME(entity_map)
+    WeightNormalization *o = dynamic_cast<WeightNormalization*>(entity_map[base_struct_name]());
+    if(!o) { cerr << "Error while reading " << name << " and treating like WeightNormalization\n"; terminate(); }
+    o->init(c[name], n);
+    objects.push_back(o);
+    return o;
+}
+
 
 Neuron *Factory::createNeuron(string name, size_t local_id, const Constants &c, const RuntimeGlobals *run_glob_c, double axon_delay) {
     GET_BASE_NAME(entity_map)
     Neuron *o = dynamic_cast<Neuron*>(entity_map[base_struct_name]());
     if(!o) { cerr << "Error while reading " << name << " and treating like Neuron\n"; terminate(); }
     o->init(c[name], local_id, run_glob_c, axon_delay);
-    // vector<string> dep_c = o->getDependentConstantsNames();
-    // if(dep_c.size()>0) {
-    //     vector<const ConstObj *> provided_constants;
-    //     for(auto it=dep_c.begin(); it != dep_c.end(); ++it) {
-    //         provided_constants.push_back( c[*it] );
-    //     }
-    //     o->setDependentConstants(provided_constants);
-    // }
     objects.push_back(o);
     return o;
 }
@@ -199,4 +223,5 @@ TuningCurve *Factory::createTuningCurve(string name, const Constants &c,  size_t
     objects.push_back(o);
     return o;
 }
+
 

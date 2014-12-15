@@ -53,6 +53,9 @@ void Constants::parse() {
             if(const_field == "act_funcs") {
                 PARSE_CONST_STRUCTURE(act_funcs)
             } else
+            if(const_field == "weight_normalizations") {
+                PARSE_CONST_STRUCTURE(weight_normalizations)
+            } else
             if(const_field == "learning_rules") {
                 PARSE_CONST_STRUCTURE(learning_rules)
             } else

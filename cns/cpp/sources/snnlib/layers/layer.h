@@ -35,11 +35,14 @@ public:
             if(!nc.reward_modulation.empty()) {
                 n->setRewardModulation(Factory::inst().createRewardModulation(nc.reward_modulation, c, n, run_glob_c));
             }
-
+            WeightNormalization *wnorm = nullptr;
+            if(!nc.weight_normalization.empty()) {
+                wnorm = Factory::inst().createWeightNormalization(nc.weight_normalization, c, n);
+            }
             if(nc.learning_rule.empty()) {
-                n->setLearningRule(Factory::inst().createLearningRule("BlankLearningRule", c, nullptr));
+                n->setLearningRule(Factory::inst().createLearningRule("BlankLearningRule", c, nullptr, nullptr));
             } else {
-                n->setLearningRule(Factory::inst().createLearningRule(nc.learning_rule, c, n));
+                n->setLearningRule(Factory::inst().createLearningRule(nc.learning_rule, c, n, wnorm));
             }
             if(nc.tuning_curve.empty()) {
                 n->setTuningCurve(Factory::inst().createTuningCurve("BlankTuningCurve", c, N, ni, nullptr));
@@ -72,24 +75,24 @@ public:
     }
     void connect(Layer &l_post, const ConnectionConf &conf, const Constants &c) {
         for(size_t ni=0; ni<neurons.size(); ni++) {
+            vector<Synapse*> added_synapses;
             for(size_t nj=0; nj<l_post.N; nj++) {
-                if(neurons[ni]->id != l_post[nj]->id) {
+                if( (neurons[ni]->id != l_post[nj]->id) && (!l_post[nj]->hasConnection(neurons[ni]->id)) ) {
                     double prob = getUnif();
                     if( conf.prob > prob ) {
                         double dendrite_delay = sampleDelay(conf.dendrite_delay_gain, conf.dendrite_delay_rate);
                         Synapse *s = Factory::inst().createSynapse(conf.type, c, neurons[ni]->id, 0, dendrite_delay);
                         l_post[nj]->addSynapse(s);
+                        added_synapses.push_back(s);
                     }
                 }
             }
-        }
-        for(size_t ni=0; ni<l_post.N; ni++) {
-            Neuron *n = l_post.neurons[ni];
-            for(size_t con_i=0; con_i<n->syns.size(); con_i++) {
-                Synapse *s = n->syns[con_i];
-                s->w = conf.weight_per_neuron/n->syns.size();
+            for(auto it=added_synapses.begin(); it != added_synapses.end(); ++it) {
+                Synapse *s = *it;
+                s->w = conf.weight_per_neuron/added_synapses.size();
             }
         }
+        
     }
 
     void print(std::ostream& str) const {

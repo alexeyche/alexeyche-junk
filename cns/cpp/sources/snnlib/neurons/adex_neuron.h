@@ -58,10 +58,13 @@ public:
     }
     // Runtime
     void propagateSynSpike(const SynSpike *sp) {
-        if( fabs(syns[sp->syn_id]->x) < SYN_ACT_TOL ) {
+        Synapse *s = syns[sp->syn_id];
+        if( fabs(s->x) < SYN_ACT_TOL ) {
             active_synapses.push_back(sp->syn_id);
         }
-        syns[sp->syn_id]->propagateSpike();
+        s->x += s->c->amp;
+        s->fired = 1;
+        if(lrule) lrule->propagateSynSpike(sp);
     }
 
     void calculateProbability() {

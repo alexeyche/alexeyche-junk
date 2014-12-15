@@ -102,3 +102,9 @@ string strip_comments(const string& input, const string& delimiters)
 {
    return strip_white(input.substr(0, input.find_first_of(delimiters)));
 }
+
+long getFileSize(string filename) {
+    struct stat stat_buf;
+    int rc = stat(filename.c_str(), &stat_buf);
+    return rc == 0 ? stat_buf.st_size : -1;
+}

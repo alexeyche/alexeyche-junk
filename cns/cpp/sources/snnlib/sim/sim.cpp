@@ -7,11 +7,11 @@
 #include <snnlib/config/factory.h>
 #include <snnlib/neurons/srm_neuron.h>
 
-Sim::Sim(size_t _jobs) : Tmax(0), jobs(_jobs), constructed(false), wta_regime(false), T_limit(0.0), rg(&rc, &net) {
+Sim::Sim(size_t _jobs) : Serializable(ESim), Tmax(0), jobs(_jobs), constructed(false), wta_regime(false), T_limit(0.0), rg(&rc, &net) {
 }
 
 
-Sim::Sim(Constants &c, size_t _jobs) : Tmax(0), jobs(_jobs), constructed(false), wta_regime(false), T_limit(0.0), rg(&rc, &net) {
+Sim::Sim(Constants &c, size_t _jobs) : Serializable(ESim), Tmax(0), jobs(_jobs), constructed(false), wta_regime(false), T_limit(0.0), rg(&rc, &net) {
     construct(c);
 }
 
@@ -318,6 +318,6 @@ void Sim::run() {
         cout << "Running simulation...\n";
         runSimOnSubset(input_neurons_count, input_neurons_count+net_neurons_count, Sim::runWorker);
     }
-
+    rg.incSimTime(Tmax);
     cout << "Done\n";
 }

@@ -5,11 +5,9 @@
 
 void Synapse::deserialize() {
 	Protos::Synapse *syn = getSerializedMessage();
-	w = syn->w();
-    id_pre = syn->id_pre();
-    dendrite_delay = syn->dendrite_delay();
-    c = castType<SynapseC>((*constGlobalInstance)[syn->const_name()]);
+    init((*constGlobalInstance)[syn->const_name()], syn->id_pre(), syn->w(), syn->dendrite_delay());
 }
+
 ProtoPack Synapse::serialize() {
 	Protos::Synapse *syn = getNewMessage();
     syn->set_w(w);

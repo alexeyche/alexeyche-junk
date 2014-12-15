@@ -14,11 +14,10 @@ public:
 		blank = false;
 		collectStatistics = false;
 	}
-	virtual void init(const ConstObj *_c, Neuron *_n)  {
-		
-	}
+	virtual void init(const ConstObj *_c, Neuron *_n, WeightNormalization *_wnorm) = 0;
 	virtual void saveStat(SerialPack &p) {};
     virtual void calculateWeightsDynamics() = 0;
+    virtual void propagateSynSpike(const SynSpike *sp) {}
     virtual void addSynapse(Synapse *s) {}
     bool isBlank() {
     	return blank;
@@ -27,6 +26,7 @@ public:
 protected:
 	bool blank;
 	Neuron *n;    
+    WeightNormalization *wnorm;
 
 	bool collectStatistics;
 };
@@ -36,8 +36,9 @@ public:
 	BlankLearningRule()  {
 		LearningRule::blank = true;
 	}
-	void init(const ConstObj *_c, Neuron *_n) {
+	void init(const ConstObj *_c, Neuron *_n, WeightNormalization *_wnorm) {
         n = _n;
+        wnorm = _wnorm;
 	}
 	
 	void deserialize() {}

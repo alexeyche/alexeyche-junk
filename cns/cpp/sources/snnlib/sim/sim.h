@@ -4,7 +4,7 @@
 #include <snnlib/layers/layer.h>
 #include <snnlib/util/time_series.h>
 #include <snnlib/util/spinning_barrier.h>
-
+#include <snnlib/serialize/serialize.h>
 #include "network.h"
 
 #define P( condition ) {if( (condition) != 0 ) { printf( "\n FAILURE in %s, line %d\n", __FILE__, __LINE__ );exit( 1 );}}
@@ -12,7 +12,7 @@
 
 #include "sim_neuron.h"
 
-class Sim: public Printable {
+class Sim: public Serializable<Protos::Sim> {
 public:
     Sim(Constants &c, size_t _jobs=1);
     Sim(size_t _jobs=1);
@@ -64,6 +64,7 @@ public:
             Constants* c_serial = rw.read()->castSerializable<Constants>();
             construct(*c_serial);
         }
+        rw.readAllocated(this);
         Factory::inst().cleanAllDynamicObj();
         for(auto it = layers.begin(); it != layers.end(); ++it) {
             (*it)->loadModel(rw);
@@ -74,11 +75,24 @@ public:
     void saveModel(string f) {
         ProtoRw rw(f,ProtoRw::Write);
         rw.write(&rg.mut_C());
+        rw.write(this);
         for(auto it = layers.begin(); it != layers.end(); ++it) {
             (*it)->saveModel(rw);
         }
         rc.saveModel(rw);
     }
+    void deserialize() {
+        Protos::Sim *s = getSerializedMessage();
+        rg.setSimTime(s->sim_time());
+        //jobs = s->jobs();
+    }
+    ProtoPack serialize() { 
+        Protos::Sim *s = getNewMessage();
+        s->set_sim_time(rg.getSimTime());
+        s->set_jobs(jobs);
+        return ProtoPack({s}); 
+    }
+
 
     void print(std::ostream& str) const {
         for(auto it=layers.begin(); it!=layers.end(); ++it) {

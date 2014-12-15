@@ -13,7 +13,7 @@ protected:
     friend class Factory;
 public:
     Synapse(const ConstObj *_c, size_t _id_pre, double _w, double _dendrite_delay) : Serializable(ESynapse) {
-        init(_c, _w, _id_pre, _dendrite_delay);
+        init(_c, _id_pre, _w, _dendrite_delay);
     }
     void init(const ConstObj *_c, size_t _id_pre, double _w, double _dendrite_delay) {
         c = castType<SynapseC>(_c);
@@ -21,6 +21,7 @@ public:
         w = _w;
         x = 0.0;
         dendrite_delay = _dendrite_delay;
+        fired = 0;
     }
     virtual void reset() {
         x = 0;
@@ -31,11 +32,8 @@ public:
     double w;
     double dendrite_delay;
     
-    uchar fired;
+    double fired;
 
-    void propagateSpike() {
-        x += c->amp;
-    }
     void print(std::ostream& str) const {
         str << "Synapse(id_pre: " << id_pre << ", x:" << x << ", w: " << w << ", dendrite_delay: " << dendrite_delay << ")";
     }

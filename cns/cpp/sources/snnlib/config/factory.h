@@ -19,18 +19,12 @@ class Constants;
 class RuntimeGlobals;
 class SerializableBase;
 class RewardModulation;
+class WeightNormalization;
 
 class Factory {
     Factory();
     ~Factory() {
-        for(auto it=objects.begin(); it != objects.end(); ++it) {
-            delete *it;
-        }
-        for(auto it=dyn_objects.begin(); it != dyn_objects.end(); ++it) {
-           delete *it;
-        }
-        objects.clear();
-        dyn_objects.clear();
+        cleanAll();
     }
     friend class ProtoRw;
 public:
@@ -43,8 +37,9 @@ public:
     RewardModulation* createRewardModulation(string name, const Constants &c, Neuron *n, RuntimeGlobals *run_glob_c);
     Neuron *createNeuron(string name, size_t local_id, const Constants &c, const RuntimeGlobals *run_glob_c, double axon_delay);
     TuningCurve *createTuningCurve(string name, const Constants &c,  size_t layer_size, size_t neuron_id, Neuron *n);
-    LearningRule * createLearningRule(string name, const Constants &c, Neuron *n);
+    LearningRule * createLearningRule(string name, const Constants &c, Neuron *n, WeightNormalization *wnorm);
     SerializableBase* createSerializable(const string &name);
+    WeightNormalization* createWeightNormalization(string name, const Constants &c, Neuron *n);
 
     template <typename T>
     T* registerObj(T *o) {
@@ -58,6 +53,17 @@ public:
             dyn_objects.erase(it);
             delete o_in;
         }
+    }
+    void cleanAll() {
+        for(auto it=objects.begin(); it != objects.end(); ++it) {
+            delete *it;
+        }
+        for(auto it=dyn_objects.begin(); it != dyn_objects.end(); ++it) {
+            delete *it;
+        }
+ 
+        objects.clear();
+        dyn_objects.clear();
     }
 
     void cleanObj(Obj *o) {
