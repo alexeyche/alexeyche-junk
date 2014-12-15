@@ -33,7 +33,9 @@ enum ESerializableClass {
                             ESim,
                             EOptimalStdpStat,
                             EStdp,
-                            EStdpStat
+                            EStdpStat,
+                            ESoftMinMax,
+                            ENonlinearMinMax
                         };
 
 static const char* ESerializableClass_str[] =
@@ -62,7 +64,9 @@ static const char* ESerializableClass_str[] =
                                                 "Sim",
                                                 "OptimalStdpStat",
                                                 "Stdp",
-                                                "StdpStat"
+                                                "StdpStat",
+                                                "SoftMinMax",
+                                                "NonlinearMinMax"
                                             };
 
 

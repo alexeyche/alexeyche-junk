@@ -37,7 +37,10 @@ public:
         }
         return ( (part*c->r0*c->beta) / ( 1.0+part))/1000.0;
     };
-
+    void provideRuntime(ActFuncRuntime &rt) {
+        rt.prob = MakeDelegate(this, &ExpHennequin::prob);
+        rt.probDeriv = MakeDelegate(this, &ExpHennequin::probDeriv);
+    }
     const ExpHennequinC *c;
 };
 

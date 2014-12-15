@@ -25,8 +25,11 @@ public:
     ~SigmaTuningCurve() {
     }
 
-    void calculateResponse(const double &x) {
-        n->y = gain*exp( - (x - center)*(x - center) / ( 2 * sigma_square ));
+    double calculateResponse(const double &x) {
+        return gain*exp( - (x - center)*(x - center) / ( 2 * sigma_square ));
+    }
+    void provideRuntime(TuningCurveRuntime &rt) {
+        rt.calculateResponse = MakeDelegate(this, &SigmaTuningCurve::calculateResponse);
     }
 
 

@@ -14,30 +14,38 @@ void Neuron::init(const ConstObj *_c, size_t _local_id, const RuntimeGlobals *_g
     bc = _c;
     glob_c = _glob_c;
 
-    act = nullptr; lrule = nullptr; tc = nullptr;
+    lrule = nullptr;
+    tc = nullptr;
+    rmod = nullptr;
+    LearningRule::provideDefaultRuntime(lrule_rt);
+    RewardModulation::provideDefaultRuntime(rmod_rt);
+    TuningCurve::provideDefaultRuntime(tc_rt);
+
 
     reset();
-    weight_factor = 1.0;
 
     collectStatistics = false;
     stat = nullptr;
     axon_delay = _axon_delay;
-    rmod = nullptr;
+
 
     local_id = _local_id;
 }
 
-void Neuron::setActFunc(ActFunc *_act) {
-    act = _act;
+void Neuron::setActFunc(ActFunc *act) {
+    act->provideRuntime(act_rt);
 }
 void Neuron::setLearningRule(LearningRule *_lrule) {
     lrule = _lrule;
+    lrule->provideRuntime(lrule_rt);
 }
 void Neuron::setTuningCurve(TuningCurve *_tc) {
     tc = _tc;
+    tc->provideRuntime(tc_rt);
 }
 void Neuron::setRewardModulation(RewardModulation *_rmod) {
     rmod = _rmod;
+    rmod->provideRuntime(rmod_rt);
 }
 
 void Neuron::addSynapse(Synapse *s) {
@@ -47,14 +55,14 @@ void Neuron::addSynapse(Synapse *s) {
 void Neuron::addSynapseAtPos(Synapse *s, const size_t &pos_i) {
     if(pos_i>syns.size()) {
         cerr << "Can't add synapse at that position\n";
-        terminate(); 
+        terminate();
     }
     if(collectStatistics) {
         stat->syns.push_back(vector<double>());
     }
-    lrule->addSynapse(s);
+    if(lrule) lrule->addSynapse(s);
     syns[pos_i] = s;
-}  
+}
 
 void Neuron::reset() {
     y = 0.0;
@@ -77,14 +85,12 @@ ProtoPack Neuron::serialize() {
     n_ser->set_axon_delay(axon_delay);
     n_ser->set_id(id);
     n_ser->set_num_of_synapses(syns.size());
-    n_ser->set_weight_factor(weight_factor);
     return ProtoPack({n_ser});
 }
 void Neuron::deserialize() {
     Protos::Neuron *mess = getSerializedMessage();
     id = mess->id();
     axon_delay = mess->axon_delay();
-    weight_factor = mess->weight_factor();
     if(syns.size()>0) {
         syns.clear();
     }
@@ -93,7 +99,7 @@ void Neuron::deserialize() {
 
 void Neuron::saveModel(ProtoRw &rw) {
     rw.write(this);
-    if(!lrule->isBlank()) {
+    if(lrule) {
         rw.write(lrule);
     }
     for(size_t syn_i=0; syn_i<syns.size(); syn_i++) {
@@ -104,7 +110,7 @@ void Neuron::saveModel(ProtoRw &rw) {
 
 void Neuron::loadModel(ProtoRw &rw) {
     rw.readAllocated(this);
-    if(!lrule->isBlank()) {
+    if(lrule) {
         rw.readAllocated(lrule);
     }
     for(size_t syn_i=0; syn_i<syns.size(); syn_i++) {

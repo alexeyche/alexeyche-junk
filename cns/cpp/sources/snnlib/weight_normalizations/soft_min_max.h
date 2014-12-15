@@ -3,36 +3,33 @@
 
 #include "weight_normalization.h"
 
-class MinMax : public WeightNormalization {
+class SoftMinMax : public WeightNormalization {
 protected:
-    MinMax() {
-        Serializable::init(EMinMax);
+    SoftMinMax() {
+        Serializable::init(ESoftMinMax);
     }
     friend class Factory;
 public:
-    MinMax(const MinMaxC *_c, Neuron *_n) {
+    SoftMinMax(const SoftMinMaxC *_c, Neuron *_n) {
         init(_c, _n);
     }
     void init(const ConstObj *_c, Neuron *_n) {
-        c = castType<MinMaxC>(_c);
+        c = castType<SoftMinMaxC>(_c);
         n = _n;
-        Serializable::init(EMinMax);
+        Serializable::init(ESoftMinMax);
     }
     void preModifyMeasure() {}
 
     double ltpMod(const double &w) {
-        double delta = c->w_max - w;
-        if(delta>0) return 0.0;
-        return delta * c->nu_plus;
+        return c->nu_plus * (c->w_max - w);
     }
 
     double ltdMod(const double &w) {
-        if(w<=0) return 0.0;
-        return w * c->nu_minus;
+        return c->nu_minus * w;
     }
 
     void modifyWeightDerivative(double &dw, const size_t &syn_id) {
-        if((n->syns[syn_id]->w >= c->w_max)||(n->syns[syn_id]->w <= 0.0)) dw = 0.0;
+        dw += ltpMod(n->syns[syn_id]->w) - ltdMod(n->syns[syn_id]->w);
     }
 
     void provideRuntime(WeightNormalizationRuntime &rt, Mode m) {
@@ -43,12 +40,12 @@ public:
         } else {
             rt.ltpMod = &WeightNormalization::ltpModDefault;
             rt.ltdMod = &WeightNormalization::ltdModDefault;
-            rt.modifyWeightDerivative = MakeDelegate(this, &MinMax::modifyWeightDerivative);
+            rt.modifyWeightDerivative = MakeDelegate(this, &SoftMinMax::modifyWeightDerivative);
         }
-        rt.preModifyMeasure = MakeDelegate(this, &MinMax::preModifyMeasure);
+        rt.preModifyMeasure = MakeDelegate(this, &SoftMinMax::preModifyMeasure);
     }
 
-	void deserialize() {
+    void deserialize() {
     }
     ProtoPack serialize() {
         return getNew();
@@ -59,5 +56,5 @@ public:
 
     void print(std::ostream& str) const { }
 
-    const MinMaxC *c;
+    const SoftMinMaxC *c;
 };

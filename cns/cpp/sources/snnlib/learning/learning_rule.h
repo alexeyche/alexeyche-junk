@@ -6,45 +6,45 @@
 #include <snnlib/config/constants.h>
 #include <snnlib/neurons/synapse.h>
 
+#include <snnlib/weight_normalizations/weight_normalization.h>
+#include <snnlib/act_funcs/act_func.h>
+
 class Neuron;
+
+
+struct LearningRuleRuntime {
+    propSynSpikeDelegate propagateSynSpike;
+    stateDelegate calculateWeightsDynamics;
+};
 
 class LearningRule : public Serializable<Protos::BlankModel> {
 public:
 	LearningRule() : Serializable(EBlankModel) {
-		blank = false;
 		collectStatistics = false;
 	}
-	virtual void init(const ConstObj *_c, Neuron *_n, WeightNormalization *_wnorm) = 0;
+	virtual void init(const ConstObj *_c, Neuron *_n, ActFunc *_act_f, WeightNormalization *_wnorm) = 0;
 	virtual void saveStat(SerialPack &p) {};
     virtual void calculateWeightsDynamics() = 0;
     virtual void propagateSynSpike(const SynSpike *sp) {}
     virtual void addSynapse(Synapse *s) {}
-    bool isBlank() {
-    	return blank;
-    }
+
 	virtual void enableCollectStatistics() {};
+    virtual void provideRuntime(LearningRuleRuntime &rt) = 0;
+
+
+    static void calculateWeightsDynamicsDefault() {}
+    static void propagateSynSpikeDefault(const SynSpike *sp) {}
+    static void provideDefaultRuntime(LearningRuleRuntime &rt) {
+        rt.propagateSynSpike = &LearningRule::propagateSynSpikeDefault;
+        rt.calculateWeightsDynamics = &LearningRule::calculateWeightsDynamicsDefault;
+    }
+
+    WeightNormalizationRuntime wnorm_rt;
+    ActFuncRuntime act_rt;
 protected:
-	bool blank;
-	Neuron *n;    
+	Neuron *n;
     WeightNormalization *wnorm;
 
 	bool collectStatistics;
 };
 
-class BlankLearningRule: public LearningRule  {
-public:
-	BlankLearningRule()  {
-		LearningRule::blank = true;
-	}
-	void init(const ConstObj *_c, Neuron *_n, WeightNormalization *_wnorm) {
-        n = _n;
-        wnorm = _wnorm;
-	}
-	
-	void deserialize() {}
-    ProtoPack serialize() { return ProtoPack(); } 
-    void calculateWeightsDynamics() {}
-    
-    void print(std::ostream& str) const { }
-
-};

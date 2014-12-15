@@ -51,14 +51,16 @@ static inline float
 fastpow (float x,
          float p)
 {
-  return fastpow2 (p * fastlog2 (x));
+    if(x < 0) return -fastpow2 (p * fastlog2 (fabs(x)));
+    return fastpow2 (p * fastlog2 (x));
 }
 
 static inline float
 fasterpow (float x,
            float p)
 {
-  return fasterpow2 (p * fasterlog2 (x));
+    if(x < 0) return -fasterpow2 (p * fasterlog2 (fabs(x)));
+    return fasterpow2 (p * fasterlog2 (x));
 }
 
 #ifdef __SSE2__

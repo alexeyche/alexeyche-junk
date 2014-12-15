@@ -9,6 +9,7 @@
 #include <snnlib/sim/sim.h>
 
 #include <snnlib/util/time_series.h>
+#include <snnlib/util/fastapprox/fastpow.h>
 
 enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_CONSTANTS, ARG_INPUT,
                     ARG_OUT_STAT, ARG_OUT_SPIKES, ARG_JOBS ,ARG_PRECALC,

@@ -31,7 +31,7 @@ public:
     double x;
     double w;
     double dendrite_delay;
-    
+
     double fired;
 
     void print(std::ostream& str) const {

@@ -31,22 +31,22 @@ public:
             double axon_delay = sampleDelay(nc.axon_delay_gain, nc.axon_delay_rate);
 
             Neuron *n = Factory::inst().createNeuron(nc.neuron, ni, c, run_glob_c, axon_delay);
-            n->setActFunc(Factory::inst().createActFunc(nc.act_func, c, n));
+            ActFunc *act_f = Factory::inst().createActFunc(nc.act_func, c, n);
+            n->setActFunc(act_f);
+
             if(!nc.reward_modulation.empty()) {
                 n->setRewardModulation(Factory::inst().createRewardModulation(nc.reward_modulation, c, n, run_glob_c));
             }
+
             WeightNormalization *wnorm = nullptr;
             if(!nc.weight_normalization.empty()) {
                 wnorm = Factory::inst().createWeightNormalization(nc.weight_normalization, c, n);
             }
-            if(nc.learning_rule.empty()) {
-                n->setLearningRule(Factory::inst().createLearningRule("BlankLearningRule", c, nullptr, nullptr));
-            } else {
-                n->setLearningRule(Factory::inst().createLearningRule(nc.learning_rule, c, n, wnorm));
+
+            if(!nc.learning_rule.empty()) {
+                n->setLearningRule(Factory::inst().createLearningRule(nc.learning_rule, c, n, act_f, wnorm));
             }
-            if(nc.tuning_curve.empty()) {
-                n->setTuningCurve(Factory::inst().createTuningCurve("BlankTuningCurve", c, N, ni, nullptr));
-            } else {
+            if(!nc.tuning_curve.empty()) {
                 n->setTuningCurve(Factory::inst().createTuningCurve(nc.tuning_curve, c, N, ni, n));
             }
 
@@ -92,7 +92,7 @@ public:
                 s->w = conf.weight_per_neuron/added_synapses.size();
             }
         }
-        
+
     }
 
     void print(std::ostream& str) const {

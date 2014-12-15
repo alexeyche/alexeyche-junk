@@ -11,7 +11,7 @@ for(ep in 1:1000) {
     output_spikes = sprintf("%s/%s_output_spikes.pb", workdir, ep)
     if(!file.exists(output_spikes)) { ep=ep-1; break }
 }
-#ep = 14
+ep = 1
 ep_str=""
 if(ep>0) {
     ep_str = sprintf("%d_",ep)
@@ -138,14 +138,15 @@ if( (file.exists(stat_file))&&(file.info(stat_file)$size>0)) {
 #             }
 #         }
     }
-    stdp_stat_id = grep("StdpStat", names(stat)) 
+    stdp_stat_id = grep("^StdpStat", names(stat)) 
     if(length(stdp_stat_id)>0) {
         id = stdp_stat_id[neuron_to_read]
         stdp = stat[[id]]
-        syn_id = 50
+        syn_id = 30
         
-        par(mfrow=c(2,1))
+        par(mfrow=c(3,1))
         
+        plot(nst[["w"]][[syn_id]][t_plot], type="l")            
         plot(stdp[["y_trace"]][t_plot], type="l")
         plot(stdp[["x_trace"]][[syn_id]][t_plot], type="l")
     }

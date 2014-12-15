@@ -74,11 +74,11 @@ protected:
     friend class Factory;
 
 public:
-    OptimalStdp(const ConstObj *_c, Neuron *_n, WeightNormalization *_wnorm) : LearningRule() {
-    	init(_c, _n, _wnorm);
+    OptimalStdp(const ConstObj *_c, Neuron *_n, ActFunc *_act_f, WeightNormalization *_wnorm) : LearningRule() {
+    	init(_c, _n, _act_f, _wnorm);
     }
-    
-    void init(const ConstObj *_c, Neuron *_n, WeightNormalization *_wnorm) {
+
+    void init(const ConstObj *_c, Neuron *_n, ActFunc *_act_f, WeightNormalization *_wnorm) {
         c = castType<OptimalStdpC>(_c);
         n = _n;
         p_acc = 0.0;
@@ -88,6 +88,13 @@ public:
         stat = nullptr;
         wnorm = _wnorm;
 
+        _act_f->provideRuntime(act_rt);
+        if(_wnorm) {
+            _wnorm->provideRuntime(wnorm_rt, WeightNormalization::Derivative);
+        } else {
+            WeightNormalization::provideDefaultRuntime(wnorm_rt);
+        }
+
         Serializable::init(EOptimalStdp);
     }
     void addSynapse(Synapse *s) {
@@ -96,7 +103,7 @@ public:
             stat->C.push_back(vector<double>());
         }
     }
-    
+
     void enableCollectStatistics() {
         collectStatistics = true;
         stat = Factory::inst().registerObj<OptimalStdpStat>(new OptimalStdpStat(this));
@@ -116,19 +123,19 @@ public:
         }
     }
     void calculateWeightsDynamics()  {
-        //cout << n->id << ": " C.size() << " " << n->syns.size() << "\n"
-        if(wnorm) wnorm->preModifyMeasure();
-        if(n->p<(1.0/1000.0)) n->p = 1.0/1000;    
+        wnorm_rt.preModifyMeasure();
+
+        if(n->p<(1.0/1000.0)) n->p = 1.0/1000;
         if(n->glob_c->getSimTime() >= c->mean_p_dur) {
             B = B_calc();
             auto it=active_synapses.begin();
             while(it != active_synapses.end()) {
                 Synapse *syn = n->syns[*it];
-                
+
                 C[*it] += - C[*it]/c->tau_c + SRMMethods::dLLH_dw(n, syn);
                 double dw = c->learning_rate * ( C[*it]*B - c->weight_decay * syn->fired * syn->w);
                 //cout << c->weight_decay << "*" << syn->fired << "*" << syn->w << " == " << c->weight_decay * syn->fired * syn->w << "\n";
-                if(wnorm) wnorm->modifyWeightDerivative(dw, *it);
+                wnorm_rt.modifyWeightDerivative(dw, *it);
                 syn->w += dw;
 
                 if(fabs(C[*it]) < SYN_ACT_TOL) {
@@ -136,11 +143,11 @@ public:
                 } else {
                     it++;
                 }
-                
+
                 if(std::isnan(dw)) {
                     cout << "Found nan dw:\n";
                     double fired = n->fired;
-                    cout << n->act->probDeriv(n->y) << "/(" << n->p  << "/" << n->M << ") * (" << fired << "-" << n->p << ") * " << syn->x << " == ";
+                    cout << n->act_rt.probDeriv(n->y) << "/(" << n->p  << "/" << n->M << ") * (" << fired << "-" << n->p << ") * " << syn->x << " == ";
                     cout << SRMMethods::dLLH_dw(n, syn) << "\n";
                     cout << *n;
                     terminate();
@@ -153,25 +160,28 @@ public:
         p_acc += (-p_acc+n->fired)/c->mean_p_dur;
 
     }
+    void provideRuntime(LearningRuleRuntime &rt) {
+        rt.calculateWeightsDynamics = MakeDelegate(this, &OptimalStdp::calculateWeightsDynamics);
+        rt.propagateSynSpike = MakeDelegate(this, &OptimalStdp::propagateSynSpike);
+    }
 
-    
 
     void deserialize() {
         Protos::OptimalStdp *mess = getSerializedMessage<Protos::OptimalStdp>();
         p_acc = mess->p_acc();
     }
-    ProtoPack serialize() { 
+    ProtoPack serialize() {
         Protos::OptimalStdp *mess = getNewMessage<Protos::OptimalStdp>();
         mess->set_p_acc(p_acc);
-        return ProtoPack({mess}); 
+        return ProtoPack({mess});
     }
-    ProtoPack getNew() { 
-        return ProtoPack({ getNewMessage<Protos::OptimalStdp>() }); 
+    ProtoPack getNew() {
+        return ProtoPack({ getNewMessage<Protos::OptimalStdp>() });
     }
     void saveStat(SerialPack &p) {
         p.push_back(stat);
-    }   
-     
+    }
+
     void print(std::ostream& str) const { }
 
     double p_acc;

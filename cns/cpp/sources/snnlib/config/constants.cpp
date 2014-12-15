@@ -15,8 +15,6 @@ Constants *constGlobalInstance = nullptr;
     }\
 }\
 
-string Constants::blank_prefix = string("Blank");
-
 string Constants::preprocessAndReadConstJson(string filename) {
     string out;
 

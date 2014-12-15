@@ -64,7 +64,7 @@ public:
         }
         s->x += s->c->amp;
         s->fired = 1;
-        if(lrule) lrule->propagateSynSpike(sp);
+        lrule_rt.propagateSynSpike(sp);
     }
 
     void calculateProbability() {
@@ -85,7 +85,7 @@ public:
             y += glob_c->Dt() * ( dV/c->C );
             a += glob_c->Dt() * ( da/c->tau_a );
 
-            p = act->prob(y);
+            p = act_rt.prob(y);
         }
         if(collectStatistics) {
             adex_stat->collect(this);
@@ -93,13 +93,9 @@ public:
     }
 
     void attachCurrent(const double &I) {
-        tc->calculateResponse(I);
+        y = tc_rt.calculateResponse(I);
     }
-    void provideDelegates(RunTimeDelegates &rtd) {
-        rtd.input_dg.push_back(MakeDelegate(this, &AdExNeuron::attachCurrent));
-        rtd.state_dg.push_back(MakeDelegate(this, &AdExNeuron::calculateProbability));
-        rtd.state_dg.push_back(MakeDelegate(this, &AdExNeuron::calculateDynamics));
-    }
+
 
     void calculateDynamics() {
         if(p > getUnif()) {
@@ -124,6 +120,12 @@ public:
         }
 
 
+    }
+    void provideRuntime(NeuronRuntime &rt) {
+        rt.attachCurrent = MakeDelegate(this, &AdExNeuron::attachCurrent);
+        rt.calculateDynamics = MakeDelegate(this, &AdExNeuron::calculateDynamics);
+        rt.calculateProbability = MakeDelegate(this, &AdExNeuron::calculateProbability);
+        rt.propagateSynSpike = MakeDelegate(this, &AdExNeuron::propagateSynSpike);
     }
     ProtoPack serialize() {
         return Neuron::serialize();

@@ -37,7 +37,7 @@ public:
     RewardModulation* createRewardModulation(string name, const Constants &c, Neuron *n, RuntimeGlobals *run_glob_c);
     Neuron *createNeuron(string name, size_t local_id, const Constants &c, const RuntimeGlobals *run_glob_c, double axon_delay);
     TuningCurve *createTuningCurve(string name, const Constants &c,  size_t layer_size, size_t neuron_id, Neuron *n);
-    LearningRule * createLearningRule(string name, const Constants &c, Neuron *n, WeightNormalization *wnorm);
+    LearningRule * createLearningRule(string name, const Constants &c, Neuron *n, ActFunc *act_f, WeightNormalization *wnorm);
     SerializableBase* createSerializable(const string &name);
     WeightNormalization* createWeightNormalization(string name, const Constants &c, Neuron *n);
 
@@ -61,7 +61,7 @@ public:
         for(auto it=dyn_objects.begin(); it != dyn_objects.end(); ++it) {
             delete *it;
         }
- 
+
         objects.clear();
         dyn_objects.clear();
     }

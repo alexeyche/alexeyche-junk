@@ -6,6 +6,8 @@
 #include <snnlib/learning/optimal_stdp.h>
 #include <snnlib/learning/max_likelihood.h>
 #include <snnlib/weight_normalizations/min_max.h>
+#include <snnlib/weight_normalizations/soft_min_max.h>
+#include <snnlib/weight_normalizations/nonlinear_min_max.h>
 #include <snnlib/weight_normalizations/mean_activity_homeostasis.h>
 #include <snnlib/learning/stdp.h>
 #include <snnlib/reinforcement/likelihood.h>
@@ -42,6 +44,8 @@ Factory::Factory() {
     const_map["InputClassification"]  =  &createConstInstance<Obj, InputClassificationC>;
     const_map["MeanActivityHomeostasis"]  =  &createConstInstance<Obj, MeanActivityHomeostasisC>;
     const_map["MinMax"]  =  &createConstInstance<Obj, MinMaxC>;
+    const_map["SoftMinMax"]  =  &createConstInstance<Obj, SoftMinMaxC>;
+    const_map["NonlinearMinMax"]  =  &createConstInstance<Obj, NonlinearMinMaxC>;
     const_map["Stdp"]  =  &createConstInstance<Obj, StdpC>;
 
     entity_map["SRMNeuron"]     =   &createInstance<Obj, SRMNeuron>;
@@ -56,11 +60,10 @@ Factory::Factory() {
     entity_map["InputClassification"]  =   &createInstance<Obj, InputClassification>;
     entity_map["MeanActivityHomeostasis"]  =  &createInstance<Obj, MeanActivityHomeostasis>;
     entity_map["MinMax"]  =  &createInstance<Obj, MinMax>;
+    entity_map["SoftMinMax"]  =  &createInstance<Obj, SoftMinMax>;
+    entity_map["NonlinearMinMax"]  =  &createInstance<Obj, NonlinearMinMax>;
     entity_map["Stdp"]  =  &createInstance<Obj, Stdp>;
 
-    // blank stuff
-    entity_map["BlankTuningCurve"]  =  &createInstance<Obj, BlankTuningCurve>;
-    entity_map["BlankLearningRule"]  =  &createInstance<Obj, BlankLearningRule>;
 }
 
 #define GET_BASE_NAME(map) \
@@ -162,11 +165,11 @@ ActFunc *Factory::createActFunc(string name, const Constants &c, Neuron *n) {
     return o;
 }
 
-LearningRule * Factory::createLearningRule(string name, const Constants &c, Neuron *n, WeightNormalization *wnorm) {
+LearningRule * Factory::createLearningRule(string name, const Constants &c, Neuron *n, ActFunc *act_f, WeightNormalization *wnorm) {
     GET_BASE_NAME(entity_map)
     LearningRule *o = dynamic_cast<LearningRule*>(entity_map[base_struct_name]());
     if(!o) { cerr << "Error while reading " << name << " and treating like LearningRule\n"; terminate(); }
-    o->init(c[name], n, wnorm);
+    o->init(c[name], n, act_f, wnorm);
     objects.push_back(o);
     return o;
 }

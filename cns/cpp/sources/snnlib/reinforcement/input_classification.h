@@ -24,7 +24,7 @@ public:
     }
     void modulateReward() {
         if(n->fired) {
-            if(n->local_id == *glob_c->current_class_id) {                
+            if(n->local_id == *glob_c->current_class_id) {
                 glob_c->propagateReward(n->id, c->ltp);
                 //cout << c->ltp << "\n";
             } else {
@@ -32,6 +32,9 @@ public:
                 //cout << c->ltd << "\n";
             }
         }
+    }
+    void provideRuntime(RewardModulationRuntime &rt) {
+        rt.modulateReward = MakeDelegate(this, &InputClassification::modulateReward);
     }
 
     void deserialize() {}

@@ -27,8 +27,12 @@ public:
     double probDeriv(const double &u) const {
         return 0.0;
     };
-
+    void provideRuntime(ActFuncRuntime &rt) {
+        rt.prob = MakeDelegate(this, &Determ::prob);
+        rt.probDeriv = MakeDelegate(this, &Determ::probDeriv);
+    }
     const DetermC *c;
 };
+
 
 

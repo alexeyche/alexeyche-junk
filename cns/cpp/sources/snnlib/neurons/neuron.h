@@ -26,6 +26,14 @@ class ProtoRw;
 
 #define SYN_ACT_TOL 0.0001
 
+struct NeuronRuntime {
+    stateDelegate calculateProbability;
+    stateDelegate calculateDynamics;
+    propSynSpikeDelegate propagateSynSpike;
+    attachDelegate attachCurrent;
+};
+
+
 class Neuron: public Serializable<Protos::Neuron> {
 protected:
     Neuron() : Serializable(ENeuron) {}
@@ -56,9 +64,8 @@ public:
     virtual void calculateDynamics() = 0;
     virtual void attachCurrent(const double &I) = 0;
     virtual void propagateSynSpike(const SynSpike *sp) = 0;
-    virtual void provideDelegates(RunTimeDelegates &rtd) {}
     virtual void reset();
-
+    virtual void provideRuntime(NeuronRuntime &rt) = 0;
     // stat funcs
     virtual void saveStat(SerialPack &p);
     virtual void enableCollectStatistics();
@@ -78,23 +85,23 @@ public:
     double M;
 
     double gr;
-    double weight_factor;
-    double fired;
+    uchar fired;
 
     double axon_delay;
 
     vector<Synapse*> syns;
     list<size_t> active_synapses;
 
-    ActFunc *act;
+    ActFuncRuntime act_rt;
+    LearningRuleRuntime lrule_rt;
+    RewardModulationRuntime rmod_rt;
+    TuningCurveRuntime tc_rt;
 
     const RuntimeGlobals *glob_c;
 protected:
     NeuronStat *stat;
 
     const ConstObj *bc;
-
-
 
     LearningRule *lrule;
     TuningCurve *tc;

@@ -26,6 +26,10 @@ public:
         glob_c->propagateReward(n->id, SRMMethods::LLH(n));
     }
 
+    void provideRuntime(RewardModulationRuntime &rt) {
+        rt.modulateReward = MakeDelegate(this, &Likelihood::modulateReward);
+    }
+
     void deserialize() {}
     ProtoPack serialize() { return ProtoPack(); }
     void print(std::ostream& str) const { }

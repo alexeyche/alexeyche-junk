@@ -152,16 +152,17 @@ void Sim::simPrecalculateStep(SimWorker *sw, const double &t) {
     }
     for(size_t ni=sw->first; ni<sw->last; ni++) {
         //cout << "simulating " << ni << " at " << t << "\n";
-        Neuron *n = s->sim_neurons[ni].n;
+        Neuron* n = s->sim_neurons[ni].n;
+        NeuronRuntime &n_rt = s->sim_neurons[ni].n_rt;
         if(ni<s->input_neurons_count) {
-            n->attachCurrent(x);
+            n_rt.attachCurrent(x);
         }
 
         while(const SynSpike *sp = s->net.getSpike(ni, t)) {
-            n->propagateSynSpike(sp);
+            n_rt.propagateSynSpike(sp);
         }
-        n->calculateProbability();
-        n->calculateDynamics();
+        n_rt.calculateProbability();
+        n_rt.calculateDynamics();
 
         if(n->fired) {
             s->net.propagateSpike(n->id, t+s->rg.Dt());
@@ -180,15 +181,16 @@ void Sim::simStep(SimWorker *sw, const double &t) {
     for(size_t ni=sw->first; ni<sw->last; ni++) {
         //cout << "simulating " << ni << " at " << t << "\n";
         Neuron *n = s->sim_neurons[ni].n;
+        NeuronRuntime &n_rt = s->sim_neurons[ni].n_rt;
         if( (s->rg.doWeCareAboutInput()) && (s->sim_neurons[ni].na.first == (s->layers.size()-1)) ) {
             s->rg.setInputNeuronsFiring(n->id, t);
         }
 
         while(const SynSpike *sp = s->net.getSpike(ni, t)) {
-            n->propagateSynSpike(sp);
+            n_rt.propagateSynSpike(sp);
         }
-        n->calculateProbability();
-        n->calculateDynamics();
+        n_rt.calculateProbability();
+        n_rt.calculateDynamics();
 
         if(n->fired) {
             s->net.propagateSpike(n->id, t+s->rg.Dt());
@@ -207,6 +209,7 @@ void Sim::simWtaStep(SimWorker *sw, const double &t) {
     for(size_t ni=sw->first; ni<sw->last; ni++) {
         //cout << "simulating " << ni << " at " << t << "\n";
         Neuron *n = s->sim_neurons[ni].n;
+        NeuronRuntime &n_rt = s->sim_neurons[ni].n_rt;
         Layer *l = s->sim_neurons[ni].l;
 
         if( (s->rg.doWeCareAboutInput()) && (s->sim_neurons[ni].na.first == (s->layers.size()-1)) ) {
@@ -214,19 +217,20 @@ void Sim::simWtaStep(SimWorker *sw, const double &t) {
         }
 
         while(const SynSpike *sp = s->net.getSpike(ni, t)) {
-            n->propagateSynSpike(sp);
+            n_rt.propagateSynSpike(sp);
         }
-        n->calculateProbability();
+        n_rt.calculateProbability();
         if(l->wta) l->p_wta += n->p;
     }
     pthread_barrier_wait( barrier );
     for(size_t ni=sw->first; ni<sw->last; ni++) {
         Neuron *n = s->sim_neurons[ni].n;
+        NeuronRuntime &n_rt = s->sim_neurons[ni].n_rt;
         Layer *l = s->sim_neurons[ni].l;
 
         if(l->wta) n->p *= s->sc.sim_run_c.wta_max_freq/(1000.0*l->p_wta);
 
-        n->calculateDynamics();
+        n_rt.calculateDynamics();
 
         if(n->fired) {
             s->net.propagateSpike(n->id, t+s->rg.Dt());

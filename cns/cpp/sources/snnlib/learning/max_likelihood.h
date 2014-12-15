@@ -60,10 +60,10 @@ protected:
     friend class Factory;
 
 public:
-    MaxLikelihood(const ConstObj *_c, Neuron *_n, WeightNormalization *_wnorm) {
-        init(_c, _n, _wnorm);
+    MaxLikelihood(const ConstObj *_c, Neuron *_n, ActFunc *_act_f, WeightNormalization *_wnorm) {
+        init(_c, _n, _act_f, _wnorm);
     }
-    void init(const ConstObj *_c, Neuron *_n, WeightNormalization *_wnorm) {
+    void init(const ConstObj *_c, Neuron *_n, ActFunc *_act_f, WeightNormalization *_wnorm) {
         c = castType<MaxLikelihoodC>(_c);
         n = _n;
         wnorm = _wnorm;
@@ -106,7 +106,7 @@ public:
                 if(c->input_target) {
                     fired = n->glob_c->inputNeuronsFiring(n->id);
                 }
-                cout << n->act->probDeriv(n->y) << "/(" << n->p  << "/" << n->M << ") * (" << fired << "-" << n->p << ") * " << syn->x << " == ";
+                cout << n->act_rt.probDeriv(n->y) << "/(" << n->p  << "/" << n->M << ") * (" << fired << "-" << n->p << ") * " << syn->x << " == ";
                 if(c->input_target) {
                     cout << SRMMethods::dLLH_dw_given_Y(n, syn, n->glob_c->inputNeuronsFiring(n->id)) << "\n";
                 } else {
@@ -138,6 +138,12 @@ public:
             stat->collect(this);
         }
     }
+    void provideRuntime(LearningRuleRuntime &rt) {
+        rt.calculateWeightsDynamics = MakeDelegate(this, &MaxLikelihood::calculateWeightsDynamics);
+        rt.propagateSynSpike = MakeDelegate(this, &MaxLikelihood::propagateSynSpike);
+    }
+
+
     void deserialize() {
     }
     ProtoPack serialize() {

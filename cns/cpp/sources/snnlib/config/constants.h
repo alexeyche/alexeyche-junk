@@ -281,18 +281,54 @@ public:
 class MinMaxC: public ConstObj {
 public:
     MinMaxC(string name) : ConstObj(name) {}
-    double w_min;
     double w_max;
+    double nu_plus;
+    double nu_minus;
 
     void fill_structure(JsonBox::Value v) {
-        w_min         = v["w_min"].getDouble();
         w_max         = v["w_max"].getDouble();
+        nu_plus         = v["nu_plus"].getDouble();
+        nu_minus         = v["nu_minus"].getDouble();
     }
     void print(std::ostream &str) const {
-        str << "w_min: " << w_min << ", w_max: " << w_max << "\n";
+        str << "w_max: " << w_max <<  ", nu_plus: " << nu_plus << ", nu_minus: " << nu_minus << "\n";
     }
 };
 
+class SoftMinMaxC: public ConstObj {
+public:
+    SoftMinMaxC(string name) : ConstObj(name) {}
+    double w_max;
+    double nu_plus;
+    double nu_minus;
+
+    void fill_structure(JsonBox::Value v) {
+        w_max         = v["w_max"].getDouble();
+        nu_plus         = v["nu_plus"].getDouble();
+        nu_minus         = v["nu_minus"].getDouble();
+    }
+    void print(std::ostream &str) const {
+        str << "w_max: " << w_max <<  ", nu_plus: " << nu_plus << ", nu_minus: " << nu_minus << "\n";
+    }
+};
+
+
+class NonlinearMinMaxC: public ConstObj {
+public:
+    NonlinearMinMaxC(string name) : ConstObj(name) {}
+    double w_max;
+    double mu;
+    double depression_factor;
+
+    void fill_structure(JsonBox::Value v) {
+        w_max         = v["w_max"].getDouble();
+        mu         = v["mu"].getDouble();
+        depression_factor         = v["depression_factor"].getDouble();
+    }
+    void print(std::ostream &str) const {
+        str << "w_max: " << w_max <<  ", mu: "<< mu << ", depression_factor: " << depression_factor << "\n";
+    }
+};
 
 class NeuronConf : public ConfObj {
 public:
@@ -318,7 +354,7 @@ public:
     }
     void print(std::ostream &str) const {
         str << "NeuronConf(neuron: " << neuron << ", learning_rule: "  << learning_rule << ", tuning_curve : " << tuning_curve <<  ", act_func: " << act_func <<
-            ", axon_delay_gain: " << axon_delay_gain  << ", axon_delay_rate: " << axon_delay_rate << 
+            ", axon_delay_gain: " << axon_delay_gain  << ", axon_delay_rate: " << axon_delay_rate <<
             ", reward_modulation: " << reward_modulation << ", weight_normalization: " << weight_normalization << ")";
     }
 };
@@ -602,8 +638,6 @@ public:
 
     SimConfiguration sim_conf;
 
-    static string blank_prefix;
-
     const ConstObj *operator[](const string &key) const {
         if(globals.count(key)) return globals.at(key);
         if(neurons.count(key)) return neurons.at(key);
@@ -615,9 +649,6 @@ public:
         if(reward_modulations.count(key)) return reward_modulations.at(key);
         if(weight_normalizations.count(key)) return weight_normalizations.at(key);
 
-        if(key.substr(0, blank_prefix.size()) == blank_prefix) { // starts with Blank -- ignore
-            return nullptr;
-        }
         cerr << "Couldn't find instance with key in constants: " << key << "\n";
         terminate();
     }

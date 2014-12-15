@@ -5,13 +5,12 @@
 #include <snnlib/util/fast_delegate.h>
 using namespace fastdelegate;
 
-typedef FastDelegate1<const double&> neuronInputDelegate;
-typedef FastDelegate0<> neuronStateDelegate;
+class SynSpike;
 
-struct RunTimeDelegates {
-    vector<neuronInputDelegate> input_dg;
-    vector<neuronStateDelegate> state_dg;
-};
+typedef FastDelegate0<> stateDelegate;
+typedef FastDelegate1<const double&, double> funDelegate;
+typedef FastDelegate1<const SynSpike *> propSynSpikeDelegate;
+typedef FastDelegate1<const double&> attachDelegate;
 
 class Obj {
 public:

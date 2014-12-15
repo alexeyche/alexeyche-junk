@@ -26,7 +26,7 @@ public:
         //cout << "Propagating syns " << sp.syn_id << " (" << syns.size() << ")\n";
         s->x += s->c->amp;
         s->fired = 1;
-        if(lrule) lrule->propagateSynSpike(sp);
+        lrule_rt.propagateSynSpike(sp);
     }
 
     void calculateProbability() {
@@ -35,16 +35,16 @@ public:
             Synapse *s = syns[*it];
             y += s->w * s->x;
         }
-        y = c->u_rest + y * weight_factor;
+        y = c->u_rest + y;
         M = fastexp(-gr);
-        p = act->prob(y) * M;
+        p = act_rt.prob(y) * M;
         if(collectStatistics) {
             stat->collect(this);
         }
     }
 
     void attachCurrent(const double &I) {
-        tc->calculateResponse(I);
+        y = tc_rt.calculateResponse(I);
     }
 
     void calculateDynamics() {
@@ -52,7 +52,7 @@ public:
             fired = 1;
             gr += c->amp_refr;
         }
-        lrule->calculateWeightsDynamics();
+        lrule_rt.calculateWeightsDynamics();
 
         auto it=active_synapses.begin();
         while(it != active_synapses.end()) {
@@ -66,7 +66,13 @@ public:
             }
         }
         gr += - gr/c->tau_refr;
-        if(rmod) rmod->modulateReward();
+        rmod_rt.modulateReward();
+    }
+    void provideRuntime(NeuronRuntime &rt) {
+        rt.attachCurrent = MakeDelegate(this, &SRMNeuron::attachCurrent);
+        rt.calculateDynamics = MakeDelegate(this, &SRMNeuron::calculateDynamics);
+        rt.calculateProbability = MakeDelegate(this, &SRMNeuron::calculateProbability);
+        rt.propagateSynSpike = MakeDelegate(this, &SRMNeuron::propagateSynSpike);
     }
     ProtoPack serialize() {
         return Neuron::serialize();

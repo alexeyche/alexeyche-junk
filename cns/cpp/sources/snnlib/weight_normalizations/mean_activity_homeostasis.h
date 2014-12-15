@@ -25,9 +25,16 @@ public:
 		p_acc += -p_acc/c->tau_mean_act;
 	}
 
-    void modifyWeightDerivative(double &dw, const size_t &syn_id) { 
+    void modifyWeightDerivative(double &dw, const size_t &syn_id) {
 
     }
+    void provideRuntime(WeightNormalizationRuntime &rt, Mode m) {
+        rt.ltpMod = &WeightNormalization::ltpModDefault;
+        rt.ltdMod = &WeightNormalization::ltdModDefault;
+        rt.preModifyMeasure = MakeDelegate(this, &MeanActivityHomeostasis::preModifyMeasure);
+        rt.modifyWeightDerivative = MakeDelegate(this, &MeanActivityHomeostasis::modifyWeightDerivative);
+    }
+
 	void deserialize() {
     }
     ProtoPack serialize() {

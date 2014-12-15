@@ -14,11 +14,11 @@ public:
     }
 
     static inline double dLLH_dw(Neuron *n, Synapse *syn) {
-    	return dLLH_dw_formula(n->p, n->act->probDeriv(n->y), n->M, n->fired, syn->x);
+    	return dLLH_dw_formula(n->p, n->act_rt.probDeriv(n->y), n->M, n->fired, syn->x);
     }
 
     static inline double dLLH_dw_given_Y(Neuron *n, Synapse *syn, const double &fired) {
-		return dLLH_dw_formula(n->p, n->act->probDeriv(n->y), n->M, fired, syn->x);
+		return dLLH_dw_formula(n->p, n->act_rt.probDeriv(n->y), n->M, fired, syn->x);
     }
 private:
 	static inline double LLH_formula(const double &fired, const double &p) {

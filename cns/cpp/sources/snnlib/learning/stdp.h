@@ -66,26 +66,25 @@ protected:
     }
     friend class Factory;
 public:
-    Stdp(const ConstObj *_c, Neuron *_n, WeightNormalization *_wnorm) : LearningRule() {
-    	init(_c, _n, _wnorm);
+    Stdp(const ConstObj *_c, Neuron *_n, ActFunc *_act_f, WeightNormalization *_wnorm) : LearningRule() {
+    	init(_c, _n, _act_f, _wnorm);
     }
-    
-    void init(const ConstObj *_c, Neuron *_n, WeightNormalization *_wnorm) {
+
+    void init(const ConstObj *_c, Neuron *_n, ActFunc *_act_f, WeightNormalization *_wnorm) {
         c = castType<StdpC>(_c);
         n = _n;
         wnorm = _wnorm;
         y_trace = 0.0;
         x_trace.resize(n->syns.size());
         fill(x_trace.begin(), x_trace.end(), 0.0);
-        
+
         stat = nullptr;
-        
-        ltp_mod = WeightNormalization::defaultLtMod;
-        ltd_mod = WeightNormalization::defaultLtMod;
-        if(wnorm) {
-            ltp_mod = wnorm->getLtpMod();
-            ltd_mod = wnorm->getLtdMod();
-        } 
+        _act_f->provideRuntime(act_rt);
+        WeightNormalization::provideDefaultRuntime(wnorm_rt);
+        if(_wnorm) {
+            _wnorm->provideRuntime(wnorm_rt, WeightNormalization::LtpLtd);
+        }
+
         Serializable::init(EStdp);
     }
     void addSynapse(Synapse *s) {
@@ -94,7 +93,7 @@ public:
             stat->x_trace.push_back(vector<double>());
         }
     }
-    
+
     void enableCollectStatistics() {
         collectStatistics = true;
         stat = Factory::inst().registerObj<StdpStat>(new StdpStat(this));
@@ -106,56 +105,58 @@ public:
         }
         x_trace[sp->syn_id] += 1;
     }
-    
+
     void calculateWeightsDynamics()  {
-        if(wnorm) wnorm->preModifyMeasure();
+        wnorm_rt.preModifyMeasure();
 
         if(n->fired) {
             y_trace += 1;
         }
+
         auto it=active_synapses.begin();
         while(it != active_synapses.end()) {
             Synapse *syn = n->syns[*it];
 
-            double dw = c->a_plus * ltp_mod(syn->w) * x_trace[*it] * n->fired - c->a_minus * ltd_mod(syn->w) * y_trace * syn->fired;
-            
-            if(wnorm) wnorm->modifyWeightDerivative(dw, *it);
-            
-            syn->x += - syn->x/c->tau_plus;
+            double dw = c->learning_rate * ( c->a_plus  * wnorm_rt.ltpMod(syn->w) * x_trace[*it] * n->fired -  \
+                                             c->a_minus * wnorm_rt.ltdMod(syn->w) * y_trace      * syn->fired );
+
+            wnorm_rt.modifyWeightDerivative(dw, *it);
+            syn->w += dw;
+
+            x_trace[*it] += - x_trace[*it]/c->tau_plus;
 
             if(fabs(x_trace[*it]) < SYN_ACT_TOL) {
                 it = active_synapses.erase(it);
             } else {
                 it++;
             }
-            
-            if(std::isnan(dw)) {
-                cout << "Found nan dw:\n";
-                cout << *n;
-                terminate();
-            }
         }
+
         y_trace += - y_trace/c->tau_minus;
+
         if(collectStatistics) {
             stat->collect(this);
         }
     }
 
-    void deserialize() {}
-    ProtoPack serialize() { 
-        return ProtoPack(); 
+    void provideRuntime(LearningRuleRuntime &rt) {
+        rt.calculateWeightsDynamics = MakeDelegate(this, &Stdp::calculateWeightsDynamics);
+        rt.propagateSynSpike = MakeDelegate(this, &Stdp::propagateSynSpike);
     }
-    ProtoPack getNew() { 
-        return ProtoPack(); 
+
+
+    void deserialize() {}
+    ProtoPack serialize() {
+        return ProtoPack();
+    }
+    ProtoPack getNew() {
+        return ProtoPack();
     }
     void saveStat(SerialPack &p) {
         p.push_back(stat);
-    }   
-     
-    void print(std::ostream& str) const { }
+    }
 
-    double (*ltp_mod)(const double &w);
-    double (*ltd_mod)(const double &w);
+    void print(std::ostream& str) const { }
 
 
     double y_trace;
