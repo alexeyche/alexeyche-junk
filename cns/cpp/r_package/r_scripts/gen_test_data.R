@@ -10,10 +10,11 @@ ornstein_uhlenbeck <- function(T, n, nu,lambda,sigma,x0){
 }
 
 set.seed(8)
-d1 <- ornstein_uhlenbeck(10,999, 0.2, 1, 0.007, 0.15)
-d2 <- ornstein_uhlenbeck(10,999, 0.2, 1, 0.007, 0.15)
-d3 <- ornstein_uhlenbeck(10,999, 0.15, 0.5, 0.01, 0.21)
-d4 <- ornstein_uhlenbeck(10,999, 0.15, 0.5, 0.01, 0.21)
+sample_len = 999
+d1 <- ornstein_uhlenbeck(10,sample_len, 0.2, 1, 0.007, 0.15)
+d2 <- ornstein_uhlenbeck(10,sample_len, 0.2, 1, 0.007, 0.15)
+d3 <- ornstein_uhlenbeck(10,sample_len, 0.15, 0.5, 0.01, 0.21)
+d4 <- ornstein_uhlenbeck(10,sample_len, 0.15, 0.5, 0.01, 0.21)
 
 
 
@@ -38,5 +39,13 @@ for(i in 1:length(lts$list)) {
 }
 
 pr$write("LabeledTimeSeriesList", lts)
+
+dm = cbind(d1,d2,d3,d4)
+G0_imre = fft(dm)/nrow(dm)
+G0 = sapply(1:ncol(G0_imre), function(i) Re(G0_imre[,i]))
+
+Fs = 1000 # Hz, sampling rate
+f = Fs/2*seq(-1,1,length.out=nrow(dm))
+
 
 
