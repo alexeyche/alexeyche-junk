@@ -45,9 +45,9 @@ Mark C.W. van~Rossum Nicolas~Brunel.
 \newblock {\em Biological Cybernetics}, 97(5-6):337--339, 2007.
 
 \bibitem{IzhSimpleModel}
-Eugene~M. Izhikevich.
+Eugene~M Izhikevich et~al.
 \newblock Simple model of spiking neurons.
-\newblock {\em Transactions on Neural Networks}, 14(6), 2003.
+\newblock {\em IEEE Transactions on neural networks}, 14(6):1569--1572, 2003.
 
 \bibitem{IzhTalam}
 Eugene~M. Izhikevich and Gerald~M. Edelman.
@@ -92,41 +92,41 @@ Frotscher M~SakmannB. Markram~H, Lubke~J.
 Johnston~D. Magee~J.C.
 \newblock A synaptically controlled, associative signal for hebbian plasticity
   in hippocampal neurons.
-\newblock {\em Science}, 275:209--13, 1997.
+\newblock {\em Science}, 275:209--313, 1997.
 
 \bibitem{stdp3}
 Sugawara Y. Grant~K. Bell~C.C., Han~V.Z.
 \newblock Synaptic plasticity in a cerebellum-like structure depends on
   temporal order.
-\newblock {\em Nature}, 387:278--81, 1997.
+\newblock {\em Nature}, 387:278--281, 1997.
 
 \bibitem{stdp4}
 Poo~M. Bi~G.
 \newblock Synaptic modifications in cultured hippocampal neurons: Dependence on
   spike timing, synaptic strength and postsynaptic cell type.
-\newblock {\em Neurosci}, 18:10464–72, 1998.
+\newblock {\em Neurosci}, 18:10464–10472, 1998.
 
 \bibitem{anderson1963}
 Т~Андерсон.
-\newblock Введение в многомерный
-  статистический анализ.
-\newblock 1963.
+\newblock {\em Введение в многомерный
+  статистический анализ}.
+\newblock Гос. изд-во физ.-мат. лит. М., 1963.
 
 \bibitem{NeuralAndAdaptiveSystems}
 W.~Curt~Lefebvre Jose C.~Principe, Neil R.~Euliano.
 \newblock {\em Neural and Adaptive Systems: Fundamentals Through Simulation}.
 \newblock Wiley, 1999.
 
+\bibitem{oja1997nonlinear}
+Erkki Oja.
+\newblock The nonlinear pca learning rule in independent component analysis.
+\newblock {\em Neurocomputing}, 17(1):25--45, 1997.
+
 \bibitem{Cooper}
 L.N. Cooper and M.F. Bear.
 \newblock The bcm theory of synapse modification at 30: interaction of theory
   with experiment.
 \newblock {\em Nature Reviews Neuroscience}, 13:798--810, 2012.
-
-\bibitem{friedman1973projection}
-Jerome~H Friedman and John~W Tukey.
-\newblock A projection pursuit algorithm for exploratory data analysis.
-\newblock 1973.
 
 \bibitem{bcm_book}
 Intrator N. Blais B.~S. Cooper, L.~N and H.~Z. Shouval.
@@ -188,7 +188,7 @@ Taro Toyoizumi, Jean-Pascal Pfister, Kazuyuki Aihara, and Wulfram Gerstner.
 \newblock Generalized bienenstock--cooper--munro rule for spiking neurons that
   maximizes information transmission.
 \newblock {\em Proceedings of the National Academy of Sciences of the United
-  States of America}, 102(14):5239, 2005.
+  States of America}, 102(14):5239--5244, 2005.
 
 \bibitem{OptStdpSecond}
 K.~Aihara T.~Toyoizumi, J.-P.~Pfister and W.~Gerstner.
