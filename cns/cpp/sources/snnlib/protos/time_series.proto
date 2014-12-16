@@ -15,4 +15,11 @@ message LabeledTimeSeriesList {
     repeated LabeledTimeSeries list = 1;
 }
 
+message PatternsTimeline {
+    repeated string labels = 1;
+    repeated uint32 labels_id_timeline = 2;
+    repeated double timeline = 3;
+    required double tmax = 4;
+}
+
 

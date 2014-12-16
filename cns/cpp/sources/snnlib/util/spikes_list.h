@@ -2,6 +2,7 @@
 
 #include <snnlib/protos/spikes_list.pb.h>
 
+#include <snnlib/util/time_series.h>
 #include <snnlib/serialize/serialize.h>
 
 class SpikesList: public Serializable<Protos::SpikesList> {
@@ -78,4 +79,39 @@ public:
 
     size_t N;
     vector<double> *sp_list;
+};
+
+class LabeledSpikesList: public Serializable<Protos::LabeledSpikesList> {
+private:
+    friend class Factory;
+    LabeledSpikesList() : Serializable(ELabeledSpikesList) {}
+public:
+    LabeledSpikesList(PatternsTimeline &_ptl, SpikesList &_sl) : Serializable(ELabeledSpikesList),
+        sl(_sl), ptl(_ptl) {}
+
+
+    virtual ProtoPack serialize() {
+        Protos::LabeledSpikesList *l = getNewMessage();
+
+        Protos::SpikesList *sl_m = copyProtoMessage<Protos::SpikesList>(sl.serialize().front());
+        Protos::PatternsTimeline *ptl_m = copyProtoMessage<Protos::PatternsTimeline>(ptl.serialize().front());
+
+        l->set_allocated_sl(sl_m);
+        l->set_allocated_ptl(ptl_m);
+        return ProtoPack({l});
+    }
+
+
+    virtual void deserialize() {
+        Protos::LabeledSpikesList *m = getSerializedMessage();
+        sl.deserializeFromAllocated(m->mutable_sl());
+        ptl.deserializeFromAllocated(m->mutable_ptl());
+    }
+
+    void print(std::ostream& str) const {
+        cout << "SpikesList: " << sl;
+        cout << "PatternsTimeline: " << ptl;
+    }
+    SpikesList sl;
+    PatternsTimeline ptl;
 };

@@ -108,6 +108,65 @@ public:
     vector<LabeledTimeSeries> ts;
 };
 
+class PatternsTimeline : public Serializable<Protos::PatternsTimeline> {
+
+
+public:
+    PatternsTimeline() : Serializable(EPatternsTimeline) {}
+    virtual ProtoPack serialize() {
+        Protos::PatternsTimeline *l = getNewMessage();
+        for(auto it=labels.begin(); it != labels.end(); ++it) {
+            l->add_labels(*it);
+        }
+        for(auto it=labels_id_timeline.begin(); it != labels_id_timeline.end(); ++it) {
+            l->add_labels_id_timeline(*it);
+        }
+        for(auto it=timeline.begin(); it != timeline.end(); ++it) {
+            l->add_timeline(*it);
+        }
+        l->set_tmax(Tmax);
+        return ProtoPack({l});
+    }
+    virtual void deserialize() {
+        Protos::PatternsTimeline *m = getSerializedMessage();
+        for(size_t i=0; i<m->labels_size(); i++) {
+            labels.push_back(m->labels(i));
+        }
+        for(size_t i=0; i<m->labels_id_timeline_size(); i++) {
+            labels_id_timeline.push_back(m->labels_id_timeline(i));
+        }
+        for(size_t i=0; i<m->timeline_size(); i++) {
+            timeline.push_back(m->timeline(i));
+        }
+        Tmax = m->tmax();
+    }
+    const size_t* getCurrentClassId(const double &t) {
+        while(current_position < timeline.size()) {
+            if(t <= timeline[current_position]) {
+                return &labels_id_timeline[current_position];
+            }
+            current_position += 1;
+        }
+        cerr << "Trying to get current class for time bigger than Tmax\n";
+        terminate();
+    }
+    void print(std::ostream& str) const {
+        str << "labels: "; print_vector<string>(labels, str,","); str << "\n";
+        str << "timeline: "; print_vector<double>(timeline,str,","); str << "\n";
+        str << "labels id timeline: "; print_vector<size_t>(labels_id_timeline,str,","); str << "\n";
+        str << "Tmax: " << Tmax << "\n";
+    }
+    void reset() {
+        current_position = 0;
+    }
+    vector<string> labels;
+    vector<size_t> labels_id_timeline;
+    vector<double> timeline;
+    double Tmax;
+
+    size_t current_position;
+};
+
 
 class ContLabeledTimeSeries : public Printable {
 public:
@@ -127,39 +186,30 @@ public:
             }
 
             int pos = -1;
-            if(labels.size()>0) {
-                auto pos_it = find(labels.begin(), labels.end(), it->label);
-                if(pos_it != labels.end()) {
-                    pos = pos_it - labels.begin();
+            if(ptl.labels.size()>0) {
+                auto pos_it = find(ptl.labels.begin(), ptl.labels.end(), it->label);
+                if(pos_it != ptl.labels.end()) {
+                    pos = pos_it - ptl.labels.begin();
                 }
             }
 
             if(pos<0) {
-                labels.push_back(it->label);
-                pos = labels.size()-1;
+                ptl.labels.push_back(it->label);
+                pos = ptl.labels.size()-1;
             }
 
-            labels_id_timeline.push_back(pos);
+            ptl.labels_id_timeline.push_back(pos);
             acc_time += dt*(double)it->ts.size();
-            timeline.push_back(acc_time);
+            ptl.timeline.push_back(acc_time);
          }
 
-         if(timeline.size()>0) {
-            Tmax = timeline.back();
+         if(ptl.timeline.size()>0) {
+            ptl.Tmax = ptl.timeline.back();
          }
-         current_position = 0;
+         ptl.current_position = 0;
     }
 
-    const size_t* getCurrentClassId(const double &t) {
-        while(current_position < timeline.size()) {
-            if(t <= timeline[current_position]) {
-                return &labels_id_timeline[current_position];
-            }
-            current_position += 1;
-        }
-        cerr << "Trying to get current class for time bigger than Tmax\n";
-        terminate();
-    }
+
 
     inline void pop_value() {
         data.pop_front();
@@ -172,22 +222,20 @@ public:
     }
     void print(std::ostream& str) const {
         str << "data: "; print_deque<double>(data, str,","); str << "\n";
-        str << "labels: "; print_vector<string>(labels, str,","); str << "\n";
-        str << "timeline: "; print_vector<double>(timeline,str,","); str << "\n";
-        str << "labels id timeline: "; print_vector<size_t>(labels_id_timeline,str,","); str << "\n";
-        str << "Tmax: " << Tmax << "\n";
+        str << "patterns timeline: " << ptl << "\n";
+
     }
     void reset() {
-        current_position = 0;
+        ptl.reset();
+    }
+    const double& getTmax() {
+        return ptl.Tmax;
     }
 
-    size_t current_position;
-    double Tmax;
+
 
     deque<double> data;
-    vector<string> labels;
-
-    vector<size_t> labels_id_timeline;
-    vector<double> timeline;
+    PatternsTimeline ptl;
 };
+
 

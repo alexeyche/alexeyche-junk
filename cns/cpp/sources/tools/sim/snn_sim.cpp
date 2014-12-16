@@ -138,8 +138,8 @@ int main(int argc, char **argv) {
         LabeledTimeSeriesList *lst = static_cast<LabeledTimeSeriesList*>(inp);
         s.setInputTimeSeries(*lst);
     } else
-    if(inp->getName() == "SpikesList") {
-        SpikesList *sl = static_cast<SpikesList*>(inp);
+    if(inp->getName() == "LabeledSpikesList") {
+        LabeledSpikesList *sl = static_cast<LabeledSpikesList*>(inp);
         s.setInputSpikesList(*sl);
     } else {
         cerr << "Inappropriate input file " << inp->getName() << "\n";

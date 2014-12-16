@@ -46,7 +46,8 @@ public:
         }
         if(!output_spikes_file.empty()){
             ProtoRw prw(output_spikes_file, ProtoRw::Write);
-            prw.write(&net.spikes_list);
+            LabeledSpikesList lsl(ptl, net.spikes_list);
+            prw.write(&lsl);
         }
 
         layers.clear();
@@ -86,11 +87,11 @@ public:
         rg.setSimTime(s->sim_time());
         //jobs = s->jobs();
     }
-    ProtoPack serialize() { 
+    ProtoPack serialize() {
         Protos::Sim *s = getNewMessage();
         s->set_sim_time(rg.getSimTime());
         s->set_jobs(jobs);
-        return ProtoPack({s}); 
+        return ProtoPack({s});
     }
 
 
@@ -105,17 +106,19 @@ public:
         CHECK_CONSTRUCT()
         input_ts_list = l;
         input_ts = ContLabeledTimeSeries(l, sc.ts_map_conf.dt);
+        ptl = input_ts.ptl;
     }
 
-    void setInputSpikesList(SpikesList l) {
+    void setInputSpikesList(LabeledSpikesList l) {
         CHECK_CONSTRUCT()
-        if(l.N < input_neurons_count) {
+        if(l.sl.N < input_neurons_count) {
             cerr << "Input spikes list is inconsistent with const.json\n";
             terminate();
         }
         for(size_t ni=0; ni<input_neurons_count; ni++) {
-            net.spikes_list[ni] = l[ni];
+            net.spikes_list[ni] = l.sl[ni];
         }
+        ptl = l.ptl;
     }
 
     void setOutputSpikesFile(const string &filename) {
@@ -143,6 +146,7 @@ public:
         net.reset(reset_input_stat);
         if(input_ts_list.size()>0){
             input_ts = ContLabeledTimeSeries(input_ts_list, sc.ts_map_conf.dt);
+            ptl = input_ts.ptl;
         }
     }
 
@@ -198,5 +202,7 @@ public:
     bool constructed;
     bool wta_regime;
     LabeledTimeSeriesList input_ts_list;
+
+    PatternsTimeline ptl;
 };
 

@@ -1,11 +1,11 @@
 {
     "tuning_curves" : {
         "SigmaTuningCurve" : {
-            "sigma" : [0.1, 0.1],
+            "sigma" : [0.01, 0.01],
             "intercept" : [-2.4, 2.4], // for synthetic control
-//            "intercept" : [-1.0, 1.0],   // for test data
-//            "gain" : [1.2, 1.2]     // for test data
-            "gain" : [ 1.0, 1.0 ]
+            "gain" : [ 30, 30 ],
+            "prob_next_sigma" : 0.0,
+            "max_sigma_num" : 1
         }
     },
     "neurons" : {
@@ -61,36 +61,36 @@
             "scaling_factor" : 1
         },
         "MinMax" : {     // http://www.scholarpedia.org/article/Spike-timing_dependent_plasticity
-            "w_max" : 15,
+            "w_max" : 10,
             "nu_plus" : 0.1,
             "nu_minus" : 0.1
         },
         "SoftMinMax" : {  // http://www.scholarpedia.org/article/Spike-timing_dependent_plasticity
-            "w_max" : 5,
+            "w_max" : 4,
             "nu_plus" : 0.1,
             "nu_minus" : 0.1
         },
         "NonlinearMinMax" : {  // Gutig et al. 2003. "Learning Input Correlations through Nonlinear Temporally Asymmetric Hebbian Plasticity"
-            "w_max" : 1,
+            "w_max" : 1.5,
             "mu" : 0.5,
-            "depression_factor" : 1.0
+            "depression_factor" : 1.1
         }
     },
     "learning_rules" : {
         "OptimalStdp" : {
             "tau_c" : 100,
             "mean_p_dur" : 60000,
-            "target_rate" : 15,
-            "target_rate_factor" : 0,
-            "weight_decay" : 0.01,
-            "learning_rate" : 0.12
+            "target_rate" : 5,
+            "target_rate_factor" : 1,
+            "weight_decay" : 0.005,
+            "learning_rate" : 0.04
         },
         "Stdp" : {
             "tau_plus" : 30.0, // ms
             "tau_minus" : 30.0, // ms
             "a_plus" : 1,
             "a_minus" : 1,
-            "learning_rate" : 0.05
+            "learning_rate" : 0.01
         },
         "MaxLikelihood" : {
             "tau_el" : 100,
@@ -123,9 +123,9 @@
                 "wta" : false,
                 "neuron_conf" : {
                     "neuron" : "SRMNeuron",
-                    "learning_rule" : "Stdp",
+                    "learning_rule" : "OptimalStdp",
+                    "weight_normalization" : "MinMax",
                     "act_func" : "ExpHennequin",
-                    "weight_normalization" : "NonlinearMinMax",
                     "axon_delay_distr" : [0, 0]
                 }
             }                
@@ -161,7 +161,7 @@
 //            }
         },
         "time_series_map_conf" : {
-            "dt" : 3.0          // ms
+            "dt" : 2.0          // ms
         },
         "sim_run_conf" : {
             "seed" : -1,

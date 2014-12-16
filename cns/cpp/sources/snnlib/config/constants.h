@@ -95,16 +95,22 @@ public:
     pair<double,double> sigma;
     pair<double,double> intercept;
     pair<double,double> gain;
+    double prob_next_sigma;
+    int max_sigma_num;
 
     void fill_structure(JsonBox::Value v) {
         sigma = readLowAndHigh(v["sigma"].getArray());
         intercept = readLowAndHigh(v["intercept"].getArray());
         gain = readLowAndHigh(v["gain"].getArray());
+        prob_next_sigma = v["prob_next_sigma"].getDouble();
+        max_sigma_num = v["max_sigma_num"].getInt();
     }
     void print(std::ostream &str) const {
         str << "sigma: "; printDoublePair(sigma, str);
         str << ", intercept: "; printDoublePair(intercept, str);
         str << ", gain: "; printDoublePair(gain, str);
+        str << ", prob_next_sigma: " << prob_next_sigma;
+        str << ", max_sigma_num: " << max_sigma_num;
         str << "\n";
     }
 };

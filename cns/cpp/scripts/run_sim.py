@@ -20,7 +20,10 @@ def runSim(snn_sim_bin, args, log_stdout, verbose=False):
     ]            
 
     for k, v in [ (k, args[k]) for k in sorted(args) ]:
-        cmd += [k, v]
+        if type(v) is bool:
+            cmd += [k]
+        else:
+            cmd += [k, v]
     start_time = time.time()
     sp = sub.Popen(cmd, stdout=open(log_stdout, 'w'), stderr=sub.STDOUT, shell=False)
     if verbose:
@@ -42,6 +45,7 @@ def runSim(snn_sim_bin, args, log_stdout, verbose=False):
         sys.exit(1)
 
 
+
 def main(args):
     const_hex = md5.new(args.const).hexdigest()
     i=0
@@ -55,7 +59,7 @@ def main(args):
         wd = new_wd
         i+=1
     
-    start_ep = 1
+    start_ep = 0
     if os.path.exists(wd):
         max_ep = -1
         for f in os.listdir(wd):
@@ -91,8 +95,10 @@ def main(args):
     }            
     if args.T_max != 0:
         common_sim_args['--T-max'] = args.T_max
-    for ep in xrange(start_ep, start_ep + args.epochs):
+
+    for ep in xrange(start_ep, start_ep + args.epochs + 1):
         sim_args = common_sim_args.copy()
+        
         sim_args['--save'] = wd_file("%s_model.pb" % ep)
         sim_args['--output'] = wd_file("%s_output_spikes.pb" % ep)
         if args.stat:
@@ -102,6 +108,16 @@ def main(args):
             if not os.path.exists(model_load):
                 raise Exception("Can't find model for previous epoch number %s" % str(ep-1))
             sim_args['--load'] = model_load
+        
+        if ep == 0:
+            sim_args['--precalc'] = True
+            sim_args['--output'] = wd_file("input_spikes.pb")
+            del sim_args['--save']
+        else:
+            if not os.path.exists( wd_file("input_spikes.pb") ):
+                raise Exception("Can't find input_spikes.pb")
+            sim_args['--input'] = wd_file("input_spikes.pb")
+
         print "Epoch %d" % ep
         runSim(args.snn_sim_bin, sim_args, wd_file("%s_output.log" % ep), verbose = args.verbose)
     
@@ -115,7 +131,7 @@ if __name__ == '__main__':
     parser.add_argument('-i', 
                         '--input', 
                         required=True,
-                        help='Input spikes list or time series protobuf')
+                        help='Input time series protobuf')
     parser.add_argument('-e', 
                         '--epochs', 
                         required=False,

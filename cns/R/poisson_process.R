@@ -131,9 +131,14 @@ correl_poiss = function (lambda, corr, n=10000)
   return(merke[-aussortieren,])
 }
 
-lx = rpois(10000, 8)
-ly = rpois(10000, 8)
-lt = rpois(10000, 2)
+lx = rpois(100000, 0.01)
+ly = rpois(100000, 0.01)
+lt = rpois(100000, 0.005)
 
 x = lx+lt
 y = ly+lt
+
+cor(x,y)
+x_sp = which(x == 1)
+y_sp = which(y == 1)
+prast(list(x_sp, y_sp), T0=0,Tmax=1000)

@@ -175,7 +175,7 @@ void Sim::simPrecalculateStep(SimWorker *sw, const double &t) {
 void Sim::simStep(SimWorker *sw, const double &t) {
     Sim *s = sw->s;
     if(sw->thread_id == 0) {
-        s->rg.current_class_id = s->input_ts.getCurrentClassId(t);
+        s->rg.current_class_id = s->ptl.getCurrentClassId(t);
     }
     pthread_barrier_wait( barrier );
     for(size_t ni=sw->first; ni<sw->last; ni++) {
@@ -206,6 +206,10 @@ void Sim::simStep(SimWorker *sw, const double &t) {
 
 void Sim::simWtaStep(SimWorker *sw, const double &t) {
     Sim *s = sw->s;
+    if(sw->thread_id == 0) {
+        s->rg.current_class_id = s->ptl.getCurrentClassId(t);
+    }
+    pthread_barrier_wait( barrier );
     for(size_t ni=sw->first; ni<sw->last; ni++) {
         //cout << "simulating " << ni << " at " << t << "\n";
         Neuron *n = s->sim_neurons[ni].n;
@@ -287,7 +291,7 @@ void Sim::precalculateInputSpikes() {
     if(T_limit >= 1.0) {
         Tmax = T_limit;
     } else {
-        Tmax = input_ts.Tmax;
+        Tmax = input_ts.getTmax();
     }
     rg.setDt(sc.ts_map_conf.dt);
     runSimOnSubset(0, input_neurons_count, Sim::runPrecalculateWorker);

@@ -35,7 +35,9 @@ enum ESerializableClass {
                             EStdp,
                             EStdpStat,
                             ESoftMinMax,
-                            ENonlinearMinMax
+                            ENonlinearMinMax,
+                            ELabeledSpikesList,
+                            EPatternsTimeline
                         };
 
 static const char* ESerializableClass_str[] =
@@ -66,7 +68,9 @@ static const char* ESerializableClass_str[] =
                                                 "Stdp",
                                                 "StdpStat",
                                                 "SoftMinMax",
-                                                "NonlinearMinMax"
+                                                "NonlinearMinMax",
+                                                "LabeledSpikesList",
+                                                "PatternsTimeline"
                                             };
 
 
@@ -129,6 +133,13 @@ public:
         return d;
     }
 
+    template <typename CT>
+    CT* copyProtoMessage(google::protobuf::Message* mess) {
+        CT* d = castProtoMessage<CT>(mess);
+        CT* new_d = new CT(*d);
+        return new_d;
+    }
+
 
     Serializable(const Serializable &another) {
         copyFrom(another);
@@ -161,7 +172,15 @@ public:
             getNewSerializedMessage(another.serialized_messages[mi]);
         }
     }
-
+    void deserializeFromAllocated(google::protobuf::Message* m) {
+        if(serialized_messages.size() != 0) {
+            cerr << "Failed to serialize from allocated: serialized mesage is already allocated\n";
+            terminate();
+        }
+        serialized_messages.push_back(m);
+        deserialize();
+        serialized_messages.clear();
+    }
 
 
     virtual ProtoPack serialize() = 0;

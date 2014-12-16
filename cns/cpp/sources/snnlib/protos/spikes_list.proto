@@ -1,6 +1,8 @@
 
 package Protos;
 
+import "time_series.proto";
+
 message SpikesSequence {
     repeated double seq = 1 [packed=true];
 }
@@ -8,5 +10,10 @@ message SpikesSequence {
 
 message SpikesList {
     repeated SpikesSequence spikes_list = 1;
+}
+
+message LabeledSpikesList {
+    required SpikesList sl = 1;
+    required PatternsTimeline ptl = 2;
 }
 

@@ -122,6 +122,9 @@ SerializableBase* Factory::createSerializable(const string &name) {
     if(name == "Reward") {
         s = new Reward();
     } else
+    if(name == "LabeledSpikesList") {
+        s = new LabeledSpikesList();
+    } else
     if(name == "Sim") {
         s = new Sim();
     } else

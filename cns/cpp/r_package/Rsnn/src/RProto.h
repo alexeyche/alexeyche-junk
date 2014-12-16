@@ -43,7 +43,7 @@ public:
                 v.push_back(o);
             }
             
-            if( (v.size() == 1)&&(v[0]->getName() == "SpikesList")) {
+            if( (v.size() == 1)&&(v[0]->getName() == "LabeledSpikesList")) {
                 values = convert(v[0]);
             } else {
                 for(size_t vi=0; vi<v.size(); vi++) {
@@ -109,13 +109,13 @@ public:
 
     Rcpp::List convert(SerializableBase *s) {
         Rcpp::List out;
-        if(s->getName() == "SpikesList") {
-            SpikesList *sl = dynamic_cast<SpikesList*>(s);
-            if(!sl) { ERR("Can't cast"); }
-            for(size_t ni=0; ni<sl->N; ni++) {
+        if(s->getName() == "LabeledSpikesList") {
+            LabeledSpikesList *lsl = dynamic_cast<LabeledSpikesList*>(s);
+            if(!lsl) { ERR("Can't cast"); }
+            for(size_t ni=0; ni<lsl->sl.N; ni++) {
                 stringstream ss;
                 ss << ni;
-                out[ss.str()] = Rcpp::NumericVector(Rcpp::wrap(sl->sp_list[ni]));
+                out[ss.str()] = Rcpp::NumericVector(Rcpp::wrap(lsl->sl.sp_list[ni]));
             }
         } else 
         if((s->getName() == "NeuronStat")||(s->getName() == "AdExNeuronStat")) {
