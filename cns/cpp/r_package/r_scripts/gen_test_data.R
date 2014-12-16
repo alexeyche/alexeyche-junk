@@ -8,13 +8,14 @@ mean_rate = 10 # Hz
 
 correllated_neurons = 50
 
-correlation = 0.3
+correlation = 0.5
 
 getCorrRate = function(p, lambda) {
+    if(p == 1) return(2*lambda)
     p * lambda/(1-p) 
 }
-corr_rate = mean_rate*getCorrRate(correlation, 1)
-decorr_rate = mean_rate*(1-getCorrRate(correlation, 1))
+corr_rate = mean_rate*getCorrRate(correlation, 1)/2
+decorr_rate = mean_rate*(1-getCorrRate(correlation, 1)/2)
 
 rates = c(rep(decorr_rate, correllated_neurons), rep(mean_rate, N-correllated_neurons))
 
@@ -28,8 +29,6 @@ for(ni in seq(1, correllated_neurons, by=2)) {
 }
 
 
-
-
 net = vector("list",N)
 net_b = NULL
 for(ni in 1:N) {
@@ -39,4 +38,4 @@ for(ni in 1:N) {
     net[[ni]] = which(spikes_bin == 1)
 }
 
-prast(net)
+prast(net,T0=0,Tmax=1000)
