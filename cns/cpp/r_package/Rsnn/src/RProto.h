@@ -80,6 +80,52 @@ public:
             }
             ProtoPack pack({&lts_mess});
             rw.writeProtoPack(message_name, pack);
+        } else    
+        if(message_name == "LabeledSpikesList") {
+            Protos::LabeledSpikesList lsl_mess;
+
+            Protos::SpikesList *sl = new Protos::SpikesList;
+            Rcpp::List sp_list = list["spikes_list"];
+            for(size_t ni=0; ni<sp_list.size(); ni++) {
+                Rcpp::NumericVector spikes = sp_list[ni];
+                Protos::SpikesSequence *s = sl->add_spikes_list();
+                for(auto it=spikes.begin(); it != spikes.end(); ++it) {
+                    s->add_seq(*it);
+                }
+            }
+            lsl_mess.set_allocated_sl(sl);
+
+            Protos::PatternsTimeline *ptl = new Protos::PatternsTimeline;
+            Rcpp::CharacterVector labels_r = list["labels"];
+            vector<string> labels_tl = Rcpp::as< vector<string> >(labels_r);
+            Rcpp::NumericVector timeline = list["timeline"];
+            if(labels_tl.size() != timeline.size()) {
+                ERR("Can't write spikes list with labels and timeline different size\n");
+            }
+            vector<string> labels;
+            for(size_t i=0; i < labels_tl.size(); i++) {
+                string lab = labels_tl[i];
+                double tl = timeline[i];
+                int pos = -1;
+                if(labels.size()>0) {
+                    auto pos_it = find(labels.begin(), labels.end(), lab);
+                    if(pos_it != labels.end()) {
+                        pos = pos_it - labels.begin();
+                    }
+                }
+                if(pos<0) {
+                    ptl->add_labels(lab);
+                    labels.push_back(lab);
+                    pos = labels.size()-1;
+                }
+                ptl->add_labels_id_timeline(pos);
+                ptl->add_timeline(tl);
+            }
+            double Tmax = timeline[timeline.size()-1];
+            ptl->set_tmax(Tmax);
+            lsl_mess.set_allocated_ptl(ptl);
+            ProtoPack pack({&lsl_mess});
+            rw.writeProtoPack(message_name, pack);
         } else {
             ERR("Can't recognize serializable name: " << message_name << "\n");
         }
