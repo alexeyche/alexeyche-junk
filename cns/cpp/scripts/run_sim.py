@@ -87,10 +87,15 @@ def main(args):
 
     def wd_file(s):
         return os.path.join(wd, s)
+    input = None
+    if args.input:
+        input = args.input
+    elif args.spikes:
+        input = args.spikes
 
     common_sim_args = {
             '--jobs' : str(args.jobs),
-            '--input' : args.input,
+            '--input' : input,
             '--constants' : const
     }            
     if args.T_max != 0:
@@ -108,16 +113,18 @@ def main(args):
             if not os.path.exists(model_load):
                 raise Exception("Can't find model for previous epoch number %s" % str(ep-1))
             sim_args['--load'] = model_load
-        
-        if ep == 0:
-            sim_args['--precalc'] = True
-            sim_args['--output'] = wd_file("input_spikes.pb")
-            del sim_args['--save']
-        else:
-            if not os.path.exists( wd_file("input_spikes.pb") ):
-                raise Exception("Can't find input_spikes.pb")
-            sim_args['--input'] = wd_file("input_spikes.pb")
 
+        if args.input:
+            if ep == 0:
+                sim_args['--precalc'] = True
+                sim_args['--output'] = wd_file("input_spikes.pb")
+                del sim_args['--save']
+            else:
+                if not os.path.exists( wd_file("input_spikes.pb") ):
+                    raise Exception("Can't find input_spikes.pb")
+                sim_args['--input'] = wd_file("input_spikes.pb")
+        elif ep == 0:
+            continue
         print "Epoch %d" % ep
         runSim(args.snn_sim_bin, sim_args, wd_file("%s_output.log" % ep), verbose = args.verbose)
     
@@ -130,8 +137,12 @@ if __name__ == '__main__':
 
     parser.add_argument('-i', 
                         '--input', 
-                        required=True,
+                        required=False,
                         help='Input time series protobuf')
+    parser.add_argument('-sp', 
+                        '--spikes', 
+                        required=False,
+                        help='Input labeled spikes list protobuf')
     parser.add_argument('-e', 
                         '--epochs', 
                         required=False,
@@ -169,4 +180,6 @@ if __name__ == '__main__':
                         help='Path to snn sim bin (default: $SCRIPT_DIR/../build/bin/%s)' % SNN_SIM, default=os.path.join(os.path.dirname(this_file), "../build/bin", SNN_SIM))
 
     args = parser.parse_args(sys.argv[1:])    
+    if (not args.spikes and not args.input) or (args.spikes and args.input):
+        raise Exception("Need input time series or input spikes")
     main(args)

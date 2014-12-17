@@ -103,7 +103,7 @@ van_rossum_alg <- function(train, unknown_object) {
 test = function() {
 
   name = synth
-  c(train, test) := read_ts_file(name)
+  c(train, test) := read_ts_file(name, 120,"/home/alexeyche/prog/sim/ts")
 
   ucr_test(train, test, eucl_dist_alg)
 }

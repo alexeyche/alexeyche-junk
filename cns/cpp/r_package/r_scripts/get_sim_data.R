@@ -159,7 +159,7 @@ if( (file.exists(stat_file))&&(file.info(stat_file)$size>0)) {
         B = opt[["B"]]
         if(length(B) == 0) return;
         t_plot = 0+1:1000
-        syn_id = 40
+        syn_id = 15
         par(mfrow=c(4,1))
         neuron_to_plot = listen_neuron[1]
         #sp = net[[neuron_to_plot+1]][ net[[neuron_to_plot+1]]<max(t_plot) ]
@@ -182,7 +182,7 @@ if( (file.exists(stat_file))&&(file.info(stat_file)$size>0)) {
     if(length(stdp_stat_id)>0) {
         id = stdp_stat_id[neuron_to_read]
         stdp = stat[[id]]
-        syn_id = 30
+        syn_id = 15
         
         par(mfrow=c(3,1))
         
@@ -193,3 +193,4 @@ if( (file.exists(stat_file))&&(file.info(stat_file)$size>0)) {
 
 }
 
+#dev.off()
