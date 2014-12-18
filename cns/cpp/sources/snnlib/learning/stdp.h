@@ -116,7 +116,8 @@ public:
         auto it=active_synapses.begin();
         while(it != active_synapses.end()) {
             Synapse *syn = n->syns[*it];
-
+            //cout << n->id << ":" << *it << "\n";
+            //cout <<  c->a_plus  << "*" << wnorm_rt.ltpMod(syn->w) << "*" << x_trace[*it] << "*"  << n->fired  << " == " << c->a_plus  * wnorm_rt.ltpMod(syn->w) * x_trace[*it] * n->fired << "\n";
             double dw = c->learning_rate * ( c->a_plus  * wnorm_rt.ltpMod(syn->w) * x_trace[*it] * n->fired -  \
                                              c->a_minus * wnorm_rt.ltdMod(syn->w) * y_trace      * syn->fired );
 

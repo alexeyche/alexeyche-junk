@@ -11,7 +11,7 @@ ornstein_uhlenbeck <- function(T, n, nu,lambda,sigma,x0){
 
 set.seed(8)
 
-sample_len = 999
+sample_len = 60
 d1 <- ornstein_uhlenbeck(10,sample_len, 0.2, 1, 0.007, 0.15)
 d2 <- ornstein_uhlenbeck(10,sample_len, 0.2, 1, 0.007, 0.15)
 d3 <- ornstein_uhlenbeck(10,sample_len, 0.15, 0.5, 0.01, 0.21)

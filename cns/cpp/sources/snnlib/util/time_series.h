@@ -147,7 +147,7 @@ public:
             }
             current_position += 1;
         }
-        cerr << "Trying to get current class for time bigger than Tmax\n";
+        cerr << "Trying to get current class for time bigger than Tmax: " << t << "\n";
         terminate();
     }
     void print(std::ostream& str) const {

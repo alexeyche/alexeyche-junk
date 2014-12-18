@@ -63,7 +63,7 @@ if(measure_corr) {
 
 
 Ti=0
-Trange=1000
+Trange=200
 p1 = prast(net,T0=Ti*Trange,Tmax=(Ti+1)*Trange)
 
 if(file.exists(model_file)) {
@@ -182,7 +182,7 @@ if( (file.exists(stat_file))&&(file.info(stat_file)$size>0)) {
     if(length(stdp_stat_id)>0) {
         id = stdp_stat_id[neuron_to_read]
         stdp = stat[[id]]
-        syn_id = 15
+        syn_id = 58
         
         par(mfrow=c(3,1))
         

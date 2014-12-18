@@ -22,7 +22,7 @@ public:
 
     double ltpMod(const double &w) {
         double delta = c->w_max - w;
-        if(delta>0) return 0.0;
+        if(delta<=0) return 0.0;
         return delta * c->nu_plus;
     }
 
