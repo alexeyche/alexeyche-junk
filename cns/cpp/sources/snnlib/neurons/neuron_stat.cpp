@@ -18,6 +18,7 @@ void NeuronStat::collect(Neuron *n) {
     if(p.size()>STAT_COLLECT_LIMIT) return;
     p.push_back(n->p);
     u.push_back(n->y);
+    M.push_back(n->M);
     for(size_t syn_i=0; syn_i<n->syns.size(); syn_i++) {
         syns[syn_i].push_back(n->syns[syn_i]->x);
         w[syn_i].push_back(n->syns[syn_i]->w);
@@ -29,6 +30,9 @@ ProtoPack NeuronStat::serialize() {
     Protos::NeuronStat *stat = getNewMessage();
     for(auto it=p.begin(); it != p.end(); ++it) {
         stat->add_p(*it);
+    }
+    for(auto it=M.begin(); it != M.end(); ++it) {
+        stat->add_m(*it);
     }
     for(auto it=u.begin(); it != u.end(); ++it) {
         stat->add_u(*it);

@@ -168,6 +168,7 @@ public:
             NeuronStat *st = dynamic_cast<NeuronStat*>(s);
             if(!st) { ERR("Can't cast"); }
             out["p"] = Rcpp::wrap(st->p);
+            out["M"] = Rcpp::wrap(st->M);
             out["u"] = Rcpp::wrap(st->u);
             out["syns"] = Rcpp::wrap(st->syns);
             out["w"] = Rcpp::wrap(st->w);

@@ -109,8 +109,6 @@ public:
 };
 
 class PatternsTimeline : public Serializable<Protos::PatternsTimeline> {
-
-
 public:
     PatternsTimeline() : Serializable(EPatternsTimeline) {}
     virtual ProtoPack serialize() {
@@ -148,6 +146,7 @@ public:
             current_position += 1;
         }
         cerr << "Trying to get current class for time bigger than Tmax: " << t << "\n";
+        cout << "timeline: "; print_vector<double>(timeline,cout,","); cout << "\n";
         terminate();
     }
     void print(std::ostream& str) const {

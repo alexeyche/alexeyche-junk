@@ -86,17 +86,18 @@ if( (file.exists(stat_file))&&(file.info(stat_file)$size>0)) {
     listen_neuron = c$sim_configuration$neurons_to_listen
     
     stat = RProto$new(stat_file)$read()
-    neuron_to_read = 1
+    neuron_to_read = 2
     
     nstat_id = grep("NeuronStat", names(stat))
     if(length(nstat_id)>0) {
         nid = nstat_id[neuron_to_read]
-        t_plot = 1:1000
+        t_plot = 1:100
         
         nst = stat[[nid]]
-#         par(mfrow=c(3,1))
+#         par(mfrow=c(4,1))
 #         plot(nst[["u"]][t_plot], type="l")
 #         plot(nst[["p"]][t_plot], type="l")
+#         plot(nst[["M"]][t_plot], type="l")
 #         #sp = net[[listen_neuron]][net[[listen_neuron]]<1000]
 #         #plot(sp, rep(1, length(sp)), xlim=c(min(t_plot), max(t_plot)))
 #         syns = nst[["syns"]]
@@ -160,16 +161,17 @@ if( (file.exists(stat_file))&&(file.info(stat_file)$size>0)) {
         if(length(B) == 0) return;
         t_plot = 0+1:1000
         syn_id = 15
-        par(mfrow=c(4,1))
+        
         neuron_to_plot = listen_neuron[1]
+        #par(mfrow=c(4,1))
         #sp = net[[neuron_to_plot+1]][ net[[neuron_to_plot+1]]<max(t_plot) ]
         #sp = sp[ sp > min(t_plot) ]
         #plot(sp, rep(1, length(sp)), xlim=c(min(t_plot), max(t_plot)))
-        plot(C[[syn_id]][t_plot], type="l")
-        plot(B[t_plot], type="l")
-        plot(nst[["w"]][[syn_id]][t_plot], type="l")
-        syns = nst[["syns"]]
-        plot(syns[[syn_id]][t_plot],type="l", ylim=c(0,3))
+#         plot(C[[syn_id]][t_plot], type="l")
+#         plot(B[t_plot], type="l")
+#         plot(nst[["w"]][[syn_id]][t_plot], type="l")
+#         syns = nst[["syns"]]
+#         plot(syns[[syn_id]][t_plot],type="l", ylim=c(0,3))
          
 #         if(length(syns)>0) {
 #             plot(syns[[1]][t_plot],type="l", ylim=c(-3,3))
@@ -184,11 +186,11 @@ if( (file.exists(stat_file))&&(file.info(stat_file)$size>0)) {
         stdp = stat[[id]]
         syn_id = 58
         
-        par(mfrow=c(3,1))
+        #par(mfrow=c(3,1))
         
-        plot(nst[["w"]][[syn_id]][t_plot], type="l")            
-        plot(stdp[["y_trace"]][t_plot], type="l")
-        plot(stdp[["x_trace"]][[syn_id]][t_plot], type="l")
+        #plot(nst[["w"]][[syn_id]][t_plot], type="l")            
+        #plot(stdp[["y_trace"]][t_plot], type="l")
+        #plot(stdp[["x_trace"]][[syn_id]][t_plot], type="l")
     }
 
 }

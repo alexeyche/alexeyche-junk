@@ -27,6 +27,9 @@ public:
         for(size_t i=0; i<m->u_size(); i++) {
             u.push_back(m->u(i));
         }
+        for(size_t i=0; i<m->m_size(); i++) {
+            M.push_back(m->m(i));
+        }
         for(size_t i=0; i<m->syns_size(); i++) {
             Protos::NeuronStat::SynStat syn_m = m->syns(i);
 
@@ -49,5 +52,6 @@ public:
     vector<vector<double>> w;
     vector<double> p;
     vector<double> u;
+    vector<double> M;
 };
 

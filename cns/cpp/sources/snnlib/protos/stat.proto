@@ -7,8 +7,9 @@ message NeuronStat {
         repeated double w = 2 [packed=true];
     }
 	repeated double p = 1 [packed=true];
-	repeated double u = 2 [packed=true];
-	repeated SynStat syns = 3;
+    repeated double m = 3 [packed=true];
+	repeated double u = 4 [packed=true];
+	repeated SynStat syns = 5;
 }
 
 message AdExNeuronStat {

@@ -6,8 +6,13 @@
 class AdExNeuron;
 
 class AdExNeuronStat : public NeuronStat  {
+protected:
+    AdExNeuronStat() { 
+        init(EAdExNeuronStat);
+    }
+    friend class Factory;
 public:
-    AdExNeuronStat() {
+    AdExNeuronStat(Neuron *n) : NeuronStat(n) {
         init(EAdExNeuronStat);
     }
     virtual void collect(AdExNeuron *n);
@@ -54,7 +59,7 @@ public:
 
     void enableCollectStatistics() {
         collectStatistics = true;
-        adex_stat = Factory::inst().registerObj<AdExNeuronStat>(new AdExNeuronStat());
+        adex_stat = Factory::inst().registerObj<AdExNeuronStat>(new AdExNeuronStat(this));
     }
     // Runtime
     void propagateSynSpike(const SynSpike *sp) {
@@ -106,6 +111,7 @@ public:
             p = 0.0;
             //cout <<"fire\n";
         }
+        lrule_rt.calculateWeightsDynamics();
 
         auto it=active_synapses.begin();
         while(it != active_synapses.end()) {
@@ -118,8 +124,7 @@ public:
                 ++it;
             }
         }
-
-
+        rmod_rt.modulateReward();
     }
     void provideRuntime(NeuronRuntime &rt) {
         rt.attachCurrent = MakeDelegate(this, &AdExNeuron::attachCurrent);
