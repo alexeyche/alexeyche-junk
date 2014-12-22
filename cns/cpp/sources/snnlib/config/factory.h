@@ -2,6 +2,7 @@
 
 #include <snnlib/base.h>
 #include <snnlib/util/json/json_box.h>
+#include <snnlib/util/distributions.h>
 
 typedef map<string, Obj*(*)()> entity_map_type;
 typedef map<string, Obj*(*)(string)> const_map_type;
@@ -40,6 +41,40 @@ public:
     LearningRule * createLearningRule(string name, const Constants &c, Neuron *n, ActFunc *act_f, WeightNormalization *wnorm);
     SerializableBase* createSerializable(const string &name);
     WeightNormalization* createWeightNormalization(string name, const Constants &c, Neuron *n);
+
+    template <typename T>
+    Distribution<T> *createDistribution(const string &str_init) {
+        Distribution<T> *o;
+        if(strStartsWith(str_init, "Exp")) {
+            vector<double> params = parseParenthesis(str_init);
+            if(params.size() != 2) {
+                cerr << "Bad parameters to Exp distribution: " << str_init << "\n";
+                terminate();
+            }
+            o = new ExpDistribution(params[0], params[1]);
+        } else
+        if(strStartsWith(str_init, "Norm")) {
+            vector<double> params = parseParenthesis(str_init);
+            if(params.size() != 2) {
+                cerr << "Bad parameters to Norm distribution: " << str_init << "\n";
+                terminate();
+            }
+            o = new NormalDistribution(params[0], params[1]);
+        } else
+        if(strStartsWith(str_init, "Unif")) {
+            vector<double> params = parseParenthesis(str_init);
+            if(params.size() != 2) {
+                cerr << "Bad parameters to Unif distribution: " << str_init << "\n";
+                terminate();
+            }
+            o = new UniformDistribution(params[0], params[1]);
+        } else {
+            cerr << "Unknown Distribution " << str_init << "\n";
+            terminate();
+        }
+        objects.push_back(o);
+        return o;
+    }
 
     template <typename T>
     T* registerObj(T *o) {
@@ -95,6 +130,9 @@ public:
         cerr << "Unrecognized typename: " << deriv_struct_name << "\n";
         terminate();
     }
+
+
+
     static Factory& inst();
 private:
     entity_map_type entity_map;

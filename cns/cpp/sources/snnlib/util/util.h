@@ -22,3 +22,9 @@ double getNorm();
 string strip_white(const string& input);
 string strip_comments(const string& input, const string& delimiters);
 long getFileSize(string filename);
+
+bool strStartsWith(const string &s, const string &prefix);
+
+
+
+vector<double> parseParenthesis(const string &s);

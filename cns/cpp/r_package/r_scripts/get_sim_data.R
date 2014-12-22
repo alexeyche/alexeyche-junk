@@ -22,6 +22,7 @@ if(ep>0) {
 output_spikes = sprintf("%s/%soutput_spikes.pb", workdir, ep_str)
 input_spikes = sprintf("%s/input_spikes.pb", workdir)
 stat_file = sprintf("%s/%sstat.pb", workdir, ep_str)
+p_stat_file = sprintf("%s/%sp_stat.pb", workdir, ep_str)
 model_file = sprintf("%s/%smodel.pb", workdir, ep_str)
 const = sprintf("%s/const.json", workdir)
 
@@ -36,26 +37,13 @@ if (file.exists(input_spikes)) {
     net = RProto$new(input_spikes)$read()
 }
 
+    
 measure_corr = FALSE
 if(measure_corr) {
     N = sum(sapply(c$sim_configuration$input_layers_conf, function(x) x$size))
-    Tmax = max(sapply(net[1:N], function(x) if(length(x)>0) max(x) else -Inf))
     dt = c$sim_conf$sim_run_conf$dt
     
-    net_m = matrix(0, nrow=N, ncol=Tmax/dt)
-    for(ni in 1:N) {
-        net_m[ni, ceiling(net[[ni]]/dt) ] <- 1
-    }
-    cor_m = matrix(0, nrow=N, ncol=N)
-    for(ni in 1:100) {
-        for(nj in 1:100) {
-            if((all(net_m[ni,] == 0))||(all(net_m[nj,] == 0))||(ni == nj)) {
-                cor_m[ni, nj] = 0
-            } else {
-                cor_m[ni, nj] = cor(net_m[ni, ], net_m[nj, ])
-            }
-        }
-    }
+    cor_m = measureSpikeCor(net[1:N], dt)
     gr_pl(cor_m)
 }
 
@@ -63,7 +51,7 @@ if(measure_corr) {
 
 
 Ti=0
-Trange=200
+Trange=1000
 p1 = prast(net,T0=Ti*Trange,Tmax=(Ti+1)*Trange)
 
 if(file.exists(model_file)) {
@@ -195,4 +183,8 @@ if( (file.exists(stat_file))&&(file.info(stat_file)$size>0)) {
 
 }
 
+if( (file.exists(p_stat_file))&&(file.info(p_stat_file)$size>0)) {
+    p_stat = RProto$new(p_stat_file)$read()
+    p_m = do.call(rbind, lapply(p_stat, function(x) x$p))
+}
 #dev.off()

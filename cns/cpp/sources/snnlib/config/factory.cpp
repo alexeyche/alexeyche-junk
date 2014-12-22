@@ -147,6 +147,7 @@ SerializableBase* Factory::createSerializable(const string &name) {
     return s;
 }
 
+
 ConstObj *Factory::createConst(string name, JsonBox::Value v) {
     GET_BASE_NAME(const_map)
     ConstObj *o = dynamic_cast<ConstObj*>(const_map[base_struct_name](name));
@@ -167,6 +168,7 @@ ActFunc *Factory::createActFunc(string name, const Constants &c, Neuron *n) {
     objects.push_back(o);
     return o;
 }
+
 
 LearningRule * Factory::createLearningRule(string name, const Constants &c, Neuron *n, ActFunc *act_f, WeightNormalization *wnorm) {
     GET_BASE_NAME(entity_map)

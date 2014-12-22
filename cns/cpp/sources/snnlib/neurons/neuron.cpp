@@ -58,7 +58,7 @@ void Neuron::addSynapseAtPos(Synapse *s, const size_t &pos_i) {
         terminate();
     }
     if(collectStatistics) {
-        stat->syns.push_back(vector<double>());
+        stat->addSynapse(s);
     }
     if(lrule) lrule->addSynapse(s);
     syns[pos_i] = s;
@@ -122,15 +122,20 @@ void Neuron::loadModel(ProtoRw &rw) {
 // stat funcs
 void Neuron::saveStat(SerialPack &p) {
     p.push_back(stat);
-    lrule->saveStat(p);
+    if(stat->mode == NeuronStat::Full) {
+        lrule->saveStat(p);
+    }
 }
 
 void Neuron::enableCollectStatistics() {
     collectStatistics = true;
-    stat = Factory::inst().registerObj<NeuronStat>(new NeuronStat(this));
+    stat = Factory::inst().registerObj<NeuronStat>(new NeuronStat(this, NeuronStat::Full));
     lrule->enableCollectStatistics();
 }
-
+void Neuron::enableCollectProbStatistics() {
+    collectStatistics = true;
+    stat = Factory::inst().registerObj<NeuronStat>(new NeuronStat(this, NeuronStat::PStat));
+}
 // print
 void Neuron::print(std::ostream& str) const {
     str << "Neuron(" << id << ")\n";

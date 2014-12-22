@@ -123,6 +123,8 @@ public:
             l->add_timeline(*it);
         }
         l->set_tmax(Tmax);
+        l->set_gap_between_patterns(gapBetweenPatterns);
+        l->set_dt(dt);
         return ProtoPack({l});
     }
     virtual void deserialize() {
@@ -137,11 +139,13 @@ public:
             timeline.push_back(m->timeline(i));
         }
         Tmax = m->tmax();
+        gapBetweenPatterns = m->gap_between_patterns();
+        dt = m->dt();
     }
-    const size_t* getCurrentClassId(const double &t) {
+    const size_t& getCurrentClassId(const double &t) {
         while(current_position < timeline.size()) {
             if(t <= timeline[current_position]) {
-                return &labels_id_timeline[current_position];
+                return labels_id_timeline[current_position];
             }
             current_position += 1;
         }
@@ -149,6 +153,18 @@ public:
         cout << "timeline: "; print_vector<double>(timeline,cout,","); cout << "\n";
         terminate();
     }
+    const double& getCurrentPatternEnd(const double &t) {
+        while(current_position < timeline.size()) {
+            if(t <= timeline[current_position]) {
+                return timeline[current_position];
+            }
+            current_position += 1;
+        }
+        cerr << "Trying to get current class for time bigger than Tmax: " << t << "\n";
+        cout << "timeline: "; print_vector<double>(timeline,cout,","); cout << "\n";
+        terminate();
+    }
+
     void print(std::ostream& str) const {
         str << "labels: "; print_vector<string>(labels, str,","); str << "\n";
         str << "timeline: "; print_vector<double>(timeline,str,","); str << "\n";
@@ -162,23 +178,27 @@ public:
     vector<size_t> labels_id_timeline;
     vector<double> timeline;
     double Tmax;
+    double gapBetweenPatterns;
+    double dt;
 
     size_t current_position;
 };
 
+typedef deque<double> ContData;
 
 class ContLabeledTimeSeries : public Printable {
 public:
     ContLabeledTimeSeries() {}
-    ContLabeledTimeSeries(LabeledTimeSeriesList lst, const double &dt) {
-        init(lst, dt);
+    ContLabeledTimeSeries(LabeledTimeSeriesList lst, const double &dt, const double &gapBetweenPatterns) {
+        init(lst, dt, gapBetweenPatterns);
     }
 
-    void init(LabeledTimeSeriesList lst, const double &dt) {
+    void init(LabeledTimeSeriesList lst, const double &dt, const double &gapBetweenPatterns) {
         double acc_time = 0;
         auto engine = std::default_random_engine{};
         std::random_shuffle(lst.ts.begin(), lst.ts.end());
-
+        ptl.gapBetweenPatterns = gapBetweenPatterns;
+        ptl.dt = dt;
         for(auto it=lst.ts.begin(); it != lst.ts.end(); ++it) {
             for(auto it_val=it->ts.data.begin(); it_val != it->ts.data.end(); ++it_val) {
                 data.push_back(*it_val);
@@ -198,7 +218,7 @@ public:
             }
 
             ptl.labels_id_timeline.push_back(pos);
-            acc_time += dt*(double)it->ts.size();
+            acc_time += dt*(double)it->ts.size() + ptl.gapBetweenPatterns;
             ptl.timeline.push_back(acc_time);
          }
 
@@ -215,6 +235,9 @@ public:
     }
     inline const double& top_value() {
         return *data.begin();
+    }
+    bool dataIsReady(const double &t) {
+        return (data.size()>0) && ((ptl.getCurrentPatternEnd(t) - ptl.gapBetweenPatterns) >= t);
     }
     inline size_t size() const {
         return data.size();
@@ -233,7 +256,7 @@ public:
 
 
 
-    deque<double> data;
+    ContData data;
     PatternsTimeline ptl;
 };
 

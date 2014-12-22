@@ -108,6 +108,9 @@ def main(args):
         sim_args['--output'] = wd_file("%s_output_spikes.pb" % ep)
         if args.stat:
             sim_args['--stat'] = wd_file("%s_stat.pb" % ep)
+        elif args.p_stat:
+            sim_args['--p-stat'] = wd_file("%s_p_stat.pb" % ep)
+
         if ep>1:
             model_load = wd_file("%s_model.pb" % str(ep-1))
             if not os.path.exists(model_load):
@@ -163,6 +166,10 @@ if __name__ == '__main__':
                         '--stat',
                         action='store_true',
                         help='Save statistics')
+    parser.add_argument('-ps', 
+                        '--p-stat',
+                        action='store_true',
+                        help='Save probabilites of neurons')
     parser.add_argument('-v', 
                         '--verbose', 
                         action='store_true',
@@ -180,6 +187,12 @@ if __name__ == '__main__':
                         help='Path to snn sim bin (default: $SCRIPT_DIR/../build/bin/%s)' % SNN_SIM, default=os.path.join(os.path.dirname(this_file), "../build/bin", SNN_SIM))
 
     args = parser.parse_args(sys.argv[1:])    
+    if len(sys.argv) == 1:
+        parser.print_help()
+        sys.exit(1)
+
     if (not args.spikes and not args.input) or (args.spikes and args.input):
         raise Exception("Need input time series or input spikes")
+    if args.stat and args.p_stat:
+        raise Exception("Can't collect Full and Partial statistics. Choose one")
     main(args)

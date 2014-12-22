@@ -5,13 +5,17 @@
 
 
 class Neuron;
+class Synapse;
 
 class NeuronStat : public Serializable<Protos::NeuronStat> {
 protected:
     NeuronStat() : Serializable<Protos::NeuronStat>(ENeuronStat) { }
     friend class Factory;
 public:
-    NeuronStat(Neuron *n);
+    enum CollectMode { Full, PStat };
+
+    NeuronStat(Neuron *n, CollectMode _mode = NeuronStat::Full);
+
 
 
 
@@ -44,7 +48,7 @@ public:
             w.push_back(w_v);
         }
     }
-
+    void addSynapse(Synapse *s);
     void print(std::ostream& str) const {
     }
 
@@ -53,5 +57,7 @@ public:
     vector<double> p;
     vector<double> u;
     vector<double> M;
+
+    CollectMode mode;
 };
 

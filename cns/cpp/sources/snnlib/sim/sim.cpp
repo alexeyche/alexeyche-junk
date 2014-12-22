@@ -142,19 +142,22 @@ void Sim::runSimOnSubset(size_t left_neuron_id, size_t right_neuron_id, void* (*
 void Sim::simPrecalculateStep(SimWorker *sw, const double &t) {
     double x = 0.0;
     Sim *s = sw->s;
+    bool dataIsReady = false;
     if(sw->last <= s->input_neurons_count) {
-        if(s->input_ts.size()>0) {
+        dataIsReady = s->input_ts.dataIsReady(t);
+        if(dataIsReady) {
             x = s->input_ts.top_value();
-        }
-        if(sw->thread_id == 0) {
-            s->input_ts.pop_value();
+            if(sw->thread_id == 0) {
+                s->input_ts.pop_value();
+            }
         }
     }
+
     for(size_t ni=sw->first; ni<sw->last; ni++) {
         //cout << "simulating " << ni << " at " << t << "\n";
         Neuron* n = s->sim_neurons[ni].n;
         NeuronRuntime &n_rt = s->sim_neurons[ni].n_rt;
-        if(ni<s->input_neurons_count) {
+        if((ni<s->input_neurons_count) && (dataIsReady)) {
             n_rt.attachCurrent(x);
         }
 
@@ -175,7 +178,7 @@ void Sim::simPrecalculateStep(SimWorker *sw, const double &t) {
 void Sim::simStep(SimWorker *sw, const double &t) {
     Sim *s = sw->s;
     if(sw->thread_id == 0) {
-        s->rg.current_class_id = s->ptl.getCurrentClassId(t);
+        s->rg.current_class_id = &s->ptl.getCurrentClassId(t);
     }
     pthread_barrier_wait( barrier );
     for(size_t ni=sw->first; ni<sw->last; ni++) {
@@ -207,7 +210,7 @@ void Sim::simStep(SimWorker *sw, const double &t) {
 void Sim::simWtaStep(SimWorker *sw, const double &t) {
     Sim *s = sw->s;
     if(sw->thread_id == 0) {
-        s->rg.current_class_id = s->ptl.getCurrentClassId(t);
+        s->rg.current_class_id = &s->ptl.getCurrentClassId(t);
     }
     pthread_barrier_wait( barrier );
     for(size_t ni=sw->first; ni<sw->last; ni++) {

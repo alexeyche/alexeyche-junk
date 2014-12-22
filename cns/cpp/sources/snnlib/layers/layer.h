@@ -28,7 +28,7 @@ public:
         p_wta = 0.0;
         wta = _wta;
         for(size_t ni=0; ni<N; ni++) {
-            double axon_delay = sampleDelay(nc.axon_delay_gain, nc.axon_delay_rate);
+            double axon_delay = nc.axon_delay_distr->getSample();
 
             Neuron *n = Factory::inst().createNeuron(nc.neuron, ni, c, run_glob_c, axon_delay);
             ActFunc *act_f = Factory::inst().createActFunc(nc.act_func, c, n);
@@ -75,22 +75,18 @@ public:
     }
     void connect(Layer &l_post, const ConnectionConf &conf, const Constants &c) {
         for(size_t ni=0; ni<neurons.size(); ni++) {
-            vector<Synapse*> added_synapses;
             for(size_t nj=0; nj<l_post.N; nj++) {
                 if( (neurons[ni]->id != l_post[nj]->id) && (!l_post[nj]->hasConnection(neurons[ni]->id)) ) {
                     double prob = getUnif();
                     if( conf.prob > prob ) {
-                        double dendrite_delay = sampleDelay(conf.dendrite_delay_gain, conf.dendrite_delay_rate);
-                        Synapse *s = Factory::inst().createSynapse(conf.type, c, neurons[ni]->id, 0, dendrite_delay);
+                        double dendrite_delay = conf.dendrite_delay_distr->getSample();
+                        double weight = conf.weight_distr->getSample();
+                        Synapse *s = Factory::inst().createSynapse(conf.type, c, neurons[ni]->id, weight, dendrite_delay);
                         l_post[nj]->addSynapse(s);
-                        added_synapses.push_back(s);
                     }
                 }
             }
-            for(auto it=added_synapses.begin(); it != added_synapses.end(); ++it) {
-                Synapse *s = *it;
-                s->w = conf.weight_per_neuron/added_synapses.size();
-            }
+
         }
 
     }

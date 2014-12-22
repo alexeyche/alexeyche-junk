@@ -7,6 +7,8 @@
 #include <snnlib/util/util.h>
 #include <snnlib/serialize/serialize.h>
 #include <snnlib/protos/model.pb.h>
+#include <snnlib/util/distributions.h>
+#include <snnlib/config/factory.h>
 
 class ConfObj: public Entity {
 public:
@@ -344,8 +346,8 @@ public:
     string learning_rule;
     string reward_modulation;
     string weight_normalization;
-    double axon_delay_gain;
-    double axon_delay_rate;
+    Distribution<double>* axon_delay_distr;
+
 
     void fill_structure(JsonBox::Value v) {
         act_func = v["act_func"].getString();
@@ -354,13 +356,11 @@ public:
         reward_modulation = v["reward_modulation"].getString();
         weight_normalization = v["weight_normalization"].getString();
         neuron = v["neuron"].getString();
-        JsonBox::Array a = v["axon_delay_distr"].getArray();
-        axon_delay_gain = a[0].getDouble();
-        axon_delay_rate = a[1].getDouble();
+        axon_delay_distr = Factory::inst().createDistribution<double>(v["axon_delay_distr"].getString());
     }
     void print(std::ostream &str) const {
         str << "NeuronConf(neuron: " << neuron << ", learning_rule: "  << learning_rule << ", tuning_curve : " << tuning_curve <<  ", act_func: " << act_func <<
-            ", axon_delay_gain: " << axon_delay_gain  << ", axon_delay_rate: " << axon_delay_rate <<
+            ", axon_delay_distr: " << *axon_delay_distr  <<
             ", reward_modulation: " << reward_modulation << ", weight_normalization: " << weight_normalization << ")";
     }
 };
@@ -386,24 +386,24 @@ public:
 class ConnectionConf: public ConfObj {
 public:
     double prob;
-    double weight_per_neuron;
+    //double weight_per_neuron;
     string type;
-    double dendrite_delay_gain;
-    double dendrite_delay_rate;
+    Distribution<double> *weight_distr;
+    Distribution<double> *dendrite_delay_distr;
 
 
     void fill_structure(JsonBox::Value v) {
         prob = v["prob"].getDouble();
         type = v["type"].getString();
-        weight_per_neuron = v["weight_per_neuron"].getDouble();
-        JsonBox::Array ad = v["dendrite_delay_distr"].getArray();
-        dendrite_delay_gain = ad[0].getDouble();
-        dendrite_delay_rate = ad[1].getDouble();
+        //weight_per_neuron = v["weight_per_neuron"].getDouble();
+        dendrite_delay_distr = Factory::inst().createDistribution<double>(v["dendrite_delay_distr"].getString());
+        weight_distr = Factory::inst().createDistribution<double>(v["weight_distr"].getString());
+
     }
 
     void print(std::ostream &str) const {
-        str << "ConnectionConf(" << "prob: " << prob << ", weight_per_neuron: " << weight_per_neuron << ", type: " <<   type <<
-            ", dendrite_delay_gain: " << dendrite_delay_gain  << ", dendrite_delay_rate: " << dendrite_delay_rate << ")";
+        str << "ConnectionConf(" << "prob: " << prob << ", weight_distr: " << *weight_distr << ", type: " <<   type <<
+            ", dendrite_delay_distr: " << *dendrite_delay_distr << ")";
 
     }
 };
@@ -411,13 +411,16 @@ public:
 class TimeSeriesMapConf : public ConfObj {
 public:
     double dt;
+    double gap_between_patterns;
     void print(std::ostream &str) const {
-        str << "dt : " << dt;
+        str << "dt : " << dt << ", gap_between_patterns: " << gap_between_patterns;
     }
     void fill_structure(JsonBox::Value v) {
         dt = v["dt"].getDouble();
+        gap_between_patterns = v["gap_between_patterns"].getDouble();
     }
 };
+
 class SimRunConf: public ConfObj {
 public:
     double dt;

@@ -108,3 +108,22 @@ long getFileSize(string filename) {
     int rc = stat(filename.c_str(), &stat_buf);
     return rc == 0 ? stat_buf.st_size : -1;
 }
+
+bool strStartsWith(const string &s, const string &prefix) {
+    return s.substr(0, prefix.size()) == prefix;
+}
+
+vector<double> parseParenthesis(const string &s) {
+    if((std::count(s.begin(), s.end(), '(') != 1)||(std::count(s.begin(), s.end(), ')') != 1)) {
+        cerr << "Bad string to parse parenthesis: " << s << "\n";
+        terminate();
+    }
+    vector<string> left_side = split(s, '(');
+    vector<string> right_side = split(left_side.back(), ')');
+    vector<string> content = split(right_side.front(), ',');
+    vector<double> out;
+    for(auto it=content.begin(); it != content.end(); ++it) {
+        out.push_back(stof(*it));
+    }
+    return out;
+}

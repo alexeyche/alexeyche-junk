@@ -41,8 +41,16 @@ public:
             }
             rc.saveStat(st);
             prw.write(st);
-
-
+        }
+        if(!p_statistics_file.empty()) {
+            ProtoRw prw(p_statistics_file, ProtoRw::Write);
+            SerialPack st;
+            for(size_t ni=input_neurons_count; ni < sim_neurons.size(); ni++) {
+                Neuron *n = accessByGlobalId(ni);
+                n->saveStat(st);
+            }
+            rc.saveStat(st);
+            prw.write(st);
         }
         if(!output_spikes_file.empty()){
             ProtoRw prw(output_spikes_file, ProtoRw::Write);
@@ -105,7 +113,7 @@ public:
     void setInputTimeSeries(LabeledTimeSeriesList l) {
         CHECK_CONSTRUCT()
         input_ts_list = l;
-        input_ts = ContLabeledTimeSeries(l, sc.ts_map_conf.dt);
+        input_ts = ContLabeledTimeSeries(l, sc.ts_map_conf.dt, sc.ts_map_conf.gap_between_patterns);
         ptl = input_ts.ptl;
     }
 
@@ -145,7 +153,7 @@ public:
         CHECK_CONSTRUCT()
         net.reset(reset_input_stat);
         if(input_ts_list.size()>0){
-            input_ts = ContLabeledTimeSeries(input_ts_list, sc.ts_map_conf.dt);
+            input_ts = ContLabeledTimeSeries(input_ts_list, sc.ts_map_conf.dt, sc.ts_map_conf.gap_between_patterns);
             ptl = input_ts.ptl;
         }
     }
@@ -158,6 +166,13 @@ public:
         }
         for(auto it=sc.reward_layers_to_listen.begin(); it != sc.reward_layers_to_listen.end(); ++it) {
             rc.enableCollectStatistics(*it);
+        }
+    }
+    void monitorPStat(const string &filename) {
+        CHECK_CONSTRUCT()
+        p_statistics_file = filename;
+        for(size_t ni=input_neurons_count; ni < (input_neurons_count + net_neurons_count); ni++) {
+            accessByGlobalId(ni)->enableCollectProbStatistics();
         }
     }
     void setTlimit(double _T_limit) {
@@ -193,6 +208,7 @@ public:
     vector<SimNeuron> sim_neurons;
 
     string statistics_file;
+    string p_statistics_file;
     string output_spikes_file;
 
     SimConfiguration sc;

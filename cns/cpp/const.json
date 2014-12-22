@@ -4,7 +4,7 @@
             "sigma" : [0.01, 0.01],
             "intercept" : [-1.0, 1.0], // for test data
 //            "intercept" : [-2.4, 2.4], // for synthetic control
-            "gain" : [ 1.5, 1.5 ],
+            "gain" : [ 5.5, 5.5 ],
             "prob_next_sigma" : 0.0,
             "max_sigma_num" : 1
         }
@@ -96,10 +96,10 @@
         "OptimalStdp" : {
             "tau_c" : 100,
             "mean_p_dur" : 60000,
-            "target_rate" : 5,
+            "target_rate" : 10,
             "target_rate_factor" : 1,
-            "weight_decay" : 0.005,
-            "learning_rate" : 0.01
+            "weight_decay" : 0.010,
+            "learning_rate" : 0.015
         },
         "Stdp" : {
             "tau_plus" : 30.0, // ms
@@ -129,7 +129,7 @@
                     "neuron" : "AdExNeuron",
                     "tuning_curve" : "SigmaTuningCurve",
                     "act_func" : "Determ",
-                    "axon_delay_distr" : [0, 0]
+                    "axon_delay_distr" : "Exp(0,0)"
                 }
             }
         ],
@@ -139,20 +139,21 @@
                 "wta" : false,
                 "neuron_conf" : {
                     "neuron" : "SRMNeuron",
-                    "learning_rule" : "Stdp",
+                    "learning_rule" : "OptimalStdp",
                     "weight_normalization" : "MinMax",
                     "act_func" : "ExpHennequin_Strict",
-                    "axon_delay_distr" : [0, 0]
+                    "axon_delay_distr" : "Exp(0,0)"
                 }
             }
         ],
         "conn_map" : {
             "0->1" : [
-                { "prob" : 1.0, "weight_per_neuron" : 225, "type" : "Synapse", "dendrite_delay_distr" : [0, 0] }
-            ],
-            "1->1" : [
-                { "prob" : 0.1, "weight_per_neuron" : 75, "type" : "Synapse_Inh", "dendrite_delay_distr" : [0, 0] }
-            ]
+                { "prob" : 1.0, "weight_distr" : "Norm(0.75, 0.1)", "type" : "Synapse", "dendrite_delay_distr" : "Exp(0,0)" }
+            ]            
+//            ],
+//            "1->1" : [
+//                { "prob" : 0.1, "weight_distr" : "Norm(4, 0.25)", "type" : "Synapse_Inh", "dendrite_delay_distr" : "Exp(0,0)" }
+//            ]
         },
         "reinforce_map" : {
 //            "1 -> 1" : {
@@ -160,7 +161,8 @@
 //            }
         },
         "time_series_map_conf" : {
-            "dt" : 1.0          // ms
+            "dt" : 1.0,          // ms
+            "gap_between_patterns" : 30.0  // ms, gap between patterns  
         },
         "sim_run_conf" : {
             "seed" : -1,

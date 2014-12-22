@@ -4,7 +4,7 @@
 #include <snnlib/protos/common.pb.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 #include <google/protobuf/io/coded_stream.h>
-
+#include <snnlib/serialize/serialize.h>
 #include <snnlib/config/factory.h>
 
 #include <fcntl.h>
@@ -76,6 +76,17 @@ public:
             readMessage(pack[mi]);
         }
         b->deserialize();
+    }
+
+    template <typename T>
+    T* read(bool print=false) {
+        SerializableBase *b = read(print);
+        T *o = dynamic_cast<T*>(b);
+        if(!o) {
+            cerr << "Errors while reading " << b->getName() << "\n";
+            terminate();
+        }
+        return o;
     }
 
     SerializableBase* read(bool print=false) {

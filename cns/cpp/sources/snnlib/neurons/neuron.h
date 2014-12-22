@@ -69,6 +69,7 @@ public:
     // stat funcs
     virtual void saveStat(SerialPack &p);
     virtual void enableCollectStatistics();
+    void enableCollectProbStatistics();
     // serialize
     void deserialize();
     ProtoPack serialize();

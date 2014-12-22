@@ -4,8 +4,8 @@
 #include "neuron_stat.h"
 #include "neuron.h"
 
-NeuronStat::NeuronStat(Neuron *n) : Serializable(ENeuronStat) {
-    if(n) {
+NeuronStat::NeuronStat(Neuron *n, CollectMode _mode) : Serializable(ENeuronStat), mode(_mode) {
+    if((n)&&(mode == Full)) {
         for(size_t syn_i=0; syn_i<n->syns.size(); syn_i++) {
             syns.push_back(vector<double>());
             w.push_back(vector<double>());
@@ -15,15 +15,19 @@ NeuronStat::NeuronStat(Neuron *n) : Serializable(ENeuronStat) {
 
 
 void NeuronStat::collect(Neuron *n) {
-    if(p.size()>STAT_COLLECT_LIMIT) return;
-    p.push_back(n->p);
-    u.push_back(n->y);
-    M.push_back(n->M);
-    for(size_t syn_i=0; syn_i<n->syns.size(); syn_i++) {
-        syns[syn_i].push_back(n->syns[syn_i]->x);
-        w[syn_i].push_back(n->syns[syn_i]->w);
+    if(mode == Full) {
+        if(p.size()>STAT_COLLECT_LIMIT) return;
+        p.push_back(n->p);
+        u.push_back(n->y);
+        M.push_back(n->M);
+        for(size_t syn_i=0; syn_i<n->syns.size(); syn_i++) {
+            syns[syn_i].push_back(n->syns[syn_i]->x);
+            w[syn_i].push_back(n->syns[syn_i]->w);
+        }
+    } else
+    if(mode == PStat) {
+        p.push_back(n->p);
     }
-
 }
 
 ProtoPack NeuronStat::serialize() {
@@ -48,3 +52,8 @@ ProtoPack NeuronStat::serialize() {
     return ProtoPack({stat});
 }
 
+void NeuronStat::addSynapse(Synapse *s) {
+    if(mode == Full) {
+        syns.push_back(vector<double>());
+    }
+}

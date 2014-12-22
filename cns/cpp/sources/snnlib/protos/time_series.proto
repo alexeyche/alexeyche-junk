@@ -20,6 +20,8 @@ message PatternsTimeline {
     repeated uint32 labels_id_timeline = 2;
     repeated double timeline = 3;
     required double tmax = 4;
+    required double dt = 5;
+    required double gap_between_patterns = 6;
 }
 
 

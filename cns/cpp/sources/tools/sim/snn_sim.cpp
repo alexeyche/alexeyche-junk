@@ -13,7 +13,7 @@
 
 enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_CONSTANTS, ARG_INPUT,
                     ARG_OUT_STAT, ARG_OUT_SPIKES, ARG_JOBS ,ARG_PRECALC,
-                    ARG_MODEL_SAVE, ARG_MODEL_LOAD, ARG_T_MAX };
+                    ARG_MODEL_SAVE, ARG_MODEL_LOAD, ARG_T_MAX, ARG_OUT_P_STAT };
 const option::Descriptor usage[] =
 {
  {ARG_UNKNOWN, 0, "", "",Arg::None, "USAGE: example [options]\n\n"
@@ -25,6 +25,7 @@ const option::Descriptor usage[] =
  {ARG_MODEL_SAVE, 0,"s","save",Arg::NonEmpty, "  --save, -s  \tSave model." },
  {ARG_T_MAX, 0,"T","T-max",Arg::NonEmpty, "  --T-max, -T  \tMaximum simulation time (default: max input length)." },
  {ARG_OUT_STAT, 0,"","stat",Arg::NonEmpty, "  --stat  \tFile name to save detailed statistics." },
+ {ARG_OUT_P_STAT, 0,"","p-stat",Arg::NonEmpty, "  --p-stat  \tFile name to save probabilites of model." },
  {ARG_JOBS, 0,"j","jobs",Arg::NonEmpty, "  --jobs  -j \tParallel jobs to run (default 1)" },
  {ARG_PRECALC, 0,"", "precalc",Arg::None, "  --precalc  \tOnly precalculate spike on time series." },
  {ARG_HELP, 0,"h", "help",Arg::None, "  --help  \tPrint usage and exit." },
@@ -40,6 +41,7 @@ struct SnnSimOpts {
     string const_file;
     string out_spikes;
     string out_stat_file;
+    string out_p_stat_file;
     string model_save;
     string model_load;
     int jobs;
@@ -94,6 +96,9 @@ SnnSimOpts parseOptions(int argc, char **argv) {
     if(options[ARG_OUT_STAT].count()>0) {
         sopt.out_stat_file = options[ARG_OUT_STAT].arg;
     }
+    if(options[ARG_OUT_P_STAT].count()>0) {
+        sopt.out_p_stat_file = options[ARG_OUT_P_STAT].arg;
+    }
     if(options[ARG_PRECALC].count()>0) {
         sopt.precalc = true;
     }
@@ -106,6 +111,10 @@ SnnSimOpts parseOptions(int argc, char **argv) {
     if(options[ARG_T_MAX].count()>0) {
         sopt.Tmax = atof(options[ARG_T_MAX].arg);
         cout << sopt.Tmax <<"\n";
+    }
+    if((!sopt.out_p_stat_file.empty())&&(!sopt.out_stat_file.empty())) {
+        cout << "Need to choose on of the mode of collecting statistics\n";
+        terminate();
     }
     return sopt;
 }
@@ -150,6 +159,9 @@ int main(int argc, char **argv) {
 
     if(!sopt.out_stat_file.empty()) {
         s.monitorStat(sopt.out_stat_file);
+    }
+    if(!sopt.out_p_stat_file.empty()) {
+        s.monitorPStat(sopt.out_p_stat_file);
     }
 
     if(sopt.precalc) {

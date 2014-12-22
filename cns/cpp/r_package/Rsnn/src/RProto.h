@@ -168,10 +168,10 @@ public:
             NeuronStat *st = dynamic_cast<NeuronStat*>(s);
             if(!st) { ERR("Can't cast"); }
             out["p"] = Rcpp::wrap(st->p);
-            out["M"] = Rcpp::wrap(st->M);
-            out["u"] = Rcpp::wrap(st->u);
-            out["syns"] = Rcpp::wrap(st->syns);
-            out["w"] = Rcpp::wrap(st->w);
+            if(st->M.size()>0) out["M"] = Rcpp::wrap(st->M);
+            if(st->u.size()>0) out["u"] = Rcpp::wrap(st->u);
+            if(st->syns.size()>0) out["syns"] = Rcpp::wrap(st->syns);
+            if(st->w.size()>0) out["w"] = Rcpp::wrap(st->w);
         } else 
         if(s->getName() == "AdExNeuronStat") {
             AdExNeuronStat *st = dynamic_cast<AdExNeuronStat*>(s);

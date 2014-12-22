@@ -57,4 +57,24 @@ gr_pl = function(m) {
   levelplot(m, col.regions=colorRampPalette(c("black", "white")))
 }
 
+measureSpikeCor = function(net, dt) {
+    N = length(net)
+    Tmax = max(sapply(net, function(x) if(length(x)>0) max(x) else -Inf))
+    
+    net_m = matrix(0, nrow=N, ncol=Tmax/dt)
+    for(ni in 1:N) {
+        net_m[ni, ceiling(net[[ni]]/dt) ] <- 1
+    }
+    cor_m = matrix(0, nrow=N, ncol=N)
+    for(ni in 1:100) {
+        for(nj in 1:100) {
+            if((all(net_m[ni,] == 0))||(all(net_m[nj,] == 0))||(ni == nj)) {
+                cor_m[ni, nj] = 0
+            } else {
+                cor_m[ni, nj] = cor(net_m[ni, ], net_m[nj, ])
+            }
+        }
+    }
 
+    return(cor_m)    
+}
