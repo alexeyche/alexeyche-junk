@@ -226,6 +226,6 @@ if( (file.exists(p_stat_file))&&(file.info(p_stat_file)$size>0)) {
          main="Metric    MDS",	type="n")
     lab_cols = rainbow(length(lab_spikes$labels))
     text(x, y, labels = lab_spikes$labels[lab_spikes$labels_id_timeline+1], cex=.7, col=lab_cols[lab_spikes$labels_id_timeline+1])
-    require(fpc)
+    
 }
 #dev.off()
