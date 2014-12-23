@@ -1,6 +1,6 @@
 #pragma once
 
-#include <snnlib/util/matrix.h>
+
 #include <snnlib/core.h>
 #include <snnlib/util/json/json_box.h>
 #include <snnlib/base.h>

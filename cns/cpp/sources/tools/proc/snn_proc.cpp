@@ -5,7 +5,10 @@
 #include <snnlib/neurons/neuron_stat.h>
 #include <snnlib/util/spikes_list.h>
 #include <snnlib/base.h>
+#include <snnlib/util/matrix.h>
 
+
+#include "p_stat_calc.h"
 
 enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_SPIKES, ARG_P_STAT, ARG_JOBS };
 const option::Descriptor usage[] =
@@ -77,23 +80,39 @@ SnnProcOpts parseOptions(int argc, char **argv) {
 
 
 
+
 int main(int argc, char **argv) {
     SnnProcOpts opts = parseOptions(argc, argv);
-    NeuronStat* st;
+    vector<NeuronStat*> st;
     {
         ProtoRw prw(opts.p_stat, ProtoRw::Read);
-        st = prw.read<NeuronStat>();
+        st = prw.readAll<NeuronStat>();
     }
 
     LabeledSpikesList* sp_list;
     {
-        ProtoRw prw(opts.p_stat, ProtoRw::Read);
+        ProtoRw prw(opts.spikes, ProtoRw::Read);
         sp_list = prw.read<LabeledSpikesList>();
     }
-    sp_list->ptl
+    assert(st.size() > 0);
 
+    size_t p_size = st[0]->p.size();
 
+    vector<IndexSlice> patterns;
 
+    const vector<double> &tl = sp_list->ptl.timeline;
+    const double &dt = sp_list->ptl.dt;
+
+    double t=0;
+    for(auto it=tl.begin(); it != tl.end(); ++it) {
+        patterns.push_back( IndexSlice((size_t)(t/dt), min(p_size, (size_t)((*it)/dt) )) );
+        cout << "adding pattern [" << patterns.back().from << ", " << patterns.back().to << ")\n";
+        t = *it;
+    }
+
+    DoubleMatrix dist = calcPStatDistance(st, patterns, opts.jobs);
+
+    cout << dist << "\n";
     return 0;
 }
 

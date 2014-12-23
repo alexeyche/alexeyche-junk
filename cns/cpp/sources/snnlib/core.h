@@ -34,5 +34,8 @@ using std::ofstream;
 using std::ios;
 using std::list;
 using std::tuple;
+using std::pair;
+using std::stoi;
+using std::min;
 
 typedef unsigned char uchar;

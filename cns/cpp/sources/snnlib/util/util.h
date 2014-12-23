@@ -25,6 +25,13 @@ long getFileSize(string filename);
 
 bool strStartsWith(const string &s, const string &prefix);
 
+struct IndexSlice {
+    IndexSlice(size_t _from, size_t _to) : from(_from), to(_to) {}
+    size_t from;
+    size_t to;
+};
+
+vector<IndexSlice> dispatchOnThreads(size_t elements_size, size_t jobs);
 
 
 vector<double> parseParenthesis(const string &s);

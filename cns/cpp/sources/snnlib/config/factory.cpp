@@ -23,6 +23,7 @@
 #include <snnlib/sim/sim.h>
 
 #include <snnlib/util/spikes_list.h>
+#include <snnlib/util/matrix.h>
 #include <snnlib/util/time_series.h>
 
 Factory& Factory::inst() {
@@ -102,6 +103,9 @@ SerializableBase* Factory::createSerializable(const string &name) {
     } else
     if(name == "OptimalStdp") {
         s = new OptimalStdp();
+    } else
+    if(name == "DoubleMatrix") {
+        s = new DoubleMatrix();
     } else
     if(name == "Neuron") {
         cerr << "Neuron is not allow to be created by serialization factory\n";

@@ -45,7 +45,7 @@ public:
         if(!p_statistics_file.empty()) {
             ProtoRw prw(p_statistics_file, ProtoRw::Write);
             SerialPack st;
-            for(size_t ni=input_neurons_count; ni < sim_neurons.size(); ni++) {
+            for(size_t ni=input_neurons_count; ni < (input_neurons_count + net_neurons_count); ni++) {
                 Neuron *n = accessByGlobalId(ni);
                 n->saveStat(st);
             }

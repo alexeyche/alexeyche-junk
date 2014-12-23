@@ -127,3 +127,23 @@ vector<double> parseParenthesis(const string &s) {
     }
     return out;
 }
+
+
+vector<IndexSlice> dispatchOnThreads(size_t elements_size, size_t jobs) {
+    vector<IndexSlice> out;
+    for(size_t ji=0; ji < jobs; ji++) {
+        int el_per_thread;
+        if(fabs(fmod(elements_size, jobs)) < 0.000001) {
+            el_per_thread = elements_size / jobs;
+        } else {
+            el_per_thread = (elements_size + jobs - 1) / jobs;
+        }
+
+        size_t first = min( ji    * el_per_thread, elements_size );
+        size_t last  = min( (ji+1) * el_per_thread, elements_size );
+        if(first != last) {
+            out.push_back( IndexSlice(first, last) );
+        }
+    }
+    return out;
+}

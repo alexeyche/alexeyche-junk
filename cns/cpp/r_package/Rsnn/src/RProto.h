@@ -42,8 +42,8 @@ public:
                 if(!o) break;
                 v.push_back(o);
             }
-            
-            if( (v.size() == 1)&&(v[0]->getName() == "LabeledSpikesList")) {
+        
+            if ((v.size() == 1) && (v[0]->getName() == "LabeledSpikesList")) {
                 values = convert(v[0]);
             } else {
                 for(size_t vi=0; vi<v.size(); vi++) {
@@ -51,7 +51,7 @@ public:
                     ss << v[vi]->getName() << "_" << vi;
                     values[ss.str()] = convert(v[vi]);
                 }
-            }                
+            }
             delete rw;
         }            
         return values;
@@ -64,7 +64,7 @@ public:
         ProtoRw rw(protofile, ProtoRw::Write);
         if(message_name == "LabeledTimeSeriesList") {
             Protos::LabeledTimeSeriesList lts_mess;
-            Rcpp::List lts_list = list["list"];
+            const Rcpp::List &lts_list = list;
             for(auto it=lts_list.begin(); it != lts_list.end(); ++it) {
                 Protos::LabeledTimeSeries *lts = lts_mess.add_list();
                 Rcpp::List lts_r = *it;
@@ -158,11 +158,19 @@ public:
         if(s->getName() == "LabeledSpikesList") {
             LabeledSpikesList *lsl = dynamic_cast<LabeledSpikesList*>(s);
             if(!lsl) { ERR("Can't cast"); }
+            Rcpp::List spikes;
             for(size_t ni=0; ni<lsl->sl.N; ni++) {
                 stringstream ss;
                 ss << ni;
-                out[ss.str()] = Rcpp::NumericVector(Rcpp::wrap(lsl->sl.sp_list[ni]));
+                spikes[ss.str()] = Rcpp::NumericVector(Rcpp::wrap(lsl->sl.sp_list[ni]));
             }
+            out["spikes"] = spikes;
+            out["labels"] = Rcpp::wrap(lsl->ptl.labels);
+            out["labels_id_timeline"] = Rcpp::wrap(lsl->ptl.labels_id_timeline);
+            out["end_of_patterns"] = Rcpp::wrap(lsl->ptl.timeline);
+            out["dt"] = lsl->ptl.dt;
+            out["Tmax"] = lsl->ptl.Tmax;
+            out["gapBetweenPatterns"] = lsl->ptl.gapBetweenPatterns;
         } else 
         if((s->getName() == "NeuronStat")||(s->getName() == "AdExNeuronStat")) {
             NeuronStat *st = dynamic_cast<NeuronStat*>(s);

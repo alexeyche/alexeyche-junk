@@ -37,7 +37,8 @@ enum ESerializableClass {
                             ESoftMinMax,
                             ENonlinearMinMax,
                             ELabeledSpikesList,
-                            EPatternsTimeline
+                            EPatternsTimeline,
+                            EDoubleMatrix
                         };
 
 static const char* ESerializableClass_str[] =
@@ -70,7 +71,8 @@ static const char* ESerializableClass_str[] =
                                                 "SoftMinMax",
                                                 "NonlinearMinMax",
                                                 "LabeledSpikesList",
-                                                "PatternsTimeline"
+                                                "PatternsTimeline",
+                                                "DoubleMatrix"
                                             };
 
 

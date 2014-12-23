@@ -81,6 +81,9 @@ public:
     template <typename T>
     T* read(bool print=false) {
         SerializableBase *b = read(print);
+        if(!b) {
+            return nullptr;
+        }
         T *o = dynamic_cast<T*>(b);
         if(!o) {
             cerr << "Errors while reading " << b->getName() << "\n";
@@ -122,12 +125,18 @@ public:
     }
 
     template <typename T>
-    vector<T> readAll() {
+    vector<T*> readAll() {
         CHECK_MODE(Read);
-        vector<T> v;
+        vector<T*> v;
+        T *el = read<T>();
+        if(!el) {
+            cerr << "Can't read first element from protobuf\n";
+            terminate();
+        }
+        v.push_back(el);
         while(true) {
-            T el;
-            if(!read(&el)) {
+            T *el = read<T>();
+            if(!el) {
                 break; // we are at end
             }
             v.push_back(el);
