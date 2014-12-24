@@ -25,22 +25,11 @@ if(all(dist == 0)) {
     q()
 }
     
-
 fit = cmdscale(dist, 2, eig=TRUE)
 x <- fit$points[,1]
 y <- fit$points[,2]
-png("eval_dist_matrix.png",width=1024, height=768)
-
-plot(x, y, xlab="Coordinate 1", ylab="Coordinate 2", 
-     main="Metric    MDS",    type="n")
-
-lab_cols = rainbow(length(ulabs))
-text(x, y, labels = labs, cex=.7, col=lab_cols[sapply(labs, function(l) which(l == ulabs))])
-
 points = cbind(x,y)
-dist_xy = function(x_y1, x_y2) {
-    sqrt((x_y1[1] - x_y2[1])^2 + (x_y1[2] - x_y2[2])^2)
-}
+
 global_centroid =  matrix(c(mean(x), mean(y)), nrow=1, ncol=2)
 centroids = NULL
 for(lab in ulabs) {
@@ -50,9 +39,19 @@ for(lab in ulabs) {
     centroids = rbind(centroids, c(mean(xc), mean(yc)))  
 }
 
+png("eval_dist_matrix.png",width=1024, height=768)
+plot(x, y, xlab="Coordinate 1", ylab="Coordinate 2", main="Metric MDS",    type="n")
+lab_cols = rainbow(length(ulabs))
+text(x, y, labels = labs, cex=.7, col=lab_cols[sapply(labs, function(l) which(l == ulabs))])
 points(centroids, lwd=10, pch=3, col=lab_cols)
 points(global_centroid, lwd=10, pch=3, col="black")
 invisible(dev.off())
+
+##############
+
+dist_xy = function(x_y1, x_y2) {
+    sqrt((x_y1[1] - x_y2[1])^2 + (x_y1[2] - x_y2[2])^2)
+}
 
 sse_bss_criterion = function(points, ulabs, centroids, global_centroid) {
     dist_to_c = NULL
