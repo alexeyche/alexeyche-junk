@@ -106,13 +106,14 @@ int main(int argc, char **argv) {
     double t=0;
     for(auto it=tl.begin(); it != tl.end(); ++it) {
         patterns.push_back( IndexSlice((size_t)(t/dt), min(p_size, (size_t)((*it)/dt) )) );
-        cout << "adding pattern [" << patterns.back().from << ", " << patterns.back().to << ")\n";
+        //cout << "adding pattern [" << patterns.back().from << ", " << patterns.back().to << ")\n";
         t = *it;
     }
 
     DoubleMatrix dist = calcPStatDistance(st, patterns, opts.jobs);
+    vector<string> labs = sp_list->ptl.getLabelsTimeline();
+    dist.printR(labs, labs);
 
-    cout << dist << "\n";
     return 0;
 }
 

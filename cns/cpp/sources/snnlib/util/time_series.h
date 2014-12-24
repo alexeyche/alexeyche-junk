@@ -174,6 +174,14 @@ public:
     void reset() {
         current_position = 0;
     }
+    vector<string> getLabelsTimeline() {
+        vector<string> labs;
+        for(auto it = labels_id_timeline.begin(); it != labels_id_timeline.end(); ++it) {
+            labs.push_back(labels[*it]);
+        }
+        return labs;
+    }
+
     vector<string> labels;
     vector<size_t> labels_id_timeline;
     vector<double> timeline;

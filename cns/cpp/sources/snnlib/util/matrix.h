@@ -57,7 +57,22 @@ public:
             str << "|\n";
         }
     }
-
+    void printR(const vector<string> &row_labels, const vector<string> &col_labels) {
+        assert( (row_labels.size() == nrow ) && (col_labels.size() == ncol) );
+        for(auto it=col_labels.begin(); it != col_labels.end(); ++it) {
+            cout << *it;
+            if( (it+1) != col_labels.end() ) cout << ",";
+        }
+        cout << "\n";
+        for(size_t i=0; i<nrow; i++) {
+            cout << row_labels[i] << ",";
+            for(size_t j=0; j<ncol; j++) {
+                cout << getElement(i, j);
+                if( (j+1) != ncol ) cout << ",";
+            }
+            cout << "\n";
+        }
+    }
 
 protected:
     T *vals;

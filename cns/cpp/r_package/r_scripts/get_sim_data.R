@@ -182,50 +182,54 @@ if( (file.exists(stat_file))&&(file.info(stat_file)$size>0)) {
     }
 
 }
-
-if( (file.exists(p_stat_file))&&(file.info(p_stat_file)$size>0)) {
-    p_stat = RProto$new(p_stat_file)$read()
-    p_m = do.call(rbind, lapply(p_stat, function(x) x$p))
-    t=1
-    pairs = list()
-    for(t_end in lab_spikes$end_of_patterns) {
-        pairs[[length(pairs)+1]] = c(t, min(t_end, ncol(p_m)) )
-        t = t_end + 1
-    }
-    dist = matrix(0, ncol=length(pairs), nrow=length(pairs))
-    i = 1
-    for(pi in pairs) {
-        j = 1
-        for(pj in pairs) {
-            ifrom = pi[1]
-            ito = pi[2]
-            
-            jfrom = pj[1]
-            jto = pj[2]
-            m1 = p_m[,jfrom:jto]
-            m2 = p_m[,ifrom:ito]
-            if(ncol(m1) > ncol(m2)) {
-                dc = ncol(m1) - ncol(m2)
-                m2 = cbind(m2, matrix(0, ncol=dc, nrow=nrow(m2)))
-            } else
-            if(ncol(m1) < ncol(m2)) {
-                dc = ncol(m2) - ncol(m1)
-                m1 = cbind(m1, matrix(0, ncol=dc, nrow=nrow(m1)))
-            }
-            d = (m1 - m2)^2
-            dist[i,j] = mean(rowSums(d))
-            j = j + 1
+p_stat_eval = TRUE
+if(p_stat_eval) {
+    if( (file.exists(p_stat_file))&&(file.info(p_stat_file)$size>0)) {
+        p_stat = RProto$new(p_stat_file)$read()
+        p_m = do.call(rbind, lapply(p_stat, function(x) x$p))
+        t=1
+        pairs = list()
+        for(t_end in lab_spikes$end_of_patterns) {
+            pairs[[length(pairs)+1]] = c(t, min(t_end, ncol(p_m)) )
+            t = t_end + 1
         }
-        i = i + 1
+        dist = matrix(0, ncol=length(pairs), nrow=length(pairs))
+        i = 1
+        for(pi in pairs) {
+            j = 1
+            for(pj in pairs) {
+                ifrom = pi[1]
+                ito = pi[2]
+                
+                jfrom = pj[1]
+                jto = pj[2]
+                m1 = p_m[,jfrom:jto]
+                m2 = p_m[,ifrom:ito]
+                if(ncol(m1) > ncol(m2)) {
+                    dc = ncol(m1) - ncol(m2)
+                    m2 = cbind(m2, matrix(0, ncol=dc, nrow=nrow(m2)))
+                } else
+                    if(ncol(m1) < ncol(m2)) {
+                        dc = ncol(m2) - ncol(m1)
+                        m1 = cbind(m1, matrix(0, ncol=dc, nrow=nrow(m1)))
+                    }
+                d = (m1 - m2)^2
+                dist[i,j] = mean(rowSums(d))
+                j = j + 1
+            }
+            i = i + 1
+        }
+        
+        fit = cmdscale(dist, 2, eig=TRUE)
+        x <- fit$points[,1]
+        y <- fit$points[,2]
+        plot(x, y, xlab="Coordinate 1", ylab="Coordinate 2", 
+             main="Metric    MDS",	type="n")
+        lab_cols = rainbow(length(lab_spikes$labels))
+        text(x, y, labels = lab_spikes$labels[lab_spikes$labels_id_timeline+1], cex=.7, col=lab_cols[lab_spikes$labels_id_timeline+1])        
+        
+        points(centroids, lwd=10, pch=3, col=lab_cols)
+        points(total_centroid, lwd=10, pch=3, col="black")
     }
-    
-    fit = cmdscale(dist, 2, eig=TRUE)
-    x <- fit$points[,1]
-    y <- fit$points[,2]
-    plot(x, y, xlab="Coordinate 1", ylab="Coordinate 2", 
-         main="Metric    MDS",	type="n")
-    lab_cols = rainbow(length(lab_spikes$labels))
-    text(x, y, labels = lab_spikes$labels[lab_spikes$labels_id_timeline+1], cex=.7, col=lab_cols[lab_spikes$labels_id_timeline+1])
-    
 }
 #dev.off()

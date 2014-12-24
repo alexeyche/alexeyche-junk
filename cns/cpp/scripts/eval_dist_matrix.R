@@ -1,0 +1,95 @@
+
+args <- commandArgs(trailingOnly = FALSE)
+arg_i = grep("--args", args)
+if(length(arg_i) == 0) {
+    f = "/home/alexeyche/prog/newsim/runs/90f771759412f0950bb6b890d8f954a2_0000/1_dist_matrix.csv"   
+} else {
+    f = args[arg_i+1]
+}
+
+col_labs = scan(f, what=character(), nlines=1, sep=",", quiet=TRUE)
+nc = length(col_labs)
+ss = scan(f, what=character(), skip=1, sep=",", quiet=TRUE)
+nr = length(ss)/nc - 1
+
+
+row_labs_bool = c(TRUE, rep(FALSE, nc))
+row_labs = ss[row_labs_bool]
+labs = row_labs
+
+dist = matrix(as.numeric(ss[!row_labs_bool]), nrow=nr, ncol=nc, byrow=TRUE)
+ulabs = unique(row_labs)
+
+if(all(dist == 0)) {
+    cat("99999\n")
+    q()
+}
+    
+
+fit = cmdscale(dist, 2, eig=TRUE)
+x <- fit$points[,1]
+y <- fit$points[,2]
+png("eval_dist_matrix.png",width=1024, height=768)
+
+plot(x, y, xlab="Coordinate 1", ylab="Coordinate 2", 
+     main="Metric    MDS",    type="n")
+
+lab_cols = rainbow(length(ulabs))
+text(x, y, labels = labs, cex=.7, col=lab_cols[sapply(labs, function(l) which(l == ulabs))])
+
+points = cbind(x,y)
+dist_xy = function(x_y1, x_y2) {
+    sqrt((x_y1[1] - x_y2[1])^2 + (x_y1[2] - x_y2[2])^2)
+}
+global_centroid =  matrix(c(mean(x), mean(y)), nrow=1, ncol=2)
+centroids = NULL
+for(lab in ulabs) {
+    ci = which(labs == lab)
+    xc = x[ci]
+    yc = y[ci]
+    centroids = rbind(centroids, c(mean(xc), mean(yc)))  
+}
+
+points(centroids, lwd=10, pch=3, col=lab_cols)
+points(global_centroid, lwd=10, pch=3, col="black")
+invisible(dev.off())
+
+sse_bss_criterion = function(points, ulabs, centroids, global_centroid) {
+    dist_to_c = NULL
+    for(lab in ulabs) {
+        labi = which(lab == ulabs)
+        d = sapply(1:nrow(points), function(i) dist_xy(points[i,], centroids[labi, ]) )
+        dist_to_c = cbind(dist_to_c, d)
+    }
+    sse = 0
+    bss = 0
+    for(lab in ulabs) {
+        labi = which(lab == ulabs)
+        ci = which(labs == lab)
+        d = dist_to_c[ci,labi]
+        sse = sse + sum(d^2)
+        
+        bss = bss + length(d)*dist_xy(centroids[labi,], global_centroid)^2
+    }
+    return(sse-bss)
+}
+
+calinski_harabasz_criterion = function(points, ulabs, labs, centroids, global_centroid) {
+    cluster_lengths = table(labs)
+    ss_b = 0
+    for(lab in ulabs) {
+        labi = which(lab == ulabs)        
+        ss_b = ss_b + cluster_lengths[labi]*dist_xy(centroids[labi,], global_centroid)^2
+    } 
+    ss_w = 0
+    for(lab in ulabs) {
+        labi = which(lab == ulabs)
+        cpoints = points[which(lab == labs),]
+        d = sapply(1:nrow(cpoints), function(i) dist_xy(cpoints[i,], centroids[labi, ]) )
+        ss_w = ss_w + sum(d^2)
+    }
+    k = length(ulabs)
+    return( (ss_b/ss_w) )
+}
+
+cat(calinski_harabasz_criterion(points, ulabs, labs, centroids, global_centroid),"\n")

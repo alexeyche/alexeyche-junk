@@ -6,17 +6,29 @@ import sys
 import md5
 import shutil
 import multiprocessing
+from contextlib import contextmanager
 
 from config import RUNS_DIR
 from config import SNN_SIM
+from config import SNN_PROC
 from config import CONST_JSON
 
 import subprocess as sub
 import time
 
-def runSim(snn_sim_bin, args, log_stdout, verbose=False):
+this_file = os.path.realpath(__file__)
+
+@contextmanager
+def pushd(newDir):
+    previousDir = os.getcwd()
+    os.chdir(newDir)
+    yield
+    os.chdir(previousDir)
+
+
+def runProcess(bin, args, log_stdout, verbose=False):
     cmd = [
-            snn_sim_bin,
+        bin,
     ]            
 
     for k, v in [ (k, args[k]) for k in sorted(args) ]:
@@ -38,13 +50,32 @@ def runSim(snn_sim_bin, args, log_stdout, verbose=False):
     if verbose:
         print "time run: %s sec" % str(end_time-start_time)
     if sp.returncode != 0:
-        print "snn_sim failed: "
+        print "Run failed: "
         with open(log_stdout) as lf:
             for l in lf:
                 print l.strip()
         sys.exit(1)
 
 
+def evalClusteringPStat(args, wd, ep, p_stat_file, spikes):
+    print "Evaluation through clustering ...",
+    if args.verbose:
+        print 
+    proc_args = {}
+    proc_args['--p-stat'] = p_stat_file
+    proc_args['--spikes'] = spikes
+    proc_args['--jobs'] = args.jobs
+    proc_output = os.path.join(wd, "%s_dist_matrix.csv" % ep)
+    runProcess(args.snn_proc_bin, proc_args, proc_output, verbose=args.verbose)
+    
+    eval_output = os.path.join(wd, "%s_eval_pstat.log" % ep)
+    eval_r_script = os.path.join(os.path.dirname(this_file), "eval_dist_matrix.R")
+    with pushd(wd):
+        runProcess("Rscript",  { eval_r_script : proc_output }, eval_output, verbose=args.verbose)
+
+    with open(eval_output) as ev_ptr:
+        for l in ev_ptr:
+            print l.strip()
 
 def main(args):
     const_hex = md5.new(args.const).hexdigest()
@@ -87,6 +118,7 @@ def main(args):
 
     def wd_file(s):
         return os.path.join(wd, s)
+    
     input = None
     if args.input:
         input = args.input
@@ -94,21 +126,22 @@ def main(args):
         input = args.spikes
 
     common_sim_args = {
-            '--jobs' : str(args.jobs),
-            '--input' : input,
-            '--constants' : const
+        '--jobs' : str(args.jobs),
+        '--input' : input,
+        '--constants' : const
     }            
     if args.T_max != 0:
         common_sim_args['--T-max'] = args.T_max
 
     for ep in xrange(start_ep, start_ep + args.epochs + 1):
         sim_args = common_sim_args.copy()
-        
+        if args.eval_clustering_p_stat: 
+            sim_args['--p-stat'] = wd_file("%s_p_stat.pb" % ep) 
         sim_args['--save'] = wd_file("%s_model.pb" % ep)
         sim_args['--output'] = wd_file("%s_output_spikes.pb" % ep)
         if args.stat:
             sim_args['--stat'] = wd_file("%s_stat.pb" % ep)
-        elif args.p_stat:
+        elif args.p_stat and '--p-stat' not in sim_args:
             sim_args['--p-stat'] = wd_file("%s_p_stat.pb" % ep)
 
         if ep>1:
@@ -129,13 +162,12 @@ def main(args):
         elif ep == 0:
             continue
         print "Epoch %d" % ep
-        runSim(args.snn_sim_bin, sim_args, wd_file("%s_output.log" % ep), verbose = args.verbose)
-    
-
+        runProcess(args.snn_sim_bin, sim_args, wd_file("%s_output.log" % ep), verbose = args.verbose)
+        if args.eval_clustering_p_stat and ep > 0: 
+            evalClusteringPStat(args, wd, ep, sim_args['--p-stat'], sim_args['--output'])
 
 
 if __name__ == '__main__':
-    this_file = os.path.realpath(__file__)
     parser = argparse.ArgumentParser(description='Tool for simulating snn')
 
     parser.add_argument('-i', 
@@ -185,6 +217,12 @@ if __name__ == '__main__':
     parser.add_argument('--snn-sim-bin', 
                         required=False,
                         help='Path to snn sim bin (default: $SCRIPT_DIR/../build/bin/%s)' % SNN_SIM, default=os.path.join(os.path.dirname(this_file), "../build/bin", SNN_SIM))
+    parser.add_argument('--snn-proc-bin', 
+                        required=False,
+                        help='Path to snn proc bin (default: $SCRIPT_DIR/../build/bin/%s)' % SNN_PROC, default=os.path.join(os.path.dirname(this_file), "../build/bin", SNN_PROC))
+    parser.add_argument('--eval-clustering-p-stat',
+                        action='store_true',
+                        help='Run evaluation of unsupervised classification with clustering of model intensities')
 
     args = parser.parse_args(sys.argv[1:])    
     if len(sys.argv) == 1:
