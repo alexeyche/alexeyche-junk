@@ -10,13 +10,14 @@
 
 #include "p_stat_calc.h"
 
-enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_SPIKES, ARG_P_STAT, ARG_JOBS };
+enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_SPIKES, ARG_P_STAT, ARG_JOBS, ARG_OUT_JSON };
 const option::Descriptor usage[] =
 {
  {ARG_UNKNOWN, 0, "", "",Arg::None, "USAGE: example [options]\n\n"
                                         "Options:" },
  {ARG_SPIKES, 0,"s","spikes",Arg::NonEmpty, "  --spikes, -s  \tLabeled Spikes List to process" },
  {ARG_P_STAT, 0,"p","p-stat",Arg::NonEmpty, "  --p-stat, -p  \tProbability statistics of model to proccess" },
+ {ARG_OUT_JSON, 0,"o","output",Arg::NonEmpty, "  --output, -o  \tOutput file in json format" },
  {ARG_JOBS, 0,"j","jobs",Arg::NonEmpty, "  --jobs  -j \tParallel jobs to run (default 1)" },
  {ARG_HELP, 0,"h", "help",Arg::None, "  --help  \tPrint usage and exit." },
 
@@ -29,6 +30,7 @@ struct SnnProcOpts {
     SnnProcOpts() : jobs(1) {}
     string spikes;
     string p_stat;
+    string output;
     int jobs;
 };
 
@@ -74,6 +76,9 @@ SnnProcOpts parseOptions(int argc, char **argv) {
     if(options[ARG_P_STAT].count()>0) {
         opts.p_stat = options[ARG_P_STAT].arg;
     }
+    if(options[ARG_OUT_JSON].count()>0) {
+        opts.output = options[ARG_OUT_JSON].arg;
+    }
     return opts;
 }
 
@@ -111,9 +116,31 @@ int main(int argc, char **argv) {
     }
 
     DoubleMatrix dist = calcPStatDistance(st, patterns, opts.jobs);
-    vector<string> labs = sp_list->ptl.getLabelsTimeline();
-    dist.printR(labs, labs);
 
+    const SpikesList &sl = sp_list->sl;
+    double acc_rate = 0;
+    for(size_t i = sl.N-1; i>=(sl.N-st.size()) ; i--) {
+        acc_rate += sl[i].size()/sp_list->ptl.Tmax;
+    }
+    double rate = 1000*acc_rate/st.size();
+
+
+    JsonBox::Value out;
+    out["distance_matrix"] = dist.serializeToJson();
+    out["mean_rate"] = rate;
+
+    vector<string> labs = sp_list->ptl.getLabelsTimeline();
+    JsonBox::Array labs_json;
+    for(auto it=labs.begin(); it != labs.end(); ++it) {
+        labs_json.push_back(*it);
+    }
+    out["labels"] = labs_json;
+
+    if(!opts.output.empty()) {
+        out.writeToFile(opts.output);
+    } else {
+        cout << out;
+    }
     return 0;
 }
 

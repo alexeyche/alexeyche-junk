@@ -1,0 +1,31 @@
+{
+    "language"        : "PYTHON",
+    "main-file"       : "unsup_snn",
+    "experiment-name" : "unsupervised-clustering",
+    "variables": {
+        "weight_decay": {
+            "type": "FLOAT",
+            "size": 1,
+            "min":  0,
+            "max":  0.1
+        },
+        "tau_c": {
+            "type": "FLOAT",
+            "size": 1,
+            "min":  50,
+            "max":  300
+        }
+    },
+    "tasks": {
+      "cluster_criterion" : {
+          "type"        : "OBJECTIVE",
+          "likelihood"  : "GAUSSIAN"
+      },
+      "mean_rate" : {
+          "type"        : "CONSTRAINT",
+          "likelihood"  : "GAUSSIAN"
+      }
+    },
+    "polling-time" : 10
+}
+

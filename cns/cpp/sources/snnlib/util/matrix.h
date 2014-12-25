@@ -4,8 +4,8 @@
 #include <snnlib/util/json/json_box.h>
 #include <snnlib/serialize/serialize.h>
 #include <snnlib/protos/matrix.pb.h>
+#include <snnlib/util/json/json_box.h>
 
-using namespace std;
 
 
 template <typename T>
@@ -72,6 +72,17 @@ public:
             }
             cout << "\n";
         }
+    }
+    JsonBox::Array serializeToJson() {
+        JsonBox::Array a;
+        for(size_t i=0; i<nrow; i++) {
+            JsonBox::Array r;
+            for(size_t j=0; j<ncol; j++) {
+                r.push_back(getElement(i, j));
+            }
+            a.push_back(r);
+        }
+        return a;
     }
 
 protected:

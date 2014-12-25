@@ -1,53 +1,16 @@
+require(rjson, quietly=TRUE)
 
 args <- commandArgs(trailingOnly = FALSE)
+we_are_in_r_studio = length(grep("RStudio", args)) > 0
 arg_i = grep("--args", args)
 if(length(arg_i) == 0) {
-    f = "/home/alexeyche/prog/newsim/runs/90f771759412f0950bb6b890d8f954a2_0000/1_dist_matrix.csv"   
+    f = "/home/alexeyche/prog/sim_spear/12/1_proc_output.json"
 } else {
     f = args[arg_i+1]
 }
 
-col_labs = scan(f, what=character(), nlines=1, sep=",", quiet=TRUE)
-nc = length(col_labs)
-ss = scan(f, what=character(), skip=1, sep=",", quiet=TRUE)
-nr = length(ss)/nc - 1
 
-
-row_labs_bool = c(TRUE, rep(FALSE, nc))
-row_labs = ss[row_labs_bool]
-labs = row_labs
-
-dist = matrix(as.numeric(ss[!row_labs_bool]), nrow=nr, ncol=nc, byrow=TRUE)
-ulabs = unique(row_labs)
-
-if(all(dist == 0)) {
-    cat("99999\n")
-    q()
-}
-    
-fit = cmdscale(dist, 2, eig=TRUE)
-x <- fit$points[,1]
-y <- fit$points[,2]
-points = cbind(x,y)
-
-global_centroid =  matrix(c(mean(x), mean(y)), nrow=1, ncol=2)
-centroids = NULL
-for(lab in ulabs) {
-    ci = which(labs == lab)
-    xc = x[ci]
-    yc = y[ci]
-    centroids = rbind(centroids, c(mean(xc), mean(yc)))  
-}
-
-png("eval_dist_matrix.png",width=1024, height=768)
-plot(x, y, xlab="Coordinate 1", ylab="Coordinate 2", main="Metric MDS",    type="n")
-lab_cols = rainbow(length(ulabs))
-text(x, y, labels = labs, cex=.7, col=lab_cols[sapply(labs, function(l) which(l == ulabs))])
-points(centroids, lwd=10, pch=3, col=lab_cols)
-points(global_centroid, lwd=10, pch=3, col="black")
-invisible(dev.off())
-
-##############
+###################################
 
 dist_xy = function(x_y1, x_y2) {
     sqrt((x_y1[1] - x_y2[1])^2 + (x_y1[2] - x_y2[2])^2)
@@ -91,4 +54,47 @@ calinski_harabasz_criterion = function(points, ulabs, labs, centroids, global_ce
     return( (ss_b/ss_w) )
 }
 
-cat(calinski_harabasz_criterion(points, ulabs, labs, centroids, global_centroid),"\n")
+#########################
+
+calculate_criterion = function(f) {    
+    data = fromJSON(file = f)  
+    dist = do.call(rbind, data$distance_matrix)
+    mean_rate = data$mean_rate
+    labs = data$labels
+    
+    ulabs = unique(labs)
+    
+    if(all(dist == 0)) {
+        return(99999)
+    }
+    
+    fit = cmdscale(dist, 2, eig=TRUE)
+    x <- fit$points[,1]
+    y <- fit$points[,2]
+    points = cbind(x,y)
+    
+    global_centroid =  matrix(c(mean(x), mean(y)), nrow=1, ncol=2)
+    centroids = NULL
+    for(lab in ulabs) {
+        ci = which(labs == lab)
+        xc = x[ci]
+        yc = y[ci]
+        centroids = rbind(centroids, c(mean(xc), mean(yc)))  
+    }
+    if(!we_are_in_r_studio) {
+        png(sprintf("%s_eval_dist_matrix.png", data$epoch),width=1024, height=768)
+    }
+    plot(x, y, xlab="Coordinate 1", ylab="Coordinate 2", main="Metric MDS",    type="n")
+    lab_cols = rainbow(length(ulabs))
+    text(x, y, labels = labs, cex=.7, col=lab_cols[sapply(labs, function(l) which(l == ulabs))])
+    points(centroids, lwd=10, pch=3, col=lab_cols)
+    points(global_centroid, lwd=10, pch=3, col="black")
+    if(!we_are_in_r_studio) {
+        invisible(dev.off())
+    }
+    -calinski_harabasz_criterion(points, ulabs, labs, centroids, global_centroid)
+}
+##############
+if(!we_are_in_r_studio) {
+    cat(calculate_criterion(f),"\n")
+}

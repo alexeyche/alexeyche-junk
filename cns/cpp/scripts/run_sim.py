@@ -7,6 +7,7 @@ import md5
 import shutil
 import multiprocessing
 from contextlib import contextmanager
+import json
 
 from config import RUNS_DIR
 from config import SNN_SIM
@@ -26,24 +27,27 @@ def pushd(newDir):
     os.chdir(previousDir)
 
 
-def runProcess(bin, args, log_stdout, verbose=False):
+def runProcess(bin, args, log_stdout=None, verbose=False):
     cmd = [
         bin,
     ]            
-
     for k, v in [ (k, args[k]) for k in sorted(args) ]:
         if type(v) is bool:
             cmd += [k]
         else:
-            cmd += [k, v]
+            cmd += [k, str(v)]
     start_time = time.time()
-    sp = sub.Popen(cmd, stdout=open(log_stdout, 'w'), stderr=sub.STDOUT, shell=False)
+    if log_stdout:
+        sp = sub.Popen(cmd, stdout=open(log_stdout, 'w'), stderr=sub.STDOUT, shell=False)
+    else:        
+        sp = sub.Popen(cmd, stdout=sub.PIPE, stderr=sub.STDOUT, shell=False)
+
     if verbose:
         print 
         print " ".join(cmd)
         print 
     try:
-        sp.communicate()
+        stdout, stderr = sp.communicate()
     except KeyboardInterrupt:
         print "Bye"
     end_time = time.time()
@@ -51,13 +55,18 @@ def runProcess(bin, args, log_stdout, verbose=False):
         print "time run: %s sec" % str(end_time-start_time)
     if sp.returncode != 0:
         print "Run failed: "
-        with open(log_stdout) as lf:
-            for l in lf:
+        if stdout:
+            with open(log_stdout) as lf:
+                for l in lf:
+                    print l.strip()
+        else:
+            for l in stdout:
                 print l.strip()
         sys.exit(1)
-
-
-def evalClusteringPStat(args, wd, ep, p_stat_file, spikes):
+    if not log_stdout:
+        return stdout
+    
+def evalClusteringPStat(args, wd, ep, p_stat_file, spikes, stat):
     print "Evaluation through clustering ...",
     if args.verbose:
         print 
@@ -65,56 +74,70 @@ def evalClusteringPStat(args, wd, ep, p_stat_file, spikes):
     proc_args['--p-stat'] = p_stat_file
     proc_args['--spikes'] = spikes
     proc_args['--jobs'] = args.jobs
-    proc_output = os.path.join(wd, "%s_dist_matrix.csv" % ep)
+    json_proc = os.path.join(wd, "%s_proc_output.json" % ep)
+    proc_args['--output'] = json_proc
+    proc_output = os.path.join(wd, "%s_proc_stdout.log" % ep)
     runProcess(args.snn_proc_bin, proc_args, proc_output, verbose=args.verbose)
+    if os.path.exists(proc_output) and os.stat(proc_output).st_size == 0:
+        os.remove(proc_output)
     
+    j = json.load(open(json_proc))
+    j['epoch'] = ep 
+    json.dump(j, open(json_proc, 'w'), indent=4)
+
     eval_output = os.path.join(wd, "%s_eval_pstat.log" % ep)
     eval_r_script = os.path.join(os.path.dirname(this_file), "eval_dist_matrix.R")
     with pushd(wd):
-        runProcess("Rscript",  { eval_r_script : proc_output }, eval_output, verbose=args.verbose)
+        eval = runProcess("Rscript",  { eval_r_script : json_proc }, verbose=args.verbose)
 
-    with open(eval_output) as ev_ptr:
-        for l in ev_ptr:
-            print l.strip()
+    stat['eval'] = float(eval.strip())
+    stat['mean_rate'] = float(j['mean_rate'])
+    if args.verbose:
+        for k in sorted(stat.keys()):
+            print k, ":", stat[k],
+        print
 
 def main(args):
     const_hex = md5.new(args.const).hexdigest()
     i=0
-    wd = None
-    while i<1000:
-        new_wd = os.path.join(args.runs_dir, const_hex + "_%04d" % i)
-        if not os.path.exists(new_wd):
-            if not args.old_dir or not wd:
-                wd = new_wd
-            break
-        wd = new_wd
-        i+=1
-    
-    start_ep = 0
-    if os.path.exists(wd):
-        max_ep = -1
-        for f in os.listdir(wd):
-            f_spl = f.split("_")
-            if len(f_spl) > 1 and "model" in f:
-                max_ep = max(max_ep, int(f_spl[0]))
-        if max_ep>0:
-            while True:
-                ans = raw_input("%s already exists and %s epochs was done here. Continue learning? (y/n): " % (os.path.basename(wd), max_ep))
-                if ans in ["Y","y"]:
-                    start_ep = max_ep + 1
-                    break
-                elif ans in ["N", "n"]:
-                    print "Cleaning %s ... " % wd
-                    for f in os.listdir(wd):
-                        os.remove(os.path.join(wd, f))
-                    break                        
-                else:
-                    print "incomprehensible answer"
-    else:
-        os.mkdir(wd)
+    wd = args.working_dir
 
-    shutil.copy(args.const, wd)
+    start_ep = 0
+    if not wd:
+        while i<1000:
+            new_wd = os.path.join(args.runs_dir, const_hex + "_%04d" % i)
+            if not os.path.exists(new_wd):
+                if not args.old_dir or not wd:
+                    wd = new_wd
+                break
+            wd = new_wd
+            i+=1
+        
+        if os.path.exists(wd):
+            max_ep = -1
+            for f in os.listdir(wd):
+                f_spl = f.split("_")
+                if len(f_spl) > 1 and "model" in f:
+                    max_ep = max(max_ep, int(f_spl[0]))
+            if max_ep>0:
+                while True:
+                    ans = raw_input("%s already exists and %s epochs was done here. Continue learning? (y/n): " % (os.path.basename(wd), max_ep))
+                    if ans in ["Y","y"]:
+                        start_ep = max_ep + 1
+                        break
+                    elif ans in ["N", "n"]:
+                        print "Cleaning %s ... " % wd
+                        for f in os.listdir(wd):
+                            os.remove(os.path.join(wd, f))
+                        break                        
+                    else:
+                        print "incomprehensible answer"
+        else:
+            os.mkdir(wd)
+
     const = os.path.join(wd, os.path.basename(args.const))
+    if not os.path.exists(const):
+        shutil.copy(args.const, wd)
 
     def wd_file(s):
         return os.path.join(wd, s)
@@ -132,6 +155,8 @@ def main(args):
     }            
     if args.T_max != 0:
         common_sim_args['--T-max'] = args.T_max
+    
+    stat = {'eval' : None, 'mean_rate' : 0}
 
     for ep in xrange(start_ep, start_ep + args.epochs + 1):
         sim_args = common_sim_args.copy()
@@ -164,7 +189,26 @@ def main(args):
         print "Epoch %d" % ep
         runProcess(args.snn_sim_bin, sim_args, wd_file("%s_output.log" % ep), verbose = args.verbose)
         if args.eval_clustering_p_stat and ep > 0: 
-            evalClusteringPStat(args, wd, ep, sim_args['--p-stat'], sim_args['--output'])
+            evalClusteringPStat(args, wd, ep, sim_args['--p-stat'], sim_args['--output'], stat)
+    return stat
+
+
+class RunSimArgs(object):
+    input = None
+    epochs = 1
+    eval_clustering_p_stat = True
+    const = os.path.join(os.path.dirname(this_file), "../", CONST_JSON)
+    working_dir = RUNS_DIR
+    jobs = multiprocessing.cpu_count()
+    T_max = 0
+    stat = None
+    verbose = True
+    snn_sim_bin = os.path.join(os.path.dirname(this_file), "../build/bin", SNN_SIM)
+    snn_proc_bin = os.path.join(os.path.dirname(this_file), "../build/bin", SNN_PROC)
+    old_dir = False
+    p_stat = None
+    spikes = None
+    runs_dir = RUNS_DIR
 
 
 if __name__ == '__main__':
@@ -181,15 +225,15 @@ if __name__ == '__main__':
     parser.add_argument('-e', 
                         '--epochs', 
                         required=False,
-                        help='Number of epochs to run', default=1,type=int)
+                        help='Number of epochs to run', default=RunSimArgs.epochs,type=int)
     parser.add_argument('-j', 
                         '--jobs', 
                         required=False,
-                        help='Number of parallell jobs (default: %(default)s)', default=multiprocessing.cpu_count())
+                        help='Number of parallell jobs (default: %(default)s)', default=RunSimArgs.jobs)
     parser.add_argument('-T', 
                         '--T-max', 
                         required=False,
-                        help='Run only specific amount of simulation time (ms)', default=0)
+                        help='Run only specific amount of simulation time (ms)', default=RunSimArgs.T_max)
     parser.add_argument('-o', 
                         '--old-dir', 
                         action='store_true',
@@ -209,17 +253,21 @@ if __name__ == '__main__':
     parser.add_argument('-r', 
                         '--runs-dir', 
                         required=False,
-                        help='Runs dir (default: %(default)s)', default=RUNS_DIR)
+                        help='Runs dir (default: %(default)s)', default=RunSimArgs.runs_dir)
+    parser.add_argument('-w', 
+                        '--working-dir',
+                        required=False,
+                        help='Working dir (default: %(default)s/%md5_of_const%_%number_of_experiment%)', default=RunSimArgs.working_dir)
     parser.add_argument('-c', 
                         '--const', 
                         required=False,
-                        help='Path to const.json file (default: $SCRIPT_DIR/../%s)' % CONST_JSON, default=os.path.join(os.path.dirname(this_file), "../", CONST_JSON))
+                        help='Path to const.json file (default: $SCRIPT_DIR/../%s)' % CONST_JSON, default=RunSimArgs.const)
     parser.add_argument('--snn-sim-bin', 
                         required=False,
-                        help='Path to snn sim bin (default: $SCRIPT_DIR/../build/bin/%s)' % SNN_SIM, default=os.path.join(os.path.dirname(this_file), "../build/bin", SNN_SIM))
+                        help='Path to snn sim bin (default: $SCRIPT_DIR/../build/bin/%s)' % SNN_SIM, default=RunSimArgs.snn_sim_bin)
     parser.add_argument('--snn-proc-bin', 
                         required=False,
-                        help='Path to snn proc bin (default: $SCRIPT_DIR/../build/bin/%s)' % SNN_PROC, default=os.path.join(os.path.dirname(this_file), "../build/bin", SNN_PROC))
+                        help='Path to snn proc bin (default: $SCRIPT_DIR/../build/bin/%s)' % SNN_PROC, default=RunSimArgs.snn_proc_bin)
     parser.add_argument('--eval-clustering-p-stat',
                         action='store_true',
                         help='Run evaluation of unsupervised classification with clustering of model intensities')
@@ -233,4 +281,6 @@ if __name__ == '__main__':
         raise Exception("Need input time series or input spikes")
     if args.stat and args.p_stat:
         raise Exception("Can't collect Full and Partial statistics. Choose one")
-    main(args)
+    sim_opts = RunSimArgs()
+    sim_opts.__dict__.update(args.__dict__)
+    main(sim_opts)
