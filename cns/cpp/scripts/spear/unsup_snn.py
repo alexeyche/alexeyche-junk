@@ -35,11 +35,15 @@ def set_value_in_nested_dict(d, path, value):
         set_value_in_nested_dict(d[path[0]], path[1:], value)
 
                 
-EPOCHS_NUM = 15
+EPOCHS_NUM = 10
 INPUT_DATA = "/home/alexeyche/prog/sim/test_data.2_classes.pb"
 RUNS_DIR = "/home/alexeyche/prog/sim_spear"
 
-variables_path = ["learning_rules", "OptimalStdp"]
+variables_path = { 
+    'weight_decay' :  ["learning_rules", "OptimalStdp"],
+    'tau_c' :  ["learning_rules", "OptimalStdp"],
+    'beta' : ["act_funcs", "ExpHennequin_Strict"],
+}
 
 def evaluate(job_id, params):
     wd = os.path.join(RUNS_DIR, str(job_id))
@@ -52,7 +56,7 @@ def evaluate(job_id, params):
 
     j = json.loads(open(const_json).read(), object_pairs_hook=collections.OrderedDict)
     for k, v in params.items():
-        set_value_in_nested_dict(j, variables_path + [k], v)
+        set_value_in_nested_dict(j, variables_path[k] + [k], v)
     json.dump(j, open(const_json, 'w'), indent=4)
     
     run_sim_args = run_sim.RunSimArgs()
@@ -60,13 +64,12 @@ def evaluate(job_id, params):
     run_sim_args.epochs = EPOCHS_NUM
     run_sim_args.working_dir = wd
     run_sim_args.const = const_json
-    print run_sim_args.__dict__
-    print run_sim.RunSimArgs.__dict__
+    
     stat = run_sim.main(run_sim_args)
    
     return {
         "cluster_criterion" : stat['eval'],
-        "mean_rate" : stat['mean_rate'],
+#        "mean_rate" : stat['mean_rate'],
     }
 
 def main(job_id, params):

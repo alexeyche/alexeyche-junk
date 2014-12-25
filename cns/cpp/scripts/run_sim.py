@@ -198,7 +198,7 @@ class RunSimArgs(object):
     epochs = 1
     eval_clustering_p_stat = True
     const = os.path.join(os.path.dirname(this_file), "../", CONST_JSON)
-    working_dir = RUNS_DIR
+    working_dir = None
     jobs = multiprocessing.cpu_count()
     T_max = 0
     stat = None

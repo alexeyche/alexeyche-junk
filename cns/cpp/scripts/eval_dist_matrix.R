@@ -56,8 +56,8 @@ calinski_harabasz_criterion = function(points, ulabs, labs, centroids, global_ce
 
 #########################
 
-calculate_criterion = function(f) {    
-    data = fromJSON(file = f)  
+calculate_criterion = function(proc_out_json) {    
+    data = fromJSON(file = proc_out_json)  
     dist = do.call(rbind, data$distance_matrix)
     mean_rate = data$mean_rate
     labs = data$labels
@@ -92,7 +92,7 @@ calculate_criterion = function(f) {
     if(!we_are_in_r_studio) {
         invisible(dev.off())
     }
-    -calinski_harabasz_criterion(points, ulabs, labs, centroids, global_centroid)
+    -calinski_harabasz_criterion(points, ulabs, labs, centroids, global_centroid)/mean_rate
 }
 ##############
 if(!we_are_in_r_studio) {

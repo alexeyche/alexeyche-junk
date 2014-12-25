@@ -11,7 +11,7 @@ ornstein_uhlenbeck <- function(T, n, nu,lambda,sigma,x0){
 
 set.seed(8)
 
-sample_len = 59
+sample_len = 119
 
 lts = list()
 
