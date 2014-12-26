@@ -8,6 +8,7 @@ vector<string> split(const string &s, char delim);
 vector<string> splitBySubstr(const string &s_inp, const string &delimiter);
 
 void trim(string &str);
+string trimC(const string &str);
 
 #ifndef PI
     #define PI 3.1415926535897932384626433832795028841971693993751

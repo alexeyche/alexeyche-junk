@@ -47,6 +47,11 @@ void trim(string &str) {
     }
 }
 
+string trimC(const string &str) {
+    string s(str);
+    trim(s);
+    return s;
+}
 double normal_distr_var = -1;
 
 double getUnif() {

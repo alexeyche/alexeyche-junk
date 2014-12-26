@@ -28,9 +28,12 @@ def pushd(newDir):
 
 
 def runProcess(bin, args, log_stdout=None, verbose=False):
-    cmd = [
-        bin,
-    ]            
+    if type(bin) is list:
+        cmd = list(bin)
+    else:
+        cmd = [
+            bin,
+        ]            
     for k, v in [ (k, args[k]) for k in sorted(args) ]:
         if type(v) is bool:
             cmd += [k]
@@ -55,12 +58,12 @@ def runProcess(bin, args, log_stdout=None, verbose=False):
         print "time run: %s sec" % str(end_time-start_time)
     if sp.returncode != 0:
         print "Run failed: "
-        if stdout:
+        if log_stdout:
             with open(log_stdout) as lf:
                 for l in lf:
                     print l.strip()
         else:
-            for l in stdout:
+            for l in stdout.split("\n"):
                 print l.strip()
         sys.exit(1)
     if not log_stdout:
@@ -77,7 +80,7 @@ def evalClusteringPStat(args, wd, ep, p_stat_file, spikes, stat):
     json_proc = os.path.join(wd, "%s_proc_output.json" % ep)
     proc_args['--output'] = json_proc
     proc_output = os.path.join(wd, "%s_proc_stdout.log" % ep)
-    runProcess(args.snn_proc_bin, proc_args, proc_output, verbose=args.verbose)
+    runProcess([args.snn_proc_bin, "p_stat_dist"], proc_args, proc_output, verbose=args.verbose)
     if os.path.exists(proc_output) and os.stat(proc_output).st_size == 0:
         os.remove(proc_output)
     
@@ -196,15 +199,15 @@ def main(args):
 class RunSimArgs(object):
     input = None
     epochs = 1
-    eval_clustering_p_stat = True
+    eval_clustering_p_stat = False
     const = os.path.join(os.path.dirname(this_file), "../", CONST_JSON)
+    snn_sim_bin = os.path.join(os.path.dirname(this_file), "../build/bin", SNN_SIM)
+    snn_proc_bin = os.path.join(os.path.dirname(this_file), "../build/bin", SNN_PROC)
     working_dir = None
     jobs = multiprocessing.cpu_count()
     T_max = 0
     stat = None
     verbose = True
-    snn_sim_bin = os.path.join(os.path.dirname(this_file), "../build/bin", SNN_SIM)
-    snn_proc_bin = os.path.join(os.path.dirname(this_file), "../build/bin", SNN_PROC)
     old_dir = False
     p_stat = None
     spikes = None
@@ -257,7 +260,7 @@ if __name__ == '__main__':
     parser.add_argument('-w', 
                         '--working-dir',
                         required=False,
-                        help='Working dir (default: %(default)s/%md5_of_const%_%number_of_experiment%)', default=RunSimArgs.working_dir)
+                        help='Working dir (default: %%runs_dir%%/%%md5_of_const%%_%%number_of_experiment%%)')
     parser.add_argument('-c', 
                         '--const', 
                         required=False,

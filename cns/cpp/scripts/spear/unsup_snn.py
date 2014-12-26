@@ -35,8 +35,8 @@ def set_value_in_nested_dict(d, path, value):
         set_value_in_nested_dict(d[path[0]], path[1:], value)
 
                 
-EPOCHS_NUM = 10
-INPUT_DATA = "/home/alexeyche/prog/sim/synth_control.512.6_by_10.pb"
+EPOCHS_NUM = 30
+INPUT_DATA = "/home/alexeyche/prog/sim/synth_control.120.4_classes_by_10.pb"
 RUNS_DIR = "/home/alexeyche/prog/sim_spear"
 
 variables_path = { 
@@ -64,12 +64,12 @@ def evaluate(job_id, params):
     run_sim_args.epochs = EPOCHS_NUM
     run_sim_args.working_dir = wd
     run_sim_args.const = const_json
-    
+    run_sim_args.eval_clustering_p_stat = True
+
     stat = run_sim.main(run_sim_args)
    
     return {
         "cluster_criterion" : stat['eval'],
-#        "mean_rate" : stat['mean_rate'],
     }
 
 def main(job_id, params):

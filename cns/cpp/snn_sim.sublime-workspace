@@ -536,13 +536,10 @@
 			}
 		},
 		{
-			"contents": "\n\n#include <snnlib/util/optionparser/opt.h>\n#include <snnlib/serialize/proto_rw.h>\n#include <snnlib/neurons/neuron_stat.h>\n#include <snnlib/util/spikes_list.h>\n#include <snnlib/base.h>\n#include <snnlib/util/matrix.h>\n\n\n#include \"p_stat_calc.h\"\n\nenum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_SPIKES, ARG_P_STAT, ARG_JOBS, ARG_OUT_JSON };\nconst option::Descriptor usage[] =\n{\n {ARG_UNKNOWN, 0, \"\", \"\",Arg::None, \"USAGE: example [options]\\n\\n\"\n                                        \"Options:\" },\n {ARG_SPIKES, 0,\"s\",\"spikes\",Arg::NonEmpty, \"  --spikes, -s  \\tLabeled Spikes List to process\" },\n {ARG_P_STAT, 0,\"p\",\"p-stat\",Arg::NonEmpty, \"  --p-stat, -p  \\tProbability statistics of model to proccess\" },\n {ARG_OUT_JSON, 0,\"o\",\"output\",Arg::NonEmpty, \"  --output, -o  \\tOutput file in json format\" },\n {ARG_JOBS, 0,\"j\",\"jobs\",Arg::NonEmpty, \"  --jobs  -j \\tParallel jobs to run (default 1)\" },\n {ARG_HELP, 0,\"h\", \"help\",Arg::None, \"  --help  \\tPrint usage and exit.\" },\n\n {ARG_UNKNOWN, 0, \"\", \"\",Arg::None, \"\\nExamples:\\n\"\n                               \"% Need to fill %\" },\n {0,0,0,0,0,0}\n};\n\nstruct SnnProcOpts {\n    SnnProcOpts() : jobs(1) {}\n    string spikes;\n    string p_stat;\n    string output;\n    int jobs;\n};\n\nSnnProcOpts parseOptions(int argc, char **argv) {\n    argc-=(argc>0); argv+=(argc>0); // skip program name argv[0] if present\n    option::Stats  stats(usage, argc, argv);\n    option::Option options[stats.options_max];\n    option::Option buffer[stats.buffer_max];\n\n    option::Parser parse(usage, argc, argv, options, buffer);\n    if (parse.error())\n        exit(1);\n\n    if ((options[ARG_HELP]) || (argc == 0)) {\n        option::printUsage(cout, usage);\n        exit(0);\n    }\n\n    if(options[ARG_SPIKES].count() != 1) {\n        cerr << \"Inappropriate spikes argument\\n\";\n        exit(1);\n    }\n    if(options[ARG_P_STAT].count() != 1) {\n        cerr << \"Inappropriate --p-stat argument\\n\";\n        exit(1);\n    }\n    for (option::Option* opt = options[ARG_UNKNOWN]; opt; opt = opt->next()) {\n      cerr << \"Unknown option: \" << string(opt->name,opt->namelen) << \"\\n\";\n    }\n    if(options[ARG_UNKNOWN].count() > 0) exit(1);\n    for (int i = 0; i < parse.nonOptionsCount(); ++i) {\n      cerr << \"Non-options arguments are not supported (\" << i << \": \" << parse.nonOption(i) << \")\\n\";\n    }\n    if(parse.nonOptionsCount()>0) exit(1);\n\n    SnnProcOpts opts;\n    if(options[ARG_JOBS].count()>0) {\n        opts.jobs = atoi(options[ARG_JOBS].arg);\n    }\n    if(options[ARG_SPIKES].count()>0) {\n        opts.spikes = options[ARG_SPIKES].arg;\n    }\n    if(options[ARG_P_STAT].count()>0) {\n        opts.p_stat = options[ARG_P_STAT].arg;\n    }\n    if(options[ARG_OUT_JSON].count()>0) {\n        opts.output = options[ARG_OUT_JSON].arg;\n    }\n    return opts;\n}\n\n\n\n\n\nint main(int argc, char **argv) {\n    SnnProcOpts opts = parseOptions(argc, argv);\n    vector<NeuronStat*> st;\n    {\n        ProtoRw prw(opts.p_stat, ProtoRw::Read);\n        st = prw.readAll<NeuronStat>();\n    }\n\n    LabeledSpikesList* sp_list;\n    {\n        ProtoRw prw(opts.spikes, ProtoRw::Read);\n        sp_list = prw.read<LabeledSpikesList>();\n    }\n    assert(st.size() > 0);\n\n    size_t p_size = st[0]->p.size();\n\n    vector<IndexSlice> patterns;\n\n    const vector<double> &tl = sp_list->ptl.timeline;\n    const double &dt = sp_list->ptl.dt;\n\n    double t=0;\n    for(auto it=tl.begin(); it != tl.end(); ++it) {\n        patterns.push_back( IndexSlice((size_t)(t/dt), min(p_size, (size_t)((*it)/dt) )) );\n        //cout << \"adding pattern [\" << patterns.back().from << \", \" << patterns.back().to << \")\\n\";\n        t = *it;\n    }\n\n    DoubleMatrix dist = calcPStatDistance(st, patterns, opts.jobs);\n    vector<string> labs = sp_list->ptl.getLabelsTimeline();\n\n    const SpikesList &sl = sp_list->sl;\n    double acc_rate = 0;\n    for(size_t i = sl.N-1; i>=(sl.N-st.size()) ; i--) {\n        acc_rate += sl[i].size()/sp_list->ptl.Tmax;\n    }\n    double rate = 1000*acc_rate/st.size();\n\n\n    JsonBox::Value out;\n    out[\"distance_matrix\"] = dist.serializeToJson();\n    out[\"mean_rate\"] = rate;\n    JsonBox::Array labs_json;\n    for(auto it=labs.begin(); u\n    if(!opts.output.empty()) {\n        out.writeToFile(opts.output);\n    } else {\n        cout << out;\n    }\n    return 0;\n}\n\n",
 			"file": "sources/tools/proc/snn_proc.cpp",
-			"file_size": 4229,
-			"file_write_time": 130639779143286031,
 			"settings":
 			{
-				"buffer_size": 4260,
+				"buffer_size": 4357,
 				"line_ending": "Unix"
 			}
 		},
@@ -944,7 +941,7 @@
 	"groups":
 	[
 		{
-			"selected": 2,
+			"selected": 1,
 			"sheets":
 			[
 				{
@@ -1013,15 +1010,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 4260,
+						"buffer_size": 4357,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								4132,
-								4132
+								4230,
+								4230
 							]
 						],
 						"settings":
