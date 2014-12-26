@@ -2,8 +2,8 @@
     "tuning_curves" : {
         "SigmaTuningCurve" : {
             "sigma" : [0.01, 0.01],
-            "intercept" : [-1.0, 1.0], // for test data
-//            "intercept" : [-2.4, 2.4], // for synthetic control
+//            "intercept" : [-1.0, 1.0], // for test data
+            "intercept" : [-2.4, 2.4], // for synthetic control
             "gain" : [ 1.4, 1.4 ],
             "prob_next_sigma" : 0.0,
             "max_sigma_num" : 1
@@ -77,7 +77,7 @@
             "scaling_factor" : 1
         },
         "MinMax" : {     // http://www.scholarpedia.org/article/Spike-timing_dependent_plasticity
-            "w_max" : 8,
+            "w_max" : 12,
             "nu_plus" : 0.01,
             "nu_minus" : 0.01
         },
@@ -99,7 +99,7 @@
             "target_rate" : 10,
             "target_rate_factor" : 1,
             "weight_decay" : 0.02,
-            "learning_rate" : 0.05
+            "learning_rate" : 0.2
         },
         "Stdp" : {
             "tau_plus" : 30.0, // ms
@@ -148,7 +148,7 @@
         ],
         "conn_map" : {
             "0->1" : [
-                { "prob" : 1.0, "weight_distr" : "Norm(2.5, 0.25)", "type" : "Synapse", "dendrite_delay_distr" : "Exp(0,0)" }
+                { "prob" : 1.0, "weight_distr" : "Norm(4.5, 0.25)", "type" : "Synapse", "dendrite_delay_distr" : "Exp(0,0)" }
             ]            
 //            ],
 //            "1->1" : [

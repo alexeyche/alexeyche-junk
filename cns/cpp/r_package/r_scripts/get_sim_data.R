@@ -5,18 +5,18 @@ library(rjson)
 
 
 
-rundir="/home/alexeyche/prog/newsim/runs"
+#rundir="/home/alexeyche/prog/newsim/runs"
 #rundir="/home/kayla/alexeyche/sim/runs"
-#rundir="/home/alexeyche/prog/sim_spear"
+rundir="/home/alexeyche/prog/sim_spear"
 runname = system(sprintf("ls -t %s | sed -ne '1p'", rundir),intern=TRUE)
-#runname = "10"
+#runname = "150"
 workdir=sprintf("%s/%s", rundir, runname)
 for(ep in 1:1000) {
     output_spikes = sprintf("%s/%s_output_spikes.pb", workdir, ep)
     if(!file.exists(output_spikes)) { ep=ep-1; break }
 }
 
-#ep = 10
+#ep = 4
 ep_str=""
 if(ep>0) {
     ep_str = sprintf("%d_",ep)
@@ -55,7 +55,7 @@ if(measure_corr) {
 
 
 
-Ti=0
+Ti=4
 Trange=1000
 p1 = prast(net,T0=Ti*Trange,Tmax=(Ti+1)*Trange)
 

@@ -28,7 +28,11 @@ public:
         s->fired = 1;
         lrule_rt.propagateSynSpike(sp);
     }
-
+    
+    void attachCurrent(const double &I) {
+        y = tc_rt.calculateResponse(I);
+    }
+    
     void calculateProbability() {
         y = 0.0;
         for(auto it=active_synapses.begin(); it != active_synapses.end(); ++it) {
@@ -43,9 +47,6 @@ public:
         }
     }
 
-    void attachCurrent(const double &I) {
-        y = tc_rt.calculateResponse(I);
-    }
 
     void calculateDynamics() {
         if(p > getUnif()) {

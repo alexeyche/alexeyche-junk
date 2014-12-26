@@ -72,6 +72,10 @@ public:
         lrule_rt.propagateSynSpike(sp);
     }
 
+    void attachCurrent(const double &I) {
+        y = tc_rt.calculateResponse(I);
+    }
+
     void calculateProbability() {
         if(refr > 0.000001) {
             refr -= glob_c->Dt();
@@ -97,9 +101,6 @@ public:
         }
     }
 
-    void attachCurrent(const double &I) {
-        y = tc_rt.calculateResponse(I);
-    }
 
 
     void calculateDynamics() {

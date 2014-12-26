@@ -9,7 +9,7 @@ if(length(arg_i) == 0) {
     f = args[arg_i+1]
 }
 
-
+target_rate = 10.0
 ###################################
 
 dist_xy = function(x_y1, x_y2) {
@@ -84,7 +84,11 @@ calculate_criterion = function(proc_out_json) {
     if(!we_are_in_r_studio) {
         png(sprintf("%s_eval_dist_matrix.png", data$epoch),width=1024, height=768)
     }
-    plot(x, y, xlab="Coordinate 1", ylab="Coordinate 2", main="Metric MDS",    type="n")
+    val = -1000*calinski_harabasz_criterion(points, ulabs, labs, centroids, global_centroid)/(30+(target_rate-mean_rate)^2)
+    if(mean_rate<target_rate) {
+        val = val/(10*(target_rate-mean_rate)/target_rate)
+    }
+    plot(x, y, xlab="Coordinate 1", ylab="Coordinate 2", main=sprintf("Metric MDS: %s", val),    type="n")
     lab_cols = rainbow(length(ulabs))
     text(x, y, labels = labs, cex=.7, col=lab_cols[sapply(labs, function(l) which(l == ulabs))])
     points(centroids, lwd=10, pch=3, col=lab_cols)
@@ -92,7 +96,7 @@ calculate_criterion = function(proc_out_json) {
     if(!we_are_in_r_studio) {
         invisible(dev.off())
     }
-    -calinski_harabasz_criterion(points, ulabs, labs, centroids, global_centroid)/mean_rate
+    return(val)    
 }
 ##############
 if(!we_are_in_r_studio) {

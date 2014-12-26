@@ -36,7 +36,7 @@ def set_value_in_nested_dict(d, path, value):
 
                 
 EPOCHS_NUM = 10
-INPUT_DATA = "/home/alexeyche/prog/sim/test_data.2_classes.pb"
+INPUT_DATA = "/home/alexeyche/prog/sim/synth_control.512.6_by_10.pb"
 RUNS_DIR = "/home/alexeyche/prog/sim_spear"
 
 variables_path = { 
