@@ -2,14 +2,14 @@
 
 library(Rsnn)
 library(rjson)
+setwd("~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts")
 
 
-
-#rundir="/home/alexeyche/prog/newsim/runs"
+rundir="/home/alexeyche/prog/newsim/runs"
 #rundir="/home/kayla/alexeyche/sim/runs"
-rundir="/home/alexeyche/prog/sim_spear"
+#rundir="/home/alexeyche/prog/sim_spear"
 runname = system(sprintf("ls -t %s | sed -ne '1p'", rundir),intern=TRUE)
-runname = "17"
+#runname = "17"
 workdir=sprintf("%s/%s", rundir, runname)
 for(ep in 1:1000) {
     output_spikes = sprintf("%s/%s_output_spikes.pb", workdir, ep)
@@ -76,115 +76,11 @@ if(file.exists(model_file)) {
 
 
 if( (file.exists(stat_file))&&(file.info(stat_file)$size>0)) {
-    listen_neuron = c$sim_configuration$neurons_to_listen
+    
     
     stat = RProto$new(stat_file)$read()
-    neuron_to_read = 2
-    
-    nstat_id = grep("NeuronStat", names(stat))
-    if(length(nstat_id)>0) {
-        nid = nstat_id[neuron_to_read]
-        t_plot = 1:100
-        
-        nst = stat[[nid]]
-#         par(mfrow=c(4,1))
-#         plot(nst[["u"]][t_plot], type="l")
-#         plot(nst[["p"]][t_plot], type="l")
-#         plot(nst[["M"]][t_plot], type="l")
-#         #sp = net[[listen_neuron]][net[[listen_neuron]]<1000]
-#         #plot(sp, rep(1, length(sp)), xlim=c(min(t_plot), max(t_plot)))
-#         syns = nst[["syns"]]
-#         if(length(syns)>0) {
-#             plot(syns[[1]][t_plot],type="l", ylim=c(0,3))
-#             for(i in 2:length(syns)) {
-#                 lines(syns[[i]][t_plot])
-#             }
-#         }
-    }
-    rew_stat_id = grep("RewardStat", names(stat))
-    if(length(rew_stat_id)>0) {
-        lid = rew_stat_id[1]
-        
-        rst = list(r=NULL, mean_r=NULL)
-        for(old_ep in 1:1000) {
-            old_stat_file = sprintf("%s/%s_stat.pb", workdir, old_ep)
-            if(file.exists(old_stat_file)) {
-                old_stat = RProto$new(old_stat_file)$read()
-                old_rst = old_stat[[lid]]
-                rst[["r"]] = c(rst[["r"]], old_rst[["r"]])
-                rst[["mean_r"]] = c(rst[["mean_r"]], old_rst[["mean_r"]])
-            } else {
-                break
-            }
-        }            
-       
-        #rst = stat[[lid]]
-        r = rst[["r"]]
-        mean_r = rst[["mean_r"]]
-        #plotl(r-mean_r)
-    }
-    maxl_stat_id = grep("MaxLikelihoodStat", names(stat))
-    if(length(maxl_stat_id)>0) {
-        id = maxl_stat_id[neuron_to_read]
-        maxl = stat[[id]]
-        tr = maxl[["traces"]]
-        t_plot = 0+1:1000
-        syn_id = 33
-        par(mfrow=c(3,1))
-        #plot(nst[["p"]][t_plot], type="l")
-        inp = any(sapply(c$learning_rules, function(r) if("input_target" %in% names(r)) { r$input_target } else { FALSE } ))
-        neuron_to_plot = listen_neuron
-        if(inp) {
-            neuron_to_plot = listen_neuron - sum(sapply(c$sim_conf$input_layers_conf, function(l) l$size))
-            syn_id = neuron_to_plot
-        }
-        sp = net[[neuron_to_plot+1]][ net[[neuron_to_plot+1]]<max(t_plot) ]
-        sp = sp[ sp > min(t_plot) ]
-        plot(sp, rep(1, length(sp)), xlim=c(min(t_plot), max(t_plot)))
-        plot(nst[["syns"]][[syn_id+1]][t_plot], type="l")
-        plot(tr[[syn_id]][t_plot], type="l")
-    }
-    opt_stdp_stat_id = grep("OptimalStdpStat", names(stat))
-    mean_p_dur_min = min(sapply(c$learning_rules, function(x) if("mean_p_dur" %in% names(x)) x$mean_p_dur else Inf))
-    if((length(opt_stdp_stat_id)>0)&&(model[["sim_time"]]>=mean_p_dur_min)) {
-        id = opt_stdp_stat_id[neuron_to_read]
-        opt = stat[[id]]
-        C = opt[["C"]]
-        B = opt[["B"]]
-        if(length(B) == 0) return;
-        t_plot = 0+1:1000
-        syn_id = 15
-        
-        neuron_to_plot = listen_neuron[1]
-        #par(mfrow=c(4,1))
-        #sp = net[[neuron_to_plot+1]][ net[[neuron_to_plot+1]]<max(t_plot) ]
-        #sp = sp[ sp > min(t_plot) ]
-        #plot(sp, rep(1, length(sp)), xlim=c(min(t_plot), max(t_plot)))
-#         plot(C[[syn_id]][t_plot], type="l")
-#         plot(B[t_plot], type="l")
-#         plot(nst[["w"]][[syn_id]][t_plot], type="l")
-#         syns = nst[["syns"]]
-#         plot(syns[[syn_id]][t_plot],type="l", ylim=c(0,3))
-         
-#         if(length(syns)>0) {
-#             plot(syns[[1]][t_plot],type="l", ylim=c(-3,3))
-#             for(i in 2:length(syns)) {
-#                 lines(syns[[i]][t_plot])
-#             }
-#         }
-    }
-    stdp_stat_id = grep("^StdpStat", names(stat)) 
-    if(length(stdp_stat_id)>0) {
-        id = stdp_stat_id[neuron_to_read]
-        stdp = stat[[id]]
-        syn_id = 58
-        
-        #par(mfrow=c(3,1))
-        
-        #plot(nst[["w"]][[syn_id]][t_plot], type="l")            
-        #plot(stdp[["y_trace"]][t_plot], type="l")
-        #plot(stdp[["x_trace"]][[syn_id]][t_plot], type="l")
-    }
+    source('plot_stat.R')
+    plot_stat(stat, c, model, 2)
 
 }
 p_stat_eval = TRUE

@@ -17,7 +17,7 @@
 #include <snnlib/protos/model.pb.h>
 //#include "neuron_model.h"
 
-static size_t global_neuron_index = 0;
+extern size_t global_neuron_index;
 
 
 class ProtoRw;

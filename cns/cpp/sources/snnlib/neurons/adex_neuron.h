@@ -141,7 +141,9 @@ public:
     }
 
     void saveStat(SerialPack &p) {
-        p.push_back(adex_stat);
+        if(adex_stat) {
+            p.push_back(adex_stat);
+        }
         //lrule->saveStat(p);
     }
 

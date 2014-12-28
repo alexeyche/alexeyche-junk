@@ -2,7 +2,7 @@
 #include "neuron.h"
 
 
-
+size_t global_neuron_index = 0;
 
 Neuron::Neuron(const ConstObj *_c, size_t _local_id, const RuntimeGlobals *_glob_c, double _axon_delay) : Serializable(ENeuron) {
     init(_c, _local_id, _glob_c, _axon_delay);
@@ -121,9 +121,11 @@ void Neuron::loadModel(ProtoRw &rw) {
 ////////////////////////////////////////////////////////////////////////////
 // stat funcs
 void Neuron::saveStat(SerialPack &p) {
-    p.push_back(stat);
-    if(stat->mode == NeuronStat::Full) {
-        lrule->saveStat(p);
+    if(stat) {
+        p.push_back(stat);
+        if(stat->mode == NeuronStat::Full) {
+            lrule->saveStat(p);
+        }
     }
 }
 

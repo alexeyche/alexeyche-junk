@@ -1,6 +1,6 @@
 
 
-require(Rsnn)
+#require(Rsnn)
 
 N = 100
 
@@ -39,3 +39,11 @@ for(ni in 1:N) {
 }
 
 prast(net,T0=0,Tmax=1000)
+
+conv_spike_matrix = function(sp_m, w) {
+    t(sapply(1:nrow(sp_m), function(i) filter(sp_m[i,], w, circular=TRUE)))
+}
+
+w = exp( -(seq(-2.5,2.5,length.out=100)^2/1) )
+
+

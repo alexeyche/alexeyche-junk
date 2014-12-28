@@ -11,7 +11,7 @@
 
 class RConstants : public Constants {
 public:
-    RConstants(std::string _const_filename) : Constants(_const_filename) { 
+    RConstants(std::string _const_json) : Constants(_const_json, Constants::FromString) { 
     }
     void print() {
         cout << *this;

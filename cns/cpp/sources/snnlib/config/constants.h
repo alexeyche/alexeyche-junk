@@ -601,13 +601,19 @@ class Constants : public Serializable<Protos::Constants> {
     }
     friend class Factory;
 public:
-    Constants(string filename) : Serializable(EConstants) {
+	enum LoadMode {FromFile, FromString};
+    Constants(string source, LoadMode m = FromFile) : Serializable(EConstants) {
         Serializable::init(EConstants);
-        json_content = preprocessAndReadConstJson(filename);
+        if(m == FromFile) {
+        	json_content = preprocessAndReadConstJson(source);
+        } else 
+        if(m == FromString) {
+        	json_content = source;
+        }
         constGlobalInstance = this;
         parse();
     }
-
+    
     void parse();
     static string preprocessAndReadConstJson(string filename);
 

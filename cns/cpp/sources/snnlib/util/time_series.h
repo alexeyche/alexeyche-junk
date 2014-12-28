@@ -110,7 +110,7 @@ public:
 
 class PatternsTimeline : public Serializable<Protos::PatternsTimeline> {
 public:
-    PatternsTimeline() : Serializable(EPatternsTimeline) {}
+    PatternsTimeline() : Serializable(EPatternsTimeline), current_position(0) {}
     virtual ProtoPack serialize() {
         Protos::PatternsTimeline *l = getNewMessage();
         for(auto it=labels.begin(); it != labels.end(); ++it) {

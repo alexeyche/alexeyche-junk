@@ -305,14 +305,17 @@ void Sim::precalculateInputSpikes() {
 
 void Sim::run() {
     CHECK_CONSTRUCT()
+    ptl.reset();
     if(input_ts.size() != 0) {
         input_ts.reset();
         precalculateInputSpikes();
     }
-    cout << "Configuring connection map and dispatch spikes on queues...\n";
-    net.configureConnMap();
-    net.dispathInputSpikes(net.spikes_list);
-    cout << "Done\n";
+    if(!net.input_spikes_dispatched) {
+        cout << "Configuring connection map and dispatch spikes on queues...\n";
+        net.configureConnMap();
+        net.dispathInputSpikes(net.spikes_list);
+        cout << "Done\n";
+    }
     if(T_limit >= 1.0) {
         Tmax = T_limit;
     } else {

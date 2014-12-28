@@ -34,22 +34,12 @@ public:
     ~Sim() {
         if(!statistics_file.empty()) {
             ProtoRw prw(statistics_file, ProtoRw::Write);
-            SerialPack st;
-            for(auto it=sc.neurons_to_listen.begin(); it != sc.neurons_to_listen.end(); ++it) {
-                Neuron *n = accessByGlobalId(*it);
-                n->saveStat(st);
-            }
-            rc.saveStat(st);
+            SerialPack st = saveStat();
             prw.write(st);
         }
         if(!p_statistics_file.empty()) {
             ProtoRw prw(p_statistics_file, ProtoRw::Write);
-            SerialPack st;
-            for(size_t ni=input_neurons_count; ni < (input_neurons_count + net_neurons_count); ni++) {
-                Neuron *n = accessByGlobalId(ni);
-                n->saveStat(st);
-            }
-            rc.saveStat(st);
+            SerialPack st = savePStat();
             prw.write(st);
         }
         if(!output_spikes_file.empty()){
@@ -59,8 +49,26 @@ public:
         }
 
         layers.clear();
+        cout << "Sim out\n";
     }
-
+    SerialPack saveStat() {
+        SerialPack st;
+        for(auto it=sc.neurons_to_listen.begin(); it != sc.neurons_to_listen.end(); ++it) {
+            Neuron *n = accessByGlobalId(*it);
+            n->saveStat(st);
+        }
+        rc.saveStat(st);
+        return st;
+    }
+    SerialPack savePStat() {
+        SerialPack st;
+        for(size_t ni=input_neurons_count; ni < (input_neurons_count + net_neurons_count); ni++) {
+            Neuron *n = accessByGlobalId(ni);
+            n->saveStat(st);
+        }
+        rc.saveStat(st);
+        return st;   
+    }
     void loadModel(string f) {
         ProtoRw rw(f,ProtoRw::Read);
         if(constGlobalInstance) {
@@ -156,11 +164,9 @@ public:
             input_ts = ContLabeledTimeSeries(input_ts_list, sc.ts_map_conf.dt, sc.ts_map_conf.gap_between_patterns);
             ptl = input_ts.ptl;
         }
+        
     }
-
-    void monitorStat(const string &filename) {
-        CHECK_CONSTRUCT()
-        statistics_file = filename;
+    void turnOnStatCollect() {
         for(auto it=sc.neurons_to_listen.begin(); it != sc.neurons_to_listen.end(); ++it) {
             accessByGlobalId(*it)->enableCollectStatistics();
         }
@@ -168,12 +174,21 @@ public:
             rc.enableCollectStatistics(*it);
         }
     }
-    void monitorPStat(const string &filename) {
+    void monitorStat(const string &filename) {
         CHECK_CONSTRUCT()
-        p_statistics_file = filename;
+        statistics_file = filename;
+        turnOnStatCollect();
+    }
+    void turnOnPStatCollect() {
         for(size_t ni=input_neurons_count; ni < (input_neurons_count + net_neurons_count); ni++) {
             accessByGlobalId(ni)->enableCollectProbStatistics();
         }
+    }
+
+    void monitorPStat(const string &filename) {
+        CHECK_CONSTRUCT()
+        p_statistics_file = filename;
+        turnOnPStatCollect();
     }
     void setTlimit(double _T_limit) {
         T_limit = _T_limit;

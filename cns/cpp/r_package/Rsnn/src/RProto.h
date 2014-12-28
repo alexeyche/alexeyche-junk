@@ -31,7 +31,7 @@ public:
             if(o->getName() == "Constants") {
                 delete rw;
                 Constants *c = static_cast<Constants*>(o);
-                values = readModel(c);
+                values = readModelFromFile(c);
                 return values;
             }
             
@@ -42,14 +42,13 @@ public:
                 if(!o) break;
                 v.push_back(o);
             }
-        
             if ((v.size() == 1) && (v[0]->getName() == "LabeledSpikesList")) {
-                values = convert(v[0]);
+                values = convertToList(v[0]);
             } else {
                 for(size_t vi=0; vi<v.size(); vi++) {
                     stringstream ss;
                     ss << v[vi]->getName() << "_" << vi;
-                    values[ss.str()] = convert(v[vi]);
+                    values[ss.str()] = convertToList(v[vi]);
                 }
             }
             delete rw;
@@ -59,14 +58,12 @@ public:
     void print() {
         cout << "RProto instance. run instance$read() method to read protobuf\n";
     }
-
-    void write(const string &message_name, const Rcpp::List &list) {
-        ProtoRw rw(protofile, ProtoRw::Write);
+    static ProtoPack listToProtobuf(const Rcpp::List &list, const string &message_name) {
         if(message_name == "LabeledTimeSeriesList") {
-            Protos::LabeledTimeSeriesList lts_mess;
+            Protos::LabeledTimeSeriesList *lts_mess = new Protos::LabeledTimeSeriesList;
             const Rcpp::List &lts_list = list;
             for(auto it=lts_list.begin(); it != lts_list.end(); ++it) {
-                Protos::LabeledTimeSeries *lts = lts_mess.add_list();
+                Protos::LabeledTimeSeries *lts = lts_mess->add_list();
                 Rcpp::List lts_r = *it;
                 const string &label = lts_r["label"];
                 lts->set_label(label);
@@ -78,11 +75,10 @@ public:
                 }
                 lts->set_allocated_ts(ts);
             }
-            ProtoPack pack({&lts_mess});
-            rw.writeProtoPack(message_name, pack);
+            return ProtoPack({lts_mess});
         } else    
         if(message_name == "LabeledSpikesList") {
-            Protos::LabeledSpikesList lsl_mess;
+            Protos::LabeledSpikesList *lsl_mess = new Protos::LabeledSpikesList;
 
             Protos::SpikesList *sl = new Protos::SpikesList;
             Rcpp::List sp_list = list["spikes_list"];
@@ -93,7 +89,7 @@ public:
                     s->add_seq(*it);
                 }
             }
-            lsl_mess.set_allocated_sl(sl);
+            lsl_mess->set_allocated_sl(sl);
 
             Protos::PatternsTimeline *ptl = new Protos::PatternsTimeline;
             Rcpp::CharacterVector labels_r = list["labels"];
@@ -123,37 +119,44 @@ public:
             }
             double Tmax = timeline[timeline.size()-1];
             ptl->set_tmax(Tmax);
-            lsl_mess.set_allocated_ptl(ptl);
-            ProtoPack pack({&lsl_mess});
-            rw.writeProtoPack(message_name, pack);
+            lsl_mess->set_allocated_ptl(ptl);
+            return ProtoPack({lsl_mess});
         } else {
             ERR("Can't recognize serializable name: " << message_name << "\n");
         }
     }
-
-    Rcpp::List readModel(Constants *c) { 
-        Sim s(*c);
-        s.loadModel(protofile);
-        size_t total_size = s.input_neurons_count + s.net_neurons_count;
+    void write(const string &message_name, const Rcpp::List &list) {
+        ProtoRw rw(protofile, ProtoRw::Write);
+        ProtoPack p = listToProtobuf(list, message_name);
+        rw.writeProtoPack(message_name, p);
+    }
+    static Rcpp::List readModel(Sim *s) {
+        size_t total_size = s->input_neurons_count + s->net_neurons_count;
         Rcpp::NumericMatrix w(total_size, total_size);
-        for(auto it=s.layers.begin(); it != s.layers.end(); ++it) {
+        for(auto it=s->layers.begin(); it != s->layers.end(); ++it) {
             Layer *l = *it;
             for(auto it_n=l->neurons.begin(); it_n != l->neurons.end(); ++it_n) {
                 Neuron *n = *it_n;
                 for(auto it_s=n->syns.begin(); it_s != n->syns.end(); ++it_s) {
-                    Synapse *s = *it_s;
-                    w(s->id_pre, n->id) = s->w;
+                    Synapse *syn = *it_s;
+                    w(syn->id_pre, n->id) = syn->w;
                 }
             }
         }        
         Rcpp::List out;
         out["w"] = w;
-        out["sim_time"] = s.rg.getSimTime();
-        Factory::inst().cleanAll();
+        out["sim_time"] = s->rg.getSimTime();
         return out;
     }
+    Rcpp::List readModelFromFile(Constants *c) { 
+        Sim s(*c);
+        s.loadModel(protofile);
+        Rcpp::List l = readModel(&s);
+        Factory::inst().cleanAll();
+        return l;
+    }
 
-    Rcpp::List convert(SerializableBase *s) {
+    static Rcpp::List convertToList(SerializableBase *s) {
         Rcpp::List out;
         if(s->getName() == "LabeledSpikesList") {
             LabeledSpikesList *lsl = dynamic_cast<LabeledSpikesList*>(s);
@@ -171,6 +174,15 @@ public:
             out["dt"] = lsl->ptl.dt;
             out["Tmax"] = lsl->ptl.Tmax;
             out["gapBetweenPatterns"] = lsl->ptl.gapBetweenPatterns;
+        } else 
+        if(s->getName() == "SpikesList") {
+            SpikesList *sl = dynamic_cast<SpikesList*>(s);
+            if(!sl) { ERR("Can't cast"); }
+            for(size_t ni=0; ni<sl->N; ni++) {
+                stringstream ss;
+                ss << ni;
+                out[ss.str()] = Rcpp::NumericVector(Rcpp::wrap(sl->sp_list[ni]));
+            }
         } else 
         if((s->getName() == "NeuronStat")||(s->getName() == "AdExNeuronStat")) {
             NeuronStat *st = dynamic_cast<NeuronStat*>(s);

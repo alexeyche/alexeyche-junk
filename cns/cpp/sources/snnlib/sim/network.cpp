@@ -20,6 +20,7 @@ void Network::init(const Sim *_s) {
     //input_queues = new SpikeQueue[net_size];
     net_queues = new SpikesQueue[total_size];
     input_queues = new SpikesQueue[total_size];
+    input_spikes_dispatched = false;
 }
 
 
@@ -102,4 +103,5 @@ void Network::dispathInputSpikes(const SpikesList &sl) {
         input_queues[ni].push_and_sort(syn_spikes[ni]);
     }
     delete []syn_spikes;
+    input_spikes_dispatched = true;
 }

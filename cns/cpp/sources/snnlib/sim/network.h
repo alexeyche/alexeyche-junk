@@ -77,4 +77,6 @@ public:
 	//SpikeQueue *net_queues;
 	vector<Conn> *conn_map;
 	SpikesList spikes_list;
+
+	bool input_spikes_dispatched;
 };
