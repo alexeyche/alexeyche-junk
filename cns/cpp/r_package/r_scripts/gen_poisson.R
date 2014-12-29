@@ -7,7 +7,7 @@ getCorrRate = function(p, lambda) {
     p * lambda/(1-p) 
 }
 
-gen_correlated_poisson = function(N, mean_rate=10, correllated_neurons=50, group_size=2, correlation=0.5, len=10000) {
+gen_correlated_poisson = function(N, mean_rate=10, correllated_neurons=50, group_size=2, correlation=0.5, len=10000, binary=FALSE) {
     
     corr_rate = mean_rate*getCorrRate(correlation, 1)/2
     decorr_rate = mean_rate*(1-getCorrRate(correlation, 1)/2)
@@ -31,12 +31,21 @@ gen_correlated_poisson = function(N, mean_rate=10, correllated_neurons=50, group
         net_b = rbind(net_b, spikes_bin)
         net[[ni]] = which(spikes_bin == 1)
     }
-    
-    return(net)
+    if(binary) {
+        return(net_b)    
+    } else {
+        return(net)
+    }
 }
 
-gen_poisson = function(N, rate=10, len=10000)  {
-    lapply(1:N, function(x) which(rpois(len, rate/1000) == 1))
+gen_poisson = function(N, rate=10, len=10000, binary=FALSE)  {
+    net_b = t(sapply(1:N, function(x) rpois(len, rate/1000)))
+    if(binary) {
+        net_b
+    } else {  
+        lapply(1:N, function(ni) which(net_b[ni,]== 1))
+    }
+    
 }
     
 
