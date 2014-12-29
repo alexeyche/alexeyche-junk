@@ -56,7 +56,14 @@ public:
             p_acc.push_back(m->p_acc(i));
         }
     }
+    void reset() {
+        p_acc.clear();
+        B.clear();
+        for(auto it=C.begin(); it != C.end(); ++it) {
+            it->clear();
+        }
 
+    }
     void print(std::ostream& str) const {
     }
     vector<double> p_acc;
@@ -82,9 +89,7 @@ public:
         c = castType<OptimalStdpC>(_c);
         n = _n;
         p_acc = 0.0;
-        B = 0.0;
-        C.resize(n->syns.size());
-        fill(C.begin(), C.end(), 0.0);
+
         stat = nullptr;
         wnorm = _wnorm;
 
@@ -96,6 +101,7 @@ public:
         }
 
         Serializable::init(EOptimalStdp);
+        reset();
     }
     void addSynapse(Synapse *s) {
         C.push_back(0.0);
@@ -103,7 +109,11 @@ public:
             stat->C.push_back(vector<double>());
         }
     }
-
+    void reset() {
+        B = 0.0;
+        fill(C.begin(), C.end(), 0.0);
+        if(stat) stat->reset();
+    }
     void enableCollectStatistics() {
         collectStatistics = true;
         stat = Factory::inst().registerObj<OptimalStdpStat>(new OptimalStdpStat(this));

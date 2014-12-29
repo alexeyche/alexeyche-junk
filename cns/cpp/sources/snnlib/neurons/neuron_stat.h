@@ -48,6 +48,15 @@ public:
             w.push_back(w_v);
         }
     }
+    virtual void reset() {
+        p.clear();
+        u.clear();
+        M.clear();
+        for(size_t syn_i = 0; syn_i < syns.size(); syn_i++ ) {
+            syns[syn_i].clear();
+            w[syn_i].clear();
+        }
+    }
     void addSynapse(Synapse *s);
     void print(std::ostream& str) const {
     }

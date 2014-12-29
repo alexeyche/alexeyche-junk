@@ -27,7 +27,7 @@ public:
     virtual void calculateWeightsDynamics() = 0;
     virtual void propagateSynSpike(const SynSpike *sp) {}
     virtual void addSynapse(Synapse *s) {}
-
+    virtual void reset() {}
 	virtual void enableCollectStatistics() {};
     virtual void provideRuntime(LearningRuleRuntime &rt) = 0;
 

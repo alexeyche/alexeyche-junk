@@ -49,7 +49,6 @@ public:
         }
 
         layers.clear();
-        cout << "Sim out\n";
     }
     SerialPack saveStat() {
         SerialPack st;
@@ -67,7 +66,7 @@ public:
             n->saveStat(st);
         }
         rc.saveStat(st);
-        return st;   
+        return st;
     }
     void loadModel(string f) {
         ProtoRw rw(f,ProtoRw::Read);
@@ -157,14 +156,19 @@ public:
         terminate();
     }
 
-    void resetSim(bool reset_input_stat=false) {
+    void resetSim(bool reset_input=false) {
         CHECK_CONSTRUCT()
-        net.reset(reset_input_stat);
+        net.reset(reset_input);
         if(input_ts_list.size()>0){
             input_ts = ContLabeledTimeSeries(input_ts_list, sc.ts_map_conf.dt, sc.ts_map_conf.gap_between_patterns);
             ptl = input_ts.ptl;
         }
-        
+        ptl.reset();
+        for(auto it=sim_neurons.begin(); it != sim_neurons.end(); ++it) {
+            Neuron* n = it->n;
+            n->reset();
+        }
+
     }
     void turnOnStatCollect() {
         for(auto it=sc.neurons_to_listen.begin(); it != sc.neurons_to_listen.end(); ++it) {

@@ -105,3 +105,17 @@ void Network::dispathInputSpikes(const SpikesList &sl) {
     delete []syn_spikes;
     input_spikes_dispatched = true;
 }
+
+
+void Network::reset(bool reset_input = false) {
+    for(size_t global_id = 0; global_id<total_size; ++global_id) {
+        if((global_id >= s->input_neurons_count)||(reset_input)) {
+            spikes_list[global_id].clear();
+        }
+        net_queues[global_id].clear();
+        if((reset_input)&&(input_queues)) {
+            input_queues[global_id].clear();
+        }
+        input_queues[global_id].reset();
+    }
+}

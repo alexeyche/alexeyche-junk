@@ -21,15 +21,13 @@ void Neuron::init(const ConstObj *_c, size_t _local_id, const RuntimeGlobals *_g
     RewardModulation::provideDefaultRuntime(rmod_rt);
     TuningCurve::provideDefaultRuntime(tc_rt);
 
-
-    reset();
-
     collectStatistics = false;
     stat = nullptr;
     axon_delay = _axon_delay;
 
 
     local_id = _local_id;
+    reset();
 }
 
 void Neuron::setActFunc(ActFunc *act) {
@@ -75,6 +73,8 @@ void Neuron::reset() {
         s->reset();
     }
     active_synapses.clear();
+    if (stat) stat->reset();
+    if (lrule) lrule->reset();
 }
 
 /////////////////////////////////////////////////////////////////////////////

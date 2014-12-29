@@ -72,15 +72,14 @@ plot_stat = function(stat, cr, net, model, neuron_to_read =2, syn_id=58, t_plot=
         opt = stat[[id]]
         C = opt[["C"]]
         B = opt[["B"]]
-        if(length(B) == 0) return;
-        syn_id = 15
+        if(length(B) == 0) return();        
         
-        neuron_to_plot = listen_neuron[1]
+        neuron_to_plot = listen_neuron[neuron_to_read]
         par(mfrow=c(4,1))
         sp = net[[neuron_to_plot+1]][ net[[neuron_to_plot+1]]<max(t_plot) ]
         sp = sp[ sp > min(t_plot) ]
         plot(sp, rep(1, length(sp)), xlim=c(min(t_plot), max(t_plot)))
-        plot(C[[syn_id]][t_plot], type="l")
+        plot(C[[syn_id]][t_plot], type="l", ylim=c(min(C[[syn_id]][t_plot]),max(C[[syn_id]][t_plot])))
         #plot(B[t_plot], type="l")
         plot(nst[["w"]][[syn_id]][t_plot], type="l")
         syns = nst[["syns"]]

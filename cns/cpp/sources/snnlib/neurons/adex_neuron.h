@@ -7,7 +7,7 @@ class AdExNeuron;
 
 class AdExNeuronStat : public NeuronStat  {
 protected:
-    AdExNeuronStat() { 
+    AdExNeuronStat() {
         init(EAdExNeuronStat);
     }
     friend class Factory;
@@ -31,7 +31,10 @@ public:
         return ProtoPack({ getNewMessage(), getNewMessage<Protos::AdExNeuronStat>() });
     }
     void print(std::ostream& str) const {}
-
+    void reset() {
+        NeuronStat::reset();
+        a.clear();
+    }
     vector<double> a;
 };
 
@@ -60,6 +63,9 @@ public:
     void enableCollectStatistics() {
         collectStatistics = true;
         adex_stat = Factory::inst().registerObj<AdExNeuronStat>(new AdExNeuronStat(this));
+    }
+    void reset() {
+
     }
     // Runtime
     void propagateSynSpike(const SynSpike *sp) {
