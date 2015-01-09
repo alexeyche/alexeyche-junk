@@ -4,308 +4,348 @@
 		"selected_items":
 		[
 			[
-				"glob",
-				"global_id"
+				"Tripl",
+				"TripleStdpMin"
 			],
 			[
-				"rese",
-				"reset_input_queue"
+				"base",
+				"base_struct_name"
 			],
 			[
-				"cross",
-				"cross_spectrum_dist"
+				"en",
+				"entity_map"
 			],
 			[
-				"p_stat",
-				"p_stat_dist"
+				"bas",
+				"base_struct_name"
 			],
 			[
-				"JsonBox",
-				"JsonBox::Array"
+				"lea",
+				"learning"
 			],
 			[
-				"out",
-				"output"
+				"learn",
+				"learning"
 			],
 			[
-				"ser",
-				"serializeToJson"
+				"inp",
+				"input_spikes_dispatched"
 			],
 			[
-				"Patt",
-				"PatternsPair"
+				"coll",
+				"collectPStat"
 			],
 			[
-				"Pa",
-				"PatternsPair"
+				"Seri",
+				"SerialPack"
 			],
 			[
-				"patt",
-				"patternsPairs"
+				"Ser",
+				"SerialPack"
 			],
 			[
-				"pattern",
-				"patternsPair"
+				"tun",
+				"turnOnPStatCollect"
 			],
 			[
-				"net",
-				"net_neurons_count"
+				"js",
+				"json_content"
 			],
 			[
-				"Nuer",
-				"NeuronStat"
+				"From",
+				"FromFile"
 			],
 			[
-				"data",
-				"dataIsReady"
+				"Load",
+				"LoadMode"
 			],
 			[
-				"gap",
-				"gap_between_patterns"
-			],
-			[
-				"wei",
-				"weight_distr"
-			],
-			[
-				"den",
-				"dendrite_delay_distr"
-			],
-			[
-				"weigh",
-				"weight_distr"
-			],
-			[
-				"Unif",
-				"UniformDistribution"
-			],
-			[
-				"Norm",
-				"NormalDistribution"
-			],
-			[
-				"parse",
-				"parseParenthesis"
-			],
-			[
-				"spikes",
-				"spikes_list"
-			],
-			[
-				"seri",
-				"serialized_messages"
-			],
-			[
-				"spik",
-				"spikes_list"
-			],
-			[
-				"Label",
-				"LabeledSpikesList"
-			],
-			[
-				"Patter",
-				"PatternsTimeline"
-			],
-			[
-				"ELabe",
-				"ELabeledSpikesList"
-			],
-			[
-				"la",
-				"labels_id_timeline"
-			],
-			[
-				"int",
-				"intercept"
-			],
-			[
-				"max",
-				"max_sigma_num"
-			],
-			[
-				"prob",
-				"prob_next_sigma"
-			],
-			[
-				"Soft",
-				"SoftMinMaxC"
-			],
-			[
-				"nu",
-				"nu_plus"
-			],
-			[
-				"ltd",
-				"ltdMod"
-			],
-			[
-				"ltp",
-				"ltpMod"
-			],
-			[
-				"De",
-				"Derivative"
-			],
-			[
-				"Neur",
-				"NeuronRuntime"
+				"cur",
+				"current_position"
 			],
 			[
 				"Neu",
-				"NeuronRuntime"
+				"NeuronStat"
 			],
 			[
-				"prov",
-				"provideRuntime"
+				"ltp",
+				"ltp_mod"
 			],
 			[
-				"pro",
-				"propSynSpikeDelegate"
-			],
-			[
-				"stat",
-				"stateDelegate"
-			],
-			[
-				"Tun",
-				"TuningCurve"
-			],
-			[
-				"do",
-				"double"
-			],
-			[
-				"provide",
-				"provideDefaultRuntime"
-			],
-			[
-				"Re",
-				"RewardModulation"
-			],
-			[
-				"Rewa",
-				"RewardModulationRuntime"
-			],
-			[
-				"mod",
-				"modulateReward"
-			],
-			[
-				"Le",
-				"LearningRule"
-			],
-			[
-				"Ac",
-				"ActFuncRuntime"
-			],
-			[
-				"ac",
-				"act_func"
-			],
-			[
-				"act_",
-				"act_funcs"
+				"de",
+				"defaultLtMod"
 			],
 			[
 				"weight",
+				"weight_normalization"
+			],
+			[
+				"lt",
+				"ltp_mod"
+			],
+			[
+				"We",
+				"WeightDerivative"
+			],
+			[
+				"ta",
+				"tau_minus"
+			],
+			[
+				"addSyn",
+				"addSynapseAtPos"
+			],
+			[
+				"addS",
+				"addSynapse"
+			],
+			[
+				"Opt",
+				"OptimalStdp"
+			],
+			[
+				"add",
+				"added_synapses"
+			],
+			[
+				"conn",
+				"connections_established"
+			],
+			[
+				"propa",
+				"propagateSynSpike"
+			],
+			[
+				"seriali",
+				"serialization"
+			],
+			[
+				"Optim",
+				"OptimalStdpStat"
+			],
+			[
+				"wei",
 				"weight_normalizations"
 			],
 			[
-				"fun",
-				"funDelegate"
+				"E",
+				"EOptimalStdp"
+			],
+			[
+				"glob",
+				"glob_c"
+			],
+			[
+				"mean",
+				"mean_p_dur"
+			],
+			[
+				"mea",
+				"mean_p_dur"
+			],
+			[
+				"sim",
+				"sim_time"
 			],
 			[
 				"pre",
 				"preModifyMeasure"
 			],
 			[
-				"Lea",
-				"LearningRule"
+				"mod",
+				"modifyWeightDerivative"
 			],
 			[
-				"Proto",
+				"tar",
+				"target_rate"
+			],
+			[
+				"Op",
+				"OptimalStdpStat"
+			],
+			[
+				"EM",
+				"EMeanActivityHomeostasis"
+			],
+			[
+				"Min",
+				"MinMaxC"
+			],
+			[
+				"Me",
+				"MeanActivityHomeostasis"
+			],
+			[
+				"w_m",
+				"w_max"
+			],
+			[
+				"aff",
+				"aff_post"
+			],
+			[
+				"Re",
+				"RewardModConf"
+			],
+			[
+				"layer",
+				"layers"
+			],
+			[
+				"cons",
+				"constants"
+			],
+			[
+				"MaxLi",
+				"MaxLikelihoodStat"
+			],
+			[
+				"col",
+				"collectStatistics"
+			],
+			[
+				"el",
+				"eligibility_trace"
+			],
+			[
+				"dLL",
+				"dLLH_dw_formula"
+			],
+			[
+				"LLH",
+				"LLH_formula"
+			],
+			[
+				"glo",
+				"globalInstance"
+			],
+			[
+				"learni",
+				"learning_rate"
+			],
+			[
+				"ac",
+				"active_synapses"
+			],
+			[
+				"Neur",
+				"Neuron"
+			],
+			[
+				"neur",
+				"neuron_prepared_reward"
+			],
+			[
+				"save",
+				"saveStat"
+			],
+			[
+				"Rewa",
+				"RewardControl"
+			],
+			[
+				"Sera",
+				"SerialPack"
+			],
+			[
+				"Rew",
+				"RewardStat"
+			],
+			[
+				"rewa",
+				"reward_layers_to_listen"
+			],
+			[
+				"rew",
+				"reward_layers_to_listen"
+			],
+			[
+				"Prot",
 				"ProtoPack"
 			],
 			[
-				"Inp",
-				"InputClassification"
+				"Pro",
+				"ProtoRw"
 			],
 			[
-				"class",
-				"current_class_id"
+				"read",
+				"readAllocated"
 			],
 			[
-				"curr",
-				"current_position"
+				"me",
+				"mean_r"
 			],
 			[
-				"labe",
-				"labels_id_timeline"
+				"act",
+				"active_layers"
 			],
 			[
-				"In",
-				"InputClassification"
+				"neu",
+				"neuron"
 			],
 			[
-				"p",
-				"p_wta"
+				"post",
+				"post_id_it"
 			],
 			[
-				"wta",
-				"wta_max_freq"
+				"pos",
+				"post_id_it"
 			],
 			[
-				"LLH_",
-				"LLH_given_Y"
+				"rewar",
+				"reward_control"
 			],
 			[
-				"inp",
+				"Lay",
+				"LayerModulatedReward"
+			],
+			[
+				"Jso",
+				"JsonBox::Object"
+			],
+			[
+				"size",
+				"size_t"
+			],
+			[
+				"rein",
+				"reinforce_map"
+			],
+			[
+				"print",
+				"print_vector"
+			],
+			[
+				"del",
+				"delimiter"
+			],
+			[
+				"stru",
+				"struct_name"
+			],
+			[
+				"null",
+				"nullptr"
+			],
+			[
+				"Run",
+				"RuntimeGlobals"
+			],
+			[
+				"tau",
+				"tau_mean_rew"
+			],
+			[
+				"input_t",
 				"input_target"
 			],
 			[
-				"MaxL",
-				"MaxLikelihoodC"
-			],
-			[
-				"le",
-				"learning_rule"
-			],
-			[
-				"ini",
-				"initInputNeuronsFiringDelivery"
-			],
-			[
-				"input",
-				"input_neurons_count"
-			],
-			[
-				"Max",
-				"MaxLikelihoodC"
-			],
-			[
-				"EPIS",
+				"epi",
 				"episode_length"
 			],
 			[
-				"ep",
-				"episode_rate"
-			],
-			[
-				"sim",
-				"sim_neurons"
-			],
-			[
-				"Layer",
-				"Layer"
-			],
-			[
-				"we",
-				"weight_factor"
-			],
-			[
-				"Syna",
-				"Synapse"
+				"num",
+				"num_of_episodes"
 			],
 			[
 				"globa",
@@ -320,8 +360,16 @@
 				"SynSpike"
 			],
 			[
+				"ser",
+				"serialized_messages"
+			],
+			[
 				"ope",
 				"operator"
+			],
+			[
+				"input",
+				"input_ts_list"
 			],
 			[
 				"Spik",
@@ -356,20 +404,20 @@
 				"runtime_globals"
 			],
 			[
-				"Seri",
-				"SerialFamily"
-			],
-			[
 				"Sy",
 				"Synapse"
+			],
+			[
+				"Proto",
+				"ProtoRw"
 			],
 			[
 				"Conf",
 				"ConfObj"
 			],
 			[
-				"read",
-				"readAny"
+				"stat",
+				"statLimit"
 			],
 			[
 				"get",
@@ -380,24 +428,16 @@
 				"names_size"
 			],
 			[
-				"en",
-				"enableCollectStatistics"
-			],
-			[
-				"neur",
-				"neuron_id"
+				"la",
+				"layer_size"
 			],
 			[
 				"__",
 				"__global_id"
 			],
 			[
-				"Ser",
-				"Serializable"
-			],
-			[
-				"glo",
-				"global_id"
+				"net",
+				"net_queues"
 			],
 			[
 				"thr",
@@ -420,8 +460,8 @@
 				"runSimOnSubset"
 			],
 			[
-				"de",
-				"deserialize"
+				"out",
+				"out_spikes"
 			],
 			[
 				"sp",
@@ -432,12 +472,20 @@
 				"LabeledTimeSeriesList"
 			],
 			[
+				"Label",
+				"LabeledTimeSeriesList"
+			],
+			[
 				"te",
 				"terminate"
 			],
 			[
 				"file",
 				"filename"
+			],
+			[
+				"seri",
+				"serialize"
 			],
 			[
 				"Neuron",
@@ -466,208 +514,25 @@
 			[
 				"code",
 				"codedIn"
-			],
-			[
-				"coded",
-				"codedOut"
-			],
-			[
-				"calc",
-				"calculateDynamics"
-			],
-			[
-				"neuo",
-				"neurons"
-			],
-			[
-				"neu",
-				"neurons"
-			],
-			[
-				"syn",
-				"syn_id"
-			],
-			[
-				"Bal",
-				"BlankTuningCurve"
-			],
-			[
-				"Blank",
-				"BlankTuningCurve"
-			],
-			[
-				"learn",
-				"learning_rule"
-			],
-			[
-				"tuning",
-				"tuning_curve"
-			],
-			[
-				"SRMLa",
-				"SRMLayer"
-			],
-			[
-				"neuron",
-				"neuron_conf"
-			],
-			[
-				"add",
-				"addNeuron"
 			]
 		]
 	},
 	"buffers":
 	[
 		{
-			"file": "sources/snnlib/util/util.h",
+			"contents": "x",
 			"settings":
 			{
-				"buffer_size": 1027,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "sources/snnlib/sim/sim.h",
-			"settings":
-			{
-				"buffer_size": 7048,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "sources/snnlib/neurons/neuron.h",
-			"settings":
-			{
-				"buffer_size": 2915,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "sources/snnlib/neurons/neuron.cpp",
-			"settings":
-			{
-				"buffer_size": 3889,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "sources/snnlib/neurons/neuron_stat.h",
-			"settings":
-			{
-				"buffer_size": 1746,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "sources/snnlib/neurons/adex_neuron.h",
-			"settings":
-			{
-				"buffer_size": 4629,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "sources/snnlib/learning/optimal_stdp.h",
-			"settings":
-			{
-				"buffer_size": 6545,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "sources/snnlib/learning/learning_rule.h",
-			"settings":
-			{
-				"buffer_size": 1508,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "sources/snnlib/sim/sim_neuron.h",
-			"settings":
-			{
-				"buffer_size": 323,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "sources/snnlib/sim/sim.cpp",
-			"settings":
-			{
-				"buffer_size": 10006,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "sources/snnlib/sim/network.cpp",
-			"settings":
-			{
-				"buffer_size": 3832,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "sources/snnlib/util/spikes_queue.h",
-			"settings":
-			{
-				"buffer_size": 3863,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "sources/snnlib/sim/network.h",
-			"settings":
-			{
-				"buffer_size": 1574,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "sources/snnlib/util/util.cpp",
-			"settings":
-			{
-				"buffer_size": 3858,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "sources/snnlib/util/json/array.cpp",
-			"settings":
-			{
-				"buffer_size": 3921,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "sources/snnlib/util/matrix.h",
-			"settings":
-			{
-				"buffer_size": 3375,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "sources/snnlib/util/json/json_box.h",
-			"settings":
-			{
-				"buffer_size": 1082,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "sources/snnlib/util/json/output_filter.h",
-			"settings":
-			{
-				"buffer_size": 3664,
-				"line_ending": "Unix"
+				"buffer_size": 1,
+				"line_ending": "Unix",
+				"name": "x"
 			}
 		}
 	],
 	"build_system": "Packages/User/make.sublime-build",
 	"command_palette":
 	{
-		"height": 392.0,
+		"height": 75.0,
 		"selected_items":
 		[
 			[
@@ -738,127 +603,110 @@
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/config",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/layers",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/learning",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/neurons",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/protos",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/reinforcement",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/serialize",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/sim",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/tuning_curves",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/util",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/weight_normalizations",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/tools",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/tools/proc",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/tools/sim"
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/tuning_curves"
 	],
 	"file_history":
 	[
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/config/constants.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/config/factory.cpp",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/neurons/neuron.cpp",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/learning/triple_stdp.cpp",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/learning/triple_stdp.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/learning/optimal_stdp.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/tools/sim/snn_sim.cpp",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/layers/layer.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/protos/model.proto",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/learning/learning_rule.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/sim/network.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/config/factory.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/util/util.cpp",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/serialize/serialize.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/serialize/proto_rw.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/core.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/weight_normalizations/mean_activity_homeostasis.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/sim/sim.cpp",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/sim/sim.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/serialize/serialize.cpp",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/neurons/srm_neuron.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/neurons/neuron.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/util/optionparser/optionparser.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/base.h",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/neurons/neuron_stat.cpp",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/neurons/neuron_stat.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/act_funcs/determ.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/neurons/adex_neuron.cpp",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/learning/stdp.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/protos/stat.proto",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/util/time_series.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/neurons/adex_neuron.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/tools/dumptool/dumptool.cpp",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/sim/network.cpp",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/neurons/neuron_model.h",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/neurons/neuron_model.cpp",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/neurons/neuron_stat.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/neurons/neuron.cpp",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/util/json/json_box.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/util/json/value.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/util/json/value.cpp",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/util/json/solidus_escaper.cpp",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/tools/proc/cross_spectrum_dist.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/learning/max_likelihood.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/tuning_curves/tuning_curve.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/weight_normalizations/min_max.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/.tags_sorted_by_file",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/util/spikes_list.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/util/spikes_queue.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/util/fast_delegate_bind.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/util/spikes_list.cpp",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/protos/spikes_list.proto",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/neurons/synapse.cpp",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/neurons/synapse.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/protos/time_series.proto",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/weight_normalizations/weight_normalization.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/learning/stdp.cpp",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/learning/max_likelihood.cpp",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/learning/CMakeLists.txt",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/reinforcement/likelihood.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/config/constants.cpp",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/learning/optimal_stdp.cpp",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/learning/stdp_all_to_all.cpp",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/act_funcs/exp_hennequin.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/tools/testproto/out.pb",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/tools/testproto/main.cpp",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/learning/srm_methods.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/tuning_curves/sigma_tuning_curve.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/learning/min_max.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/learning/mean_activity_homeostasis.h",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/reinforcement/reward_modulation.h",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/sim/runtime_globals.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/util/spikes_queue.cpp",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/util/spikes_list.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/sim/sim.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/sim/sim.cpp",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/util/time_series.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/tools/proc/snn_proc.cpp",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/tools/proc/cross_spectrum_dist.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/tools/proc/p_stat_dist.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/tools/sim/snn_sim.cpp",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/protos/time_series.proto",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/util/matrix.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/protos/spikes_list.proto",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/serialize/proto_rw.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/util/json/array.cpp",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/util/json/convert.cpp",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/tools/proc/p_stat_calc.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/build/snnlib/protos/stat.pb.h",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/util/util.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/util/util.cpp",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/protos/matrix.proto",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/core.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/config/constants.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/protos/model.proto",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/serialize/serialize.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/config/factory.cpp",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/config/factory.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/util/matrix.cpp",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/base.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/learning/max_likelihood.cpp",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/learning/max_likelihood.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/weight_normalizations/min_max.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/learning/optimal_stdp.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/learning/learning_rule.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/layers/layer.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/config/constants.cpp",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/neurons/neuron.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/util/spikes_list.cpp",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/weight_normalizations/mean_activity_homeostasis.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/util/json/value.cpp",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/act_funcs/act_func.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/learning/stdp.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/tuning_curves/sigma_tuning_curve.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/util/optionparser/optionparser.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/util/optionparser/opt.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/util/distributions.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/tools/dumptool/dumptool.cpp",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/util/.tags_sorted_by_file",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/tuning_curves/CMakeLists.txt",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/protos/stat.proto",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/util/json/value.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/config/distributions.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/weight_normalizations/weight_normalization.h",
-		"/home/alexeyche/.config/sublime-text-3/Packages/CTags/Default.sublime-keymap",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/CMakeLists.txt",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/reinforcement/input_classification.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/act_funcs/exp_hennequin.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/reinforcement/likelihood.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/learning/srm_methods.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/neurons/srm_neuron.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/learning/stdp.cpp",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/neurons/synapse.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/serialize/serialize.cpp",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/weight_normalizations/nonlinear_min_max.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/weight_normalizations/soft_min_max.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/util/fastapprox/fastlog.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/neurons/adex_neuron.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/sim/sim_neuron.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/build/snnlib/protos/spikes_list.pb.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/util/fastapprox/sse.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/build/snnlib/protos/time_series.pb.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/util/spikes_queue.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/util/fastapprox/fastpow.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/util/fast_delegate.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/util/fastapprox/fastexp.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/sim/sim_input_layer.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/tuning_curves/tuning_curve.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/sim/reward_control.cpp",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/act_funcs/determ.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/sim/runtime_globals.cpp",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/sim/network.cpp",
+		"/home/alexeyche/prog/snn_sim/sources/snnlib/learn/optim.c",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/const.json",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/tools/testproto/time_series.proto",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/reinforcement/input_classification.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/learning/weight_normalization.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/sim/reward_control.cpp",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/sim/reward_control.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/act_funcs/CMakeLists.txt",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/sim/runtime_globals.cpp",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/util/fast_delegate.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/CMakeLists.txt",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/util/fastapprox/cast.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/util/fastapprox/fastpow.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/sim/sim_neuron.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/protos/matrix.proto",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/sim/CMakeLists.txt",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/layers/layer_info.cpp",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/reinforcement/likelyhood.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/CMakeLists.txt",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/sim/network.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/learning/max_likelyhood.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/util/fast_delegate_bind.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/neurons/synapse.cpp",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/tools/testproto/out.pb",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/.tags_sorted_by_file",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/act_funcs/act_func.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/util/spikes_queue.cpp",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/layers/layer.cpp",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/layers/layer_info.h",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/.tags",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/neurons/CMakeLists.txt",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/neurons/adex_neuron.cpp",
 		"/home/alexeyche/.config/sublime-text-3/Packages/User/CTags.sublime-settings",
 		"/home/alexeyche/.config/sublime-text-3/Packages/CTags/CTags.sublime-settings",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/CMakeLists.txt",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/layers/neuron_stat.cpp",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/layers/neuron_stat.h",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/layers/synapse.h",
@@ -875,11 +723,22 @@
 		"/home/alexeyche/prog/snn_sim/sources/snnlib/sim/netsim.c",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/util/spinlock.h",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/util/spinning_barrier.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/build/snnlib/protos/stat.pb.h",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/sim/sim_layer.h",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/util/json/indenter.cpp",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/tools/dumptool/ucr_ts.h",
-		"/home/alexeyche/distr/FastDelegate/Demo.cpp"
+		"/home/alexeyche/distr/FastDelegate/Demo.cpp",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/util/optionparser/opt.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/layers/neuron_test.h",
+		"/home/alexeyche/prog/snn_sim/sources/snnlib/layers/neuron_funcs.c",
+		"/home/alexeyche/prog/snn_sim/scripts/common.sh",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/build/snnlib/protos/spikes_list.pb.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/config/type_maps.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/build/snnlib/protos/time_series.pb.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/protos/spike_list.proto",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/layers/common.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/serialize/CMakeLists.txt",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/layers/srm_layer.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/snnlib/tuning_curves/CMakeLists.txt"
 	],
 	"find":
 	{
@@ -898,43 +757,75 @@
 		"case_sensitive": false,
 		"find_history":
 		[
-			"stat",
+			"addSyna",
+			"\n                    ",
+			"addSynapse",
+			".minimal_model",
+			"enabl",
+			"enab",
+			"MeanActivityHomeostasisC",
+			"meanAc",
+			"mean_p_dur",
+			"SRMNeu",
+			"SrmNeu",
+			"Optimal",
+			"Stdp",
+			"stdp",
+			"Stdp",
+			"hasCo",
 			"reset",
-			"resetSim",
-			"pStatDistUsage",
-			"pStatDistOptionIndex",
-			"labs",
-			"index_p",
-			"matrix",
-			"readAll",
-			"pair",
-			"dynamic_cast",
-			">();",
-			"true",
+			"reset()",
+			"arg",
+			"seed",
 			"saveS",
-			"enableCollectStatistics",
-			"ContLabeledTimeSeries",
-			"attachCurrent",
-			"top_val",
-			"distri",
-			"ptl",
-			"v4sf",
-			"- ",
+			"saveStat",
+			"castPro",
+			"deser",
+			"addS",
+			"StdpC",
+			"Stdp",
+			"stdp",
+			"Learnin",
+			"OptimalStdp",
+			"addSy",
+			"Syna",
+			"Synap",
+			"synaps",
+			"createCons",
+			"cout",
+			"seed",
 			"p_acc",
-			"SoftMinMax",
-			"MinMax",
-			"attac",
-			"lrule",
-			"ltule",
-			"lrule",
-			"add_ts",
-			"list",
-			"InputClassification",
-			"ExpHe",
-			"gain",
-			"input_targe",
-			"Likelihood",
-			"synapse",
+			"add_p_a",
+			"add_c",
+			"add_C",
+			"mean_p",
+			"MaxLikelihood",
+			"MeanActivityHomeostasis",
+			"cout",
+			"glob_inst",
+			"NeuronStat",
+			"saveS",
+			"active_synapses",
+			"active",
+			"saveMode",
+			"rRewa",
+			"Layer",
+			"saveS",
+			"Factory::inst().registerObj<NeuronStat>(new NeuronStat(this));",
+			"ena",
+			"neurons_t",
+			"neuron_t",
+			"Neuron",
+			"print",
+			"reinfor",
+			"aff_p",
+			"max_likelihood",
+			"Bool",
+			"isBool",
+			"get",
+			"bool",
+			"false",
+			"true",
 			"lst",
 			"l",
 			"operator",
@@ -993,10 +884,7 @@
 			"NEURON",
 			"getDouble",
 			"SigmaL",
-			"comple",
-			"l_Id",
-			"> ",
-			"DetermC"
+			"comple"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -1004,8 +892,15 @@
 		"regex": true,
 		"replace_history":
 		[
-			"NonlinearMinMax",
-			"SoftMinMax",
+			"->minimal_model",
+			"Triple",
+			"TripleStdp",
+			"last()->arg",
+			"Stdp",
+			"OptimalStdp",
+			"MinMax",
+			"MaxLikelihoodStat",
+			"Reward",
 			"Factory",
 			"SerialPack",
 			"o",
@@ -1029,543 +924,40 @@
 		"show_context": true,
 		"use_buffer2": true,
 		"whole_word": false,
-		"wrap": true
+		"wrap": false
 	},
 	"groups":
 	[
 		{
-			"selected": 3,
+			"selected": 0,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "sources/snnlib/util/util.h",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1027,
+						"buffer_size": 1,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								312,
-								312
+								1,
+								1
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/C++/C++.tmLanguage"
+							"auto_name": "x",
+							"syntax": "Packages/Text/Plain text.tmLanguage"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 9,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "sources/snnlib/sim/sim.h",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 7048,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								5034,
-								5034
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 2268.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 4,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "sources/snnlib/neurons/neuron.h",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 2915,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1956,
-								1956
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 702.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 1,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "sources/snnlib/neurons/neuron.cpp",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 3889,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1269,
-								1269
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 162.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "sources/snnlib/neurons/neuron_stat.h",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1746,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1483,
-								1483
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 378.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 3,
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "sources/snnlib/neurons/adex_neuron.h",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 4629,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1364,
-								1364
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 594.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
-					"type": "text"
-				},
-				{
-					"buffer": 6,
-					"file": "sources/snnlib/learning/optimal_stdp.h",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 6545,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1731,
-								1731
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 864.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 5,
-					"type": "text"
-				},
-				{
-					"buffer": 7,
-					"file": "sources/snnlib/learning/learning_rule.h",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1508,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								894,
-								894
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 6,
-					"type": "text"
-				},
-				{
-					"buffer": 8,
-					"file": "sources/snnlib/sim/sim_neuron.h",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 323,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 7,
-					"type": "text"
-				},
-				{
-					"buffer": 9,
-					"file": "sources/snnlib/sim/sim.cpp",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 10006,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								9106,
-								9106
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 4893.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 8,
-					"type": "text"
-				},
-				{
-					"buffer": 10,
-					"file": "sources/snnlib/sim/network.cpp",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 3832,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								3548,
-								3548
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 681.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 10,
-					"type": "text"
-				},
-				{
-					"buffer": 11,
-					"file": "sources/snnlib/util/spikes_queue.h",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 3863,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								593,
-								593
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 11,
-					"type": "text"
-				},
-				{
-					"buffer": 12,
-					"file": "sources/snnlib/sim/network.h",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1574,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								755,
-								755
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 213.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 12,
-					"type": "text"
-				},
-				{
-					"buffer": 13,
-					"file": "sources/snnlib/util/util.cpp",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 3858,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								426,
-								426
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 270.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 13,
-					"type": "text"
-				},
-				{
-					"buffer": 14,
-					"file": "sources/snnlib/util/json/array.cpp",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 3921,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								316,
-								311
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 14,
-					"type": "text"
-				},
-				{
-					"buffer": 15,
-					"file": "sources/snnlib/util/matrix.h",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 3375,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								3375,
-								3375
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": -0.0,
-						"translation.y": 1059.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 17,
-					"type": "text"
-				},
-				{
-					"buffer": 16,
-					"file": "sources/snnlib/util/json/json_box.h",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1082,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								704,
-								704
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 16,
-					"type": "text"
-				},
-				{
-					"buffer": 17,
-					"file": "sources/snnlib/util/json/output_filter.h",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 3664,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								2915,
-								2915
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": -0.0,
-						"translation.y": 1242.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 15,
 					"type": "text"
 				}
 			]
@@ -1573,7 +965,7 @@
 	],
 	"incremental_find":
 	{
-		"height": 34.0
+		"height": 25.0
 	},
 	"input":
 	{
@@ -1622,348 +1014,232 @@
 		"selected_items":
 		[
 			[
-				"ad",
-				"snnlib/neurons/adex_neuron.h"
+				"fa",
+				"snnlib/config/factory.cpp"
 			],
 			[
-				"lear",
+				"lea",
 				"snnlib/learning/learning_rule.h"
-			],
-			[
-				"opt",
-				"snnlib/learning/optimal_stdp.h"
 			],
 			[
 				"neu",
-				"snnlib/neurons/neuron_stat.h"
-			],
-			[
-				"sim_ne",
-				"snnlib/sim/sim_neuron.h"
-			],
-			[
-				"sim.h",
-				"snnlib/sim/sim.h"
-			],
-			[
-				"spikq",
-				"snnlib/util/spikes_queue.h"
-			],
-			[
-				"netw",
-				"snnlib/sim/network.cpp"
-			],
-			[
-				"sim.cp",
-				"snnlib/sim/sim.cpp"
-			],
-			[
-				"ut",
-				"snnlib/util/util.cpp"
-			],
-			[
-				"util",
-				"snnlib/util/util.h"
-			],
-			[
-				"snn",
-				"tools/proc/snn_proc.cpp"
-			],
-			[
-				"js",
-				"snnlib/util/json/json_box.h"
-			],
-			[
-				"time",
-				"snnlib/util/time_series.h"
-			],
-			[
-				"spik",
-				"snnlib/util/spikes_list.h"
-			],
-			[
-				"ma",
-				"snnlib/util/matrix.h"
-			],
-			[
-				"snn_pro",
-				"tools/proc/snn_proc.cpp"
-			],
-			[
-				"matr",
-				"snnlib/util/matrix.h"
-			],
-			[
-				"matri",
-				"snnlib/util/matrix.h"
-			],
-			[
-				"time_se",
-				"snnlib/util/time_series.h"
-			],
-			[
-				"spike",
-				"snnlib/util/spikes_list.h"
-			],
-			[
-				"",
-				"tools/proc/snn_proc.cpp"
-			],
-			[
-				"spi",
-				"snnlib/util/spikes_list.h"
-			],
-			[
-				"spikes",
-				"snnlib/util/spikes_list.h"
-			],
-			[
-				"core",
-				"snnlib/core.h"
-			],
-			[
-				"fa",
-				"snnlib/config/factory.h"
-			],
-			[
-				"seri",
-				"snnlib/serialize/serialize.h"
-			],
-			[
-				"const",
-				"snnlib/config/constants.h"
-			],
-			[
-				"proto_rw",
-				"snnlib/serialize/proto_rw.h"
-			],
-			[
-				"base",
-				"snnlib/base.h"
-			],
-			[
-				"proto",
-				"snnlib/serialize/proto_rw.h"
-			],
-			[
-				"time_s",
-				"snnlib/util/time_series.h"
-			],
-			[
-				"prot",
-				"snnlib/serialize/proto_rw.h"
-			],
-			[
-				"snn_pr",
-				"tools/proc/snn_proc.cpp"
-			],
-			[
-				"snn_",
-				"tools/sim/snn_sim.cpp"
-			],
-			[
-				"snn_s",
-				"tools/sim/snn_sim.cpp"
-			],
-			[
-				"neur",
-				"snnlib/neurons/neuron_stat.h"
-			],
-			[
-				"le",
-				"snnlib/learning/learning_rule.h"
-			],
-			[
-				"la",
-				"snnlib/layers/layer.h"
-			],
-			[
-				"uti",
-				"snnlib/util/util.h"
+				"snnlib/neurons/neuron.cpp"
 			],
 			[
 				"cons",
 				"snnlib/config/constants.h"
 			],
 			[
-				"dis",
-				"snnlib/util/distributions.h"
+				"triple",
+				"snnlib/learning/triple_stdp.h"
 			],
 			[
-				"val",
-				"snnlib/util/json/value.cpp"
-			],
-			[
-				"min",
-				"snnlib/weight_normalizations/min_max.h"
-			],
-			[
-				"we",
-				"snnlib/weight_normalizations/weight_normalization.h"
-			],
-			[
-				"std",
-				"snnlib/learning/stdp.h"
-			],
-			[
-				"sigma",
-				"snnlib/tuning_curves/sigma_tuning_curve.h"
-			],
-			[
-				"stdp",
-				"snnlib/learning/stdp.h"
-			],
-			[
-				"time_ser",
-				"snnlib/util/time_series.h"
-			],
-			[
-				"ser",
-				"snnlib/serialize/serialize.h"
-			],
-			[
-				"sim.c",
-				"snnlib/sim/sim.cpp"
-			],
-			[
-				"tim",
-				"snnlib/protos/time_series.proto"
-			],
-			[
-				"fast",
-				"snnlib/util/fastapprox/fastpow.h"
-			],
-			[
-				"fastpo",
-				"snnlib/util/fastapprox/fastpow.h"
-			],
-			[
-				"soft",
-				"snnlib/weight_normalizations/soft_min_max.h"
-			],
-			[
-				"non",
-				"snnlib/weight_normalizations/nonlinear_min_max.h"
-			],
-			[
-				"min_ma",
-				"snnlib/weight_normalizations/min_max.h"
+				"uti",
+				"snnlib/util/util.cpp"
 			],
 			[
 				"pro",
 				"snnlib/serialize/proto_rw.h"
 			],
 			[
-				"mi",
-				"snnlib/weight_normalizations/min_max.h"
+				"seria",
+				"snnlib/serialize/serialize.h"
 			],
 			[
-				"srm",
-				"snnlib/learning/srm_methods.h"
-			],
-			[
-				"mo",
+				"model",
 				"snnlib/protos/model.proto"
 			],
 			[
-				"ne",
-				"snnlib/neurons/neuron.cpp"
+				"sim.h",
+				"snnlib/sim/sim.h"
 			],
 			[
-				"syn",
-				"snnlib/neurons/synapse.h"
-			],
-			[
-				"n",
-				"snnlib/neurons/neuron.cpp"
-			],
-			[
-				"ba",
-				"snnlib/base.h"
-			],
-			[
-				"tunin",
-				"snnlib/tuning_curves/tuning_curve.h"
-			],
-			[
-				"lik",
-				"snnlib/reinforcement/likelihood.h"
-			],
-			[
-				"rew",
-				"snnlib/reinforcement/reward_modulation.h"
-			],
-			[
-				"max",
-				"snnlib/learning/max_likelihood.h"
-			],
-			[
-				"ex",
-				"snnlib/act_funcs/exp_hennequin.h"
-			],
-			[
-				"op",
-				"snnlib/learning/optimal_stdp.h"
+				"sim.cp",
+				"snnlib/sim/sim.cpp"
 			],
 			[
 				"mea",
 				"snnlib/weight_normalizations/mean_activity_homeostasis.h"
 			],
 			[
-				"det",
-				"snnlib/act_funcs/determ.h"
-			],
-			[
-				"ac",
-				"snnlib/act_funcs/act_func.h"
-			],
-			[
-				"act",
-				"snnlib/act_funcs/act_func.h"
-			],
-			[
-				"sim.",
+				"sim",
 				"snnlib/sim/sim.h"
 			],
 			[
-				"ade",
-				"snnlib/neurons/adex_neuron.h"
+				"la",
+				"snnlib/layers/layer.h"
 			],
 			[
-				"bas",
-				"snnlib/base.h"
+				"const",
+				"snnlib/config/constants.h"
 			],
 			[
-				"sim_n",
-				"snnlib/sim/sim_neuron.h"
+				"snn",
+				"tools/sim/snn_sim.cpp"
 			],
 			[
-				"runt",
-				"snnlib/sim/runtime_globals.h"
+				"srm",
+				"snnlib/neurons/srm_neuron.h"
 			],
 			[
-				"runti",
-				"snnlib/sim/runtime_globals.cpp"
+				"ne",
+				"snnlib/sim/network.h"
 			],
 			[
-				"neuro",
+				"stat.",
+				"snnlib/protos/stat.proto"
+			],
+			[
+				"neur",
 				"snnlib/neurons/neuron.h"
 			],
 			[
-				"fact",
-				"snnlib/config/factory.h"
+				"tr",
+				"snnlib/learning/triple_stdp.cpp"
 			],
 			[
-				"rewa",
-				"snnlib/reinforcement/reward_modulation.h"
+				"opt",
+				"snnlib/learning/optimal_stdp.h"
 			],
 			[
-				"fac",
-				"snnlib/config/factory.cpp"
+				"val",
+				"snnlib/util/json/value.cpp"
+			],
+			[
+				"va",
+				"snnlib/util/json/value.h"
+			],
+			[
+				"js",
+				"snnlib/util/json/json_box.h"
+			],
+			[
+				"jso",
+				"snnlib/util/json/json_box.h"
+			],
+			[
+				"proto",
+				"snnlib/serialize/proto_rw.h"
+			],
+			[
+				"dump",
+				"tools/dumptool/dumptool.cpp"
+			],
+			[
+				"snn_si",
+				"tools/sim/snn_sim.cpp"
+			],
+			[
+				"tripl",
+				"snnlib/learning/triple_stdp.h"
+			],
+			[
+				"mode",
+				"snnlib/protos/model.proto"
+			],
+			[
+				"stat",
+				"snnlib/protos/stat.proto"
+			],
+			[
+				"mo",
+				"snnlib/protos/model.proto"
+			],
+			[
+				"le",
+				"snnlib/learning/learning_rule.h"
+			],
+			[
+				"seri",
+				"snnlib/serialize/serialize.h"
+			],
+			[
+				"ser",
+				"snnlib/serialize/serialize.h"
+			],
+			[
+				"stdp",
+				"snnlib/learning/stdp.h"
+			],
+			[
+				"tri",
+				"snnlib/learning/triple_stdp.cpp"
+			],
+			[
+				"ad",
+				"snnlib/neurons/adex_neuron.h"
+			],
+			[
+				"dete",
+				"snnlib/act_funcs/determ.h"
+			],
+			[
+				"time",
+				"snnlib/util/time_series.h"
 			],
 			[
 				"sim.cpp",
 				"snnlib/sim/sim.cpp"
+			],
+			[
+				"seed",
+				".tags_sorted_by_file"
+			],
+			[
+				"snn_s",
+				"tools/sim/snn_sim.cpp"
+			],
+			[
+				"netw",
+				"snnlib/sim/network.cpp"
+			],
+			[
+				"sr",
+				"snnlib/neurons/srm_neuron.h"
+			],
+			[
+				"spike",
+				"snnlib/util/spikes_list.h"
+			],
+			[
+				"de",
+				"snnlib/act_funcs/determ.h"
+			],
+			[
+				"stat.pr",
+				"snnlib/protos/stat.proto"
+			],
+			[
+				"spikes",
+				"snnlib/util/spikes_list.h"
+			],
+			[
+				"optm",
+				"snnlib/learning/optimal_stdp.h"
+			],
+			[
+				"we",
+				"snnlib/weight_normalizations/weight_normalization.h"
+			],
+			[
+				"min_",
+				"snnlib/weight_normalizations/min_max.h"
+			],
+			[
+				"std",
+				"snnlib/learning/stdp.h"
+			],
+			[
+				"max",
+				"snnlib/learning/max_likelihood.h"
+			],
+			[
+				"min",
+				"snnlib/weight_normalizations/min_max.h"
+			],
+			[
+				"wei",
+				"snnlib/weight_normalizations/weight_normalization.h"
 			],
 			[
 				"like",
@@ -1974,52 +1250,152 @@
 				"snnlib/act_funcs/exp_hennequin.h"
 			],
 			[
-				"srm_me",
-				"snnlib/learning/srm_methods.h"
+				"syna",
+				"snnlib/neurons/synapse.h"
+			],
+			[
+				"optim",
+				"snnlib/learning/optimal_stdp.h"
+			],
+			[
+				"sun.h",
+				"snnlib/neurons/srm_neuron.h"
+			],
+			[
+				"optima",
+				"snnlib/learning/optimal_stdp.h"
+			],
+			[
+				"op",
+				"snnlib/learning/optimal_stdp.h"
+			],
+			[
+				"syn",
+				"snnlib/neurons/synapse.h"
+			],
+			[
+				"fact",
+				"snnlib/config/factory.h"
+			],
+			[
+				"base",
+				"snnlib/base.h"
+			],
+			[
+				"sim.c",
+				"snnlib/sim/sim.cpp"
+			],
+			[
+				"srm_ne",
+				"snnlib/neurons/srm_neuron.h"
+			],
+			[
+				"min_m",
+				"snnlib/learning/min_max.h"
+			],
+			[
+				"max_",
+				"snnlib/learning/max_likelihood.h"
 			],
 			[
 				"run",
 				"snnlib/sim/runtime_globals.h"
 			],
 			[
-				"learn",
-				"snnlib/learning/learning_rule.h"
+				"sere",
+				"snnlib/serialize/serialize.h"
 			],
 			[
-				"srm_",
-				"snnlib/learning/srm_methods.h"
+				"sim.",
+				"snnlib/sim/sim.h"
 			],
 			[
-				"mode",
+				"runti",
+				"snnlib/sim/runtime_globals.h"
+			],
+			[
+				"inp",
+				"snnlib/reinforcement/input_classification.h"
+			],
+			[
+				"re",
+				"snnlib/reinforcement/reward_modulation.h"
+			],
+			[
+				"fac",
+				"snnlib/config/factory.cpp"
+			],
+			[
+				"time_",
+				"snnlib/util/time_series.h"
+			],
+			[
+				"ma",
+				"snnlib/learning/max_likelihood.h"
+			],
+			[
+				"rew",
+				"snnlib/sim/reward_control.cpp"
+			],
+			[
+				"rewa",
+				"snnlib/sim/reward_control.cpp"
+			],
+			[
+				"max_l",
+				"snnlib/learning/max_likelihood.h"
+			],
+			[
+				"syna.",
+				"snnlib/neurons/synapse.cpp"
+			],
+			[
+				"lik",
+				"snnlib/reinforcement/likelihood.h"
+			],
+			[
+				"",
+				"snnlib/sim/reward_control.h"
+			],
+			[
+				"runt",
+				"snnlib/sim/runtime_globals.h"
+			],
+			[
+				"mod",
 				"snnlib/protos/model.proto"
 			],
 			[
-				"sim",
-				"snnlib/sim/sim.cpp"
+				"net",
+				"snnlib/sim/network.h"
+			],
+			[
+				"co",
+				"snnlib/core.h"
+			],
+			[
+				"ba",
+				"snnlib/base.h"
+			],
+			[
+				"rei",
+				"snnlib/reinforcement/reward_modulation.h"
+			],
+			[
+				"spik",
+				"snnlib/util/spikes_queue.h"
 			],
 			[
 				"spikes_l",
 				"snnlib/util/spikes_list.h"
 			],
 			[
-				"dete",
-				"snnlib/act_funcs/determ.h"
-			],
-			[
-				"net",
-				"snnlib/sim/network.cpp"
-			],
-			[
 				"act_",
 				"snnlib/act_funcs/act_func.h"
 			],
 			[
-				"syna",
-				"snnlib/neurons/synapse.h"
-			],
-			[
-				"dump",
-				"tools/dumptool/dumptool.cpp"
+				"prot",
+				"snnlib/serialize/proto_rw.h"
 			],
 			[
 				"dum",
@@ -2030,16 +1406,24 @@
 				"snnlib/tuning_curves/sigma_tuning_curve.h"
 			],
 			[
-				"stat.",
-				"snnlib/protos/stat.proto"
+				"bas",
+				"snnlib/base.h"
 			],
 			[
 				"value",
 				"snnlib/util/json/value.cpp"
 			],
 			[
+				"core",
+				"snnlib/core.h"
+			],
+			[
 				"con",
 				"snnlib/config/constants.h"
+			],
+			[
+				"sim_ne",
+				"snnlib/sim/sim_neuron.h"
 			],
 			[
 				"serl",
@@ -2062,16 +1446,20 @@
 				"snnlib/util/optionparser/opt.h"
 			],
 			[
+				"ade",
+				"snnlib/layers/adex_neuron.cpp"
+			],
+			[
+				"fast",
+				"snnlib/util/fast_delegate.h"
+			],
+			[
 				"si",
 				"snnlib/sim/sim.h"
 			],
 			[
 				"d",
 				"tools/dumptool/dumptool.cpp"
-			],
-			[
-				"seria",
-				"snnlib/serialize/serialize.h"
 			],
 			[
 				"prot_rw",
@@ -2086,6 +1474,14 @@
 				"snnlib/tuning_curves/sigma_tuning_curve.h"
 			],
 			[
+				"tunin",
+				"snnlib/tuning_curves/tuning_curve.h"
+			],
+			[
+				"act",
+				"snnlib/act_funcs/act_func.h"
+			],
+			[
 				"f",
 				"snnlib/config/factory.cpp"
 			],
@@ -2098,8 +1494,12 @@
 				"snnlib/layers/layer.h"
 			],
 			[
-				"lea",
-				"snnlib/learning/learning_rule.h"
+				"neuro",
+				"snnlib/layers/neuron_test.h"
+			],
+			[
+				"sigma",
+				"snnlib/tuning_curves/sigma_tuning_curve.h"
 			],
 			[
 				"sim_la",
@@ -2108,6 +1508,10 @@
 			[
 				"simn",
 				"snnlib/sim/sim_neuron.h"
+			],
+			[
+				"srm_",
+				"snnlib/layers/srm_layer.h"
 			],
 			[
 				"tun",
@@ -2120,18 +1524,6 @@
 			[
 				"ucr",
 				"tools/dumptool/ucr_ts.h"
-			],
-			[
-				"sn",
-				"tools/sim/snn_sim.cpp"
-			],
-			[
-				"simc",
-				"snnlib/sim/sim.cpp"
-			],
-			[
-				"tuni",
-				"snnlib/tuning_curves/tuning_curve.h"
 			]
 		],
 		"width": 0.0

@@ -9,7 +9,8 @@ message NeuronStat {
 	repeated double p = 1 [packed=true];
     repeated double m = 3 [packed=true];
 	repeated double u = 4 [packed=true];
-	repeated SynStat syns = 5;
+    repeated double ga = 5 [packed=true];
+	repeated SynStat syns = 6;
 }
 
 message AdExNeuronStat {
@@ -43,4 +44,13 @@ message StdpStat {
     }
     repeated XTrace x_trace_vals = 1;
     repeated double y_trace = 2;
+}
+message TripleStdpStat {
+    message XTrace {
+        repeated double r1 = 1 [packed=true];
+        repeated double r2 = 2 [packed=true];
+    }
+    repeated XTrace x_trace_vals = 1;
+    repeated double o1 = 2;
+    repeated double o2 = 3;
 }

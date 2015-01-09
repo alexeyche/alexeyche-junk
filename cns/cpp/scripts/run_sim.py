@@ -8,6 +8,7 @@ import shutil
 import multiprocessing
 from contextlib import contextmanager
 import json
+import traceback
 
 from config import RUNS_DIR
 from config import SNN_SIM
@@ -18,6 +19,7 @@ import subprocess as sub
 import time
 
 this_file = os.path.realpath(__file__)
+
 
 @contextmanager
 def pushd(newDir):
@@ -117,12 +119,12 @@ def main(args):
             i+=1
         
         if os.path.exists(wd):
-            max_ep = -1
+            max_ep = 0
             for f in os.listdir(wd):
                 f_spl = f.split("_")
                 if len(f_spl) > 1 and "model" in f:
                     max_ep = max(max_ep, int(f_spl[0]))
-            if max_ep>0:
+            if max_ep>=0:
                 while True:
                     ans = raw_input("%s already exists and %s epochs was done here. Continue learning? (y/n): " % (os.path.basename(wd), max_ep))
                     if ans in ["Y","y"]:
@@ -178,6 +180,10 @@ def main(args):
                 raise Exception("Can't find model for previous epoch number %s" % str(ep-1))
             sim_args['--load'] = model_load
 
+        if ep == 1 and args.collect_statistics:
+            sim_args['--T-max'] = args.collect_statistics
+            sim_args['--no-learning'] = True
+
         if args.input:
             if ep == 0:
                 sim_args['--precalc'] = True
@@ -212,7 +218,7 @@ class RunSimArgs(object):
     p_stat = None
     spikes = None
     runs_dir = RUNS_DIR
-
+    collect_statistics = None
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Tool for simulating snn')
@@ -274,7 +280,9 @@ if __name__ == '__main__':
     parser.add_argument('--eval-clustering-p-stat',
                         action='store_true',
                         help='Run evaluation of unsupervised classification with clustering of model intensities')
-
+    parser.add_argument('--collect-statistics',
+                        required=False,
+                        help='Run simulation in first epoch without learning to collect statistics')
     args = parser.parse_args(sys.argv[1:])    
     if len(sys.argv) == 1:
         parser.print_help()
@@ -286,4 +294,13 @@ if __name__ == '__main__':
         raise Exception("Can't collect Full and Partial statistics. Choose one")
     sim_opts = RunSimArgs()
     sim_opts.__dict__.update(args.__dict__)
+
+    with open(sim_opts.const) as const_ptr:
+        c_json = "\n".join([ l.split("//")[0].split("#")[0] for l in const_ptr.readlines() ])
+    try:
+        const = json.loads(c_json)
+    except:
+        print "Error while reading const.json:"
+        print traceback.format_exc()
+        sys.exit(1) 
     main(sim_opts)

@@ -17,7 +17,7 @@ for(ep in 1:1000) {
 }
 
 #ep = 12
-ep_str=""
+ep_str="0_"
 if(ep>0) {
     ep_str = sprintf("%d_",ep)
 }
@@ -56,7 +56,7 @@ if(measure_corr) {
 
 
 Ti=0
-Trange=1000
+Trange=1224
 p1 = prast(net,T0=Ti*Trange,Tmax=(Ti+1)*Trange)
 
 if(file.exists(model_file)) {
@@ -76,11 +76,9 @@ if(file.exists(model_file)) {
 
 
 if( (file.exists(stat_file))&&(file.info(stat_file)$size>0)) {
-    
-    
     stat = RProto$new(stat_file)$read()
     source('plot_stat.R')
-    plot_stat(stat, c, model, 2)
+    plot_stat(stat, c, net, model, 1, 51, 1:1000)
 
 }
 p_stat_eval = TRUE

@@ -83,7 +83,7 @@ int main(int argc, char **argv) {
         prw.write(&list_of_lts);
     } else
     if(options[ARG_PB].count() > 0) {
-        ProtoRw prw(options[ARG_PB].arg, ProtoRw::Read);
+        ProtoRw prw(options[ARG_PB].last()->arg, ProtoRw::Read);
         while(prw.read(true)) {}
     } else {
         option::printUsage(cout, usage);

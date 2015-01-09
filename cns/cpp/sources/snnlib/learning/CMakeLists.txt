@@ -16,6 +16,7 @@ set(SOURCES
     max_likelihood.cpp
     optimal_stdp.cpp
     stdp.cpp
+    triple_stdp.cpp
 )
 
 # add directory name to sources

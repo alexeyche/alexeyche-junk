@@ -1,4 +1,5 @@
 
+neuron_to_read = 2; syn_id=58; t_plot=1:1000
 plot_stat = function(stat, cr, net, model, neuron_to_read =2, syn_id=58, t_plot=1:1000) {
     if(length(stat)==0) return
     listen_neuron = cr$sim_configuration$neurons_to_listen
@@ -22,6 +23,11 @@ plot_stat = function(stat, cr, net, model, neuron_to_read =2, syn_id=58, t_plot=
         #                 lines(syns[[i]][t_plot])
         #             }
         #         }
+    }
+    adex_stat_id = grep("AdExNeuronStat", names(stat))
+    if(length(adex_stat_id)>0) {
+        nid = adex_stat_id[neuron_to_read]
+        
     }
     rew_stat_id = grep("RewardStat", names(stat))
     if(length(rew_stat_id)>0) {
@@ -102,5 +108,24 @@ plot_stat = function(stat, cr, net, model, neuron_to_read =2, syn_id=58, t_plot=
         plot(nst[["w"]][[syn_id]][t_plot], type="l")            
         plot(stdp[["y_trace"]][t_plot], type="l")
         plot(stdp[["x_trace"]][[syn_id]][t_plot], type="l")
+    }
+    tr_stdp_stat_id = grep("^TripleStdpStat", names(stat)) 
+    if(length(tr_stdp_stat_id)>0) {
+        id = tr_stdp_stat_id[neuron_to_read]
+        tr_stdp = stat[[id]]
+        
+        if(length(tr_stdp[["r2"]])>0) {
+            par(mfrow=c(5,1))
+        } else {
+            par(mfrow=c(4,1))
+        }
+        
+        plot(diff(nst[["w"]][[syn_id]][t_plot]), type="l", xlim=c(min(t_plot), max(t_plot)))
+        plot(tr_stdp[["o1"]][t_plot], type="l", ylab="o1")
+        plot(tr_stdp[["o2"]][t_plot], type="l", ylab="o2")
+        plot(tr_stdp[["r1"]][[syn_id]][t_plot], type="l", ylab="r1")
+        if(length(tr_stdp[["r2"]])>0) {
+            plot(tr_stdp[["r2"]][[syn_id]][t_plot], type="l", ylab="r2")
+        }
     }
 }

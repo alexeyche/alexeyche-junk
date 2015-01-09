@@ -20,7 +20,7 @@ public:
         init(_size, _wta, nc, c, run_glob_c);
     }
 
-    virtual void init(size_t _size, bool _wta, const NeuronConf &nc, const Constants &c, RuntimeGlobals *run_glob_c) {
+    virtual void init(size_t _size, bool _wta, const NeuronConf &nc, const Constants &c, RuntimeGlobals *run_glob_c, bool learning = true) {
         id = global_layer_index++;
         N = _size;
         neuron_conf = &nc;
@@ -43,7 +43,7 @@ public:
                 wnorm = Factory::inst().createWeightNormalization(nc.weight_normalization, c, n);
             }
 
-            if(!nc.learning_rule.empty()) {
+            if( (!nc.learning_rule.empty())&&(learning) ) {
                 n->setLearningRule(Factory::inst().createLearningRule(nc.learning_rule, c, n, act_f, wnorm));
             }
             if(!nc.tuning_curve.empty()) {
@@ -76,7 +76,7 @@ public:
     void connect(Layer &l_post, const ConnectionConf &conf, const Constants &c) {
         for(size_t ni=0; ni<neurons.size(); ni++) {
             for(size_t nj=0; nj<l_post.N; nj++) {
-                if( (neurons[ni]->id != l_post[nj]->id) && (!l_post[nj]->hasConnection(neurons[ni]->id)) ) {
+                if (neurons[ni]->id != l_post[nj]->id) { //&& (!l_post[nj]->hasConnection(neurons[ni]->id)) ) {
                     double prob = getUnif();
                     if( conf.prob > prob ) {
                         double dendrite_delay = conf.dendrite_delay_distr->getSample();
@@ -88,7 +88,6 @@ public:
             }
 
         }
-
     }
 
     void print(std::ostream& str) const {

@@ -7,11 +7,11 @@
 #include <snnlib/config/factory.h>
 #include <snnlib/neurons/srm_neuron.h>
 
-Sim::Sim(size_t _jobs) : Serializable(ESim), Tmax(0), jobs(_jobs), constructed(false), wta_regime(false), T_limit(0.0), rg(&rc, &net) {
+Sim::Sim(size_t _jobs, bool _learning) : Serializable(ESim), Tmax(0), jobs(_jobs), constructed(false), wta_regime(false), learning(_learning), T_limit(0.0), rg(&rc, &net) {
 }
 
 
-Sim::Sim(Constants &c, size_t _jobs) : Serializable(ESim), Tmax(0), jobs(_jobs), constructed(false), wta_regime(false), T_limit(0.0), rg(&rc, &net) {
+Sim::Sim(Constants &c, size_t _jobs, bool _learning) : Serializable(ESim), Tmax(0), jobs(_jobs), constructed(false), wta_regime(false), learning(_learning), T_limit(0.0), rg(&rc, &net) {
     construct(c);
 }
 
@@ -32,7 +32,7 @@ void Sim::construct(Constants &c) {
             cerr << "Can't create input layer with WTA property\n";
             terminate();
         }
-        Layer *l = Factory::inst().createLayer(conf.size, false, conf.nconf, c, &rg);
+        Layer *l = Factory::inst().createLayer(conf.size, false, conf.nconf, c, &rg, learning);
         layers.push_back(l);
         input_neurons_count += l->N;
         for(size_t ni=0; ni<l->N; ni++) {
@@ -46,7 +46,7 @@ void Sim::construct(Constants &c) {
     net_neurons_count = 0;
     for(size_t l_id = 0; l_id < sc.net_layers_conf.size(); l_id++) {
         LayerConf conf = sc.net_layers_conf[l_id];
-        Layer *l = Factory::inst().createLayer(conf.size, conf.wta, conf.nconf, c, &rg);
+        Layer *l = Factory::inst().createLayer(conf.size, conf.wta, conf.nconf, c, &rg, learning);
         layers.push_back(l);
         net_neurons_count += l->N;
         for(size_t ni=0; ni<l->N; ni++) {
@@ -158,6 +158,7 @@ void Sim::simPrecalculateStep(SimWorker *sw, const double &t) {
         Neuron* n = s->sim_neurons[ni].n;
         NeuronRuntime &n_rt = s->sim_neurons[ni].n_rt;
         if((ni<s->input_neurons_count) && (dataIsReady)) {
+            //cout << "Attaching current " << x << " to neuron " << n->id << "\n";
             n_rt.attachCurrent(x);
         }
 
@@ -168,6 +169,7 @@ void Sim::simPrecalculateStep(SimWorker *sw, const double &t) {
         n_rt.calculateDynamics();
 
         if(n->fired) {
+            //cout << "Neuron " << n->id << " fired at " << t+s->rg.Dt()  << ": " << (int)n->fired << "\n";
             s->net.propagateSpike(n->id, t+s->rg.Dt());
             n->fired = 0;
         }

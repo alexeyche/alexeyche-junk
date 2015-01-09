@@ -245,7 +245,9 @@ public:
         return *data.begin();
     }
     bool dataIsReady(const double &t) {
-        return (data.size()>0) && ((ptl.getCurrentPatternEnd(t) - ptl.gapBetweenPatterns) >= t);
+        // cout << data.size() << ">0 && " << ptl.getCurrentPatternEnd(t) << " - " << ptl.gapBetweenPatterns << " > " << t << "\n";
+        // cout << (bool)((data.size()>0) && ((ptl.getCurrentPatternEnd(t) - ptl.gapBetweenPatterns) > t)) << "\n";
+        return (data.size()>0) && ((ptl.getCurrentPatternEnd(t) - ptl.gapBetweenPatterns) > t);
     }
     inline size_t size() const {
         return data.size();

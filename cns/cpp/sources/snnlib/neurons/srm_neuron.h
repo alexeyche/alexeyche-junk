@@ -40,7 +40,7 @@ public:
             y += s->w * s->x;
         }
         y = c->u_rest + y;
-        M = fastexp(-gr);
+        M = fastexp(-(gr+ga));
         p = act_rt.prob(y) * M;
         if(collectStatistics) {
             stat->collect(this);
@@ -52,6 +52,7 @@ public:
         if(p > getUnif()) {
             fired = 1;
             gr += c->amp_refr;
+            ga += c->amp_adapt;
         }
         lrule_rt.calculateWeightsDynamics();
 
@@ -67,6 +68,7 @@ public:
             }
         }
         gr += - gr/c->tau_refr;
+        ga += - ga/c->tau_adapt;
         rmod_rt.modulateReward();
     }
     void provideRuntime(NeuronRuntime &rt) {
@@ -84,7 +86,7 @@ public:
 
     void print(std::ostream& str) const {
         str << "SRMNeuron(" << id << ")\n";
-        str << "\ty == " << y << ", p == " << p << ", M == " << M << ", gr == " << gr << ", fired == " << fired << ", axon_delay: " << axon_delay << ", synapses\n";
+        str << "\ty == " << y << ", p == " << p << ", M == " << M << ", gr == " << gr << ", ga == " << ga << ", fired == " << fired << ", axon_delay: " << axon_delay << ", synapses\n";
         for(auto it=syns.begin(); it != syns.end(); ++it) {
             str << **it << ", ";
         }

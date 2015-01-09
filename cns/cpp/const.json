@@ -2,9 +2,8 @@
     "tuning_curves" : {
         "SigmaTuningCurve" : {
             "sigma" : [0.01, 0.01],
-//            "intercept" : [-1.0, 1.0], // for test data
-            "intercept" : [-2.4, 2.4], // for synthetic control
-            "gain" : [ 2.4, 2.4 ],
+            "intercept" : [-1.0, 1.0], 
+            "gain" : [ 70.0, 70.0 ],
             "prob_next_sigma" : 0.0,
             "max_sigma_num" : 1
         }
@@ -13,7 +12,9 @@
         "SRMNeuron" : {
             "tau_refr"  : 2.5,
             "amp_refr"  : 200.0,
-            "u_rest"    : 0.0
+            "u_rest"    : 0.0,
+            "tau_adapt" : 300,
+            "amp_adapt" : 1.0
         },
         "AdExNeuron" : {
             "C" : 100,
@@ -72,12 +73,12 @@
     },
     "weight_normalizations" : {
         "MeanActivityHomeostasis" : { // Carlson et al. 2013. "Biologically plausible models of homeostasis and STDP: Stability and learning in spiking neural networks"
-            "tau_mean_act" : 10000,
+            "tau_mean" : 10000,
             "gamma" : 0.1,
             "scaling_factor" : 1
         },
         "MinMax" : {     // http://www.scholarpedia.org/article/Spike-timing_dependent_plasticity
-            "w_max" : 12,
+            "w_max" : 6,
             "nu_plus" : 0.01,
             "nu_minus" : 0.01
         },
@@ -95,11 +96,11 @@
     "learning_rules" : {
         "OptimalStdp" : {
             "tau_c" : 100,
-            "mean_p_dur" : 60000,
+            "tau_mean" : 60000,
             "target_rate" : 10,
             "target_rate_factor" : 1,
-            "weight_decay" : 0.02,
-            "learning_rate" : 0.2
+            "weight_decay" : 0.1,
+            "learning_rate" : 0.01
         },
         "Stdp" : {
             "tau_plus" : 30.0, // ms
@@ -107,6 +108,25 @@
             "a_plus" : 1.0,
             "a_minus" : 2.25,
             "learning_rate" : 0.1
+        },
+        "TripleStdp" : {
+            "tau_plus" : 16.8, // ms
+            "tau_minus" : 33.7, // ms
+            "tau_x" : 150, // ms
+            "tau_y" : 150, // ms
+            "a2_plus" : 0.61,
+            "a2_minus" : 0.16,
+            "a3_plus" : 0.67,
+            "a3_minus" : 0.14,
+            "learning_rate" : 0.1
+        },
+        "TripleStdpMin" : {
+            "tau_plus" : 16.8, // ms
+            "tau_minus" : 33.7, // ms
+            "tau_y" : 114, // ms
+            "a3_plus" : 0.65,
+            "a2_minus" : 0.28,
+            "learning_rate" : 2
         },
         "MaxLikelihood" : {
             "tau_el" : 100,
@@ -139,20 +159,40 @@
                 "wta" : false,
                 "neuron_conf" : {
                     "neuron" : "SRMNeuron",
-                    "learning_rule" : "OptimalStdp",
+                    "learning_rule" : "TripleStdpMin",
                     "weight_normalization" : "MinMax",
                     "act_func" : "ExpHennequin",
                     "axon_delay_distr" : "Exp(0,0)"
                 }
             }
+//            {
+//                "size" : 100,
+//                "wta" : false,
+//                "neuron_conf" : {
+//                    "neuron" : "SRMNeuron",
+//                    "learning_rule" : "OptimalStdp_L2",
+//                    "weight_normalization" : "MinMax",
+//                    "act_func" : "ExpHennequin",
+//                    "axon_delay_distr" : "Exp(0,0)"
+//                }
+//            }
         ],
         "conn_map" : {
             "0->1" : [
-                { "prob" : 1.0, "weight_distr" : "Norm(4.1, 0.25)", "type" : "Synapse", "dendrite_delay_distr" : "Exp(0,0)" }
-            ]            
+                { "prob" : 1.0, "weight_distr" : "Norm(2.6, 0.25)", "type" : "Synapse", "dendrite_delay_distr" : "Exp(0,0)" }
+            ]
 //            ],
-//            "1->1" : [
-//                { "prob" : 0.1, "weight_distr" : "Norm(4, 0.25)", "type" : "Synapse_Inh", "dendrite_delay_distr" : "Exp(0,0)" }
+//            "0->2" : [
+//                { "prob" : 1.0, "weight_distr" : "Norm(2.1, 0.25)", "type" : "Synapse", "dendrite_delay_distr" : "Exp(0,0)" }
+//            ],
+//            "1->2" : [
+//                { "prob" : 1.0, "weight_distr" : "Norm(2.1, 0.25)", "type" : "Synapse_Inh", "dendrite_delay_distr" : "Exp(0,0)" }
+//            ],
+//            "2->1" : [
+//                { "prob" : 1.0, "weight_distr" : "Norm(1.1, 0.25)", "type" : "Synapse", "dendrite_delay_distr" : "Exp(0,0)" }
+//            ],
+//            "2->2" : [
+//                { "prob" : 0.1, "weight_distr" : "Norm(1.0, 0.25)", "type" : "Synapse", "dendrite_delay_distr" : "Exp(0,0)" }
 //            ]
         },
         "reinforce_map" : {
@@ -162,7 +202,7 @@
         },
         "time_series_map_conf" : {
             "dt" : 2.0,          // ms
-            "gap_between_patterns" : 30.0  // ms, gap between patterns  
+            "gap_between_patterns" : 200.0  // ms, gap between patterns  
         },
         "sim_run_conf" : {
             "seed" : -1,
@@ -170,7 +210,7 @@
             "start_rate" : 20.0,    // Hz
             "wta_max_freq" : 100.0 // Hz                
         },
-        "neurons_to_listen" : [100, 101, 102],
+        "neurons_to_listen" : [100,151],
         "reward_layers_to_listen" : []
     }
 }

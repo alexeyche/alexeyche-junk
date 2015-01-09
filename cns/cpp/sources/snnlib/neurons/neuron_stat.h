@@ -34,6 +34,9 @@ public:
         for(size_t i=0; i<m->m_size(); i++) {
             M.push_back(m->m(i));
         }
+        for(size_t i=0; i<m->m_size(); i++) {
+            ga.push_back(m->ga(i));
+        }
         for(size_t i=0; i<m->syns_size(); i++) {
             Protos::NeuronStat::SynStat syn_m = m->syns(i);
 
@@ -52,6 +55,7 @@ public:
         p.clear();
         u.clear();
         M.clear();
+        ga.clear();
         for(size_t syn_i = 0; syn_i < syns.size(); syn_i++ ) {
             syns[syn_i].clear();
             w[syn_i].clear();
@@ -66,6 +70,7 @@ public:
     vector<double> p;
     vector<double> u;
     vector<double> M;
+    vector<double> ga;
 
     CollectMode mode;
 };

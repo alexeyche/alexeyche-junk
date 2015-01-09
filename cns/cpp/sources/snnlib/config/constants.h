@@ -34,15 +34,19 @@ public:
     SRMNeuronC(string name) : ConstObj(name) {}
     double tau_refr;
     double amp_refr;
+    double tau_adapt;
+    double amp_adapt;
     double u_rest;
 
     void fill_structure(JsonBox::Value v) {
         tau_refr = v["tau_refr"].getDouble();
         amp_refr = v["amp_refr"].getDouble();
+        tau_adapt = v["tau_adapt"].getDouble();
+        amp_adapt = v["amp_adapt"].getDouble();
         u_rest = v["u_rest"].getDouble();
     }
     void print(std::ostream &str) const {
-        str << "tau_refr: " << tau_refr << ", amp_refr: " << amp_refr << ", u_rest: " << u_rest <<"\n";
+        str << "tau_refr: " << tau_refr << ", amp_refr: " << ", tau_adapt: " << tau_adapt << ", amp_adapt: "  << amp_adapt << ", u_rest: " << u_rest <<"\n";
     }
 };
 
@@ -178,7 +182,7 @@ class OptimalStdpC: public ConstObj {
 public:
     OptimalStdpC(string name) : ConstObj(name) {}
     double tau_c;
-    double mean_p_dur;
+    double tau_mean;
     double target_rate;
     double __target_rate;
     double target_rate_factor;
@@ -187,7 +191,7 @@ public:
 
     void fill_structure(JsonBox::Value v) {
         tau_c               = v["tau_c"].getDouble();
-        mean_p_dur          = v["mean_p_dur"].getDouble();
+        tau_mean          = v["tau_mean"].getDouble();
         target_rate         = v["target_rate"].getDouble();
         target_rate_factor  = v["target_rate_factor"].getDouble();
         weight_decay        = v["weight_decay"].getDouble();
@@ -197,7 +201,7 @@ public:
     void print(std::ostream &str) const {
         str <<
         "tau_c: " << tau_c << ", " <<
-        "mean_p_dur: " << mean_p_dur << ", " <<
+        "tau_mean: " << tau_mean << ", " <<
         "target_rate: " << target_rate << ", " <<
         "target_rate_factor: " << target_rate_factor << ", " <<
         "learning_rate: " << learning_rate << ", " <<
@@ -244,6 +248,46 @@ public:
 };
 
 
+class TripleStdpC: public ConstObj {
+public:
+    TripleStdpC(string name) : ConstObj(name) {}
+    double tau_minus;
+    double tau_plus;
+    double tau_x;
+    double tau_y;
+    double a2_plus;
+    double a2_minus;
+    double a3_plus;
+    double a3_minus;
+    double learning_rate;
+    bool minimal_model;
+
+    void fill_structure(JsonBox::Value v) {
+        tau_minus               = v["tau_minus"].getDouble();
+        tau_plus               = v["tau_plus"].getDouble();
+        tau_x               = v["tau_x"].getDouble();
+        tau_y               = v["tau_y"].getDouble();
+        a2_plus               = v["a2_plus"].getDouble();
+        a2_minus               = v["a2_minus"].getDouble();
+        a3_plus               = v["a3_plus"].getDouble();
+        a3_minus               = v["a3_minus"].getDouble();
+        learning_rate         = v["learning_rate"].getDouble();
+        minimal_model = false;
+        if(strStartsWith(getName(), "TripleStdpMin")) {
+            minimal_model = true;
+        }
+    }
+    void print(std::ostream &str) const {
+        if(minimal_model) {
+            str << "tau_minus: " << tau_minus << ", tau_plus: " << tau_plus << ", tau_y: " << tau_y << ", a2_minus: " << a2_minus << ", learning_rate: " << learning_rate << ", a3_plus: " << a3_plus << "\n";
+        } else {
+            str << "tau_minus: " << tau_minus << ", tau_plus: " << tau_plus << ", tau_y: " << tau_y << ", tau_x: " << tau_x << ", a2_plus: " << a2_plus << ", a2_minus: " << a2_minus << ", learning_rate: " << learning_rate << ", a3_plus: " << a3_plus << ", a3_minus: " << a3_minus << "\n";
+        }
+    }
+};
+
+
+
 class InputClassificationC: public ConstObj {
 public:
     InputClassificationC(string name) : ConstObj(name) {}
@@ -272,17 +316,17 @@ public:
 class MeanActivityHomeostasisC: public ConstObj {
 public:
     MeanActivityHomeostasisC(string name) : ConstObj(name) {}
-    double tau_mean_act;
+    double tau_mean;
     double gamma;
     double scaling_factor;
 
     void fill_structure(JsonBox::Value v) {
-        tau_mean_act               = v["tau_mean_act"].getDouble();
+        tau_mean               = v["tau_mean"].getDouble();
         gamma         = v["gamma"].getDouble();
         scaling_factor         = v["scaling_factor"].getDouble();
     }
     void print(std::ostream &str) const {
-        str << "tau_mean_act: " << tau_mean_act << ", gamma: " << gamma << ", scaling_factor: " << scaling_factor <<  "\n";
+        str << "tau_mean: " << tau_mean << ", gamma: " << gamma << ", scaling_factor: " << scaling_factor <<  "\n";
     }
 };
 

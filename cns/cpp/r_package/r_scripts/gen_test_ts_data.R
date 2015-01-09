@@ -27,6 +27,9 @@ for(i in 1:50) {
 
 
 
+normalize = function(x, min_val, max_val) {
+    2*( 1 - (max_val-x)/(max_val-min_val) ) -1
+}
 
 
 require(Rsnn)
@@ -37,7 +40,7 @@ pr = RProto$new(dest_file)
 max_d = max(sapply(lts,function(x) max(x$ts)))
 min_d = min(sapply(lts,function(x) min(x$ts)))
 for(i in 1:length(lts)) {    
-    lts[[i]]$ts = 2*(0.21 - lts[[i]]$ts)/(max_d-min_d) -1
+    lts[[i]]$ts = normalize(lts[[i]]$ts, min_d, max_d)
 }
 
 pr$write("LabeledTimeSeriesList", lts)

@@ -22,7 +22,7 @@ public:
 		if(n->fired) {
 			p_acc += 1.0;
 		}
-		p_acc += -p_acc/c->tau_mean_act;
+		p_acc += -p_acc/c->tau_mean;
 	}
 
     void modifyWeightDerivative(double &dw, const size_t &syn_id) {

@@ -81,7 +81,7 @@ protected:
     friend class Factory;
 
 public:
-    OptimalStdp(const ConstObj *_c, Neuron *_n, ActFunc *_act_f, WeightNormalization *_wnorm) : LearningRule() {
+    OptimalStdp(const ConstObj *_c, Neuron *_n, ActFunc *_act_f, WeightNormalization *_wnorm) {
     	init(_c, _n, _act_f, _wnorm);
     }
 
@@ -128,7 +128,7 @@ public:
 
     }
     void propagateSynSpike(const SynSpike *sp) {
-        if((n->glob_c->getSimTime() >= c->mean_p_dur)&&(fabs(C[sp->syn_id]) < SYN_ACT_TOL)) {
+        if((n->glob_c->getSimTime() >= c->tau_mean)&&(fabs(C[sp->syn_id]) < SYN_ACT_TOL)) {
             active_synapses.push_back(sp->syn_id);
         }
     }
@@ -136,14 +136,15 @@ public:
         wnorm_rt.preModifyMeasure();
 
         if(n->p<(1.0/1000.0)) n->p = 1.0/1000;
-        if(n->glob_c->getSimTime() >= c->mean_p_dur) {
+        if(n->glob_c->getSimTime() >= c->tau_mean) {
             B = B_calc();
             auto it=active_synapses.begin();
             while(it != active_synapses.end()) {
                 Synapse *syn = n->syns[*it];
 
                 C[*it] += - C[*it]/c->tau_c + SRMMethods::dLLH_dw(n, syn);
-                double dw = c->learning_rate * ( C[*it]*B - c->weight_decay * syn->fired * syn->w);
+                double dw = c->learning_rate * ( C[*it] * B * wnorm_rt.ltpMod(syn->w) - wnorm_rt.ltdMod(syn->w) );
+                //double dw = c->learning_rate * ( C[*it]*B - c->weight_decay * syn->fired * syn->w);
                 //cout << c->weight_decay << "*" << syn->fired << "*" << syn->w << " == " << c->weight_decay * syn->fired * syn->w << "\n";
                 wnorm_rt.modifyWeightDerivative(dw, *it);
                 syn->w += dw;
@@ -167,7 +168,7 @@ public:
                 stat->collect(this);
             }
         }
-        p_acc += (-p_acc+n->fired)/c->mean_p_dur;
+        p_acc += (-p_acc+n->fired)/c->tau_mean;
 
     }
     void provideRuntime(LearningRuleRuntime &rt) {

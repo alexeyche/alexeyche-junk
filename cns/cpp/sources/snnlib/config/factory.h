@@ -34,7 +34,7 @@ public:
     ConstObj *createConst(string name, JsonBox::Value v);
     ActFunc *createActFunc(string name, const Constants &c, Neuron *n);
     Synapse *createSynapse(string name, const Constants &c, size_t id_pre, double w, double dendrite_delay);
-    Layer *createLayer(size_t size, bool wta, const NeuronConf &nc, const Constants &glob_c, RuntimeGlobals *run_glob_c);
+    Layer *createLayer(size_t size, bool wta, const NeuronConf &nc, const Constants &glob_c, RuntimeGlobals *run_glob_c, bool learning);
     RewardModulation* createRewardModulation(string name, const Constants &c, Neuron *n, RuntimeGlobals *run_glob_c);
     Neuron *createNeuron(string name, size_t local_id, const Constants &c, const RuntimeGlobals *run_glob_c, double axon_delay);
     TuningCurve *createTuningCurve(string name, const Constants &c,  size_t layer_size, size_t neuron_id, Neuron *n);
@@ -115,18 +115,16 @@ public:
     }
 
     string findBaseStructName(string deriv_struct_name) {
-        for(auto it=entity_map.begin(); it != entity_map.end(); ++it) {
-            string base_struct_name = it->first;
-            if(deriv_struct_name.substr(0, base_struct_name.size()) == base_struct_name) {
-                return base_struct_name;
-            }
+        vector<string> del0 = split(deriv_struct_name, '_');
+        assert(del0.size() > 0);
+        string base_struct_name = del0[0];
+        if(entity_map.find(base_struct_name) != entity_map.end()) {
+            return base_struct_name;
         }
-        for(auto it=const_map.begin(); it != const_map.end(); ++it) {
-            string base_struct_name = it->first;
-            if(deriv_struct_name.substr(0, base_struct_name.size()) == base_struct_name) {
-                return base_struct_name;
-            }
+        if(const_map.find(base_struct_name) != const_map.end()) {
+            return base_struct_name;
         }
+        
         cerr << "Unrecognized typename: " << deriv_struct_name << "\n";
         terminate();
     }

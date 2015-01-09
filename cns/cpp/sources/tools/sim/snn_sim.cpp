@@ -13,7 +13,7 @@
 
 enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_CONSTANTS, ARG_INPUT,
                     ARG_OUT_STAT, ARG_OUT_SPIKES, ARG_JOBS ,ARG_PRECALC,
-                    ARG_MODEL_SAVE, ARG_MODEL_LOAD, ARG_T_MAX, ARG_OUT_P_STAT };
+                    ARG_MODEL_SAVE, ARG_MODEL_LOAD, ARG_T_MAX, ARG_OUT_P_STAT, ARG_NO_LEARNING };
 const option::Descriptor usage[] =
 {
  {ARG_UNKNOWN, 0, "", "",Arg::None, "USAGE: example [options]\n\n"
@@ -28,6 +28,7 @@ const option::Descriptor usage[] =
  {ARG_OUT_P_STAT, 0,"","p-stat",Arg::NonEmpty, "  --p-stat  \tFile name to save probabilites of model." },
  {ARG_JOBS, 0,"j","jobs",Arg::NonEmpty, "  --jobs  -j \tParallel jobs to run (default 1)" },
  {ARG_PRECALC, 0,"", "precalc",Arg::None, "  --precalc  \tOnly precalculate spike on time series." },
+ {ARG_NO_LEARNING, 0,"", "no-learning",Arg::None, "  --no-learning  \tTurning off all learning dynamics despite of const.json content. Good for statistics collecting" },
  {ARG_HELP, 0,"h", "help",Arg::None, "  --help  \tPrint usage and exit." },
 
  {ARG_UNKNOWN, 0, "", "",Arg::None, "\nExamples:\n"
@@ -46,6 +47,7 @@ struct SnnSimOpts {
     string model_load;
     int jobs;
     bool precalc;
+    bool no_learning;
     double Tmax;
 };
 
@@ -64,12 +66,12 @@ SnnSimOpts parseOptions(int argc, char **argv) {
         exit(0);
     }
 
-    if(options[ARG_INPUT].count() != 1) {
-        cerr << "Inappropriate input argument\n";
+    if(options[ARG_INPUT].count() == 0) {
+        cerr << "Need input argument\n";
         exit(1);
     }
-    if(options[ARG_OUT_SPIKES].count() != 1) {
-        cerr << "Inappropriate output spikes argument\n";
+    if(options[ARG_OUT_SPIKES].count() == 0) {
+        cerr << "Need output spikes argument\n";
         exit(1);
     }
 
@@ -85,33 +87,37 @@ SnnSimOpts parseOptions(int argc, char **argv) {
 
 
     SnnSimOpts sopt;
-    sopt.input = options[ARG_INPUT].arg;
-    sopt.out_spikes = options[ARG_OUT_SPIKES].arg;
+    sopt.input = options[ARG_INPUT].last()->arg;
+    sopt.out_spikes = options[ARG_OUT_SPIKES].last()->arg;
     if(options[ARG_CONSTANTS].count()>0) {
-        sopt.const_file = options[ARG_CONSTANTS].arg;
+        sopt.const_file = options[ARG_CONSTANTS].last()->arg;
     }
     if(options[ARG_JOBS].count()>0) {
-        sopt.jobs = atoi(options[ARG_JOBS].arg);
+        sopt.jobs = atoi(options[ARG_JOBS].last()->arg);
     }
     if(options[ARG_OUT_STAT].count()>0) {
-        sopt.out_stat_file = options[ARG_OUT_STAT].arg;
+        sopt.out_stat_file = options[ARG_OUT_STAT].last()->arg;
     }
     if(options[ARG_OUT_P_STAT].count()>0) {
-        sopt.out_p_stat_file = options[ARG_OUT_P_STAT].arg;
+        sopt.out_p_stat_file = options[ARG_OUT_P_STAT].last()->arg;
     }
     if(options[ARG_PRECALC].count()>0) {
         sopt.precalc = true;
     }
     if(options[ARG_MODEL_SAVE].count()>0) {
-        sopt.model_save = options[ARG_MODEL_SAVE].arg;
+        sopt.model_save = options[ARG_MODEL_SAVE].last()->arg;
     }
     if(options[ARG_MODEL_LOAD].count()>0) {
-        sopt.model_load = options[ARG_MODEL_LOAD].arg;
+        sopt.model_load = options[ARG_MODEL_LOAD].last()->arg;
     }
     if(options[ARG_T_MAX].count()>0) {
-        sopt.Tmax = atof(options[ARG_T_MAX].arg);
+        sopt.Tmax = atof(options[ARG_T_MAX].last()->arg);
         cout << sopt.Tmax <<"\n";
     }
+    if(options[ARG_NO_LEARNING].count()>0) {
+        sopt.no_learning = true;
+    }
+
     if((!sopt.out_p_stat_file.empty())&&(!sopt.out_stat_file.empty())) {
         cout << "Need to choose on of the mode of collecting statistics\n";
         terminate();
@@ -123,7 +129,7 @@ SnnSimOpts parseOptions(int argc, char **argv) {
 int main(int argc, char **argv) {
     SnnSimOpts sopt = parseOptions(argc, argv);
 
-    Sim s(sopt.jobs);
+    Sim s(sopt.jobs, !sopt.no_learning);
     Constants *c = nullptr;
     if(!sopt.const_file.empty()) {
         c = new Constants(sopt.const_file);
@@ -156,7 +162,7 @@ int main(int argc, char **argv) {
     }
 
     s.setTlimit(sopt.Tmax);
-
+    
     if(!sopt.out_stat_file.empty()) {
         s.monitorStat(sopt.out_stat_file);
     }

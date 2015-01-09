@@ -24,8 +24,8 @@ public:
 	}
 	virtual void init(const ConstObj *_c, Neuron *_n, ActFunc *_act_f, WeightNormalization *_wnorm) = 0;
 	virtual void saveStat(SerialPack &p) {};
-    virtual void calculateWeightsDynamics() = 0;
-    virtual void propagateSynSpike(const SynSpike *sp) {}
+    void calculateWeightsDynamics() {};
+    void propagateSynSpike(const SynSpike *sp) {}
     virtual void addSynapse(Synapse *s) {}
     virtual void reset() {}
 	virtual void enableCollectStatistics() {};

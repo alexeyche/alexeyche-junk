@@ -11,6 +11,7 @@
 #include <snnlib/neurons/adex_neuron.h>
 #include <snnlib/learning/max_likelihood.h>
 #include <snnlib/learning/optimal_stdp.h>
+#include <snnlib/learning/triple_stdp.h>
 #include <snnlib/learning/stdp.h>
 
 class RProto {
@@ -174,7 +175,7 @@ public:
             out["dt"] = lsl->ptl.dt;
             out["Tmax"] = lsl->ptl.Tmax;
             out["gapBetweenPatterns"] = lsl->ptl.gapBetweenPatterns;
-        } else 
+        }
         if(s->getName() == "SpikesList") {
             SpikesList *sl = dynamic_cast<SpikesList*>(s);
             if(!sl) { ERR("Can't cast"); }
@@ -183,7 +184,7 @@ public:
                 ss << ni;
                 out[ss.str()] = Rcpp::NumericVector(Rcpp::wrap(sl->sp_list[ni]));
             }
-        } else 
+        } 
         if((s->getName() == "NeuronStat")||(s->getName() == "AdExNeuronStat")) {
             NeuronStat *st = dynamic_cast<NeuronStat*>(s);
             if(!st) { ERR("Can't cast"); }
@@ -192,36 +193,46 @@ public:
             if(st->u.size()>0) out["u"] = Rcpp::wrap(st->u);
             if(st->syns.size()>0) out["syns"] = Rcpp::wrap(st->syns);
             if(st->w.size()>0) out["w"] = Rcpp::wrap(st->w);
-        } else 
+            if(st->ga.size()>0) out["ga"] = Rcpp::wrap(st->ga);
+        } 
         if(s->getName() == "AdExNeuronStat") {
             AdExNeuronStat *st = dynamic_cast<AdExNeuronStat*>(s);
             if(!st) { ERR("Can't cast"); }
             out["a"] = Rcpp::wrap(st->a);
-        } else 
+        }
         if(s->getName() == "RewardStat") {
             RewardStat *st = dynamic_cast<RewardStat*>(s);
             if(!st) { ERR("Can't cast"); }
             out["r"] = Rcpp::wrap(st->r);
             out["mean_r"] = Rcpp::wrap(st->mean_r);
-        } else            
+        } 
         if(s->getName() == "MaxLikelihoodStat") {
             MaxLikelihoodStat *st = dynamic_cast<MaxLikelihoodStat*>(s);
             if(!st) { ERR("Can't cast"); }
             out["traces"] = Rcpp::wrap(st->eligibility_trace);
-        } else 
+        } 
         if(s->getName() == "StdpStat") {
             StdpStat *st = dynamic_cast<StdpStat*>(s);
             if(!st) { ERR("Can't cast"); }
             out["y_trace"] = Rcpp::wrap(st->y_trace);
             out["x_trace"] = Rcpp::wrap(st->x_trace);
-        } else 
+        }
+        if(s->getName() == "TripleStdpStat") {
+            TripleStdpStat *st = dynamic_cast<TripleStdpStat*>(s);
+            if(!st) { ERR("Can't cast"); }
+            out["r1"] = Rcpp::wrap(st->r1);
+            out["r2"] = Rcpp::wrap(st->r2);
+            out["o1"] = Rcpp::wrap(st->o1);
+            out["o2"] = Rcpp::wrap(st->o2);
+        }
         if(s->getName() == "OptimalStdpStat") {
             OptimalStdpStat *st = dynamic_cast<OptimalStdpStat*>(s);
             if(!st) { ERR("Can't cast"); }
             out["p_acc"] = Rcpp::wrap(st->p_acc);
             out["B"] = Rcpp::wrap(st->B);
             out["C"] = Rcpp::wrap(st->C);
-        } else {
+        } 
+        if(out.size()==0) {
             ERR("Unknown serializable name: " << s->getName() << "\n");
         }
         return out;

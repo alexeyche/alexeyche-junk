@@ -48,17 +48,16 @@ void Neuron::setRewardModulation(RewardModulation *_rmod) {
 
 void Neuron::addSynapse(Synapse *s) {
     syns.resize(syns.size() + 1);
-    addSynapseAtPos(s, syns.size()-1);
+    addSynapseAtAllocatedPos(s, syns.size()-1);
+    if(stat) stat->addSynapse(s);
+    if(lrule) lrule->addSynapse(s);
 }
-void Neuron::addSynapseAtPos(Synapse *s, const size_t &pos_i) {
+
+void Neuron::addSynapseAtAllocatedPos(Synapse *s, const size_t &pos_i) {
     if(pos_i>syns.size()) {
         cerr << "Can't add synapse at that position\n";
         terminate();
     }
-    if(collectStatistics) {
-        stat->addSynapse(s);
-    }
-    if(lrule) lrule->addSynapse(s);
     syns[pos_i] = s;
 }
 
@@ -66,8 +65,10 @@ void Neuron::reset() {
     y = 0.0;
     p = 0.0;
     gr = 0.0;
+    ga = 0.0;
     M = 0.0;
     fired = 0;
+
     for(auto it=syns.begin(); it != syns.end(); ++it) {
         Synapse *s = *it;
         s->reset();
@@ -85,12 +86,18 @@ ProtoPack Neuron::serialize() {
     n_ser->set_axon_delay(axon_delay);
     n_ser->set_id(id);
     n_ser->set_num_of_synapses(syns.size());
+    n_ser->set_ga(ga);
+    n_ser->set_has_learning_rule(false);
+    if(lrule) {
+        n_ser->set_has_learning_rule(true);
+    }
     return ProtoPack({n_ser});
 }
 void Neuron::deserialize() {
     Protos::Neuron *mess = getSerializedMessage();
     id = mess->id();
     axon_delay = mess->axon_delay();
+    ga = mess->ga();
     if(syns.size()>0) {
         syns.clear();
     }
@@ -103,18 +110,21 @@ void Neuron::saveModel(ProtoRw &rw) {
         rw.write(lrule);
     }
     for(size_t syn_i=0; syn_i<syns.size(); syn_i++) {
-    //cout << *syns[syn_i] << "\n";
         rw.write(syns[syn_i]);
     }
 }
 
 void Neuron::loadModel(ProtoRw &rw) {
     rw.readAllocated(this);
-    if(lrule) {
+    if(getSerializedMessage()->has_learning_rule()) {
+        if(!lrule) {
+            cerr << "Trying to deserialize learning rule but it's not pointed in constants file\n";
+            terminate();
+        }
         rw.readAllocated(lrule);
     }
     for(size_t syn_i=0; syn_i<syns.size(); syn_i++) {
-        addSynapseAtPos(rw.read()->castSerializable<Synapse>(), syn_i);
+        addSynapseAtAllocatedPos(rw.read()->castSerializable<Synapse>(), syn_i);
     }
 }
 
@@ -124,7 +134,7 @@ void Neuron::saveStat(SerialPack &p) {
     if(stat) {
         p.push_back(stat);
         if(stat->mode == NeuronStat::Full) {
-            lrule->saveStat(p);
+            if(lrule) lrule->saveStat(p);
         }
     }
 }
@@ -132,7 +142,9 @@ void Neuron::saveStat(SerialPack &p) {
 void Neuron::enableCollectStatistics() {
     collectStatistics = true;
     stat = Factory::inst().registerObj<NeuronStat>(new NeuronStat(this, NeuronStat::Full));
-    lrule->enableCollectStatistics();
+    if(lrule) {
+        lrule->enableCollectStatistics();
+    }
 }
 void Neuron::enableCollectProbStatistics() {
     collectStatistics = true;

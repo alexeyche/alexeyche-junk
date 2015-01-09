@@ -84,8 +84,9 @@ public:
     double y;
     double p;
     double M;
-
+    
     double gr;
+    double ga;
     uchar fired;
 
     double axon_delay;

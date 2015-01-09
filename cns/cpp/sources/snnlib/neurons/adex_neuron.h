@@ -50,14 +50,10 @@ public:
 
     }
     void init(const ConstObj *_c, size_t _local_id, const RuntimeGlobals *_glob_c, double _axon_delay) {
-        Neuron::init(_c, _local_id, _glob_c, _axon_delay);
         Serializable::init(EAdExNeuron);
-        c = castType<AdExNeuronC>(bc);
-
-        a = 0.0;
-        refr = 0.0;
-
         adex_stat = nullptr;
+        Neuron::init(_c, _local_id, _glob_c, _axon_delay);
+        c = castType<AdExNeuronC>(bc);
     }
 
     void enableCollectStatistics() {
@@ -65,8 +61,13 @@ public:
         adex_stat = Factory::inst().registerObj<AdExNeuronStat>(new AdExNeuronStat(this));
     }
     void reset() {
+        Neuron::reset();
+        I = 0.0;
 
+        a = 0.0;
+        refr = 0.0;
     }
+    
     // Runtime
     void propagateSynSpike(const SynSpike *sp) {
         Synapse *s = syns[sp->syn_id];
@@ -78,21 +79,22 @@ public:
         lrule_rt.propagateSynSpike(sp);
     }
 
-    void attachCurrent(const double &I) {
-        y = tc_rt.calculateResponse(I);
+    void attachCurrent(const double &I_attach) {
+        I = tc_rt.calculateResponse(I_attach);
+        //cout << "\t response: " << y << "\n"; 
     }
 
     void calculateProbability() {
         if(refr > 0.000001) {
             refr -= glob_c->Dt();
         } else {
-            double dV = c->u_rest + y;
+            double dV = I - c->gL * ( y - c->EL );
+            I = 0.0;
             for(auto it=active_synapses.begin(); it != active_synapses.end(); ++it) {
                 Synapse *s = syns[*it];
                 dV += s->w * s->x;
-            }
-            dV -= - c->gL * ( y - c->EL );
-            if(c->slope > 0.0) {
+            }            
+            if(fabs(c->slope) > 0.000001) {
                 dV += c->gL * c->slope * exp( (y - c->u_tr)/c->slope );
             }
             double da = c->a * ( y - c->EL ) - a;
@@ -110,13 +112,14 @@ public:
 
 
     void calculateDynamics() {
-        if(p > getUnif()) {
+        double coin = getUnif();
+        if(p > coin) {
+            // cout << "\t\t Neuron " << id << " fired: " << p << " > " << coin << "\n";
             fired = 1;
             y = c->EL;
             a += c->b;
             refr = c->t_ref;
-            p = 0.0;
-            //cout <<"fire\n";
+            p = 0.0;            
         }
         lrule_rt.calculateWeightsDynamics();
 
@@ -167,6 +170,7 @@ public:
 
     double a;
     double refr;
+    double I;
     AdExNeuronStat *adex_stat;
 };
 

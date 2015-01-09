@@ -14,8 +14,8 @@
 
 class Sim: public Serializable<Protos::Sim> {
 public:
-    Sim(Constants &c, size_t _jobs=1);
-    Sim(size_t _jobs=1);
+    Sim(Constants &c, size_t _jobs=1, bool _learning = true);
+    Sim(size_t _jobs=1, bool _learning = true);
     void construct(Constants &c);
 
     #define CHECK_CONSTRUCT() \
@@ -209,6 +209,10 @@ public:
     void runSimOnSubset(size_t left_neuron_id, size_t right_neuron_id, void* (*sim_func)(void* content));
     void precalculateInputSpikes();
     void run();
+    
+    void setLearning(bool l) {
+        learning = l;
+    }
 
     double Tmax;
     double T_limit;
@@ -236,6 +240,7 @@ public:
 
     bool constructed;
     bool wta_regime;
+    bool learning;
     LabeledTimeSeriesList input_ts_list;
 
     PatternsTimeline ptl;

@@ -10,6 +10,7 @@
 #include <snnlib/weight_normalizations/nonlinear_min_max.h>
 #include <snnlib/weight_normalizations/mean_activity_homeostasis.h>
 #include <snnlib/learning/stdp.h>
+#include <snnlib/learning/triple_stdp.h>
 #include <snnlib/reinforcement/likelihood.h>
 #include <snnlib/reinforcement/input_classification.h>
 #include <snnlib/act_funcs/determ.h>
@@ -48,6 +49,8 @@ Factory::Factory() {
     const_map["SoftMinMax"]  =  &createConstInstance<Obj, SoftMinMaxC>;
     const_map["NonlinearMinMax"]  =  &createConstInstance<Obj, NonlinearMinMaxC>;
     const_map["Stdp"]  =  &createConstInstance<Obj, StdpC>;
+    const_map["TripleStdp"]  =  &createConstInstance<Obj, TripleStdpC>;
+    const_map["TripleStdpMin"]  =  &createConstInstance<Obj, TripleStdpC>;
 
     entity_map["SRMNeuron"]     =   &createInstance<Obj, SRMNeuron>;
     entity_map["AdExNeuron"]     =   &createInstance<Obj, AdExNeuron>;
@@ -64,6 +67,8 @@ Factory::Factory() {
     entity_map["SoftMinMax"]  =  &createInstance<Obj, SoftMinMax>;
     entity_map["NonlinearMinMax"]  =  &createInstance<Obj, NonlinearMinMax>;
     entity_map["Stdp"]  =  &createInstance<Obj, Stdp>;
+    entity_map["TripleStdp"]  =  &createInstance<Obj, TripleStdp>;    
+    entity_map["TripleStdpMin"]  =  &createInstance<Obj, TripleStdp>;    
 
 }
 
@@ -134,6 +139,12 @@ SerializableBase* Factory::createSerializable(const string &name) {
     } else
     if(name == "Stdp") {
         s = new Stdp();
+    } else
+    if(name == "TripleStdp") {
+        s = new TripleStdp();
+    } else
+    if(name == "TripleStdpStat") {
+        s = new TripleStdpStat();
     } else
     if(name == "StdpStat") {
         s = new StdpStat();
@@ -219,9 +230,9 @@ Neuron *Factory::createNeuron(string name, size_t local_id, const Constants &c, 
     return o;
 }
 
-Layer *Factory::createLayer(size_t size, bool wta, const NeuronConf &nc, const Constants &c, RuntimeGlobals *run_glob_c) {
+Layer *Factory::createLayer(size_t size, bool wta, const NeuronConf &nc, const Constants &c, RuntimeGlobals *run_glob_c, bool learning = true) {
     Layer *o = new Layer();
-    o->init(size, wta, nc, c, run_glob_c);
+    o->init(size, wta, nc, c, run_glob_c, learning); 
     objects.push_back(o);
     return o;
 }
