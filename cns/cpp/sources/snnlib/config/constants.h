@@ -330,6 +330,26 @@ public:
     }
 };
 
+
+class ActivityDependentSlideC: public ConstObj {
+public:
+    ActivityDependentSlideC(string name) : ConstObj(name) {}
+    double target_rate;
+    double __target_rate_cube;
+
+    double tau_mean;
+    
+    void fill_structure(JsonBox::Value v) {
+        target_rate         = v["target_rate"].getDouble();
+        tau_mean         = v["tau_mean"].getDouble();
+        __target_rate_cube = (target_rate/1000.0) * (target_rate/1000.0) * (target_rate/1000.0);
+    }
+    void print(std::ostream &str) const {
+        str << "target_rate: " << target_rate << ", tau_mean: " << tau_mean << "\n";
+    }
+};
+
+
 class MinMaxC: public ConstObj {
 public:
     MinMaxC(string name) : ConstObj(name) {}

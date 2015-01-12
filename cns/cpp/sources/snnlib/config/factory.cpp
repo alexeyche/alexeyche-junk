@@ -9,6 +9,8 @@
 #include <snnlib/weight_normalizations/soft_min_max.h>
 #include <snnlib/weight_normalizations/nonlinear_min_max.h>
 #include <snnlib/weight_normalizations/mean_activity_homeostasis.h>
+#include <snnlib/weight_normalizations/activity_dependent_slide.h>
+
 #include <snnlib/learning/stdp.h>
 #include <snnlib/learning/triple_stdp.h>
 #include <snnlib/reinforcement/likelihood.h>
@@ -51,6 +53,7 @@ Factory::Factory() {
     const_map["Stdp"]  =  &createConstInstance<Obj, StdpC>;
     const_map["TripleStdp"]  =  &createConstInstance<Obj, TripleStdpC>;
     const_map["TripleStdpMin"]  =  &createConstInstance<Obj, TripleStdpC>;
+    const_map["ActivityDependentSlide"]  =  &createConstInstance<Obj, ActivityDependentSlideC>;
 
     entity_map["SRMNeuron"]     =   &createInstance<Obj, SRMNeuron>;
     entity_map["AdExNeuron"]     =   &createInstance<Obj, AdExNeuron>;
@@ -69,6 +72,7 @@ Factory::Factory() {
     entity_map["Stdp"]  =  &createInstance<Obj, Stdp>;
     entity_map["TripleStdp"]  =  &createInstance<Obj, TripleStdp>;    
     entity_map["TripleStdpMin"]  =  &createInstance<Obj, TripleStdp>;    
+    entity_map["ActivityDependentSlide"]  =  &createInstance<Obj, ActivityDependentSlide>;    
 
 }
 
@@ -140,6 +144,9 @@ SerializableBase* Factory::createSerializable(const string &name) {
     if(name == "Stdp") {
         s = new Stdp();
     } else
+    if(name == "ActivityDependentSlide") {
+        s = new ActivityDependentSlide();
+    } else
     if(name == "TripleStdp") {
         s = new TripleStdp();
     } else
@@ -151,6 +158,18 @@ SerializableBase* Factory::createSerializable(const string &name) {
     } else
     if(name == "OptimalStdpStat") {
         s = new OptimalStdpStat();
+    } else
+    if(name == "MinMax") {
+        s = new MinMax();
+    } else
+    if(name == "SoftMinMax") {
+        s = new SoftMinMax();
+    } else
+    if(name == "NonlinearMinMax") {
+        s = new NonlinearMinMax();
+    } else
+    if(name == "MeanActivityHomeostasis") {
+        s = new MeanActivityHomeostasis();
     } else
     if(name == "LabeledTimeSeriesList") {
         s = new LabeledTimeSeriesList();

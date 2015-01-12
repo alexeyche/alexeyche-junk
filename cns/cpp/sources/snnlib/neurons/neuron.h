@@ -58,7 +58,7 @@ public:
         return glob_c->getReward(id);
     }
     void addSynapse(Synapse *s);
-    void addSynapseAtPos(Synapse *s, const size_t &pos_i);
+    void addSynapseAtAllocatedPos(Synapse *s, const size_t &pos_i);
     // runtime
     virtual void calculateProbability() = 0;
     virtual void calculateDynamics() = 0;

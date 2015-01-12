@@ -77,6 +77,10 @@
             "gamma" : 0.1,
             "scaling_factor" : 1
         },
+        "ActivityDependentSlide" : {
+            "target_rate" : 10,
+            "tau_mean" : 60000
+        }, 
         "MinMax" : {     // http://www.scholarpedia.org/article/Spike-timing_dependent_plasticity
             "w_max" : 6,
             "nu_plus" : 0.01,
@@ -124,9 +128,9 @@
             "tau_plus" : 16.8, // ms
             "tau_minus" : 33.7, // ms
             "tau_y" : 114, // ms
-            "a3_plus" : 0.65,
-            "a2_minus" : 0.28,
-            "learning_rate" : 2
+            "a3_plus" : 0.2456, // tau_minus * a2_minus / ( target_rate * tau_plus * tau_y )
+            "a2_minus" : 1.0, // 
+            "learning_rate" : 0.1
         },
         "MaxLikelihood" : {
             "tau_el" : 100,
@@ -159,8 +163,8 @@
                 "wta" : false,
                 "neuron_conf" : {
                     "neuron" : "SRMNeuron",
-                    "learning_rule" : "TripleStdpMin",
-                    "weight_normalization" : "MinMax",
+                    "learning_rule" : "Stdp",
+                    "weight_normalization" : "ActivityDependentSlide",
                     "act_func" : "ExpHennequin",
                     "axon_delay_distr" : "Exp(0,0)"
                 }
@@ -179,21 +183,11 @@
         ],
         "conn_map" : {
             "0->1" : [
-                { "prob" : 1.0, "weight_distr" : "Norm(2.6, 0.25)", "type" : "Synapse", "dendrite_delay_distr" : "Exp(0,0)" }
+                { "prob" : 0.5, "weight_distr" : "Norm(2.6, 0.25)", "type" : "Synapse", "dendrite_delay_distr" : "Exp(0,0)" }
+            ],
+            "1->1" : [
+                { "prob" : 0.1, "weight_distr" : "Norm(2.6, 0.25)", "type" : "Synapse_Inh", "dendrite_delay_distr" : "Exp(0,0)" }
             ]
-//            ],
-//            "0->2" : [
-//                { "prob" : 1.0, "weight_distr" : "Norm(2.1, 0.25)", "type" : "Synapse", "dendrite_delay_distr" : "Exp(0,0)" }
-//            ],
-//            "1->2" : [
-//                { "prob" : 1.0, "weight_distr" : "Norm(2.1, 0.25)", "type" : "Synapse_Inh", "dendrite_delay_distr" : "Exp(0,0)" }
-//            ],
-//            "2->1" : [
-//                { "prob" : 1.0, "weight_distr" : "Norm(1.1, 0.25)", "type" : "Synapse", "dendrite_delay_distr" : "Exp(0,0)" }
-//            ],
-//            "2->2" : [
-//                { "prob" : 0.1, "weight_distr" : "Norm(1.0, 0.25)", "type" : "Synapse", "dendrite_delay_distr" : "Exp(0,0)" }
-//            ]
         },
         "reinforce_map" : {
 //            "1 -> 1" : {

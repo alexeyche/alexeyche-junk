@@ -41,9 +41,10 @@ public:
 
     WeightNormalizationRuntime wnorm_rt;
     ActFuncRuntime act_rt;
+    WeightNormalization *wnorm;
 protected:
 	Neuron *n;
-    WeightNormalization *wnorm;
+
 
 	bool collectStatistics;
 };

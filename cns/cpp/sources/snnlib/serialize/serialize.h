@@ -40,7 +40,8 @@ enum ESerializableClass {
                             EPatternsTimeline,
                             EDoubleMatrix,
                             ETripleStdp,
-                            ETripleStdpStat
+                            ETripleStdpStat,
+                            EActivityDependentSlide
                         };
 
 static const char* ESerializableClass_str[] =
@@ -76,7 +77,8 @@ static const char* ESerializableClass_str[] =
                                                 "PatternsTimeline",
                                                 "DoubleMatrix",
                                                 "TripleStdp",
-                                                "TripleStdpStat"
+                                                "TripleStdpStat",
+                                                "ActivityDependentSlide"
                                             };
 
 

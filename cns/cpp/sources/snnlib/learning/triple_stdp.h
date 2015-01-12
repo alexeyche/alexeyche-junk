@@ -229,6 +229,7 @@ public:
                 it++;
             }
         }
+
         if(n->fired) {
             o2 += 1;
         }
@@ -261,9 +262,7 @@ public:
         }
         for(size_t ri=0; ri < mess->r1_size(); ri++) {
             r1.push_back(mess->r1(ri));
-        }
-        for(size_t ri=0; ri < mess->r2_size(); ri++) {
-            r2.push_back(mess->r2(ri));
+            if(ri < mess->r2_size()) r2.push_back(mess->r2(ri));
         }
     }
     ProtoPack serialize() {

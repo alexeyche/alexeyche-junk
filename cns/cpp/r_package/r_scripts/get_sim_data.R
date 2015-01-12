@@ -78,7 +78,7 @@ if(file.exists(model_file)) {
 if( (file.exists(stat_file))&&(file.info(stat_file)$size>0)) {
     stat = RProto$new(stat_file)$read()
     source('plot_stat.R')
-    plot_stat(stat, c, net, model, 1, 51, 1:1000)
+    plot_stat(stat, c, net, model, 1, 75, 1:1000)
 
 }
 p_stat_eval = TRUE
