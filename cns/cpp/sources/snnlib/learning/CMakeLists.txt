@@ -17,6 +17,7 @@ set(SOURCES
     optimal_stdp.cpp
     stdp.cpp
     triple_stdp.cpp
+    bcm_rule.cpp
 )
 
 # add directory name to sources

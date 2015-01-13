@@ -76,7 +76,7 @@ public:
     void connect(Layer &l_post, const ConnectionConf &conf, const Constants &c) {
         for(size_t ni=0; ni<neurons.size(); ni++) {
             for(size_t nj=0; nj<l_post.N; nj++) {
-                if (neurons[ni]->id != l_post[nj]->id) { //&& (!l_post[nj]->hasConnection(neurons[ni]->id)) ) {
+                if ((neurons[ni]->id != l_post[nj]->id) && (!l_post[nj]->hasConnection(neurons[ni]->id)) ) {
                     double prob = getUnif();
                     if( conf.prob > prob ) {
                         double dendrite_delay = conf.dendrite_delay_distr->getSample();

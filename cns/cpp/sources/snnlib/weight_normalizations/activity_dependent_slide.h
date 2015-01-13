@@ -27,7 +27,7 @@ public:
     void modifyWeightDerivative(double &dw, const size_t &syn_id) {
         if(n->glob_c->getSimTime() < c->tau_mean) dw = 0.0;
     }
-    double ltdMod(const double &w) { 
+    double ltdMod(const double &w) {
         return __p_acc_cube / c->__target_rate_cube;
     }
     void provideRuntime(WeightNormalizationRuntime &rt, Mode m) {

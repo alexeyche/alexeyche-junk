@@ -1,6 +1,6 @@
 {
     "language"        : "PYTHON",
-    "main-file"       : "unsup_snn",
+    "main-file"       : "optimal_stdp",
     "experiment-name" : "unsupervised_clustering",
     "variables": {
         "weight_decay": {
@@ -23,7 +23,7 @@
         }
     },
     "tasks": {
-      "cluster_criterion" : {
+      "eval_clustering_p_stat" : {
           "type"        : "OBJECTIVE",
           "likelihood"  : "GAUSSIAN"
       }

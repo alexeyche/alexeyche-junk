@@ -203,7 +203,11 @@ def main(args):
 
 
 class RunSimArgs(object):
+    def setEvalCriterion(self, criterion_name):
+        self.__dict__[criterion_name] = True
+
     input = None
+    spikes = None
     epochs = 1
     eval_clustering_p_stat = False
     const = os.path.join(os.path.dirname(this_file), "../", CONST_JSON)
@@ -216,7 +220,6 @@ class RunSimArgs(object):
     verbose = True
     old_dir = False
     p_stat = None
-    spikes = None
     runs_dir = RUNS_DIR
     collect_statistics = None
 

@@ -82,17 +82,17 @@
             "tau_mean" : 60000
         }, 
         "MinMax" : {     // http://www.scholarpedia.org/article/Spike-timing_dependent_plasticity
-            "w_max" : 6,
+            "w_max" : 15,
             "nu_plus" : 0.01,
             "nu_minus" : 0.01
         },
         "SoftMinMax" : {  // http://www.scholarpedia.org/article/Spike-timing_dependent_plasticity
-            "w_max" : 4,
+            "w_max" : 10,
             "nu_plus" : 0.1,
             "nu_minus" : 0.1
         },
         "NonlinearMinMax" : {  // Gutig et al. 2003. "Learning Input Correlations through Nonlinear Temporally Asymmetric Hebbian Plasticity"
-            "w_max" : 5,
+            "w_max" : 10,
             "mu" : 0.5,
             "depression_factor" : 1.0
         }
@@ -103,15 +103,21 @@
             "tau_mean" : 60000,
             "target_rate" : 10,
             "target_rate_factor" : 1,
-            "weight_decay" : 0.1,
-            "learning_rate" : 0.01
+            "weight_decay" : 0.01,
+            "learning_rate" : 0.1
+        },
+        "BCMRule" : {
+            "tau_x" : 100,
+            "tau_y" : 100,
+            "tau_mean" : 10000,
+            "learning_rate" : 0.001
         },
         "Stdp" : {
             "tau_plus" : 30.0, // ms
             "tau_minus" : 50.0, // ms
             "a_plus" : 1.0,
-            "a_minus" : 2.25,
-            "learning_rate" : 0.1
+            "a_minus" : 1.5,
+            "learning_rate" : 0.05
         },
         "TripleStdp" : {
             "tau_plus" : 16.8, // ms
@@ -164,30 +170,20 @@
                 "neuron_conf" : {
                     "neuron" : "SRMNeuron",
                     "learning_rule" : "Stdp",
-                    "weight_normalization" : "ActivityDependentSlide",
+                    "weight_normalization" : "NonlinearMinMax",
                     "act_func" : "ExpHennequin",
                     "axon_delay_distr" : "Exp(0,0)"
                 }
             }
-//            {
-//                "size" : 100,
-//                "wta" : false,
-//                "neuron_conf" : {
-//                    "neuron" : "SRMNeuron",
-//                    "learning_rule" : "OptimalStdp_L2",
-//                    "weight_normalization" : "MinMax",
-//                    "act_func" : "ExpHennequin",
-//                    "axon_delay_distr" : "Exp(0,0)"
-//                }
-//            }
         ],
         "conn_map" : {
             "0->1" : [
-                { "prob" : 0.5, "weight_distr" : "Norm(2.6, 0.25)", "type" : "Synapse", "dendrite_delay_distr" : "Exp(0,0)" }
-            ],
-            "1->1" : [
-                { "prob" : 0.1, "weight_distr" : "Norm(2.6, 0.25)", "type" : "Synapse_Inh", "dendrite_delay_distr" : "Exp(0,0)" }
+                { "prob" : 1.0, "weight_distr" : "Norm(4.6, 0.25)", "type" : "Synapse", "dendrite_delay_distr" : "Exp(0,0)" }
             ]
+//            "1->1" : [
+//                { "prob" : 0.05, "weight_distr" : "Norm(4.6, 0.25)", "type" : "Synapse", "dendrite_delay_distr" : "Exp(0,0)" },
+//                { "prob" : 0.05, "weight_distr" : "Norm(4.6, 0.25)", "type" : "Synapse_Inh", "dendrite_delay_distr" : "Exp(0,0)" }
+//            ]
         },
         "reinforce_map" : {
 //            "1 -> 1" : {

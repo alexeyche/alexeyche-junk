@@ -23,16 +23,16 @@ public:
         if( fabs(s->x) < SYN_ACT_TOL ) {
             active_synapses.push_back(sp->syn_id);
         }
-        //cout << "Propagating syns " << sp.syn_id << " (" << syns.size() << ")\n";
+        //cout << "Propagating syns " << sp->syn_id << " (" << syns.size() << ")\n";
         s->x += s->c->amp;
         s->fired = 1;
         lrule_rt.propagateSynSpike(sp);
     }
-    
+
     void attachCurrent(const double &I) {
         y = tc_rt.calculateResponse(I);
     }
-    
+
     void calculateProbability() {
         y = 0.0;
         for(auto it=active_synapses.begin(); it != active_synapses.end(); ++it) {

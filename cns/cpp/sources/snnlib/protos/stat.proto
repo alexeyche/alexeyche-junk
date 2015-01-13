@@ -26,6 +26,16 @@ message OptimalStdpStat {
     repeated double p_acc = 4;
 }
 
+message BCMRuleStat {
+    message XStat {
+        repeated double x = 1 [packed=true];
+    }
+    repeated double y = 2 [packed=true];
+    repeated XStat x_vals = 3;
+    repeated double p_acc = 4;
+}
+
+
 message RewardStat {
     repeated double r = 1;
     repeated double mean_r = 2;

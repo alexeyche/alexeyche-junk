@@ -5,6 +5,7 @@
 #include <snnlib/config/constants.h>
 #include <snnlib/learning/optimal_stdp.h>
 #include <snnlib/learning/max_likelihood.h>
+#include <snnlib/learning/bcm_rule.h>
 #include <snnlib/weight_normalizations/min_max.h>
 #include <snnlib/weight_normalizations/soft_min_max.h>
 #include <snnlib/weight_normalizations/nonlinear_min_max.h>
@@ -54,6 +55,7 @@ Factory::Factory() {
     const_map["TripleStdp"]  =  &createConstInstance<Obj, TripleStdpC>;
     const_map["TripleStdpMin"]  =  &createConstInstance<Obj, TripleStdpC>;
     const_map["ActivityDependentSlide"]  =  &createConstInstance<Obj, ActivityDependentSlideC>;
+    const_map["BCMRule"]  =  &createConstInstance<Obj, BCMRuleC>;
 
     entity_map["SRMNeuron"]     =   &createInstance<Obj, SRMNeuron>;
     entity_map["AdExNeuron"]     =   &createInstance<Obj, AdExNeuron>;
@@ -70,9 +72,10 @@ Factory::Factory() {
     entity_map["SoftMinMax"]  =  &createInstance<Obj, SoftMinMax>;
     entity_map["NonlinearMinMax"]  =  &createInstance<Obj, NonlinearMinMax>;
     entity_map["Stdp"]  =  &createInstance<Obj, Stdp>;
-    entity_map["TripleStdp"]  =  &createInstance<Obj, TripleStdp>;    
-    entity_map["TripleStdpMin"]  =  &createInstance<Obj, TripleStdp>;    
-    entity_map["ActivityDependentSlide"]  =  &createInstance<Obj, ActivityDependentSlide>;    
+    entity_map["TripleStdp"]  =  &createInstance<Obj, TripleStdp>;
+    entity_map["TripleStdpMin"]  =  &createInstance<Obj, TripleStdp>;
+    entity_map["ActivityDependentSlide"]  =  &createInstance<Obj, ActivityDependentSlide>;
+    entity_map["BCMRule"]  =  &createInstance<Obj, BCMRule>;
 
 }
 
@@ -165,6 +168,12 @@ SerializableBase* Factory::createSerializable(const string &name) {
     if(name == "SoftMinMax") {
         s = new SoftMinMax();
     } else
+    if(name == "BCMRule") {
+        s = new BCMRule();
+    } else
+    if(name == "BCMRuleStat") {
+        s = new BCMRuleStat();
+    } else
     if(name == "NonlinearMinMax") {
         s = new NonlinearMinMax();
     } else
@@ -251,7 +260,7 @@ Neuron *Factory::createNeuron(string name, size_t local_id, const Constants &c, 
 
 Layer *Factory::createLayer(size_t size, bool wta, const NeuronConf &nc, const Constants &c, RuntimeGlobals *run_glob_c, bool learning = true) {
     Layer *o = new Layer();
-    o->init(size, wta, nc, c, run_glob_c, learning); 
+    o->init(size, wta, nc, c, run_glob_c, learning);
     objects.push_back(o);
     return o;
 }

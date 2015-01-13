@@ -209,6 +209,30 @@ public:
     }
 };
 
+class BCMRuleC: public ConstObj {
+public:
+    BCMRuleC(string name) : ConstObj(name) {}
+    double tau_y;
+    double tau_x;
+    double tau_mean;
+    double learning_rate;
+
+    void fill_structure(JsonBox::Value v) {
+        tau_x               = v["tau_x"].getDouble();
+        tau_y               = v["tau_y"].getDouble();
+        tau_mean          = v["tau_mean"].getDouble();
+        learning_rate               = v["learning_rate"].getDouble();
+    }
+    void print(std::ostream &str) const {
+        str <<
+        "tau_x: " << tau_x << ", " <<
+        "tau_y: " << tau_y << ", " <<
+        "tau_mean: " << tau_mean << ", " <<
+        "learning_rate: " << learning_rate << "\n";
+    }
+};
+
+
 class MaxLikelihoodC: public ConstObj {
 public:
     MaxLikelihoodC(string name) : ConstObj(name) {}
@@ -338,7 +362,7 @@ public:
     double __target_rate_cube;
 
     double tau_mean;
-    
+
     void fill_structure(JsonBox::Value v) {
         target_rate         = v["target_rate"].getDouble();
         tau_mean         = v["tau_mean"].getDouble();
@@ -670,14 +694,14 @@ public:
         Serializable::init(EConstants);
         if(m == FromFile) {
         	json_content = preprocessAndReadConstJson(source);
-        } else 
+        } else
         if(m == FromString) {
         	json_content = source;
         }
         constGlobalInstance = this;
         parse();
     }
-    
+
     void parse();
     static string preprocessAndReadConstJson(string filename);
 

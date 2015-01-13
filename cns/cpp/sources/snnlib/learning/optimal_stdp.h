@@ -99,6 +99,8 @@ public:
         } else {
             WeightNormalization::provideDefaultRuntime(wnorm_rt);
         }
+        C.resize(n->syns.size());
+        fill(C.begin(), C.end(), 0.0);
 
         Serializable::init(EOptimalStdp);
         reset();
@@ -143,8 +145,8 @@ public:
                 Synapse *syn = n->syns[*it];
 
                 C[*it] += - C[*it]/c->tau_c + SRMMethods::dLLH_dw(n, syn);
-                double dw = c->learning_rate * ( C[*it] * B * wnorm_rt.ltpMod(syn->w) - wnorm_rt.ltdMod(syn->w) );
-                //double dw = c->learning_rate * ( C[*it]*B - c->weight_decay * syn->fired * syn->w);
+                double dw = c->learning_rate * ( C[*it]*B * wnorm_rt.ltpMod(syn->w) - c->weight_decay * syn->fired * syn->w);
+                //double dw = c->learning_rate * ( C[*it]*B * wnorm_rt.ltpMod(syn->w) - c->weight_decay * syn->fired * syn->w * wnorm_rt.ltdMod(syn->w));
                 //cout << c->weight_decay << "*" << syn->fired << "*" << syn->w << " == " << c->weight_decay * syn->fired * syn->w << "\n";
                 wnorm_rt.modifyWeightDerivative(dw, *it);
                 syn->w += dw;
@@ -180,6 +182,14 @@ public:
     void deserialize() {
         Protos::OptimalStdp *mess = getSerializedMessage<Protos::OptimalStdp>();
         p_acc = mess->p_acc();
+
+        C.clear();
+        if(stat) stat->C.clear();
+
+        for(auto it=n->syns.begin(); it != n->syns.end(); ++it) {
+            addSynapse(*it);
+        }
+        reset();
     }
     ProtoPack serialize() {
         Protos::OptimalStdp *mess = getNewMessage<Protos::OptimalStdp>();

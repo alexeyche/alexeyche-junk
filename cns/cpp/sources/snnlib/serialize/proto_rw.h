@@ -121,7 +121,7 @@ public:
 
     void write(SerializableBase *mess) {
         CHECK_MODE(Write);
-        writeProtoPack(mess->getName(), mess->serialize());
+        writeProtoPack(mess->serialize(), mess->getName());
     }
 
     template <typename T>
@@ -143,7 +143,7 @@ public:
         }
         return v;
     }
-    void writeProtoPack(const string &name, const ProtoPack &pack) {
+    void writeProtoPack(const ProtoPack &pack, const string &name) {
         Protos::Class cl;
         cl.set_instance_class_name(name);
         writeMessage(&cl);

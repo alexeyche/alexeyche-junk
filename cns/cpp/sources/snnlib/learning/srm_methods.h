@@ -25,6 +25,6 @@ private:
 		return fired*log(p) + (1 - fired) * log(1-p);
 	}
 	static inline double dLLH_dw_formula(const double &p, const double &p_stroke, const double &M, const double &fired, const double &x) {
-		return (p_stroke/(p/M)) * (fired - p) * x;
+		return (p_stroke/(p/M)) * (fired - p) * fabs(x);
 	}
 };

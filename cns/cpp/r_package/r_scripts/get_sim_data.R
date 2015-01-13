@@ -7,7 +7,7 @@ setwd("~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts")
 
 rundir="/home/alexeyche/prog/newsim/runs"
 #rundir="/home/kayla/alexeyche/sim/runs"
-#rundir="/home/alexeyche/prog/sim_spear"
+rundir="/home/alexeyche/prog/sim_spear/eval_clustering_p_stat_optimal_stdp"
 runname = system(sprintf("ls -t %s | sed -ne '1p'", rundir),intern=TRUE)
 #runname = "17"
 workdir=sprintf("%s/%s", rundir, runname)
@@ -55,8 +55,8 @@ if(measure_corr) {
 
 
 
-Ti=0
-Trange=1224
+Ti=16
+Trange=500
 p1 = prast(net,T0=Ti*Trange,Tmax=(Ti+1)*Trange)
 
 if(file.exists(model_file)) {
@@ -78,7 +78,7 @@ if(file.exists(model_file)) {
 if( (file.exists(stat_file))&&(file.info(stat_file)$size>0)) {
     stat = RProto$new(stat_file)$read()
     source('plot_stat.R')
-    plot_stat(stat, c, net, model, 1, 75, 1:1000)
+    plot_stat(stat, c, net, model, 2, 50, 1:1000)
 
 }
 p_stat_eval = TRUE
@@ -86,6 +86,6 @@ if(p_stat_eval) {
     if( (file.exists(proc_out_json))&&(file.info(proc_out_json)$size>0)) {
         setwd("~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts")
         source('../../scripts/eval_dist_matrix.R')
-        calculate_criterion(proc_out_json)
+        #calculate_criterion(proc_out_json)
     }
 }

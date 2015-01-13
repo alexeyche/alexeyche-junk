@@ -11,6 +11,7 @@
 #include <snnlib/neurons/adex_neuron.h>
 #include <snnlib/learning/max_likelihood.h>
 #include <snnlib/learning/optimal_stdp.h>
+#include <snnlib/learning/bcm_rule.h>
 #include <snnlib/learning/triple_stdp.h>
 #include <snnlib/learning/stdp.h>
 
@@ -120,16 +121,28 @@ public:
             }
             double Tmax = timeline[timeline.size()-1];
             ptl->set_tmax(Tmax);
+            Rcpp::NumericVector dt = list["dt"];
+            if(dt.size() != 1) {
+                ERR("dt must be numeric vector with size 1")
+            }
+            ptl->set_dt(dt[0]);
+            Rcpp::NumericVector gap_between_patterns = list["gap_between_patterns"];
+            if(gap_between_patterns.size() != 1) {
+                ERR("gap_between_patterns must be numeric vector with size 1")
+            }
+
+            ptl->set_gap_between_patterns(gap_between_patterns[0]);
+
             lsl_mess->set_allocated_ptl(ptl);
             return ProtoPack({lsl_mess});
         } else {
             ERR("Can't recognize serializable name: " << message_name << "\n");
         }
     }
-    void write(const string &message_name, const Rcpp::List &list) {
+    void write(const Rcpp::List &list, const string &message_name) {
         ProtoRw rw(protofile, ProtoRw::Write);
         ProtoPack p = listToProtobuf(list, message_name);
-        rw.writeProtoPack(message_name, p);
+        rw.writeProtoPack(p, message_name);
     }
     static Rcpp::List readModel(Sim *s) {
         size_t total_size = s->input_neurons_count + s->net_neurons_count;
@@ -231,6 +244,13 @@ public:
             out["p_acc"] = Rcpp::wrap(st->p_acc);
             out["B"] = Rcpp::wrap(st->B);
             out["C"] = Rcpp::wrap(st->C);
+        } 
+        if(s->getName() == "BCMRuleStat") {
+            BCMRuleStat *st = dynamic_cast<BCMRuleStat*>(s);
+            if(!st) { ERR("Can't cast"); }
+            out["p_acc"] = Rcpp::wrap(st->p_acc);
+            out["y"] = Rcpp::wrap(st->y);
+            out["x"] = Rcpp::wrap(st->x);
         } 
         if(out.size()==0) {
             ERR("Unknown serializable name: " << s->getName() << "\n");

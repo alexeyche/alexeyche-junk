@@ -109,6 +109,18 @@ plot_stat = function(stat, cr, net, model, neuron_to_read =2, syn_id=58, t_plot=
         plot(stdp[["y_trace"]][t_plot], type="l")
         plot(stdp[["x_trace"]][[syn_id]][t_plot], type="l")
     }
+    bcm_stat_id = grep("^BCMRuleStat", names(stat)) 
+    if(length(bcm_stat_id)>0) {
+        id = bcm_stat_id[neuron_to_read]
+        bcm = stat[[id]]
+        
+        par(mfrow=c(4,1))
+        
+        plot(nst[["w"]][[syn_id]][t_plot], type="l")            
+        plot(bcm[["p_acc"]][t_plot], type="l")
+        plot(bcm[["y"]][t_plot], type="l")
+        plot(bcm[["x"]][[syn_id]][t_plot], type="l")        
+    }
     tr_stdp_stat_id = grep("^TripleStdpStat", names(stat)) 
     if(length(tr_stdp_stat_id)>0) {
         id = tr_stdp_stat_id[neuron_to_read]

@@ -106,17 +106,22 @@ void Neuron::deserialize() {
 
 void Neuron::saveModel(ProtoRw &rw) {
     rw.write(this);
+    for(size_t syn_i=0; syn_i<syns.size(); syn_i++) {
+        rw.write(syns[syn_i]);
+    }
     if(lrule) {
         rw.write(lrule);
         if(lrule->wnorm) rw.write(lrule->wnorm);
     }
-    for(size_t syn_i=0; syn_i<syns.size(); syn_i++) {
-        rw.write(syns[syn_i]);
-    }
+
 }
 
 void Neuron::loadModel(ProtoRw &rw) {
     rw.readAllocated(this);
+    for(size_t syn_i=0; syn_i<syns.size(); syn_i++) {
+        addSynapseAtAllocatedPos(rw.read()->castSerializable<Synapse>(), syn_i);
+    }
+
     if(getSerializedMessage()->has_learning_rule()) {
         if(!lrule) {
             cerr << "Trying to deserialize learning rule but it's not pointed in constants file\n";
@@ -124,9 +129,6 @@ void Neuron::loadModel(ProtoRw &rw) {
         }
         rw.readAllocated(lrule);
         if(lrule->wnorm) rw.readAllocated(lrule->wnorm);
-    }
-    for(size_t syn_i=0; syn_i<syns.size(); syn_i++) {
-        addSynapseAtAllocatedPos(rw.read()->castSerializable<Synapse>(), syn_i);
     }
 }
 

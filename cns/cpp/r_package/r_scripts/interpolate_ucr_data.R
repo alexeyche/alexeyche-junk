@@ -6,7 +6,7 @@ source('./interpolate_ts.R')
 
 ts_dir = '~/prog/sim/ts'
 
-sample_size = 512
+sample_size = 120
 
 data = synth # synthetic control
 #data = starlight_curves
@@ -32,6 +32,7 @@ if(!file.exists(train_fname)) {
     }
     for(i in 1:length(test_dataset)) {
         inter_ts = interpolate_ts(test_dataset[[i]]$data, sample_size)
+        inter_ts = normalize(inter_ts, min_val, max_val)
         test_dataset_inter[i, ] = c(test_dataset[[i]]$label,inter_ts)
     }
     write.table(train_dataset_inter,file=train_fname,sep=" ", col.names = F, row.names = F, append=F)
