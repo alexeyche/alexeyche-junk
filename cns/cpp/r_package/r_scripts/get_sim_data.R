@@ -7,7 +7,8 @@ setwd("~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts")
 
 rundir="/home/alexeyche/prog/newsim/runs"
 #rundir="/home/kayla/alexeyche/sim/runs"
-rundir="/home/alexeyche/prog/sim_spear/eval_clustering_p_stat_optimal_stdp"
+#rundir="/home/alexeyche/prog/sim_spear/eval_clustering_p_stat_optimal_stdp"
+#rundir="/home/alexeyche/prog/sim_spear/eval_clustering_p_stat_stdp"
 runname = system(sprintf("ls -t %s | sed -ne '1p'", rundir),intern=TRUE)
 #runname = "17"
 workdir=sprintf("%s/%s", rundir, runname)
@@ -16,13 +17,13 @@ for(ep in 1:1000) {
     if(!file.exists(output_spikes)) { ep=ep-1; break }
 }
 
-#ep = 12
+ep = 1
 ep_str="0_"
 if(ep>0) {
     ep_str = sprintf("%d_",ep)
 }
 
-
+#output_spikes = sprintf("%s/%stune_weights_output_spikes.pb", workdir, ep_str)
 output_spikes = sprintf("%s/%soutput_spikes.pb", workdir, ep_str)
 input_spikes = sprintf("%s/input_spikes.pb", workdir)
 stat_file = sprintf("%s/%sstat.pb", workdir, ep_str)

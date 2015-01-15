@@ -19,13 +19,29 @@ def clean_from_comments(f):
             f_ptr.write(l_mod + "\n")
 
 def set_value_in_nested_dict(d, path, value):
-    if len(path) == 1:
-        d[path[0]] = value[0]
-    else:
-        if not type(d[path[0]]) is collections.OrderedDict and not type(d[path[0]]) is dict:
+    print path
+    if len(path) > 1:
+        if not (type(d[path[0]]) is dict or type(d[path[0]]) is collections.OrderedDict or type(d[path[0]]) is list):
             raise Exception("Unexpected key value: %s" % d[path[0]])
         set_value_in_nested_dict(d[path[0]], path[1:], value)
+        return
+    d[path[0]] = value[0]
 
+def binary_search(a, x, d, lo=0, hi=None, fun = lambda val : val):
+    if hi is None:
+        hi = len(a)
+    while lo < hi:
+        mid = (lo+hi)//2
+        midval = fun(a[mid])
+        diff = midval - x
+        if abs(diff) > d:
+            if diff<0:
+                lo = mid+1
+            else:
+                hi = mid
+        else:
+            return mid
+    return -1
 
 def evaluate(job_id, params, config):
     run_sim_args = run_sim.RunSimArgs()
@@ -52,7 +68,7 @@ def evaluate(job_id, params, config):
 
     j = json.loads(open(const_json).read(), object_pairs_hook=collections.OrderedDict)
     for k, v in params.items():
-        set_value_in_nested_dict(j, config['variables_path'][k] + [k], v)
+        set_value_in_nested_dict(j, config['variables_path'][k], v)
     json.dump(j, open(const_json, 'w'), indent=4)
     
     stat = run_sim.main(run_sim_args)

@@ -117,7 +117,7 @@
             "tau_minus" : 50.0, // ms
             "a_plus" : 1.0,
             "a_minus" : 1.5,
-            "learning_rate" : 0.05
+            "learning_rate" : 2.5
         },
         "TripleStdp" : {
             "tau_plus" : 16.8, // ms
@@ -170,7 +170,7 @@
                 "neuron_conf" : {
                     "neuron" : "SRMNeuron",
                     "learning_rule" : "Stdp",
-                    "weight_normalization" : "NonlinearMinMax",
+                    "weight_normalization" : "MinMax",
                     "act_func" : "ExpHennequin",
                     "axon_delay_distr" : "Exp(0,0)"
                 }
@@ -179,11 +179,11 @@
         "conn_map" : {
             "0->1" : [
                 { "prob" : 1.0, "weight_distr" : "Norm(4.6, 0.25)", "type" : "Synapse", "dendrite_delay_distr" : "Exp(0,0)" }
+            ],
+            "1->1" : [
+                { "prob" : 0.05, "weight_distr" : "Norm(4.6, 0.25)", "type" : "Synapse", "dendrite_delay_distr" : "Exp(0,0)" },
+                { "prob" : 0.05, "weight_distr" : "Norm(4.6, 0.25)", "type" : "Synapse_Inh", "dendrite_delay_distr" : "Exp(0,0)" }
             ]
-//            "1->1" : [
-//                { "prob" : 0.05, "weight_distr" : "Norm(4.6, 0.25)", "type" : "Synapse", "dendrite_delay_distr" : "Exp(0,0)" },
-//                { "prob" : 0.05, "weight_distr" : "Norm(4.6, 0.25)", "type" : "Synapse_Inh", "dendrite_delay_distr" : "Exp(0,0)" }
-//            ]
         },
         "reinforce_map" : {
 //            "1 -> 1" : {

@@ -3,18 +3,18 @@
 
 #include "p_stat_calc.h"
 
-enum  pStatDistOptionIndex { ARG_UNKNOWN, ARG_HELP, ARG_SPIKES, ARG_P_STAT, ARG_JOBS, ARG_OUT_JSON };
+enum  pStatDistOptionIndex { STAT_DIST_PROG_ARG_UNKNOWN, STAT_DIST_PROG_ARG_HELP, STAT_DIST_PROG_ARG_SPIKES, STAT_DIST_PROG_ARG_P_STAT, STAT_DIST_PROG_ARG_JOBS, STAT_DIST_PROG_ARG_OUT_JSON };
 const option::Descriptor pStatDistUsage[] =
 {
- {ARG_UNKNOWN, 0, "", "",Arg::None, "USAGE: example [options]\n\n"
+ {STAT_DIST_PROG_ARG_UNKNOWN, 0, "", "",Arg::None, "USAGE: example [options]\n\n"
                                         "Options:" },
- {ARG_SPIKES, 0,"s","spikes",Arg::NonEmpty, "  --spikes, -s  \tLabeled Spikes List to process" },
- {ARG_P_STAT, 0,"p","p-stat",Arg::NonEmpty, "  --p-stat, -p  \tProbability statistics of model to proccess" },
- {ARG_OUT_JSON, 0,"o","output",Arg::NonEmpty, "  --output, -o  \tOutput file in json format" },
- {ARG_JOBS, 0,"j","jobs",Arg::NonEmpty, "  --jobs  -j \tParallel jobs to run (default 1)" },
- {ARG_HELP, 0,"h", "help",Arg::None, "  --help  \tPrint usage and exit." },
+ {STAT_DIST_PROG_ARG_SPIKES, 0,"s","spikes",Arg::NonEmpty, "  --spikes, -s  \tLabeled Spikes List to process" },
+ {STAT_DIST_PROG_ARG_P_STAT, 0,"p","p-stat",Arg::NonEmpty, "  --p-stat, -p  \tProbability statistics of model to proccess" },
+ {STAT_DIST_PROG_ARG_OUT_JSON, 0,"o","output",Arg::NonEmpty, "  --output, -o  \tOutput file in json format" },
+ {STAT_DIST_PROG_ARG_JOBS, 0,"j","jobs",Arg::NonEmpty, "  --jobs  -j \tParallel jobs to run (default 1)" },
+ {STAT_DIST_PROG_ARG_HELP, 0,"h", "help",Arg::None, "  --help  \tPrint usage and exit." },
 
- {ARG_UNKNOWN, 0, "", "",Arg::None, "\nExamples:\n"
+ {STAT_DIST_PROG_ARG_UNKNOWN, 0, "", "",Arg::None, "\nExamples:\n"
                                "% Need to fill %" },
  {0,0,0,0,0,0}
 };
@@ -38,40 +38,40 @@ PStatDistanceOpts parsePStatDistOpts(int argc, char **argv) {
     if (parse.error())
         exit(1);
 
-    if ((options[ARG_HELP]) || (argc == 0)) {
+    if ((options[STAT_DIST_PROG_ARG_HELP]) || (argc == 0)) {
         option::printUsage(cout, pStatDistUsage);
         exit(0);
     }
 
-    if(options[ARG_SPIKES].count() != 1) {
+    if(options[STAT_DIST_PROG_ARG_SPIKES].count() != 1) {
         cerr << "Inappropriate spikes argument\n";
         exit(1);
     }
-    if(options[ARG_P_STAT].count() != 1) {
+    if(options[STAT_DIST_PROG_ARG_P_STAT].count() != 1) {
         cerr << "Inappropriate --p-stat argument\n";
         exit(1);
     }
-    for (option::Option* opt = options[ARG_UNKNOWN]; opt; opt = opt->next()) {
+    for (option::Option* opt = options[STAT_DIST_PROG_ARG_UNKNOWN]; opt; opt = opt->next()) {
       cerr << "Unknown option: " << string(opt->name,opt->namelen) << "\n";
     }
-    if(options[ARG_UNKNOWN].count() > 0) exit(1);
+    if(options[STAT_DIST_PROG_ARG_UNKNOWN].count() > 0) exit(1);
     for (int i = 0; i < parse.nonOptionsCount(); ++i) {
       cerr << "Non-options arguments are not supported (" << i << ": " << parse.nonOption(i) << ")\n";
     }
     if(parse.nonOptionsCount()>0) exit(1);
 
     PStatDistanceOpts opts;
-    if(options[ARG_JOBS].count()>0) {
-        opts.jobs = atoi(options[ARG_JOBS].arg);
+    if(options[STAT_DIST_PROG_ARG_JOBS].count()>0) {
+        opts.jobs = atoi(options[STAT_DIST_PROG_ARG_JOBS].arg);
     }
-    if(options[ARG_SPIKES].count()>0) {
-        opts.spikes = options[ARG_SPIKES].arg;
+    if(options[STAT_DIST_PROG_ARG_SPIKES].count()>0) {
+        opts.spikes = options[STAT_DIST_PROG_ARG_SPIKES].arg;
     }
-    if(options[ARG_P_STAT].count()>0) {
-        opts.p_stat = options[ARG_P_STAT].arg;
+    if(options[STAT_DIST_PROG_ARG_P_STAT].count()>0) {
+        opts.p_stat = options[STAT_DIST_PROG_ARG_P_STAT].arg;
     }
-    if(options[ARG_OUT_JSON].count()>0) {
-        opts.output = options[ARG_OUT_JSON].arg;
+    if(options[STAT_DIST_PROG_ARG_OUT_JSON].count()>0) {
+        opts.output = options[STAT_DIST_PROG_ARG_OUT_JSON].arg;
     }
     return opts;
 }

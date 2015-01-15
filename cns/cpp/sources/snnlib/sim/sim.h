@@ -196,6 +196,7 @@ public:
     }
     void setTlimit(double _T_limit) {
         T_limit = _T_limit;
+        ptl.Tmax = T_limit;
     }
 
     static void* runWorker(void *content);
@@ -209,7 +210,7 @@ public:
     void runSimOnSubset(size_t left_neuron_id, size_t right_neuron_id, void* (*sim_func)(void* content));
     void precalculateInputSpikes();
     void run();
-    
+
     void setLearning(bool l) {
         learning = l;
     }

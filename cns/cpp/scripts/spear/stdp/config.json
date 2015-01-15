@@ -1,0 +1,57 @@
+{
+    "language"        : "PYTHON",
+    "main-file"       : "stdp",
+    "experiment-name" : "unsupervised_clustering",
+    "variables": {
+        "tau_plus": {
+            "type": "FLOAT",
+            "size": 1,
+            "min":  1,
+            "max": 100 
+        },
+        "tau_minus": {
+            "type": "FLOAT",
+            "size": 1,
+            "min":  1,
+            "max": 100 
+        },
+        "a_plus": {
+            "type": "FLOAT",
+            "size": 1,
+            "min":  0.01,
+            "max":  5.0
+        },
+        "a_minus": {
+            "type": "FLOAT",
+            "size": 1,
+            "min":  0.01,
+            "max":  5.0
+        },
+        "prob_feedforward": {
+            "type": "FLOAT",
+            "size": 1,
+            "min":  0.05,
+            "max":  1.0
+        },
+        "prob_reccurent_inh": {
+            "type": "FLOAT",
+            "size": 1,
+            "min":  0.05,
+            "max":  1.0
+        },
+        "prob_reccurent_exc": {
+            "type": "FLOAT",
+            "size": 1,
+            "min":  0.05,
+            "max":  1.0
+        }
+    },
+    "tasks": {
+      "eval_clustering_p_stat" : {
+          "type"        : "OBJECTIVE",
+          "likelihood"  : "GAUSSIAN"
+      }
+    },
+    "polling-time" : 5
+}
+

@@ -9,6 +9,9 @@ import multiprocessing
 from contextlib import contextmanager
 import json
 import traceback
+import collections
+import numpy as np
+import functools
 
 from config import RUNS_DIR
 from config import SNN_SIM
@@ -17,6 +20,8 @@ from config import CONST_JSON
 
 import subprocess as sub
 import time
+
+import common
 
 this_file = os.path.realpath(__file__)
 
@@ -29,7 +34,7 @@ def pushd(newDir):
     os.chdir(previousDir)
 
 
-def runProcess(bin, args, log_stdout=None, verbose=False):
+def runProcess(bin, args, log_stdout=None, verbose=False, json_stdout=False):
     if type(bin) is list:
         cmd = list(bin)
     else:
@@ -68,9 +73,11 @@ def runProcess(bin, args, log_stdout=None, verbose=False):
             for l in stdout.split("\n"):
                 print l.strip()
         sys.exit(1)
-    if not log_stdout:
+    if not log_stdout and not json_stdout:
         return stdout
-    
+    if json_stdout:
+        return json.loads(stdout, object_pairs_hook=collections.OrderedDict)
+
 def evalClusteringPStat(args, wd, ep, p_stat_file, spikes, stat):
     print "Evaluation through clustering ...",
     if args.verbose:
@@ -101,6 +108,52 @@ def evalClusteringPStat(args, wd, ep, p_stat_file, spikes, stat):
         for k in sorted(stat.keys()):
             print k, ":", stat[k],
         print
+
+def read_const(const_file):
+    with open(const_file) as const_ptr:
+        c_json = "\n".join([ l.split("//")[0].split("#")[0] for l in const_ptr.readlines() ])
+    try:
+        const = json.loads(c_json, object_pairs_hook=collections.OrderedDict)
+    except:
+        print "Error while reading %s:" % const_file
+        print traceback.format_exc()
+        sys.exit(1) 
+    return const
+
+
+
+
+def tune_start_weights(args, wd, common_sim_args, weight_range=(2.5, 20), T_max=1000):
+    const = read_const(common_sim_args['--constants'])
+
+    def run_one_tune(args, wd, common_sim_args, const, w):
+        sim_args = common_sim_args.copy()
+        sim_args['--no-learning'] = True
+        sim_args['--T-max'] = T_max
+        for c in const['sim_configuration']['conn_map']:
+            for i, c_var in enumerate(const['sim_configuration']['conn_map'][c]):
+                c_var['weight_distr'] = "Norm(%s,0.5)" % w
+                const['sim_configuration']['conn_map'][c][i] = c_var
+        sim_args['--constants'] = os.path.join(wd, "tune_const.json")
+        json.dump(const, open(sim_args['--constants'], 'w'), indent=4)
+        sim_args['--output'] = os.path.join(wd, "tune_weights_output_spikes.pb")
+        
+        runProcess(args.snn_sim_bin, sim_args, os.path.join("tune_weights_output.log"), verbose = args.verbose)
+
+
+        proc_args = {
+            '--spikes' : sim_args['--output'],
+            '--net-neurons' : sum([ conf['size'] for conf in  const['sim_configuration']['net_layers_conf'] ])
+        }
+        json_output = runProcess([args.snn_proc_bin, "mean_net_rate"], proc_args, verbose=args.verbose, json_stdout=True)
+        mean = json_output['mean_rate']
+        print "weight %s got %s mean rate" % (w, mean)
+        return mean
+    
+
+    weights = np.linspace(weight_range[0], weight_range[1], 25)
+    part_fun_tune = functools.partial(run_one_tune, args, wd, common_sim_args, const)
+    common.binary_search(weights, args.tune_start_weights_to_target_rate, 0.1, fun=part_fun_tune)
 
 def main(args):
     const_hex = md5.new(args.const).hexdigest()
@@ -161,8 +214,10 @@ def main(args):
     if args.T_max != 0:
         common_sim_args['--T-max'] = args.T_max
     
-    stat = {'eval' : None, 'mean_rate' : 0}
+    if args.tune_start_weights_to_target_rate:
+        tune_start_weights(args, wd, common_sim_args)
 
+    stat = {'eval' : None, 'mean_rate' : 0}
     for ep in xrange(start_ep, start_ep + args.epochs + 1):
         sim_args = common_sim_args.copy()
         if args.eval_clustering_p_stat: 
@@ -222,6 +277,7 @@ class RunSimArgs(object):
     p_stat = None
     runs_dir = RUNS_DIR
     collect_statistics = None
+    tune_start_weights_to_target_rate = None
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Tool for simulating snn')
@@ -286,6 +342,9 @@ if __name__ == '__main__':
     parser.add_argument('--collect-statistics',
                         required=False,
                         help='Run simulation in first epoch without learning to collect statistics')
+    parser.add_argument('--tune-start-weights-to-target-rate',
+                        required=False,
+                        help='Run simulations to find optimal start weight for specific target rate', type=int)
     args = parser.parse_args(sys.argv[1:])    
     if len(sys.argv) == 1:
         parser.print_help()
@@ -298,12 +357,5 @@ if __name__ == '__main__':
     sim_opts = RunSimArgs()
     sim_opts.__dict__.update(args.__dict__)
 
-    with open(sim_opts.const) as const_ptr:
-        c_json = "\n".join([ l.split("//")[0].split("#")[0] for l in const_ptr.readlines() ])
-    try:
-        const = json.loads(c_json)
-    except:
-        print "Error while reading const.json:"
-        print traceback.format_exc()
-        sys.exit(1) 
+    const = read_const(sim_opts.const)
     main(sim_opts)

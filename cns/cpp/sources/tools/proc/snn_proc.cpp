@@ -9,12 +9,14 @@
 
 #include "p_stat_dist.h"
 #include "cross_spectrum_dist.h"
+#include "mean_net_rate.h"
 
 
 void printModUsage() {
     cout << "snn_proc has subprograms:\n";
     cout << "\t\tp_stat_dist -- calculate distance matrix between intensity values\n";
     cout << "\t\tcross_spectrum_dist -- calculate distance matrix based on cross spectrum metric\n";
+    cout << "\t\tmean_net_rate -- get mean net rate\n";
 }
 
 int main(int argc, char **argv) {
@@ -32,6 +34,9 @@ int main(int argc, char **argv) {
     } else
     if(mod == "cross_spectrum_dist") {
         cross_spectrum_dist(--argc, ++argv);
+    } else
+    if(mod == "mean_net_rate") {
+        mean_net_rate(--argc, ++argv);
     } else {
         cerr << "Failed to recognize subprogram: " << mod << "\n";
         printModUsage();

@@ -17,10 +17,10 @@ protected:
     friend class Factory;
 public:
     Layer(size_t _size, bool _wta, const NeuronConf &nc, const Constants &c, RuntimeGlobals *run_glob_c) {
-        init(_size, _wta, nc, c, run_glob_c);
+        init(_size, _wta, nc, c, run_glob_c, true);
     }
 
-    virtual void init(size_t _size, bool _wta, const NeuronConf &nc, const Constants &c, RuntimeGlobals *run_glob_c, bool learning = true) {
+    virtual void init(size_t _size, bool _wta, const NeuronConf &nc, const Constants &c, RuntimeGlobals *run_glob_c, bool learning) {
         id = global_layer_index++;
         N = _size;
         neuron_conf = &nc;

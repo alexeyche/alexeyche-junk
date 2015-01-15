@@ -50,6 +50,14 @@ public:
             y_trace.push_back(m->y_trace(i));
         }
     }
+    void reset() {
+        y_trace.clear();
+        x_trace.clear();
+        for(auto it=x_trace.begin(); it != x_trace.end(); ++it) {
+            it->clear();
+        }
+
+    }
 
     void print(std::ostream& str) const {
     }
@@ -92,6 +100,12 @@ public:
         if(collectStatistics) {
             stat->x_trace.push_back(vector<double>());
         }
+    }
+
+    void reset() {
+        y_trace = 0.0;
+        fill(x_trace.begin(), x_trace.end(), 0.0);
+        if(stat) stat->reset();
     }
 
     void enableCollectStatistics() {
@@ -146,7 +160,15 @@ public:
     }
 
 
-    void deserialize() {}
+    void deserialize() {
+        x_trace.clear();
+        if(stat) stat->x_trace.clear();
+
+        for(auto it=n->syns.begin(); it != n->syns.end(); ++it) {
+            addSynapse(*it);
+        }
+        reset();
+    }
     ProtoPack serialize() {
         return ProtoPack();
     }
