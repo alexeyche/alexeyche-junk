@@ -12,6 +12,7 @@ import traceback
 import collections
 import numpy as np
 import functools
+import math
 
 from config import RUNS_DIR
 from config import SNN_SIM
@@ -34,7 +35,7 @@ def pushd(newDir):
     os.chdir(previousDir)
 
 
-def runProcess(bin, args, log_stdout=None, verbose=False, json_stdout=False):
+def runProcess(bin, args, log_stdout=None, verbose=False, json_stdout=False, do_not_wait=False):
     if type(bin) is list:
         cmd = list(bin)
     else:
@@ -51,11 +52,13 @@ def runProcess(bin, args, log_stdout=None, verbose=False, json_stdout=False):
         sp = sub.Popen(cmd, stdout=open(log_stdout, 'w'), stderr=sub.STDOUT, shell=False)
     else:        
         sp = sub.Popen(cmd, stdout=sub.PIPE, stderr=sub.STDOUT, shell=False)
-
+   
     if verbose:
         print 
         print " ".join(cmd)
         print 
+    if do_not_wait:
+        return sp
     try:
         stdout, stderr = sp.communicate()
     except KeyboardInterrupt:
@@ -123,37 +126,58 @@ def read_const(const_file):
 
 
 
-def tune_start_weights(args, wd, common_sim_args, weight_range=(2.5, 20), T_max=1000):
+def tuneStartWeights(args, wd, common_sim_args, weight_range=(2.5, 40, 50), T_max=2500, parallel_launches=4):
     const = read_const(common_sim_args['--constants'])
-
-    def run_one_tune(args, wd, common_sim_args, const, w):
-        sim_args = common_sim_args.copy()
-        sim_args['--no-learning'] = True
-        sim_args['--T-max'] = T_max
+    
+    sim_args = common_sim_args.copy()
+    sim_args['--no-learning'] = True
+    sim_args['--T-max'] = T_max
+    sim_args['--constants'] = os.path.join(wd, "tune_const.json")
+    
+    def run_one_tune(args, wd, sim_args, const, w):
         for c in const['sim_configuration']['conn_map']:
             for i, c_var in enumerate(const['sim_configuration']['conn_map'][c]):
                 c_var['weight_distr'] = "Norm(%s,0.5)" % w
                 const['sim_configuration']['conn_map'][c][i] = c_var
-        sim_args['--constants'] = os.path.join(wd, "tune_const.json")
         json.dump(const, open(sim_args['--constants'], 'w'), indent=4)
-        sim_args['--output'] = os.path.join(wd, "tune_weights_output_spikes.pb")
+
+        procs = []
+        for i in range(parallel_launches):
+            sim_args_launch = sim_args.copy()
+            sim_args_launch['--jobs'] = int(math.floor(float(sim_args_launch['--jobs'])/parallel_launches))
+            if i == parallel_launches-1:
+                 sim_args_launch['--jobs']  += sim_args['--jobs'] - sim_args_launch['--jobs'] * parallel_launches
+            sim_args_launch['--output'] = os.path.join(wd, "tune_weights_output_spikes_%s.pb" % i)
+            sp = runProcess(args.snn_sim_bin, sim_args_launch, os.path.join(wd, "tune_weights_output_%s.log" % i), verbose = args.verbose, do_not_wait=True)
+            procs.append( (sim_args_launch, sp) )
         
-        runProcess(args.snn_sim_bin, sim_args, os.path.join("tune_weights_output.log"), verbose = args.verbose)
+        mean_acc = 0.0
+        for sim_args_launch, sp in procs:
+            try:
+                stdout, stderr = sp.communicate()
+            except KeyboardInterrupt:
+                print "Bye"
+            if sp.returncode != 0:
+                print "Run failed: "
+                for l in stdout.split("\n"):
+                    print l.strip()
+                sys.exit(1)
+            proc_args = {
+                '--spikes' : sim_args_launch['--output'],
+                '--net-neurons' : sum([ conf['size'] for conf in  const['sim_configuration']['net_layers_conf'] ]),
+            }
+            json_output = runProcess([args.snn_proc_bin, "mean_net_rate"], proc_args, verbose=args.verbose, json_stdout=True)
+            mean_acc += json_output['mean_rate']
 
-
-        proc_args = {
-            '--spikes' : sim_args['--output'],
-            '--net-neurons' : sum([ conf['size'] for conf in  const['sim_configuration']['net_layers_conf'] ])
-        }
-        json_output = runProcess([args.snn_proc_bin, "mean_net_rate"], proc_args, verbose=args.verbose, json_stdout=True)
-        mean = json_output['mean_rate']
+        mean = mean_acc/parallel_launches            
         print "weight %s got %s mean rate" % (w, mean)
         return mean
     
 
-    weights = np.linspace(weight_range[0], weight_range[1], 25)
-    part_fun_tune = functools.partial(run_one_tune, args, wd, common_sim_args, const)
+    weights = np.linspace(weight_range[0], weight_range[1], weight_range[2])
+    part_fun_tune = functools.partial(run_one_tune, args, wd, sim_args, const)
     common.binary_search(weights, args.tune_start_weights_to_target_rate, 0.1, fun=part_fun_tune)
+    common_sim_args['--constants'] = sim_args['--constants']
 
 def main(args):
     const_hex = md5.new(args.const).hexdigest()
@@ -207,7 +231,7 @@ def main(args):
         input = args.spikes
 
     common_sim_args = {
-        '--jobs' : str(args.jobs),
+        '--jobs' : args.jobs,
         '--input' : input,
         '--constants' : const
     }            
@@ -215,7 +239,7 @@ def main(args):
         common_sim_args['--T-max'] = args.T_max
     
     if args.tune_start_weights_to_target_rate:
-        tune_start_weights(args, wd, common_sim_args)
+        tuneStartWeights(args, wd, common_sim_args)
 
     stat = {'eval' : None, 'mean_rate' : 0}
     for ep in xrange(start_ep, start_ep + args.epochs + 1):
@@ -297,7 +321,7 @@ if __name__ == '__main__':
     parser.add_argument('-j', 
                         '--jobs', 
                         required=False,
-                        help='Number of parallell jobs (default: %(default)s)', default=RunSimArgs.jobs)
+                        help='Number of parallell jobs (default: %(default)s)', default=RunSimArgs.jobs, type=int)
     parser.add_argument('-T', 
                         '--T-max', 
                         required=False,

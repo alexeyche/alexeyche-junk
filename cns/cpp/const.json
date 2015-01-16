@@ -178,7 +178,7 @@
         ],
         "conn_map" : {
             "0->1" : [
-                { "prob" : 1.0, "weight_distr" : "Norm(4.6, 0.25)", "type" : "Synapse", "dendrite_delay_distr" : "Exp(0,0)" }
+                { "prob" : 0.25, "weight_distr" : "Norm(4.6, 0.25)", "type" : "Synapse", "dendrite_delay_distr" : "Exp(0,0)" }
             ],
             "1->1" : [
                 { "prob" : 0.05, "weight_distr" : "Norm(4.6, 0.25)", "type" : "Synapse", "dendrite_delay_distr" : "Exp(0,0)" },
