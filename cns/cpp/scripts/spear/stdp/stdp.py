@@ -18,6 +18,7 @@ conf['variables_path'] = {
     "tau_minus" :  ["learning_rules", "Stdp", "tau_minus"],
     "a_plus" :  ["learning_rules", "Stdp", "a_plus"],
     "a_minus" :  ["learning_rules", "Stdp", "a_minus"],
+    "learning_rate" :  ["learning_rules", "Stdp", "learning_rate"],
     "prob_feedforward" : ["sim_configuration", "conn_map", "0->1", 0, "prob"],
     "prob_reccurent_exc" : ["sim_configuration", "conn_map", "1->1", 0, "prob"],
     "prob_reccurent_inh" : ["sim_configuration", "conn_map", "1->1", 1, "prob"],

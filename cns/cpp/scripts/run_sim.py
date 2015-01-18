@@ -13,6 +13,7 @@ import collections
 import numpy as np
 import functools
 import math
+import re
 
 from config import RUNS_DIR
 from config import SNN_SIM
@@ -124,11 +125,23 @@ def read_const(const_file):
     return const
 
 
+DISTR_REG_EXP = "[A-Za-z]+\(([ 0-9.]+),([ 0-9.]+)\)"
 
-
-def tuneStartWeights(args, wd, common_sim_args, weight_range=(2.5, 40, 50), T_max=2500, parallel_launches=4):
+def tuneStartWeights(args, wd, common_sim_args, weight_range=(2.5, 100, 500), T_max=2500, parallel_launches=4):
     const = read_const(common_sim_args['--constants'])
-    
+    d_re = re.compile(DISTR_REG_EXP)
+    acc_w = 0.0
+    conn_count = 0
+    for c in const['sim_configuration']['conn_map']:
+        for c_var in const['sim_configuration']['conn_map'][c]:
+            m = d_re.match(c_var['weight_distr'])
+            if m:
+                acc_w += float(m.group(1))
+                conn_count += 1
+            else:
+                raise Exception("Faild to parse distribution of weighgts: %s" % c_var['weight_distr'])
+    start_weight = acc_w / conn_count
+
     sim_args = common_sim_args.copy()
     sim_args['--no-learning'] = True
     sim_args['--T-max'] = T_max
@@ -176,7 +189,19 @@ def tuneStartWeights(args, wd, common_sim_args, weight_range=(2.5, 40, 50), T_ma
 
     weights = np.linspace(weight_range[0], weight_range[1], weight_range[2])
     part_fun_tune = functools.partial(run_one_tune, args, wd, sim_args, const)
-    common.binary_search(weights, args.tune_start_weights_to_target_rate, 0.1, fun=part_fun_tune)
+
+    pos = common.binary_search(weights, args.tune_start_weights_to_target_rate, 0.5, fun=part_fun_tune)
+    if pos < 0:
+        raise Exception("Failed to find good weight")
+
+    new_const = read_const(sim_args['--constants'])
+    for c in new_const['sim_configuration']['net_layers_conf']:
+        #if 'learning_rule' in c['neuron_conf']:
+        #    new_const['learning_rules'][ c['neuron_conf']['learning_rule'] ]['learning_rate'] *= weights[pos]/start_weight
+        if 'weight_normalization' in c['neuron_conf']:
+            if 'w_max' in new_const['weight_normalizations'][ c['neuron_conf']['weight_normalization'] ]:
+                new_const['weight_normalizations'][ c['neuron_conf']['weight_normalization'] ]['w_max'] *= weights[pos]/start_weight
+    json.dump(new_const, open(sim_args['--constants'], 'w'), indent=4)
     common_sim_args['--constants'] = sim_args['--constants']
 
 def main(args):

@@ -44,6 +44,12 @@
             "size": 1,
             "min":  0.05,
             "max":  1.0
+        },
+        "learning_rate": {
+            "type": "FLOAT",
+            "size": 1,
+            "min":  0.04,
+            "max":  75.0
         }
     },
     "tasks": {

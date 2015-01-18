@@ -1,0 +1,99 @@
+{
+    "language"        : "PYTHON",
+    "main-file"       : "structure",
+    "experiment-name" : "unsupervised_clustering",
+    "variables": {
+        "tau_adapt": {
+            "type": "FLOAT",
+            "size": 1,
+            "min":  0,
+            "max": 500 
+        },
+        "amp_adapt": {
+            "type": "FLOAT",
+            "size": 1,
+            "min":  0,
+            "max": 10 
+        },
+        "tau_refr": {
+            "type": "FLOAT",
+            "size": 1,
+            "min": 0, 
+            "max": 10 
+        },
+        "beta": {
+            "type": "FLOAT",
+            "size": 1,
+            "min":  0.1,
+            "max":  4.0
+        },
+        "epsp_decay_exc": {
+            "type": "FLOAT",
+            "size": 1,
+            "min": 1, 
+            "max": 50 
+        },
+        "epsp_decay_inh": {
+            "type": "FLOAT",
+            "size": 1,
+            "min": 1, 
+            "max": 50 
+        },
+        "prob_feedforward_exc": {
+            "type": "FLOAT",
+            "size": 1,
+            "min":  0.1,
+            "max":  1.0
+        },
+        "prob_feedforward_inh": {
+            "type": "FLOAT",
+            "size": 1,
+            "min":  0.0,
+            "max":  1.0
+        },
+        "prob_reccurent_inh": {
+            "type": "FLOAT",
+            "size": 1,
+            "min":  0.0,
+            "max":  1.0
+        },
+        "prob_reccurent_exc": {
+            "type": "FLOAT",
+            "size": 1,
+            "min":  0.0,
+            "max":  1.0
+        },
+        "weight_distr_mean_ff_exc" : {
+            "type": "FLOAT",
+            "size": 1,
+            "min":  1,
+            "max": 80 
+        },
+        "weight_distr_mean_ff_inh" : {
+            "type": "FLOAT",
+            "size": 1,
+            "min":  1,
+            "max": 80 
+        },
+        "weight_distr_mean_rec_exc" : {
+            "type": "FLOAT",
+            "size": 1,
+            "min":  1,
+            "max": 80 
+        },
+        "weight_distr_mean_rec_inh" : {
+            "type": "FLOAT",
+            "size": 1,
+            "min":  1,
+            "max": 80 
+        }
+    },
+    "tasks": {
+      "eval_clustering_p_stat" : {
+          "type"        : "OBJECTIVE",
+          "likelihood"  : "GAUSSIAN"
+      }
+    },
+    "polling-time" : 5
+}
+

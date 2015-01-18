@@ -4,7 +4,7 @@ args <- commandArgs(trailingOnly = FALSE)
 we_are_in_r_studio = length(grep("RStudio", args)) > 0
 arg_i = grep("--args", args)
 if(length(arg_i) == 0) {
-    f = "/home/alexeyche/prog/sim_spear/12/1_proc_output.json"
+    f = "/home/alexeyche/prog/sim_spear/eval_clustering_p_stat_structure/28/1_proc_output.json"
 } else {
     f = args[arg_i+1]
 }
@@ -86,15 +86,17 @@ calculate_criterion = function(proc_out_json) {
     }
     val = -100*calinski_harabasz_criterion(points, ulabs, labs, centroids, global_centroid)
     if(mean_rate<target_rate) {
-        val = val*exp(- ((mean_rate - target_rate)^2)/30.0)
+        val = val*exp(- ((mean_rate - target_rate)^2)/10.0)
     } else {
-        val = val*exp(- ((mean_rate - target_rate)^2)/300.0)
+        val = val*exp(- ((mean_rate - target_rate)^2)/100.0)
     }
-    plot(x, y, xlab="Coordinate 1", ylab="Coordinate 2", main=sprintf("Metric MDS: %s", val),    type="n")
-    lab_cols = rainbow(length(ulabs))
-    text(x, y, labels = labs, cex=.7, col=lab_cols[sapply(labs, function(l) which(l == ulabs))])
-    points(centroids, lwd=10, pch=3, col=lab_cols)
-    points(global_centroid, lwd=10, pch=3, col="black")
+    suppressWarnings({
+        plot(x, y, xlab="Coordinate 1", ylab="Coordinate 2", main=sprintf("Metric MDS: %s", val),    type="n")
+        lab_cols = rainbow(length(ulabs))
+        text(x, y, labels = labs, cex=.7, col=lab_cols[sapply(labs, function(l) which(l == ulabs))])
+        points(centroids, lwd=10, pch=3, col=lab_cols)
+        points(global_centroid, lwd=10, pch=3, col="black")
+    })        
     if(!we_are_in_r_studio) {
         invisible(dev.off())
     }
