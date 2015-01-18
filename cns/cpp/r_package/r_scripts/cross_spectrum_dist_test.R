@@ -12,10 +12,13 @@ x = seq(0, T, length.out=len)
 net = list()
 net_b = NULL
 for(ni in 1:N) {
-    f1 = sin(x/100)
-    a = sample(seq(0.1,10, length.out=100), 1)
-    b = sample(seq(-10,10, length.out=100), 1)
-    f2 = sin(a*x/100-b)
+    a1 = sample(seq(0.8,1.1, length.out=100), 1)
+    b1 = sample(seq(-10,10, length.out=100), 1)
+    f1 = sin(a1*x/100-b1)
+
+    a2 = sample(seq(0.1,10, length.out=100), 1)
+    b2 = sample(seq(-10,10, length.out=100), 1)
+    f2 = sin(a2*x/100-b2)
     
     f = list(f1, f2)
     f_sp = matrix(0, nrow=length(f), ncol=len)

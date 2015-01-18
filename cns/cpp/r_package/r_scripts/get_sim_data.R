@@ -8,16 +8,16 @@ setwd("~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts")
 rundir="/home/alexeyche/prog/newsim/runs"
 #rundir="/home/kayla/alexeyche/sim/runs"
 #rundir="/home/alexeyche/prog/sim_spear/eval_clustering_p_stat_optimal_stdp"
-#rundir="/home/alexeyche/prog/sim_spear/eval_clustering_p_stat_stdp"
+rundir="/home/alexeyche/prog/sim_spear/eval_clustering_p_stat_structure"
 runname = system(sprintf("ls -t %s | sed -ne '1p'", rundir),intern=TRUE)
-#runname = "17"
+#runname = "251"
 workdir=sprintf("%s/%s", rundir, runname)
 for(ep in 1:1000) {
     output_spikes = sprintf("%s/%s_output_spikes.pb", workdir, ep)
     if(!file.exists(output_spikes)) { ep=ep-1; break }
 }
 
-ep = 1
+#ep = 1
 ep_str="0_"
 if(ep>0) {
     ep_str = sprintf("%d_",ep)
@@ -56,8 +56,8 @@ if(measure_corr) {
 
 
 
-Ti=16
-Trange=500
+Ti=0
+Trange=1000
 p1 = prast(net,T0=Ti*Trange,Tmax=(Ti+1)*Trange)
 
 if(file.exists(model_file)) {

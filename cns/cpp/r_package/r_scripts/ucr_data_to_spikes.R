@@ -1,6 +1,6 @@
 
 require(Rsnn)
-
+setwd("~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts")
 source("ucr_ts.R")
 
 ts_dir = "~/prog/sim/ts"

@@ -195,8 +195,10 @@ public:
         turnOnPStatCollect();
     }
     void setTlimit(double _T_limit) {
-        T_limit = _T_limit;
-        ptl.Tmax = T_limit;
+        if(_T_limit>=1.0) {
+            T_limit = _T_limit;
+            ptl.Tmax = T_limit;
+        }
     }
 
     static void* runWorker(void *content);

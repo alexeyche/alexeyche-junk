@@ -26,7 +26,8 @@ for(pn in names(p)) {
     p[[pn]] = decodeFromDb(paste(p[[pn]], collapse=''))
 }
 
-
-p[["criterion"]] = unlist(sapply(d, function(x) x$values$cluster_criterion))
-
-
+crit_name = "eval_clustering_p_stat"
+p[["criterion"]] = unlist(sapply(d, function(x) if(crit_name %in% names(x$values)) { x$values[[crit_name]] } else { NA }))
+p[["id"]] = unlist(sapply(d, function(x) x$id))
+pc = p$criterion
+plot(p[["id"]], pc, type="l")
