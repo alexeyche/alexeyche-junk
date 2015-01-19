@@ -6,6 +6,7 @@ import shutil
 import re
 
 import run_sim
+import multiprocessing
 
 from config import CONST_JSON
 from config import RUNS_DIR
@@ -92,7 +93,7 @@ def is_nested_list(v):
         return type(v[0]) is list
     return False
 
-def evaluate(job_id, params, config):
+def evaluate(job_id, params, config, jobs=multiprocessing.cpu_count()):
     run_sim_args = run_sim.RunSimArgs()
     if config.get('input_spikes'):
         run_sim_args.spikes = config['input_spikes']
@@ -112,6 +113,7 @@ def evaluate(job_id, params, config):
     const_json = os.path.join(wd, CONST_JSON)
     run_sim_args.const = const_json
     run_sim_args.working_dir = wd
+    run_sim_args.jobs = jobs
     #run_sim_args.tune_start_weights_to_target_rate = config['tune_start_weights_to_target_rate']
 
     clean_from_comments(const_json)

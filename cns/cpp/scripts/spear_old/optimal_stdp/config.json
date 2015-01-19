@@ -1,0 +1,33 @@
+{
+    "language"        : "PYTHON",
+    "main-file"       : "optimal_stdp",
+    "experiment-name" : "unsupervised_clustering",
+    "variables": {
+        "weight_decay": {
+            "type": "FLOAT",
+            "size": 1,
+            "min":  0.005,
+            "max":  0.1
+        },
+        "tau_c": {
+            "type": "FLOAT",
+            "size": 1,
+            "min":  50,
+            "max":  300
+        },
+        "beta": {
+            "type": "FLOAT",
+            "size": 1,
+            "min":  0.5,
+            "max":  5.0
+        }
+    },
+    "tasks": {
+      "eval_clustering_p_stat" : {
+          "type"        : "OBJECTIVE",
+          "likelihood"  : "GAUSSIAN"
+      }
+    },
+    "polling-time" : 5
+}
+

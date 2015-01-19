@@ -84,7 +84,7 @@ calculate_criterion = function(proc_out_json) {
     if(!we_are_in_r_studio) {
         png(sprintf("%s_eval_dist_matrix.png", data$epoch),width=1024, height=768)
     }
-    val = -100*calinski_harabasz_criterion(points, ulabs, labs, centroids, global_centroid)
+    val = -10*calinski_harabasz_criterion(points, ulabs, labs, centroids, global_centroid)
     if(mean_rate<target_rate) {
         val = val*exp(- ((mean_rate - target_rate)^2)/10.0)
     } else {

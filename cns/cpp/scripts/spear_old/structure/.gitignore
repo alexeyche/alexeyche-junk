@@ -1,0 +1,8 @@
+jobs
+output
+*.pyc
+*.swp
+best*.txt
+exp*pkl
+exp*pkl.lock
+trace.csv

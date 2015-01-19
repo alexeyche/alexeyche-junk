@@ -176,12 +176,12 @@
         ],
         "conn_map" : {
             "0->1" : [
-                { "prob" : 0.5, "weight_distr" : "Norm(4.6, 0.1)", "type" : "Synapse", "dendrite_delay_distr" : "Exp(0,0)" },
-                { "prob" : 0.5, "weight_distr" : "Norm(4.6, 0.1)", "type" : "Synapse_Inh", "dendrite_delay_distr" : "Exp(0,0)" }
+                { "prob" : 0.5, "weight_distr" : "Norm(10.6, 0.1)", "type" : "Synapse", "dendrite_delay_distr" : "Exp(0,0)" },
+                { "prob" : 0.5, "weight_distr" : "Norm(10.6, 0.1)", "type" : "Synapse_Inh", "dendrite_delay_distr" : "Exp(0,0)" }
             ],
             "1->1" : [
-                { "prob" : 0.05, "weight_distr" : "Norm(4.6, 0.1)", "type" : "Synapse", "dendrite_delay_distr" : "Exp(0,0)" },
-                { "prob" : 0.05, "weight_distr" : "Norm(4.6, 0.1)", "type" : "Synapse_Inh", "dendrite_delay_distr" : "Exp(0,0)" }
+                { "prob" : 0.05, "weight_distr" : "Norm(10.6, 0.1)", "type" : "Synapse", "dendrite_delay_distr" : "Exp(0,0)" },
+                { "prob" : 0.05, "weight_distr" : "Norm(10.6, 0.1)", "type" : "Synapse_Inh", "dendrite_delay_distr" : "Exp(0,0)" }
             ]
         },
         "reinforce_map" : {
