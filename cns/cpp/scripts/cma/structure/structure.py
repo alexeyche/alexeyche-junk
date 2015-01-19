@@ -3,6 +3,7 @@ import os
 import json
 import numpy as np
 import sys
+import multiprocessing
 
 this_file = os.path.realpath(__file__)
 base_dir = os.path.join(os.path.dirname(this_file), "../")
@@ -43,7 +44,7 @@ cma_conf = {
     "beta": { "min" : 0.1, "max" : 5.0 },
     "epsp_decay_exc": { "min" : 1, "max" : 100 },
     "epsp_decay_inh": { "min" : 1, "max" : 100 },
-    "prob_feedforward_exc" : { "min" : 0.05, "max" : 1.0.0 },
+    "prob_feedforward_exc" : { "min" : 0.05, "max" : 1.0 },
     "prob_feedforward_inh" : { "min" : 0, "max" : 1.0 },
     "prob_reccurent_exc" : { "min" : 0, "max" : 1.0 },
     "prob_reccurent_inh" : { "min" : 0, "max" : 1.0 },
@@ -55,6 +56,8 @@ cma_conf = {
 var_names = sorted(conf['variables_path'])
 
 bounds = [0, 10]
+jobs = 2
+cma_jobs = multiprocessing.cpu_count()/jobs
 
 def scale_to_cma(x, min, max, a, b):
     return ((b-a)*(x - min)/(max-min)) + a
@@ -63,40 +66,53 @@ def scale_from_cma(x, min, max, a, b):
     return ((max-min)*(x - a)/(b-a)) + min
 
 
-id = 0
-def eval(x):
-    global id
+def eval(x, id, ret_q):
     p = dict(zip(var_names, x))
     for param in p:
         p[param] = scale_from_cma(p[param], cma_conf[param]["min"], cma_conf[param]['max'], bounds[0], bounds[1])
     try:
-        res = evaluate(id, p, conf)
+        res = evaluate(id, p, conf, jobs, verbose=False)
         ret = res[ conf['criterion_name'] ]
-    except KeyboardInterrupt:
-        sys.exit(1)
-    except:        
-        ret = 0.0
-    id += 1
-    return ret
-
+        ret_q.put(ret)
+    except Exception as ex:        
+        ret_q.put(ex)
 
 const = read_const(os.path.join(os.path.dirname(this_file), "../../../const.json"))
 start_params = {}
 for param in var_names:
-    v = float(get_value_in_nested_dict(const, conf['variables_path'][k]))
+    v = float(get_value_in_nested_dict(const, conf['variables_path'][param]))
     start_params[param] = scale_to_cma(v, cma_conf[param]["min"], cma_conf[param]['max'], bounds[0], bounds[1])
 
 es = cma.CMAEvolutionStrategy([ start_params[p] for p in var_names ], 2, { 'bounds' : [0.0,10.0] } )
+id = 0
 while not es.stop():
-   X = es.ask()
-   tells = []
-   for x in X:
-       print "Launching #%d: " % id
-       ret = eval(x)
-       tells.append(ret)
-   print tells
-   es.tell(X, tells)
-   es.disp()  # by default sparse, see option verb_disp
+    X = es.ask()
+    tells = []
+    X_distr = X
+    while X_distr:
+        pool = []
+        for ji in range(cma_jobs):
+            if len(X_distr) == 0:
+                break
+            print "Launching #%d: " % id
+            ret_q = multiprocessing.Queue()
+            p = multiprocessing.Process(target=eval, args = (X_distr[0], id , ret_q))
+            X_distr = X_distr[1:]
+            p.start()
+            pool.append( (id, p, ret_q) )       
+            id += 1
+        for id_src, p, ret_q in pool:
+            p.join()
+            r = ret_q.get()
+            if isinstance(r, KeyboardInterrupt):
+                raise r
+            elif isinstance(r, Exception):
+                r = 0.0
+            print "got %f from %d" % (r, id_src)
+            tells.append(r)
+    print tells
+    es.tell(X, tells)
+    es.disp()  # by default sparse, see option verb_disp
 
 cma.pprint(es.result())
 

@@ -45,7 +45,10 @@ void Network::configureConnMap() {
 
 void Network::propagateSpike(const size_t &global_id, const double &t) {
     spikes_list[global_id].push_back(t);
-
+    if(((1000.0*((spikes_list[global_id].size())/t))>300.0)&&(t>1000)) {
+        cerr << "Rate limit exceeded: " << spikes_list[global_id].size() << " spikes of neuron " << global_id << " at " << t << "\n";
+        terminate();
+    }
     const double &axon_delay = s->sim_neurons[global_id].n->axon_delay;
     for(size_t con_i=0; con_i < conn_map[global_id].size(); con_i++) {
         SynSpike sp;

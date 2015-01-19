@@ -68,7 +68,6 @@ def runProcess(bin, args, log_stdout=None, verbose=False, json_stdout=False, do_
     if verbose:
         print "time run: %s sec" % str(end_time-start_time)
     if sp.returncode != 0:
-        print "Run failed: "
         if log_stdout:
             with open(log_stdout) as lf:
                 for l in lf:
@@ -76,15 +75,16 @@ def runProcess(bin, args, log_stdout=None, verbose=False, json_stdout=False, do_
         else:
             for l in stdout.split("\n"):
                 print l.strip()
-        sys.exit(1)
+        raise Exception("Run failed")
     if not log_stdout and not json_stdout:
         return stdout
     if json_stdout:
         return json.loads(stdout, object_pairs_hook=collections.OrderedDict)
 
-def evalClusteringPStat(args, wd, ep, p_stat_file, spikes, stat):
-    print "Evaluation through clustering ...",
+
+def evalPStat(args, wd, ep, p_stat_file, spikes, eval_method, stat):
     if args.verbose:
+        print "Evaluation p stat, method %s..." % eval_method,
         print 
     proc_args = {}
     proc_args['--p-stat'] = p_stat_file
@@ -104,10 +104,10 @@ def evalClusteringPStat(args, wd, ep, p_stat_file, spikes, stat):
     eval_output = os.path.join(wd, "%s_eval_pstat.log" % ep)
     eval_r_script = os.path.join(os.path.dirname(this_file), "eval_dist_matrix.R")
     with pushd(wd):
-        runProcess("Rscript",  { eval_r_script : json_proc }, eval_output, verbose=args.verbose)
+        runProcess(["Rscript", eval_r_script],  { "--method": eval_method, "--stat" : json_proc }, eval_output, verbose=args.verbose)
     
     stat['eval'] = float(open(eval_output).read().strip())
-    stat['mean_rate'] = float(j['mean_rate'])
+    stat['mean_rate'] = sum(j['rates'])/len(j['rates'])
     if args.verbose:
         for k in sorted(stat.keys()):
             print k, ":", stat[k],
@@ -299,10 +299,11 @@ def main(args):
                 sim_args['--input'] = wd_file("input_spikes.pb")
         elif ep == 0:
             continue
-        print "Epoch %d" % ep
+        if args.epochs>1:
+            print "Epoch %d" % ep
         runProcess(args.snn_sim_bin, sim_args, wd_file("%s_output.log" % ep), verbose = args.verbose)
         if args.eval_clustering_p_stat and ep > 0: 
-            evalClusteringPStat(args, wd, ep, sim_args['--p-stat'], sim_args['--output'], stat)
+            evalPStat(args, wd, ep, sim_args['--p-stat'], sim_args['--output'], "clustering", stat)
     return stat
 
 

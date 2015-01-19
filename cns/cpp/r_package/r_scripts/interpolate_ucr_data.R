@@ -6,7 +6,7 @@ source('./interpolate_ts.R')
 
 ts_dir = '~/prog/sim/ts'
 
-sample_size = 120
+sample_size = 60
 
 data = synth # synthetic control
 #data = starlight_curves

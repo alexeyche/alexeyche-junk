@@ -1,7 +1,7 @@
 {
     "criterion_name" : "eval_clustering_p_stat",
     "runs_dir" : "/home/alexeyche/prog/sim_spear",
-    "input_spikes" : "/home/alexeyche/prog/sim/spikes/synthetic_control_40_len_4_classes_train.pb",
+    "input_spikes" : "/home/alexeyche/prog/sim/spikes/synthetic_control_300_len_6_classes_train.pb",
     "epochs" : 1,
     "tune_start_weights_to_target_rate" : 10
 }

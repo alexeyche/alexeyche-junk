@@ -4,7 +4,7 @@ setwd("~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts")
 source("ucr_ts.R")
 
 ts_dir = "~/prog/sim/ts"
-sample_size = 120
+sample_size = 60
 data_name = synth
 c(data_train, data_test) := read_ts_file(data_name, sample_size, ts_dir)
 
@@ -22,7 +22,8 @@ gap_between_patterns = 100
 
 intercept = seq(min_val, max_val, length.out=N)
 
-sel = c(1:10, 51:60, 101:110, 151:160)
+#sel = c(1:10, 51:60, 101:110, 151:160)
+sel = c(1:length(data_train))
 data_complect = list(train=data_train, test=data_test)
 spikes_complect = list()
 
@@ -57,3 +58,4 @@ for(data_part in names(spikes_complect)) {
     prw = RProto$new(fname)
     prw$write(spikes_complect[[data_part]], "LabeledSpikesList")
 }
+prast(spikes_complect[["train"]]$spikes,T0=0,Tmax=1000)

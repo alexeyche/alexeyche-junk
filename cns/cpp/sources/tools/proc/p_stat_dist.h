@@ -109,17 +109,15 @@ void p_stat_dist(int argc, char **argv) {
 
     DoubleMatrix dist = calcPStatDistance(st, patterns, opts.jobs);
 
-    const SpikesList &sl = sp_list->sl;
-    double acc_rate = 0;
-    for(size_t i = sl.N-1; i>=(sl.N-st.size()) ; i--) {
-        acc_rate += sl[i].size()/sp_list->ptl.Tmax;
-    }
-    double rate = 1000*acc_rate/st.size();
-
-
     JsonBox::Value out;
+    
+    const SpikesList &sl = sp_list->sl;
+    JsonBox::Array rates;
+    for(size_t i = sl.N-1; i>=(sl.N-st.size()) ; i--) {
+        rates.push_back(1000*sl[i].size()/sp_list->ptl.Tmax);        
+    }
     out["distance_matrix"] = dist.serializeToJson();
-    out["mean_rate"] = rate;
+    out["rates"] = rates;
 
     vector<string> labs = sp_list->ptl.getLabelsTimeline();
     JsonBox::Array labs_json;

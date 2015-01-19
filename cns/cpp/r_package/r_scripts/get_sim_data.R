@@ -8,7 +8,7 @@ setwd("~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts")
 rundir="/home/alexeyche/prog/newsim/runs"
 #rundir="/home/kayla/alexeyche/sim/runs"
 #rundir="/home/alexeyche/prog/sim_spear/eval_clustering_p_stat_optimal_stdp"
-rundir="/home/alexeyche/prog/sim_spear/eval_clustering_p_stat_structure"
+#rundir="/home/alexeyche/prog/sim_spear/eval_clustering_p_stat_structure"
 runname = system(sprintf("ls -t %s | sed -ne '1p'", rundir),intern=TRUE)
 #runname = "251"
 workdir=sprintf("%s/%s", rundir, runname)

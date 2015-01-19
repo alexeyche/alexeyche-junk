@@ -199,6 +199,8 @@ void Sim::simStep(SimWorker *sw, const double &t) {
 
         if(n->fired) {
             s->net.propagateSpike(n->id, t+s->rg.Dt());
+            
+             
             n->fired = 0;
         }
     }

@@ -3,12 +3,31 @@ require(rjson, quietly=TRUE)
 args <- commandArgs(trailingOnly = FALSE)
 we_are_in_r_studio = length(grep("RStudio", args)) > 0
 arg_i = grep("--args", args)
-if(length(arg_i) == 0) {
-    f = "/home/alexeyche/prog/sim_spear/eval_clustering_p_stat_structure/28/1_proc_output.json"
+if(we_are_in_r_studio) {
+    method = "clustering"
+    f = "/home/alexeyche/prog/newsim/runs/90f771759412f0950bb6b890d8f954a2_0000/1_proc_output.json"
 } else {
-    f = args[arg_i+1]
+    usage = function() {
+        cat("Options:\n\t--method=(clustering|NN_NMI)\n\t--stat=json_file_with_stat\n")
+        q()
+    }
+    if(length(arg_i) == 0) usage() 
+    i = 1
+    method = f = NULL
+    while(i <= length(args)) {
+        if(args[i] == "--method") {
+            method = args[i+1]
+            i = i + 1
+        } else
+        if(args[i] == "--stat") {
+            f = args[i+1]
+            i = i + 1
+        }
+        i = i + 1
+    }
+    if((is.null( c(method, f)))||(is.na( c(method, f)))) usage()
 }
-
+data = fromJSON(file = f)  
 target_rate = 10.0
 ###################################
 
@@ -55,11 +74,15 @@ calinski_harabasz_criterion = function(points, ulabs, labs, centroids, global_ce
 }
 
 #########################
+rate_penalty = function(val) {
+    rates = data$rates
+    val / sqrt(sum((rates - rep(target_rate, length(rates)))^2))
+}
 
-calculate_criterion = function(proc_out_json) {    
-    data = fromJSON(file = proc_out_json)  
+
+
+calculate_criterion = function(data) {    
     dist = do.call(rbind, data$distance_matrix)
-    mean_rate = data$mean_rate
     labs = data$labels
     
     ulabs = unique(labs)
@@ -84,12 +107,8 @@ calculate_criterion = function(proc_out_json) {
     if(!we_are_in_r_studio) {
         png(sprintf("%s_eval_dist_matrix.png", data$epoch),width=1024, height=768)
     }
-    val = -10*calinski_harabasz_criterion(points, ulabs, labs, centroids, global_centroid)
-    if(mean_rate<target_rate) {
-        val = val*exp(- ((mean_rate - target_rate)^2)/10.0)
-    } else {
-        val = val*exp(- ((mean_rate - target_rate)^2)/100.0)
-    }
+    val = -100*calinski_harabasz_criterion(points, ulabs, labs, centroids, global_centroid)
+    val = rate_penalty(val)
     suppressWarnings({
         plot(x, y, xlab="Coordinate 1", ylab="Coordinate 2", main=sprintf("Metric MDS: %s", val),    type="n")
         lab_cols = rainbow(length(ulabs))
@@ -104,5 +123,7 @@ calculate_criterion = function(proc_out_json) {
 }
 ##############
 if(!we_are_in_r_studio) {
-    cat(calculate_criterion(f),"\n")
+    if(method == "clustering") {
+        cat(calculate_criterion(data),"\n")
+    }   
 }
