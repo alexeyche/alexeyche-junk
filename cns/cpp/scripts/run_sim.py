@@ -104,9 +104,9 @@ def evalClusteringPStat(args, wd, ep, p_stat_file, spikes, stat):
     eval_output = os.path.join(wd, "%s_eval_pstat.log" % ep)
     eval_r_script = os.path.join(os.path.dirname(this_file), "eval_dist_matrix.R")
     with pushd(wd):
-        eval = runProcess("Rscript",  { eval_r_script : json_proc }, verbose=args.verbose)
-
-    stat['eval'] = float(eval.strip())
+        runProcess("Rscript",  { eval_r_script : json_proc }, eval_output, verbose=args.verbose)
+    
+    stat['eval'] = float(open(eval_output).read().strip())
     stat['mean_rate'] = float(j['mean_rate'])
     if args.verbose:
         for k in sorted(stat.keys()):

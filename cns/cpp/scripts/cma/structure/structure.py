@@ -36,53 +36,66 @@ conf['variables_path'] = {
 }        
 conf['study'] = "structure"
 
-def main(job_id, params):
-    return evaluate(job_id, params, conf)
-
-const = read_const(os.path.join(os.path.dirname(this_file), "../../../const.json"))
-
-params = {}
-for k in conf['variables_path']:
-    params[k] = float(get_value_in_nested_dict(const, conf['variables_path'][k]))
-
-scaling_of_variables = []
 cma_conf = {
-    "tau_adapt": { "min" : 10, "max" : 500, "scale" : 10 } ,
-    "amp_adapt": { "min" : 0, "max" : 50, "scale" : 10 },
-    "tau_refr": { "min" : 1, "max" : 100, "scale" : 10 },
-    "beta": { "min" : 0.1, "max" : 4.0, "scale" : 10 },
-    "epsp_decay_exc": { "min" : 1, "max" : 100, "scale" : 10 },
-    "epsp_decay_inh": { "min" : 1, "max" : 100, "scale" : 10 },
-    "prob_feedforward_exc" : { "min" : 0.05, "max" : 1.0, "scale" : 1.0 },
-    "prob_feedforward_inh" : { "min" : 0, "max" : 1.0, "scale" : 1 },
-    "prob_reccurent_exc" : { "min" : 0, "max" : 1.0, "scale" : 1 },
-    "prob_reccurent_inh" : { "min" : 0, "max" : 1.0, "scale" : 1 },
-    "weight_distr_mean_ff_exc"  :  { "min" : 0.1, "max" : 100, "scale" : 10 }, 
-    "weight_distr_mean_ff_inh"  :  { "min" : 0, "max" : 100, "scale" : 10}, 
-    "weight_distr_mean_rec_exc" :  { "min" : 0, "max" : 100, "scale" : 10 }, 
-    "weight_distr_mean_rec_inh" :  { "min" : 0, "max" : 100, "scale" : 10 }, 
+    "tau_adapt": { "min" : 10, "max" : 500 } ,
+    "amp_adapt": { "min" : 0, "max" : 10 },
+    "tau_refr": { "min" : 1, "max" : 100 },
+    "beta": { "min" : 0.1, "max" : 5.0 },
+    "epsp_decay_exc": { "min" : 1, "max" : 100 },
+    "epsp_decay_inh": { "min" : 1, "max" : 100 },
+    "prob_feedforward_exc" : { "min" : 0.05, "max" : 1.0.0 },
+    "prob_feedforward_inh" : { "min" : 0, "max" : 1.0 },
+    "prob_reccurent_exc" : { "min" : 0, "max" : 1.0 },
+    "prob_reccurent_inh" : { "min" : 0, "max" : 1.0 },
+    "weight_distr_mean_ff_exc"  :  { "min" : 0.1, "max" : 100 }, 
+    "weight_distr_mean_ff_inh"  :  { "min" : 0, "max" : 100}, 
+    "weight_distr_mean_rec_exc" :  { "min" : 0, "max" : 100 }, 
+    "weight_distr_mean_rec_inh" :  { "min" : 0, "max" : 100 }, 
 }
 var_names = sorted(conf['variables_path'])
 
-es = cma.CMAEvolutionStrategy([ params[p] for p in var_names ], 0.1)
+bounds = [0, 10]
+
+def scale_to_cma(x, min, max, a, b):
+    return ((b-a)*(x - min)/(max-min)) + a
+
+def scale_from_cma(x, min, max, a, b):
+    return ((max-min)*(x - a)/(b-a)) + min
+
+
 id = 0
+def eval(x):
+    global id
+    p = dict(zip(var_names, x))
+    for param in p:
+        p[param] = scale_from_cma(p[param], cma_conf[param]["min"], cma_conf[param]['max'], bounds[0], bounds[1])
+    try:
+        res = evaluate(id, p, conf)
+        ret = res[ conf['criterion_name'] ]
+    except KeyboardInterrupt:
+        sys.exit(1)
+    except:        
+        ret = 0.0
+    id += 1
+    return ret
+
+
+const = read_const(os.path.join(os.path.dirname(this_file), "../../../const.json"))
+start_params = {}
+for param in var_names:
+    v = float(get_value_in_nested_dict(const, conf['variables_path'][k]))
+    start_params[param] = scale_to_cma(v, cma_conf[param]["min"], cma_conf[param]['max'], bounds[0], bounds[1])
+
+es = cma.CMAEvolutionStrategy([ start_params[p] for p in var_names ], 2, { 'bounds' : [0.0,10.0] } )
 while not es.stop():
    X = es.ask()
-   print X
    tells = []
    for x in X:
-       print x
-       import pdb; pdb.set_trace()
-       launch_params = dict(zip(var_names, x))
        print "Launching #%d: " % id
-       print launch_params
-       ret = main(id, launch_params) 
-       tells.append( ret[ conf['criterion_name'] ] )
-       id += 1
-   es.tell(X, tells)
-   print "told tells: "
+       ret = eval(x)
+       tells.append(ret)
    print tells
-
+   es.tell(X, tells)
    es.disp()  # by default sparse, see option verb_disp
 
 cma.pprint(es.result())
