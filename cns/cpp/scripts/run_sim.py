@@ -304,6 +304,7 @@ def main(args):
         runProcess(args.snn_sim_bin, sim_args, wd_file("%s_output.log" % ep), verbose = args.verbose)
         if args.eval_clustering_p_stat and ep > 0: 
             evalPStat(args, wd, ep, sim_args['--p-stat'], sim_args['--output'], "clustering", stat)
+            os.remove(sim_args['--p-stat'])
     return stat
 
 

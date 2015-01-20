@@ -5,7 +5,7 @@ we_are_in_r_studio = length(grep("RStudio", args)) > 0
 arg_i = grep("--args", args)
 if(we_are_in_r_studio) {
     method = "clustering"
-    f = "/home/alexeyche/prog/newsim/runs/90f771759412f0950bb6b890d8f954a2_0000/1_proc_output.json"
+    f = "/home/alexeyche/prog/sim_spear/eval_clustering_p_stat_structure/6/1_proc_output.json"
 } else {
     usage = function() {
         cat("Options:\n\t--method=(clustering|NN_NMI)\n\t--stat=json_file_with_stat\n")
@@ -73,10 +73,17 @@ calinski_harabasz_criterion = function(points, ulabs, labs, centroids, global_ce
     return( (ss_b/ss_w) )
 }
 
+
 #########################
 rate_penalty = function(val) {
-    rates = data$rates
-    val / sqrt(sum((rates - rep(target_rate, length(rates)))^2))
+    rates = data$rates    
+    target_rate_sum = sqrt(sum(rep(target_rate, length(data$rates))^2))
+    rate_sum = sqrt(sum((rates^2)))
+    if(mean(rates)>target_rate) {
+        val*exp( - (rate_sum - target_rate_sum)^2/2000.0)
+    } else {
+        val*exp( - (rate_sum - target_rate_sum)^2/500.0)
+    }
 }
 
 
@@ -88,7 +95,7 @@ calculate_criterion = function(data) {
     ulabs = unique(labs)
     
     if(all(dist == 0)) {
-        return(99999)
+        return(0.0)
     }
     
     fit = cmdscale(dist, 2, eig=TRUE)

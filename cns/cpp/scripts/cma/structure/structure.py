@@ -40,10 +40,10 @@ conf['study'] = "structure"
 cma_conf = {
     "tau_adapt": { "min" : 10, "max" : 500 } ,
     "amp_adapt": { "min" : 0, "max" : 10 },
-    "tau_refr": { "min" : 1, "max" : 100 },
+    "tau_refr": { "min" : 1, "max" : 50 },
     "beta": { "min" : 0.1, "max" : 5.0 },
-    "epsp_decay_exc": { "min" : 1, "max" : 100 },
-    "epsp_decay_inh": { "min" : 1, "max" : 100 },
+    "epsp_decay_exc": { "min" : 1, "max" : 50 },
+    "epsp_decay_inh": { "min" : 1, "max" : 50 },
     "prob_feedforward_exc" : { "min" : 0.05, "max" : 1.0 },
     "prob_feedforward_inh" : { "min" : 0, "max" : 1.0 },
     "prob_reccurent_exc" : { "min" : 0, "max" : 1.0 },
@@ -56,8 +56,8 @@ cma_conf = {
 var_names = sorted(conf['variables_path'])
 
 bounds = [0, 10]
-jobs = 2
-cma_jobs = multiprocessing.cpu_count()/jobs
+jobs = 3
+cma_jobs = 1 # multiprocessing.cpu_count()/jobs
 
 def scale_to_cma(x, min, max, a, b):
     return ((b-a)*(x - min)/(max-min)) + a
@@ -83,21 +83,22 @@ for param in var_names:
     v = float(get_value_in_nested_dict(const, conf['variables_path'][param]))
     start_params[param] = scale_to_cma(v, cma_conf[param]["min"], cma_conf[param]['max'], bounds[0], bounds[1])
 
-es = cma.CMAEvolutionStrategy([ start_params[p] for p in var_names ], 2, { 'bounds' : [0.0,10.0] } )
+es = cma.CMAEvolutionStrategy([ start_params[p] for p in var_names ], 2, { 'bounds' : [ bounds[0], bounds[1] ] } )
 id = 0
 while not es.stop():
     X = es.ask()
     tells = []
-    X_distr = X
-    while X_distr:
+    X_work = X
+    while X_work:
         pool = []
         for ji in range(cma_jobs):
-            if len(X_distr) == 0:
+            if len(X_work) == 0:
                 break
             print "Launching #%d: " % id
             ret_q = multiprocessing.Queue()
-            p = multiprocessing.Process(target=eval, args = (X_distr[0], id , ret_q))
-            X_distr = X_distr[1:]
+            #eval(X_work[0], id, ret_q)
+            p = multiprocessing.Process(target=eval, args = (X_work[0], id , ret_q))
+            X_work = X_work[1:]
             p.start()
             pool.append( (id, p, ret_q) )       
             id += 1
