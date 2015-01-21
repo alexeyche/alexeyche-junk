@@ -96,9 +96,9 @@ class SnnProc(object):
         CLUSTERING = "clustering"
         NN_NMI = "nn_nmi"
 
-    def __init__(self, wd, main_args):
+    def __init__(self, wd, args):
         self.wd = wd
-        self.main_args = main_args
+        self.args = args
 
     def proc_p_stat(self, p_stat, spikes, test_p_stat=None, test_spikes=None): # return path to json file with answer
         ep = get_last_ep(self.wd)
@@ -109,10 +109,11 @@ class SnnProc(object):
             proc_args['--test-spikes'] = test_spikes
         if test_p_stat:
             proc_args['--test-p-stat'] = test_p_stat
-        proc_args['--jobs'] = main_args.jobs
+        proc_args['--jobs'] = self.args.jobs
         json_proc = os.path.join(self.wd, "%s_proc_output.json" % ep)
         proc_args['--output'] = json_proc
-        runProcess([self.main_args.snn_proc_bin, "p_stat_dist"], proc_args, proc_output, verbose=main_args.verbose)
+        proc_output = os.path.join(self.wd, "%s_snn_proc_output.log" % ep)
+        runProcess([self.args.snn_proc_bin, "p_stat_dist"], proc_args, proc_output, verbose=self.args.verbose)
         if os.path.exists(proc_output) and os.stat(proc_output).st_size == 0:
             os.remove(proc_output)
         return json_proc
@@ -145,140 +146,46 @@ class SnnProc(object):
         json_proc = self.proc_p_stat(p_stat, spikes, test_p_stat, test_spikes)
         return self.eval_dist_matrix(json_proc, SnnProc.EvalMethods.NN_NMI)
 
-def evalPStat(args, wd, ep, p_stat_file, spikes, eval_method, stat):
-    if args.verbose:
-        print "Evaluation p stat, method %s..." % eval_method,
-        print 
-    proc_args = {}
-    proc_args['--p-stat'] = p_stat_file
-    proc_args['--spikes'] = spikes
-    if test_spikes:
-        proc_args['--test-spikes'] = test_spikes
-    proc_args['--jobs'] = args.jobs
-    json_proc = os.path.join(wd, "%s_proc_output.json" % ep)
-    proc_args['--output'] = json_proc
-    proc_output = os.path.join(wd, "%s_proc_stdout.log" % ep)
-    runProcess([args.snn_proc_bin, "p_stat_dist"], proc_args, proc_output, verbose=args.verbose)
-    if os.path.exists(proc_output) and os.stat(proc_output).st_size == 0:
-        os.remove(proc_output)
-    
-    j = json.load(open(json_proc))
-    j['epoch'] = ep 
-    json.dump(j, open(json_proc, 'w'), indent=4)
-
-    eval_output = os.path.join(wd, "%s_eval_pstat.log" % ep)
-    eval_r_script = os.path.join(os.path.dirname(this_file), "eval_dist_matrix.R")
-    with pushd(wd):
-        runProcess(["Rscript", eval_r_script],  { "--method": eval_method, "--stat" : json_proc }, eval_output, verbose=args.verbose)
-    
-    stat['eval'] = float(open(eval_output).read().strip())
-    stat['mean_rate'] = sum(j['rates'])/len(j['rates'])
-    if args.verbose:
-        for k in sorted(stat.keys()):
-            print k, ":", stat[k],
-        print
-
-def read_const(const_file):
-    with open(const_file) as const_ptr:
-        c_json = "\n".join([ l.split("//")[0].split("#")[0] for l in const_ptr.readlines() ])
-    try:
-        const = json.loads(c_json, object_pairs_hook=collections.OrderedDict)
-    except:
-        print "Error while reading %s:" % const_file
-        print traceback.format_exc()
-        sys.exit(1) 
-    return const
-
-
-DISTR_REG_EXP = "[A-Za-z]+\(([ 0-9.]+),([ 0-9.]+)\)"
-
-def tuneStartWeights(args, wd, common_sim_args, weight_range=(2.5, 100, 500), T_max=2500, parallel_launches=4):
-    const = read_const(common_sim_args['--constants'])
-    d_re = re.compile(DISTR_REG_EXP)
-    acc_w = 0.0
-    conn_count = 0
-    for c in const['sim_configuration']['conn_map']:
-        for c_var in const['sim_configuration']['conn_map'][c]:
-            m = d_re.match(c_var['weight_distr'])
-            if m:
-                acc_w += float(m.group(1))
-                conn_count += 1
-            else:
-                raise Exception("Faild to parse distribution of weighgts: %s" % c_var['weight_distr'])
-    start_weight = acc_w / conn_count
-
-    sim_args = common_sim_args.copy()
-    sim_args['--no-learning'] = True
-    sim_args['--T-max'] = T_max
-    sim_args['--constants'] = os.path.join(wd, "tune_const.json")
-    
-    def run_one_tune(args, wd, sim_args, const, w):
-        for c in const['sim_configuration']['conn_map']:
-            for i, c_var in enumerate(const['sim_configuration']['conn_map'][c]):
-                c_var['weight_distr'] = "Norm(%s,0.5)" % w
-                const['sim_configuration']['conn_map'][c][i] = c_var
-        json.dump(const, open(sim_args['--constants'], 'w'), indent=4)
-
-        procs = []
-        for i in range(parallel_launches):
-            sim_args_launch = sim_args.copy()
-            sim_args_launch['--jobs'] = int(math.floor(float(sim_args_launch['--jobs'])/parallel_launches))
-            if i == parallel_launches-1:
-                 sim_args_launch['--jobs']  += sim_args['--jobs'] - sim_args_launch['--jobs'] * parallel_launches
-            sim_args_launch['--output'] = os.path.join(wd, "tune_weights_output_spikes_%s.pb" % i)
-            sp = runProcess(args.snn_sim_bin, sim_args_launch, os.path.join(wd, "tune_weights_output_%s.log" % i), verbose = args.verbose, do_not_wait=True)
-            procs.append( (sim_args_launch, sp) )
-        
-        mean_acc = 0.0
-        for sim_args_launch, sp in procs:
-            try:
-                stdout, stderr = sp.communicate()
-            except KeyboardInterrupt:
-                print "Bye"
-            if sp.returncode != 0:
-                print "Run failed: "
-                for l in stdout.split("\n"):
-                    print l.strip()
-                sys.exit(1)
-            proc_args = {
-                '--spikes' : sim_args_launch['--output'],
-                '--net-neurons' : sum([ conf['size'] for conf in  const['sim_configuration']['net_layers_conf'] ]),
-            }
-            json_output = runProcess([args.snn_proc_bin, "mean_net_rate"], proc_args, verbose=args.verbose, json_stdout=True)
-            mean_acc += json_output['mean_rate']
-
-        mean = mean_acc/parallel_launches            
-        print "weight %s got %s mean rate" % (w, mean)
-        return mean
-    
-
-    weights = np.linspace(weight_range[0], weight_range[1], weight_range[2])
-    part_fun_tune = functools.partial(run_one_tune, args, wd, sim_args, const)
-
-    pos = common.binary_search(weights, args.tune_start_weights_to_target_rate, 0.5, fun=part_fun_tune)
-    if pos < 0:
-        raise Exception("Failed to find good weight")
-
-    new_const = read_const(sim_args['--constants'])
-    for c in new_const['sim_configuration']['net_layers_conf']:
-        #if 'learning_rule' in c['neuron_conf']:
-        #    new_const['learning_rules'][ c['neuron_conf']['learning_rule'] ]['learning_rate'] *= weights[pos]/start_weight
-        if 'weight_normalization' in c['neuron_conf']:
-            if 'w_max' in new_const['weight_normalizations'][ c['neuron_conf']['weight_normalization'] ]:
-                new_const['weight_normalizations'][ c['neuron_conf']['weight_normalization'] ]['w_max'] *= weights[pos]/start_weight
-    json.dump(new_const, open(sim_args['--constants'], 'w'), indent=4)
-    common_sim_args['--constants'] = sim_args['--constants']
-
 
 class SnnSim(object):
-    def wd(s = None):
+    class Args(object):
+        def setEvalCriterion(self, criterion_name):
+            self.__dict__[criterion_name] = True
+
+        input = None
+        test_input = None
+        spikes = None
+        test_spikes = None
+        epochs = 1
+        eval_clustering_p_stat = False
+        eval_nn_nmi = None
+        const = os.path.join(os.path.dirname(this_file), "../", CONST_JSON)
+        snn_sim_bin = os.path.join(os.path.dirname(this_file), "../build/bin", SNN_SIM)
+        snn_proc_bin = os.path.join(os.path.dirname(this_file), "../build/bin", SNN_PROC)
+        working_dir = None
+        jobs = multiprocessing.cpu_count()
+        T_max = 0
+        stat = None
+        verbose = True
+        old_dir = False
+        p_stat = None
+        runs_dir = RUNS_DIR
+        collect_statistics = None
+        tune_start_weights_to_target_rate = None
+
+    def wd(self, s = None):
         if s:
-            return os.path.join(self.wd, s)
+            return os.path.join(self.workdir, s)
         else:
-            return self.wd
+            return self.workdir
 
     def __init__(self, wd, args):
         self.args = args
+        self.workdir = wd
+        const = os.path.join(wd, os.path.basename(args.const))
+        if not os.path.exists(const):
+            shutil.copy(args.const, wd)
+
         input = None
         if args.input:
             input = args.input
@@ -291,11 +198,13 @@ class SnnSim(object):
             '--constants' : const
         }            
         if args.T_max != 0:
-            common_sim_args['--T-max'] = args.T_max
+            self.common_sim_args['--T-max'] = args.T_max
         self.last_run_epoch = None
+        if args.tune_start_weights_to_target_rate:
+            common.tuneStartWeights(args, wd, common_sim_args)
 
-    def run_one_epoch(self, ep):
-        sim_args = common_sim_args.copy()
+    def run_epoch(self, ep):
+        sim_args = self.common_sim_args.copy()
         if self.args.eval_clustering_p_stat or self.args.eval_nn_nmi: 
             p_stat  = self.wd("%s_p_stat.pb" % ep)
             sim_args['--p-stat'] = p_stat
@@ -334,9 +243,11 @@ class SnnSim(object):
             print "Epoch %d" % ep
         runProcess(self.args.snn_sim_bin, sim_args, self.wd("%s_output.log" % ep), verbose = self.args.verbose)
         self.last_run_epoch = ep
-        
-        if self.args.eval_clustering_p_stat and ep > 0: 
-            evalPStat(self.args, wd, ep, sim_args['--p-stat'], sim_args['--output'], "clustering", stat)
+        eval = {}
+        if ep == 0:
+            return eval
+        if self.args.eval_clustering_p_stat:
+            eval = SnnProc(self.wd(), self.args).eval_clustering(sim_args['--p-stat'], sim_args['--output'])
             os.remove(sim_args['--p-stat'])
         if self.args.eval_nn_nmi:
             if (self.args.test_input and self.args.test_spikes) and self.args.eval_nn_nmi:
@@ -354,10 +265,11 @@ class SnnSim(object):
             sim_args['--no-learning'] = True
             
             runProcess(self.args.snn_sim_bin, sim_args, self.wd("%s_test_output.log" % ep), verbose = self.args.verbose)
-            eval = SnnProc(wd, self.args).eval_nn_nmi(output_spikes, p_stat, test_output_spikes, test_p_stat)
+            eval = SnnProc(self.wd(), self.args).eval_nn_nmi(output_spikes, p_stat, test_output_spikes, test_p_stat)
             
             os.remove(p_stat)
             os.remove(test_p_stat)
+        return eval
 
 def main(args):
     const_hex = md5.new(args.const).hexdigest()
@@ -397,118 +309,15 @@ def main(args):
         else:
             os.mkdir(wd)
 
-    const = os.path.join(wd, os.path.basename(args.const))
-    if not os.path.exists(const):
-        shutil.copy(args.const, wd)
 
-    def wd_file(s):
-        return os.path.join(wd, s)
     
-    input = None
-    if args.input:
-        input = args.input
-    elif args.spikes:
-        input = args.spikes
-
-    common_sim_args = {
-        '--jobs' : args.jobs,
-        '--input' : input,
-        '--constants' : const
-    }            
-    if args.T_max != 0:
-        common_sim_args['--T-max'] = args.T_max
-    
-    if args.tune_start_weights_to_target_rate:
-        tuneStartWeights(args, wd, common_sim_args)
     stat = {'eval' : None, 'mean_rate' : 0}
+    sim = SnnSim(wd, args)
     for ep in xrange(start_ep, start_ep + args.epochs + 1):
-        sim_args = common_sim_args.copy()
-        if args.eval_clustering_p_stat or args.eval_nn_nmi: 
-            p_stat  = wd_file("%s_p_stat.pb" % ep)
-            sim_args['--p-stat'] = p_stat
-        sim_args['--save'] = wd_file("%s_model.pb" % ep)
-        output_spikes = wd_file("%s_output_spikes.pb" % ep)
-        sim_args['--output'] = output_spikes
-
-        if args.stat:
-            sim_args['--stat'] = wd_file("%s_stat.pb" % ep)
-        elif args.p_stat and '--p-stat' not in sim_args:
-            sim_args['--p-stat'] = wd_file("%s_p_stat.pb" % ep)
-
-        if ep>1:
-            model_load = wd_file("%s_model.pb" % str(ep-1))
-            if not os.path.exists(model_load):
-                raise Exception("Can't find model for previous epoch number %s" % str(ep-1))
-            sim_args['--load'] = model_load
-
-        if ep == 1 and args.collect_statistics:
-            sim_args['--T-max'] = args.collect_statistics
-            sim_args['--no-learning'] = True
-
-        if args.input:
-            if ep == 0:
-                sim_args['--precalc'] = True
-                sim_args['--output'] = wd_file("input_spikes.pb")
-                del sim_args['--save']
-            else:
-                if not os.path.exists( wd_file("input_spikes.pb") ):
-                    raise Exception("Can't find input_spikes.pb")
-                sim_args['--input'] = wd_file("input_spikes.pb")
-        elif ep == 0:
-            continue
-        if args.epochs>1:
-            print "Epoch %d" % ep
-        runProcess(args.snn_sim_bin, sim_args, wd_file("%s_output.log" % ep), verbose = args.verbose)
-        if args.eval_clustering_p_stat and ep > 0: 
-            evalPStat(args, wd, ep, sim_args['--p-stat'], sim_args['--output'], "clustering", stat)
-            os.remove(sim_args['--p-stat'])
-        if args.eval_nn_nmi:
-            if (args.test_input and args.test_spikes) and args.eval_nn_nmi:
-                raise Exception("Need only test spikes or test time series. Not both")
-            if args.test_input:
-                sim_args['--input'] = args.test_input
-            elif args.test_spikes:
-                sim_args['--input'] = args.test_spikes
-            else:
-                raise Exception("Need test set for evaluation with NN NMI")
-            test_output_spikes = wd_file("%s_test_output_spikes.pb" % ep)
-            sim_args['--output'] = test_output_spikes
-            test_p_stat = wd_file("%s_test_p_stat.pb" % ep)
-            sim_args['--p-stat'] = test_p_stat
-            sim_args['--no-learning'] = True
-            
-            runProcess(args.snn_sim_bin, sim_args, wd_file("%s_test_output.log" % ep), verbose = args.verbose)
-            eval = SnnProc(wd, args).eval_nn_nmi(output_spikes, p_stat, test_output_spikes, test_p_stat)
-            
-            os.remove(p_stat)
-            os.remove(test_p_stat)
+        stat = sim.run_epoch(ep)
     return stat
 
 
-class RunSimArgs(object):
-    def setEvalCriterion(self, criterion_name):
-        self.__dict__[criterion_name] = True
-
-    input = None
-    test_input = None
-    spikes = None
-    test_spikes = None
-    epochs = 1
-    eval_clustering_p_stat = False
-    eval_nn_nmi = None
-    const = os.path.join(os.path.dirname(this_file), "../", CONST_JSON)
-    snn_sim_bin = os.path.join(os.path.dirname(this_file), "../build/bin", SNN_SIM)
-    snn_proc_bin = os.path.join(os.path.dirname(this_file), "../build/bin", SNN_PROC)
-    working_dir = None
-    jobs = multiprocessing.cpu_count()
-    T_max = 0
-    stat = None
-    verbose = True
-    old_dir = False
-    p_stat = None
-    runs_dir = RUNS_DIR
-    collect_statistics = None
-    tune_start_weights_to_target_rate = None
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Tool for simulating snn')
@@ -521,6 +330,10 @@ if __name__ == '__main__':
                         '--test-input', 
                         required=False,
                         help='Test input time series protobuf')
+    parser.add_argument('-sp', 
+                        '--spikes', 
+                        required=False,
+                        help='Train input labeled spikes list protobuf')
     parser.add_argument('-spt', 
                         '--test-spikes', 
                         required=False,
@@ -528,15 +341,15 @@ if __name__ == '__main__':
     parser.add_argument('-e', 
                         '--epochs', 
                         required=False,
-                        help='Number of epochs to run', default=RunSimArgs.epochs,type=int)
+                        help='Number of epochs to run', default=SnnSim.Args.epochs,type=int)
     parser.add_argument('-j', 
                         '--jobs', 
                         required=False,
-                        help='Number of parallell jobs (default: %(default)s)', default=RunSimArgs.jobs, type=int)
+                        help='Number of parallell jobs (default: %(default)s)', default=SnnSim.Args.jobs, type=int)
     parser.add_argument('-T', 
                         '--T-max', 
                         required=False,
-                        help='Run only specific amount of simulation time (ms)', default=RunSimArgs.T_max)
+                        help='Run only specific amount of simulation time (ms)', default=SnnSim.Args.T_max)
     parser.add_argument('-o', 
                         '--old-dir', 
                         action='store_true',
@@ -556,7 +369,7 @@ if __name__ == '__main__':
     parser.add_argument('-r', 
                         '--runs-dir', 
                         required=False,
-                        help='Runs dir (default: %(default)s)', default=RunSimArgs.runs_dir)
+                        help='Runs dir (default: %(default)s)', default=SnnSim.Args.runs_dir)
     parser.add_argument('-w', 
                         '--working-dir',
                         required=False,
@@ -564,13 +377,13 @@ if __name__ == '__main__':
     parser.add_argument('-c', 
                         '--const', 
                         required=False,
-                        help='Path to const.json file (default: $SCRIPT_DIR/../%s)' % CONST_JSON, default=RunSimArgs.const)
+                        help='Path to const.json file (default: $SCRIPT_DIR/../%s)' % CONST_JSON, default=SnnSim.Args.const)
     parser.add_argument('--snn-sim-bin', 
                         required=False,
-                        help='Path to snn sim bin (default: $SCRIPT_DIR/../build/bin/%s)' % SNN_SIM, default=RunSimArgs.snn_sim_bin)
+                        help='Path to snn sim bin (default: $SCRIPT_DIR/../build/bin/%s)' % SNN_SIM, default=SnnSim.Args.snn_sim_bin)
     parser.add_argument('--snn-proc-bin', 
                         required=False,
-                        help='Path to snn proc bin (default: $SCRIPT_DIR/../build/bin/%s)' % SNN_PROC, default=RunSimArgs.snn_proc_bin)
+                        help='Path to snn proc bin (default: $SCRIPT_DIR/../build/bin/%s)' % SNN_PROC, default=SnnSim.Args.snn_proc_bin)
     parser.add_argument('--eval-clustering-p-stat',
                         action='store_true',
                         help='Run evaluation of unsupervised classification with clustering of model intensities')
@@ -592,8 +405,8 @@ if __name__ == '__main__':
         raise Exception("Need input time series or input spikes")
     if args.stat and args.p_stat:
         raise Exception("Can't collect Full and Partial statistics. Choose one")
-    sim_opts = RunSimArgs()
+    sim_opts = SnnSim.Args()
     sim_opts.__dict__.update(args.__dict__)
 
-    const = read_const(sim_opts.const)
+    const = common.read_const(sim_opts.const)
     main(sim_opts)

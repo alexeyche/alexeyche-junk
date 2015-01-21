@@ -72,6 +72,19 @@ def get_value_in_nested_dict(d, path):
             return get_value_in_nested_dict(d[path[0]], path[1:])
     return d[path[0]]
 
+def read_const(const_file):
+    with open(const_file) as const_ptr:
+        c_json = "\n".join([ l.split("//")[0].split("#")[0] for l in const_ptr.readlines() ])
+    try:
+        const = json.loads(c_json, object_pairs_hook=collections.OrderedDict)
+    except:
+        print "Error while reading %s:" % const_file
+        print traceback.format_exc()
+        sys.exit(1) 
+    return const
+
+
+
 def binary_search(a, x, d, lo=0, hi=None, fun = lambda val : val):
     if hi is None:
         hi = len(a)
@@ -94,7 +107,7 @@ def is_nested_list(v):
     return False
 
 def evaluate(job_id, params, config, jobs=multiprocessing.cpu_count(), verbose=True):
-    run_sim_args = run_sim.RunSimArgs()
+    run_sim_args = run_sim.SnnSim.Args()
     if config.get('input_spikes'):
         run_sim_args.spikes = config['input_spikes']
     elif config.get('input_ts'):
@@ -134,3 +147,84 @@ def evaluate(job_id, params, config, jobs=multiprocessing.cpu_count(), verbose=T
         config['criterion_name'] : stat['eval'],
     }
 
+
+DISTR_REG_EXP = "[A-Za-z]+\(([ 0-9.]+),([ 0-9.]+)\)"
+
+def tuneStartWeights(args, wd, common_sim_args, weight_range=(2.5, 100, 500), T_max=2500, parallel_launches=4):
+    const = read_const(common_sim_args['--constants'])
+    d_re = re.compile(DISTR_REG_EXP)
+    acc_w = 0.0
+    conn_count = 0
+    for c in const['sim_configuration']['conn_map']:
+        for c_var in const['sim_configuration']['conn_map'][c]:
+            m = d_re.match(c_var['weight_distr'])
+            if m:
+                acc_w += float(m.group(1))
+                conn_count += 1
+            else:
+                raise Exception("Faild to parse distribution of weighgts: %s" % c_var['weight_distr'])
+    start_weight = acc_w / conn_count
+
+    sim_args = common_sim_args.copy()
+    sim_args['--no-learning'] = True
+    sim_args['--T-max'] = T_max
+    sim_args['--constants'] = os.path.join(wd, "tune_const.json")
+    
+    def run_one_tune(args, wd, sim_args, const, w):
+        for c in const['sim_configuration']['conn_map']:
+            for i, c_var in enumerate(const['sim_configuration']['conn_map'][c]):
+                c_var['weight_distr'] = "Norm(%s,0.5)" % w
+                const['sim_configuration']['conn_map'][c][i] = c_var
+        json.dump(const, open(sim_args['--constants'], 'w'), indent=4)
+
+        procs = []
+        for i in range(parallel_launches):
+            sim_args_launch = sim_args.copy()
+            sim_args_launch['--jobs'] = int(math.floor(float(sim_args_launch['--jobs'])/parallel_launches))
+            if i == parallel_launches-1:
+                 sim_args_launch['--jobs']  += sim_args['--jobs'] - sim_args_launch['--jobs'] * parallel_launches
+            sim_args_launch['--output'] = os.path.join(wd, "tune_weights_output_spikes_%s.pb" % i)
+            sp = runProcess(args.snn_sim_bin, sim_args_launch, os.path.join(wd, "tune_weights_output_%s.log" % i), verbose = args.verbose, do_not_wait=True)
+            procs.append( (sim_args_launch, sp) )
+        
+        mean_acc = 0.0
+        for sim_args_launch, sp in procs:
+            try:
+                stdout, stderr = sp.communicate()
+            except KeyboardInterrupt:
+                print "Bye"
+            if sp.returncode != 0:
+                print "Run failed: "
+                for l in stdout.split("\n"):
+                    print l.strip()
+                sys.exit(1)
+            proc_args = {
+                '--spikes' : sim_args_launch['--output'],
+                '--net-neurons' : sum([ conf['size'] for conf in  const['sim_configuration']['net_layers_conf'] ]),
+            }
+            json_output = runProcess([args.snn_proc_bin, "mean_net_rate"], proc_args, verbose=args.verbose, json_stdout=True)
+            mean_acc += json_output['mean_rate']
+
+        mean = mean_acc/parallel_launches            
+        print "weight %s got %s mean rate" % (w, mean)
+        return mean
+    
+
+    weights = np.linspace(weight_range[0], weight_range[1], weight_range[2])
+    part_fun_tune = functools.partial(run_one_tune, args, wd, sim_args, const)
+
+    pos = common.binary_search(weights, args.tune_start_weights_to_target_rate, 0.5, fun=part_fun_tune)
+    if pos < 0:
+        raise Exception("Failed to find good weight")
+
+    new_const = read_const(sim_args['--constants'])
+    for c in new_const['sim_configuration']['net_layers_conf']:
+        #if 'learning_rule' in c['neuron_conf']:
+        #    new_const['learning_rules'][ c['neuron_conf']['learning_rule'] ]['learning_rate'] *= weights[pos]/start_weight
+        if 'weight_normalization' in c['neuron_conf']:
+            if 'w_max' in new_const['weight_normalizations'][ c['neuron_conf']['weight_normalization'] ]:
+                new_const['weight_normalizations'][ c['neuron_conf']['weight_normalization'] ]['w_max'] *= weights[pos]/start_weight
+    json.dump(new_const, open(sim_args['--constants'], 'w'), indent=4)
+    common_sim_args['--constants'] = sim_args['--constants']
+
+   
