@@ -82,6 +82,69 @@ def runProcess(bin, args, log_stdout=None, verbose=False, json_stdout=False, do_
         return json.loads(stdout, object_pairs_hook=collections.OrderedDict)
 
 
+RE_NUMBERED_FILE = re.compile("^([0-9]+)")
+def get_last_ep(wd):
+    l = []
+    for f in os.listdir(wd):
+        m = RE_NUMBERED_FILE.match(f)        
+        if m:
+            l.append(int(m.group(1)))
+    return max(l)
+    
+class SnnProc(object):
+    class EvalMethods(object):
+        CLUSTERING = "clustering"
+        NN_NMI = "nn_nmi"
+
+    def __init__(self, wd, main_args):
+        self.wd = wd
+        self.main_args = main_args
+
+    def proc_p_stat(self, p_stat, spikes, test_p_stat=None, test_spikes=None): # return path to json file with answer
+        ep = get_last_ep(self.wd)
+        proc_args = {}
+        proc_args['--p-stat'] = p_stat
+        proc_args['--spikes'] = spikes
+        if test_spikes:
+            proc_args['--test-spikes'] = test_spikes
+        if test_p_stat:
+            proc_args['--test-p-stat'] = test_p_stat
+        proc_args['--jobs'] = main_args.jobs
+        json_proc = os.path.join(self.wd, "%s_proc_output.json" % ep)
+        proc_args['--output'] = json_proc
+        runProcess([self.main_args.snn_proc_bin, "p_stat_dist"], proc_args, proc_output, verbose=main_args.verbose)
+        if os.path.exists(proc_output) and os.stat(proc_output).st_size == 0:
+            os.remove(proc_output)
+        return json_proc
+    
+    def eval_dist_matrix(self, json_proc, eval_method):
+        ep = get_last_ep(self.wd)
+        j = json.load(open(json_proc))
+        j['epoch'] = ep
+        json.dump(j, open(json_proc, 'w'), indent=4)
+
+        eval_output = os.path.join(wd, "%s_eval_pstat.log" % ep)
+        eval_r_script = os.path.join(os.path.dirname(this_file), "eval_dist_matrix.R")
+        with pushd(wd):
+            runProcess(["Rscript", eval_r_script],  { "--method": eval_method, "--stat" : json_proc }, eval_output, verbose=args.verbose)
+        
+        stat = {} 
+        stat['eval'] = float(open(eval_output).read().strip())
+        stat['mean_rate'] = sum(j['rates'])/len(j['rates'])
+        if args.verbose:
+            for k in sorted(stat.keys()):
+                print k, ":", stat[k],
+            print
+        return stat
+
+    def eval_clustering(self, p_stat, spikes):
+        json_proc = self.proc_p_stat(p_stat, spikes)
+        return self.eval_dist_matrix(json_proc, SnnProc.EvalMethods.CLUSTERING)
+
+    def eval_nn_nmi(self, p_stat, spikes, test_p_stat, test_spikes):
+        json_proc = self.proc_p_stat(p_stat, spikes, test_p_stat, test_spikes)
+        return self.eval_dist_matrix(json_proc, SnnProc.EvalMethods.NN_NMI)
+
 def evalPStat(args, wd, ep, p_stat_file, spikes, eval_method, stat):
     if args.verbose:
         print "Evaluation p stat, method %s..." % eval_method,
@@ -89,6 +152,8 @@ def evalPStat(args, wd, ep, p_stat_file, spikes, eval_method, stat):
     proc_args = {}
     proc_args['--p-stat'] = p_stat_file
     proc_args['--spikes'] = spikes
+    if test_spikes:
+        proc_args['--test-spikes'] = test_spikes
     proc_args['--jobs'] = args.jobs
     json_proc = os.path.join(wd, "%s_proc_output.json" % ep)
     proc_args['--output'] = json_proc
@@ -204,6 +269,96 @@ def tuneStartWeights(args, wd, common_sim_args, weight_range=(2.5, 100, 500), T_
     json.dump(new_const, open(sim_args['--constants'], 'w'), indent=4)
     common_sim_args['--constants'] = sim_args['--constants']
 
+
+class SnnSim(object):
+    def wd(s = None):
+        if s:
+            return os.path.join(self.wd, s)
+        else:
+            return self.wd
+
+    def __init__(self, wd, args):
+        self.args = args
+        input = None
+        if args.input:
+            input = args.input
+        elif args.spikes:
+            input = args.spikes
+
+        self.common_sim_args = {
+            '--jobs' : args.jobs,
+            '--input' : input,
+            '--constants' : const
+        }            
+        if args.T_max != 0:
+            common_sim_args['--T-max'] = args.T_max
+        self.last_run_epoch = None
+
+    def run_one_epoch(self, ep):
+        sim_args = common_sim_args.copy()
+        if self.args.eval_clustering_p_stat or self.args.eval_nn_nmi: 
+            p_stat  = self.wd("%s_p_stat.pb" % ep)
+            sim_args['--p-stat'] = p_stat
+        
+        sim_args['--save'] = self.wd("%s_model.pb" % ep)
+        output_spikes = self.wd("%s_output_spikes.pb" % ep)
+        sim_args['--output'] = output_spikes
+
+        if self.args.stat:
+            sim_args['--stat'] = self.wd("%s_stat.pb" % ep)
+        elif self.args.p_stat and '--p-stat' not in sim_args:
+            sim_args['--p-stat'] = self.wd("%s_p_stat.pb" % ep)
+
+        if ep>1:
+            model_load = self.wd("%s_model.pb" % str(ep-1))
+            if not os.path.exists(model_load):
+                raise Exception("Can't find model for previous epoch number %s" % str(ep-1))
+            sim_args['--load'] = model_load
+
+        if ep == 1 and self.args.collect_statistics:
+            sim_args['--T-max'] = self.args.collect_statistics
+            sim_args['--no-learning'] = True
+
+        if self.args.input:
+            if ep == 0:
+                sim_args['--precalc'] = True
+                sim_args['--output'] = self.wd("input_spikes.pb")
+                del sim_args['--save']
+            else:
+                if not os.path.exists( self.wd("input_spikes.pb") ):
+                    raise Exception("Can't find input_spikes.pb")
+                sim_args['--input'] = self.wd("input_spikes.pb")
+        elif ep == 0:
+            return
+        if self.args.epochs>1:
+            print "Epoch %d" % ep
+        runProcess(self.args.snn_sim_bin, sim_args, self.wd("%s_output.log" % ep), verbose = self.args.verbose)
+        self.last_run_epoch = ep
+        
+        if self.args.eval_clustering_p_stat and ep > 0: 
+            evalPStat(self.args, wd, ep, sim_args['--p-stat'], sim_args['--output'], "clustering", stat)
+            os.remove(sim_args['--p-stat'])
+        if self.args.eval_nn_nmi:
+            if (self.args.test_input and self.args.test_spikes) and self.args.eval_nn_nmi:
+                raise Exception("Need only test spikes or test time series. Not both")
+            if self.args.test_input:
+                sim_args['--input'] = self.args.test_input
+            elif self.args.test_spikes:
+                sim_args['--input'] = self.args.test_spikes
+            else:
+                raise Exception("Need test set for evaluation with NN NMI")
+            test_output_spikes = self.wd("%s_test_output_spikes.pb" % ep)
+            sim_args['--output'] = test_output_spikes
+            test_p_stat = self.wd("%s_test_p_stat.pb" % ep)
+            sim_args['--p-stat'] = test_p_stat
+            sim_args['--no-learning'] = True
+            
+            runProcess(self.args.snn_sim_bin, sim_args, self.wd("%s_test_output.log" % ep), verbose = self.args.verbose)
+            eval = SnnProc(wd, self.args).eval_nn_nmi(output_spikes, p_stat, test_output_spikes, test_p_stat)
+            
+            os.remove(p_stat)
+            os.remove(test_p_stat)
+
 def main(args):
     const_hex = md5.new(args.const).hexdigest()
     i=0
@@ -265,14 +420,16 @@ def main(args):
     
     if args.tune_start_weights_to_target_rate:
         tuneStartWeights(args, wd, common_sim_args)
-
     stat = {'eval' : None, 'mean_rate' : 0}
     for ep in xrange(start_ep, start_ep + args.epochs + 1):
         sim_args = common_sim_args.copy()
-        if args.eval_clustering_p_stat: 
-            sim_args['--p-stat'] = wd_file("%s_p_stat.pb" % ep) 
+        if args.eval_clustering_p_stat or args.eval_nn_nmi: 
+            p_stat  = wd_file("%s_p_stat.pb" % ep)
+            sim_args['--p-stat'] = p_stat
         sim_args['--save'] = wd_file("%s_model.pb" % ep)
-        sim_args['--output'] = wd_file("%s_output_spikes.pb" % ep)
+        output_spikes = wd_file("%s_output_spikes.pb" % ep)
+        sim_args['--output'] = output_spikes
+
         if args.stat:
             sim_args['--stat'] = wd_file("%s_stat.pb" % ep)
         elif args.p_stat and '--p-stat' not in sim_args:
@@ -305,6 +462,26 @@ def main(args):
         if args.eval_clustering_p_stat and ep > 0: 
             evalPStat(args, wd, ep, sim_args['--p-stat'], sim_args['--output'], "clustering", stat)
             os.remove(sim_args['--p-stat'])
+        if args.eval_nn_nmi:
+            if (args.test_input and args.test_spikes) and args.eval_nn_nmi:
+                raise Exception("Need only test spikes or test time series. Not both")
+            if args.test_input:
+                sim_args['--input'] = args.test_input
+            elif args.test_spikes:
+                sim_args['--input'] = args.test_spikes
+            else:
+                raise Exception("Need test set for evaluation with NN NMI")
+            test_output_spikes = wd_file("%s_test_output_spikes.pb" % ep)
+            sim_args['--output'] = test_output_spikes
+            test_p_stat = wd_file("%s_test_p_stat.pb" % ep)
+            sim_args['--p-stat'] = test_p_stat
+            sim_args['--no-learning'] = True
+            
+            runProcess(args.snn_sim_bin, sim_args, wd_file("%s_test_output.log" % ep), verbose = args.verbose)
+            eval = SnnProc(wd, args).eval_nn_nmi(output_spikes, p_stat, test_output_spikes, test_p_stat)
+            
+            os.remove(p_stat)
+            os.remove(test_p_stat)
     return stat
 
 
@@ -313,9 +490,12 @@ class RunSimArgs(object):
         self.__dict__[criterion_name] = True
 
     input = None
+    test_input = None
     spikes = None
+    test_spikes = None
     epochs = 1
     eval_clustering_p_stat = False
+    eval_nn_nmi = None
     const = os.path.join(os.path.dirname(this_file), "../", CONST_JSON)
     snn_sim_bin = os.path.join(os.path.dirname(this_file), "../build/bin", SNN_SIM)
     snn_proc_bin = os.path.join(os.path.dirname(this_file), "../build/bin", SNN_PROC)
@@ -337,10 +517,14 @@ if __name__ == '__main__':
                         '--input', 
                         required=False,
                         help='Input time series protobuf')
-    parser.add_argument('-sp', 
-                        '--spikes', 
+    parser.add_argument('-it', 
+                        '--test-input', 
                         required=False,
-                        help='Input labeled spikes list protobuf')
+                        help='Test input time series protobuf')
+    parser.add_argument('-spt', 
+                        '--test-spikes', 
+                        required=False,
+                        help='Test input labeled spikes list protobuf')
     parser.add_argument('-e', 
                         '--epochs', 
                         required=False,
@@ -390,6 +574,9 @@ if __name__ == '__main__':
     parser.add_argument('--eval-clustering-p-stat',
                         action='store_true',
                         help='Run evaluation of unsupervised classification with clustering of model intensities')
+    parser.add_argument('--eval-nn-nmi',
+                        action='store_true',
+                        help='Run evaluation of net with nearest neighbourhood classificator 1 and NMI measure of confustion matrix (need test set of input)')
     parser.add_argument('--collect-statistics',
                         required=False,
                         help='Run simulation in first epoch without learning to collect statistics')
