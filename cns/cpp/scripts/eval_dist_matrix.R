@@ -4,8 +4,8 @@ args <- commandArgs(trailingOnly = FALSE)
 we_are_in_r_studio = length(grep("RStudio", args)) > 0
 arg_i = grep("--args", args)
 if(we_are_in_r_studio) {
-    method = "clustering"
-    f = "/home/alexeyche/prog/sim_spear/eval_clustering_p_stat_structure/6/1_proc_output.json"
+    method = "nn_nmi"
+    f = "/home/alexeyche/prog/sim_spear/eval_nn_nmi_structure/10/1_proc_output.json"
 } else {
     usage = function() {
         cat("Options:\n\t--method=(clustering|NN_NMI)\n\t--stat=json_file_with_stat\n")
@@ -86,7 +86,34 @@ rate_penalty = function(val) {
     }
 }
 
-
+nn_nmi = function(data) {
+    library(caret, quietly=TRUE)
+    dist = do.call(rbind, data$distance_matrix)
+    diag(dist) <- Inf
+    
+    labs = data$labels
+    test_labs = data$test_labels
+    ulabs = unique(c(labs, test_labs))
+    
+    tr_ids = 1:length(labs)
+    conf_m = matrix(0, nrow=length(ulabs), ncol=length(ulabs))
+    
+    resp = ulabs
+    pred = ulabs
+    for(i in 1:length(test_labs)) {
+        tr_i = which(dist[i+length(labs),tr_ids] == min(dist[i+length(labs),tr_ids]))
+        tr_i = tr_i[1]
+        act_class = which(ulabs == labs[i])
+        pred_class = which(ulabs == labs[tr_i])
+        
+        resp = c(resp, act_class)
+        pred = c(pred, pred_class)        
+    }
+    t = table(pred,resp)
+    cf = confusionMatrix(t)
+    print(cf)
+    return(-cf$overall[1])
+}
 
 calculate_criterion = function(data) {    
     dist = do.call(rbind, data$distance_matrix)
@@ -132,5 +159,8 @@ calculate_criterion = function(data) {
 if(!we_are_in_r_studio) {
     if(method == "clustering") {
         cat(calculate_criterion(data),"\n")
-    }   
+    } else    
+    if(method == "nn_nmi") {
+        cat(nn_nmi(data),"\n")
+    }
 }

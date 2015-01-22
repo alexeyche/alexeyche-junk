@@ -114,6 +114,8 @@ def evaluate(job_id, params, config, jobs=multiprocessing.cpu_count(), verbose=T
         run_sim_args.input = config['input_ts']
     else:
         raise Exception("Can't find input_spikes or input_ts in config.json")
+    if config.get('test_spikes'):
+        run_sim_args.test_spikes = config['input_spikes']
 
     run_sim_args.epochs = config['epochs']
     run_sim_args.setEvalCriterion(config['criterion_name'])

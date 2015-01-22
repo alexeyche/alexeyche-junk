@@ -124,15 +124,15 @@ class SnnProc(object):
         j['epoch'] = ep
         json.dump(j, open(json_proc, 'w'), indent=4)
 
-        eval_output = os.path.join(wd, "%s_eval_pstat.log" % ep)
+        eval_output = os.path.join(self.wd, "%s_eval_pstat.log" % ep)
         eval_r_script = os.path.join(os.path.dirname(this_file), "eval_dist_matrix.R")
-        with pushd(wd):
-            runProcess(["Rscript", eval_r_script],  { "--method": eval_method, "--stat" : json_proc }, eval_output, verbose=args.verbose)
+        with pushd(self.wd):
+            runProcess(["Rscript", eval_r_script],  { "--method": eval_method, "--stat" : json_proc }, eval_output, verbose=self.args.verbose)
         
         stat = {} 
-        stat['eval'] = float(open(eval_output).read().strip())
+        stat['eval'] = float(open(eval_output).readlines()[-1].strip())
         stat['mean_rate'] = sum(j['rates'])/len(j['rates'])
-        if args.verbose:
+        if self.args.verbose:
             for k in sorted(stat.keys()):
                 print k, ":", stat[k],
             print
@@ -265,7 +265,7 @@ class SnnSim(object):
             sim_args['--no-learning'] = True
             
             runProcess(self.args.snn_sim_bin, sim_args, self.wd("%s_test_output.log" % ep), verbose = self.args.verbose)
-            eval = SnnProc(self.wd(), self.args).eval_nn_nmi(output_spikes, p_stat, test_output_spikes, test_p_stat)
+            eval = SnnProc(self.wd(), self.args).eval_nn_nmi(p_stat, output_spikes, test_p_stat, test_output_spikes)
             
             os.remove(p_stat)
             os.remove(test_p_stat)

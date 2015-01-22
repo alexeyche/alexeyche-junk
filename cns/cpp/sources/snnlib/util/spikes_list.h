@@ -112,6 +112,24 @@ public:
         cout << "SpikesList: " << sl;
         cout << "PatternsTimeline: " << ptl;
     }
+
+    vector<IndexSlice> getPatternSlices() const {
+        vector<IndexSlice> patterns;
+        const vector<double> &tl = ptl.timeline;
+        const double &dt = ptl.dt;
+
+        double t=0;
+        for(auto it=tl.cbegin(); it != tl.cend(); ++it) {
+            if(t>ptl.Tmax) {
+                break;
+            }
+            patterns.push_back( IndexSlice((size_t)(t/dt), min((size_t)ptl.Tmax, (size_t)((*it)/dt) )) );
+            //cout << "adding pattern [" << patterns.back().from << ", " << patterns.back().to << ")\n";
+            t = *it;
+        }
+        return patterns;
+    }
+
     SpikesList sl;
     PatternsTimeline ptl;
 };

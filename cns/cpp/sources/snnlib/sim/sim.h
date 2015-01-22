@@ -45,6 +45,7 @@ public:
         if(!output_spikes_file.empty()){
             ProtoRw prw(output_spikes_file, ProtoRw::Write);
             LabeledSpikesList lsl(ptl, net.spikes_list);
+            lsl.ptl.dt = sc.sim_run_c.dt;
             prw.write(&lsl);
         }
 

@@ -13,7 +13,7 @@ sys.path.insert(0, base_dir)
 
 import cma
 from common import evaluate
-from run_sim import read_const
+from common import read_const
 from common import get_value_in_nested_dict
 
 CONFIG=os.path.join(os.path.dirname(this_file), "../snn_config.json")
@@ -56,8 +56,8 @@ cma_conf = {
 var_names = sorted(conf['variables_path'])
 
 bounds = [0, 10]
-jobs = 3
-cma_jobs = 1 # multiprocessing.cpu_count()/jobs
+jobs = 4
+cma_jobs = 2 # multiprocessing.cpu_count()/jobs
 
 def scale_to_cma(x, min, max, a, b):
     return ((b-a)*(x - min)/(max-min)) + a

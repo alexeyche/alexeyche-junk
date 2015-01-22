@@ -3,13 +3,15 @@
 
 #include "p_stat_calc.h"
 
-enum  pStatDistOptionIndex { STAT_DIST_PROG_ARG_UNKNOWN, STAT_DIST_PROG_ARG_HELP, STAT_DIST_PROG_ARG_SPIKES, STAT_DIST_PROG_ARG_P_STAT, STAT_DIST_PROG_ARG_JOBS, STAT_DIST_PROG_ARG_OUT_JSON };
+enum  pStatDistOptionIndex { STAT_DIST_PROG_ARG_UNKNOWN, STAT_DIST_PROG_ARG_HELP, STAT_DIST_PROG_ARG_SPIKES, STAT_DIST_PROG_ARG_P_STAT, STAT_DIST_PROG_ARG_JOBS, STAT_DIST_PROG_ARG_OUT_JSON, STAT_DIST_PROG_ARG_TEST_SPIKES, STAT_DIST_PROG_ARG_TEST_P_STAT };
 const option::Descriptor pStatDistUsage[] =
 {
  {STAT_DIST_PROG_ARG_UNKNOWN, 0, "", "",Arg::None, "USAGE: example [options]\n\n"
                                         "Options:" },
  {STAT_DIST_PROG_ARG_SPIKES, 0,"s","spikes",Arg::NonEmpty, "  --spikes, -s  \tLabeled Spikes List to process" },
+ {STAT_DIST_PROG_ARG_TEST_SPIKES, 0,"ts","test-spikes",Arg::NonEmpty, "  --test-spikes, -ts  \tTest set of Labeled Spikes List to process" },
  {STAT_DIST_PROG_ARG_P_STAT, 0,"p","p-stat",Arg::NonEmpty, "  --p-stat, -p  \tProbability statistics of model to proccess" },
+ {STAT_DIST_PROG_ARG_TEST_P_STAT, 0,"tp","test-p-stat",Arg::NonEmpty, "  --test-p-stat, -tp  \tTest set of probability statistics of model to proccess" },
  {STAT_DIST_PROG_ARG_OUT_JSON, 0,"o","output",Arg::NonEmpty, "  --output, -o  \tOutput file in json format" },
  {STAT_DIST_PROG_ARG_JOBS, 0,"j","jobs",Arg::NonEmpty, "  --jobs  -j \tParallel jobs to run (default 1)" },
  {STAT_DIST_PROG_ARG_HELP, 0,"h", "help",Arg::None, "  --help  \tPrint usage and exit." },
@@ -23,7 +25,9 @@ const option::Descriptor pStatDistUsage[] =
 struct PStatDistanceOpts {
     PStatDistanceOpts() : jobs(1) {}
     string spikes;
+    string test_spikes;
     string p_stat;
+    string test_p_stat;
     string output;
     int jobs;
 };
@@ -67,11 +71,21 @@ PStatDistanceOpts parsePStatDistOpts(int argc, char **argv) {
     if(options[STAT_DIST_PROG_ARG_SPIKES].count()>0) {
         opts.spikes = options[STAT_DIST_PROG_ARG_SPIKES].arg;
     }
+    if(options[STAT_DIST_PROG_ARG_TEST_SPIKES].count()>0) {
+        opts.test_spikes = options[STAT_DIST_PROG_ARG_TEST_SPIKES].arg;
+    }    
     if(options[STAT_DIST_PROG_ARG_P_STAT].count()>0) {
         opts.p_stat = options[STAT_DIST_PROG_ARG_P_STAT].arg;
     }
+    if(options[STAT_DIST_PROG_ARG_TEST_P_STAT].count()>0) {
+        opts.test_p_stat = options[STAT_DIST_PROG_ARG_TEST_P_STAT].arg;
+    }
     if(options[STAT_DIST_PROG_ARG_OUT_JSON].count()>0) {
         opts.output = options[STAT_DIST_PROG_ARG_OUT_JSON].arg;
+    }
+    if(((opts.test_spikes.empty())&&(!opts.test_p_stat.empty()))||((!opts.test_spikes.empty())&&(opts.test_p_stat.empty()))) {
+        cerr << "Need test spikes and test p stat be pointed simultaniously\n";
+        terminate();
     }
     return opts;
 }
@@ -80,10 +94,16 @@ PStatDistanceOpts parsePStatDistOpts(int argc, char **argv) {
 
 void p_stat_dist(int argc, char **argv) {
     PStatDistanceOpts opts = parsePStatDistOpts(argc, argv);
+
     vector<NeuronStat*> st;
     {
         ProtoRw prw(opts.p_stat, ProtoRw::Read);
         st = prw.readAll<NeuronStat>();
+    }
+    vector<NeuronStat*> test_st;
+    if(!opts.test_p_stat.empty()) {
+        ProtoRw prw(opts.test_p_stat, ProtoRw::Read);
+        test_st = prw.readAll<NeuronStat>();   
     }
 
     LabeledSpikesList* sp_list;
@@ -91,23 +111,21 @@ void p_stat_dist(int argc, char **argv) {
         ProtoRw prw(opts.spikes, ProtoRw::Read);
         sp_list = prw.read<LabeledSpikesList>();
     }
-    assert(st.size() > 0);
-
-    size_t p_size = st[0]->p.size();
-
-    vector<IndexSlice> patterns;
-
-    const vector<double> &tl = sp_list->ptl.timeline;
-    const double &dt = sp_list->ptl.dt;
-
-    double t=0;
-    for(auto it=tl.begin(); it != tl.end(); ++it) {
-        patterns.push_back( IndexSlice((size_t)(t/dt), min(p_size, (size_t)((*it)/dt) )) );
-        //cout << "adding pattern [" << patterns.back().from << ", " << patterns.back().to << ")\n";
-        t = *it;
+    
+    
+    LabeledSpikesList *test_sp_list = nullptr;
+    if(!opts.test_spikes.empty()) {
+        ProtoRw prw(opts.test_spikes, ProtoRw::Read);
+        test_sp_list = prw.read<LabeledSpikesList>();
     }
 
-    DoubleMatrix dist = calcPStatDistance(st, patterns, opts.jobs);
+    vector<IndexSlice> patterns = sp_list->getPatternSlices();
+    vector<IndexSlice> test_patterns;
+    if(test_sp_list) {
+        test_patterns = test_sp_list->getPatternSlices();
+    }
+    
+    DoubleMatrix dist = calcPStatDistance(st, test_st, patterns, test_patterns, opts.jobs);
 
     JsonBox::Value out;
     
@@ -125,6 +143,15 @@ void p_stat_dist(int argc, char **argv) {
         labs_json.push_back(*it);
     }
     out["labels"] = labs_json;
+    if(test_sp_list) {
+        vector<string> test_labs = test_sp_list->ptl.getLabelsTimeline();
+        JsonBox::Array test_labs_json;
+        for(auto it=test_labs.begin(); it != test_labs.end(); ++it) {
+            test_labs_json.push_back(*it);
+        }
+        out["test_labels"] = test_labs_json;
+    }
+    
 
     if(!opts.output.empty()) {
         out.writeToFile(opts.output);
