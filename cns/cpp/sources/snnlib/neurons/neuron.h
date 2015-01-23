@@ -84,7 +84,7 @@ public:
     double y;
     double p;
     double M;
-    
+
     double gr;
     double ga;
     uchar fired;
@@ -94,10 +94,12 @@ public:
     vector<Synapse*> syns;
     list<size_t> active_synapses;
 
+    // run time interfaces
     ActFuncRuntime act_rt;
     LearningRuleRuntime lrule_rt;
     RewardModulationRuntime rmod_rt;
     TuningCurveRuntime tc_rt;
+    vector<SynapseRuntime> syns_rt;
 
     const RuntimeGlobals *glob_c;
 protected:

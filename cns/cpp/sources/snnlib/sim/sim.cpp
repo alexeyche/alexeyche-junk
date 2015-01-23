@@ -199,8 +199,8 @@ void Sim::simStep(SimWorker *sw, const double &t) {
 
         if(n->fired) {
             s->net.propagateSpike(n->id, t+s->rg.Dt());
-            
-             
+
+
             n->fired = 0;
         }
     }
@@ -259,7 +259,6 @@ void Sim::simWtaStep(SimWorker *sw, const double &t) {
     }
     pthread_barrier_wait( barrier );
 }
-
 
 void* Sim::runWorker(void *content) {
     SimWorker *sw = static_cast<SimWorker*>(content);

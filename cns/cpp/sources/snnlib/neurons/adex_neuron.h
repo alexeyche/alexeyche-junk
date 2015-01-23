@@ -67,21 +67,21 @@ public:
         a = 0.0;
         refr = 0.0;
     }
-    
+
     // Runtime
     void propagateSynSpike(const SynSpike *sp) {
         Synapse *s = syns[sp->syn_id];
         if( fabs(s->x) < SYN_ACT_TOL ) {
             active_synapses.push_back(sp->syn_id);
         }
-        s->x += s->c->amp;
-        s->fired = 1;
+
+        syns_rt[sp->syn_id].propagateSpike();
         lrule_rt.propagateSynSpike(sp);
     }
 
     void attachCurrent(const double &I_attach) {
         I = tc_rt.calculateResponse(I_attach);
-        //cout << "\t response: " << y << "\n"; 
+        //cout << "\t response: " << y << "\n";
     }
 
     void calculateProbability() {
@@ -93,7 +93,7 @@ public:
             for(auto it=active_synapses.begin(); it != active_synapses.end(); ++it) {
                 Synapse *s = syns[*it];
                 dV += s->w * s->x;
-            }            
+            }
             if(fabs(c->slope) > 0.000001) {
                 dV += c->gL * c->slope * exp( (y - c->u_tr)/c->slope );
             }
@@ -119,7 +119,7 @@ public:
             y = c->EL;
             a += c->b;
             refr = c->t_ref;
-            p = 0.0;            
+            p = 0.0;
         }
         lrule_rt.calculateWeightsDynamics();
 
@@ -129,8 +129,7 @@ public:
             if(fabs(s->x) < SYN_ACT_TOL) {
                 it = active_synapses.erase(it);
             } else {
-                s->x -= s->x/s->c->epsp_decay;
-                s->fired = 0;
+                syns_rt[*it].calculateDynamics();
                 ++it;
             }
         }

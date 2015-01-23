@@ -48,6 +48,11 @@ void Neuron::setRewardModulation(RewardModulation *_rmod) {
 
 void Neuron::addSynapse(Synapse *s) {
     syns.resize(syns.size() + 1);
+    // runtime
+    SynapseRuntime srt;
+    s->provideRuntime(srt);
+    syns_rt.push_back(srt);
+
     addSynapseAtAllocatedPos(s, syns.size()-1);
     if(stat) stat->addSynapse(s);
     if(lrule) lrule->addSynapse(s);

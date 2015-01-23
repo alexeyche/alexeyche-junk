@@ -50,6 +50,12 @@
             "epsp_decay" : 20.0,
             "amp" : -1.0
         }
+//        "DynamicSynapse" : {  // Tsodyks, Markram, 1997
+//            "u_se" : 0.5,
+//            "tau_in" : 5.0,
+//            "tau_rec" : 850,
+//            "a_se" : 1.0
+//        }
     },
     "act_funcs" : {
         "Determ" : {

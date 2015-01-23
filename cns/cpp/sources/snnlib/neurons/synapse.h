@@ -7,6 +7,12 @@
 #include <snnlib/serialize/serialize.h>
 #include <snnlib/sim/runtime_globals.h>
 
+
+struct SynapseRuntime {
+    stateDelegate calculateDynamics;
+    stateDelegate propagateSpike;
+};
+
 class Synapse : public Serializable<Protos::Synapse> {
 protected:
     Synapse() : Serializable(ESynapse) {}
@@ -23,9 +29,24 @@ public:
         dendrite_delay = _dendrite_delay;
         fired = 0;
     }
+
+    virtual void calculateDynamics() {
+        x -= x/c->epsp_decay;
+        fired = 0;
+    }
     virtual void reset() {
         x = 0;
     }
+    virtual void propagateSpike() {
+        x += c->amp;
+        fired = 1;
+    }
+
+    void provideRuntime(SynapseRuntime &srt) {
+        srt.calculateDynamics = MakeDelegate(this, &Synapse::calculateDynamics);
+        srt.propagateSpike = MakeDelegate(this, &Synapse::propagateSpike);
+    }
+
     size_t id_pre;
 
     double x;
