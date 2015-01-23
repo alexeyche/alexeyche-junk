@@ -5,7 +5,7 @@ we_are_in_r_studio = length(grep("RStudio", args)) > 0
 arg_i = grep("--args", args)
 if(we_are_in_r_studio) {
     method = "nn_nmi"
-    f = "/home/alexeyche/prog/sim_spear/eval_nn_nmi_structure/10/1_proc_output.json"
+    f = "/home/alexeyche/prog/sim_spear/eval_clustering_p_stat_structure/4366/1_proc_output.json"
 } else {
     usage = function() {
         cat("Options:\n\t--method=(clustering|NN_NMI)\n\t--stat=json_file_with_stat\n")
@@ -27,7 +27,8 @@ if(we_are_in_r_studio) {
     }
     if((is.null( c(method, f)))||(is.na( c(method, f)))) usage()
 }
-data = fromJSON(file = f)  
+data = NULL
+if(file.exists(f)) data = fromJSON(file = f)  
 target_rate = 10.0
 ###################################
 
@@ -80,7 +81,9 @@ rate_penalty = function(val) {
     target_rate_sum = sqrt(sum(rep(target_rate, length(data$rates))^2))
     rate_sum = sqrt(sum((rates^2)))
     if(mean(rates)>target_rate) {
-        val*exp( - (rate_sum - target_rate_sum)^2/2000.0)
+        mod = 200*exp( - (rate_sum - target_rate_sum)^2/2000.0)
+        if(mod>1) mod = 1
+        val*mod
     } else {
         val*exp( - (rate_sum - target_rate_sum)^2/500.0)
     }
@@ -141,7 +144,7 @@ calculate_criterion = function(data) {
     if(!we_are_in_r_studio) {
         png(sprintf("%s_eval_dist_matrix.png", data$epoch),width=1024, height=768)
     }
-    val = -100*calinski_harabasz_criterion(points, ulabs, labs, centroids, global_centroid)
+    val = -calinski_harabasz_criterion(points, ulabs, labs, centroids, global_centroid)
     val = rate_penalty(val)
     suppressWarnings({
         plot(x, y, xlab="Coordinate 1", ylab="Coordinate 2", main=sprintf("Metric MDS: %s", val),    type="n")
@@ -164,3 +167,4 @@ if(!we_are_in_r_studio) {
         cat(nn_nmi(data),"\n")
     }
 }
+

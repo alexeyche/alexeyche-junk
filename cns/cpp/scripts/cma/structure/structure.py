@@ -41,7 +41,7 @@ cma_conf = {
     "tau_adapt": { "min" : 10, "max" : 500 } ,
     "amp_adapt": { "min" : 0, "max" : 10 },
     "tau_refr": { "min" : 1, "max" : 50 },
-    "beta": { "min" : 0.1, "max" : 5.0 },
+    "beta": { "min" : 0.1, "max" : 7.5 },
     "epsp_decay_exc": { "min" : 1, "max" : 50 },
     "epsp_decay_inh": { "min" : 1, "max" : 50 },
     "prob_feedforward_exc" : { "min" : 0.05, "max" : 1.0 },
@@ -57,7 +57,7 @@ var_names = sorted(conf['variables_path'])
 
 bounds = [0, 10]
 jobs = 4
-cma_jobs = 2 # multiprocessing.cpu_count()/jobs
+cma_jobs = 1 # multiprocessing.cpu_count()/jobs
 
 def scale_to_cma(x, min, max, a, b):
     return ((b-a)*(x - min)/(max-min)) + a
