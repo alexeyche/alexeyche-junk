@@ -74,8 +74,7 @@ public:
         if( fabs(s->x) < SYN_ACT_TOL ) {
             active_synapses.push_back(sp->syn_id);
         }
-
-        syns_rt[sp->syn_id].propagateSpike();
+        s->propagateSpike();
         lrule_rt.propagateSynSpike(sp);
     }
 
@@ -129,7 +128,7 @@ public:
             if(fabs(s->x) < SYN_ACT_TOL) {
                 it = active_synapses.erase(it);
             } else {
-                syns_rt[*it].calculateDynamics();
+                s->calculateDynamics();
                 ++it;
             }
         }

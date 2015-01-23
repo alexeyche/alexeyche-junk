@@ -99,7 +99,7 @@ public:
     LearningRuleRuntime lrule_rt;
     RewardModulationRuntime rmod_rt;
     TuningCurveRuntime tc_rt;
-    vector<SynapseRuntime> syns_rt;
+    //vector<SynapseRuntime> syns_rt;
 
     const RuntimeGlobals *glob_c;
 protected:
