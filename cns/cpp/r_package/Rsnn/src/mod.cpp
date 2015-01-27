@@ -24,7 +24,8 @@ RCPP_MODULE(snnMod) {
     .method("print", &RProto::print, "Print proto instance")
     ;
     Rcpp::class_<RGammatoneFB>("RGammatoneFB")
-    .constructor<size_t>()
+    .constructor()
     .method("calc", &RGammatoneFB::calc, "Run calculations")
+    .method("print", &RGammatoneFB::print, "Print instance")
     ;
 }

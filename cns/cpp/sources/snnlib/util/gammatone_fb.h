@@ -88,7 +88,6 @@ public:
            *==========================================
            */
            membrane[t] = ( u0r * qcos + u0i * qsin ) * gain;
-           cout << membrane[t] << "\n";
            if ( 1 == hrect && membrane[t] < 0 ) {
               membrane[t] = 0;  /* half-wave rectifying */
            }

@@ -9,6 +9,7 @@
     assign("RSim", Module("snnMod")$RSim, envir=parent.env(environment()))
     assign("RProto", Module("snnMod")$RProto, envir=parent.env(environment()))
     assign("RConstants", Module("snnMod")$RConstants, envir=parent.env(environment()))
+    assign("RGammatoneFB", Module("snnMod")$RGammatoneFB, envir=parent.env(environment()))
     setMethod( "show", RSim, function(object) {
         object$print()    
     } )
@@ -17,6 +18,9 @@
     } )
     setMethod( "show", RProto, function(object) {
         object$print()
+    } )
+    setMethod( "show", RGammatoneFB, function(object) {
+        object$print()    
     } )
 
 }
