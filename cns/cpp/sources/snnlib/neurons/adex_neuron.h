@@ -91,7 +91,7 @@ public:
             I = 0.0;
             for(auto it=active_synapses.begin(); it != active_synapses.end(); ++it) {
                 Synapse *s = syns[*it];
-                dV += s->w * s->x;
+                dV += s->w * s->getCurrent();
             }
             if(fabs(c->slope) > 0.000001) {
                 dV += c->gL * c->slope * exp( (y - c->u_tr)/c->slope );

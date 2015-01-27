@@ -14,7 +14,7 @@ set(DIRS
     act_funcs
     serialize
 	neurons
-    #reinforcement
+    synapses
     #filt
     #    conn
 )

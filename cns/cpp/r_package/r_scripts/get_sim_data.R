@@ -10,7 +10,7 @@ rundir="/home/alexeyche/prog/newsim/runs"
 #rundir="/home/alexeyche/prog/sim_spear/eval_clustering_p_stat_optimal_stdp"
 rundir="/home/alexeyche/prog/sim_spear/eval_clustering_p_stat_structure"
 runname = system(sprintf("ls -t %s | sed -ne '1p'", rundir),intern=TRUE)
-runname = "342"
+runname = "34"
 workdir=sprintf("%s/%s", rundir, runname)
 for(ep in 1:1000) {
     output_spikes = sprintf("%s/%s_output_spikes.pb", workdir, ep)

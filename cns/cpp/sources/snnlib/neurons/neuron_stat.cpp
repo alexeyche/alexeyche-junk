@@ -1,5 +1,6 @@
 
 #include <snnlib/protos/stat.pb.h>
+#include <snnlib/synapses/synapse.h>
 
 #include "neuron_stat.h"
 #include "neuron.h"

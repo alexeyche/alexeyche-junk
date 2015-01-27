@@ -179,13 +179,17 @@ void Sim::simPrecalculateStep(SimWorker *sw, const double &t) {
 
 void Sim::simStep(SimWorker *sw, const double &t) {
     Sim *s = sw->s;
+    //bool need_reset = false;
     if(sw->thread_id == 0) {
+        //size_t tmp = s->ptl.current_position;
         s->rg.current_class_id = &s->ptl.getCurrentClassId(t);
+        //if(tmp != s->ptl.current_position) need_reset = true;
     }
     pthread_barrier_wait( barrier );
     for(size_t ni=sw->first; ni<sw->last; ni++) {
         //cout << "simulating " << ni << " at " << t << "\n";
         Neuron *n = s->sim_neurons[ni].n;
+        //if(need_reset) n->reset();
         NeuronRuntime &n_rt = s->sim_neurons[ni].n_rt;
         if( (s->rg.doWeCareAboutInput()) && (s->sim_neurons[ni].na.first == (s->layers.size()-1)) ) {
             s->rg.setInputNeuronsFiring(n->id, t);

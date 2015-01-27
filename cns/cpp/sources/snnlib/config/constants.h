@@ -122,9 +122,9 @@ public:
 };
 
 
-class SynapseC : public ConstObj {
+class SimpleSynapseC : public ConstObj {
 public:
-    SynapseC(string name) : ConstObj(name) {}
+    SimpleSynapseC(string name) : ConstObj(name) {}
     double epsp_decay;
     double amp;
 
@@ -138,6 +138,25 @@ public:
 
 };
 
+class DynamicSynapseC : public ConstObj {
+public:
+    DynamicSynapseC(string name) : ConstObj(name) {}
+    double u_se;
+    double tau_in;
+    double tau_rec;
+    double a_se;
+
+    void fill_structure(JsonBox::Value v) {
+        u_se = v["u_se"].getDouble();
+        tau_in = v["tau_in"].getDouble();
+        tau_rec = v["tau_rec"].getDouble();
+        a_se = v["a_se"].getDouble();
+    }
+    void print(std::ostream &str) const {
+        str << "u_se: " << u_se << ", tau_in: " << tau_in << ", tau_rec: " << tau_rec << ", a_se: " << a_se << "\n";
+     }
+
+};
 
 class DetermC : public ConstObj {
 public:

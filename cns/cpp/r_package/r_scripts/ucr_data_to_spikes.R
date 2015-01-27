@@ -17,7 +17,7 @@ max_test = max(sapply(data_test, function(x) max(x$data)))
 max_val = max(max_train, max_test)
 
 N = 100
-dt = 5
+dt = 10
 gap_between_patterns = 100
 
 intercept = seq(min_val, max_val, length.out=N)
@@ -58,4 +58,4 @@ for(data_part in names(spikes_complect)) {
     prw = RProto$new(fname)
     prw$write(spikes_complect[[data_part]], "LabeledSpikesList")
 }
-prast(spikes_complect[["train"]]$spikes,T0=0,Tmax=1000)
+prast(spikes_complect[["train"]]$spikes,T0=110000,Tmax=111000)

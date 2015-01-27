@@ -13,16 +13,16 @@ struct SynapseRuntime {
     stateDelegate propagateSpike;
 };
 
-class Synapse : public Serializable<Protos::Synapse> {
+class Synapse : public Serializable<Protos::Synapse>{
 protected:
     Synapse() : Serializable(ESynapse) {}
     friend class Factory;
 public:
-    Synapse(const ConstObj *_c, size_t _id_pre, double _w, double _dendrite_delay) : Serializable(ESynapse) {
+    Synapse(const ConstObj *_c, size_t _id_pre, double _w, double _dendrite_delay) : Serializable(ESynapse)  {
         init(_c, _id_pre, _w, _dendrite_delay);
     }
-    void init(const ConstObj *_c, size_t _id_pre, double _w, double _dendrite_delay) {
-        c = castType<SynapseC>(_c);
+    virtual void init(const ConstObj *_c, size_t _id_pre, double _w, double _dendrite_delay) {
+        bc = _c;
         id_pre = _id_pre;
         w = _w;
         x = 0.0;
@@ -30,22 +30,18 @@ public:
         fired = 0;
     }
 
-    virtual void calculateDynamics() {
-        x -= x/c->epsp_decay;
-        fired = 0;
-    }
-    virtual void reset() {
-        x = 0;
-    }
-    virtual void propagateSpike() {
-        x += c->amp;
-        fired = 1;
-    }
+    virtual void calculateDynamics() = 0;
+    virtual void reset() = 0;
+    virtual void propagateSpike() = 0;
+    virtual double getCurrent() = 0;
 
-    void provideRuntime(SynapseRuntime &srt) {
+    virtual void provideRuntime(SynapseRuntime &srt) {
         srt.calculateDynamics = MakeDelegate(this, &Synapse::calculateDynamics);
         srt.propagateSpike = MakeDelegate(this, &Synapse::propagateSpike);
     }
+
+    void deserialize();
+    ProtoPack serialize();
 
     size_t id_pre;
 
@@ -54,12 +50,6 @@ public:
     double dendrite_delay;
 
     double fired;
-
-    void print(std::ostream& str) const {
-        str << "Synapse(id_pre: " << id_pre << ", x:" << x << ", w: " << w << ", dendrite_delay: " << dendrite_delay << ")";
-    }
-    void deserialize();
-    ProtoPack serialize();
-
-    const SynapseC *c;
+    
+    const ConstObj *bc;
 };

@@ -24,12 +24,13 @@ conf['variables_path'] = {
     "amp_adapt": ["neurons", "SRMNeuron", "amp_adapt"],
     "tau_refr": ["neurons", "SRMNeuron", "tau_refr"],
     "beta": ["act_funcs", "ExpHennequin", "beta"],
-    "epsp_decay_exc": ["synapses", "Synapse", "epsp_decay"],
-    "epsp_decay_inh": ["synapses", "Synapse_Inh", "epsp_decay"],
+    "epsp_decay_exc": ["synapses", "SimpleSynapse", "epsp_decay"],
+    "epsp_decay_inh": ["synapses", "SimpleSynapse_Inh", "epsp_decay"],
     "prob_feedforward_exc" : ["sim_configuration", "conn_map", "0->1", 0, "prob"],
     "prob_feedforward_inh" : ["sim_configuration", "conn_map", "0->1", 1, "prob"],
     "prob_reccurent_exc" : ["sim_configuration", "conn_map", "1->1", 0, "prob"],
     "prob_reccurent_inh" : ["sim_configuration", "conn_map", "1->1", 1, "prob"],
+#    "size" : ["sim_configuration", "net_layers_conf", 0, "size" ],
     "weight_distr_mean_ff_exc"  :  ["sim_configuration", "conn_map", "0->1", 0, "weight_distr", 0], 
     "weight_distr_mean_ff_inh"  :  ["sim_configuration", "conn_map", "0->1", 1, "weight_distr", 0], 
     "weight_distr_mean_rec_exc" :  ["sim_configuration", "conn_map", "1->1", 0, "weight_distr", 0], 
@@ -46,8 +47,9 @@ cma_conf = {
     "epsp_decay_inh": { "min" : 1, "max" : 50 },
     "prob_feedforward_exc" : { "min" : 0.05, "max" : 1.0 },
     "prob_feedforward_inh" : { "min" : 0, "max" : 1.0 },
-    "prob_reccurent_exc" : { "min" : 0, "max" : 1.0 },
+    "prob_reccurent_exc" : { "min" : 0, "max" : 0.2 },
     "prob_reccurent_inh" : { "min" : 0, "max" : 1.0 },
+#    "size" : { "min" : 2, "max" : 100.0 },
     "weight_distr_mean_ff_exc"  :  { "min" : 0.1, "max" : 100 }, 
     "weight_distr_mean_ff_inh"  :  { "min" : 0, "max" : 100}, 
     "weight_distr_mean_rec_exc" :  { "min" : 0, "max" : 100 }, 
@@ -56,8 +58,8 @@ cma_conf = {
 var_names = sorted(conf['variables_path'])
 
 bounds = [0, 10]
-jobs = 4
-cma_jobs = 1 # multiprocessing.cpu_count()/jobs
+jobs = 3
+cma_jobs = 2 # multiprocessing.cpu_count()/jobs
 
 def scale_to_cma(x, min, max, a, b):
     return ((b-a)*(x - min)/(max-min)) + a
@@ -70,6 +72,7 @@ def eval(x, id, ret_q):
     p = dict(zip(var_names, x))
     for param in p:
         p[param] = scale_from_cma(p[param], cma_conf[param]["min"], cma_conf[param]['max'], bounds[0], bounds[1])
+#    p["size"] = int(p["size"])
     try:
         res = evaluate(id, p, conf, jobs, verbose=False)
         ret = res[ conf['criterion_name'] ]
@@ -83,7 +86,7 @@ for param in var_names:
     v = float(get_value_in_nested_dict(const, conf['variables_path'][param]))
     start_params[param] = scale_to_cma(v, cma_conf[param]["min"], cma_conf[param]['max'], bounds[0], bounds[1])
 
-es = cma.CMAEvolutionStrategy([ start_params[p] for p in var_names ], 2, { 'bounds' : [ bounds[0], bounds[1] ] } )
+es = cma.CMAEvolutionStrategy([ start_params[p] for p in var_names ], 2, { 'bounds' : [ bounds[0], bounds[1] ], 'popsize' : 20 } )
 id = 0
 while not es.stop():
     X = es.ask()

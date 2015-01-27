@@ -35,7 +35,7 @@ public:
         y = 0.0;
         for(auto it=active_synapses.begin(); it != active_synapses.end(); ++it) {
             Synapse *s = syns[*it];
-            y += s->w * s->x;
+            y += s->getCurrent() * s->w;
         }
         y = c->u_rest + y;
         M = fastexp(-(gr+ga));

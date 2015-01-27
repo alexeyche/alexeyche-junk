@@ -42,20 +42,20 @@
         }
     },
     "synapses" : {
-        "Synapse" : {
+        "SimpleSynapse" : {
             "epsp_decay" : 20.0,
             "amp" : 1.0
         },
-        "Synapse_Inh" : {
+        "SimpleSynapse_Inh" : {
             "epsp_decay" : 20.0,
             "amp" : -1.0
+        },
+        "DynamicSynapse" : {  // Tsodyks, Markram, 1997
+            "u_se" : 0.5,
+            "tau_in" : 50.0,
+            "tau_rec" : 100,
+            "a_se" : 20
         }
-//        "DynamicSynapse" : {  // Tsodyks, Markram, 1997
-//            "u_se" : 0.5,
-//            "tau_in" : 5.0,
-//            "tau_rec" : 850,
-//            "a_se" : 1.0
-//        }
     },
     "act_funcs" : {
         "Determ" : {
@@ -182,12 +182,12 @@
         ],
         "conn_map" : {
             "0->1" : [
-                { "prob" : 0.5, "weight_distr" : "Norm(10.6, 0.1)", "type" : "Synapse", "dendrite_delay_distr" : "Exp(0,0)" },
-                { "prob" : 0.5, "weight_distr" : "Norm(10.6, 0.1)", "type" : "Synapse_Inh", "dendrite_delay_distr" : "Exp(0,0)" }
+                { "prob" : 0.5, "weight_distr" : "Norm(10.6, 0.1)", "type" : "SimpleSynapse", "dendrite_delay_distr" : "Exp(0,0)" },
+                { "prob" : 0.5, "weight_distr" : "Norm(10.6, 0.1)", "type" : "SimpleSynapse_Inh", "dendrite_delay_distr" : "Exp(0,0)" }
             ],
             "1->1" : [
-                { "prob" : 0.05, "weight_distr" : "Norm(10.6, 0.1)", "type" : "Synapse", "dendrite_delay_distr" : "Exp(0,0)" },
-                { "prob" : 0.05, "weight_distr" : "Norm(10.6, 0.1)", "type" : "Synapse_Inh", "dendrite_delay_distr" : "Exp(0,0)" }
+                { "prob" : 0.05, "weight_distr" : "Norm(10.6, 0.1)", "type" : "SimpleSynapse", "dendrite_delay_distr" : "Exp(0,0)" },
+                { "prob" : 0.05, "weight_distr" : "Norm(10.6, 0.1)", "type" : "SimpleSynapse_Inh", "dendrite_delay_distr" : "Exp(0,0)" }
             ]
         },
         "reinforce_map" : {

@@ -144,7 +144,7 @@ calculate_criterion = function(data) {
     if(!we_are_in_r_studio) {
         png(sprintf("%s_eval_dist_matrix.png", data$epoch),width=1024, height=768)
     }
-    val = -calinski_harabasz_criterion(points, ulabs, labs, centroids, global_centroid)
+    val = -10*calinski_harabasz_criterion(points, ulabs, labs, centroids, global_centroid)
     val = rate_penalty(val)
     suppressWarnings({
         plot(x, y, xlab="Coordinate 1", ylab="Coordinate 2", main=sprintf("Metric MDS: %s", val),    type="n")
