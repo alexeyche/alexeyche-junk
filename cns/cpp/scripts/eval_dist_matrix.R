@@ -118,7 +118,7 @@ nn_nmi = function(data) {
     return(-cf$overall[1])
 }
 
-calculate_criterion = function(data) {    
+calculate_criterion = function(data, pl=TRUE) {    
     dist = do.call(rbind, data$distance_matrix)
     labs = data$labels
     
@@ -145,16 +145,18 @@ calculate_criterion = function(data) {
         png(sprintf("%s_eval_dist_matrix.png", data$epoch),width=1024, height=768)
     }
     val = -10*calinski_harabasz_criterion(points, ulabs, labs, centroids, global_centroid)
-    val = rate_penalty(val)
-    suppressWarnings({
-        plot(x, y, xlab="Coordinate 1", ylab="Coordinate 2", main=sprintf("Metric MDS: %s", val),    type="n")
-        lab_cols = rainbow(length(ulabs))
-        text(x, y, labels = labs, cex=.7, col=lab_cols[sapply(labs, function(l) which(l == ulabs))])
-        points(centroids, lwd=10, pch=3, col=lab_cols)
-        points(global_centroid, lwd=10, pch=3, col="black")
-    })        
-    if(!we_are_in_r_studio) {
-        invisible(dev.off())
+    if(!is.null(data$rates)) val = rate_penalty(val)
+    if(pl) {
+        suppressWarnings({
+            plot(x, y, xlab="Coordinate 1", ylab="Coordinate 2", main=sprintf("Metric MDS: %s", val),    type="n")
+            lab_cols = rainbow(length(ulabs))
+            text(x, y, labels = labs, cex=.7, col=lab_cols[sapply(labs, function(l) which(l == ulabs))])
+            points(centroids, lwd=10, pch=3, col=lab_cols)
+            points(global_centroid, lwd=10, pch=3, col="black")
+        })        
+        if(!we_are_in_r_studio) {
+            invisible(dev.off())
+        }
     }
     return(val)    
 }
