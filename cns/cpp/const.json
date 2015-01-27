@@ -171,7 +171,7 @@
         ],
         "net_layers_conf" : [
             {
-                "size" : 250,
+                "size" : 100,
                 "wta" : false,
                 "neuron_conf" : {
                     "neuron" : "SRMNeuron",

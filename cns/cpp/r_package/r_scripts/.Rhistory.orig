@@ -1,0 +1,886 @@
+<<<<<<< HEAD
+sapply(centroids[,1], function(x) x -xc)
+sapply(centroids[,1], function(x) x-xc)
+rowMeans(sapply(centroids[,1], function(x) x-xc))
+colMeans(sapply(centroids[,1], function(x) x-xc))
+rowMeans(sapply(centroids[,2], function(i) i-yc))
+colMeans(sapply(centroids[,2], function(i) i-yc))
+centroids[1,]
+centroids[1,1]
+cx = centroids[1,1]
+xc - cx
+sqrt((xc - centroid[1,1])^2 + (yc - centroid[1,2])^2 )
+sqrt((xc - centroid[1,1])^2 + (yc - centroids[1,2])^2 )
+sqrt((xc - centroids[1,1])^2 + (yc - centroids[1,2])^2 )
+mean(sqrt((xc - centroids[1,1])^2 + (yc - centroids[1,2])^2 ))
+mean(sqrt((xc - centroids[2,1])^2 + (yc - centroids[2,2])^2 ))
+sapply(1:ncol(centroids), function(i) mean(sqrt((xc - centroids[i,1])^2 + (yc - centroids[i,2])^2 ))
+sapply(1:ncol(centroids), function(i) mean(sqrt((xc - centroids[i,1])^2 + (yc - centroids[i,2])^2 )))
+dist_means = NULL
+for(lab in lab_spikes$labels) {
+labi = which(lab == lab_spikes$labels)
+ci = which(lab_spikes$labels_id_timeline == labi-1)
+xc = x[ci]
+yc = y[ci]
+d = sapply(1:ncol(centroids), function(i) mean(sqrt((xc - centroids[i,1])^2 + (yc - centroids[i,2])^2 )))
+dist_means = c(dist_means, d)
+}
+dist_means
+dist_means = NULL
+for(lab in lab_spikes$labels) {
+labi = which(lab == lab_spikes$labels)
+ci = which(lab_spikes$labels_id_timeline == labi-1)
+xc = x[ci]
+yc = y[ci]
+d = sapply(1:ncol(centroids), function(i) mean(sqrt((xc - centroids[i,1])^2 + (yc - centroids[i,2])^2 )))
+dist_means = rbind(dist_means, d)
+}
+dist_means
+centroids
+centroids[,1]
+centroids[,1] - centroids[,2]
+centroids[1,1]-centroids[1,2]
+centroids
+sqrt((centroids[1,1] - centroids[2,1])^2 + (centroids[1,2] - centroids[2,2])^2)
+labi
+cdist = matrix(0, nrow=nrow(centroids), ncol=nrow(centroids))
+dist_means = NULL
+cdist = matrix(0, nrow=nrow(centroids), ncol=nrow(centroids))
+for(lab in lab_spikes$labels) {
+labi = which(lab == lab_spikes$labels)
+ci = which(lab_spikes$labels_id_timeline == labi-1)
+xc = x[ci]
+yc = y[ci]
+d = sapply(1:nrow(centroids), function(i) mean(sqrt((xc - centroids[i,1])^2 + (yc - centroids[i,2])^2 )))
+dist_means = rbind(dist_means, d)
+for(other_lab in lab_spikes$labels) {
+if(other_lab != lab) {
+labj = which(lab == lab_spikes$labels)
+cdist[labi, labj] = sqrt((centroids[labi,1] - centroids[labj,1])^2 + (centroids[labi,2] - centroids[labj,2])^2)
+}
+}
+cdist
+dist_means = NULL
+cdist = matrix(0, nrow=nrow(centroids), ncol=nrow(centroids))
+for(lab in lab_spikes$labels) {
+labi = which(lab == lab_spikes$labels)
+ci = which(lab_spikes$labels_id_timeline == labi-1)
+xc = x[ci]
+yc = y[ci]
+d = sapply(1:nrow(centroids), function(i) mean(sqrt((xc - centroids[i,1])^2 + (yc - centroids[i,2])^2 )))
+dist_means = rbind(dist_means, d)
+for(other_lab in lab_spikes$labels) {
+if(other_lab != lab) {
+labj = which(lab == lab_spikes$labels)
+cdist[labi, labj] = sqrt((centroids[labi,1] - centroids[labj,1])^2 + (centroids[labi,2] - centroids[labj,2])^2)
+}
+}
+}
+cdist
+labi
+labj
+cdist = matrix(0, nrow=nrow(centroids), ncol=nrow(centroids))
+for(lab in lab_spikes$labels) {
+labi = which(lab == lab_spikes$labels)
+ci = which(lab_spikes$labels_id_timeline == labi-1)
+xc = x[ci]
+yc = y[ci]
+d = sapply(1:nrow(centroids), function(i) mean(sqrt((xc - centroids[i,1])^2 + (yc - centroids[i,2])^2 )))
+dist_means = rbind(dist_means, d)
+for(other_lab in lab_spikes$labels) {
+if(other_lab != lab) {
+labj = which(other_lab == lab_spikes$labels)
+cdist[labi, labj] = sqrt((centroids[labi,1] - centroids[labj,1])^2 + (centroids[labi,2] - centroids[labj,2])^2)
+}
+}
+}
+cdist
+dist_means
+dist_means
+centroids = NULL
+for(lab in lab_spikes$labels) {
+labi = which(lab == lab_spikes$labels)
+ci = which(lab_spikes$labels_id_timeline == labi-1)
+xc = x[ci]
+yc = y[ci]
+centroids = rbind(centroids, c(mean(xc), mean(yc)))
+}
+dist_means = NULL
+cdist = matrix(0, nrow=nrow(centroids), ncol=nrow(centroids))
+for(lab in lab_spikes$labels) {
+labi = which(lab == lab_spikes$labels)
+ci = which(lab_spikes$labels_id_timeline == labi-1)
+xc = x[ci]
+yc = y[ci]
+d = sapply(1:nrow(centroids), function(i) mean(sqrt((xc - centroids[i,1])^2 + (yc - centroids[i,2])^2 )))
+dist_means = rbind(dist_means, d)
+for(other_lab in lab_spikes$labels) {
+if(other_lab != lab) {
+labj = which(other_lab == lab_spikes$labels)
+cdist[labi, labj] = sqrt((centroids[labi,1] - centroids[labj,1])^2 + (centroids[labi,2] - centroids[labj,2])^2)
+}
+}
+}
+dist_means
+dist_means[labi, ]
+dist_means[labj, labi]
+dist_means
+labi
+labj
+cor(x,y)
+x
+,y
+y
+x %*% y
+x %*% t(y)
+gr_pl(x %*% t(y))
+centroids
+centroids[1,]
+dist_xy = function(x_y1, x_y2) {
+sqrt((x_y1[1] - x_y2[1])^2 + (x_y1[2] - x_y2[2])^2)
+}
+x
+x_y = cbind(x,y)
+x_y
+sapply(1:ncol(x_y), function(i) dist_xy(x_y[1,], centroids[1, ]) )
+sapply(1:ncol(x_y), function(i) dist_xy(x_y[i,], centroids[1, ]) )
+x_y[1,]
+sapply(1:ncol(x_y), function(i) dist_xy(x_y[i,], centroids[1, ]) )
+sapply(1:nrow(x_y), function(i) dist_xy(x_y[i,], centroids[1, ]) )
+sapply(1:nrow(x_y), function(i) dist_xy(x_y[i,], centroids[1, ]) )
+distances_to_centroids = NULL
+for(lab in lab_spikes$labels) {
+labi = which(lab == lab_spikes$labels)
+d = sapply(1:nrow(x_y), function(i) dist_xy(x_y[labi,], centroids[1, ]) )
+distances_to_centroids = cbind(distances_to_centroids, d)
+}
+distances_to_centroids
+dist_to_c = NULL
+for(lab in lab_spikes$labels) {
+labi = which(lab == lab_spikes$labels)
+d = sapply(1:nrow(x_y), function(i) dist_xy(x_y[i,], centroids[labi, ]) )
+dist_to_c = cbind(dist_to_c, d)
+}
+dist_to_c
+centroids
+total_centroid =  c(mean(x), mean(y))
+total_centroid
+x
+fit = cmdscale(dist, 2, eig=TRUE)
+x <- fit$points[,1]
+y <- fit$points[,2]
+plot(x, y, xlab="Coordinate 1", ylab="Coordinate 2",
+main="Metric    MDS",	type="n")
+lab_cols = rainbow(length(lab_spikes$labels))
+text(x, y, labels = lab_spikes$labels[lab_spikes$labels_id_timeline+1], cex=.7, col=lab_cols[lab_spikes$labels_id_timeline+1])
+x_y = cbind(x,y)
+dist_xy = function(x_y1, x_y2) {
+sqrt((x_y1[1] - x_y2[1])^2 + (x_y1[2] - x_y2[2])^2)
+}
+total_centroid =  c(mean(x), mean(y))
+centroids = NULL
+for(lab in lab_spikes$labels) {
+labi = which(lab == lab_spikes$labels)
+ci = which(lab_spikes$labels_id_timeline == labi-1)
+xc = x[ci]
+yc = y[ci]
+centroids = rbind(centroids, c(mean(xc), mean(yc)))
+}
+dist_to_c = NULL
+for(lab in lab_spikes$labels) {
+labi = which(lab == lab_spikes$labels)
+d = sapply(1:nrow(x_y), function(i) dist_xy(x_y[i,], centroids[labi, ]) )
+dist_to_c = cbind(dist_to_c, d)
+}
+points(centroids, lwd=10, pch=3, col=lab_cols)
+points(total_centroid, lwd=10, pch=3, col="black")
+total_centroid
+points(total_centroid, lwd=10, pch=3, col="black")
+points(0,0, lwd=10, pch=3, col="black")
+total_centroid
+total_centroid
+centroids
+total_centroid =  matrix(c(mean(x), mean(y)), nrow=1, ncol=2)
+fit = cmdscale(dist, 2, eig=TRUE)
+x <- fit$points[,1]
+y <- fit$points[,2]
+plot(x, y, xlab="Coordinate 1", ylab="Coordinate 2",
+main="Metric    MDS",	type="n")
+lab_cols = rainbow(length(lab_spikes$labels))
+text(x, y, labels = lab_spikes$labels[lab_spikes$labels_id_timeline+1], cex=.7, col=lab_cols[lab_spikes$labels_id_timeline+1])
+x_y = cbind(x,y)
+dist_xy = function(x_y1, x_y2) {
+sqrt((x_y1[1] - x_y2[1])^2 + (x_y1[2] - x_y2[2])^2)
+}
+total_centroid =  matrix(c(mean(x), mean(y)), nrow=1, ncol=2)
+centroids = NULL
+for(lab in lab_spikes$labels) {
+labi = which(lab == lab_spikes$labels)
+ci = which(lab_spikes$labels_id_timeline == labi-1)
+xc = x[ci]
+yc = y[ci]
+centroids = rbind(centroids, c(mean(xc), mean(yc)))
+}
+dist_to_c = NULL
+for(lab in lab_spikes$labels) {
+labi = which(lab == lab_spikes$labels)
+d = sapply(1:nrow(x_y), function(i) dist_xy(x_y[i,], centroids[labi, ]) )
+dist_to_c = cbind(dist_to_c, d)
+}
+points(centroids, lwd=10, pch=3, col=lab_cols)
+points(total_centroid, lwd=10, pch=3, col="black")
+dist_to_c
+dist_to_cd
+d
+dist_to_c
+sse = 0
+for(lab in lab_spikes$labels) {
+labi = which(lab == lab_spikes$labels)
+ci = which(lab_spikes$labels_id_timeline == labi-1)
+d = dist_to_c[ci,labi]
+sse = sse + d^2
+}
+sse
+sse = 0
+for(lab in lab_spikes$labels) {
+labi = which(lab == lab_spikes$labels)
+ci = which(lab_spikes$labels_id_timeline == labi-1)
+d = dist_to_c[ci,labi]
+sse = sse + sum(d^2)
+}
+sse
+ci
+ci
+labi
+centroid
+centroids
+dist_xy(centroids[labi,], total_centroid)
+sse = 0
+bss = 0
+for(lab in lab_spikes$labels) {
+labi = which(lab == lab_spikes$labels)
+ci = which(lab_spikes$labels_id_timeline == labi-1)
+d = dist_to_c[ci,labi]
+sse = sse + sum(d^2)
+bss = bss + length(d)*dist_xy(centroids[labi,], total_centroid)
+}
+bss
+sse = 0
+bss = 0
+for(lab in lab_spikes$labels) {
+labi = which(lab == lab_spikes$labels)
+ci = which(lab_spikes$labels_id_timeline == labi-1)
+d = dist_to_c[ci,labi]
+sse = sse + sum(d^2)
+bss = bss + length(d)*dist_xy(centroids[labi,], total_centroid)^2
+}
+bss
+sse
+sse+bss
+sse-bss
+source('~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts/eval_dist_matrix.R', echo=TRUE)
+=======
+plot(exp(x), type="l")
+plot(x, exp(x), type="l")
+plot(x, exp(x/100), type="l")
+plot(x, exp((x+5)/100), type="l")
+plot(x, 10*exp((x+5)/100), type="l")
+plot(x, exp((x+5)/100)/10, type="l")
+plot(x, exp((10*x+5)/100), type="l")
+plot(x, exp((2*x+5)/100), type="l")
+plot(x, exp((2*x-5)/100), type="l")
+plot(x, exp((2*x)/100)-5, type="l")
+plot(x, exp((2*(x+5))/100), type="l")
+plot(x, exp((2*(x+1))/100), type="l")
+source('~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts/gen_test_ts_data.R', echo=TRUE)
+source('~/.active-rstudio-document', echo=TRUE)
+RConstants$new()
+source('~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts/sim.R', echo=TRUE)
+const = RConstants$new("/home/alexeyche/prog//alexeyche-junk/cns/cpp/const.json")
+source('~/.active-rstudio-document', echo=TRUE)
+const
+source('~/.active-rstudio-document', echo=TRUE)
+const
+require(Rsnn)
+require(rjson)
+f = fromJSON(file="/home/alexeyche/prog//alexeyche-junk/cns/cpp/const.json")
+source('~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts/sim.R', echo=TRUE)
+const
+tempfile
+tempfile()
+source('~/.active-rstudio-document', echo=TRUE)
+source('~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts/sim.R', echo=TRUE)
+c
+c$sim_configuration
+c$sim_configuration$net_layers
+c$sim_configuration$net_layers[[1]]$size
+source('~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts/sim.R', echo=TRUE)
+cjson
+?write
+source('~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts/sim.R', echo=TRUE)
+temp_const
+source('~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts/sim.R', echo=TRUE)
+const
+c
+source('~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts/sim.R', echo=TRUE)
+cjson
+write(cjson, file=temp_const)
+source('~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts/sim.R', echo=TRUE)
+source('~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts/sim.R', echo=TRUE)
+const
+cjson
+source('~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts/sim.R', echo=TRUE)
+const
+cjson
+temp_const
+source('~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts/gen_test_data.R', echo=TRUE)
+source('~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts/gen_test_data.R', echo=TRUE)
+rates
+rpoiss
+rpois
+source('~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts/gen_test_data.R', echo=TRUE)
+w = exp( -(seq(-10,10,length.out=100)/10) )
+w
+plotl(w)
+source('~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts/gen_test_data.R', echo=TRUE)
+plotl(w)
+w = exp( -(seq(-10,10,length.out=1000)^2/10) )
+plotl(w)
+w = exp( -(seq(-1,1,length.out=100)^2/1) )
+sp = rpois(10000, 10/1000)
+filter(sp, w, circular=TRUE)
+plotl(filter(sp, w, circular=TRUE))
+plot(filter(sp, w, circular=TRUE), xlim=c(0,100))
+plot(filter(sp, w, circular=TRUE), xlim=c(0,1000))
+sp = c(rep(0,100), 1, rep(0,100))
+plot(filter(sp, w, circular=TRUE), xlim=c(0,1000))
+source('~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts/gen_test_data.R', echo=TRUE)
+plot(filter(sp, w, circular=TRUE), xlim=c(0,1000))
+w = exp( -(seq(-5,5,length.out=100)^2/1) )
+plot(filter(sp, w, circular=TRUE), xlim=c(0,1000))
+plot(filter(sp, w, circular=TRUE), xlim=c(0,100))
+plot(filter(sp, w, circular=TRUE), xlim=c(0,200))
+w = exp( -(seq(-2.5,2.5,length.out=100)^2/1) )
+plot(filter(sp, w, circular=TRUE), xlim=c(0,200))
+write()
+?write
+write.table
+?write.table
+source('~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts/sim.R', echo=TRUE)
+const
+c
+cjson
+c$sim_configuration$net_layers[[1]]$size = 1
+c
+cjson = toJSON(c)
+cf = file(temp_const)
+writeLines(cjson, cf)
+close(cf)
+const = RConstants$new(temp_const)
+temp_const
+c
+c$sim_configuration
+require(Rsnn)
+require(rjson)
+temp_const = tempfile()
+const = "/home/alexeyche/prog//alexeyche-junk/cns/cpp/const.json"
+system(sprintf("sed -e 's|//.*$||g' %s > %s", const, temp_const), intern=TRUE)
+c = fromJSON(file=temp_const, unexpected.escape ="skip")
+c
+c$sim_configuration$net_layers_conf[[1]]$size = 1
+c
+source('~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts/sim.R', echo=TRUE)
+const
+source('~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts/sim.R', echo=TRUE)
+source('~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts/sim.R', echo=TRUE)
+s
+source('~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts/sim.R', echo=TRUE)
+s
+list(spikes_list=rpois(1000, 10/1000), labels=c("1"), timeline=c(1000))
+source('~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts/sim.R', echo=TRUE)
+s
+source('~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts/sim.R', echo=TRUE)
+s
+source('~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts/sim.R', echo=TRUE)
+s
+c$sim_configuration$input_layers_conf[[1]]
+require(Rsnn)
+require(rjson)
+temp_const = tempfile()
+const = "/home/alexeyche/prog//alexeyche-junk/cns/cpp/const.json"
+system(sprintf("sed -e 's|//.*$||g' %s > %s", const, temp_const), intern=TRUE)
+c = fromJSON(file=temp_const, unexpected.escape ="skip")
+c$sim_configuration$net_layers_conf[[1]]$size = 1
+c$sim_configuration$input_layers_conf[[1]]
+c$sim_configuration$input_layers_conf[[1]]$size
+rate = 10
+len = 1000
+N = cr$sim_configuration$input_layers_conf[[1]]$size
+sapply(1:N, function(x) rpois(len, rate/1000))
+source('~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts/sim.R', echo=TRUE)
+require(Rsnn)
+require(rjson)
+temp_const = tempfile()
+const = "/home/alexeyche/prog//alexeyche-junk/cns/cpp/const.json"
+system(sprintf("sed -e 's|//.*$||g' %s > %s", const, temp_const), intern=TRUE)
+cr = fromJSON(file=temp_const, unexpected.escape ="skip")
+cr$sim_configuration$net_layers_conf[[1]]$size = 1
+cjson = toJSON(cr)
+cf = file(temp_const)
+writeLines(cjson, cf)
+close(cf)
+const = RConstants$new(temp_const)
+s = RSim$new(const)
+rate = 10
+len = 1000
+N = cr$sim_configuration$input_layers_conf[[1]]$size
+sapply(1:N, function(x) which(rpois(len, rate/1000) == 1))
+net = sapply(1:N, function(x) which(rpois(len, rate/1000) == 1))
+net
+prast(net)
+source('~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts/sim.R', echo=TRUE)
+s
+source('~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts/sim.R', echo=TRUE)
+source('~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts/sim.R', echo=TRUE)
+const
+source('~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts/sim.R', echo=TRUE)
+prast(net_ans)
+cr$sim_configuration$conn_map
+cr$sim_configuration$conn_map[["0->1"]]
+cr$sim_configuration$conn_map[["0->1"]]$weight_dist
+cr$sim_configuration$conn_map[["0->1"]]$weight_distr
+cr$sim_configuration$conn_map[["0->1"]][[1]]
+cr$sim_configuration$conn_map[["0->1"]][[1]]$weight_distr
+source('~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts/sim.R', echo=TRUE)
+prast(net_ans)
+source('~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts/sim.R', echo=TRUE)
+source('~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts/sim.R', echo=TRUE)
+source('~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts/sim.R', echo=TRUE)
+source('~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts/sim.R', echo=TRUE)
+source('~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts/sim.R', echo=TRUE)
+source('~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts/sim.R', echo=TRUE)
+source('~/prog/alexeyche-junk/cns/cpp/scripts/eval_dist_matrix.R', echo=TRUE)
+dist = do.call(rbind, data$distance_matrix)
+dist
+gr_pl(dst)
+>>>>>>> 6bfad5f4821ca5d05620b6bc98ab3be127a4fd9e
+gr_pl(dist)
+require(Rsnn)
+gr_pl(dist)
+dist[1,]
+dist[1,1:300]
+min(dist[1,1:300])
+dist
+dist = do.call(rbind, data$distance_matrix)
+diag(dist) <- Inf
+which(min(dist[1,300]))
+min(dist[1,300])
+which(dist[1,300] == m)
+m = min(dist[1,300])
+which(dist[1,300] == min(dist[1,300]))
+dist = do.call(rbind, data$distance_matrix)
+diag(dist) <- Inf
+labs = data$labels
+test_labs = data$test_labels
+tr_ids = 1:length(labs)
+ulabs = unique(c(labs, test_labs))
+conf_m = matrix(0, nrow=length(ulabs), ncol=length(ulabs))
+for(i in 1:length(test_labs)) {
+tr_i = which(dist[i,tr_ids] == min(dist[i,tr_ids]))
+act_class = which(ulabs == labs(i))
+pred_class = which(ulabs == labs(tr_i))
+if(act_class == pred_class) {
+conf_m[act_class,pred_class] = conf_m[act_class,pred_class] + 1
+}
+}
+dist = do.call(rbind, data$distance_matrix)
+diag(dist) <- Inf
+labs = data$labels
+test_labs = data$test_labels
+tr_ids = 1:length(labs)
+ulabs = unique(c(labs, test_labs))
+conf_m = matrix(0, nrow=length(ulabs), ncol=length(ulabs))
+for(i in 1:length(test_labs)) {
+tr_i = which(dist[i,tr_ids] == min(dist[i,tr_ids]))
+act_class = which(ulabs == labs[i])
+pred_class = which(ulabs == labs[tr_i])
+if(act_class == pred_class) {
+conf_m[act_class,pred_class] = conf_m[act_class,pred_class] + 1
+}
+}
+conf_m
+1:length(test_labs)
+dist = do.call(rbind, data$distance_matrix)
+diag(dist) <- Inf
+labs = data$labels
+test_labs = data$test_labels
+tr_ids = 1:length(labs)
+ulabs = unique(c(labs, test_labs))
+conf_m = matrix(0, nrow=length(ulabs), ncol=length(ulabs))
+for(i in 1:length(test_labs)) {
+tr_i = which(dist[i+length(labs),tr_ids] == min(dist[i+length(labs),tr_ids]))
+act_class = which(ulabs == labs[i])
+pred_class = which(ulabs == labs[tr_i])
+if(act_class == pred_class) {
+conf_m[act_class,pred_class] = conf_m[act_class,pred_class] + 1
+}
+}
+conf_m
+act_class
+pred_class
+dist = do.call(rbind, data$distance_matrix)
+diag(dist) <- Inf
+labs = data$labels
+test_labs = data$test_labels
+tr_ids = 1:length(labs)
+ulabs = unique(c(labs, test_labs))
+conf_m = matrix(0, nrow=length(ulabs), ncol=length(ulabs))
+for(i in 1:length(test_labs)) {
+tr_i = which(dist[i+length(labs),tr_ids] == min(dist[i+length(labs),tr_ids]))
+act_class = which(ulabs == labs[i])
+pred_class = which(ulabs == labs[tr_i])
+conf_m[act_class,pred_class] = conf_m[act_class,pred_class] + 1
+}
+conf_m
+tr_i
+labs
+labs[tr_i]
+i=1
+i+length(labs)
+dist[i+length(labs),tr_ids]
+min(dist[i+length(labs),tr_ids])
+m = min(dist[i+length(labs),tr_ids])
+which(dist[i+length(labs),tr_ids]  == m)
+ulabs
+plotl(dist[i+length(labs),tr_ids]
+plotl(dist[i+length(labs),tr_ids])
+plotl(dist[2+length(labs),tr_ids])
+plotl(dist[3+length(labs),tr_ids])
+plotl(dist[4+length(labs),tr_ids])
+plotl(dist[5+length(labs),tr_ids])
+plotl(dist[5+length(labs),tr_ids])
+plotl(dist[6+length(labs),tr_ids])
+plotl(dist[7+length(labs),tr_ids])
+tr_ids
+dist[,100]
+plotl(dist[100+length(labs),tr_ids])
+dist[100,]
+dist[,101]
+dist[,100]
+plotl(dist[,100])
+plotl(dist[,101])
+plotl(dist[,102])
+dist[100,102]
+dist[101,102]
+dist[99,102]
+min(dist)
+source('~/prog/alexeyche-junk/cns/cpp/scripts/eval_dist_matrix.R', echo=TRUE)
+dist = do.call(rbind, data$distance_matrix)
+diag(dist) <- Inf
+labs = data$labels
+test_labs = data$test_labels
+tr_ids = 1:length(labs)
+ulabs = unique(c(labs, test_labs))
+conf_m = matrix(0, nrow=length(ulabs), ncol=length(ulabs))
+for(i in 1:length(test_labs)) {
+tr_i = which(dist[i+length(labs),tr_ids] == min(dist[i+length(labs),tr_ids]))
+act_class = which(ulabs == labs[i])
+pred_class = which(ulabs == labs[tr_i])
+conf_m[act_class,pred_class] = conf_m[act_class,pred_class] + 1
+}
+conf_m
+install.packages("caret")
+install.packages(pRoc)
+install.packages("pRoc")
+install.packages("pROC")
+require(pROC)
+?roc
+resp = NULL
+pred = NULL
+for(i in 1:length(test_labs)) {
+tr_i = which(dist[i+length(labs),tr_ids] == min(dist[i+length(labs),tr_ids]))
+act_class = which(ulabs == labs[i])
+pred_class = which(ulabs == labs[tr_i])
+resp = c(resp, act_class)
+pred = c(pred, pred_class)
+}
+resp
+pres
+pred
+roc(pred, resp)
+plot(roc(pred, resp))
+?plot(roc(pred, resp))
+?roc
+?plot(roc(pred, resp, smooth=TRUE))
+plot(roc(pred, resp, smooth=TRUE))
+?roc
+roc(pred, resp, smooth=TRUE)
+roc(pred, resp)
+smooth.roc(pred, resp)
+roc(pred, resp, polygon=TRUE)
+roc(resp, pred, polygon=TRUE)
+roc(resp, pred, polygon=TRUE)
+plotl(roc(resp, pred, polygon=TRUE))
+plotl(roc(resp, pred, polygon=TRUE))
+plotl(roc(resp, pred))
+?p.roc
+?roc
+?caret
+require(caret)
+?confusionMatrix
+tr_ids = 1:length(labs)
+conf_m = matrix(0, nrow=length(ulabs), ncol=length(ulabs))
+for(i in 1:length(test_labs)) {
+tr_i = which(dist[i+length(labs),tr_ids] == min(dist[i+length(labs),tr_ids]))
+act_class = which(ulabs == labs[i])
+pred_class = which(ulabs == labs[tr_i])
+conf_m[act_class, pred_class] = conf_m[act_class, pred_class]+1
+}
+conf_m
+confusionMatrix(conf_m)
+confusionMatrix(pred,resp)
+install.packages("e1071")
+confusionMatrix(pred,resp)
+conf_m
+?confusionMatrix
+confusionMatrix(pred, resp)
+confusionMatrix(pred, resp)$positive
+names(confusionMatrix(pred, resp))
+confusionMatrix(pred, resp)$overall
+confusionMatrix(pred, resp)$overall$accuracy
+confusionMatrix(pred, resp)$overall[1]
+source('~/prog/alexeyche-junk/cns/cpp/scripts/eval_dist_matrix.R', echo=TRUE)
+<<<<<<< HEAD
+invisible(require(rjson))
+?require
+require(rjson, quietly=TRUE)
+source('~/prog/alexeyche-junk/cns/cpp/scripts/eval_dist_matrix.R', echo=TRUE)
+source('~/prog/alexeyche-junk/cns/cpp/scripts/eval_dist_matrix.R', echo=TRUE)
+calinski_harabasz_criterion(points, ulabs, labs, centroids, global_centroid)
+data$mean_rate
+args
+source('~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts/cross_spectrum_dist_test.R', echo=TRUE)
+s1
+fft(s1) * Conj(fft(s2))
+plotl(fft(s1) * Conj(fft(s2))()
+plot(fft(s1) * Conj(fft(s2)), type="l")
+plot(abs(fft(s1) * Conj(fft(s2))), type="l")
+plot(abs(fft(s1) * Conj(fft(s1))), type="l")
+s1 = rnorm(10000)
+plot(abs(fft(s1) * Conj(fft(s1))), type="l")
+plot(Re(fft(s1) * Conj(fft(s1))), type="l")
+?spec.pgram
+spec.pgram(s1)
+?spec.pgram
+spec.pgram(s1, taper=10)
+spec.pgram(s1, taper=0.5)
+spec.pgram(s1, spans=c(3,5))
+spec.pgram(s1, spans=c(3,10))
+spec.pgram(s1, spans=c(0,5))
+spec.pgram(s1, spans=c(1,5))
+spec.pgram(s1, spans=c(1,100))
+spec.pgram(s1, spans=c(1,10))
+spec.pgram(s1, spans=c(3,10))
+spec.pgram(s1, spans=c(3,100))
+spec.pgram(s1, spans=c(3,1000))
+?spec.pgram
+source('~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts/cross_spectrum_dist_test.R', echo=TRUE)
+spec.taper(s1)
+plot(spec.taper(s1),type="l")
+plot(spec.taper(s1, p=c(3,5)),type="l")
+?spec.taper
+plot(spec.taper(s1, p=5,type="l")
+plot(spec.taper(s1, p=5),type="l")
+plot(spec.taper(s1, p=0.5),type="l")
+?spec.pragm
+?spec.pgram
+sales.spc <- spectrum(ts.union(BJsales, BJsales.lead),
+kernel("modified.daniell", c(5,7)))
+ts = ts.union(BJsales, BJsales.lead)
+ts
+kernel("modified.daniell", c(5,7))
+plotl(kernel("modified.daniell", c(5,7)))
+require(Rsnn)
+plotl(kernel("modified.daniell", c(5,7)))
+plotl(kernel("modified.daniell", c(5,10)))
+plotl(kernel("modified.daniell", c(5,7)))
+plotl(kernel("modified.daniell", c(1,7)))
+plotl(kernel("modified.daniell", c(5,7)))
+sales.spc <- spectrum(ts.union(BJsales, BJsales.lead))
+sales.spc <- spectrum(ts.union(BJsales, BJsales.lead),
+kernel("modified.daniell", c(5,7)))
+?spec.pgram
+source('~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts/cross_spectrum_dist_test.R', echo=TRUE)
+?spec.pgram
+source('~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts/cross_spectrum_dist_test.R', echo=TRUE)
+?spec.pgram
+plot(sales.spc, plot.type = "phase")
+plot(sales.spc, plot.type = "coherency")
+source('~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts/cross_spectrum_dist_test.R', echo=TRUE)
+plotl(fs1)
+plotl(Re(fs1))
+source('~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts/cross_spectrum_dist_test.R', echo=TRUE)
+fs1
+source('~/prog/work/solomon/read.R', echo=TRUE)
+source('~/prog/work/solomon/read.R', echo=TRUE)
+source('~/prog/work/solomon/read.R', echo=TRUE)
+source('~/prog/work/solomon/read.R', echo=TRUE)
+source('~/prog/work/solomon/read.R', echo=TRUE)
+source('~/prog/work/solomon/read.R', echo=TRUE)
+source('~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts/vis_p_stat.R', echo=TRUE)
+install.packages("irlba")
+require(irliba)
+require(irlba)
+?irlba
+source('~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts/vis_p_stat.R', echo=TRUE)
+irlba(feats, nu=2, nv=2)
+feats[1,]
+irlba(feats, adjust=10)
+irlba(feats, adjust=1)
+source('~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts/get_sim_data.R', echo=TRUE)
+source('~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts/get_sim_data.R', echo=TRUE)
+=======
+invisible(require(caret, quietly=TRUE))
+library(caret, quietly=TRUE)
+source('~/prog/alexeyche-junk/cns/cpp/scripts/eval_dist_matrix.R', echo=TRUE)
+cat(nn_nmi(data),"\n")
+library(caret, quietly=TRUE)
+dist = do.call(rbind, data$distance_matrix)
+diag(dist) <- Inf
+dist
+labs = data$labels
+test_labs = data$test_labels
+ulabs = unique(c(labs, test_labs))
+labs
+ulabs
+test_labs
+tr_ids = 1:length(labs)
+conf_m = matrix(0, nrow=length(ulabs), ncol=length(ulabs))
+tr_ids
+resp = NULL
+pred = NULL
+for(i in 1:length(test_labs)) {
+tr_i = which(dist[i+length(labs),tr_ids] == min(dist[i+length(labs),tr_ids]))
+act_class = which(ulabs == labs[i])
+pred_class = which(ulabs == labs[tr_i])
+resp = c(resp, act_class)
+pred = c(pred, pred_class)
+}
+resp
+pred
+cf = confusionMatrix(pred, resp)
+length(resp)
+length(pred)
+levels(pred)
+levels(resp)
+as.table(pred)
+cf = confusionMatrix(as.table(pred), as.table(resp))
+cbind(pred,resp)
+as.table(cbind(pred,resp))
+cf = confusionMatrix(as.table(cbind(pred,resp)))
+as.factor(resp)
+cf = confusionMatrix(as.factor(pred), as.factor(resp)
+cf = confusionMatrix(as.factor(pred), as.factor(resp))
+as.factor(pred)
+as.factor(resp)
+cf = confusionMatrix(as.factor(pred), as.factor(resp))
+table(pred,resp)
+cf = confusionMatrix(table(pred,resp))
+t = table(pred,resp)
+nrow(t)
+col(t)
+t
+pred
+resp
+unique(resp)
+unique(pred)
+rates = data$rates
+target_rate_sum = sqrt(sum(rep(target_rate, length(data$rates))^2))
+rate_sum = sqrt(sum((rates^2)))
+if(mean(rates)>target_rate) {
+val*exp( - (rate_sum - target_rate_sum)^2/2000.0)
+} else {
+val*exp( - (rate_sum - target_rate_sum)^2/500.0)
+}
+}
+nn_nmi = function(data) {
+library(caret, quietly=TRUE)
+dist = do.call(rbind, data$distance_matrix)
+diag(dist) <- Inf
+labs = data$labels
+test_labs = data$test_labels
+ulabs = unique(c(labs, test_labs))
+tr_ids = 1:length(labs)
+conf_m = matrix(0, nrow=length(ulabs), ncol=length(ulabs))
+resp = ulabs
+pred = ulabs
+for(i in 1:length(test_labs)) {
+tr_i = which(dist[i+length(labs),tr_ids] == min(dist[i+length(labs),tr_ids]))
+act_class = which(ulabs == labs[i])
+pred_class = which(ulabs == labs[tr_i])
+resp = c(resp, act_class)
+pred = c(pred, pred_class)
+}
+t = table(pred,resp)
+cf = confusionMatrix()
+print(cf)
+library(caret, quietly=TRUE)
+dist = do.call(rbind, data$distance_matrix)
+diag(dist) <- Inf
+labs = data$labels
+test_labs = data$test_labels
+ulabs = unique(c(labs, test_labs))
+tr_ids = 1:length(labs)
+conf_m = matrix(0, nrow=length(ulabs), ncol=length(ulabs))
+resp = ulabs
+pred = ulabs
+for(i in 1:length(test_labs)) {
+tr_i = which(dist[i+length(labs),tr_ids] == min(dist[i+length(labs),tr_ids]))
+act_class = which(ulabs == labs[i])
+pred_class = which(ulabs == labs[tr_i])
+resp = c(resp, act_class)
+pred = c(pred, pred_class)
+}
+t = table(pred,resp)
+cf = confusionMatrix()
+print(cf)
+t = table(pred,resp)
+t
+cf = confusionMatrix()
+print(cf)
+cf = confusionMatrix(t)
+print(cf)
+source('~/prog/alexeyche-junk/cns/cpp/scripts/eval_dist_matrix.R', echo=TRUE)
+library(caret, quietly=TRUE)
+dist = do.call(rbind, data$distance_matrix)
+diag(dist) <- Inf
+labs = data$labels
+test_labs = data$test_labels
+ulabs = unique(c(labs, test_labs))
+tr_ids = 1:length(labs)
+conf_m = matrix(0, nrow=length(ulabs), ncol=length(ulabs))
+resp = ulabs
+pred = ulabs
+for(i in 1:length(test_labs)) {
+tr_i = which(dist[i+length(labs),tr_ids] == min(dist[i+length(labs),tr_ids]))
+act_class = which(ulabs == labs[i])
+pred_class = which(ulabs == labs[tr_i])
+resp = c(resp, act_class)
+pred = c(pred, pred_class)
+}
+t = table(pred,resp)
+cf = confusionMatrix(t)
+print(cf)
+warnings()
+tr_ids = 1:length(labs)
+tr_ids
+which(dist[i+length(labs),tr_ids] == min(dist[i+length(labs),tr_ids]))
+dist[i+length(labs),tr_ids] == min(dist[i+length(labs),tr_ids])
+source('~/prog/alexeyche-junk/cns/cpp/scripts/eval_dist_matrix.R', echo=TRUE)
+cat(nn_nmi(data),"\n")
+source('~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts/ucr_data_to_spikes.R', echo=TRUE)
+prast(spikes_complect[["train"]]$spikes,T0=50000,Tmax=60000)
+prast(spikes_complect[["train"]]$spikes,T0=100000,Tmax=111000)
+prast(spikes_complect[["train"]]$spikes,T0=110000,Tmax=111000)
+>>>>>>> 6bfad5f4821ca5d05620b6bc98ab3be127a4fd9e
+source('~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts/get_sim_data.R', echo=TRUE)

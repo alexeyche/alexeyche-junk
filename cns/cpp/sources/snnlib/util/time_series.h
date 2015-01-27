@@ -33,9 +33,6 @@ public:
 
 class LabeledTimeSeries  :  public Serializable<Protos::LabeledTimeSeries> {
 public:
-    string label;
-    TimeSeries ts;
-
     LabeledTimeSeries() : Serializable(ELabeledTimeSeries) {}
     LabeledTimeSeries(const vector<double> &data, string _label) : Serializable(ELabeledTimeSeries), ts(data), label(_label) { }
     LabeledTimeSeries(const Protos::LabeledTimeSeries &m) : Serializable(ELabeledTimeSeries) {
@@ -65,6 +62,9 @@ public:
         ts.deserialize(m->ts());
     }
     // end Serializable
+
+    string label;
+    TimeSeries ts;
 
 };
 

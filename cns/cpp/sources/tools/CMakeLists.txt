@@ -5,7 +5,7 @@ set(DIRS
     sim
     dumptool
     proc
-    #prep
+    gammatone_fb
     #filt
     #postproc
     #calc
