@@ -58,4 +58,4 @@ for(data_part in names(spikes_complect)) {
     prw = RProto$new(fname)
     prw$write(spikes_complect[[data_part]], "LabeledSpikesList")
 }
-prast(spikes_complect[["train"]]$spikes,T0=0,Tmax=1000)
+prast(spikes_complect[["train"]]$spikes,T0=110000,Tmax=111000)

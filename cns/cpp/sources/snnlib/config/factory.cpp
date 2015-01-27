@@ -18,7 +18,8 @@
 #include <snnlib/reinforcement/input_classification.h>
 #include <snnlib/act_funcs/determ.h>
 #include <snnlib/act_funcs/exp_hennequin.h>
-#include <snnlib/neurons/synapse.h>
+#include <snnlib/synapses/simple_synapse.h>
+#include <snnlib/synapses/dynamic_synapse.h>
 #include <snnlib/tuning_curves/sigma_tuning_curve.h>
 #include <snnlib/neurons/srm_neuron.h>
 #include <snnlib/neurons/adex_neuron.h>
@@ -39,7 +40,8 @@ Factory& Factory::inst() {
 Factory::Factory() {
     const_map["SRMNeuron"]     =   &createConstInstance<Obj, SRMNeuronC>;
     const_map["AdExNeuron"]     =   &createConstInstance<Obj, AdExNeuronC>;
-    const_map["Synapse"]      =   &createConstInstance<Obj, SynapseC>;
+    const_map["SimpleSynapse"]      =   &createConstInstance<Obj, SimpleSynapseC>;
+    const_map["DynamicSynapse"]      =   &createConstInstance<Obj, DynamicSynapseC>;
     const_map["Determ"]       =   &createConstInstance<Obj, DetermC>;
     const_map["ExpHennequin"] =   &createConstInstance<Obj, ExpHennequinC>;
     const_map["OptimalStdp"]  =   &createConstInstance<Obj, OptimalStdpC>;
@@ -59,7 +61,8 @@ Factory::Factory() {
 
     entity_map["SRMNeuron"]     =   &createInstance<Obj, SRMNeuron>;
     entity_map["AdExNeuron"]     =   &createInstance<Obj, AdExNeuron>;
-    entity_map["Synapse"]      =   &createInstance<Obj, Synapse>;
+    entity_map["SimpleSynapse"]      =   &createInstance<Obj, SimpleSynapse>;
+    entity_map["DynamicSynapse"]      =   &createInstance<Obj, DynamicSynapse>;
     entity_map["Determ"]       =   &createInstance<Obj, Determ>;
     entity_map["ExpHennequin"] =   &createInstance<Obj, ExpHennequin>;
     entity_map["OptimalStdp"]  =   &createInstance<Obj, OptimalStdp>;
@@ -98,8 +101,11 @@ SerializableBase* Factory::createSerializable(const string &name) {
     if(name == "SpikesList") {
         s = new SpikesList();
     } else
-    if(name == "Synapse") {
-        s = new Synapse();
+    if(name == "SimpleSynapse") {
+        s = new SimpleSynapse();
+    } else
+    if(name == "DynamicSynapse") {
+        s = new DynamicSynapse();
     } else
     if(name == "AdExNeuron") {
         s = new AdExNeuron();

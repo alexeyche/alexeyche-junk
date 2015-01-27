@@ -5,9 +5,7 @@ cmake_minimum_required(VERSION 2.8)
 
 
 set(SOURCES
-    adex_neuron.cpp
-    neuron_stat.cpp
-    neuron.cpp
+    synapse.cpp
 )
 
 # add directory name to sources

@@ -4,7 +4,7 @@
 #include <snnlib/serialize/serialize.h>
 #include <snnlib/protos/model.pb.h>
 #include <snnlib/config/constants.h>
-#include <snnlib/neurons/synapse.h>
+#include <snnlib/synapses/synapse.h>
 
 #include <snnlib/weight_normalizations/weight_normalization.h>
 #include <snnlib/act_funcs/act_func.h>

@@ -24,12 +24,13 @@ conf['variables_path'] = {
     "amp_adapt": ["neurons", "SRMNeuron", "amp_adapt"],
     "tau_refr": ["neurons", "SRMNeuron", "tau_refr"],
     "beta": ["act_funcs", "ExpHennequin", "beta"],
-    "epsp_decay_exc": ["synapses", "Synapse", "epsp_decay"],
-    "epsp_decay_inh": ["synapses", "Synapse_Inh", "epsp_decay"],
+    "epsp_decay_exc": ["synapses", "SimpleSynapse", "epsp_decay"],
+    "epsp_decay_inh": ["synapses", "SimpleSynapse_Inh", "epsp_decay"],
     "prob_feedforward_exc" : ["sim_configuration", "conn_map", "0->1", 0, "prob"],
     "prob_feedforward_inh" : ["sim_configuration", "conn_map", "0->1", 1, "prob"],
     "prob_reccurent_exc" : ["sim_configuration", "conn_map", "1->1", 0, "prob"],
     "prob_reccurent_inh" : ["sim_configuration", "conn_map", "1->1", 1, "prob"],
+#    "size" : ["sim_configuration", "net_layers_conf", 0, "size" ],
     "weight_distr_mean_ff_exc"  :  ["sim_configuration", "conn_map", "0->1", 0, "weight_distr", 0], 
     "weight_distr_mean_ff_inh"  :  ["sim_configuration", "conn_map", "0->1", 1, "weight_distr", 0], 
     "weight_distr_mean_rec_exc" :  ["sim_configuration", "conn_map", "1->1", 0, "weight_distr", 0], 
@@ -48,6 +49,7 @@ cma_conf = {
     "prob_feedforward_inh" : { "min" : 0, "max" : 1.0 },
     "prob_reccurent_exc" : { "min" : 0, "max" : 0.2 },
     "prob_reccurent_inh" : { "min" : 0, "max" : 1.0 },
+#    "size" : { "min" : 2, "max" : 100.0 },
     "weight_distr_mean_ff_exc"  :  { "min" : 0.1, "max" : 100 }, 
     "weight_distr_mean_ff_inh"  :  { "min" : 0, "max" : 100}, 
     "weight_distr_mean_rec_exc" :  { "min" : 0, "max" : 100 }, 
@@ -56,8 +58,13 @@ cma_conf = {
 var_names = sorted(conf['variables_path'])
 
 bounds = [0, 10]
+<<<<<<< HEAD
 jobs = 2
 cma_jobs = 1 # multiprocessing.cpu_count()/jobs
+=======
+jobs = 3
+cma_jobs = 2 # multiprocessing.cpu_count()/jobs
+>>>>>>> 6bfad5f4821ca5d05620b6bc98ab3be127a4fd9e
 
 def scale_to_cma(x, min, max, a, b):
     return ((b-a)*(x - min)/(max-min)) + a
@@ -70,6 +77,7 @@ def eval(x, id, ret_q):
     p = dict(zip(var_names, x))
     for param in p:
         p[param] = scale_from_cma(p[param], cma_conf[param]["min"], cma_conf[param]['max'], bounds[0], bounds[1])
+#    p["size"] = int(p["size"])
     try:
         res = evaluate(id, p, conf, jobs, verbose=False)
         ret = res[ conf['criterion_name'] ]

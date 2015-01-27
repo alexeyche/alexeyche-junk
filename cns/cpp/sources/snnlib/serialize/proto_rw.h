@@ -32,7 +32,7 @@ public:
             }
             zeroIn = new IstreamInputStream(ifs);
             codedIn = new CodedInputStream(zeroIn);
-            codedIn->SetTotalBytesLimit(100.0 * 1024 * 1024,100.0 * 1024 * 1024);
+            codedIn->SetTotalBytesLimit(300.0 * 1024 * 1024,300.0 * 1024 * 1024);
         } else
         if(m == Write) {
             if(f.empty()) {

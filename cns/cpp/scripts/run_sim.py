@@ -8,7 +8,6 @@ import shutil
 import multiprocessing
 from contextlib import contextmanager
 import json
-import traceback
 import collections
 import numpy as np
 import functools

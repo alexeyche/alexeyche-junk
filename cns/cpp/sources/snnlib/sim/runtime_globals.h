@@ -6,7 +6,7 @@ class Network;
 
 class RuntimeGlobals {
 public:
-	RuntimeGlobals(RewardControl *_rc, Network *_net) : rc(_rc), net(_net) {}
+	RuntimeGlobals(RewardControl *_rc, Network *_net) : rc(_rc), net(_net), current_class_id(nullptr) {}
 	void setDt(double _dt) {
 		dt = _dt;
 	}

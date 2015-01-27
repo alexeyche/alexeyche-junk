@@ -10,8 +10,8 @@
 #include <snnlib/config/factory.h>
 #include <snnlib/serialize/serialize.h>
 #include <snnlib/reinforcement/reward_modulation.h>
+#include <snnlib/synapses/synapse.h>
 
-#include "synapse.h"
 #include "neuron_stat.h"
 
 #include <snnlib/protos/model.pb.h>
