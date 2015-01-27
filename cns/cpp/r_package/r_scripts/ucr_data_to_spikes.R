@@ -16,7 +16,7 @@ max_train = max(sapply(data_train, function(x) max(x$data)))
 max_test = max(sapply(data_test, function(x) max(x$data)))
 max_val = max(max_train, max_test)
 
-N = 100
+N = 50
 dt = 5
 gap_between_patterns = 100
 

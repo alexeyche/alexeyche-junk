@@ -160,7 +160,7 @@
     "sim_configuration" : {
         "input_layers_conf" : [
             {
-                "size" : 100,
+                "size" : 50,
                 "neuron_conf" : {
                     "neuron" : "AdExNeuron",
                     "tuning_curve" : "SigmaTuningCurve",
@@ -171,7 +171,7 @@
         ],
         "net_layers_conf" : [
             {
-                "size" : 100,
+                "size" : 250,
                 "wta" : false,
                 "neuron_conf" : {
                     "neuron" : "SRMNeuron",

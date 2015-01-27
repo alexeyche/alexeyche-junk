@@ -46,7 +46,7 @@ cma_conf = {
     "epsp_decay_inh": { "min" : 1, "max" : 50 },
     "prob_feedforward_exc" : { "min" : 0.05, "max" : 1.0 },
     "prob_feedforward_inh" : { "min" : 0, "max" : 1.0 },
-    "prob_reccurent_exc" : { "min" : 0, "max" : 1.0 },
+    "prob_reccurent_exc" : { "min" : 0, "max" : 0.2 },
     "prob_reccurent_inh" : { "min" : 0, "max" : 1.0 },
     "weight_distr_mean_ff_exc"  :  { "min" : 0.1, "max" : 100 }, 
     "weight_distr_mean_ff_inh"  :  { "min" : 0, "max" : 100}, 
@@ -56,7 +56,7 @@ cma_conf = {
 var_names = sorted(conf['variables_path'])
 
 bounds = [0, 10]
-jobs = 4
+jobs = 2
 cma_jobs = 1 # multiprocessing.cpu_count()/jobs
 
 def scale_to_cma(x, min, max, a, b):
@@ -83,7 +83,7 @@ for param in var_names:
     v = float(get_value_in_nested_dict(const, conf['variables_path'][param]))
     start_params[param] = scale_to_cma(v, cma_conf[param]["min"], cma_conf[param]['max'], bounds[0], bounds[1])
 
-es = cma.CMAEvolutionStrategy([ start_params[p] for p in var_names ], 2, { 'bounds' : [ bounds[0], bounds[1] ] } )
+es = cma.CMAEvolutionStrategy([ start_params[p] for p in var_names ], 2, { 'bounds' : [ bounds[0], bounds[1] ], 'popsize' : 20 } )
 id = 0
 while not es.stop():
     X = es.ask()
