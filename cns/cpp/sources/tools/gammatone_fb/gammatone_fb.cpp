@@ -8,10 +8,7 @@
 #include <snnlib/serialize/serialize.h>
 #include <snnlib/serialize/proto_rw.h>
 #include <snnlib/util/util.h>
-
-
-#include "gammatone_fb.h"
-
+#include <snnlib/util/gammatone_fb.h>
 #include <snnlib/util/time_series.h>
 
 
