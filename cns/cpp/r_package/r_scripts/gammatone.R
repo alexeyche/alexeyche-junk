@@ -8,39 +8,61 @@ sample_size = 60
 
 c(train, test) := read_ts_file(synth, sample_size, "~/prog/sim/ts")
 
-
-fn_opt = function(input) {
+filter_with_gammatones = function(set, freqs, sampling_rate, hrect, verbose) {
     fb = RGammatoneFB$new()
-    
-    low_f = input[1]
-    high_f = input[2]
-    freqs = seq(low_f, high_f, length.out=100)
-    sampling_rate = input[3]
-    hrect = 1
-    verbose = 0
-    
-    train_fb = list()
-    for(x in train) {
+    oset = list()
+    for(x in set) {
         o = fb$calc(x$data, freqs, sampling_rate, hrect, verbose)
         mem = do.call(rbind, o$membrane)
-        train_fb[[length(train_fb)+1]] = list(data=mem, label=x$label)
+        oset[[length(oset)+1]] = list(data=mem, label=x$label)
     }
-    
-    dm = matrix(0, length(train_fb), length(train_fb))
-    for(i in 1:length(train_fb)) {
+    return(oset)
+}
+
+clust_eval_set = function(set, pl=FALSE) {
+    dm = matrix(0, length(set), length(set))
+    for(i in 1:length(set)) {
         for(j in 1:i) {
-            d = sum((train_fb[[i]]$data - train_fb[[j]]$data)^2)
+            d = sum((set[[i]]$data - set[[j]]$data)^2)
             dm[i,j] = d
             dm[j,i] = d
         }
     }
     data$distance_matrix = lapply(1:nrow(dm), function(i) dm[i,])
-    data$labels = sapply(train_fb, function(x) x$label)
-    return(calculate_criterion(data, FALSE))
+    data$labels = sapply(set, function(x) x$label)
+    return(calculate_criterion(data, pl))
 }
 
-o = optim(c(1, 200, 1000), fn_opt, lower=0.1, method="Brent")
+lseq = function(from, to, length) {
+    stopifnot(from>0)
+    exp(seq(log(from), log(to), length.out = length))
+}
+scale = function(x, min, max, a, b) {
+    ((b-a)*(x-min)/(max-min)) + a
+}
+
+
+fn_opt = function(input) {    
+    low_f = input[1]
+    high_f = input[2]
+    sampling_rate = input[3]
+    #low_f = scale(input[1],  cma_bounds[1], cma_bounds[2], 0.1, 200)
+    #high_f = scale(input[2], cma_bounds[1], cma_bounds[2], 10, 2000)
+    #sampling_rate = scale(input[3], cma_bounds[1], cma_bounds[2], 10, 2000)
+    
+    freqs = lseq(low_f, high_f, 100)
+    
+    cat(low_f, high_f, sampling_rate, "=")
+    hrect = 1
+    verbose = 0
+    train_fb = filter_with_gammatones(train, freqs, sampling_rate, hrect, verbose)
+    ev = clust_eval_set(train_fb)
+    cat(ev,"\n")
+    return(ev)
+}
+
+
+o = optim(c(1, 200, 1000), fn_opt, lower=0.1)
+
 #o = DEoptim(fn_opt, , c(25, 5000, 10000))
 
-
-#fn_opt(c(0.1,200,575))
