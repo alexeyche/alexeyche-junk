@@ -1,7 +1,0 @@
-package Protos;
-
-message DoubleMatrix {
-  required uint32 ncol = 1;
-  required uint32 nrow = 2;
-  repeated double vals = 3 [packed=true];
-}
