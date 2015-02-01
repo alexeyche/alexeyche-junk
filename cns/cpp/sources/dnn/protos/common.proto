@@ -1,0 +1,8 @@
+
+package Protos;
+
+
+
+message Class {
+    required string instance_class_name = 1;
+}
