@@ -1,6 +1,0 @@
-build
-bin
-CMakeCache.txt
-CMakeFiles
-cmake_install.cmake
-C.ex
