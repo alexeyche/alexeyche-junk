@@ -2,17 +2,11 @@ cmake_minimum_required(VERSION 2.8)
 
 ## recurse
 set(DIRS
-    sim
-    dumptool
-    proc
-    gammatone_fb
-    #filt
-    #postproc
-    #calc
+    dnn_sim
 )
 
 foreach(dir ${DIRS})
     add_subdirectory(${dir})
 endforeach()
 
-set(SNN_SIM_SRCS ${SNN_SIM_SRCS} ${DIR_SRCS} PARENT_SCOPE)
+set(DNN_SRCS ${DNN_SRCS} ${DIR_SRCS} PARENT_SCOPE)

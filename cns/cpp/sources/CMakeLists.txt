@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 2.8)
-project(snn_sim C CXX)
+project(dnn C CXX)
 
-set(SNNSIM_MAJOR_VERSION 0)
-set(SNNSIM_MINOR_VERSION 1)
-set(SNNSIM_PATCH_VERSION 0)
-set(SNNSIM_VERSION
-  ${SNNSIM_MAJOR_VERSION}.${SNNSIM_MINOR_VERSION}.${SNNSIM_PATCH_VERSION})
+set(DNN_MAJOR_VERSION 0)
+set(DNN_MINOR_VERSION 1)
+set(DNN_PATCH_VERSION 0)
+set(DNN_VERSION
+  ${DNN_MAJOR_VERSION}.${DNN_MINOR_VERSION}.${DNN_PATCH_VERSION})
  
 # First, define all the compilation options.
 # We default to debugging mode for developers.
@@ -53,6 +53,6 @@ include_directories(${CMAKE_SOURCE_DIR})
 include_directories(${CMAKE_BINARY_DIR})
 
 # Recurse into the rest of the project.
-add_subdirectory(snnlib)
+add_subdirectory(dnn)
 add_subdirectory(tools)
 
