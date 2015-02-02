@@ -1,6 +1,8 @@
 #pragma once
 
 #include <iostream>
+#include <memory>
+#include <vector>
 
 using std::cout;
 using std::move;
@@ -10,45 +12,34 @@ using std::vector;
 void test();
 
 
-template <typename Constants>
+
+template <typename Constants, typename State>
 class DynamicObject {
 public:
-    DynamicObject(Constants &_c) : c(_c) {}
-	void step() {
+    DynamicObject(const Constants &_c) : c(_c) {}
+	virtual void step(State &dState_dt) = 0;
+	
 
-    }
-
-private:
-    Constants &c;
+	State state;
+protected:
+    const Constants &c;
 };
 
+class NeuronState : public vector<double> {
+		
+};
 
-class System : public DynamicObject {
+struct NeuronConstants {
+	double tau_leak;
+};
+
+class Neuron : public DynamicObject<NeuronConstants, State> {
 public:
-	void add(unique_ptr<DynamicObject> o) {
-		dyn_objects.push_back( move(o) );
+	Neuron(NeuronConstants &c) : DynamicObject(c) {}
+	
+	void step(State &dState_dt) {
+		dState_dt[0] = state[0]/c.tau_leak; 
 	}
-
-	void step() {
-		for(auto it=dyn_objects.begin(); it != dyn_objects.end(); ++it) {
-			it->step();
-		}
-	}
-
-	vector<unique_ptr<DynamicObject>> dyn_objects;
-};
-
-
-class OneStateDynamicObject: public DynamicObject {
-public:
-
-    vector<const double&> shared_states;
-    double state;
-};
-
-class LIF : public OneStateDynamicObject {
-    void step() {
-
-    }
+	
 };
 
