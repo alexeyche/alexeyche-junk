@@ -10,18 +10,25 @@ using std::vector;
 void test();
 
 
+template <typename Constants>
 class DynamicObject {
-public:	
-	virtual void step() = 0;
+public:
+    DynamicObject(Constants &_c) : c(_c) {}
+	void step() {
+
+    }
+
+private:
+    Constants &c;
 };
 
 
 class System : public DynamicObject {
-public:	
+public:
 	void add(unique_ptr<DynamicObject> o) {
 		dyn_objects.push_back( move(o) );
 	}
-	
+
 	void step() {
 		for(auto it=dyn_objects.begin(); it != dyn_objects.end(); ++it) {
 			it->step();
@@ -31,10 +38,17 @@ public:
 	vector<unique_ptr<DynamicObject>> dyn_objects;
 };
 
-class LeakyIntegrateAndFire : public DynamicObject {
-	void step() {
-		
-	}
-	
-	double x;
+
+class OneStateDynamicObject: public DynamicObject {
+public:
+
+    vector<const double&> shared_states;
+    double state;
 };
+
+class LIF : public OneStateDynamicObject {
+    void step() {
+
+    }
+};
+
