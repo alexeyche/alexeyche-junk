@@ -2,6 +2,6 @@
 #include "test.h"
 
 void test() {
-	NeuronConstants c;
-	Neuron n(c);
+    NeuronConstants c;
+    Neuron n(c);
 }
