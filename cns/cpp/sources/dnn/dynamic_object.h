@@ -5,6 +5,41 @@
 
 namespace dnn {
 
+
+
+
+
+//DynamicObject returns State
+//System returns States 
+
+// Input ->|
+//         |DynamicObject-> FunEventGenerator
+// System->|
+//
+// or
+// 
+// Fun( DynamicObject(Fun(Input), System) )
+
+// Fun1< DynamicObject0<Input, Fun0<System0>> > sys = funEval(Do2InputEval(inputEval(), funEval(System)));
+// sys.eval();
+// 
+
+template <typename T>
+class Object {
+    virtual T& eval() { return s; }
+protected:
+    T &s;
+};
+
+
+class Fun {
+public:    
+    virtual State operator() (State& o) = 0;
+};
+
+
+
+
 template <typename StateType>
 class DynamicObjectBase {
 public:
@@ -14,13 +49,6 @@ public:
     virtual const StateType& output() { return state[0]; }
 protected:
     State state;
-    ActiveContainer<StateType> inputs;
-};
-class DynamicObjectBaseDeleter {
-public:
-    void operator() (DynamicObjectBase *o) {
-        delete o;
-    }
 };
 
 
@@ -29,14 +57,8 @@ typedef double DefaultStateType;
 template <typename Constants>
 class DynamicObject : public DynamicObjectBase<DefaultStateType> {
 public:
-
-
     DynamicObject(const Constants &_c) : c(_c) {}
-
-
-
 protected:
-
     const Constants &c;
 
 };
