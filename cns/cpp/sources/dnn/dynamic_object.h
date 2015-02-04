@@ -5,99 +5,87 @@
 
 namespace dnn {
 
-
-
-
-
 //DynamicObject returns State
-//System returns States 
+//System returns States
 
 // Input ->|
 //         |DynamicObject-> FunEventGenerator
 // System->|
 //
 // or
-// 
+//
 // Fun( DynamicObject(Fun(Input), System) )
 
 // Fun1< DynamicObject0<Input, Fun0<System0>> > sys = funEval(Do2InputEval(inputEval(), funEval(System)));
 // sys.eval();
-// 
+//
 
-template <typename T>
 class Object {
-    virtual T& eval() { return s; }
-protected:
-    T &s;
-};
-
-
-class Fun {
-public:    
-    virtual State operator() (State& o) = 0;
-};
-
-
-
-
-template <typename StateType>
-class DynamicObjectBase {
 public:
-    typedef vector<StateType> State;
-    virtual void step(State &dState_dt) = 0;
-    virtual void init() = 0;
-    virtual const StateType& output() { return state[0]; }
-protected:
-    State state;
+    virtual double eval() = 0;
 };
 
-
-typedef double DefaultStateType;
-
-template <typename Constants>
-class DynamicObject : public DynamicObjectBase<DefaultStateType> {
+template <typename Arg>
+class ObjectDep : public Object {
 public:
-    DynamicObject(const Constants &_c) : c(_c) {}
+    ObjectDep(Arg &_o)  : o(_o) {}
 protected:
-    const Constants &c;
-
+    Arg &o;
 };
 
-
-
-
-struct SynapseConstants {
-    double tau_syn;
-};
-
-class Synapse : public DynamicObject<SynapseConstants> {
-    Synapse(const SynapseConstants &c) : DynamicObject(c) {}
-
-    void init() {
-        state[0] = 0.0;
-    }
-    void step(State &dState_dt) {
-        dState_dt[0] = state[0]/c.tau_syn;
-    }
-};
-
-
-struct NeuronConstants {
-    double tau_leak;
-};
-
-class Neuron : public DynamicObject<NeuronConstants> {
+class DynamicObject : public Object {
 public:
-    Neuron(const NeuronConstants &c) : DynamicObject(c) {}
+    virtual void step(double &dState_dt) = 0;
+protected:
+    double state;
+};
 
-    void init() {
-        state[0] = 0.0;
+template <typename Arg>
+class DynamicObjectDep : public DynamicObject, public ObjectDep<Arg> {
+public:
+    DynamicObjectDep(Arg &_o) : ObjectDep<Arg>(_o) {}
+};
+
+class Input : public DynamicObject {
+public:
+    void step(double &dState_dt) {}
+    double eval() {
+        return 5;
     }
-    void step(State &dState_dt) {
-        dState_dt[0] = state[0]/c.tau_leak;
+};
+
+
+
+template <typename Arg>
+class LeakyIntegrateAndFire : public DynamicObjectDep<Arg> {
+public:
+    LeakyIntegrateAndFire(Arg &o) : DynamicObjectDep<Arg>(o) {}
+
+    double eval() {
+        double o_ev = DynamicObjectDep<Arg>::o.eval();
+        return o_ev*2;
     }
+
+    void step(double &dState_dt) {
+        dState_dt += DynamicObject::state/100.0;
+    }
+
 
 };
+
+template <typename Arg>
+class ActivFunc : public ObjectDep<Arg> {
+public:
+    ActivFunc(Arg &_o) : ObjectDep<Arg>(_o) {}
+    double eval() {
+        double u = ObjectDep<Arg>::o.eval();
+        if(u>5.0) {
+            return 1.0;
+        }
+        return 0.0;
+    }
+};
+
 
 
 }
