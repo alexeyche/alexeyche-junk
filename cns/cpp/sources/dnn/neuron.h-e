@@ -8,10 +8,10 @@ namespace dnn {
 template <typename State, typename Eval = double, typename InputEval = double, typename SynapseSystemEval = double>
 class Neuron : public DynamicObject<State, Eval> {
 public:
-    Neuron(EvalObject<InputEval> &i, EvalObject<SynapseSystemEval> &syn) : input(i), synapses(syn) {}
+    Neuron(Object<InputEval> &i, Object<SynapseSystemEval> &syn) : input(i), synapses(syn) {}
 
-    EvalObject<InputEval> &input;
-    EvalObject<SynapseSystemEval> &synapses;
+    Object<InputEval> &input;
+    Object<SynapseSystemEval> &synapses;
 };
 
 

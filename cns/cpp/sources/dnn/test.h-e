@@ -24,7 +24,7 @@ class LeakyIntegrateAndFireState : public BaseState<1> {
 
 class LeakyIntegrateAndFire : public Neuron<LeakyIntegrateAndFireState> {
 public:    
-    LeakyIntegrateAndFire(EvalObject<double> &inp, EvalObject<double> &syn) : Neuron(inp, syn) {}
+    LeakyIntegrateAndFire(Object<double> &inp, Object<double> &syn) : Neuron(inp, syn) {}
     double eval() {
         return 2*input.eval() + synapses.eval();
     }

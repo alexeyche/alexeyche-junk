@@ -5,7 +5,6 @@
 #include <numeric>
 #include <functional>
 
-
 using std::cout;
 using std::move;
 using std::unique_ptr;

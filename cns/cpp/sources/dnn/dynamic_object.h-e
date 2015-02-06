@@ -41,11 +41,11 @@ namespace dnn {
 // };
 
 // template <typename Arg>
-// class ActivFunc : public EvalObjectDep<Arg> {
+// class ActivFunc : public ObjectDep<Arg> {
 // public:
-//     ActivFunc(Arg &_o) : EvalObjectDep<Arg>(_o) {}
+//     ActivFunc(Arg &_o) : ObjectDep<Arg>(_o) {}
 //     double eval() {
-//         double u = EvalObjectDep<Arg>::o.eval();
+//         double u = ObjectDep<Arg>::o.eval();
 //         if(u>5.0) {
 //             return 1.0;
 //         }
