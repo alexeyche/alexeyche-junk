@@ -7,6 +7,7 @@ void test() {
 	s.add_elem(unique_ptr<StaticSynapse>(new StaticSynapse));
 	InputTimeSeries ts;
 	LeakyIntegrateAndFire lif(ts, s);
-    cout << lif.eval();
+    Determ act_f(lif);
+    cout << act_f.eval();
 
 }

@@ -12,7 +12,7 @@ class InputTimeSeries : public DynamicObject<InputTimeSeriesState, double> {
 public:
     double eval() {
         return 5;
-    }    
+    }
     void step(InputTimeSeriesState &dState_dt) {
 
     }
@@ -23,8 +23,8 @@ class LeakyIntegrateAndFireState : public BaseState<1> {
 };
 
 class LeakyIntegrateAndFire : public Neuron<LeakyIntegrateAndFireState> {
-public:    
-    LeakyIntegrateAndFire(EvalObject<double> &inp, EvalObject<double> &syn) : Neuron(inp, syn) {}
+public:
+    LeakyIntegrateAndFire(InputType &inp, SynapsesType &syn) : Neuron(inp, syn) {}
     double eval() {
         return 2*input.eval() + synapses.eval();
     }
@@ -32,6 +32,18 @@ public:
 
     }
 };
+
+
+class Determ : public ActFunction<double, bool> {
+public:
+    Determ(NeuronType &_n) : ActFunction(_n) {}
+    bool eval() {
+        double e = neuron.eval();
+        if(e>5) return true;
+        return false;
+    }
+};
+
 
 }
 
