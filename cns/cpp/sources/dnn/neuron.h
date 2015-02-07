@@ -4,6 +4,12 @@
 
 namespace dnn {
 
+template <typename State, typename Eval>
+class NeuronInput : public DynamicObject<State, Eval> {
+public:
+
+};
+
 
 template <typename State, typename Eval = double, typename InputEval = double, typename SynapseSystemEval = double>
 class Neuron : public DynamicObject<State, Eval> {
@@ -25,6 +31,11 @@ public:
     ActFunction(NeuronType &_n) : neuron(_n) {}
 
     NeuronType &neuron;
+};
+
+class NullEvalObject : public EvalObject<double> {
+public:
+    double eval() { return 0.0; }
 };
 
 

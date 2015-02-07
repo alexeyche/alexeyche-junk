@@ -11,6 +11,8 @@ public:
     virtual Eval eval() = 0;
 };
 
+
+
 template<typename State, typename Eval>
 class DynamicObject : public EvalObject<Eval> {
 public:

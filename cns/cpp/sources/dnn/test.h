@@ -8,7 +8,7 @@ namespace dnn {
 
 class InputTimeSeriesState : public BaseState<1> {};
 
-class InputTimeSeries : public DynamicObject<InputTimeSeriesState, double> {
+class InputTimeSeries : public NeuronInput<InputTimeSeriesState, double> {
 public:
     double eval() {
         return 5;
