@@ -22,11 +22,15 @@ public:
 class LeakyIntegrateAndFireState : public BaseState<1> {
 };
 
-class LeakyIntegrateAndFire : public Neuron<LeakyIntegrateAndFireState> {
+class LeakyIntegrateAndFire : public SpikeNeuron<LeakyIntegrateAndFireState> {
 public:
-    LeakyIntegrateAndFire(InputType &inp, SynapsesType &syn) : Neuron(inp, syn) {}
+    LeakyIntegrateAndFire(InputType &inp, SynapsesType &syn) : SpikeNeuron(inp, syn) {}
     double eval() {
         return 2*input.eval() + synapses.eval();
+    }
+
+    void spiked() {
+
     }
     void step(LeakyIntegrateAndFireState &dState_dt) {
 
@@ -34,14 +38,15 @@ public:
 };
 
 
-class Determ : public ActFunction<double, bool> {
+class Determ : public SpikeActFunction<double> {
 public:
-    Determ(NeuronType &_n) : ActFunction(_n) {}
-    bool eval() {
-        double e = neuron.eval();
+    Determ(NeuronType &_n) : SpikeActFunction(_n) {}
+    bool eval_spike() {
+    	double e = neuron.eval();
         if(e>5) return true;
         return false;
     }
+    
 };
 
 

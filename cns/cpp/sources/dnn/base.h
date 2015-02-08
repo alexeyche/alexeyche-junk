@@ -4,13 +4,14 @@
 
 namespace dnn {
 
+
+
 template <typename Eval>
 class EvalObject {
 public:
 	typedef Eval eval_type;
     virtual Eval eval() = 0;
 };
-
 
 
 template<typename State, typename Eval>

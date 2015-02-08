@@ -5,7 +5,6 @@
 namespace dnn {
 
 
-
 template <typename State, typename Eval>
 class Synapse : public DynamicObject<State, Eval> {
 
@@ -13,7 +12,13 @@ class Synapse : public DynamicObject<State, Eval> {
 
 template <typename Elem, typename Eval>
 class SynapseSystem : public System<Elem, Eval> {
-
+	double eval() {
+		double sum = 0.0;
+		for(auto it=System<Elem,Eval>::sys.begin(); it != System<Elem,Eval>::sys.end(); ++it) { 
+			sum += (*it)->eval();
+		}
+		return sum;
+	}
 };
 
 
@@ -32,17 +37,7 @@ public:
     }	
 };
 
-class StaticSynapseSystem : public SynapseSystem<StaticSynapse, double> {
-public:
-	double eval() {
-		double sum = 0.0;
-		for(auto it=sys.begin(); it != sys.end(); ++it) { 
-			sum += (*it)->eval();
-		}
-		return sum;
-	}
-
-};
+typedef SynapseSystem<StaticSynapse, double> StaticSynapseSystem;
 
 
 

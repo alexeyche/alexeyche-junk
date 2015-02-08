@@ -8,6 +8,7 @@ void test() {
 	InputTimeSeries ts;
 	LeakyIntegrateAndFire lif(ts, s);
     Determ act_f(lif);
+    
     cout << act_f.eval();
 
 }
