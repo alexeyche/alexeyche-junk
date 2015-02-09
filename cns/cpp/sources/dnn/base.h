@@ -22,15 +22,20 @@ protected:
     State state;
 };
 
-
-template <typename Elem, typename Eval>
-class System : public EvalObject<Eval> {
+template <typename Elem>
+class System : public Object {
 public:
 	void add_elem(unique_ptr<Elem> e) {
 		sys.push_back(std::move(e));
 	}
 protected:
     vector< unique_ptr<Elem> > sys;
+};
+
+
+template <typename Elem, typename Eval>
+class EvalSystem : public EvalObject<Eval>, public System<Elem> {
+
 };
 
 template <int StateSize, typename StateType = double>
