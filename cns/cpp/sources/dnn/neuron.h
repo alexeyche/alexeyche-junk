@@ -8,10 +8,10 @@ template <typename State, typename Eval>
 using NeuronInput = DynamicObject<State, Eval>;
 
 
-template <typename State, 
-		  typename Eval = bool, 
+template <typename State,
+		  typename Eval = bool,
 		  typename InputEval = double,
-		  typename SynapseSystemEval = double, 
+		  typename SynapseSystemEval = double,
 		  typename ActFunctionEval = bool>
 class SpikeNeuron : public DynamicObject<State, Eval> {
 public:
@@ -20,7 +20,7 @@ public:
     typedef EvalObject<ActFunctionEval> ActFunctionType;
 
     SpikeNeuron(InputType &i, SynapsesType &syn, ActFunctionType &af) : input(i), synapses(syn), act_f(af) {}
-    
+
     ActFunctionType &act_f;
     InputType &input;
     SynapsesType &synapses;
@@ -33,7 +33,7 @@ public:
 
     SpikeActFunction(NeuronType &_n) : neuron(_n) {}
 
-    
+
     NeuronType &neuron;
 };
 
