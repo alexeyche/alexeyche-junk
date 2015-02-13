@@ -4,67 +4,49 @@
 
 namespace dnn {
 
-template <typename Eval>
-class EvalObject {
+template <typename Eval=void>
+class DynamicObject {
 public:
-    typedef Eval eval_type;
-    virtual Eval eval() = 0;
+    virtual Eval evaluate() = 0;
 };
 
 
-
-template<typename State, typename Eval>
-class DynamicObject : public EvalObject<Eval> {
+template <
+            typename Constants,         /*user defined*/
+            typename State,             /*user defined*/
+            typename InputEval,         /*system*/
+            typename ActFunctionEval,   /*system*/
+            typename LearningRuleEval   /*system*/
+         >
+class Neuron : public DynamicObject {
 public:
-    typedef unique_ptr<State> StatePtr;
+    typename DynamicObject<InputEval> InputType;
+    typename DynamicObject<ActFunctionEval> ActFunctionType;
+    typename DynamicObject<LearningRuleEval> LearningRuleType;
 
-    DynamicObject() : state(new State) {}
+    Neuron(Constants c, InputType _input, ActFunctionType _act_func, LearningRuleType _lrule)
+
 
 protected:
-    unique_ptr<State> state;
+    InputType input;
+    ActFunctionType act_func;
+    LearningRuleType lrule;
+
+    Constants c;
+    State s;
 };
 
+template <typename Constants, typename State>
+using SpikeNeuron = Neuron<Constants, State, double, bool, void>;
 
+class IAFConstants {};
+class IAFState {};
 
+class IAFNeuron : public SpikeNeuron<IAFConstants, IAFState> {
+    void    evaluate() {
 
-struct NeuronInputState {
-
+    }
 };
-
-
-
-class Input : public DynamicObject<NeuronInputState, double> {
-public:
-    typedef unique_ptr<Input> ptr;
-    Input() {}
-    double eval() {}
-
-};
-
-
-struct SynapseState {
-
-};
-
-
-class Synapse : public DynamicObject<SynapseState, double> {
-public:
-};
-
-
-struct NeuronState {
-    bool fired;
-};
-
-class Neuron: public DynamicObject<NeuronState, double> {
-public:
-    Neuron(unique_ptr<Input> _input) : input(std::move(_input)) {}
-    double eval() {}
-protected:
-    unique_ptr<Input> input;
-};
-
-
 
 
 
