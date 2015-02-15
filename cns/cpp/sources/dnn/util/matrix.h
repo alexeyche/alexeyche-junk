@@ -4,7 +4,6 @@
 #include <snnlib/util/json/json_box.h>
 #include <snnlib/serialize/serialize.h>
 #include <snnlib/protos/matrix.pb.h>
-#include <snnlib/util/json/json_box.h>
 
 
 
@@ -73,17 +72,6 @@ public:
             cout << "\n";
         }
     }
-    JsonBox::Array serializeToJson() {
-        JsonBox::Array a;
-        for(size_t i=0; i<nrow; i++) {
-            JsonBox::Array r;
-            for(size_t j=0; j<ncol; j++) {
-                r.push_back(getElement(i, j));
-            }
-            a.push_back(r);
-        }
-        return a;
-    }
 
 protected:
     T *vals;
@@ -105,13 +93,7 @@ public:
         }
         return ProtoPack({m});
     }
-    void deserialize() {
-        Protos::DoubleMatrix *m = getSerializedMessage();
-        allocate(m->nrow(), m->ncol());
-        for(size_t i=0; i<m->vals_size(); i++) {
-            vals[i] = m->vals(i);
-        }
-    }
+
     void print(std::ostream& str) const {
         Matrix<double>::print(str);
     }

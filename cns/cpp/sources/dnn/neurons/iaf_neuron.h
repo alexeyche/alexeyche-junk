@@ -14,8 +14,8 @@ struct IAFState : public Serializable<Protos::IAFState> {
 	double p;
 	double u;
 
-	void out(ostream &str) {
-		serialize(str) << "u: " << u << "p: " << p << Self::End;
+	void processStream(Stream &str) {
+		acquire(str) << "u: " << u << "p: " << p << Self::End;
 	}
 };
 

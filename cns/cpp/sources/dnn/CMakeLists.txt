@@ -23,6 +23,7 @@ set(DIRS
     io
     protos
     util
+    contrib
 )
 
 foreach(dir ${DIRS})

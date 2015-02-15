@@ -20,9 +20,11 @@ using namespace dnn;
 void test() {
     IAFConstants c;
     IAFNeuron *n = new IAFNeuron(c);
-    
-    
-    n->getState().out(cout);
+    //Stream s(cin, Stream::Text);
+    //s << n->getState();
+
+    Stream sout(cout, Stream::Text);
+    sout << n->getState();
     
     TSInputConstants tsic;
     TSInput* tsi = new TSInput(tsic);

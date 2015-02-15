@@ -16,3 +16,7 @@ using std::accumulate;
 using std::stringstream;
 using std::string;
 using std::ostream;
+using std::istream;
+using std::cerr;
+using std::terminate;
+using std::cin;

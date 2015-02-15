@@ -1,60 +1,62 @@
 #pragma once
 
+#include <dnn/core.h>
+
 
 namespace dnn {
 
+template <typename T>
+class Serializable;
 
-// class SerializeStream {
-// public:
-//     SerializeStream(ostream &_dst_stream) : dst_stream(_dst_stream) {}
-//     virtual void put(string s) = 0;
-// protected:
-//     ostream &dst_stream;    
-// };
-
-// class StringSerializeStream : public SerializeStream {
-// public: 
-//     StringSerializeStream(ostream &_dst_stream) : SerializeStream(_dst_stream) {}
-//     void put(string s) {
-//         dst_stream << s << "\n";
-//     }
-// };
-
-
-
-// class OStream {
-// public: 
-//     enum EndMarker { End };
-//     static EndMarker end;
-
-//     OStream(SerializeStream &_serial_stream) : serial_stream(_serial_stream), count(0), started(false) {}
+class Stream {
+public:
+    enum Repr { Binary, Text };
+    Stream(istream &str, Repr _r = Binary) : _input_str(&str), r(_r), _output_str(nullptr) {} 
+    Stream(ostream &str, Repr _r = Binary) : _output_str(&str), r(_r), _input_str(nullptr) {} 
+    bool isOutput() {
+        if(_output_str) return true;
+        return false;
+    }
+    bool isInput() {
+        if(_input_str) return true;
+        return false;
+    }
+    istream& getInputStream() {
+        if(_input_str) return *_input_str;
+        cerr << "Stream is wrongly opened or used\n";
+        terminate();
+    }
+    ostream& getOutputStream() {
+        if(_output_str) return *_output_str;
+        cerr << "Stream is wrongly opened or used\n";
+        terminate();
+    }
+    template<typename T>
+    Stream& operator << (Serializable<T> &v);
     
-//     template <typename T>
-//     OStream& operator << (T &v) {
-//         if(typeid(v).name() == typeid(EndMarker).name()) {
-//             serial_stream.put(ss.str());
-//             return *this;
-//         }
-        
-//         ss << v;
-    
-//         count++;
-//         if(count % 2 == 0) {
-//             ss << "; ";
-//         }
-//         return *this;
-//     }
+    Repr getRepr() {
+        return r;
+    }
 
-    
-// private:
-//     bool started;
-//     stringstream ss;
-//     size_t count;
+private:
+    istream *_input_str;    
+    ostream *_output_str;    
+    Repr r;
+};
 
-//     SerializeStream &serial_stream;
-// };
-// OStream::EndMarker OStream::end = End;
-// class IStream {
-// };
 
 }
+
+#include <dnn/io/serialize.h>
+
+namespace dnn {
+
+template <typename T>
+Stream& Stream::operator << (Serializable<T> &v) {
+    v.processStream(*this);
+    return *this;
+}
+
+
+
+}    
