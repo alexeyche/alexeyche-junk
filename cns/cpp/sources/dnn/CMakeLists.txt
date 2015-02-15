@@ -17,17 +17,19 @@ foreach(file ${SOURCES})
 endforeach()
 # Append sources (with directory name) to list of all DNN sources (used at
 # the parent scope).
-set(DNN_SRC ${DIR_SRCS})
+set(DNN_SRCS ${DIR_SRCS})
 
 set(DIRS
+    io
     protos
+    util
 )
 
 foreach(dir ${DIRS})
   add_subdirectory(${dir})
 endforeach()
 
-add_library(dnn SHARED ${DNN_SRC})
+add_library(dnn SHARED ${DNN_SRCS})
 include_directories(${CMAKE_BINARY_DIR}/protos)
 
 SET_TARGET_PROPERTIES(dnn PROPERTIES COMPILE_FLAGS "-fPIC")

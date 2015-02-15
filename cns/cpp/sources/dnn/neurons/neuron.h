@@ -35,7 +35,7 @@ public:
         synapses.push_back(syn);
     }
     
-    const State& getState() {
+    State& getState() {
         return s;
     }
 protected:
