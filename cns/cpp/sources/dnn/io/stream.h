@@ -54,6 +54,7 @@ private:
     SerializeStream &serial_stream;
 };
 OStream::EndMarker OStream::end = End;
-
+class IStream {
+};
 
 }

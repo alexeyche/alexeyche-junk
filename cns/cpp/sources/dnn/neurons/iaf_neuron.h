@@ -2,18 +2,23 @@
 
 #include "spike_neuron.h"
 #include <dnn/io/stream.h>
+#include <dnn/protos/generated.pb.h>
+#include <dnn/io/serialize.h>
 
 namespace dnn {
 
 struct IAFConstants {};
 
-
-struct IAFState {
+/*@GENERATE_PROTO@*/
+struct IAFState : public Serializable<Protos::IAFState> {
 	double p;
 	double u;
 
 	void out(OStream &str) const {
-		str << "u: " << u << "p: " << p << OStream::end;
+		str << name() << "u: " << u << "p: " << p << OStream::end;
+	}
+	void in(IStream &in) const {
+
 	}
 };
 
