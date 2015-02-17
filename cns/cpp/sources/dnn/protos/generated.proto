@@ -1,7 +1,41 @@
 package Protos;
 
+message IAFConstants {
+    required double R = 1;
+    required double C = 2;
+}
+
 message IAFState {
     required double p = 1;
     required double u = 2;
+}
+
+message StdpConstants {
+    required double a_plus = 1;
+}
+
+message StdpState {
+    required double x = 1;
+}
+
+message DetermConstants {
+    required double threshold = 1;
+}
+
+message TSInputConstants {
+    required double dt = 1;
+}
+
+message TSInputState {
+    required uint32 index = 1;
+}
+
+message StaticSynapseConstants {
+    required double epsp_decay = 1;
+}
+
+message StaticSynapseState {
+    required double x = 1;
+    required double w = 2;
 }
 

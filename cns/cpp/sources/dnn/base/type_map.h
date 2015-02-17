@@ -1,0 +1,8 @@
+REG_TYPE(IAFConstants)
+REG_TYPE(IAFState)
+REG_TYPE(IAFNeuron)
+REG_TYPE(Determ)
+REG_TYPE(DetermConstants)
+REG_TYPE(StaticSynapse)
+REG_TYPE(StaticSynapseState)
+REG_TYPE(StaticSynapseConstants)

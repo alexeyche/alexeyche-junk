@@ -7,7 +7,9 @@
 #include <functional>
 #include <sstream>
 #include <string>
+#include <map>
 
+using std::map;
 using std::cout;
 using std::move;
 using std::unique_ptr;

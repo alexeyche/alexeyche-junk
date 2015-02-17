@@ -7,12 +7,9 @@ namespace dnn {
 
 
 template <typename Constants, typename State>
-class Synapse : public ISynapse {
+class Synapse : public ISynapse, public StateObject<Constants, State>  {
 public:
-	Synapse(Constants _c) : c(_c) {}
-protected:
-	Constants c;
-	State s;	
+	Synapse() {}
 };
 
 

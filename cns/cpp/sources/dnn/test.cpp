@@ -18,33 +18,12 @@ using std::terminate;
 using namespace dnn;
 
 void test() {
-    IAFConstants c;
-    IAFNeuron *n = new IAFNeuron(c);
-    //Stream s(cin, Stream::Text);
-    //s << n->getState();
-
+    IAFConstants *c = Factory::inst().createObject<IAFConstants>("IAFConstants");
+    IAFNeuron *n = new IAFNeuron();
+    n->setConstants(*c);
     Stream sout(cout, Stream::Text);
-    sout << n->getState();
-    
-    TSInputConstants tsic;
-    TSInput* tsi = new TSInput(tsic);
-    n->setInput(tsi);
+    sout << *n;
 
-    DetermConstants dc;
-    Determ *d = new Determ(dc);
-    n->setActFunction(d);
-
-    StdpConstants stdpc;
-    Stdp *stdp = new Stdp(stdpc, *n);
-
-    StaticSynapseConstants stat_syn_const;
-    StaticSynapse *syn = new StaticSynapse(stat_syn_const);
-    n->addSynapse(syn);
-
-    delete syn;
-    delete stdp;
-    delete d;
-    delete tsi;
     delete n;
 }
 

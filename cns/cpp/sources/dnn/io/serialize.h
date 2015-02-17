@@ -3,6 +3,7 @@
 #include <dnn/io/stream.h>
 #include <dnn/core.h>
 #include <dnn/util/util.h>
+#include <dnn/base/object.h>
 
 #include <google/protobuf/message.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>
@@ -16,40 +17,18 @@ using namespace google::protobuf::io;
 namespace dnn {
 
 
-template <typename Proto>
-class Serializable {
-public: 
-	#define ASSERT_FIELDS() \
-	if((!reflection)||(!mess)||(!field_descr)) {\
-		cerr << "Wrong using of Serializable class.\n"; \
-		terminate(); \
-	}\
+class SerializableBase  {
+public:
+    enum EndMarker { End };
 
-	typedef Serializable<Proto> Self;
-	
-	enum EndMarker { End };	
-	
-	Serializable() : _ack_stream(nullptr), mess(nullptr) {}
-	~Serializable() {
-		if(mess) delete mess;
-	}
+    SerializableBase() : _ack_stream(nullptr) {}
+
     virtual void processStream(Stream &str) = 0;
-  	
-  	Serializable& acquire(Stream &str) {
-  		_ack_stream = &str;
+    static bool readBinaryMessage(google::protobuf::Message* mess, istream *str) {
+        IstreamInputStream *zeroIn = new IstreamInputStream(str);
+        CodedInputStream *codedIn = new CodedInputStream(zeroIn);
 
-  		return *this;
-  	}
-  	static void readBinaryMessage(google::protobuf::Message* mess, istream *str) {
-  		if(mess) {
-  			delete mess;
-  		}
-  		mess = new Proto;
-
-  		IstreamInputStream *zeroIn = new IstreamInputStream(str);
-  		CodedInputStream *codedIn = new CodedInputStream(zeroIn);
-  		
-  	    google::protobuf::uint32 size;
+        google::protobuf::uint32 size;
         if(!codedIn->ReadVarint32(&size)) {
             return false;
         }
@@ -59,23 +38,51 @@ public:
             terminate();
         }
         codedIn->PopLimit(limit);
-  	}
+    }
+    static void writeBinaryMessage(google::protobuf::Message* mess, ostream *str) {
+        if(!mess) {
+          cerr << "Trying to write null binary message\n";
+        }
+        google::protobuf::uint32 size = mess->ByteSize();
+        OstreamOutputStream *zeroOut = new OstreamOutputStream(str);
+        CodedOutputStream *codedOut = new CodedOutputStream(zeroOut);
 
-  	static void writeBinaryMessage(google::protobuf::Message* mess, ostream *str) {
-		if(!mess) {
-			cerr << "Trying to write null binary message\n";
-		}
-  		google::protobuf::uint32 size = mess->ByteSize();
-  		OstreamOutputStream *zeroOut = new OstreamOutputStream(str);
-  		CodedOutputStream *codedOut = new CodedOutputStream(zeroOut);
-  		
-  		codedOut->WriteVarint32(size);  		
-  		mess->SerializeToCodedStream(codedOut);
+        codedOut->WriteVarint32(size);
+        mess->SerializeToCodedStream(codedOut);
 
-  		delete codedOut;
-  		delete zeroOut;
-  	}
+        delete codedOut;
+        delete zeroOut;
+    }
+    SerializableBase& acquire(Stream &str) {
+        _ack_stream = &str;
 
+        return *this;
+    }
+protected:
+    Stream *_ack_stream;
+};
+
+
+template <typename Proto>
+class Serializable : public SerializableBase, public Object {
+public:
+	#define ASSERT_FIELDS() \
+	if((!reflection)||(!mess)||(!field_descr)) {\
+		cerr << "Wrong using of Serializable class.\n"; \
+		terminate(); \
+	}\
+
+	typedef Serializable<Proto> Self;
+
+    Serializable() : mess(nullptr) {}
+    ~Serializable() {
+        if(mess) delete mess;
+    }
+
+    Serializable& acquire(Stream &str) {
+        _ack_stream = &str;
+        return *this;
+    }
   	Serializable& operator << (EndMarker v) {
   		ASSERT_FIELDS()
   		if(_ack_stream->isOutput()) {
@@ -94,12 +101,22 @@ public:
 	  			cerr << "UB\n";
 	  			terminate();
 	  		}
-	  	} else 
+	  	} else
   		if(_ack_stream->isInput()) {
-  			if(_ack_stream->getRepr() == Stream::Binary) {
+  			mess = new Proto;
+            if(_ack_stream->getRepr() == Stream::Binary) {
+                readBinaryMessage(mess, &_ack_stream->getInputStream());
   			} else
 	  		if(_ack_stream->getRepr() == Stream::Text) {
-
+                std::istreambuf_iterator<char> eos;
+                string s(std::istreambuf_iterator<char>(_ack_stream->getInputStream()), eos);
+                string err;
+                pbjson::json2pb(s, mess, err);
+                if(!err.empty()) {
+                    cerr << "Errors while converting json:\n";
+                    cerr << err;
+                    terminate();
+                }
 	  		} else {
 	  			cerr << "UB\n";
 	  			terminate();
@@ -110,7 +127,7 @@ public:
   		}
   		return *this;
   	}
-  	
+
   	Serializable& operator << (string v) {
   		if(!mess) {
   			mess = new Proto;
@@ -123,18 +140,18 @@ public:
   		const google::protobuf::Descriptor* descriptor = mess->GetDescriptor();
   		field_descr = descriptor->FindFieldByName(fname);
   		if(!field_descr) {
-  			cerr << "Can't find proto field by name " << fname << "\n";	
-  			terminate();  			
-  		} 
+  			cerr << "Can't find proto field by name " << fname << "\n";
+  			terminate();
+  		}
   		return *this;
   	}
 
   	Serializable& operator << (double &v) {
   		ASSERT_FIELDS()
   		if(_ack_stream->isOutput()) {
-  			reflection->SetDouble(mess, field_descr, v);  		
+  			reflection->SetDouble(mess, field_descr, v);
   		} else {
-  			v = reflection->GetDouble(*mess, field_descr);  		
+  			v = reflection->GetDouble(*mess, field_descr);
   		}
   		return *this;
   	}
@@ -143,7 +160,7 @@ public:
   		if(_ack_stream->isOutput()) {
   			reflection->SetUInt32(mess, field_descr, v);
   		} else {
-  			v = reflection->GetUInt32(*mess, field_descr);  			
+  			v = reflection->GetUInt32(*mess, field_descr);
   		}
   		return *this;
   	}
@@ -157,15 +174,10 @@ public:
 		return *this;
   	}
 
-  	
 private:
 	const google::protobuf::FieldDescriptor* field_descr;
 	const google::protobuf::Reflection* reflection;
-
-	string current_field;
 	google::protobuf::Message* mess;
-	Stream *_ack_stream;  	
-    
 };
 
 

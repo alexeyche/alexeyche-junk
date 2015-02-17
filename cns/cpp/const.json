@@ -1,0 +1,41 @@
+{
+    "neurons" : {
+        "IAFNeuron" : {
+            "C" : 1, // mF/cm2
+            "Vl" : -65.0, // mV
+            "gl" : 0.1,   // mS/cm2
+            "noise" : 1.5,
+            "Vreset" : -70, // mV
+            "tau_refr" : 2 // ms
+        }
+    },
+    "synapses" : {
+        "StaticSynapse" : {
+            "epsp_decay" : 10.0
+        }
+    },
+    "act_functions" : {
+        "Determ" : {
+            "Vtr" : -60.0
+        }
+    },
+    "inputs" : {
+        "TSInput" : {
+
+        }
+    },
+    "sim_configuration" : {
+        "layers" : [
+            {
+                "size" : 100,
+                "neuron_conf" : {
+                    "neuron" : "IAFNeuron",
+                    "act_function" : "Determ",
+                    "input" : "TSInput",
+                    "axon_delay" : 0.0
+                }
+            }
+        ]
+    }
+
+}

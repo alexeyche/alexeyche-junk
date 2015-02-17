@@ -16,8 +16,8 @@ public:
 template <typename Constants, typename State>
 class SpikeNeuron : public Neuron<Constants, State, void, bool>, public ISpikeNeuron {
 public:
-	typedef Neuron<Constants, State, void, bool> Parent;
-	SpikeNeuron(Constants _c) : Parent(_c) {}
+    typedef Neuron<Constants, State, void, bool> Parent;
+	SpikeNeuron() {}
 
 	vector<ISynapse*>& getSynapses() {
 		return Parent::synapses;

@@ -5,12 +5,9 @@
 namespace dnn {
 
 template <typename Constants, typename State>
-class Input : public DynamicObject<double> {
+class Input : public DynamicObject<double>, public StateObject<Constants, State> {
 public:
-	Input(Constants _c) : c(_c) {}
-protected:
-	Constants c;
-	State s;
+	Input() {}
 };
 
 

@@ -4,10 +4,20 @@
 #include <dnn/io/stream.h>
 #include <dnn/protos/generated.pb.h>
 #include <dnn/io/serialize.h>
+#include <dnn/base/factory.h>
 
 namespace dnn {
 
-struct IAFConstants {};
+/*@GENERATE_PROTO@*/
+struct IAFConstants : public Serializable<Protos::IAFConstants> {
+
+	double R;
+	double C;
+
+	void processStream(Stream &str) {
+		acquire(str) << "R: " << R << "C: " << C << Self::End;
+	}
+};
 
 /*@GENERATE_PROTO@*/
 struct IAFState : public Serializable<Protos::IAFState> {
@@ -21,8 +31,7 @@ struct IAFState : public Serializable<Protos::IAFState> {
 
 class IAFNeuron : public SpikeNeuron<IAFConstants, IAFState> {
 public:
-	typedef SpikeNeuron<IAFConstants, IAFState> Parent;
-	IAFNeuron(IAFConstants _c) : Parent(_c) {}
+	IAFNeuron() {}
 
 	void evaluate() {
 

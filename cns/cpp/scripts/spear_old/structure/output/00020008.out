@@ -1,0 +1,25 @@
+Running in wrapper mode for '20008'
+
+Running python job.
+
+Epoch 1
+
+/home/alexeyche/prog/alexeyche-junk/cns/cpp/scripts/../build/bin/snn_sim --constants /home/alexeyche/prog/sim_spear/eval_clustering_p_stat_structure/20008/const.json --input /home/alexeyche/prog/sim/spikes/synthetic_control_40_len_4_classes_train.pb --jobs 2 --output /home/alexeyche/prog/sim_spear/eval_clustering_p_stat_structure/20008/1_output_spikes.pb --p-stat /home/alexeyche/prog/sim_spear/eval_clustering_p_stat_structure/20008/1_p_stat.pb --save /home/alexeyche/prog/sim_spear/eval_clustering_p_stat_structure/20008/1_model.pb
+
+time run: 1.33428883553 sec
+Evaluation through clustering ...
+
+/home/alexeyche/prog/alexeyche-junk/cns/cpp/scripts/../build/bin/snn_proc p_stat_dist --jobs 2 --output /home/alexeyche/prog/sim_spear/eval_clustering_p_stat_structure/20008/1_proc_output.json --p-stat /home/alexeyche/prog/sim_spear/eval_clustering_p_stat_structure/20008/1_p_stat.pb --spikes /home/alexeyche/prog/sim_spear/eval_clustering_p_stat_structure/20008/1_output_spikes.pb
+
+time run: 0.1410779953 sec
+
+Rscript /home/alexeyche/prog/alexeyche-junk/cns/cpp/scripts/eval_dist_matrix.R /home/alexeyche/prog/sim_spear/eval_clustering_p_stat_structure/20008/1_proc_output.json
+
+time run: 0.29762005806 sec
+eval : -3.821341e-05 mean_rate : 0.005
+Got result -0.000038
+
+Job file reloaded.
+Completed successfully in 1.80 seconds. [-0.000038]
+setting job 20008 complete
+set...

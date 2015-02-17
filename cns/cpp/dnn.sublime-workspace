@@ -1,0 +1,803 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"Stat",
+				"StaticSynapse"
+			],
+			[
+				"TS",
+				"TSInput"
+			],
+			[
+				"Dete",
+				"Determ"
+			],
+			[
+				"IA",
+				"IAFNeuron"
+			],
+			[
+				"IAF",
+				"IAFNeuron"
+			],
+			[
+				"IS",
+				"ISpikeNeuron"
+			],
+			[
+				"Sta",
+				"StaticSynapse"
+			],
+			[
+				"Deter",
+				"DetermConstants"
+			],
+			[
+				"dyna",
+				"dynamic_object"
+			],
+			[
+				"cre",
+				"createObject"
+			],
+			[
+				"typ",
+				"typename"
+			],
+			[
+				"nam",
+				"namespace"
+			],
+			[
+				"StateS",
+				"StaticSynapseConstants"
+			],
+			[
+				"St",
+				"Stdp"
+			],
+			[
+				"Std",
+				"StdpConstants"
+			],
+			[
+				"Det",
+				"DetermConstants"
+			],
+			[
+				"TSI",
+				"TSInputConstants"
+			],
+			[
+				"Ser",
+				"Serializable"
+			],
+			[
+				"Le",
+				"LearningRuleType"
+			],
+			[
+				"In",
+				"InputType"
+			],
+			[
+				"Ac",
+				"ActFunctionType"
+			],
+			[
+				"Input",
+				"InputEval"
+			],
+			[
+				"Act",
+				"ActFunctionEval"
+			],
+			[
+				"ty",
+				"typename"
+			],
+			[
+				"Syn",
+				"SynapseState"
+			],
+			[
+				"Neu",
+				"Neuron"
+			],
+			[
+				"State",
+				"StatePtr"
+			],
+			[
+				"Ba",
+				"BaseStatePtr"
+			],
+			[
+				"S",
+				"SynapsesType"
+			],
+			[
+				"Inp",
+				"InputType"
+			],
+			[
+				"Neuron",
+				"NeuronType"
+			],
+			[
+				"inp",
+				"input_type"
+			],
+			[
+				"Eval",
+				"EvalObject"
+			],
+			[
+				"Ob",
+				"ObjectDep"
+			],
+			[
+				"Dyn",
+				"DynamicObjectBase"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "sources/dnn/test.cpp",
+			"settings":
+			{
+				"buffer_size": 506,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "const.json",
+			"settings":
+			{
+				"buffer_size": 844,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "sources/dnn/inputs/ts_input.h",
+			"settings":
+			{
+				"buffer_size": 697,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "sources/dnn/synapses/static_synapse.h",
+			"settings":
+			{
+				"buffer_size": 880,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "sources/dnn/synapses/synapse.h",
+			"settings":
+			{
+				"buffer_size": 214,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "sources/dnn/learning_rules/learning_rule.h",
+			"settings":
+			{
+				"buffer_size": 384,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "sources/dnn/learning_rules/stdp.h",
+			"settings":
+			{
+				"buffer_size": 726,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "sources/dnn/act_functions/act_function.h",
+			"settings":
+			{
+				"buffer_size": 192,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "make",
+	"command_palette":
+	{
+		"height": 75.0,
+		"selected_items":
+		[
+			[
+				"insta",
+				"Package Control: Install Package"
+			],
+			[
+				"in",
+				"Package Control: Install Package"
+			],
+			[
+				"inst",
+				"Package Control: Install Package"
+			],
+			[
+				":",
+				"File: Save All"
+			],
+			[
+				":o",
+				":$ - EOF"
+			]
+		],
+		"width": 449.0
+	},
+	"console":
+	{
+		"height": 653.0,
+		"history":
+		[
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/act_functions",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/base",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/inputs",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/io",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/learning_rules",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/neurons",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/protos",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/synapses",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/tools",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/tools/dnn_sim"
+	],
+	"file_history":
+	[
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/const.json",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/neurons/iaf_neuron.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/neurons/spike_neuron.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/act_functions/determ.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/base/factory.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/base/factory.cpp",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/base/type_map.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/neurons/neuron.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/base/dynamic_object.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/inputs/input.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/io/serialize.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/CMakeLists.txt",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/synapses/synapse.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/util/spinlock.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/act_functions/act_function.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/base/object.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/io/serialize.cpp",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/inputs/ts_input.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/core.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/contrib/rapidjson/rapidjson.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/contrib/rapidjson/reader.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/test.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/io/stream.cpp",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/io/stream.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/tools/dnn_sim/dnn_sim.cpp",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/synapses/static_synapse.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/io/CMakeLists.txt",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/learning_rules/stdp.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/contrib/pbjson/bin2ascii.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/util/spinning_barrier.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/learning_rules/learning_rule.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/util/time_series.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/dnn.sublime-project",
+		"/home/alexeyche/.config/sublime-text-3/Packages/User/Preferences.sublime-settings",
+		"/home/alexeyche/.config/sublime-text-3/Packages/Default/Default (Linux).sublime-keymap",
+		"/home/alexeyche/.config/sublime-text-3/Packages/User/Default (Linux).sublime-keymap",
+		"/home/alexeyche/.config/sublime-text-3/Packages/Default/Preferences.sublime-settings",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/try.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/test.cpp",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/neuron.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/base.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/dynamic_object.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/active_container.h",
+		"/home/alexeyche/prog/snn_sim/snn_sim.sublime-project",
+		"/home/alexeyche/prog/snn_sim/sources/tools/filt/filt_opts.h",
+		"/home/alexeyche/prog/snn_sim/sources/tools/sim/snn_sim.c",
+		"/home/alexeyche/.config/sublime-text-3/Packages/User/make.sublime-build",
+		"/home/alexeyche/prog/snn_sim/sources/snnlib/sim/sim.c"
+	],
+	"find":
+	{
+		"height": 35.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"SerializableBase::",
+			"readBinaryMessage",
+			"ignore"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			""
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 2,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "sources/dnn/test.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 506,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								296,
+								296
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 231.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "const.json",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 844,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								844,
+								844
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JSON.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": -0.0,
+						"translation.y": 69.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "sources/dnn/inputs/ts_input.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 697,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								333,
+								333
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 33.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "sources/dnn/synapses/static_synapse.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 880,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								733,
+								733
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "sources/dnn/synapses/synapse.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 214,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								202,
+								202
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "sources/dnn/learning_rules/learning_rule.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 384,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								251,
+								251
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 6,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "sources/dnn/learning_rules/stdp.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 726,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								699,
+								699
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "sources/dnn/act_functions/act_function.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 192,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								183,
+								183
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 7,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 34.0
+	},
+	"input":
+	{
+		"height": 0.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 371.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"project": "dnn.sublime-project",
+	"replace":
+	{
+		"height": 64.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+			[
+				"fa",
+				"dnn/base/factory.h"
+			],
+			[
+				"syna",
+				"dnn/synapses/synapse.h"
+			],
+			[
+				"stati",
+				"dnn/synapses/static_synapse.h"
+			],
+			[
+				"stdp",
+				"dnn/learning_rules/stdp.h"
+			],
+			[
+				"lea",
+				"dnn/learning_rules/learning_rule.h"
+			],
+			[
+				"deter",
+				"dnn/act_functions/determ.h"
+			],
+			[
+				"spike",
+				"dnn/neurons/spike_neuron.h"
+			],
+			[
+				"test",
+				"dnn/test.cpp"
+			],
+			[
+				"ac",
+				"dnn/act_functions/act_function.h"
+			],
+			[
+				"std",
+				"dnn/learning_rules/stdp.h"
+			],
+			[
+				"stat",
+				"dnn/synapses/static_synapse.h"
+			],
+			[
+				"ts",
+				"dnn/inputs/ts_input.h"
+			],
+			[
+				"inpu",
+				"dnn/inputs/input.h"
+			],
+			[
+				"dyna",
+				"dnn/base/dynamic_object.h"
+			],
+			[
+				"neu",
+				"dnn/neurons/neuron.h"
+			],
+			[
+				"ia",
+				"dnn/neurons/iaf_neuron.h"
+			],
+			[
+				"iaf",
+				"dnn/neurons/iaf_neuron.h"
+			],
+			[
+				"test.",
+				"dnn/test.cpp"
+			],
+			[
+				"core",
+				"dnn/core.h"
+			],
+			[
+				"ser",
+				"dnn/io/serialize.h"
+			],
+			[
+				"seria",
+				"dnn/io/serialize.cpp"
+			],
+			[
+				"snn",
+				"dnn/neurons/spike_neuron.h"
+			],
+			[
+				"dyn",
+				"dnn/base/dynamic_object.h"
+			],
+			[
+				"dy",
+				"dnn/base/dynamic_object.h"
+			],
+			[
+				"strea",
+				"dnn/io/stream.h"
+			],
+			[
+				"sta",
+				"dnn/synapses/static_synapse.h"
+			],
+			[
+				"dete",
+				"dnn/act_functions/determ.h"
+			],
+			[
+				"ts_",
+				"dnn/inputs/ts_input.h"
+			],
+			[
+				"neur",
+				"dnn/neurons/neuron.h"
+			],
+			[
+				"str",
+				"dnn/io/stream.h"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 273.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

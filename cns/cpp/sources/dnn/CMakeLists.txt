@@ -24,6 +24,7 @@ set(DIRS
     protos
     util
     contrib
+    base
 )
 
 foreach(dir ${DIRS})

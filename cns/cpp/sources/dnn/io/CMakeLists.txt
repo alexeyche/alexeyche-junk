@@ -4,6 +4,7 @@ cmake_minimum_required(VERSION 2.8)
 # Anything not in this list will not be compiled into SNN_SIM.
 set(SOURCES
     serialize.cpp
+    stream.cpp
 )
 
 # add directory name to sources

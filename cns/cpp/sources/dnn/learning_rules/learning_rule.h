@@ -5,15 +5,17 @@
 namespace dnn {
 
 template <typename Constants, typename State>
-class LearningRule : public DynamicObject<void> {
+class LearningRule : public DynamicObject<void>, public StateObject<Constants, State> {
 public:
-	LearningRule(Constants _c, ISpikeNeuron &_neuron) : c(_c), neuron(_neuron) {}
-
+	LearningRule() : neuron(nullptr) {}
+    void setNeuron(ISpikeNeuron &_neuron) {
+        neuron = _neuron;
+    }
 protected:
-	ISpikeNeuron &neuron;
+	ISpikeNeuron *neuron;
 
 	Constants c;
-	State s;	
+	State s;
 };
 
 }

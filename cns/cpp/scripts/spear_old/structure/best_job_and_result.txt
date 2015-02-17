@@ -1,0 +1,31 @@
+Best result: -1.498870
+Job-id: 20129
+Parameters: 
+name: "tau_adapt"
+dbl_val: 140.11145626
+name: "amp_adapt"
+dbl_val: 0.0
+name: "tau_refr"
+dbl_val: 6.63999850471
+name: "beta"
+dbl_val: 3.76948483131
+name: "epsp_decay_exc"
+dbl_val: 28.3333944912
+name: "epsp_decay_inh"
+dbl_val: 47.420967118
+name: "prob_feedforward_exc"
+dbl_val: 0.578484899476
+name: "prob_feedforward_inh"
+dbl_val: 0.261698508495
+name: "prob_reccurent_inh"
+dbl_val: 0.181932195485
+name: "prob_reccurent_exc"
+dbl_val: 0.188303399346
+name: "weight_distr_mean_ff_exc"
+dbl_val: 80.0
+name: "weight_distr_mean_ff_inh"
+dbl_val: 28.1064047533
+name: "weight_distr_mean_rec_exc"
+dbl_val: 51.8832295305
+name: "weight_distr_mean_rec_inh"
+dbl_val: 80.0
