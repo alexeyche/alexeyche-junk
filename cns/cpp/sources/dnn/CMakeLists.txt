@@ -25,6 +25,7 @@ set(DIRS
     util
     contrib
     base
+    neurons
 )
 
 foreach(dir ${DIRS})

@@ -18,12 +18,13 @@ using std::terminate;
 using namespace dnn;
 
 void test() {
-    IAFConstants *c = Factory::inst().createObject<IAFConstants>("IAFConstants");
-    IAFNeuron *n = new IAFNeuron();
-    n->setConstants(*c);
-    Stream sout(cout, Stream::Text);
-    sout << *n;
+    SpikeNeuronFactory::registerType<IAFConstants>("IAFConstants");
+    //IAFConstants *c = Factory::inst().createObject<IAFConstants>("IAFConstants");
+    //IAFNeuron *n = new IAFNeuron();
+    //n->setConstants(*c);
+    // Stream sout(cout, Stream::Text);
+    // sout << *n;
 
-    delete n;
+    // delete n;
 }
 

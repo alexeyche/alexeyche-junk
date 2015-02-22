@@ -6,6 +6,6 @@
 #include <dnn/synapses/static_synapse.h>
 #include <dnn/inputs/ts_input.h>
 #include <dnn/io/stream.h>
-#include <dnn/base/factory.h>
+#include <dnn/neurons/spike_neuron_factory.h>
 
 void test();

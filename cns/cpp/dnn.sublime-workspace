@@ -4,6 +4,26 @@
 		"selected_items":
 		[
 			[
+				"en",
+				"entity_map_type"
+			],
+			[
+				"Spik",
+				"SpikeNeuronFactory"
+			],
+			[
+				"IA",
+				"IAFConstants"
+			],
+			[
+				"Spike",
+				"SpikeNeuronFactory"
+			],
+			[
+				"Spi",
+				"SpikeNeuron"
+			],
+			[
 				"Stat",
 				"StaticSynapse"
 			],
@@ -14,10 +34,6 @@
 			[
 				"Dete",
 				"Determ"
-			],
-			[
-				"IA",
-				"IAFNeuron"
 			],
 			[
 				"IAF",
@@ -148,66 +164,67 @@
 	"buffers":
 	[
 		{
+			"file": "sources/dnn/neurons/spike_neuron_factory.h",
+			"settings":
+			{
+				"buffer_size": 241,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "sources/dnn/neurons/spike_neuron.h",
+			"settings":
+			{
+				"buffer_size": 504,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "sources/dnn/neurons/spike_neuron_factory.cpp",
+			"settings":
+			{
+				"buffer_size": 121,
+				"line_ending": "Unix",
+				"name": "#include \"spike_neuron_factory.h\""
+			}
+		},
+		{
+			"file": "sources/dnn/base/abstract_factory.h",
+			"settings":
+			{
+				"buffer_size": 536,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "sources/dnn/base/abstract_factory.cpp",
+			"settings":
+			{
+				"buffer_size": 208,
+				"line_ending": "Unix"
+			}
+		},
+		{
 			"file": "sources/dnn/test.cpp",
 			"settings":
 			{
-				"buffer_size": 506,
+				"buffer_size": 589,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "const.json",
+			"file": "sources/dnn/neurons/iaf_neuron.h",
 			"settings":
 			{
-				"buffer_size": 844,
+				"buffer_size": 775,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "sources/dnn/inputs/ts_input.h",
+			"file": "sources/dnn/test.h",
 			"settings":
 			{
-				"buffer_size": 697,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "sources/dnn/synapses/static_synapse.h",
-			"settings":
-			{
-				"buffer_size": 880,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "sources/dnn/synapses/synapse.h",
-			"settings":
-			{
-				"buffer_size": 214,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "sources/dnn/learning_rules/learning_rule.h",
-			"settings":
-			{
-				"buffer_size": 384,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "sources/dnn/learning_rules/stdp.h",
-			"settings":
-			{
-				"buffer_size": 726,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "sources/dnn/act_functions/act_function.h",
-			"settings":
-			{
-				"buffer_size": 192,
+				"buffer_size": 286,
 				"line_ending": "Unix"
 			}
 		}
@@ -263,35 +280,51 @@
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/act_functions",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/base",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/contrib",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/inputs",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/io",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/learning_rules",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/neurons",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/protos",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/synapses",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/tools",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/tools/dnn_sim"
 	],
 	"file_history":
 	[
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/inputs/ts_input.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/base/abstract_factory.cpp",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/base/abstract_factory.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/util/fast_delegate.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/contrib/rapidjson/filereadstream.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/learning_rules/stdp.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/act_functions/act_function.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/learning_rules/learning_rule.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/synapses/synapse.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/synapses/static_synapse.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/base/CMakeLists.txt",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/test.cpp",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/const.json",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/neurons/spike_neuron_factory.h",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/neurons/iaf_neuron.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/neurons/neuron.h",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/neurons/spike_neuron.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/util/spikes_list.cpp",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/util/spikes_list.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/util/spikes_queue.cpp",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/util/spikes_queue.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/contrib/pbjson/bin2ascii.h",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/util/spinning_barrier.h",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/act_functions/determ.h",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/base/factory.h",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/base/factory.cpp",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/base/type_map.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/neurons/neuron.h",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/base/dynamic_object.h",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/inputs/input.h",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/io/serialize.h",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/CMakeLists.txt",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/synapses/synapse.h",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/util/spinlock.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/act_functions/act_function.h",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/base/object.h",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/io/serialize.cpp",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/inputs/ts_input.h",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/core.h",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/contrib/rapidjson/rapidjson.h",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/contrib/rapidjson/reader.h",
@@ -299,12 +332,7 @@
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/io/stream.cpp",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/io/stream.h",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/tools/dnn_sim/dnn_sim.cpp",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/synapses/static_synapse.h",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/io/CMakeLists.txt",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/learning_rules/stdp.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/contrib/pbjson/bin2ascii.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/util/spinning_barrier.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/learning_rules/learning_rule.h",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/util/time_series.h",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/dnn.sublime-project",
 		"/home/alexeyche/.config/sublime-text-3/Packages/User/Preferences.sublime-settings",
@@ -312,7 +340,6 @@
 		"/home/alexeyche/.config/sublime-text-3/Packages/User/Default (Linux).sublime-keymap",
 		"/home/alexeyche/.config/sublime-text-3/Packages/Default/Preferences.sublime-settings",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/try.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/test.cpp",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/neuron.h",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/base.h",
 		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/dynamic_object.h",
@@ -365,109 +392,19 @@
 			[
 				{
 					"buffer": 0,
-					"file": "sources/dnn/test.cpp",
+					"file": "sources/dnn/neurons/spike_neuron_factory.h",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 506,
+						"buffer_size": 241,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								296,
-								296
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 231.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "const.json",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 844,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								844,
-								844
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JSON.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": -0.0,
-						"translation.y": 69.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 1,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "sources/dnn/inputs/ts_input.h",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 697,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								333,
-								333
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 33.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 0,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "sources/dnn/synapses/static_synapse.h",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 880,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								733,
-								733
+								146,
+								146
 							]
 						],
 						"settings":
@@ -478,24 +415,24 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 4,
+					"stack_index": 2,
 					"type": "text"
 				},
 				{
-					"buffer": 4,
-					"file": "sources/dnn/synapses/synapse.h",
+					"buffer": 1,
+					"file": "sources/dnn/neurons/spike_neuron.h",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 214,
+						"buffer_size": 504,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								202,
-								202
+								0,
+								0
 							]
 						],
 						"settings":
@@ -510,48 +447,49 @@
 					"type": "text"
 				},
 				{
-					"buffer": 5,
-					"file": "sources/dnn/learning_rules/learning_rule.h",
+					"buffer": 2,
+					"file": "sources/dnn/neurons/spike_neuron_factory.cpp",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 384,
+						"buffer_size": 121,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								251,
-								251
+								68,
+								68
 							]
 						],
 						"settings":
 						{
+							"auto_name": "#include \"spike_neuron_factory.h\"",
 							"syntax": "Packages/C++/C++.tmLanguage"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 6,
+					"stack_index": 0,
 					"type": "text"
 				},
 				{
-					"buffer": 6,
-					"file": "sources/dnn/learning_rules/stdp.h",
+					"buffer": 3,
+					"file": "sources/dnn/base/abstract_factory.h",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 726,
+						"buffer_size": 536,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								699,
-								699
+								0,
+								0
 							]
 						],
 						"settings":
@@ -568,20 +506,105 @@
 					"type": "text"
 				},
 				{
-					"buffer": 7,
-					"file": "sources/dnn/act_functions/act_function.h",
+					"buffer": 4,
+					"file": "sources/dnn/base/abstract_factory.cpp",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 192,
+						"buffer_size": 208,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								183,
-								183
+								104,
+								104
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "sources/dnn/test.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 589,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								313,
+								313
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "sources/dnn/neurons/iaf_neuron.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 775,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								134,
+								134
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 6,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "sources/dnn/test.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 286,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								271,
+								271
 							]
 						],
 						"settings":
@@ -604,7 +627,7 @@
 	},
 	"input":
 	{
-		"height": 0.0
+		"height": 34.0
 	},
 	"layout":
 	{
@@ -649,6 +672,42 @@
 		"selected_items":
 		[
 			[
+				"test.",
+				"dnn/test.cpp"
+			],
+			[
+				"spike",
+				"dnn/neurons/spike_neuron.h"
+			],
+			[
+				"facto",
+				"dnn/base/abstract_factory.cpp"
+			],
+			[
+				"sp",
+				"dnn/neurons/spike_neuron_factory.h"
+			],
+			[
+				"ia",
+				"dnn/neurons/iaf_neuron.h"
+			],
+			[
+				"test",
+				"dnn/test.cpp"
+			],
+			[
+				"ab",
+				"dnn/base/abstract_factory.h"
+			],
+			[
+				"neu",
+				"dnn/neurons/neuron.h"
+			],
+			[
+				"spik",
+				"dnn/neurons/spike_neuron_factory.h"
+			],
+			[
 				"fa",
 				"dnn/base/factory.h"
 			],
@@ -671,14 +730,6 @@
 			[
 				"deter",
 				"dnn/act_functions/determ.h"
-			],
-			[
-				"spike",
-				"dnn/neurons/spike_neuron.h"
-			],
-			[
-				"test",
-				"dnn/test.cpp"
 			],
 			[
 				"ac",
@@ -705,20 +756,8 @@
 				"dnn/base/dynamic_object.h"
 			],
 			[
-				"neu",
-				"dnn/neurons/neuron.h"
-			],
-			[
-				"ia",
-				"dnn/neurons/iaf_neuron.h"
-			],
-			[
 				"iaf",
 				"dnn/neurons/iaf_neuron.h"
-			],
-			[
-				"test.",
-				"dnn/test.cpp"
 			],
 			[
 				"core",

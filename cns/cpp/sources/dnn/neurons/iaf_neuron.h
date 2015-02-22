@@ -4,7 +4,6 @@
 #include <dnn/io/stream.h>
 #include <dnn/protos/generated.pb.h>
 #include <dnn/io/serialize.h>
-#include <dnn/base/factory.h>
 
 namespace dnn {
 
