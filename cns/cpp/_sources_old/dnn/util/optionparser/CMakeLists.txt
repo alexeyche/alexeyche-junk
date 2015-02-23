@@ -2,22 +2,9 @@ cmake_minimum_required(VERSION 2.8)
 
 # Define the files we need to compile.
 # Anything not in this list will not be compiled into SNN_SIM.
-set(DIRS
-    optionparser
-)
-
-foreach(dir ${DIRS})
-  add_subdirectory(${dir})
-endforeach()
-
-
 set(SOURCES
-    matrix.cpp
-    matrix.h
-    util.h
-    util.cpp
-    #spikes_list.cpp
-    #spikes_queue.cpp
+    optionparser.h
+    opt.h
 )
 
 # add directory name to sources
@@ -27,4 +14,4 @@ foreach(file ${SOURCES})
 endforeach()
 # Append sources (with directory name) to list of all SNN_SIM sources (used at
 # the parent scope).
-set(DNN_SRCS ${DNN_SRCS} ${DIR_SRCS} PARENT_SCOPE)
+set(SNN_SIM_SRCS ${SNN_SIM_SRCS} ${DIR_SRCS} PARENT_SCOPE)

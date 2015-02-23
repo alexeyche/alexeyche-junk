@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
-project(snn C CXX)
+project(dnn C CXX)
 
 set(DNN_MAJOR_VERSION 0)
 set(DNN_MINOR_VERSION 1)
@@ -53,6 +53,6 @@ include_directories(${CMAKE_SOURCE_DIR})
 include_directories(${CMAKE_BINARY_DIR})
 
 # Recurse into the rest of the project.
-add_subdirectory(snn)
+add_subdirectory(dnn)
 add_subdirectory(tools)
 

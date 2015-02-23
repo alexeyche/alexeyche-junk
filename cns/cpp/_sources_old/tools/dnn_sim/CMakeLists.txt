@@ -12,7 +12,7 @@ foreach(file ${SOURCES})
   set(DIR_SRCS ${DIR_SRCS} ${CMAKE_CURRENT_SOURCE_DIR}/${file})
 endforeach()
 # append sources (with directory name) to list of all DNN sources (used at the parent scope)
-set(SNN_SRCS ${SNN_SRCS} ${DIR_SRCS} PARENT_SCOPE)
+set(DNN_SRCS ${DNN_SRCS} ${DIR_SRCS} PARENT_SCOPE)
 
 # executable
 add_executable(dnn_sim-bin

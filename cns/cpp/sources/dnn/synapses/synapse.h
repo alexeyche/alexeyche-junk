@@ -1,16 +1,30 @@
 #pragma once
 
 
-#include <dnn/neurons/neuron.h>
+struct SynapseInterface {
+	propSynSpikeDelegate propagateSpike;
+};
 
-namespace dnn {
-
-
-template <typename Constants, typename State>
-class Synapse : public ISynapse, public StateObject<Constants, State>  {
+class SynapseBase {
 public:
-	Synapse() {}
+	typedef SynapseInterface interface;
+
+
+	virtual void provideInterface(SynapseInterface &i) = 0;
+
+	static void provideDefaultInterface(SynapseInterface &i) {
+		cerr << "No default interface for Synapse\n";
+		terminate();
+	}
 };
 
 
-}
+template <typename Constants, typename State>
+class Synapse {
+public:
+	Synapse(const Constants _c) : c(_c) {}
+protected:
+	State s;
+	const Constants c;
+};
+

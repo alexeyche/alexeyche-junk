@@ -1,11 +1,31 @@
 #pragma once
 
-namespace dnn {
 
-template <typename Constants, typename Eval>
-class ActFunction : public StatelessObject<Constants>, public DynamicObject<Eval> {
-public:
-	ActFunction() {}
+struct ActFunctionInterface {
+	funDelegate prob;
+	funDelegate probDeriv;
 };
 
-}
+
+class ActFunctionBase {
+public:
+	typedef ActFunctionInterface interface;
+	
+	virtual void provideInterface(ActFunctionInterface &i) = 0;
+
+	static void provideDefaultInterface(ActFunctionInterface &i) {
+    	cerr << "No default interface for act function\n";
+    	terminate();
+    }
+};
+
+
+
+template <typename Constants>
+class ActFunction : public ActFunctionBase {
+public:
+	ActFunction(Constants _c) : c(_c) {}
+
+protected:
+	const Constants c;
+};
