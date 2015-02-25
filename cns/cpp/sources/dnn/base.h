@@ -15,3 +15,8 @@ typedef FastDelegate0<const bool&> getBoolDelegate;
 typedef FastDelegate0<const double&> getDoubleDelegate;
 
 
+struct SynSpike {
+    double t;
+    size_t n_id;
+    size_t syn_id;
+};

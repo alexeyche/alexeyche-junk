@@ -11,7 +11,7 @@ struct LeakyIntegrateAndFireC : public Constants {
 
 
 /*@GENERATE_PROTO@*/
-struct LeakyIntegrateAndFireState : public SpikeNeuronState {
+struct LeakyIntegrateAndFireState  {
 	double p;
 	double u;
 };
@@ -19,5 +19,12 @@ struct LeakyIntegrateAndFireState : public SpikeNeuronState {
 
 class LeakyIntegrateAndFire : public SpikeNeuron<LeakyIntegrateAndFireC, LeakyIntegrateAndFireState> {
 public:
+    void reset() {
+        s.p = 0.0;
+        s.u = 0.0;
+    }
 
+    void propagateSynapseSpike(const SynSpike &sp) {
+        syns[ sp.syn_id ]->propagateSpike();
+    }
 };

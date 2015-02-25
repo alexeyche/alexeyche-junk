@@ -10,8 +10,11 @@ struct ActFunctionInterface {
 class ActFunctionBase {
 public:
 	typedef ActFunctionInterface interface;
-	
-	virtual void provideInterface(ActFunctionInterface &i) = 0;
+
+	virtual double prob(const double &u) = 0;
+    virtual double probDeriv(const double &u) = 0;
+
+    virtual void provideInterface(ActFunctionInterface &i) = 0;
 
 	static void provideDefaultInterface(ActFunctionInterface &i) {
     	cerr << "No default interface for act function\n";
