@@ -20,7 +20,11 @@ alias t4='ssh twalrus4'
 alias t5='ssh twalrus5'
 alias t4ns='ssh twalrus4.yandex.ru screen -S alexeyche_ssh -d -m'
 alias t4s='ssh -t twalrus4.yandex.ru screen -S alexeyche_ssh -r'
-
+alias t5ns='ssh twalrus5.yandex.ru screen -S alexeyche_ssh -d -m'
+alias t5s='ssh -t twalrus5.yandex.ru screen -S alexeyche_ssh -r'
+alias rmrf='rm -rf ./*'
+alias ya="/home/alexeyche/wd/arc/arcadia/devtools/ya/ya"
+alias cb='if readlink -f . | grep -Eq "build$"; then rm -rf ./*; else echo "This folder doesnt look like build directory"; fi'
 alias sl='screen -list'
 alias sr='screen -r'
 # ---------------
