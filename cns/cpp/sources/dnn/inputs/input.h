@@ -28,8 +28,6 @@ public:
 
 template <typename Constants, typename State>
 class Input : public InputBase {
-public:
-	Input() {}
 protected:
     const Constants c;
     State s;

@@ -6,8 +6,7 @@ project(dnn)
 # Define the files we need to compile.
 # Anything not in this list will not be compiled into DNN.
 set(SOURCES
-    test.cpp
-    test.h
+    
 )
 
 # add directory name to sources

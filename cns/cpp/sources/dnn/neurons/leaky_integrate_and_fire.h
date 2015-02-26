@@ -45,7 +45,7 @@ public:
     }
 
     void propagateSynapseSpike(const SynSpike &sp) {
-        syns[ sp.syn_id ]->propagateSpike();
+        syns[ sp.syn_id ].getInterface().propagateSpike();
     }
 
     void calculateDynamics(const Time& t) {

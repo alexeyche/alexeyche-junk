@@ -41,6 +41,7 @@ public:
             terminate();
         }
         codedIn->PopLimit(limit);
+        return true;
     }
 
     static void writeBinaryMessage(google::protobuf::Message* mess, ostream *str) {

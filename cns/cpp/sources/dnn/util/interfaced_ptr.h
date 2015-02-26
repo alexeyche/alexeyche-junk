@@ -26,7 +26,7 @@ public:
 		_ptr->provideInterface(i);
 	}
 
-	typename T::interface& operator ->() {
+	typename T::interface& getInterface() {
 		return i;
 	}
 

@@ -19,8 +19,6 @@
 #define FASTDELEGATEBIND_H
 #if _MSC_VER > 1000
 #pragma once
-
-namespace dnn {
 #endif // _MSC_VER > 1000
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -242,6 +240,3 @@ bind(
 } // namespace fastdelegate
 
 #endif // !defined(FASTDELEGATEBIND_H)
-
-
-}

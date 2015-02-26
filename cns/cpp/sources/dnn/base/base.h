@@ -25,7 +25,7 @@ typedef FastDelegate1<const double&> attachDelegate;
 typedef FastDelegate0<const bool&> getBoolDelegate;
 typedef FastDelegate0<const double&> getDoubleDelegate;
 typedef FastDelegate0<double> retDoubleDelegate;
-typedef FastDelegate0<const Time&> calculateDynamicsDelegate;
+typedef FastDelegate1<const Time&> calculateDynamicsDelegate;
 
 struct SynSpike {
     double t;

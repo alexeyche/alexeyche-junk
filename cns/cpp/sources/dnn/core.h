@@ -9,6 +9,7 @@
 #include <sstream>
 #include <string>
 #include <map>
+#include <fstream>
 
 using std::map;
 using std::cout;

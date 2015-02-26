@@ -27,8 +27,8 @@ struct TSInputState : public Serializable<Protos::TSInputState> {
 class TSInput : public Input<TSInputC, TSInputState> {
 public:
 	typedef Input<TSInputC, TSInputState> Parent;
-	TSInput() {}
-	double evaluate() {
+
+	double getValue() {
 		return 0.0;
 	}
 };

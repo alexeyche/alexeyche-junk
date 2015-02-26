@@ -3,7 +3,6 @@ cmake_minimum_required(VERSION 2.8)
 # Define the files we need to compile.
 # Anything not in this list will not be compiled into SNN_SIM.
 set(DIRS
-    optionparser
 )
 
 foreach(dir ${DIRS})
