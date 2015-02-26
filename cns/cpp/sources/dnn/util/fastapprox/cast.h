@@ -47,3 +47,5 @@
 #endif
 
 #endif // __CAST_H_
+
+}

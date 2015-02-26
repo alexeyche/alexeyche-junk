@@ -1,5 +1,6 @@
 
 #include "util.h"
+namespace dnn {
 
 vector<string> split_into(const string &s, char delim, vector<string> &elems) {
     stringstream ss(s);
@@ -151,4 +152,7 @@ vector<IndexSlice> dispatchOnThreads(size_t elements_size, size_t jobs) {
         }
     }
     return out;
+}
+
+
 }

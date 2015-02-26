@@ -358,3 +358,5 @@ vfastertanfull (const v4sf x)
 #endif //__SSE2__
 
 #endif // __FAST_TRIG_H_
+
+}

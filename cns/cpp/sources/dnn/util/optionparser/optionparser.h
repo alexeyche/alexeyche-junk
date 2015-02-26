@@ -2813,3 +2813,5 @@ void printUsage(Function* prn, Stream* stream, const Descriptor usage[], int wid
 // namespace option
 
 #endif /* OPTIONPARSER_H_ */
+
+}

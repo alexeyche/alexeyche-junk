@@ -1,12 +1,20 @@
 #pragma once
 
+#include "synapse.h"
+
+namespace dnn {
+
 
 struct StaticSynapseC {
+    StaticSynapseC() : psp_decay(15.0), amp(1.0) {}
+
     double psp_decay;
     double amp;
 };
 
 struct StaticSynapseState {
+    StaticSynapseState() : x(0.0) {}
+
     double x;
 };
 
@@ -15,7 +23,7 @@ public:
     void propagateSpike() {
         x += c.amp;
     }
-    void calculateDynamics() {
+    void calculateDynamics(const Time &t) {
         x -= x/c.psp_decay;
     }
 
@@ -24,3 +32,8 @@ public:
         i.calculateDynamics = MakeDelegate(this, &StaticSynapse::calculateDynamics);
     }
 };
+
+
+
+
+}

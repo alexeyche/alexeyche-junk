@@ -142,3 +142,5 @@ vfasterlog (v4sf x)
 #endif // __SSE2__
 
 #endif // __FAST_LOG_H_
+
+}

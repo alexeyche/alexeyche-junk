@@ -1,11 +1,20 @@
 #pragma once
 
+
 #include "act_function.h"
+#include <dnn/protos/generated.pb.h>
+
+namespace dnn {
+
+/*@GENERATE_PROTO@*/
+struct DetermC : public Serializable<Protos::DetermC> {
+    DetermC() : treshold(15.0) {}
+
+    void processStream(Stream &str) {
+        acquire(str) << "treshold: " << treshold << Self::End;
+    }
 
 
-
-
-struct DetermC : public Constants {
     double treshold;
 };
 
@@ -28,3 +37,7 @@ public:
     }
 
 };
+
+
+
+}

@@ -1,5 +1,7 @@
 #pragma once
 
+namespace dnn {
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "optionparser.h"
@@ -51,3 +53,5 @@ struct Arg: public option::Arg
   }
 };
 
+
+}

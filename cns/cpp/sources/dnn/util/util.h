@@ -1,7 +1,10 @@
 #pragma once
 
-#include <snnlib/base.h>
+
+#include <dnn/base/base.h>
 #include <sys/stat.h>
+
+namespace dnn {
 
 vector<string> split_into(const string &s, char delim, vector<string> &elems);
 vector<string> split(const string &s, char delim);
@@ -36,3 +39,5 @@ vector<IndexSlice> dispatchOnThreads(size_t elements_size, size_t jobs);
 
 
 vector<double> parseParenthesis(const string &s);
+
+}

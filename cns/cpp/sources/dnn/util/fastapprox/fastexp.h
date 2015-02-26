@@ -135,3 +135,5 @@ vfasterexp (const v4sf p)
 #endif //__SSE2__
 
 #endif // __FAST_EXP_H_
+
+}

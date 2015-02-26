@@ -1,14 +1,21 @@
 #pragma once
 
-#include <dnn/base.h>
+
+#include <dnn/base/base.h>
 #include <dnn/util/interfaced_ptr.h>
+#include <dnn/act_functions/act_function.h>
+#include <dnn/synapses/synapse.h>
+
+namespace dnn {
 
 
 struct SpikeNeuronInterface {
-	stateDelegate calculate_dynamics;
-	propSynSpikeDelegate propagate_synapse_spike;
+	calculateDynamicsDelegate calculateDynamics;
+	propSynSpikeDelegate propagateSynapseSpike;
 	getDoubleDelegate getFiringProbability;
+	getBoolDelegate fired;
 };
+
 
 class SpikeNeuronBase {
 public:
@@ -16,34 +23,29 @@ public:
 
 	virtual void provideInterface(SpikeNeuronInterface &i) = 0;
 
+	virtual void reset() = 0;
+
+	// runtime
+	virtual void propagateSynapseSpike(const SynSpike &s) = 0;
+	virtual void calculateDynamics(const Time &t) = 0;
+	virtual const double& getFiringProbability() = 0;
+	virtual const bool& fired() = 0;
+
 	static void provideDefaultInterface(SpikeNeuronInterface &i) {
 		cerr << "No default interface for SpikeNeuron\n";
 		terminate();
 	}
+
 };
 
 
 template <typename Constants, typename State>
 class SpikeNeuron : public SpikeNeuronBase {
 public:
-	SpikeNeuron(const Constants _c) : c(_c) : lrule(nullptr), act_f(nullptr), input(nullptr), tc(nullptr) {}
-
 	// void setLearningRule(LearningRule *_lrule) { lrule = _lrule; }
 	void setActFunction(ActFunctionBase *_act_f) { act_f.set(_act_f); }
 
 
-	virtual void reset() = 0;
-
-	// runtime
-	virtual void propagateSynapseSpike(const SynSpike &s) = 0;
-	virtual void calculateDynamics() = 0;
-
-	inline const bool& fired() {
-		return s.fired;
-	}
-	inline const double& getFiringProbability() {
-		return s.p;
-	}
 
 protected:
 	vector<InterfacedPtr<SynapseBase>> syns;
@@ -53,6 +55,9 @@ protected:
 	// InterfacedPtr<Input> input;
 	// InterfacedPtr<TuningCurve> tc;
 
-	const Constants c;
 	State s;
+	const Constants c;
 };
+
+
+}

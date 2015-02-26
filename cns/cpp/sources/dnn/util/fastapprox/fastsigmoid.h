@@ -78,3 +78,5 @@ vfastersigmoid (const v4sf x)
 #endif //__SSE2__
 
 #endif // __FAST_SIGMOID_H_
+
+}

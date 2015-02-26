@@ -1,34 +1,40 @@
 #pragma once
 
+namespace dnn {
 
-template <typename T> 
+
+template <typename T>
 class InterfacedPtr {
 public:
-	InterfacedPtr(T *_ptr) : ptr(_ptr) {
-		ptr->provideInterface(i);
+	InterfacedPtr(T *ptr_to_set) : _ptr(ptr_to_set) {
+		_ptr->provideInterface(i);
 	}
 
-	InterfacedPtr() : ptr(nullptr) {
+	InterfacedPtr() : _ptr(nullptr) {
 		T::provideDefaultInterface(i);
 	}
 
 	T* ptr() {
-		return ptr;
+		return _ptr;
 	}
-	void set(T *_ptr) {
-		if(ptr) {
+	void set(T *ptr_to_set) {
+		if(_ptr) {
 			cerr << "InterfacedPtr is already set\n";
 			terminate();
 		}
-		ptr = _ptr;
-		ptr->provideInterface(i);
+		_ptr = ptr_to_set;
+		_ptr->provideInterface(i);
 	}
 
-	T::interface& operator ->() {
+	typename T::interface& operator ->() {
 		return i;
 	}
 
 private:
-	T *ptr;
-	T::interface i;
+	T *_ptr;
+	typename T::interface i;
 };
+
+
+
+}

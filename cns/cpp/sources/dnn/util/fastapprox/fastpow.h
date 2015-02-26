@@ -82,3 +82,5 @@ vfasterpow (const v4sf x,
 #endif //__SSE2__
 
 #endif // __FAST_POW_H_
+
+}

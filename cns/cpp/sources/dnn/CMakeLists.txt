@@ -21,10 +21,10 @@ set(DNN_SRCS ${DIR_SRCS})
 
 set(DIRS
     #io
-    #protos
+    protos
     #util
-    #contrib
     #base
+    contrib
     neurons
 )
 

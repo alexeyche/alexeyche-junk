@@ -1,5 +1,7 @@
 #pragma once
 
+namespace dnn {
+
 
 struct ActFunctionInterface {
 	funDelegate prob;
@@ -26,9 +28,9 @@ public:
 
 template <typename Constants>
 class ActFunction : public ActFunctionBase {
-public:
-	ActFunction(Constants _c) : c(_c) {}
 
 protected:
 	const Constants c;
 };
+
+}

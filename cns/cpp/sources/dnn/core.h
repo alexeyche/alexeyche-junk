@@ -1,5 +1,6 @@
 #pragma once
 
+
 #include <iostream>
 #include <memory>
 #include <vector>
@@ -22,3 +23,4 @@ using std::istream;
 using std::cerr;
 using std::terminate;
 using std::cin;
+

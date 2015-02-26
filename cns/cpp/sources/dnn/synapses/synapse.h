@@ -1,18 +1,20 @@
 #pragma once
 
+namespace dnn {
+
 
 struct SynapseInterface {
 	stateDelegate propagateSpike;
-	stateDelegate calculateDynamics;
-
+	calculateDynamicsDelegate calculateDynamics;
 };
+
 
 class SynapseBase {
 public:
 	typedef SynapseInterface interface;
 
 	virtual void propagateSpike() = 0;
-	virtual void calculateDynamics() = 0;
+	virtual void calculateDynamics(const Time &t) = 0;
 
 	virtual void provideInterface(SynapseInterface &i) = 0;
 
@@ -24,12 +26,12 @@ public:
 
 
 template <typename Constants, typename State>
-class Synapse {
-public:
-	Synapse(const Constants _c) : c(_c) {}
+class Synapse : public SynapseBase {
 
 protected:
 	State s;
 	const Constants c;
 };
 
+
+}

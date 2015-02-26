@@ -1,0 +1,24 @@
+package Protos;
+
+message LeakyIntegrateAndFireC {
+    required double R = 1;
+    required double C = 2;
+}
+
+message LeakyIntegrateAndFireState {
+    required double p = 1;
+    required double u = 2;
+}
+
+message DetermC {
+    required double treshold = 1;
+}
+
+message TSInputC {
+    required double dt = 1;
+}
+
+message TSInputState {
+    required uint32 index = 1;
+}
+
