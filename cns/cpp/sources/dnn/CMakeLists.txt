@@ -6,7 +6,7 @@ project(dnn)
 # Define the files we need to compile.
 # Anything not in this list will not be compiled into DNN.
 set(SOURCES
-    
+
 )
 
 # add directory name to sources
@@ -19,7 +19,7 @@ endforeach()
 set(DNN_SRCS ${DIR_SRCS})
 
 set(DIRS
-    #io
+    io
     protos
     #util
     #base

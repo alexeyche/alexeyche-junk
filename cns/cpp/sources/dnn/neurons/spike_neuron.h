@@ -5,6 +5,7 @@
 #include <dnn/util/interfaced_ptr.h>
 #include <dnn/act_functions/act_function.h>
 #include <dnn/synapses/synapse.h>
+#include <dnn/io/serialize.h>
 
 namespace dnn {
 
@@ -17,7 +18,7 @@ struct SpikeNeuronInterface {
 };
 
 
-class SpikeNeuronBase {
+class SpikeNeuronBase : public SerializableBase {
 public:
 	typedef SpikeNeuronInterface interface;
 
@@ -38,16 +39,23 @@ public:
 
 };
 
+size_t global_neuron_index = 0;
 
 template <typename Constants, typename State>
 class SpikeNeuron : public SpikeNeuronBase {
 public:
+	SpikeNeuron() {
+		_id = global_neuron_index++;
+	}
 	// void setLearningRule(LearningRule *_lrule) { lrule = _lrule; }
 	void setActFunction(ActFunctionBase *_act_f) { act_f.set(_act_f); }
+	inline const size_t& id() { return _id; }
 
-
-
+	void processStream(Stream &str) {
+		acquire(str) << s << c;
+	}
 protected:
+	size_t _id;
 	vector<InterfacedPtr<SynapseBase>> syns;
 
 	InterfacedPtr<ActFunctionBase> act_f;

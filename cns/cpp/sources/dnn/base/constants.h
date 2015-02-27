@@ -9,7 +9,7 @@
 
 using namespace rapidjson;
 
-static const char* kTypeNames[] = 
+static const char* kTypeNames[] =
     { "Null", "False", "True", "Object", "Array", "String", "Number" };
 
 class Constants {
@@ -18,10 +18,10 @@ public:
 		std::ifstream ifs(fname);
 		std::string const_json((std::istreambuf_iterator<char>(ifs)),
                  std::istreambuf_iterator<char>());
-		
+
 		Document document;
 
-		
+
 		document.Parse(const_json.c_str());
 		if(document.HasParseError()) {
 			cerr << "Parse JSON error:\n";
@@ -29,7 +29,7 @@ public:
 			terminate();
 		}
 		const Value &neurons = document["neurons"];
-		
+
 		for (Value::ConstMemberIterator itr = neurons.MemberBegin(); itr != neurons.MemberEnd(); ++itr) {
 		    printf("Type of member %s is %s\n", itr->name.GetString(), kTypeNames[itr->value.GetType()]);
 		}

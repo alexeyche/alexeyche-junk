@@ -59,7 +59,7 @@ DnnSimOpts parseOptions(int argc, char **argv) {
     option::Option *buffer = new option::Option[stats.buffer_max];
 
     option::Parser parse(usage, argc, argv, options, buffer);
-    
+
 
     if (parse.error()) {
     	delete [] buffer;
@@ -67,9 +67,9 @@ DnnSimOpts parseOptions(int argc, char **argv) {
     	cerr << "Errors while parsing options\n";
     	terminate();
     }
-	
+
 	delete [] buffer;
-    
+
     if ((options[opts::ARG_HELP]) || (argc == 0)) {
         option::printUsage(cout, usage);
         exit(0);
@@ -134,8 +134,12 @@ DnnSimOpts parseOptions(int argc, char **argv) {
     }
     return sopt;
 }
+
+using namespace dnn;
 int main(int argc, char **argv) {
 	DnnSimOpts sopt = parseOptions(argc, argv);
     Constants c(sopt.const_file);
-	
+    Stream s(cout, Stream::Text);
+    LeakyIntegrateAndFire lif;
+    s << lif;
 }
