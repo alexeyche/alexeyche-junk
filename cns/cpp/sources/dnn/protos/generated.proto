@@ -11,15 +11,15 @@ message LeakyIntegrateAndFireState {
     required double u = 3;
 }
 
-message DetermC {
-    required double treshold = 1;
-}
-
 message TSInputC {
     required double dt = 1;
 }
 
 message TSInputState {
     required uint32 index = 1;
+}
+
+message DetermC {
+    required double treshold = 1;
 }
 

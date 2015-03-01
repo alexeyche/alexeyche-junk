@@ -27,7 +27,7 @@
         ],
         "conn_map" : {
             "0->0" : [
-                { "prob" : 0.5, "weight_distr" : "Norm(10.6, 0.1)", "type" : "StaticSynapse", "dendrite_delay_distr" : "Exp(0,0)" }
+                { "prob" : 0.5, "weight_distr" : "Norm(10.6, 0.1)", "synapse" : "StaticSynapse", "dendrite_delay_distr" : "Exp(0,0)" }
             ]
         },
         "dt" : 1.0,
