@@ -8,7 +8,8 @@ KNOWN_TYPES = {
     "int"       : "int32", 
     "size_t"    : "uint32", 
     "float"     : "float", 
-    "string"    : "string" 
+    "string"    : "string",
+    "bool"       : "bool", 
 }
 
 PROTO_FILE = "generated.proto"

@@ -31,7 +31,8 @@ public:
         terminate();
     }
 
-    Stream& operator << (SerializableBase &v);
+//    Stream& operator << (SerializableBase &v);
+    void writeObject(SerializableBase *b);
 
     Repr getRepr() {
         return r;

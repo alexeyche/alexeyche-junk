@@ -9,8 +9,8 @@ namespace dnn {
 struct TSInputC : public Serializable<Protos::TSInputC> {
     double dt;
 
-    void processStream(Stream &str) {
-        acquire(str) << "dt: " << dt << Self::End;
+    void serialize() {
+        //acquire(str) << "dt: " << dt << Self::End;
     }
 };
 
@@ -18,8 +18,8 @@ struct TSInputC : public Serializable<Protos::TSInputC> {
 struct TSInputState : public Serializable<Protos::TSInputState> {
     size_t index;
 
-    void processStream(Stream &str) {
-        acquire(str) << "index: " << index << Self::End;
+    void serialize() {
+        //acquire(str) << "index: " << index << Self::End;
     }
 };
 

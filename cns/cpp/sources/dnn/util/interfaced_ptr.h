@@ -17,6 +17,9 @@ public:
 	T* ptr() {
 		return _ptr;
 	}
+	T& ref() {
+		return *_ptr;
+	}
 	void set(T *ptr_to_set) {
 		if(_ptr) {
 			cerr << "InterfacedPtr is already set\n";
@@ -24,6 +27,10 @@ public:
 		}
 		_ptr = ptr_to_set;
 		_ptr->provideInterface(i);
+	}
+	
+	bool isSet() {
+		return _ptr ? true : false;
 	}
 
 	typename T::interface& getInterface() {

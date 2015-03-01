@@ -10,11 +10,12 @@
 #include <string>
 #include <map>
 #include <fstream>
+#include <cmath>
+#include <algorithm>
 
 using std::map;
 using std::cout;
 using std::move;
-using std::unique_ptr;
 using std::vector;
 using std::accumulate;
 using std::stringstream;
@@ -24,4 +25,9 @@ using std::istream;
 using std::cerr;
 using std::terminate;
 using std::cin;
+using std::pair;
+using std::min;
+using std::ofstream;
 
+template <typename T>
+using uptr = std::unique_ptr<T>;

@@ -3,8 +3,11 @@
 
 #include <dnn/base/base.h>
 #include <sys/stat.h>
+#include <dnn/contrib/rapidjson/document.h>
 
 namespace dnn {
+
+using namespace rapidjson;
 
 vector<string> split_into(const string &s, char delim, vector<string> &elems);
 vector<string> split(const string &s, char delim);
@@ -37,7 +40,20 @@ struct IndexSlice {
 
 vector<IndexSlice> dispatchOnThreads(size_t elements_size, size_t jobs);
 
+#define TRY(X) \
+	try {	\
+		X;	\
+	} catch {	\
+		cerr << "Error!\n"; \
+		terminate();	\
+	}\
+
 
 vector<double> parseParenthesis(const string &s);
 
+
+
 }
+
+
+

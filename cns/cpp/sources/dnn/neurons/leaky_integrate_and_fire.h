@@ -12,8 +12,8 @@ namespace dnn {
 struct LeakyIntegrateAndFireC : public Serializable<Protos::LeakyIntegrateAndFireC> {
     LeakyIntegrateAndFireC() : R(1.0), C(50.0) {}
 
-    void processStream(Stream &str) {
-        acquire(str) << "R: " << R << ", " << "C: " << C << Self::End;
+    void serialize() {
+        begin() << "R: " << R << ", " << "C: " << C << end();
     }
 
 	double R;
@@ -25,10 +25,10 @@ struct LeakyIntegrateAndFireC : public Serializable<Protos::LeakyIntegrateAndFir
 struct LeakyIntegrateAndFireState : public Serializable<Protos::LeakyIntegrateAndFireState>  {
     LeakyIntegrateAndFireState() : p(0.0), u(0.0), fired(false) {}
 
-    void processStream(Stream &str) {
-        acquire(str) << "p: "       << p << ", " \
-                     << "u: "       << u << ", " \
-                     << "fired: "   << fired << Self::End;
+    void serialize() {
+        begin() << "p: "       << p << ", " \
+                << "u: "       << u << ", " \
+                << "fired: "   << fired << end();
     }
     bool fired;
 
@@ -39,6 +39,10 @@ struct LeakyIntegrateAndFireState : public Serializable<Protos::LeakyIntegrateAn
 
 class LeakyIntegrateAndFire : public SpikeNeuron<LeakyIntegrateAndFireC, LeakyIntegrateAndFireState> {
 public:
+    const string name() const {
+        return "LeakyIntegrateAndFire";
+    }
+
     void reset() {
         s.p = 0.0;
         s.u = 0.0;

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <dnn/io/serialize.h>
+
 namespace dnn {
 
 
@@ -9,7 +11,7 @@ struct ActFunctionInterface {
 };
 
 
-class ActFunctionBase {
+class ActFunctionBase : public SerializableBase {
 public:
 	typedef ActFunctionInterface interface;
 
@@ -18,9 +20,14 @@ public:
 
     virtual void provideInterface(ActFunctionInterface &i) = 0;
 
+	static double __default(const double &u) { 
+		cerr << "Calling inapropriate default interface function\n";
+		terminate();
+	}
+	
 	static void provideDefaultInterface(ActFunctionInterface &i) {
-    	cerr << "No default interface for act function\n";
-    	terminate();
+    	i.prob = &ActFunctionBase::__default;
+    	i.probDeriv = &ActFunctionBase::__default;
     }
 };
 
@@ -28,9 +35,11 @@ public:
 
 template <typename Constants>
 class ActFunction : public ActFunctionBase {
-
+	void serialize() {
+		begin() << "Constants: " << c << end();
+	}
 protected:
-	const Constants c;
+	Constants c;
 };
 
 }

@@ -5,6 +5,7 @@
 #include <dnn/util/interfaced_ptr.h>
 #include <dnn/act_functions/act_function.h>
 #include <dnn/synapses/synapse.h>
+#include <dnn/io/serialize.h>
 
 namespace dnn {
 
@@ -17,7 +18,7 @@ struct SpikeNeuronInterface {
 };
 
 
-class SpikeNeuronBase {
+class SpikeNeuronBase : public SerializableBase {
 public:
 	typedef SpikeNeuronInterface interface;
 
@@ -44,7 +45,12 @@ class SpikeNeuron : public SpikeNeuronBase {
 public:
 	// void setLearningRule(LearningRule *_lrule) { lrule = _lrule; }
 	void setActFunction(ActFunctionBase *_act_f) { act_f.set(_act_f); }
-
+	
+	void serialize() {
+		begin() << "State: "       << s << ", " \
+			    << "Constants: "   << c << ", " \
+			    << act_f.isSet() ? << "ActFunction: " << act_f.ref() << end();
+	}
 
 
 protected:
@@ -56,7 +62,7 @@ protected:
 	// InterfacedPtr<TuningCurve> tc;
 
 	State s;
-	const Constants c;
+    Constants c;
 };
 
 

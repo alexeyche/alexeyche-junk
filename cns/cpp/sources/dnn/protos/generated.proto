@@ -6,8 +6,9 @@ message LeakyIntegrateAndFireC {
 }
 
 message LeakyIntegrateAndFireState {
-    required double p = 1;
-    required double u = 2;
+    required bool fired = 1;
+    required double p = 2;
+    required double u = 3;
 }
 
 message TSInputC {

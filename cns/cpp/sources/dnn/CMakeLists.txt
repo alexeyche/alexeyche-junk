@@ -19,10 +19,10 @@ endforeach()
 set(DNN_SRCS ${DIR_SRCS})
 
 set(DIRS
-    #io
+    io
     protos
-    #util
-    #base
+    util
+    base
     contrib
     neurons
 )

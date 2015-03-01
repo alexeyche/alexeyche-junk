@@ -11,8 +11,19 @@ namespace dnn {
 
 class Object {
 public:
-    ~Object() {}
+    virtual ~Object() {}
 };
+
+class Printable: public Object {
+protected:
+    virtual void print(std::ostream& str) const = 0;
+public:
+    friend std::ostream& operator<<(std::ostream& str, const Printable &data) {
+        data.print(str);
+        return str;
+    }
+};
+
 
 struct SynSpike;
 struct Time;
