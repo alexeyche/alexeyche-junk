@@ -20,7 +20,7 @@ public:
         if(_input_str) return true;
         return false;
     }
-    istream& getInputStream() {
+     istream& getInputStream() {
         if(_input_str) return *_input_str;
         cerr << "Stream is wrongly opened or used\n";
         terminate();
