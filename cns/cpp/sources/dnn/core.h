@@ -28,6 +28,8 @@ using std::cin;
 using std::pair;
 using std::min;
 using std::ofstream;
+using std::ifstream;
+using std::multimap;
 
 template <typename T>
 using uptr = std::unique_ptr<T>;

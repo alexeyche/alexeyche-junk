@@ -6,6 +6,8 @@ namespace dnn {
 
 class ClassName;
 class SerializableBase;
+class SpikeNeuronBase;
+class ActFunctionBase;
 
 class Factory {
 public:
@@ -23,7 +25,9 @@ public:
     }
 
     SerializableBase* createObject(string name);
-
+    
+    SpikeNeuronBase* createSpikeNeuron(string name);
+    ActFunctionBase* createActFunction(string name);
     static Factory& inst();
 
 

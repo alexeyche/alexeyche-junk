@@ -44,7 +44,7 @@ public:
     }
 
     void reset() {
-        s.p = 0.0;
+        s.p = 5.0;
         s.u = 0.0;
     }
 

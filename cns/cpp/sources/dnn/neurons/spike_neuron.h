@@ -37,23 +37,10 @@ public:
 		terminate();
 	}
 
-};
-
-
-template <typename Constants, typename State>
-class SpikeNeuron : public SpikeNeuronBase {
-public:
 	// void setLearningRule(LearningRule *_lrule) { lrule = _lrule; }
 	void setActFunction(ActFunctionBase *_act_f) { act_f.set(_act_f); }
 	
-	void serialize() {
-		begin() << "State: "       << s << ", " \
-			    << "Constants: "   << c << ", ";
-			    //<< act_f.isSet() ? << "ActFunction: " << act_f.ref() << end();
-	}
-
-
-protected:
+protected:	
 	vector<InterfacedPtr<SynapseBase>> syns;
 
 	InterfacedPtr<ActFunctionBase> act_f;
@@ -61,6 +48,20 @@ protected:
 	// InterfacedPtr<Input> input;
 	// InterfacedPtr<TuningCurve> tc;
 
+
+};
+
+
+template <typename Constants, typename State>
+class SpikeNeuron : public SpikeNeuronBase {
+public:	
+	void serialize() {
+		begin() << "Constants: "   << c << ", " \
+				<< "State: "       << s << ", " \
+			    << "ActFunction: " << act_f << end();
+	}
+protected:
+	
 	State s;
     Constants c;
 };
