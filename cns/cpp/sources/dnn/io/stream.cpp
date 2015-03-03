@@ -14,7 +14,7 @@ void Stream::writeObject(SerializableBase *b) {
 		cerr << "Stream isn't open in output mode. Need output stream\n";
 		terminate();
 	}
-	
+
 	vector<NamedMessage> messages = b->getSerialized();
 	Protos::ClassName cl;
 	cl.set_class_name(b->name());
@@ -26,11 +26,11 @@ void Stream::writeObject(SerializableBase *b) {
 		Value sub_o(kObjectType);
 		for(auto &m: messages) {
 			Document *sub_d = Json::parseProtobuf(m.second);
-			sub_o.AddMember(StringRef(m.first.c_str()), *sub_d, d.GetAllocator());			
+			sub_o.AddMember(StringRef(m.first.c_str()), *sub_d, d.GetAllocator());
 		}
 		o.AddMember(StringRef(cl.class_name().c_str()), sub_o, d.GetAllocator());
 
-		(*_output_str) << Json::stringify(o);			
+		(*_output_str) << Json::stringify(o);
 	} else
 	if(getRepr() == Binary) {
 		writeBinaryMessage(&cl, _output_str);
@@ -44,7 +44,7 @@ void Stream::writeObject(SerializableBase *b) {
 
 }
 
-#define P(condition) {if(!condition) { printf( "\n FAILURE in %s, line %d\n", __FILE__, __LINE__ );exit( 1 );}} 
+#define P(condition) {if(!condition) { printf( "\n FAILURE in %s, line %d\n", __FILE__, __LINE__ );exit( 1 );}}
 
 SerializableBase* Stream::readObject() {
 	if(!isInput()) {
@@ -53,12 +53,11 @@ SerializableBase* Stream::readObject() {
 	}
 	Protos::ClassName cl;
 	P(readBinaryMessage(&cl, _input_str));
-	
+
 	assert(cl.has_size());
 	SerializableBase* o = Factory::inst().createObject(cl.class_name());
-	
+
 	vector<NamedMessage> messages;
-	
 	for(size_t i=0; i<cl.size(); ++i) {
 		Protos::ClassName sub_cl;
 		P(readBinaryMessage(&sub_cl, _input_str));
@@ -68,7 +67,7 @@ SerializableBase* Stream::readObject() {
 		P(readBinaryMessage(m, _input_str));
 		messages.push_back( NamedMessage(sub_o->name(), m) );
 	}
-
+	std::reverse(messages.begin(), messages.end());
 	o->getDeserialized(messages);
 
 	return o;

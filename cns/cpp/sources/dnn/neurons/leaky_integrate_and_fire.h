@@ -12,7 +12,7 @@ namespace dnn {
 struct LeakyIntegrateAndFireC : public Serializable<Protos::LeakyIntegrateAndFireC> {
     LeakyIntegrateAndFireC() : R(1.0), C(50.0) {}
 
-    void serialize() {
+    void serial_process() {
         begin() << "R: " << R << ", " << "C: " << C << end();
     }
 
@@ -25,7 +25,7 @@ struct LeakyIntegrateAndFireC : public Serializable<Protos::LeakyIntegrateAndFir
 struct LeakyIntegrateAndFireState : public Serializable<Protos::LeakyIntegrateAndFireState>  {
     LeakyIntegrateAndFireState() : p(0.0), u(0.0), fired(false) {}
 
-    void serialize() {
+    void serial_process() {
         begin() << "p: "       << p << ", " \
                 << "u: "       << u << ", " \
                 << "fired: "   << fired << end();
@@ -44,7 +44,7 @@ public:
     }
 
     void reset() {
-        s.p = 5.0;
+        s.p = 0.0;
         s.u = 0.0;
     }
 

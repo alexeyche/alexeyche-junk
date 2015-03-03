@@ -25,7 +25,7 @@ public:
     }
 
     SerializableBase* createObject(string name);
-    
+
     SpikeNeuronBase* createSpikeNeuron(string name);
     ActFunctionBase* createActFunction(string name);
     static Factory& inst();

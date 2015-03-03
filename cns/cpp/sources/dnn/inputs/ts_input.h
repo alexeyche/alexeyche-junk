@@ -9,7 +9,7 @@ namespace dnn {
 struct TSInputC : public Serializable<Protos::TSInputC> {
     double dt;
 
-    void serialize() {
+    void serial_process() {
         //acquire(str) << "dt: " << dt << Self::End;
     }
 };
@@ -18,7 +18,7 @@ struct TSInputC : public Serializable<Protos::TSInputC> {
 struct TSInputState : public Serializable<Protos::TSInputState> {
     size_t index;
 
-    void serialize() {
+    void serial_process() {
         //acquire(str) << "index: " << index << Self::End;
     }
 };

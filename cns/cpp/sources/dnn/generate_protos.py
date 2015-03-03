@@ -43,7 +43,7 @@ def parseSources(src):
                         curly_counter += l.count("{")
                         curly_counter -= l.count("}")
                         if len(struct) == 0:
-                            m = re.match("(?:class|struct)[\W]+([^ ]+)", l)
+                            m = re.match("[\W]*(?:class|struct)[\W]+([^ ]+)", l)
                             if not m:
                                 raise Exception("Can't parse GENERATE_PROTO class or struct")
                             struct['name'] = m.group(1)                            

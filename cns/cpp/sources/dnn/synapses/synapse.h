@@ -1,5 +1,7 @@
 #pragma once
 
+#include <dnn/io/serialize.h>
+
 namespace dnn {
 
 
@@ -9,7 +11,7 @@ struct SynapseInterface {
 };
 
 
-class SynapseBase {
+class SynapseBase : public SerializableBase {
 public:
 	typedef SynapseInterface interface;
 

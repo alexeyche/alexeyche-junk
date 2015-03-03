@@ -10,7 +10,7 @@ namespace dnn {
 struct DetermC : public Serializable<Protos::DetermC> {
     DetermC() : treshold(15.0) {}
 
-    void serialize() {
+    void serial_process() {
         begin() << "treshold: " << treshold << end();
     }
 

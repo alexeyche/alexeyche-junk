@@ -35,7 +35,7 @@ public:
 
 template <typename Constants>
 class ActFunction : public ActFunctionBase {
-	void serialize() {
+	void serial_process() {
 		begin() << "Constants: " << c << end();
 	}
 protected:

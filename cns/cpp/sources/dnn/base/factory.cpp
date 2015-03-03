@@ -26,7 +26,7 @@ Factory& Factory::inst() {
 #define REG_TYPE_WITH_CONST(name) \
 	registerType<name>(#name);\
 	registerType<name##C>(string(#name) + string("C"));\
-	
+
 #define REG_TYPE_WITH_STATE_AND_CONST(name) \
 	registerType<name>(#name);\
 	registerType<name##C>(string(#name) + string("C"));\
@@ -36,15 +36,20 @@ Factory& Factory::inst() {
 Factory::Factory() {
 	REG_TYPE_WITH_STATE_AND_CONST(LeakyIntegrateAndFire);
 	REG_TYPE_WITH_CONST(Determ);
+	REG_TYPE(SpikeNeuronInfo);
 }
 
 Factory::~Factory() {
-	for(auto o: objects) {
+	for(auto &o: objects) {
 		delete o;
 	}
 }
 
 SerializableBase* Factory::createObject(string name) {
+	if(typemap.find(name) == typemap.end()) {
+		cerr << "Failed to find method to construct type " << name << "\n";
+		terminate();
+	}
 	SerializableBase* o = typemap[name]();
 	objects.push_back(o);
 	return o;

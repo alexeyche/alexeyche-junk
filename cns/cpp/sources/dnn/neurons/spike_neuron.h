@@ -39,8 +39,8 @@ public:
 
 	// void setLearningRule(LearningRule *_lrule) { lrule = _lrule; }
 	void setActFunction(ActFunctionBase *_act_f) { act_f.set(_act_f); }
-	
-protected:	
+
+protected:
 	vector<InterfacedPtr<SynapseBase>> syns;
 
 	InterfacedPtr<ActFunctionBase> act_f;
@@ -51,17 +51,47 @@ protected:
 
 };
 
+/*@GENERATE_PROTO@*/
+struct SpikeNeuronInfo : public Serializable<Protos::SpikeNeuronInfo> {
+	void serial_process() {
+		cout << "here0\n";
+		begin() << "num_of_synapses: " << num_of_synapses << ", "\
+				<< "act_function_is_set: " << act_function_is_set << end();
+		cout << "here1\n";
+	}
+
+	size_t num_of_synapses;
+	bool act_function_is_set;
+};
 
 template <typename Constants, typename State>
 class SpikeNeuron : public SpikeNeuronBase {
-public:	
-	void serialize() {
-		begin() << "Constants: "   << c << ", " \
-				<< "State: "       << s << ", " \
-			    << "ActFunction: " << act_f << end();
+public:
+	SpikeNeuronInfo getInfo() {
+		SpikeNeuronInfo info;
+		info.num_of_synapses = syns.size();
+		info.act_function_is_set = act_f.isSet();
+		return info;
+	}
+
+	void serial_process() {
+		SpikeNeuronInfo info;
+		if(mode == ProcessingOutput) {
+			info = getInfo();
+		}
+		begin() << "SpikeNeuronInfo: "   << info  << ", " \
+				<< "Constants: "   		 << c 	  << ", " \
+				<< "State: "       		 << s;
+		if (info.act_function_is_set) {
+			(*this) << "ActFunction: " << act_f;
+		}
+		for(size_t i=0; i<info.num_of_synapses; ++i) {
+			(*this) << "Synapse: " << s;
+		}
+		end();
 	}
 protected:
-	
+	SpikeNeuronInfo info;
 	State s;
     Constants c;
 };
