@@ -36,7 +36,7 @@ public:
 template <typename Constants>
 class ActFunction : public ActFunctionBase {
 	void serial_process() {
-		begin() << "Constants: " << c << end();
+		begin() << "Constants: " << c << Self::end;
 	}
 protected:
 	Constants c;

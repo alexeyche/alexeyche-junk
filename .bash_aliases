@@ -27,6 +27,12 @@ alias ya="/home/alexeyche/wd/arc/arcadia/devtools/ya/ya"
 alias cb='if readlink -f . | grep -Eq "build$"; then rm -rf ./*; else echo "This folder doesnt look like build directory"; fi'
 alias sl='screen -list'
 alias sr='screen -r'
+
+export CC=/usr/bin/clang
+export CXX=/usr/bin/clang++
+alias inst="sudo apt-get install"
+alias list_sources='find ./ -name "*.c" -o -name "*.h" -o -name "*.cpp" -o -name "*.hpp" | sed "s|^./||g" | sort'
+
 # ---------------
 # Common
 alias vim_ro='vim -R'

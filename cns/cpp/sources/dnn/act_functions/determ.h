@@ -11,7 +11,7 @@ struct DetermC : public Serializable<Protos::DetermC> {
     DetermC() : treshold(15.0) {}
 
     void serial_process() {
-        begin() << "treshold: " << treshold << end();
+        begin() << "treshold: " << treshold << Self::end;
     }
 
 

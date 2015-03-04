@@ -54,10 +54,8 @@ protected:
 /*@GENERATE_PROTO@*/
 struct SpikeNeuronInfo : public Serializable<Protos::SpikeNeuronInfo> {
 	void serial_process() {
-		cout << "here0\n";
 		begin() << "num_of_synapses: " << num_of_synapses << ", "\
-				<< "act_function_is_set: " << act_function_is_set << end();
-		cout << "here1\n";
+				<< "act_function_is_set: " << act_function_is_set << Self::end;
 	}
 
 	size_t num_of_synapses;
@@ -88,7 +86,7 @@ public:
 		for(size_t i=0; i<info.num_of_synapses; ++i) {
 			(*this) << "Synapse: " << s;
 		}
-		end();
+		(*this) << Self::end;
 	}
 protected:
 	SpikeNeuronInfo info;
