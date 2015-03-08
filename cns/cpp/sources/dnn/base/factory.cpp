@@ -45,6 +45,11 @@ Factory::~Factory() {
 	}
 }
 
+void Factory::deleteLast() {
+	delete objects.back();
+	objects.pop_back();
+}
+
 SerializableBase* Factory::createObject(string name) {
 	if(typemap.find(name) == typemap.end()) {
 		cerr << "Failed to find method to construct type " << name << "\n";

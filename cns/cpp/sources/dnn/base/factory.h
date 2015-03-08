@@ -25,6 +25,7 @@ public:
     }
 
     SerializableBase* createObject(string name);
+    void deleteLast();
 
     SpikeNeuronBase* createSpikeNeuron(string name);
     ActFunctionBase* createActFunction(string name);
