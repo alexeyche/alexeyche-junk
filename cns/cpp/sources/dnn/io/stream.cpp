@@ -46,32 +46,14 @@ void Stream::reader(vector<ProtoMessage> &messages) {
 	Protos::ClassName *cl = new Protos::ClassName;
 	P(readBinaryMessage(cl, _input_str));
 	
-	cout << "Read " << cl->GetTypeName() << "\n";
-	cout << cl->DebugString();
-	cout << "==================\n";
-	
 	messages.push_back(cl);
 	
 	if(cl->has_proto()) {
-		Protos::ClassName *sub_cl = new Protos::ClassName;
-		P(readBinaryMessage(sub_cl, _input_str));
-		
-		cout << "Read " << sub_cl->GetTypeName() << "\n";
-		cout << sub_cl->DebugString();
-		cout << "==================\n";
-
-		SerializableBase *o = Factory::inst().createObject(sub_cl->class_name());
+		SerializableBase *o = Factory::inst().createObject(cl->class_name());
 		
 		ProtoMessage pr = o->newProto();
-		
 		P(readBinaryMessage(pr, _input_str));		
-	
-		cout << "Read " << pr->GetTypeName() << "\n";
-		cout << pr->DebugString();
-		cout << "==================\n";
-
 		messages.push_back(pr);
-
 		Factory::inst().deleteLast();
 	}
 
@@ -91,9 +73,17 @@ SerializableBase* Stream::readObject() {
 	cout << "=============================\n===============================\n";
 	vector<ProtoMessage> messages;
 	reader(messages);
+	for(auto &m: messages) {
+		cout << "========================\n";
+		cout << m->GetTypeName() << "\n";
+		cout << m->DebugString();
+	}
+	assert(messages.size()>0);
+	Protos::ClassName *head = SerializableBase::getHeader(messages);
 
-
-	return nullptr;
+	SerializableBase *o = Factory::inst().createObject(head->class_name());
+	o->getDeserialized(messages);
+	return o;
 }
 
 

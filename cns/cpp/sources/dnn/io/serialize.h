@@ -47,6 +47,22 @@ public:
         copy_m->CopyFrom(*m);
         return copy_m;
     }
+    static Protos::ClassName* getHeader(vector<ProtoMessage> &messages) {
+        if(messages.size() == 0) {
+            cerr << "Trying to get header from empty messages stack\n";
+            terminate();
+        }
+        Protos::ClassName *head = dynamic_cast<Protos::ClassName*>(messages[0]);
+        if(!head) {
+            cerr << "There is no header on the top of the stack\n";
+            terminate();
+        }
+        return head;
+    }
+
+    Protos::ClassName* getHeader() {
+        return getHeader(messages);
+    }
 
     SerializableBase& begin() {
         if(mode == ProcessingOutput) {
@@ -58,6 +74,14 @@ public:
             header->set_size(0);
 
             messages.push_back(header);
+        }
+        if(mode == ProcessingInput) {
+            Protos::ClassName *head = getHeader();
+            if(name() != head->class_name()) {
+                cerr << "Error while deserializing. Wrong class name header: " << name() << " != " << head->class_name() << "\n";
+                terminate();
+            }
+            deleteLastMessage();
         }
         return *this;
     }
@@ -77,7 +101,9 @@ public:
             }
         } else
         if(mode == ProcessingInput) {
+
             b.getDeserialized(messages);
+            cout << "Deleting " << lastMessage()->GetTypeName() << "\n";
             deleteLastMessage();
         }
 
@@ -239,8 +265,6 @@ public:
 
     void operator << (EndMarker e) {
        if(mode == ProcessingInput) {
-            cout << "Deleting " << lastMessage()->GetTypeName() << "\n";
-            deleteLastMessage();
         } 
     }
 
@@ -250,8 +274,9 @@ public:
             while(messages.size()>0) deleteLastMessage();
 
             header = new Protos::ClassName;
-            header->set_has_proto(true);
+
             header->set_class_name(name());
+            header->set_has_proto(true);
             header->set_size(0);
             
             messages.push_back(header);
@@ -259,6 +284,14 @@ public:
             ProtoMessage mess = new Proto;
             
             messages.push_back(mess);
+        }
+        if(mode == ProcessingInput) {
+            Protos::ClassName *head = getHeader();
+            if(name() != head->class_name()) {
+                cerr << "Error while deserializing. Wrong class name header: " << name() << " != " << head->class_name() << "\n";
+                terminate();
+            }
+            deleteLastMessage();
         }
         return *this;
     }
