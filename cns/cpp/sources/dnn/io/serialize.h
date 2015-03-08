@@ -157,7 +157,7 @@ template <typename Proto>
 class Serializable : public SerializableBase {
 public:
     #define ASSERT_FIELDS() \
-    if((!messages.size() != 0)||(!field_descr)) {\
+    if((messages.size() == 0)||(!field_descr)) {\
         cerr << "Wrong using of Serializable class.\n"; \
         terminate(); \
     }\

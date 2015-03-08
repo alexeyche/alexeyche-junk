@@ -1,5 +1,13 @@
 package Protos;
 
+message TSInputC {
+    required double dt = 1;
+}
+
+message TSInputState {
+    required uint32 index = 1;
+}
+
 message LeakyIntegrateAndFireC {
     required double R = 1;
     required double C = 2;
@@ -14,14 +22,6 @@ message LeakyIntegrateAndFireState {
 message SpikeNeuronInfo {
     required uint32 num_of_synapses = 1;
     required bool act_function_is_set = 2;
-}
-
-message TSInputC {
-    required double dt = 1;
-}
-
-message TSInputState {
-    required uint32 index = 1;
 }
 
 message DetermC {
