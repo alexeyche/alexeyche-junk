@@ -49,7 +49,7 @@ public:
         if(_input_str) return true;
         return false;
     }
-     istream& getInputStream() {
+    istream& getInputStream() {
         if(_input_str) return *_input_str;
         cerr << "Stream is wrongly opened or used\n";
         terminate();
@@ -62,7 +62,7 @@ public:
 
     void writeObject(SerializableBase *b);
     SerializableBase* readObject();
-
+    void reader(vector<ProtoMessage> &messages);
     Repr getRepr() {
         return r;
     }
