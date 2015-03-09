@@ -80,7 +80,7 @@ public:
 			return;
 		}
 		
-		(this*) << "State: " << s;
+		(*this) << "State: " << s;
 		
 		if(messages->size() == 0) { 
 			(*this) << Self::end; 
@@ -92,7 +92,7 @@ public:
 			info = getInfo();
 		}
 		
-		(this*) << "SpikeNeuronInfo: "   << info  << ", " \
+		(*this) << "SpikeNeuronInfo: "   << info;
 				
 		if (info.act_function_is_set) {
 			(*this) << "ActFunction: " << act_f;
@@ -102,6 +102,7 @@ public:
 		}
 		(*this) << Self::end;
 	}
+
 protected:
 	SpikeNeuronInfo info;
 	State s;

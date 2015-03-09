@@ -6,3 +6,7 @@ message ClassName {
 	required bool has_proto = 2;
 	required uint32 size = 3;
 }
+
+message EmptyProto {
+	
+}

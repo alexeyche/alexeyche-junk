@@ -24,6 +24,8 @@ public:
     enum EndMarker { end };
 
     typedef SerializableBase Self;
+    static const bool hasProto = false;
+    typedef Protos::EmptyProto ProtoType;
 
     SerializableBase() : mode(ProcessingOutput), messages(nullptr), header(nullptr) {
 
@@ -210,6 +212,8 @@ public:
     }\
 
     typedef Serializable<Proto> Self;
+    typedef Proto ProtoType;
+    static const bool hasProto = true;
 
     const string name() const {
         Proto _fake_m;

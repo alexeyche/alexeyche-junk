@@ -13,6 +13,7 @@
 namespace dnn {
 
 Factory::entity_map_type Factory::typemap;
+Factory::proto_map_type Factory::prototypemap;
 
 Factory& Factory::inst() {
     static Factory _inst;
@@ -41,6 +42,9 @@ Factory::Factory() {
 
 Factory::~Factory() {
 	for(auto &o: objects) {
+		delete o;
+	}
+	for(auto &o: proto_objects) {
 		delete o;
 	}
 }
@@ -80,6 +84,14 @@ ActFunctionBase* Factory::createActFunction(string name) {
 	return p;
 }
 
-
+ProtoMessage Factory::createProto(string name) {
+	if(prototypemap.find(name) == prototypemap.end()) {
+		cerr << "Failed to find method to construct proto type " << name << "\n";
+		terminate();
+	}
+	ProtoMessage o = prototypemap[name]();
+	proto_objects.push_back(o);
+	return o;	
+}
 
 }

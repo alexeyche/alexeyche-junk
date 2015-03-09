@@ -54,26 +54,22 @@ void Stream::protoReader(vector<ProtoMessage> &messages) {
 	messages.push_back(cl);
 	
 	if(cl->has_proto()) {
-		SerializableBase *o = Factory::inst().createObject(cl->class_name());
-		
-		ProtoMessage pr = o->newProto();
+		ProtoMessage pr = Factory::inst().createProto(cl->class_name());
 		P(readBinaryMessage(pr, _input_str));		
 		messages.push_back(pr);
-		Factory::inst().deleteLast();
 	}
 
 	for(size_t i=0; i<cl->size(); ++i) {
-		reader(messages);
+		protoReader(messages);
 	}
 
 }
 
 void Stream::jsonReader(Value &v, vector<ProtoMessage> &messages) {
-	
 	// json to protobuf
 	for (Value::ConstMemberIterator itr = v.MemberBegin(); itr != v.MemberEnd(); ++itr) {
 		Protos::ClassName *cl = new Protos::ClassName;
-		cl.set_class_name(itr->name.GetString());
+		cl->set_class_name(itr->name.GetString());
 	}
 	
 }
@@ -89,7 +85,7 @@ SerializableBase* Stream::readObject() {
 	}
 	if(r == Text) {
 		Document document;
-		std::string jstr((std::istreambuf_iterator<char>(_input_str)), std::istreambuf_iterator<char>());
+		std::string jstr((std::istreambuf_iterator<char>(*_input_str)), std::istreambuf_iterator<char>());
 
 		document.Parse(jstr.c_str());
 

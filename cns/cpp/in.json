@@ -1,0 +1,14 @@
+{
+    "LeakyIntegrateAndFire" : {
+        "R" : 1.0,
+        "C" : 10
+    },
+    "LeakyIntegrateAndFire" : {
+        "LeakyIntegrateAndFireC" : {
+            "R" : 1.0,
+            "C" : 10
+        }            
+    }
+}    
+
+

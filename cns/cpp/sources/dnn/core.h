@@ -12,6 +12,8 @@
 #include <fstream>
 #include <cmath>
 #include <algorithm>
+#include <google/protobuf/message.h>
+typedef google::protobuf::Message* ProtoMessage;
 
 using std::map;
 using std::cout;
