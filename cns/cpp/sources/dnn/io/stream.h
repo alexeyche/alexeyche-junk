@@ -62,7 +62,8 @@ public:
 
     void writeObject(SerializableBase *b);
     SerializableBase* readObject();
-    void reader(vector<ProtoMessage> &messages);
+    void protoReader(vector<ProtoMessage> &messages);
+    void jsonReader(Value &v, vector<ProtoMessage> &messages);
     Repr getRepr() {
         return r;
     }

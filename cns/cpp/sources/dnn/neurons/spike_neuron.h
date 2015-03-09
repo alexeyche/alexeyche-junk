@@ -73,13 +73,27 @@ public:
 	}
 
 	void serial_process() {
+		begin() << "Constants: " << c;
+		
+		if(messages->size() == 0) { 
+			(*this) << Self::end; 
+			return;
+		}
+		
+		(this*) << "State: " << s;
+		
+		if(messages->size() == 0) { 
+			(*this) << Self::end; 
+			return;
+		}
+
 		SpikeNeuronInfo info;
 		if(mode == ProcessingOutput) {
 			info = getInfo();
 		}
-		begin() << "SpikeNeuronInfo: "   << info  << ", " \
-				<< "Constants: "   		 << c 	  << ", " \
-				<< "State: "       		 << s;
+		
+		(this*) << "SpikeNeuronInfo: "   << info  << ", " \
+				
 		if (info.act_function_is_set) {
 			(*this) << "ActFunction: " << act_f;
 		}
