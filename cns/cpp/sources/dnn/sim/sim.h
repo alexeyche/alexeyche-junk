@@ -19,11 +19,12 @@ public:
 		// }
 		{
 			ifstream f("../in.json");
-			
-        
 			Stream s(f, Stream::Text);
 			SerializableBase* b = s.readObject();
+			SerializableBase* b2 = s.readObject();
+			
 			Stream(cout, Stream::Text).writeObject(b);
+			Stream(cout, Stream::Text).writeObject(b2);
 		}
 
 		//cout <<

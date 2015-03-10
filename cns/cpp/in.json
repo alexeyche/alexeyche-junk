@@ -1,6 +1,6 @@
 {
     "LeakyIntegrateAndFire" : {
-        "R" : 1.0,
+        "R" : 100.0,
         "C" : 10
     },
     "LeakyIntegrateAndFire" : {

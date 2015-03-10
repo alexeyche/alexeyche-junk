@@ -91,9 +91,10 @@ public:
 		return string(buffer.GetString());
 	}
 	static Document* parseProtobuf(google::protobuf::Message* mess) {
-		rapidjson::Value* v = pbjson::pb2jsonobject(mess);
+		Document *document = new Document;
+		rapidjson::Value* v = pbjson::pb2jsonobject(mess, document->GetAllocator());
         string str = Json::stringify(*v); // hack, because of bad library pbjson        
-        Document *document = new Document;
+        
         document->Parse(str.c_str());
         return document;
 	}

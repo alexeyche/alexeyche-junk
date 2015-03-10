@@ -31,7 +31,9 @@ public:
             prototypemap[type] = &createProtoInstance<typename T::ProtoType>;
         }
     }
-    
+    bool isProtoType(const string name) {
+        return prototypemap.find(name) != prototypemap.end();
+    }
 
     SerializableBase* createObject(string name);
     ProtoMessage createProto(string name);

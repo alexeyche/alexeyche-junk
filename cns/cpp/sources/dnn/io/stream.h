@@ -17,7 +17,7 @@ class Stream {
 public:
     enum Repr { Binary, Text };
 
-    Stream(istream &str, Repr _r = Binary) : _input_str(&str), r(_r), _output_str(nullptr), zeroOut(nullptr), codedOut(nullptr) {
+    Stream(istream &str, Repr _r = Binary) : _input_str(&str), r(_r), _output_str(nullptr), zeroOut(nullptr), codedOut(nullptr),zeroIn(nullptr), codedIn(nullptr) {
         if((_input_str)&&(!_input_str->good())) {
             cerr << "Input filestream isn't open\n";
             terminate();
@@ -27,11 +27,17 @@ public:
             codedIn = new CodedInputStream(zeroIn);
             codedIn->SetTotalBytesLimit(300.0 * 1024 * 1024,300.0 * 1024 * 1024);
         }
+        if(r == Text) {
+            string jstr((std::istreambuf_iterator<char>(*_input_str)), std::istreambuf_iterator<char>());
+            document = Json::parseString(jstr);
+            assert(document.IsObject());
+            iterator = document.MemberBegin();
+        }
 
 
 
     }
-    Stream(ostream &str, Repr _r = Binary) : _output_str(&str), r(_r), _input_str(nullptr), zeroIn(nullptr), codedIn(nullptr) {
+    Stream(ostream &str, Repr _r = Binary) : _output_str(&str), r(_r), _input_str(nullptr), zeroIn(nullptr), codedIn(nullptr), zeroOut(nullptr), codedOut(nullptr) {
         if((_output_str)&&(!_output_str->good())) {
             cerr << "Output filestream isn't open\n";
             terminate();
@@ -69,7 +75,7 @@ public:
     void writeObject(SerializableBase *b);
     SerializableBase* readObject();
     void protoReader(vector<ProtoMessage> &messages);
-    void jsonReader(Value &v, vector<ProtoMessage> &messages);
+    void jsonReader(string name, const Value &v, vector<ProtoMessage> &messages);
     Repr getRepr() {
         return r;
     }
@@ -108,6 +114,8 @@ private:
     CodedInputStream *codedIn;
 
     Repr r;
+    Document document;
+    Value::ConstMemberIterator iterator;
 };
 
 }

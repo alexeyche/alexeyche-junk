@@ -44,9 +44,6 @@ Factory::~Factory() {
 	for(auto &o: objects) {
 		delete o;
 	}
-	for(auto &o: proto_objects) {
-		delete o;
-	}
 }
 
 void Factory::deleteLast() {
@@ -70,7 +67,6 @@ ProtoMessage Factory::createProto(string name) {
 		terminate();
 	}
 	ProtoMessage o = prototypemap[name]();
-	proto_objects.push_back(o);
 	return o;	
 }
 
