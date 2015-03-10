@@ -5,7 +5,6 @@
 #include <dnn/contrib/rapidjson/stringbuffer.h>
 #include <dnn/contrib/rapidjson/prettywriter.h>
 #include <dnn/contrib/rapidjson/filestream.h>
-#include <dnn/contrib/rapidjson/error/en.h>
 
 #include <dnn/util/distributions.h>
 #include <dnn/util/json.h>
@@ -86,25 +85,8 @@ struct Constants : public Printable {
 		std::string const_json((std::istreambuf_iterator<char>(ifs)),
                  std::istreambuf_iterator<char>());
 		
-		Document document;
-
+		Document document = Json::parseString(const_json);
 		
-		document.Parse(const_json.c_str());
-		
-		if(document.HasParseError()) {
-			vector<string> spl = split(const_json, '\n');
-			int offset = document.GetErrorOffset();
-			size_t line_num = 0;
-			while(line_num < spl.size()) {
-				cout << line_num+1 << ": " <<  spl[line_num]  << "\n";
-				if( (offset - (int)spl[line_num].size())<0 ) { cout << " == somewhere in that structure an error\n"; break; }
-				offset -= spl[line_num].size();
-				line_num++;
-			}
-			cerr << "Parse JSON error:\n";
-			cerr << GetParseError_En(document.GetParseError()) << line_num+1 << ":" << offset << "\n";
-			terminate();
-		}
 
 		fill(Json::getVal(document, "neurons"), neurons);
 		fill(Json::getVal(document, "act_functions"), act_functions);

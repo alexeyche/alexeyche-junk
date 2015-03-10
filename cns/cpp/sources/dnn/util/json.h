@@ -4,6 +4,8 @@
 #include <dnn/contrib/pbjson/pbjson.hpp>
 #include <dnn/contrib/rapidjson/stringbuffer.h>
 #include <dnn/contrib/rapidjson/prettywriter.h>
+#include <dnn/contrib/rapidjson/error/en.h>
+
 #include <google/protobuf/message.h>
 
 
@@ -95,7 +97,27 @@ public:
         document->Parse(str.c_str());
         return document;
 	}
+	static Document parseString(const string p) {
+		Document document;
 
+		document.Parse(p.c_str());
+		
+		if(document.HasParseError()) {
+			vector<string> spl = split(p, '\n');
+			int offset = document.GetErrorOffset();
+			size_t line_num = 0;
+			while(line_num < spl.size()) {
+				cout << line_num+1 << ": " <<  spl[line_num]  << "\n";
+				if( (offset - (int)spl[line_num].size())<0 ) { cout << " == somewhere in that structure an error\n"; break; }
+				offset -= spl[line_num].size();
+				line_num++;
+			}
+			cerr << "Parse JSON error:\n";
+			cerr << GetParseError_En(document.GetParseError()) << line_num+1 << ":" << offset << "\n";
+			terminate();
+		}
+		return document;
+	}
 };
 
 }

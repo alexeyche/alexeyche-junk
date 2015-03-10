@@ -64,6 +64,17 @@ SerializableBase* Factory::createObject(string name) {
 	return o;
 }
 
+ProtoMessage Factory::createProto(string name) {
+	if(prototypemap.find(name) == prototypemap.end()) {
+		cerr << "Failed to find method to construct proto type " << name << "\n";
+		terminate();
+	}
+	ProtoMessage o = prototypemap[name]();
+	proto_objects.push_back(o);
+	return o;	
+}
+
+
 SpikeNeuronBase* Factory::createSpikeNeuron(string name) {
 	SerializableBase *b = createObject(name);
 	SpikeNeuronBase *p = dynamic_cast<SpikeNeuronBase*>(b);
@@ -84,14 +95,5 @@ ActFunctionBase* Factory::createActFunction(string name) {
 	return p;
 }
 
-ProtoMessage Factory::createProto(string name) {
-	if(prototypemap.find(name) == prototypemap.end()) {
-		cerr << "Failed to find method to construct proto type " << name << "\n";
-		terminate();
-	}
-	ProtoMessage o = prototypemap[name]();
-	proto_objects.push_back(o);
-	return o;	
-}
 
 }

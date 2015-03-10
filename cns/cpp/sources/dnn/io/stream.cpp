@@ -67,27 +67,43 @@ void Stream::protoReader(vector<ProtoMessage> &messages) {
 
 void Stream::jsonReader(Value &v, vector<ProtoMessage> &messages) {
 	// json to protobuf
+
+	bool has_object = false;
 	for (Value::ConstMemberIterator itr = v.MemberBegin(); itr != v.MemberEnd(); ++itr) {
+		if(itr->value.IsObject()) {
+			for (Value::ConstMemberIterator itr = v.MemberBegin(); itr != v.MemberEnd(); ++itr) {
+			}
+			has_object = true;
+		}
+		cout << itr->name.GetString() << " " <<  << "\n";
+		//Protos::ClassName *cl = new Protos::ClassName;
+		//cl->set_class_name(itr->name.GetString());
+	}
+	if(!has_object) {
 		Protos::ClassName *cl = new Protos::ClassName;
 		cl->set_class_name(itr->name.GetString());
+			
 	}
 	
 }
 
 SerializableBase* Stream::readObject() {
+
 	if(!isInput()) {
 		cerr << "Stream isn't open in input mode. Need input stream\n";
 		terminate();
 	}
+
 	vector<ProtoMessage> messages;
 	if(r == Binary) {
 		protoReader(messages);
 	}
 	if(r == Text) {
-		Document document;
-		std::string jstr((std::istreambuf_iterator<char>(*_input_str)), std::istreambuf_iterator<char>());
+		string jstr((std::istreambuf_iterator<char>(*_input_str)), std::istreambuf_iterator<char>());
 
-		document.Parse(jstr.c_str());
+		Document document = Json::parseString(jstr);
+		
+		Json::stringify(document);
 
 		jsonReader(document, messages);
 	}

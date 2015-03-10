@@ -22,9 +22,13 @@ public:
             cerr << "Input filestream isn't open\n";
             terminate();
         }
-        zeroIn = new IstreamInputStream(_input_str);
-        codedIn = new CodedInputStream(zeroIn);
-        codedIn->SetTotalBytesLimit(300.0 * 1024 * 1024,300.0 * 1024 * 1024);
+        if(r == Binary) {        
+            zeroIn = new IstreamInputStream(_input_str);
+            codedIn = new CodedInputStream(zeroIn);
+            codedIn->SetTotalBytesLimit(300.0 * 1024 * 1024,300.0 * 1024 * 1024);
+        }
+
+
 
     }
     Stream(ostream &str, Repr _r = Binary) : _output_str(&str), r(_r), _input_str(nullptr), zeroIn(nullptr), codedIn(nullptr) {
@@ -32,8 +36,10 @@ public:
             cerr << "Output filestream isn't open\n";
             terminate();
         }
-        zeroOut = new OstreamOutputStream(_output_str);
-        codedOut = new CodedOutputStream(zeroOut);
+        if(r == Binary) {
+            zeroOut = new OstreamOutputStream(_output_str);
+            codedOut = new CodedOutputStream(zeroOut);
+        }
     }
     ~Stream() {
         if(codedIn)  delete codedIn;
@@ -90,7 +96,6 @@ public:
         codedOut->WriteVarint32(size);
         mess->SerializeToCodedStream(codedOut);
     }
-
 
 private:
     istream *_input_str;

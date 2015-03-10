@@ -12,14 +12,16 @@ public:
 		lif->setActFunction(act);
 		lif->reset();
 
+		// {
+		// 	ofstream f("out.pb");
+		// 	Stream s(f, Stream::Binary);
+		// 	s.writeObject(lif);
+		// }
 		{
-			ofstream f("out.pb");
-			Stream s(f, Stream::Binary);
-			s.writeObject(lif);
-		}
-		{
-			ifstream f("in.pb");
-			Stream s(f, Stream::Binary);
+			ifstream f("../in.json");
+			
+        
+			Stream s(f, Stream::Text);
 			SerializableBase* b = s.readObject();
 			Stream(cout, Stream::Text).writeObject(b);
 		}
