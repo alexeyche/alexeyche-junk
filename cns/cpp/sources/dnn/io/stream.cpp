@@ -27,13 +27,7 @@ void Stream::writeObject(SerializableBase *b) {
 		Value o(kObjectType);
 		Value sub_o(kObjectType);
 		for(auto &m: messages) {
-			cout << "============\n";
-			cout << m->DebugString() << "\n";
-			cout << "==============\n";
 			Document *sub_d = Json::parseProtobuf(m);
-			cout << "============\n";
-			cout << Json::stringify(*sub_d) << "\n";
-			cout << "==============\n";
 			buff.push_back(m->GetTypeName());
 			sub_o.AddMember(StringRef(buff.back().c_str()), *sub_d, d.GetAllocator());
 		}
