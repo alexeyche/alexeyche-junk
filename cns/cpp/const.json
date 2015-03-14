@@ -1,4 +1,9 @@
 {
+    "inputs" : {
+        "InputTimeSeries" : {
+            "dt" : 2.0,
+        }
+    },
     "neurons" : {
         "LeakyIntegrateAndFire" : {
             "R" : 1.0,
@@ -22,16 +27,23 @@
                 "size" : 50,
                 "neuron" : "LeakyIntegrateAndFire",
                 "act_function" : "Determ",
-                "axon_delay_distr" : "Exp(0,0)"
+                "axon_delay" : "Exp(12,5)",
+                "input" : "InputTimeSeries"
             }
         ],
         "conn_map" : {
             "0->0" : [
-                { "prob" : 0.5, "weight_distr" : "Norm(10.6, 0.1)", "synapse" : "StaticSynapse", "dendrite_delay_distr" : "Exp(0,0)" }
+                { "prob" : 0.5, "start_weight" : "Norm(10.6, 0.1)", "synapse" : "StaticSynapse", "dendrite_delay" : 0 }
             ]
         },
         "dt" : 1.0,
         "seed" : -1,
-        "neurons_to_listen" : [25]
+        "neurons_to_listen" : [25],
+        "files" : {
+            "InputTimeSeries" : {
+                "filename" : "/home/alexeyche/prog/sim/ts/synthetic_control/synthetic_control_TEST",
+                "format" : "ucr-ts"
+            }
+        }
     }
 }    

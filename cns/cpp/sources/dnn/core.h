@@ -12,6 +12,7 @@
 #include <fstream>
 #include <cmath>
 #include <algorithm>
+#include <ctime>
 #include <google/protobuf/message.h>
 typedef google::protobuf::Message* ProtoMessage;
 

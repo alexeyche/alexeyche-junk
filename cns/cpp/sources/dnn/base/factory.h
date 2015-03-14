@@ -27,7 +27,7 @@ public:
     template<typename T>
     static void registerType(const string type) {
         typemap[type] = &createInstance<T>;
-        if(T::hasProto) {
+        if (T::hasProto) {
             prototypemap[type] = &createProtoInstance<typename T::ProtoType>;
         }
     }

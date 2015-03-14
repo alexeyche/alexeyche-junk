@@ -15,9 +15,13 @@ public:
 			b.setInputModelStream(input_stream);
 		}
 
-
-		neurons = b.buildNeurons();
-		
+		neurons = b.buildNeurons();			
+	}
+	
+	void serialize(Stream &output_stream) {
+		for(auto &n : neurons) {
+			output_stream.writeObject(n.ptr());
+		}
 	}
 
 private:

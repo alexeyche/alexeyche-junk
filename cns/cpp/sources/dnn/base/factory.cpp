@@ -4,8 +4,8 @@
 #include <dnn/base/base.h>
 #include <dnn/neurons/leaky_integrate_and_fire.h>
 #include <dnn/act_functions/determ.h>
-
-
+#include <dnn/synapses/static_synapse.h>
+#include <dnn/inputs/input_time_series.h>
 #include <dnn/io/serialize.h>
 
 #include "factory.h"
@@ -16,8 +16,8 @@ Factory::entity_map_type Factory::typemap;
 Factory::proto_map_type Factory::prototypemap;
 
 Factory& Factory::inst() {
-    static Factory _inst;
-    return _inst;
+	static Factory _inst;
+	return _inst;
 }
 
 
@@ -36,12 +36,16 @@ Factory& Factory::inst() {
 
 Factory::Factory() {
 	REG_TYPE_WITH_STATE_AND_CONST(LeakyIntegrateAndFire);
-	REG_TYPE_WITH_CONST(Determ);
 	REG_TYPE(SpikeNeuronInfo);
+	REG_TYPE_WITH_STATE_AND_CONST(StaticSynapse);
+	REG_TYPE(SynapseInfo);
+	REG_TYPE_WITH_CONST(Determ);
+	REG_TYPE_WITH_STATE_AND_CONST(InputTimeSeries);
+
 }
 
 Factory::~Factory() {
-	for(auto &o: objects) {
+	for (auto &o : objects) {
 		delete o;
 	}
 }
@@ -52,7 +56,7 @@ void Factory::deleteLast() {
 }
 
 SerializableBase* Factory::createObject(string name) {
-	if(typemap.find(name) == typemap.end()) {
+	if (typemap.find(name) == typemap.end()) {
 		cerr << "Failed to find method to construct type " << name << "\n";
 		terminate();
 	}
@@ -62,21 +66,21 @@ SerializableBase* Factory::createObject(string name) {
 }
 
 ProtoMessage Factory::createProto(string name) {
-	if(prototypemap.find(name) == prototypemap.end()) {
+	if (prototypemap.find(name) == prototypemap.end()) {
 		cerr << "Failed to find method to construct proto type " << name << "\n";
 		terminate();
 	}
 	ProtoMessage o = prototypemap[name]();
-	return o;	
+	return o;
 }
 
 
 SpikeNeuronBase* Factory::createSpikeNeuron(string name) {
 	SerializableBase *b = createObject(name);
 	SpikeNeuronBase *p = dynamic_cast<SpikeNeuronBase*>(b);
-	if(!p) {
-	    cerr << "Error to cast " << b->name() << " to SpikeNeuronBase" << "\n";
-	    terminate();
+	if (!p) {
+		cerr << "Error to cast " << b->name() << " to SpikeNeuronBase" << "\n";
+		terminate();
 	}
 	return p;
 }
@@ -84,9 +88,9 @@ SpikeNeuronBase* Factory::createSpikeNeuron(string name) {
 ActFunctionBase* Factory::createActFunction(string name) {
 	SerializableBase *b = createObject(name);
 	ActFunctionBase *p = dynamic_cast<ActFunctionBase*>(b);
-	if(!p) {
-	    cerr << "Error to cast " << b->name() << " to ActFunctionBase" << "\n";
-	    terminate();
+	if (!p) {
+		cerr << "Error to cast " << b->name() << " to ActFunctionBase" << "\n";
+		terminate();
 	}
 	return p;
 }

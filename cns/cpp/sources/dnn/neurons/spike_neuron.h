@@ -5,6 +5,7 @@
 #include <dnn/util/interfaced_ptr.h>
 #include <dnn/act_functions/act_function.h>
 #include <dnn/synapses/synapse.h>
+#include <dnn/inputs/input.h>
 #include <dnn/io/serialize.h>
 
 namespace dnn {
@@ -16,11 +17,25 @@ struct SpikeNeuronInterface {
 	getDoubleDelegate getFiringProbability;
 	getBoolDelegate fired;
 };
-
+extern size_t global_neuron_index;
 
 class SpikeNeuronBase : public SerializableBase {
 public:
+	SpikeNeuronBase() {
+		_id = global_neuron_index++;
+	}
+
 	typedef SpikeNeuronInterface interface;
+
+	inline const size_t& id() {
+		return _id;
+	}
+	inline const double& axonDelay() {
+		return axon_delay;
+	}
+	void setAxonDelay(double d) {
+		axon_delay = d;
+	}
 
 	virtual void provideInterface(SpikeNeuronInterface &i) = 0;
 
@@ -32,34 +47,64 @@ public:
 	virtual const double& getFiringProbability() = 0;
 	virtual const bool& fired() = 0;
 
-	static void provideDefaultInterface(SpikeNeuronInterface &i) {
-		cerr << "No default interface for SpikeNeuron\n";
+
+	static void __calculateDynamicsDefault(const Time &t) {
+		cerr << "Calling inapropriate default interface function\n";
 		terminate();
+	}
+	static void __propagateSynapseSpikeDefault(const SynSpike &s) {
+		cerr << "Calling inapropriate default interface function\n";
+		terminate();
+	}
+	static const double& __getFiringProbabilityDefault() {
+		cerr << "Calling inapropriate default interface function\n";
+		terminate();
+	}
+	static const bool& __firedDefault() {
+		cerr << "Calling inapropriate default interface function\n";
+		terminate();
+	}
+	static void provideDefaultInterface(SpikeNeuronInterface &i) {
+		i.calculateDynamics = &SpikeNeuronBase::__calculateDynamicsDefault;
+		i.fired = &SpikeNeuronBase::__firedDefault;
+		i.getFiringProbability = &SpikeNeuronBase::__getFiringProbabilityDefault;
+		i.propagateSynapseSpike =  &SpikeNeuronBase::__propagateSynapseSpikeDefault;
 	}
 
 	// void setLearningRule(LearningRule *_lrule) { lrule = _lrule; }
 	void setActFunction(ActFunctionBase *_act_f) { act_f.set(_act_f); }
+	void setInput(InputBase *_input) { input.set(_input); }
+
+	void addSynapse(InterfacedPtr<SynapseBase> syn) {
+		syns.push_back(syn);
+	}
 
 protected:
+	size_t _id;
+	double axon_delay;
 	vector<InterfacedPtr<SynapseBase>> syns;
 
 	InterfacedPtr<ActFunctionBase> act_f;
+	InterfacedPtr<InputBase> input;
+
 	// InterfacedPtr<LearningRule> lrule;
-	// InterfacedPtr<Input> input;
 	// InterfacedPtr<TuningCurve> tc;
-
-
 };
 
 /*@GENERATE_PROTO@*/
 struct SpikeNeuronInfo : public Serializable<Protos::SpikeNeuronInfo> {
 	void serial_process() {
-		begin() << "num_of_synapses: " << num_of_synapses << ", "\
-				<< "act_function_is_set: " << act_function_is_set << Self::end;
+		begin() << "id: " << id << ", " \
+		        << "axon_delay: " << axon_delay << ", " \
+		        << "num_of_synapses: " << num_of_synapses << ", " \
+		        << "act_function_is_set: " << act_function_is_set << ", " \
+		        << "input_is_set: " << input_is_set << Self::end;
 	}
-
+	size_t id;
+	double axon_delay;
 	size_t num_of_synapses;
 	bool act_function_is_set;
+	bool input_is_set;
 };
 
 template <typename Constants, typename State>
@@ -67,38 +112,44 @@ class SpikeNeuron : public SpikeNeuronBase {
 public:
 	SpikeNeuronInfo getInfo() {
 		SpikeNeuronInfo info;
+		info.id = id();
+		info.axon_delay = axonDelay();
 		info.num_of_synapses = syns.size();
 		info.act_function_is_set = act_f.isSet();
+		info.input_is_set = input.isSet();
 		return info;
 	}
 
 	void serial_process() {
 		begin() << "Constants: " << c;
-		
-		if(messages->size() == 0) { 
-			(*this) << Self::end; 
+
+		if (messages->size() == 0) {
+			(*this) << Self::end;
 			return;
 		}
-		
+
 		(*this) << "State: " << s;
-		
-		if(messages->size() == 0) { 
-			(*this) << Self::end; 
+
+		if (messages->size() == 0) {
+			(*this) << Self::end;
 			return;
 		}
 
 		SpikeNeuronInfo info;
-		if(mode == ProcessingOutput) {
+		if (mode == ProcessingOutput) {
 			info = getInfo();
 		}
-		
+
 		(*this) << "SpikeNeuronInfo: "   << info;
-				
+
 		if (info.act_function_is_set) {
 			(*this) << "ActFunction: " << act_f;
 		}
-		for(size_t i=0; i<info.num_of_synapses; ++i) {
-			(*this) << "Synapse: " << s;
+		if (info.input_is_set) {
+			(*this) << "Input: " << input;
+		}
+		for (size_t i = 0; i < info.num_of_synapses; ++i) {
+			(*this) << "Synapse: " << syns[i];
 		}
 		(*this) << Self::end;
 	}
@@ -106,7 +157,7 @@ public:
 protected:
 	SpikeNeuronInfo info;
 	State s;
-    Constants c;
+	Constants c;
 };
 
 

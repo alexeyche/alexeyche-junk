@@ -109,7 +109,7 @@ public:
         }
         return d;
     }
-
+    vector<ProtoMessage> readObjectProtos();
     void protoReader(vector<ProtoMessage> &messages);
     void jsonReader(string name, const Value &v, vector<ProtoMessage> &messages);
     

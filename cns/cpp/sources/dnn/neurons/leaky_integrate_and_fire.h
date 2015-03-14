@@ -16,8 +16,8 @@ struct LeakyIntegrateAndFireC : public Serializable<Protos::LeakyIntegrateAndFir
         begin() << "R: " << R << ", " << "C: " << C << Self::end;
     }
 
-	double R;
-	double C;
+    double R;
+    double C;
 };
 
 
@@ -32,8 +32,8 @@ struct LeakyIntegrateAndFireState : public Serializable<Protos::LeakyIntegrateAn
     }
     bool fired;
 
-	double p;
-	double u;
+    double p;
+    double u;
 };
 
 

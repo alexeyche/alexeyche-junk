@@ -15,6 +15,16 @@ class SynapseBase : public SerializableBase {
 public:
 	typedef SynapseInterface interface;
 
+	void setIdPre(size_t _id_pre) {
+		id_pre = _id_pre;
+	}
+	void setDendriteDelay(double _dendrite_delay) {
+		dendrite_delay = _dendrite_delay;
+	}
+	void setWeight(double w) {
+		weight = w;
+	}
+
 	virtual void propagateSpike() = 0;
 	virtual void calculateDynamics(const Time &t) = 0;
 
@@ -24,15 +34,60 @@ public:
 		cerr << "No default interface for Synapse\n";
 		terminate();
 	}
+protected:
+	size_t id_pre;
+	double dendrite_delay;
+	double weight;
 };
 
 
+/*@GENERATE_PROTO@*/
+struct SynapseInfo : public Serializable<Protos::SynapseInfo> {
+	void serial_process() {
+		begin() << "id_pre: " 		  << id_pre 		<< ", " \
+		        << "dendrite_delay: " << dendrite_delay << ", " \
+		        << "weight: " 		  << weight 		<< Self::end;
+	}
+	size_t id_pre;
+	double dendrite_delay;
+	double weight;
+};
+
 template <typename Constants, typename State>
 class Synapse : public SynapseBase {
+	SynapseInfo getInfo() {
+		SynapseInfo info;
+		info.id_pre = id_pre;
+		info.dendrite_delay = dendrite_delay;
+		info.weight = weight;
+		return info;
+	}
 
+	void serial_process() {
+		begin() << "Constants: " << c;
+
+		if (messages->size() == 0) {
+			(*this) << Self::end;
+			return;
+		}
+
+		(*this) << "State: " << s;
+
+		if (messages->size() == 0) {
+			(*this) << Self::end;
+			return;
+		}
+		SynapseInfo info;
+		if (mode == ProcessingOutput) {
+			info = getInfo();
+		}
+
+		(*this) << "SynapseInfo: "   << info;
+		(*this) << Self::end;
+	}
 protected:
 	State s;
-	const Constants c;
+	Constants c;
 };
 
 

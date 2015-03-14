@@ -11,6 +11,7 @@ KNOWN_TYPES = {
     "string"    : "string",
     "bool"       : "bool", 
 }
+VECTOR_RE = re.compile("vector<([^ ]*?)>")
 
 PROTO_FILE = "generated.proto"
 
@@ -21,7 +22,14 @@ def generateProtos(structures, package, dst):
         for s in structures:
             f_ptr.write("message %s {\n" % s['name'])
             for i, f in enumerate(s['fields']):
-                f_ptr.write("    required %s %s = %s;\n" % (KNOWN_TYPES[ f[0] ], f[1], str(i+1)))
+                if KNOWN_TYPES.get(f[0]) is None:
+                    m = VECTOR_RE.match(f[0])
+                    if m is None:
+                        print "Can't understand type {}".format(f[0])
+                        sys.exit(1)
+                    f_ptr.write("    repeated %s %s = %s;\n" % (KNOWN_TYPES[ m.group(1) ], f[1], str(i+1)))
+                else:
+                    f_ptr.write("    required %s %s = %s;\n" % (KNOWN_TYPES[ f[0] ], f[1], str(i+1)))
             f_ptr.write("}\n")
             f_ptr.write("\n")
 
@@ -49,7 +57,7 @@ def parseSources(src):
                             struct['name'] = m.group(1)                            
                             struct['fields'] = []
                         else:
-                            m = re.match("(%s)[\W]+([^ ]+);[\W]*$" % "|".join(KNOWN_TYPES.keys()), l)
+                            m = re.match("(%s)[\W]+([^ ]+);[\W]*$" % "|".join(KNOWN_TYPES.keys() + [ "vector<{}>".format(t) for t in KNOWN_TYPES.keys() ]), l)
                             if m:
                                 struct['fields'].append( (m.group(1), m.group(2)) )
                                 continue

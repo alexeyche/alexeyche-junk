@@ -1,5 +1,6 @@
 #pragma once
 
+#include <dnn/io/serialize.h>
 
 
 namespace dnn {
@@ -9,7 +10,8 @@ struct InputInterface {
 };
 
 
-class InputBase {
+
+class InputBase : public SerializableBase {
 public:
     typedef InputInterface interface;
 
@@ -22,14 +24,28 @@ public:
     static void provideDefaultInterface(InputInterface &i) {
         i.getValue = &InputBase::getValueDefault;
     }
+    //virtual void setExternalSource(Stream *s) {
+//
+ //   }
 };
 
 
 
 template <typename Constants, typename State>
 class Input : public InputBase {
+public:    
+    void serial_process() {
+        begin() << "Constants: " << c;
+
+        if (messages->size() == 0) {
+            (*this) << Self::end;
+            return;
+        }
+
+        (*this) << "State: " << s << Self::end;;
+    }
 protected:
-    const Constants c;
+    Constants c;
     State s;
 };
 
