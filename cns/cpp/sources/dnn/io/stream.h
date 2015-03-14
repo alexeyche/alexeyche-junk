@@ -17,7 +17,16 @@ class Stream {
 public:
     enum Repr { Binary, Text };
 
-    Stream(istream &str, Repr _r = Binary) : _input_str(&str), r(_r), _output_str(nullptr), zeroOut(nullptr), codedOut(nullptr),zeroIn(nullptr), codedIn(nullptr) {
+    Stream(istream &str, Repr _r = Binary, bool _destroy_stream=false) 
+    : _input_str(&str)
+    , r(_r)
+    , destroy_stream(_destroy_stream)
+    , _output_str(nullptr)
+    , zeroOut(nullptr)
+    , codedOut(nullptr)
+    ,zeroIn(nullptr)
+    , codedIn(nullptr) 
+    {
         if((_input_str)&&(!_input_str->good())) {
             cerr << "Input filestream isn't open\n";
             terminate();
@@ -37,7 +46,16 @@ public:
 
 
     }
-    Stream(ostream &str, Repr _r = Binary) : _output_str(&str), r(_r), _input_str(nullptr), zeroIn(nullptr), codedIn(nullptr), zeroOut(nullptr), codedOut(nullptr) {
+    Stream(ostream &str, Repr _r = Binary, bool _destroy_stream=false) 
+    : _output_str(&str)
+    , r(_r)
+    , _input_str(nullptr)
+    , destroy_stream(_destroy_stream)
+    , zeroIn(nullptr)
+    , codedIn(nullptr)
+    , zeroOut(nullptr)
+    , codedOut(nullptr) 
+    {
         if((_output_str)&&(!_output_str->good())) {
             cerr << "Output filestream isn't open\n";
             terminate();
@@ -48,6 +66,10 @@ public:
         }
     }
     ~Stream() {
+        if(destroy_stream) {
+            if(_output_str) delete _output_str;
+            if(_input_str) delete _input_str;
+        }
         if(codedIn)  delete codedIn;
         if(zeroIn)   delete zeroIn;
         if(codedOut) delete codedOut;
@@ -74,8 +96,23 @@ public:
 
     void writeObject(SerializableBase *b);
     SerializableBase* readObject();
+
+    template <typename T>
+    T* readObject() {
+        SerializableBase *b = readObject();
+        if(!b) return nullptr;
+        
+        T *d = dynamic_cast<T*>(b);
+        if(!d) {
+            cerr << "Failed to cast from " << b->name() << "\n";
+            terminate();
+        }
+        return d;
+    }
+
     void protoReader(vector<ProtoMessage> &messages);
     void jsonReader(string name, const Value &v, vector<ProtoMessage> &messages);
+    
     Repr getRepr() {
         return r;
     }
@@ -116,6 +153,7 @@ private:
     Repr r;
     Document document;
     Value::ConstMemberIterator iterator;
+    bool destroy_stream;
 };
 
 }

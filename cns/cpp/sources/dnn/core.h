@@ -21,6 +21,7 @@ using std::move;
 using std::vector;
 using std::accumulate;
 using std::stringstream;
+using std::istringstream;
 using std::string;
 using std::ostream;
 using std::istream;

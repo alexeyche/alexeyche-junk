@@ -13,4 +13,5 @@ int main(int argc, char **argv) {
 	DnnSimOpts sopt = parseOptions(argc, argv);
     dnn::Constants c(sopt.const_file);
 	dnn::Sim s(c);
+	s.build();
 }

@@ -138,7 +138,12 @@ struct Constants : public Printable {
 
 	static void fill(const Value &v, map<string, string> &m) {
 		for (Value::ConstMemberIterator itr = v.MemberBegin(); itr != v.MemberEnd(); ++itr) {
-		    m[itr->name.GetString()] = Json::stringify(itr->value);
+			Document d;
+		    Value cv(kObjectType);
+		    Value copy_v;
+		    copy_v.CopyFrom(itr->value, d.GetAllocator());
+    		cv.AddMember(StringRef(itr->name.GetString()), copy_v, d.GetAllocator());
+		    m[itr->name.GetString()] = Json::stringify(cv);
 		}
 	}
 	
@@ -158,7 +163,7 @@ struct Constants : public Printable {
 			}
 		}
 	}
-
+	
 	map<string, string> neurons;
 	map<string, string> act_functions;
 	map<string, string> synapses;

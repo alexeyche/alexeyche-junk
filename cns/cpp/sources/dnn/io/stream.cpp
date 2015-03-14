@@ -129,10 +129,10 @@ SerializableBase* Stream::readObject() {
 	}
 
 	assert(messages.size()>0);
-	for(auto &m : messages) {
-		cout << m->GetTypeName() << " =================\n";
-		cout << m->DebugString();
-	}
+	// for(auto &m : messages) {
+	// 	cout << m->GetTypeName() << " =================\n";
+	// 	cout << m->DebugString();
+	// }
 	std::reverse(messages.begin(), messages.end());
 	
 	Protos::ClassName *head = SerializableBase::getHeader(messages);

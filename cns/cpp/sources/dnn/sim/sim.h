@@ -1,36 +1,28 @@
 #pragma once
 
 #include <dnn/base/factory.h>
+#include "builder.h"
 
 namespace dnn {
 
 class Sim {
 public:
-	Sim(const Constants &c) {
-		SpikeNeuronBase *lif = Factory::inst().createSpikeNeuron("LeakyIntegrateAndFire");
-		ActFunctionBase *act = Factory::inst().createActFunction("Determ");
-		lif->setActFunction(act);
-		lif->reset();
-
-		// {
-		// 	ofstream f("out.pb");
-		// 	Stream s(f, Stream::Binary);
-		// 	s.writeObject(lif);
-		// }
-		{
-			ifstream f("../in.json");
-			Stream s(f, Stream::Text);
-			SerializableBase* b = s.readObject();
-			SerializableBase* b2 = s.readObject();
-			
-			Stream(cout, Stream::Text).writeObject(b);
-			Stream(cout, Stream::Text).writeObject(b2);
+	Sim(const Constants &_c) : c(_c) {
+	}
+	void build(Stream* input_stream = nullptr) {
+		Builder b(c);
+		if(input_stream) {
+			b.setInputModelStream(input_stream);
 		}
 
-		//cout <<
-		//Serializer sr(s);
-		//sr.write(lif);
+
+		neurons = b.buildNeurons();
+		
 	}
+
+private:
+	const Constants &c;
+	vector<InterfacedPtr<SpikeNeuronBase>> neurons;
 };
 
 }
