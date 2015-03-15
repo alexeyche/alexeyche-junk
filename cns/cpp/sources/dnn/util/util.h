@@ -51,7 +51,7 @@ vector<IndexSlice> dispatchOnThreads(size_t elements_size, size_t jobs);
 
 
 vector<double> parseParenthesis(const string &s);
-
+map<string, string> parseArgOptionsPairs(const vector<string> &opts);
 
 
 }

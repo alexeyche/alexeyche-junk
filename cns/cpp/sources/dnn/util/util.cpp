@@ -163,5 +163,31 @@ void replaceAll( string &s, const string &search, const string &replace ) {
         s.insert( pos, replace );
     }
 }
+map<string, string> parseArgOptionsPairs(const vector<string> &opts) {
+    map<string, string> opt_pairs;
+    for(size_t i=0; i<opts.size(); i+=2) {
+        if ((i+1) >= opts.size()) {
+            cerr << "Free option without an argument: " << opts[i] << "\n";
+            terminate();
+        }
+        const string& optname = opts[i];
+        const string& optvalue =  opts[i+1];
+        
+        vector<string> s = split(optname, '-');
+
+        if ((s.size() != 4) || (s[0] != "") || (s[1] != "")) {
+            cerr << "Free option must be like that: --free-option\n";
+            cerr << "\t got " << optname << "\n";
+            terminate();
+        }
+        opt_pairs.insert(
+            std::make_pair(
+                "@" + string(s[2]) + "-" + string(s[3]), 
+                optvalue
+            )
+        );
+    }
+    return opt_pairs;
+}
 
 }

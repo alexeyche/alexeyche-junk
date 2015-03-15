@@ -58,7 +58,7 @@ def parseSources(src):
                             struct['name'] = m.group(1)                            
                             struct['fields'] = []
                         else:
-                            m = re.match("(%s)[\W]+([^ ]+);[\W]*$" % "|".join(KNOWN_TYPES.keys() + [ "vector<{}>".format(t) for t in KNOWN_TYPES.keys() ]), l)
+                            m = re.match("(%s)[\W]+([^_]+[^ ]+);[\W]*$" % "|".join(KNOWN_TYPES.keys() + [ "vector<{}>".format(t) for t in KNOWN_TYPES.keys() ]), l)
                             if m and curly_counter == 1:
                                 struct['fields'].append( (m.group(1), m.group(2)) )
                                 continue

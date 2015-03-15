@@ -14,10 +14,10 @@ public:
 		T::provideDefaultInterface(i);
 	}
 
-	T* ptr() {
+	inline T* ptr() {
 		return _ptr;
 	}
-	T& ref() {
+	inline T& ref() {
 		return *_ptr;
 	}
 	void set(T *ptr_to_set) {
@@ -33,7 +33,7 @@ public:
 		return _ptr ? true : false;
 	}
 
-	typename T::interface& getInterface() {
+	typename T::interface& ifc() {
 		return i;
 	}
 

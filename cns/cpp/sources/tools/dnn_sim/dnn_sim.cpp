@@ -9,6 +9,26 @@
 #include <dnn/util/option_parser.h>
 
 using namespace dnn;
+const char * usage = R"USAGE(
+USAGE: ./dnn_sim  [options]
+
+Options:
+  --input, -i      Input protobuf file with precalculated spikes or labeled time
+                   series.
+  --output, -o     Output file with serialized spikes list
+  --const, -c  Constants filename.
+  --load, -l       Load model.
+  --save, -s       Save model.
+  --stat 	       Save statistics to file.
+  --T-max, -T      Maximum simulation time (default: max input length).
+  --jobs  -j       Parallel jobs to run (default 1)
+  --no-learning    Turning off all learning dynamics despite of const.json
+                   content. Good for statistics collecting
+  --help           Print usage and exit.
+
+Examples:
+% Need to fill %
+)USAGE";
 
 struct DnnSimOpts {
     DnnSimOpts() : jobs(1), precalc(false), Tmax(0.0) {}
@@ -28,38 +48,27 @@ struct DnnSimOpts {
 
 
 int main(int argc, char **argv) {
+	if(argc == 1) {
+		cout << usage;
+		return 0; 
+	}
 	DnnSimOpts sopt;
 
+	bool need_help = false;
+	
 	OptionParser optp(argc, argv);
 	optp.option("--const", "-c", sopt.const_file, true);
 	optp.option("--output", "-o", sopt.jobs, true);
 	optp.option("--jobs", "-j", sopt.jobs, false);
-
+	optp.loption("--stat", sopt.jobs, false);
+	optp.option("--help", "-h", need_help, false, true);
+	if(need_help) { 
+		cout << usage;
+		return 0; 
+	}
 
 	vector<string> rest_opts = optp.getRawOptions();
-	for(size_t i=0; i<rest_opts.size(); i+=2) {
-		if ((i+1) >= rest_opts.size()) {
-            cerr << "Free option without an argument: " << rest_opts[i] << "\n";
-            terminate();
-        }
-        const string& optname = rest_opts[i];
-		const string& optvalue =  rest_opts[i+1];
-		
-        vector<string> s = dnn::split(optname, '-');
-
-        if ((s.size() != 4) || (s[0] != "") || (s[1] != "")) {
-            cerr << "Free option must be like that: --free-option\n";
-            cerr << "\t got " << optname << "\n";
-            terminate();
-        }
-        sopt.add_opts.insert(
-            std::make_pair(
-                "@" + string(s[2]) + "-" + string(s[3]), 
-                optvalue
-            )
-        );
-        sopt.add_opts[rest_opts[i]] = rest_opts[i+1];
-	}
+	sopt.add_opts = parseArgOptionsPairs(rest_opts);
 	
 	Constants c(sopt.const_file, sopt.add_opts);
 

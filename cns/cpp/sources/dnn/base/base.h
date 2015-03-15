@@ -36,6 +36,7 @@ typedef FastDelegate1<const double&, double> funDelegate;
 typedef FastDelegate1<const SynSpike&> propSynSpikeDelegate;
 typedef FastDelegate1<const double&> attachDelegate;
 typedef FastDelegate0<const bool&> getBoolDelegate;
+typedef FastDelegate0<bool> getBoolCopyDelegate;
 typedef FastDelegate0<const double&> getDoubleDelegate;
 typedef FastDelegate0<double> retDoubleDelegate;
 typedef FastDelegate1<const Time&> calculateDynamicsDelegate;
@@ -48,6 +49,13 @@ struct SynSpike {
 };
 
 struct Time {
+    Time(double _dt) : t(0), dt(_dt) {}
+    void operator ++() {
+        t+=dt;
+    }
+    bool operator<(const double &dur) {
+        return t < dur;
+    }
     double t;
     double dt;
 };

@@ -7,7 +7,8 @@
     "neurons" : {
         "LeakyIntegrateAndFire" : {
             "R" : 1.0,
-            "C" : 10
+            "C" : 10,
+            "leak" : 0.0
         }
     },
     "act_functions" : {

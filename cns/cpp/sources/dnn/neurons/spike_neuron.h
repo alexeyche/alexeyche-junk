@@ -7,6 +7,7 @@
 #include <dnn/synapses/synapse.h>
 #include <dnn/inputs/input.h>
 #include <dnn/io/serialize.h>
+#include <dnn/util/statistics.h>
 
 namespace dnn {
 
@@ -15,11 +16,14 @@ struct SpikeNeuronInterface {
 	calculateDynamicsDelegate calculateDynamics;
 	propSynSpikeDelegate propagateSynapseSpike;
 	getDoubleDelegate getFiringProbability;
-	getBoolDelegate fired;
+	getBoolCopyDelegate pullFiring;
 };
 extern size_t global_neuron_index;
 
+class Builder;
+
 class SpikeNeuronBase : public SerializableBase {
+friend class Builder;
 public:
 	SpikeNeuronBase() {
 		_id = global_neuron_index++;
@@ -45,7 +49,7 @@ public:
 	virtual void propagateSynapseSpike(const SynSpike &s) = 0;
 	virtual void calculateDynamics(const Time &t) = 0;
 	virtual const double& getFiringProbability() = 0;
-	virtual const bool& fired() = 0;
+	virtual bool pullFiring() = 0;
 
 
 	static void __calculateDynamicsDefault(const Time &t) {
@@ -60,13 +64,13 @@ public:
 		cerr << "Calling inapropriate default interface function\n";
 		terminate();
 	}
-	static const bool& __firedDefault() {
+	static bool __pullFiringDefault() {
 		cerr << "Calling inapropriate default interface function\n";
 		terminate();
 	}
 	static void provideDefaultInterface(SpikeNeuronInterface &i) {
 		i.calculateDynamics = &SpikeNeuronBase::__calculateDynamicsDefault;
-		i.fired = &SpikeNeuronBase::__firedDefault;
+		i.pullFiring = &SpikeNeuronBase::__pullFiringDefault;
 		i.getFiringProbability = &SpikeNeuronBase::__getFiringProbabilityDefault;
 		i.propagateSynapseSpike =  &SpikeNeuronBase::__propagateSynapseSpikeDefault;
 	}
@@ -99,8 +103,7 @@ protected:
 	InterfacedPtr<ActFunctionBase> act_f;
 	InterfacedPtr<InputBase> input;
 
-	// InterfacedPtr<LearningRule> lrule;
-	// InterfacedPtr<TuningCurve> tc;
+	Statistics stat;
 };
 
 /*@GENERATE_PROTO@*/

@@ -40,6 +40,15 @@ public:
 						n.ref().setInput(buildObjectFromConstants<InputBase>(input, c.inputs));
 					}
 				}
+				auto listen_neuron_id_it = std::find(
+					c.sim_conf.neurons_to_listen.begin(), 
+					c.sim_conf.neurons_to_listen.end(), 
+					n.ref().id()
+				);
+
+				if(listen_neuron_id_it != c.sim_conf.neurons_to_listen.end()) {
+					n.ref().stat.turnOn();
+				}
 				layer.neurons.push_back(n);
 			}
 			for (auto it = c.sim_conf.files.begin(); it != c.sim_conf.files.end(); ++it) {

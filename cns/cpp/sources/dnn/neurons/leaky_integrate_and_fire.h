@@ -13,11 +13,14 @@ struct LeakyIntegrateAndFireC : public Serializable<Protos::LeakyIntegrateAndFir
     LeakyIntegrateAndFireC() : R(1.0), C(50.0) {}
 
     void serial_process() {
-        begin() << "R: " << R << ", " << "C: " << C << Self::end;
+        begin() << "R: " << R << ", " 
+                << "C: " << C << ", "
+                << "leak: " << leak << Self::end;
     }
 
     double R;
     double C;
+    double leak;
 };
 
 
@@ -31,7 +34,6 @@ struct LeakyIntegrateAndFireState : public Serializable<Protos::LeakyIntegrateAn
                 << "fired: "   << fired << Self::end;
     }
     bool fired;
-
     double p;
     double u;
 };
@@ -49,15 +51,21 @@ public:
     }
 
     void propagateSynapseSpike(const SynSpike &sp) {
-        syns[ sp.syn_id ].getInterface().propagateSpike();
+        syns[ sp.syn_id ].ifc().propagateSpike();
     }
 
     void calculateDynamics(const Time& t) {
-
+        s.u += t.dt * ( (s.u - c.leak)/c.R + input.ifc().getValue()) / c.C; 
+        if(getUnif() < act_f.ifc().prob(s.u)) {
+            s.fired = true;
+        }
+        stat.add("u", s.u);
     }
 
-    const bool& fired() {
-        return s.fired;
+    bool pullFiring() {
+        bool acc = s.fired;
+        s.fired = false;
+        return acc;
     }
     const double& getFiringProbability() {
         return s.p;
@@ -65,7 +73,7 @@ public:
 
     void provideInterface(SpikeNeuronInterface &i) {
         i.calculateDynamics = MakeDelegate(this, &LeakyIntegrateAndFire::calculateDynamics);
-        i.fired = MakeDelegate(this, &LeakyIntegrateAndFire::fired);
+        i.pullFiring = MakeDelegate(this, &LeakyIntegrateAndFire::pullFiring);
         i.getFiringProbability = MakeDelegate(this, &LeakyIntegrateAndFire::getFiringProbability);
         i.propagateSynapseSpike = MakeDelegate(this, &LeakyIntegrateAndFire::propagateSynapseSpike);
     }

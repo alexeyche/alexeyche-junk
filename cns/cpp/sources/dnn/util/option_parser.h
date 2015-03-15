@@ -10,12 +10,12 @@ T cast(string &s) {
 template <>
 double cast(string &s) {
 	return std::stof(s);
-}	
+}
 
 template <>
 int cast(string &s) {
 	return std::stoi(s);
-}	
+}
 
 template <>
 size_t cast(string &s) {
@@ -29,36 +29,41 @@ string cast(string &s) {
 class OptionParser {
 public:
 	OptionParser(int argc, char **argv) {
-		for(size_t i=1; i<argc; ++i) {
+		for (size_t i = 1; i < argc; ++i) {
 			opts.push_back(argv[i]);
 		}
 	}
 	template <typename T>
-	void option(string long_opt, string short_opt, T &src, bool required = true, bool as_flag=false) {
+	void option(string long_opt, string short_opt, T &src, bool required = true, bool as_flag = false) {
 		bool found = false;
 		auto it = opts.begin();
-		while(it != opts.end()) {
-			if((*it == long_opt)||(*it == short_opt)) {
-				if(as_flag) { 
+		while (it != opts.end()) {
+			if ( (*it == long_opt) || ( (!short_opt.empty()) && (*it == short_opt)) ) {
+				if (as_flag) {
 					src = true;
 					it = opts.erase(it);
 				} else {
-					if( (it+1) == opts.end() ) {
+					if ( (it + 1) == opts.end() ) {
 						cerr << "Can't find value for option " << long_opt << "\n";
 						terminate();
 					}
 					src = cast<T>(*(++it));
-					it = opts.erase(it-1, it+1);
+					it = opts.erase(it - 1, it + 1);
 				}
 				found = true;
 			} else {
 				++it;
 			}
 		}
-		if((!found)&&(required)) {
+		if ((!found) && (required)) {
 			cerr << "Can't find value for option " << long_opt << "\n";
+			terminate();
 		}
 
+	}
+	template <typename T>
+	void loption(string long_opt, T &src, bool required = true, bool as_flag = false) {
+		option(long_opt, "", src, required, as_flag);
 	}
 	vector<string>& getRawOptions() {
 		return opts;

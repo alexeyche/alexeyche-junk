@@ -286,7 +286,15 @@ public:
         }
         return *this;
     }
-
+    Serializable& operator << (int &v) {
+        ASSERT_FIELDS()
+        if(mode == ProcessingOutput) {
+            currentMessage()->GetReflection()->SetInt32(currentMessage(), field_descr, v);
+        } else {
+            v = currentMessage()->GetReflection()->GetInt32(*currentMessage(), field_descr);
+        }
+        return *this;
+    }
     Serializable& operator << (string &v) {
         ASSERT_FIELDS()
         if(mode == ProcessingOutput) {

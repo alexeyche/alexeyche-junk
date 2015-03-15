@@ -17,6 +17,7 @@
 #include <thread>
 #include <mutex>
 #include <condition_variable>
+#include <cstdlib>
 
 typedef google::protobuf::Message* ProtoMessage;
 

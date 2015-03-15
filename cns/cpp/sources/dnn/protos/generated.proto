@@ -1,14 +1,11 @@
 package Protos;
 
 message LeakyIntegrateAndFireC {
-    required double R = 1;
-    required double C = 2;
+    required double leak = 1;
 }
 
 message LeakyIntegrateAndFireState {
     required bool fired = 1;
-    required double p = 2;
-    required double u = 3;
 }
 
 message SpikeNeuronInfo {
@@ -25,7 +22,6 @@ message StaticSynapseC {
 }
 
 message StaticSynapseState {
-    required double x = 1;
 }
 
 message SynapseInfo {
@@ -42,6 +38,13 @@ message InputTimeSeriesState {
     required uint32 index = 1;
 }
 
+message Stat {
+    required int32 low_lim = 1;
+    required int32 high_lim = 2;
+    required string name = 3;
+    repeated double vals = 4;
+}
+
 message TimeSeriesInfo {
     repeated uint32 labels_ids = 1;
     repeated string unique_labels = 2;
@@ -49,7 +52,7 @@ message TimeSeriesInfo {
 }
 
 message TimeSeriesData {
-    repeated double ts = 1;
+    repeated double vals = 1;
 }
 
 message DetermC {

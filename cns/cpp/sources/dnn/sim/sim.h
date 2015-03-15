@@ -31,15 +31,27 @@ public:
 
 	
 	
-	static void runWorker(Sim &s, size_t from, size_t to, size_t jobs) {
-		cout << "Hello from " << from << " : " << to << "\n";
+	static void runWorker(Sim &s, size_t from, size_t to, Barrier &barrier) {
+		Time t(s.c.sim_conf.dt);
+
+		for(; t<s.duration; ++t) {
+			for(size_t i=from; i<to; ++i) {
+				
+				s.neurons[i].ifc().calculateDynamics(t);
+				if(s.neurons[i].ifc().pullFiring()) {
+					cout << s.neurons[i].ref().id() << " made spike\n";
+				}
+			}
+		}		
+		barrier.wait();		
 	}
 	void run(size_t jobs) {
 		vector<IndexSlice> slices = dispatchOnThreads(neurons.size(), jobs);
 		vector<std::thread> threads;
 		
+		Barrier barrier(jobs);		
 		for(auto &slice: slices) {
-			threads.emplace_back(Sim::runWorker, std::ref(*this), slice.from, slice.to, jobs);
+			threads.emplace_back(Sim::runWorker, std::ref(*this), slice.from, slice.to, std::ref(barrier));
 		}
 		for(auto &t: threads) {
 			t.join();
