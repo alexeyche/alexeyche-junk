@@ -3,13 +3,16 @@
 #include "input.h"
 
 #include <dnn/protos/generated.pb.h>
+#include <dnn/io/stream.h>
 
 namespace dnn {
 
 /*@GENERATE_PROTO@*/
 struct InputTimeSeriesC : public Serializable<Protos::InputTimeSeriesC> {
     InputTimeSeriesC() : dt(1.0) {}
+    
     double dt;
+    
     void serial_process() {
         begin() << "dt: " << dt << Self::end;
     }
@@ -37,10 +40,14 @@ public:
 	double getValue() {
 		return 0.0;
 	}
-
     void provideInterface(InputInterface &i) {
         i.getValue = MakeDelegate(this, &InputTimeSeries::getValue);
     }
+    void setTimeSeries(const string& filename, const string& format) {
+        ts.set(Factory::inst().getCachedTimeSeries(name(), filename, format));
+    }
+private:
+    InterfacedPtr<TimeSeries> ts;
 };
 
 

@@ -7,6 +7,7 @@
 #include <dnn/synapses/static_synapse.h>
 #include <dnn/inputs/input_time_series.h>
 #include <dnn/io/serialize.h>
+#include <dnn/util/time_series.h>
 
 #include "factory.h"
 
@@ -51,6 +52,12 @@ Factory::~Factory() {
 }
 
 void Factory::deleteLast() {
+	auto p = objects_map.equal_range(objects.back()->name());
+	for (auto it = p.first; it != p.second; ++it) {
+		if (it->second == objects.size()-1) { 
+			objects_map.erase(it);
+		}
+	}
 	delete objects.back();
 	objects.pop_back();
 }
@@ -62,6 +69,7 @@ SerializableBase* Factory::createObject(string name) {
 	}
 	SerializableBase* o = typemap[name]();
 	objects.push_back(o);
+	objects_map.insert(std::make_pair(o->name(), objects.size()-1));
 	return o;
 }
 
@@ -95,5 +103,16 @@ ActFunctionBase* Factory::createActFunction(string name) {
 	return p;
 }
 
+TimeSeries* Factory::getCachedTimeSeries(const string &name, const string& filename, const string& format) {
+    if(ts_map.find(name) == ts_map.end()) {
+        ts_map[name] = new TimeSeries(filename, format);
+        objects.push_back(ts_map[name]);
+    }
+    return ts_map[name];
+}
+
+pair<Factory::object_iter, Factory::object_iter> Factory::getObjectsSlice(const string& name) {
+	return objects_map.equal_range(name);
+}
 
 }

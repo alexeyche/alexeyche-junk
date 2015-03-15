@@ -42,6 +42,7 @@ def parseSources(src):
             if af.endswith(".cpp") or af.endswith(".h"):
                 for l in open(af):
                     l = l.strip()
+                    l = l.split("//")[0]
                     if "@GENERATE_PROTO@" in l:
                         generate_proto = True                                                
                         struct = {}
@@ -58,7 +59,7 @@ def parseSources(src):
                             struct['fields'] = []
                         else:
                             m = re.match("(%s)[\W]+([^ ]+);[\W]*$" % "|".join(KNOWN_TYPES.keys() + [ "vector<{}>".format(t) for t in KNOWN_TYPES.keys() ]), l)
-                            if m:
+                            if m and curly_counter == 1:
                                 struct['fields'].append( (m.group(1), m.group(2)) )
                                 continue
                         if len(struct) > 0 and curly_counter == 0:

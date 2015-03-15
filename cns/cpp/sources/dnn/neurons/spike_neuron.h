@@ -73,11 +73,23 @@ public:
 
 	// void setLearningRule(LearningRule *_lrule) { lrule = _lrule; }
 	void setActFunction(ActFunctionBase *_act_f) { act_f.set(_act_f); }
+	
 	void setInput(InputBase *_input) { input.set(_input); }
-
+	bool inputIsSet() {
+		return input.isSet();
+	}
+	InputBase& getInput() {
+		if(!input.isSet()) {
+			cerr << "Trying to get input which is not set\n";
+			terminate();
+		}
+		return input.ref();
+	}
+	
 	void addSynapse(InterfacedPtr<SynapseBase> syn) {
 		syns.push_back(syn);
 	}
+
 
 protected:
 	size_t _id;

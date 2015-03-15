@@ -9,13 +9,14 @@ class ClassName;
 class SerializableBase;
 class SpikeNeuronBase;
 class ActFunctionBase;
-
+class TimeSeries;
 
 
 class Factory {
 public:
     typedef map<string, SerializableBase* (*)()> entity_map_type;
     typedef map<string, ProtoMessage (*)()> proto_map_type;
+    typedef multimap<string, size_t>::iterator object_iter;
 
     template<typename INST> static SerializableBase* createInstance() { return new INST; }
     template<typename INST> static ProtoMessage createProtoInstance() { return new INST; }
@@ -41,14 +42,25 @@ public:
 
     SpikeNeuronBase* createSpikeNeuron(string name);
     ActFunctionBase* createActFunction(string name);
+
+    TimeSeries* getCachedTimeSeries(const string &name, const string& filename, const string& format);
+
     static Factory& inst();
 
+    pair<object_iter, object_iter> getObjectsSlice(const string& name);
+    
+    SerializableBase* getObject(object_iter &it) {
+        return objects[it->second];
+    }
 
 private:
     static entity_map_type typemap;
     static proto_map_type prototypemap;
+    multimap<string, size_t> objects_map;
+
     vector<SerializableBase*> objects;
     vector<ProtoMessage> proto_objects;
+    map<string, TimeSeries*> ts_map;
 };
 
 

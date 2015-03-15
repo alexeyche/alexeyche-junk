@@ -4,7 +4,7 @@
 
 
 struct opts {
-	enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_CONSTANTS, ARG_INPUT,
+	enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_CONSTANTS,
     	                ARG_OUT_STAT, ARG_OUT_SPIKES, ARG_JOBS ,ARG_PRECALC,
         	            ARG_MODEL_SAVE, ARG_MODEL_LOAD, ARG_T_MAX, ARG_OUT_P_STAT, ARG_NO_LEARNING};
 };
@@ -13,7 +13,6 @@ const option::Descriptor usage[] =
 {
  {opts::ARG_UNKNOWN, 0, "", "",Arg::None, "USAGE: example [options]\n\n"
                                         "Options:" },
- {opts::ARG_INPUT, 0,"i","input",Arg::NonEmpty, "  --input, -i  \tInput protobuf file with precalculated spikes or labeled time series." },
  {opts::ARG_OUT_SPIKES, 0,"o","output",Arg::NonEmpty, "  --output, -o  \tOutput file with serialized spikes list" },
  {opts::ARG_CONSTANTS, 0,"c","constants",Arg::NonEmpty, "  --constants, -c  \tConstants filename." },
  {opts::ARG_MODEL_LOAD, 0,"l","load",Arg::NonEmpty, "  --load, -l  \tLoad model." },
@@ -44,6 +43,7 @@ struct DnnSimOpts {
     bool precalc;
     bool no_learning;
     double Tmax;
+    vector<string> add_opts;
 };
 
 DnnSimOpts parseOptions(int argc, char **argv) {
@@ -69,28 +69,27 @@ DnnSimOpts parseOptions(int argc, char **argv) {
         exit(0);
     }
 
-    if(options[opts::ARG_INPUT].count() == 0) {
-        cerr << "Need input argument\n";
-        exit(1);
-    }
     if(options[opts::ARG_OUT_SPIKES].count() == 0) {
         cerr << "Need output spikes argument\n";
         exit(1);
     }
 
-    for (option::Option* opt = options[opts::ARG_UNKNOWN]; opt; opt = opt->next()) {
-      cerr << "Unknown option: " << string(opt->name,opt->namelen) << "\n";
-    }
-    if(options[opts::ARG_UNKNOWN].count() > 0) exit(1);
+    
 
-    for (int i = 0; i < parse.nonOptionsCount(); ++i) {
-      cerr << "Non-options arguments are not supported (" << i << ": " << parse.nonOption(i) << ")\n";
-    }
-    if(parse.nonOptionsCount()>0) exit(1);
+    // for (int i = 0; i < parse.nonOptionsCount(); ++i) {
+    //   cerr << "Non-options arguments are not supported (" << i << ": " << parse.nonOption(i) << ")\n";
+    // }
+    //if(parse.nonOptionsCount()>0) exit(1);
 
 
     DnnSimOpts sopt;
-    sopt.input = options[opts::ARG_INPUT].last()->arg;
+    for (option::Option* opt = options[opts::ARG_UNKNOWN]; opt; opt = opt->next()) {
+      sopt.add_opts.push_back(opt->name);
+      cout << "adding " << opt->name  << " \n";
+      //cerr << "Unknown option: " << string(opt->name,opt->namelen) << "\n";
+    }
+    if(options[opts::ARG_UNKNOWN].count() > 0) exit(1);
+    //sopt.input = options[opts::ARG_INPUT].last()->arg;
     sopt.out_spikes = options[opts::ARG_OUT_SPIKES].last()->arg;
     if(options[opts::ARG_CONSTANTS].count()>0) {
         sopt.const_file = options[opts::ARG_CONSTANTS].last()->arg;

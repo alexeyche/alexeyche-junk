@@ -1,7 +1,7 @@
 {
     "inputs" : {
         "InputTimeSeries" : {
-            "dt" : 2.0,
+            "dt" : 2.0
         }
     },
     "neurons" : {
@@ -40,8 +40,8 @@
         "seed" : -1,
         "neurons_to_listen" : [25],
         "files" : {
-            "InputTimeSeries" : {
-                "filename" : "/home/alexeyche/prog/sim/ts/synthetic_control/synthetic_control_TEST",
+            "InputTimeSeries" : { 
+                "filename" : "@input-file",
                 "format" : "ucr-ts"
             }
         }

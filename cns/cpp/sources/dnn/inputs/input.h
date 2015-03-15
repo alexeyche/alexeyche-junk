@@ -1,15 +1,14 @@
 #pragma once
 
 #include <dnn/io/serialize.h>
-
+#include <dnn/util/time_series.h>
 
 namespace dnn {
+
 
 struct InputInterface {
     retDoubleDelegate getValue;
 };
-
-
 
 class InputBase : public SerializableBase {
 public:
@@ -24,26 +23,37 @@ public:
     static void provideDefaultInterface(InputInterface &i) {
         i.getValue = &InputBase::getValueDefault;
     }
-    //virtual void setExternalSource(Stream *s) {
-//
- //   }
+
+    virtual void setTimeSeries(const string& filename, const string& format) = 0;
+
 };
 
+// /*@GENERATE_PROTO@*/
+// struct InputInfo : public Serializable<Protos::InputInfo> {
+//     InputInfo() : layer_id(0) {}
 
+//     void serial_process() {
+//         begin() << "layer_id: " << layer_id << Self::end;
+//     }
+
+//     size_t layer_id;
+// };
 
 template <typename Constants, typename State>
 class Input : public InputBase {
 public:    
     void serial_process() {
-        begin() << "Constants: " << c;
+        begin() << "Constants: " << c << ", ";
 
         if (messages->size() == 0) {
             (*this) << Self::end;
             return;
         }
 
-        (*this) << "State: " << s << Self::end;;
+        (*this) << "State: " << s << Self::end;
     }
+    private:    
+    
 protected:
     Constants c;
     State s;

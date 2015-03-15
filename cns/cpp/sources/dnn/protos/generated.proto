@@ -48,6 +48,10 @@ message TimeSeriesInfo {
     repeated uint32 labels_timeline = 3;
 }
 
+message TimeSeriesData {
+    repeated double ts = 1;
+}
+
 message DetermC {
     required double treshold = 1;
 }

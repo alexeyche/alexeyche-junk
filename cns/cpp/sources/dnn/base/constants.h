@@ -141,7 +141,11 @@ struct Constants : public Printable {
 			std::srand ( sim_conf.seed );
 		}
 		sim_conf.neurons_to_listen = Json::getUintVector(sim_conf_doc, "neurons_to_listen");
-		fill(Json::getVal(sim_conf_doc, "files"), sim_conf.files);
+		const Value &files_doc = Json::getVal(sim_conf_doc, "files");
+		for (Value::ConstMemberIterator itr = files_doc.MemberBegin(); itr != files_doc.MemberEnd(); ++itr) {
+			const string k = itr->name.GetString();
+			sim_conf.files[k] = Json::stringify(itr->value);
+		}
 	}
 
 
