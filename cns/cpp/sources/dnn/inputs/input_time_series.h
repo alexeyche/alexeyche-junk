@@ -38,13 +38,20 @@ public:
     }
 
 	double getValue() {
-		return 0.0;
+        return ts.ref().data.vals[s.index];
 	}
     void provideInterface(InputInterface &i) {
         i.getValue = MakeDelegate(this, &InputTimeSeries::getValue);
     }
+
     void setTimeSeries(const string& filename, const string& format) {
         ts.set(Factory::inst().getCachedTimeSeries(name(), filename, format));
+    }
+    double getDuration() {
+        if(ts.isSet()) {
+            return ts.ref().length() * c.dt;
+        }
+        return 0.0;
     }
 private:
     InterfacedPtr<TimeSeries> ts;

@@ -14,6 +14,10 @@
 #include <algorithm>
 #include <ctime>
 #include <google/protobuf/message.h>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
+
 typedef google::protobuf::Message* ProtoMessage;
 
 using std::map;

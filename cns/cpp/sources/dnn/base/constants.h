@@ -12,46 +12,6 @@ namespace dnn {
 
 using namespace rapidjson;
 
-// struct LayerConfiguration : public Printable {
-// 	LayerConfiguration(size_t _size, string _neuron, string _act_function, uptr<Distribution<double>> _axon_delay_distr) :
-// 		size(_size), neuron(_neuron), act_function(_act_function), axon_delay_distr(std::move(_axon_delay_distr)) {}
-
-// 	LayerConfiguration(LayerConfiguration&& other) :
-// 		size(other.size), neuron(other.neuron), act_function(other.act_function), axon_delay_distr(std::move(other.axon_delay_distr)) {}
-
-// 	size_t size;
-// 	string neuron;
-// 	string act_function;
-// 	uptr<Distribution<double>> axon_delay_distr;
-
-// 	void print(ostream &o) const {
-// 		o << "size: " << size << ", neuron: " << neuron << ", act_function: " << act_function << ", axon_delay_distr: " << *(axon_delay_distr.get());
-// 		//axon_delay_distr->print(o);
-// 	}
-// private:
-// 	LayerConfiguration(const LayerConfiguration& other) {}
-//     LayerConfiguration& operator=(const LayerConfiguration& other) { return *this; }
-// };
-
-// struct ConnConfiguration : public Printable {
-// 	ConnConfiguration(double _prob, string _synapse, uptr<Distribution<double>> _weight_distr, uptr<Distribution<double>> _dendrite_delay_distr) :
-// 			prob(_prob), synapse(_synapse), weight_distr(std::move(_weight_distr)), dendrite_delay_distr(std::move(_dendrite_delay_distr)) {}
-
-// 	ConnConfiguration(ConnConfiguration&& other) :
-// 		prob(other.prob), synapse(other.synapse), weight_distr(std::move(other.weight_distr)), dendrite_delay_distr(std::move(other.dendrite_delay_distr)) {}
-
-// 	double prob;
-// 	string synapse;
-// 	uptr<Distribution<double>> weight_distr;
-// 	uptr<Distribution<double>> dendrite_delay_distr;
-
-// 	void print(ostream &o) const {
-// 		o << "prob: " <<  prob << ", synapse: " << synapse <<  ", weight_distr: " << *(weight_distr.get()) << ", dendrite_delay_distr: " << *(dendrite_delay_distr.get());
-// 	}
-// private:
-//     ConnConfiguration(const ConnConfiguration& other) {}
-//     ConnConfiguration& operator=(const ConnConfiguration& other) { return *this; }
-// };
 
 struct SimConfiguration : public Printable {
 	vector<string> layers;
@@ -80,11 +40,14 @@ struct SimConfiguration : public Printable {
 
 
 struct Constants : public Printable {
-	Constants(const string& fname) {
+	Constants(const string& fname, OptMods mods = OptMods()) {
 		std::ifstream ifs(fname);
 		std::string const_json((std::istreambuf_iterator<char>(ifs)),
 		                       std::istreambuf_iterator<char>());
 
+		for(auto it=mods.begin(); it != mods.end(); ++it) {
+			replaceAll(const_json, it->first, it->second);
+		}
 		Document document = Json::parseString(const_json);
 
 
@@ -98,13 +61,6 @@ struct Constants : public Printable {
 
 		for (SizeType i = 0; i < layers_doc.Size(); i++) {
 			const Value &v = layers_doc[i];
-			// LayerConfiguration lc(
-			// 	Json::getUintVal(v, "size"),
-			// 	Json::getStringVal(v, "neuron"),
-			// 	Json::getStringVal(v, "act_function"),
-			// 	parseDistribution<double>(Json::getStringValDef(v, "axon_delay_distr", "Exp(0,0)"))
-			// );
-			// sim_conf.layers.push_back(std::move(lc));
 			sim_conf.layers.push_back(Json::stringify(v));
 		}
 		const Value &conn_map_doc = Json::getVal(sim_conf_doc, "conn_map");
@@ -123,13 +79,6 @@ struct Constants : public Printable {
 
 			for (SizeType i = 0; i < conns.Size(); i++) {
 				const Value &v = conns[i];
-				// ConnConfiguration conn_conf(
-				// 	Json::getDoubleVal(v, "prob"),
-				// 	Json::getStringVal(v, "synapse"),
-				// 	parseDistribution<double>(Json::getStringVal(v, "start_weight")),
-				// 	parseDistribution<double>(Json::getStringValDef(v, "dendrite_delay", 0))
-				// );
-				// sim_conf.conn_map.insert( pair<pair<size_t,size_t>, ConnConfiguration>(aff_p, std::move(conn_conf)) );
 				sim_conf.conn_map.insert( pair<pair<size_t, size_t>, string>(aff_p, Json::stringify(v) ));
 			}
 		}
@@ -176,6 +125,7 @@ struct Constants : public Printable {
 			}
 		}
 	}
+
 
 	map<string, string> neurons;
 	map<string, string> act_functions;

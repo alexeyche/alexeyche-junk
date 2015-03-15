@@ -37,6 +37,7 @@ struct IndexSlice {
     size_t from;
     size_t to;
 };
+void replaceAll( string &s, const string &search, const string &replace );
 
 vector<IndexSlice> dispatchOnThreads(size_t elements_size, size_t jobs);
 

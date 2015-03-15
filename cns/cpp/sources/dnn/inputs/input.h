@@ -25,7 +25,7 @@ public:
     }
 
     virtual void setTimeSeries(const string& filename, const string& format) = 0;
-
+    virtual double getDuration() = 0;
 };
 
 // /*@GENERATE_PROTO@*/

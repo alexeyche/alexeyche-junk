@@ -42,7 +42,6 @@ Factory::Factory() {
 	REG_TYPE(SynapseInfo);
 	REG_TYPE_WITH_CONST(Determ);
 	REG_TYPE_WITH_STATE_AND_CONST(InputTimeSeries);
-
 }
 
 Factory::~Factory() {

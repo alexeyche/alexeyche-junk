@@ -25,6 +25,8 @@ public:
 };
 
 
+typedef map<string, string> OptMods;
+
 struct SynSpike;
 struct Time;
 

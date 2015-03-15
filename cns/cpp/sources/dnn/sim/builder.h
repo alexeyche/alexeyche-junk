@@ -19,7 +19,6 @@ public:
 
 	vector<InterfacedPtr<SpikeNeuronBase>> buildNeurons() {
 		vector<Layer> layers;
-
 		for (const string &lc : c.sim_conf.layers) {
 			Layer layer;
 			Document layer_conf = Json::parseStringC(lc);
@@ -55,7 +54,6 @@ public:
 						cerr << "Failed to set input file for " << o->name() << "\n";
 						terminate();
 					}
-					
 					inp->setTimeSeries(Json::getStringVal(file_conf, "filename"), Json::getStringVal(file_conf, "format"));
 				}
 			}
