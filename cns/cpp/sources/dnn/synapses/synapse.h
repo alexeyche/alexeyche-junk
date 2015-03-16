@@ -8,6 +8,7 @@ namespace dnn {
 struct SynapseInterface {
 	stateDelegate propagateSpike;
 	calculateDynamicsDelegate calculateDynamics;
+	getDoubleDelegate getMembranePotential;
 };
 
 
@@ -27,7 +28,7 @@ public:
 
 	virtual void propagateSpike() = 0;
 	virtual void calculateDynamics(const Time &t) = 0;
-
+	virtual const double& getMembranePotential() = 0;
 	virtual void provideInterface(SynapseInterface &i) = 0;
 
 	static void provideDefaultInterface(SynapseInterface &i) {

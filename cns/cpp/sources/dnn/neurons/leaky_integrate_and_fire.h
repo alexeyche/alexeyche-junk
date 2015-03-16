@@ -55,10 +55,17 @@ public:
     }
 
     void calculateDynamics(const Time& t) {
-        s.u += t.dt * ( (s.u - c.leak)/c.R + input.ifc().getValue()) / c.C; 
+        double syns_pot = 0.0;
+        for(auto &s: syns) {
+            syns_pot += s.ifc().getMembranePotential();
+        }
+
+        s.u += t.dt * ( -(s.u - c.leak)/c.R + input.ifc().getValue(t) + syns_pot) / c.C; 
+        
         if(getUnif() < act_f.ifc().prob(s.u)) {
             s.fired = true;
         }
+
         stat.add("u", s.u);
     }
 

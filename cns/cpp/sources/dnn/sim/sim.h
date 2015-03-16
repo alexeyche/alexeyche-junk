@@ -1,7 +1,7 @@
 #pragma once
 
 #include <dnn/base/factory.h>
-#include <dnn/util/barrier.h>
+#include <dnn/util/spinning_barrier.h>
 #include "builder.h"
 
 namespace dnn {
@@ -37,7 +37,7 @@ public:
 	}
 	
 	
-	static void runWorker(Sim &s, size_t from, size_t to, Barrier &barrier) {
+	static void runWorker(Sim &s, size_t from, size_t to, SpinningBarrier &barrier) {
 		Time t(s.c.sim_conf.dt);
 
 		for(; t<s.duration; ++t) {
@@ -48,14 +48,15 @@ public:
 					cout << s.neurons[i].ref().id() << " made spike\n";
 				}
 			}
+			barrier.wait();
 		}		
-		barrier.wait();		
+		
 	}
 	void run(size_t jobs) {
 		vector<IndexSlice> slices = dispatchOnThreads(neurons.size(), jobs);
 		vector<std::thread> threads;
 		
-		Barrier barrier(jobs);		
+		SpinningBarrier barrier(jobs);		
 		for(auto &slice: slices) {
 			threads.emplace_back(Sim::runWorker, std::ref(*this), slice.from, slice.to, std::ref(barrier));
 		}
@@ -69,6 +70,8 @@ private:
 	double duration;
 	const Constants &c;
 	vector<InterfacedPtr<SpikeNeuronBase>> neurons;
+
+	Network net;
 };
 
 }

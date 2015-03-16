@@ -7,18 +7,20 @@ namespace dnn {
 
 
 struct InputInterface {
-    retDoubleDelegate getValue;
+    retRefDoubleAtTimeDelegate getValue;
 };
 
 class InputBase : public SerializableBase {
 public:
     typedef InputInterface interface;
+    
 
-    virtual double getValue() = 0;
+    virtual const double& getValue(const Time &t) = 0;
     virtual void provideInterface(InputInterface &i) = 0;
-
-    static double getValueDefault() {
-        return 0.0;
+    
+    static const double def_value;
+    static const double& getValueDefault(const Time &t) {
+        return def_value;
     }
     static void provideDefaultInterface(InputInterface &i) {
         i.getValue = &InputBase::getValueDefault;
@@ -27,6 +29,8 @@ public:
     virtual void setTimeSeries(const string& filename, const string& format) = 0;
     virtual double getDuration() = 0;
 };
+
+
 
 // /*@GENERATE_PROTO@*/
 // struct InputInfo : public Serializable<Protos::InputInfo> {

@@ -7,17 +7,17 @@ namespace dnn {
 
 /*@GENERATE_PROTO@*/
 struct Stat : public Serializable<Protos::Stat> {
-	Stat() : low_lim(-1), high_lim(-1), __counter(0) {} 
-	
+	Stat() : low_lim(-1), high_lim(-1), __counter(0) {}
+
 	void serial_process() {
 		begin() << "name: " << name << ", "
-				<< "vals: " << vals << ", "
-				<< "low_lim: " << low_lim << ", "
-				<< "high_lim: " << high_lim << Self::end;
+		        << "vals: " << vals << ", "
+		        << "low_lim: " << low_lim << ", "
+		        << "high_lim: " << high_lim << Self::end;
 	}
 
 	void add(const double &s) {
-		if( ((low_lim>0)&&(__counter<low_lim)) || ((high_lim>0)&&(__counter>=high_lim)) ) { __counter++; return; }
+		if ( ((low_lim > 0) && (__counter < low_lim)) || ((high_lim > 0) && (__counter >= high_lim)) ) { __counter++; return; }
 		vals.push_back(s);
 		__counter++;
 	}
@@ -31,14 +31,16 @@ struct Stat : public Serializable<Protos::Stat> {
 	vector<double> vals;
 };
 
-struct StatInfo : public Serializable<Protos::Stat> {	
+/*@GENERATE_PROTO@*/
+struct StatisticsInfo : public Serializable<Protos::StatisticsInfo> {
 	void serial_process() {
-		begin() << "name: " 	<< name 	<< ", "
-		 	    << "stat_num: " << stat_num << Self::end;
+		begin() << "stat_names: " << stat_names << ", "
+		        << "low_lim: "    << low_lim    << ", "
+		        << "high_lim: "   << high_lim << Self::end;
 	}
-
-	string name;
-	size_t stat_num;
+	size_t low_lim;
+	size_t high_lim;
+	vector<string> stat_names;
 };
 
 
@@ -46,9 +48,9 @@ class Statistics : public SerializableBase {
 public:
 	Statistics() : low_lim(-1), high_lim(-1), _on(false) {
 		const char* stat_limit_str = std::getenv("STAT_LIMIT");
-		if(stat_limit_str) {
+		if (stat_limit_str) {
 			vector<string> spl = split(stat_limit_str, ':');
-			if(spl.size() == 2) {
+			if (spl.size() == 2) {
 				low_lim  = std::stoi(spl[0]);
 				high_lim = std::stoi(spl[1]);
 			} else {
@@ -59,11 +61,24 @@ public:
 	const string name() const {
 		return "Statistics";
 	}
-
+	StatisticsInfo getInfo() {
+		StatisticsInfo info;
+		for (auto it = stats.begin(); it != stats.end(); ++it) {
+			info.stat_names.push_back(it->first);
+		}
+		info.low_lim = low_lim;
+		info.high_lim = high_lim;
+		return info;
+	}
 	void serial_process() {
+
+		StatisticsInfo info;
+		if (mode == ProcessingOutput) {
+			info = getInfo();
+		}
 		begin() << "info: " << info << ", ";
-		for(auto it=stats.begin(); it != stats.end(); ++it){
-			(*this) << "stat: " << it->second << ", ";
+		for (auto it = info.stat_names.begin(); it != info.stat_names.end(); ++it) {
+			(*this) << "stat: " << stats[*it] << ", ";
 		}
 		(*this) << Self::end;
 	}
@@ -71,13 +86,13 @@ public:
 	void turnOn() {
 		_on = true;
 	}
-	
+
 	const bool&	on() {
 		return _on;
 	}
-	void add(const string &name, const double &v) {
-		if(!_on) return;
-		if(stats.find(name) == stats.end()) {
+	inline void add(const string &name, const double &v) {
+		if (!_on) return;
+		if (stats.find(name) == stats.end()) {
 			Stat s;
 			s.name = name;
 			s.low_lim = low_lim;
@@ -87,7 +102,6 @@ public:
 		stats[name].add(v);
 	}
 
-	StatInfo info;
 	map<string, Stat> stats;
 	int low_lim;
 	int high_lim;

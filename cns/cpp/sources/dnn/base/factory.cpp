@@ -8,6 +8,7 @@
 #include <dnn/inputs/input_time_series.h>
 #include <dnn/io/serialize.h>
 #include <dnn/util/time_series.h>
+#include <dnn/util/statistics.h>
 
 #include "factory.h"
 
@@ -42,6 +43,9 @@ Factory::Factory() {
 	REG_TYPE(SynapseInfo);
 	REG_TYPE_WITH_CONST(Determ);
 	REG_TYPE_WITH_STATE_AND_CONST(InputTimeSeries);
+	REG_TYPE(Statistics);
+	REG_TYPE(StatisticsInfo);
+	REG_TYPE(Stat);
 }
 
 Factory::~Factory() {

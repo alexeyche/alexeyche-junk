@@ -39,6 +39,7 @@ typedef FastDelegate0<const bool&> getBoolDelegate;
 typedef FastDelegate0<bool> getBoolCopyDelegate;
 typedef FastDelegate0<const double&> getDoubleDelegate;
 typedef FastDelegate0<double> retDoubleDelegate;
+typedef FastDelegate1<const Time&,const double&> retRefDoubleAtTimeDelegate;
 typedef FastDelegate1<const Time&> calculateDynamicsDelegate;
 typedef FastDelegate1<const size_t&, const double&> getValueAtIndexDelegate;
 

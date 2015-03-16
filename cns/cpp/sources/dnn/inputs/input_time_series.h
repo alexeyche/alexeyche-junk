@@ -20,9 +20,9 @@ struct InputTimeSeriesC : public Serializable<Protos::InputTimeSeriesC> {
 
 /*@GENERATE_PROTO@*/
 struct InputTimeSeriesState : public Serializable<Protos::InputTimeSeriesState> {
-    InputTimeSeriesState() : index(0) {}
+    InputTimeSeriesState() : index(0), _t(0) {}
     size_t index;
-
+    double _t;
     void serial_process() {
         begin() << "index: " << index << Self::end;
     }
@@ -37,8 +37,10 @@ public:
         return "InputTimeSeries";
     }
 
-	double getValue() {
-        return ts.ref().data.vals[s.index];
+	const double& getValue(const Time &t) {
+        s._t += t.dt;
+        if(fmod(s._t, c.dt) > 0.0001) return InputBase::def_value;
+        return ts.ref().data.vals[s.index++];
 	}
     void provideInterface(InputInterface &i) {
         i.getValue = MakeDelegate(this, &InputTimeSeries::getValue);

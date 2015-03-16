@@ -42,10 +42,14 @@ public:
     void calculateDynamics(const Time &t) {
         s.x -= t.dt * s.x/c.psp_decay;
     }
+    const double& getMembranePotential() {
+        return s.x;
+    }
 
     void provideInterface(SynapseInterface &i) {
         i.propagateSpike = MakeDelegate(this, &StaticSynapse::propagateSpike);
         i.calculateDynamics = MakeDelegate(this, &StaticSynapse::calculateDynamics);
+        i.getMembranePotential = MakeDelegate(this, &StaticSynapse::getMembranePotential);
     }
 };
 
