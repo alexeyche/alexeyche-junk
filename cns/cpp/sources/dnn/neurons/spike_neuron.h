@@ -24,6 +24,7 @@ class Builder;
 
 class SpikeNeuronBase : public SerializableBase {
 friend class Builder;
+friend class Sim;
 public:
 	SpikeNeuronBase() {
 		_id = global_neuron_index++;
@@ -93,7 +94,7 @@ public:
 	void addSynapse(InterfacedPtr<SynapseBase> syn) {
 		syns.push_back(syn);
 	}
-
+	
 
 protected:
 	size_t _id;

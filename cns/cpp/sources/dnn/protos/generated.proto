@@ -1,19 +1,11 @@
 package Protos;
 
-message LeakyIntegrateAndFireC {
-    required double leak = 1;
+message InputTimeSeriesC {
+    required double dt = 1;
 }
 
-message LeakyIntegrateAndFireState {
-    required bool fired = 1;
-}
-
-message SpikeNeuronInfo {
-    required uint32 id = 1;
-    required double axon_delay = 2;
-    required uint32 num_of_synapses = 3;
-    required bool act_function_is_set = 4;
-    required bool input_is_set = 5;
+message InputTimeSeriesState {
+    required uint32 index = 1;
 }
 
 message StaticSynapseC {
@@ -22,20 +14,13 @@ message StaticSynapseC {
 }
 
 message StaticSynapseState {
+    required double x = 1;
 }
 
 message SynapseInfo {
     required uint32 id_pre = 1;
     required double dendrite_delay = 2;
     required double weight = 3;
-}
-
-message InputTimeSeriesC {
-    required double dt = 1;
-}
-
-message InputTimeSeriesState {
-    required uint32 index = 1;
 }
 
 message Stat {
@@ -53,6 +38,26 @@ message TimeSeriesInfo {
 
 message TimeSeriesData {
     repeated double vals = 1;
+}
+
+message LeakyIntegrateAndFireC {
+    required double R = 1;
+    required double C = 2;
+    required double leak = 3;
+}
+
+message LeakyIntegrateAndFireState {
+    required bool fired = 1;
+    required double p = 2;
+    required double u = 3;
+}
+
+message SpikeNeuronInfo {
+    required uint32 id = 1;
+    required double axon_delay = 2;
+    required uint32 num_of_synapses = 3;
+    required bool act_function_is_set = 4;
+    required bool input_is_set = 5;
 }
 
 message DetermC {

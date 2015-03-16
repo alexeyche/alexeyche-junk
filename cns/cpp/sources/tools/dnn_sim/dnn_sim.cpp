@@ -13,8 +13,6 @@ const char * usage = R"USAGE(
 USAGE: ./dnn_sim  [options]
 
 Options:
-  --input, -i      Input protobuf file with precalculated spikes or labeled time
-                   series.
   --output, -o     Output file with serialized spikes list
   --const, -c  Constants filename.
   --load, -l       Load model.
@@ -58,9 +56,9 @@ int main(int argc, char **argv) {
 	
 	OptionParser optp(argc, argv);
 	optp.option("--const", "-c", sopt.const_file, true);
-	optp.option("--output", "-o", sopt.jobs, true);
+	optp.option("--output", "-o", sopt.out_spikes, true);
 	optp.option("--jobs", "-j", sopt.jobs, false);
-	optp.loption("--stat", sopt.jobs, false);
+	optp.loption("--stat", sopt.out_stat_file, false);
 	optp.option("--help", "-h", need_help, false, true);
 	if(need_help) { 
 		cout << usage;
@@ -87,5 +85,10 @@ int main(int argc, char **argv) {
 		ofstream fstr(sopt.model_save);
 		Stream str_out(fstr, Stream::Binary);
 		s.serialize(str_out);
+	}
+	if(!sopt.out_stat_file.empty()) {
+		ofstream f(sopt.out_stat_file);
+		Stream str(f, Stream::Binary);
+		s.saveStat(str);
 	}
 }

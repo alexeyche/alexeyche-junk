@@ -28,7 +28,13 @@ public:
 			output_stream.writeObject(n.ptr());
 		}
 	}
-
+	void saveStat(Stream &str) {
+		for(auto &n: neurons) {
+			if(n.ref().stat.on()) {
+				str.writeObject(&n.ref().stat); 
+			}
+		}
+	}
 	
 	
 	static void runWorker(Sim &s, size_t from, size_t to, Barrier &barrier) {
