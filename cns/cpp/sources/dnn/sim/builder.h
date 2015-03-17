@@ -127,6 +127,12 @@ public:
 		input_stream = s;
 	}
 
+	// uptr<Network> buildNetwork(const vector<InterfacedPtr<SpikeNeuronBase>>& neurons) {
+	// 	return uptr<Network>(new Network(neurons))
+	// }
+	
+
+
 private:
 	Stream *input_stream;
 	const Constants &c;

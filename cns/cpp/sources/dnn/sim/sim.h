@@ -2,7 +2,9 @@
 
 #include <dnn/base/factory.h>
 #include <dnn/util/spinning_barrier.h>
+
 #include "builder.h"
+#include "network.h"
 
 namespace dnn {
 
@@ -21,6 +23,7 @@ public:
 				duration = std::max(duration, n.ref().getInput().getDuration());
 			}
 		}
+		net = uptr<Network>(new Network(neurons));
 	}
 	
 	void serialize(Stream &output_stream) {
@@ -70,8 +73,7 @@ private:
 	double duration;
 	const Constants &c;
 	vector<InterfacedPtr<SpikeNeuronBase>> neurons;
-
-	Network net;
+	uptr<Network> net;
 };
 
 }

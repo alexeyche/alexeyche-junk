@@ -1,5 +1,59 @@
 package Protos;
 
+message InputTimeSeriesC {
+    required double dt = 1;
+}
+
+message InputTimeSeriesState {
+    required uint32 index = 1;
+}
+
+message StaticSynapseC {
+    required double psp_decay = 1;
+    required double amp = 2;
+}
+
+message StaticSynapseState {
+    required double x = 1;
+}
+
+message SynapseInfo {
+    required uint32 id_pre = 1;
+    required double dendrite_delay = 2;
+    required double weight = 3;
+}
+
+message Stat {
+    required int32 low_lim = 1;
+    required int32 high_lim = 2;
+    required string name = 3;
+    repeated double vals = 4;
+}
+
+message StatisticsInfo {
+    required uint32 low_lim = 1;
+    required uint32 high_lim = 2;
+    repeated string stat_names = 3;
+}
+
+message SpikesSequence {
+    repeated double vals = 1;
+}
+
+message SpikesListInfo {
+    required uint32 size = 1;
+}
+
+message TimeSeriesInfo {
+    repeated uint32 labels_ids = 1;
+    repeated string unique_labels = 2;
+    repeated uint32 labels_timeline = 3;
+}
+
+message TimeSeriesData {
+    repeated double vals = 1;
+}
+
 message LeakyIntegrateAndFireC {
     required double R = 1;
     required double C = 2;
@@ -18,52 +72,6 @@ message SpikeNeuronInfo {
     required uint32 num_of_synapses = 3;
     required bool act_function_is_set = 4;
     required bool input_is_set = 5;
-}
-
-message StaticSynapseC {
-    required double psp_decay = 1;
-    required double amp = 2;
-}
-
-message StaticSynapseState {
-    required double x = 1;
-}
-
-message SynapseInfo {
-    required uint32 id_pre = 1;
-    required double dendrite_delay = 2;
-    required double weight = 3;
-}
-
-message InputTimeSeriesC {
-    required double dt = 1;
-}
-
-message InputTimeSeriesState {
-    required uint32 index = 1;
-}
-
-message Stat {
-    required int32 low_lim = 1;
-    required int32 high_lim = 2;
-    required string name = 3;
-    repeated double vals = 4;
-}
-
-message StatisticsInfo {
-    required uint32 low_lim = 1;
-    required uint32 high_lim = 2;
-    repeated string stat_names = 3;
-}
-
-message TimeSeriesInfo {
-    repeated uint32 labels_ids = 1;
-    repeated string unique_labels = 2;
-    repeated uint32 labels_timeline = 3;
-}
-
-message TimeSeriesData {
-    repeated double vals = 1;
 }
 
 message DetermC {

@@ -24,6 +24,9 @@ public:
 	}
 	void setWeight(double w) {
 		weight = w;
+	}	
+	inline const size_t& getIdPre() { 
+		return id_pre;
 	}
 
 	virtual void propagateSpike() = 0;

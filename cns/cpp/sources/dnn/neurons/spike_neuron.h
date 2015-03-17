@@ -94,7 +94,9 @@ public:
 	void addSynapse(InterfacedPtr<SynapseBase> syn) {
 		syns.push_back(syn);
 	}
-	
+	inline vector<InterfacedPtr<SynapseBase>>& getSynapses() {
+		return syns;
+	}
 
 protected:
 	size_t _id;

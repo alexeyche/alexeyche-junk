@@ -4,67 +4,104 @@
 !_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 ActFunction	dnn/act_functions/act_function.h	/^class ActFunction : public ActFunctionBase {$/;"	c	namespace:dnn
-ActFunctionBase	dnn/act_functions/act_function.h	/^class ActFunctionBase {$/;"	c	namespace:dnn
+ActFunctionBase	dnn/act_functions/act_function.h	/^class ActFunctionBase : public SerializableBase {$/;"	c	namespace:dnn
 ActFunctionInterface	dnn/act_functions/act_function.h	/^struct ActFunctionInterface {$/;"	s	namespace:dnn
-c	dnn/act_functions/act_function.h	/^	const Constants c;$/;"	m	class:dnn::ActFunction
+__default	dnn/act_functions/act_function.h	/^	static double __default(const double &u) { $/;"	f	class:dnn::ActFunctionBase
+c	dnn/act_functions/act_function.h	/^	Constants c;$/;"	m	class:dnn::ActFunction
 dnn	dnn/act_functions/act_function.h	/^namespace dnn {$/;"	n
 interface	dnn/act_functions/act_function.h	/^	typedef ActFunctionInterface interface;$/;"	t	class:dnn::ActFunctionBase
 prob	dnn/act_functions/act_function.h	/^	funDelegate prob;$/;"	m	struct:dnn::ActFunctionInterface
 probDeriv	dnn/act_functions/act_function.h	/^	funDelegate probDeriv;$/;"	m	struct:dnn::ActFunctionInterface
 provideDefaultInterface	dnn/act_functions/act_function.h	/^	static void provideDefaultInterface(ActFunctionInterface &i) {$/;"	f	class:dnn::ActFunctionBase
+serial_process	dnn/act_functions/act_function.h	/^	void serial_process() {$/;"	f	class:dnn::ActFunction
 Determ	dnn/act_functions/determ.h	/^class Determ : public ActFunction<DetermC> {$/;"	c	namespace:dnn
 DetermC	dnn/act_functions/determ.h	/^    DetermC() : treshold(15.0) {}$/;"	f	struct:dnn::DetermC
 DetermC	dnn/act_functions/determ.h	/^struct DetermC : public Serializable<Protos::DetermC> {$/;"	s	namespace:dnn
 dnn	dnn/act_functions/determ.h	/^namespace dnn {$/;"	n
+name	dnn/act_functions/determ.h	/^    const string name() const {$/;"	f	class:dnn::Determ
 prob	dnn/act_functions/determ.h	/^    double prob(const double &u) {$/;"	f	class:dnn::Determ
 probDeriv	dnn/act_functions/determ.h	/^    double probDeriv(const double &u) {$/;"	f	class:dnn::Determ
-processStream	dnn/act_functions/determ.h	/^    void processStream(Stream &str) {$/;"	f	struct:dnn::DetermC
 provideInterface	dnn/act_functions/determ.h	/^    void provideInterface(ActFunctionInterface &i) {$/;"	f	class:dnn::Determ
+serial_process	dnn/act_functions/determ.h	/^    void serial_process() {$/;"	f	struct:dnn::DetermC
 treshold	dnn/act_functions/determ.h	/^    double treshold;$/;"	m	struct:dnn::DetermC
 Object	dnn/base/base.h	/^class Object {$/;"	c	namespace:dnn
+OptMods	dnn/base/base.h	/^typedef map<string, string> OptMods;$/;"	t	namespace:dnn
 Printable	dnn/base/base.h	/^class Printable: public Object {$/;"	c	namespace:dnn
 SynSpike	dnn/base/base.h	/^struct SynSpike {$/;"	s	namespace:dnn
+Time	dnn/base/base.h	/^    Time(double _dt) : t(0), dt(_dt) {}$/;"	f	struct:dnn::Time
 Time	dnn/base/base.h	/^struct Time {$/;"	s	namespace:dnn
 attachDelegate	dnn/base/base.h	/^typedef FastDelegate1<const double&> attachDelegate;$/;"	t	namespace:dnn
 calculateDynamicsDelegate	dnn/base/base.h	/^typedef FastDelegate1<const Time&> calculateDynamicsDelegate;$/;"	t	namespace:dnn
 dnn	dnn/base/base.h	/^namespace dnn {$/;"	n
 dt	dnn/base/base.h	/^    double dt;$/;"	m	struct:dnn::Time
 funDelegate	dnn/base/base.h	/^typedef FastDelegate1<const double&, double> funDelegate;$/;"	t	namespace:dnn
+getBoolCopyDelegate	dnn/base/base.h	/^typedef FastDelegate0<bool> getBoolCopyDelegate;$/;"	t	namespace:dnn
 getBoolDelegate	dnn/base/base.h	/^typedef FastDelegate0<const bool&> getBoolDelegate;$/;"	t	namespace:dnn
 getDoubleDelegate	dnn/base/base.h	/^typedef FastDelegate0<const double&> getDoubleDelegate;$/;"	t	namespace:dnn
+getValueAtIndexDelegate	dnn/base/base.h	/^typedef FastDelegate1<const size_t&, const double&> getValueAtIndexDelegate;$/;"	t	namespace:dnn
 n_id	dnn/base/base.h	/^    size_t n_id;$/;"	m	struct:dnn::SynSpike
-operator <<	dnn/base/base.h	/^    friend std::ostream& operator<<(std::ostream& str, Printable const& data) {$/;"	f	class:dnn::Printable
+operator ++	dnn/base/base.h	/^    void operator ++() {$/;"	f	struct:dnn::Time
+operator <	dnn/base/base.h	/^    bool operator<(const double &dur) {$/;"	f	struct:dnn::Time
+operator <<	dnn/base/base.h	/^    friend std::ostream& operator<<(std::ostream& str, const Printable &data) {$/;"	f	class:dnn::Printable
 propSynSpikeDelegate	dnn/base/base.h	/^typedef FastDelegate1<const SynSpike&> propSynSpikeDelegate;$/;"	t	namespace:dnn
 retDoubleDelegate	dnn/base/base.h	/^typedef FastDelegate0<double> retDoubleDelegate;$/;"	t	namespace:dnn
+retRefDoubleAtTimeDelegate	dnn/base/base.h	/^typedef FastDelegate1<const Time&,const double&> retRefDoubleAtTimeDelegate;$/;"	t	namespace:dnn
 stateDelegate	dnn/base/base.h	/^typedef FastDelegate0<> stateDelegate;$/;"	t	namespace:dnn
 syn_id	dnn/base/base.h	/^    size_t syn_id;$/;"	m	struct:dnn::SynSpike
 t	dnn/base/base.h	/^    double t;$/;"	m	struct:dnn::SynSpike
 t	dnn/base/base.h	/^    double t;$/;"	m	struct:dnn::Time
-~Object	dnn/base/base.h	/^    ~Object() {}$/;"	f	class:dnn::Object
-ConnConfiguration	dnn/base/constants.h	/^struct ConnConfiguration {$/;"	s	namespace:dnn
-Constants	dnn/base/constants.h	/^	Constants(const string& fname) {$/;"	f	struct:dnn::Constants
-Constants	dnn/base/constants.h	/^struct Constants {$/;"	s	namespace:dnn
-LayerConfiguration	dnn/base/constants.h	/^struct LayerConfiguration {$/;"	s	namespace:dnn
-SimConfiguration	dnn/base/constants.h	/^struct SimConfiguration {$/;"	s	namespace:dnn
-act_function	dnn/base/constants.h	/^	string act_function;$/;"	m	struct:dnn::LayerConfiguration
+~Object	dnn/base/base.h	/^    virtual ~Object() {}$/;"	f	class:dnn::Object
+Constants	dnn/base/constants.h	/^	Constants(const string& fname, OptMods mods = OptMods()) {$/;"	f	struct:dnn::Constants
+Constants	dnn/base/constants.h	/^struct Constants : public Printable {$/;"	s	namespace:dnn
+SimConfiguration	dnn/base/constants.h	/^struct SimConfiguration : public Printable {$/;"	s	namespace:dnn
 act_functions	dnn/base/constants.h	/^	map<string, string> act_functions;$/;"	m	struct:dnn::Constants
-axon_delay_distr	dnn/base/constants.h	/^	Distribution<double> *axon_delay_distr;$/;"	m	struct:dnn::LayerConfiguration
-conn_map	dnn/base/constants.h	/^	map< pair<size_t, size_t>, ConnConfiguration> conn_map;$/;"	m	struct:dnn::SimConfiguration
-dendrite_delay_distr	dnn/base/constants.h	/^	Distribution<double> *dendrite_delay_distr;$/;"	m	struct:dnn::ConnConfiguration
+conn_map	dnn/base/constants.h	/^	multimap< pair<size_t, size_t>, string> conn_map;$/;"	m	struct:dnn::SimConfiguration
 dnn	dnn/base/constants.h	/^namespace dnn {$/;"	n
 dt	dnn/base/constants.h	/^	double dt;$/;"	m	struct:dnn::SimConfiguration
-layers	dnn/base/constants.h	/^	vector<LayerConfiguration> layers;$/;"	m	struct:dnn::SimConfiguration
-neuron	dnn/base/constants.h	/^	string neuron;$/;"	m	struct:dnn::LayerConfiguration
+files	dnn/base/constants.h	/^	map<string, string> files;$/;"	m	struct:dnn::SimConfiguration
+fill	dnn/base/constants.h	/^	static void fill(const Value &v, map<string, string> &m) {$/;"	f	struct:dnn::Constants
+inputs	dnn/base/constants.h	/^	map<string, string> inputs;$/;"	m	struct:dnn::Constants
+layers	dnn/base/constants.h	/^	vector<string> layers;$/;"	m	struct:dnn::SimConfiguration
 neurons	dnn/base/constants.h	/^	map<string, string> neurons;$/;"	m	struct:dnn::Constants
-neurons_to_listen	dnn/base/constants.h	/^	vector<size_t> neurons_to_listen; $/;"	m	struct:dnn::SimConfiguration
-prob	dnn/base/constants.h	/^	double prob;$/;"	m	struct:dnn::ConnConfiguration
+neurons_to_listen	dnn/base/constants.h	/^	vector<size_t> neurons_to_listen;$/;"	m	struct:dnn::SimConfiguration
+print	dnn/base/constants.h	/^	void print(ostream &o) const {$/;"	f	struct:dnn::Constants
+print	dnn/base/constants.h	/^	void print(ostream &o) const {$/;"	f	struct:dnn::SimConfiguration
+print_section	dnn/base/constants.h	/^	static void print_section(const string &sect_name, const map<string, string> &m, ostream &o) {$/;"	f	struct:dnn::Constants
 seed	dnn/base/constants.h	/^	int seed;$/;"	m	struct:dnn::SimConfiguration
 sim_conf	dnn/base/constants.h	/^	SimConfiguration sim_conf;$/;"	m	struct:dnn::Constants
-size	dnn/base/constants.h	/^	size_t size;$/;"	m	struct:dnn::LayerConfiguration
-stringify	dnn/base/constants.h	/^	static string stringify(const Value &v) {$/;"	f	struct:dnn::Constants
-synapse	dnn/base/constants.h	/^	string synapse;$/;"	m	struct:dnn::ConnConfiguration
 synapses	dnn/base/constants.h	/^	map<string, string> synapses;$/;"	m	struct:dnn::Constants
-weight_distr	dnn/base/constants.h	/^	Distribution<double>* weight_distr;$/;"	m	struct:dnn::ConnConfiguration
+Factory	dnn/base/factory.cpp	/^Factory::Factory() {$/;"	f	class:dnn::Factory
+REG_TYPE	dnn/base/factory.cpp	26;"	d	file:
+REG_TYPE_WITH_CONST	dnn/base/factory.cpp	29;"	d	file:
+REG_TYPE_WITH_STATE_AND_CONST	dnn/base/factory.cpp	33;"	d	file:
+createActFunction	dnn/base/factory.cpp	/^ActFunctionBase* Factory::createActFunction(string name) {$/;"	f	class:dnn::Factory
+createObject	dnn/base/factory.cpp	/^SerializableBase* Factory::createObject(string name) {$/;"	f	class:dnn::Factory
+createProto	dnn/base/factory.cpp	/^ProtoMessage Factory::createProto(string name) {$/;"	f	class:dnn::Factory
+createSpikeNeuron	dnn/base/factory.cpp	/^SpikeNeuronBase* Factory::createSpikeNeuron(string name) {$/;"	f	class:dnn::Factory
+deleteLast	dnn/base/factory.cpp	/^void Factory::deleteLast() {$/;"	f	class:dnn::Factory
+dnn	dnn/base/factory.cpp	/^namespace dnn {$/;"	n	file:
+getCachedTimeSeries	dnn/base/factory.cpp	/^TimeSeries* Factory::getCachedTimeSeries(const string &name, const string& filename, const string& format) {$/;"	f	class:dnn::Factory
+getObjectsSlice	dnn/base/factory.cpp	/^pair<Factory::object_iter, Factory::object_iter> Factory::getObjectsSlice(const string& name) {$/;"	f	class:dnn::Factory
+inst	dnn/base/factory.cpp	/^Factory& Factory::inst() {$/;"	f	class:dnn::Factory
+prototypemap	dnn/base/factory.cpp	/^Factory::proto_map_type Factory::prototypemap;$/;"	m	class:dnn::Factory	file:
+typemap	dnn/base/factory.cpp	/^Factory::entity_map_type Factory::typemap;$/;"	m	class:dnn::Factory	file:
+~Factory	dnn/base/factory.cpp	/^Factory::~Factory() {$/;"	f	class:dnn::Factory
+Factory	dnn/base/factory.h	/^class Factory {$/;"	c	namespace:dnn
+createInstance	dnn/base/factory.h	/^    template<typename INST> static SerializableBase* createInstance() { return new INST; }$/;"	f	class:dnn::Factory
+createProtoInstance	dnn/base/factory.h	/^    template<typename INST> static ProtoMessage createProtoInstance() { return new INST; }$/;"	f	class:dnn::Factory
+dnn	dnn/base/factory.h	/^namespace dnn {$/;"	n
+entity_map_type	dnn/base/factory.h	/^    typedef map<string, SerializableBase* (*)()> entity_map_type;$/;"	t	class:dnn::Factory
+getObject	dnn/base/factory.h	/^    SerializableBase* getObject(object_iter &it) {$/;"	f	class:dnn::Factory
+isProtoType	dnn/base/factory.h	/^    bool isProtoType(const string name) {$/;"	f	class:dnn::Factory
+object_iter	dnn/base/factory.h	/^    typedef multimap<string, size_t>::iterator object_iter;$/;"	t	class:dnn::Factory
+objects	dnn/base/factory.h	/^    vector<SerializableBase*> objects;$/;"	m	class:dnn::Factory
+objects_map	dnn/base/factory.h	/^    multimap<string, size_t> objects_map;$/;"	m	class:dnn::Factory
+proto_map_type	dnn/base/factory.h	/^    typedef map<string, ProtoMessage (*)()> proto_map_type;$/;"	t	class:dnn::Factory
+proto_objects	dnn/base/factory.h	/^    vector<ProtoMessage> proto_objects;$/;"	m	class:dnn::Factory
+prototypemap	dnn/base/factory.h	/^    static proto_map_type prototypemap;$/;"	m	class:dnn::Factory
+registerType	dnn/base/factory.h	/^    static void registerType(const string type) {$/;"	f	class:dnn::Factory
+ts_map	dnn/base/factory.h	/^    map<string, TimeSeries*> ts_map;$/;"	m	class:dnn::Factory
+typemap	dnn/base/factory.h	/^    static entity_map_type typemap;$/;"	m	class:dnn::Factory
 __BIN2ASCII_H__	dnn/contrib/pbjson/bin2ascii.h	9;"	d
 b64_decode	dnn/contrib/pbjson/bin2ascii.h	/^inline std::string b64_decode(const std::string &s)$/;"	f
 b64_encode	dnn/contrib/pbjson/bin2ascii.h	/^inline std::string b64_encode(const std::string &s)$/;"	f
@@ -221,9 +258,9 @@ Iterator	dnn/contrib/rapidjson/document.h	/^    typedef GenericMember<Encoding,A
 Iterator	dnn/contrib/rapidjson/document.h	/^    typedef GenericMemberIterator Iterator;$/;"	t	class:GenericMemberIterator
 Iterator	dnn/contrib/rapidjson/document.h	/^    typedef const GenericMember<Encoding,Allocator>* Iterator;$/;"	t	struct:GenericMemberIterator
 Key	dnn/contrib/rapidjson/document.h	/^    bool Key(const Ch* str, SizeType length, bool copy) { return String(str, length, copy); }$/;"	f	class:GenericDocument
-LenPos	dnn/contrib/rapidjson/document.h	/^        enum { MaxChars = sizeof(String) \/ sizeof(Ch), MaxSize = MaxChars - 1, LenPos = MaxSize };$/;"	e	enum:GenericValue::ShortString::__anon14
-MaxChars	dnn/contrib/rapidjson/document.h	/^        enum { MaxChars = sizeof(String) \/ sizeof(Ch), MaxSize = MaxChars - 1, LenPos = MaxSize };$/;"	e	enum:GenericValue::ShortString::__anon14
-MaxSize	dnn/contrib/rapidjson/document.h	/^        enum { MaxChars = sizeof(String) \/ sizeof(Ch), MaxSize = MaxChars - 1, LenPos = MaxSize };$/;"	e	enum:GenericValue::ShortString::__anon14
+LenPos	dnn/contrib/rapidjson/document.h	/^        enum { MaxChars = sizeof(String) \/ sizeof(Ch), MaxSize = MaxChars - 1, LenPos = MaxSize };$/;"	e	enum:GenericValue::ShortString::__anon21
+MaxChars	dnn/contrib/rapidjson/document.h	/^        enum { MaxChars = sizeof(String) \/ sizeof(Ch), MaxSize = MaxChars - 1, LenPos = MaxSize };$/;"	e	enum:GenericValue::ShortString::__anon21
+MaxSize	dnn/contrib/rapidjson/document.h	/^        enum { MaxChars = sizeof(String) \/ sizeof(Ch), MaxSize = MaxChars - 1, LenPos = MaxSize };$/;"	e	enum:GenericValue::ShortString::__anon21
 Member	dnn/contrib/rapidjson/document.h	/^    typedef GenericMember<Encoding, Allocator> Member;$/;"	t	class:GenericValue
 MemberBegin	dnn/contrib/rapidjson/document.h	/^    ConstMemberIterator MemberBegin() const { RAPIDJSON_ASSERT(IsObject()); return ConstMemberIterator(data_.o.members); }$/;"	f	class:GenericValue
 MemberBegin	dnn/contrib/rapidjson/document.h	/^    MemberIterator MemberBegin()            { RAPIDJSON_ASSERT(IsObject()); return MemberIterator(data_.o.members); }$/;"	f	class:GenericValue
@@ -316,34 +353,34 @@ i	dnn/contrib/rapidjson/document.h	/^            int i;$/;"	m	struct:GenericValu
 i	dnn/contrib/rapidjson/document.h	/^        }i;$/;"	m	union:GenericValue::Number	typeref:struct:GenericValue::Number::I
 i64	dnn/contrib/rapidjson/document.h	/^        int64_t i64;$/;"	m	union:GenericValue::Number
 internal	dnn/contrib/rapidjson/document.h	/^namespace internal {$/;"	n
-kArrayFlag	dnn/contrib/rapidjson/document.h	/^        kArrayFlag = kArrayType,$/;"	e	enum:GenericValue::__anon13
-kBoolFlag	dnn/contrib/rapidjson/document.h	/^        kBoolFlag = 0x100,$/;"	e	enum:GenericValue::__anon13
-kConstStringFlag	dnn/contrib/rapidjson/document.h	/^        kConstStringFlag = kStringType | kStringFlag,$/;"	e	enum:GenericValue::__anon13
-kCopyFlag	dnn/contrib/rapidjson/document.h	/^        kCopyFlag = 0x200000,$/;"	e	enum:GenericValue::__anon13
-kCopyStringFlag	dnn/contrib/rapidjson/document.h	/^        kCopyStringFlag = kStringType | kStringFlag | kCopyFlag,$/;"	e	enum:GenericValue::__anon13
+kArrayFlag	dnn/contrib/rapidjson/document.h	/^        kArrayFlag = kArrayType,$/;"	e	enum:GenericValue::__anon20
+kBoolFlag	dnn/contrib/rapidjson/document.h	/^        kBoolFlag = 0x100,$/;"	e	enum:GenericValue::__anon20
+kConstStringFlag	dnn/contrib/rapidjson/document.h	/^        kConstStringFlag = kStringType | kStringFlag,$/;"	e	enum:GenericValue::__anon20
+kCopyFlag	dnn/contrib/rapidjson/document.h	/^        kCopyFlag = 0x200000,$/;"	e	enum:GenericValue::__anon20
+kCopyStringFlag	dnn/contrib/rapidjson/document.h	/^        kCopyStringFlag = kStringType | kStringFlag | kCopyFlag,$/;"	e	enum:GenericValue::__anon20
 kDefaultArrayCapacity	dnn/contrib/rapidjson/document.h	/^    static const SizeType kDefaultArrayCapacity = 16;$/;"	m	class:GenericValue
 kDefaultObjectCapacity	dnn/contrib/rapidjson/document.h	/^    static const SizeType kDefaultObjectCapacity = 16;$/;"	m	class:GenericValue
 kDefaultStackCapacity	dnn/contrib/rapidjson/document.h	/^    static const size_t kDefaultStackCapacity = 1024;$/;"	m	class:GenericDocument
-kDoubleFlag	dnn/contrib/rapidjson/document.h	/^        kDoubleFlag = 0x4000,$/;"	e	enum:GenericValue::__anon13
-kFalseFlag	dnn/contrib/rapidjson/document.h	/^        kFalseFlag = kFalseType | kBoolFlag,$/;"	e	enum:GenericValue::__anon13
-kInlineStrFlag	dnn/contrib/rapidjson/document.h	/^        kInlineStrFlag = 0x400000,$/;"	e	enum:GenericValue::__anon13
-kInt64Flag	dnn/contrib/rapidjson/document.h	/^        kInt64Flag = 0x1000,$/;"	e	enum:GenericValue::__anon13
-kIntFlag	dnn/contrib/rapidjson/document.h	/^        kIntFlag = 0x400,$/;"	e	enum:GenericValue::__anon13
-kNullFlag	dnn/contrib/rapidjson/document.h	/^        kNullFlag = kNullType,$/;"	e	enum:GenericValue::__anon13
-kNumberAnyFlag	dnn/contrib/rapidjson/document.h	/^        kNumberAnyFlag = kNumberType | kNumberFlag | kIntFlag | kInt64Flag | kUintFlag | kUint64Flag | kDoubleFlag,$/;"	e	enum:GenericValue::__anon13
-kNumberDoubleFlag	dnn/contrib/rapidjson/document.h	/^        kNumberDoubleFlag = kNumberType | kNumberFlag | kDoubleFlag,$/;"	e	enum:GenericValue::__anon13
-kNumberFlag	dnn/contrib/rapidjson/document.h	/^        kNumberFlag = 0x200,$/;"	e	enum:GenericValue::__anon13
-kNumberInt64Flag	dnn/contrib/rapidjson/document.h	/^        kNumberInt64Flag = kNumberType | kNumberFlag | kInt64Flag,$/;"	e	enum:GenericValue::__anon13
-kNumberIntFlag	dnn/contrib/rapidjson/document.h	/^        kNumberIntFlag = kNumberType | kNumberFlag | kIntFlag | kInt64Flag,$/;"	e	enum:GenericValue::__anon13
-kNumberUint64Flag	dnn/contrib/rapidjson/document.h	/^        kNumberUint64Flag = kNumberType | kNumberFlag | kUint64Flag,$/;"	e	enum:GenericValue::__anon13
-kNumberUintFlag	dnn/contrib/rapidjson/document.h	/^        kNumberUintFlag = kNumberType | kNumberFlag | kUintFlag | kUint64Flag | kInt64Flag,$/;"	e	enum:GenericValue::__anon13
-kObjectFlag	dnn/contrib/rapidjson/document.h	/^        kObjectFlag = kObjectType,$/;"	e	enum:GenericValue::__anon13
-kShortStringFlag	dnn/contrib/rapidjson/document.h	/^        kShortStringFlag = kStringType | kStringFlag | kCopyFlag | kInlineStrFlag,$/;"	e	enum:GenericValue::__anon13
-kStringFlag	dnn/contrib/rapidjson/document.h	/^        kStringFlag = 0x100000,$/;"	e	enum:GenericValue::__anon13
-kTrueFlag	dnn/contrib/rapidjson/document.h	/^        kTrueFlag = kTrueType | kBoolFlag,$/;"	e	enum:GenericValue::__anon13
-kTypeMask	dnn/contrib/rapidjson/document.h	/^        kTypeMask = 0xFF    \/\/ bitwise-and with mask of 0xFF can be optimized by compiler$/;"	e	enum:GenericValue::__anon13
-kUint64Flag	dnn/contrib/rapidjson/document.h	/^        kUint64Flag = 0x2000,$/;"	e	enum:GenericValue::__anon13
-kUintFlag	dnn/contrib/rapidjson/document.h	/^        kUintFlag = 0x800,$/;"	e	enum:GenericValue::__anon13
+kDoubleFlag	dnn/contrib/rapidjson/document.h	/^        kDoubleFlag = 0x4000,$/;"	e	enum:GenericValue::__anon20
+kFalseFlag	dnn/contrib/rapidjson/document.h	/^        kFalseFlag = kFalseType | kBoolFlag,$/;"	e	enum:GenericValue::__anon20
+kInlineStrFlag	dnn/contrib/rapidjson/document.h	/^        kInlineStrFlag = 0x400000,$/;"	e	enum:GenericValue::__anon20
+kInt64Flag	dnn/contrib/rapidjson/document.h	/^        kInt64Flag = 0x1000,$/;"	e	enum:GenericValue::__anon20
+kIntFlag	dnn/contrib/rapidjson/document.h	/^        kIntFlag = 0x400,$/;"	e	enum:GenericValue::__anon20
+kNullFlag	dnn/contrib/rapidjson/document.h	/^        kNullFlag = kNullType,$/;"	e	enum:GenericValue::__anon20
+kNumberAnyFlag	dnn/contrib/rapidjson/document.h	/^        kNumberAnyFlag = kNumberType | kNumberFlag | kIntFlag | kInt64Flag | kUintFlag | kUint64Flag | kDoubleFlag,$/;"	e	enum:GenericValue::__anon20
+kNumberDoubleFlag	dnn/contrib/rapidjson/document.h	/^        kNumberDoubleFlag = kNumberType | kNumberFlag | kDoubleFlag,$/;"	e	enum:GenericValue::__anon20
+kNumberFlag	dnn/contrib/rapidjson/document.h	/^        kNumberFlag = 0x200,$/;"	e	enum:GenericValue::__anon20
+kNumberInt64Flag	dnn/contrib/rapidjson/document.h	/^        kNumberInt64Flag = kNumberType | kNumberFlag | kInt64Flag,$/;"	e	enum:GenericValue::__anon20
+kNumberIntFlag	dnn/contrib/rapidjson/document.h	/^        kNumberIntFlag = kNumberType | kNumberFlag | kIntFlag | kInt64Flag,$/;"	e	enum:GenericValue::__anon20
+kNumberUint64Flag	dnn/contrib/rapidjson/document.h	/^        kNumberUint64Flag = kNumberType | kNumberFlag | kUint64Flag,$/;"	e	enum:GenericValue::__anon20
+kNumberUintFlag	dnn/contrib/rapidjson/document.h	/^        kNumberUintFlag = kNumberType | kNumberFlag | kUintFlag | kUint64Flag | kInt64Flag,$/;"	e	enum:GenericValue::__anon20
+kObjectFlag	dnn/contrib/rapidjson/document.h	/^        kObjectFlag = kObjectType,$/;"	e	enum:GenericValue::__anon20
+kShortStringFlag	dnn/contrib/rapidjson/document.h	/^        kShortStringFlag = kStringType | kStringFlag | kCopyFlag | kInlineStrFlag,$/;"	e	enum:GenericValue::__anon20
+kStringFlag	dnn/contrib/rapidjson/document.h	/^        kStringFlag = 0x100000,$/;"	e	enum:GenericValue::__anon20
+kTrueFlag	dnn/contrib/rapidjson/document.h	/^        kTrueFlag = kTrueType | kBoolFlag,$/;"	e	enum:GenericValue::__anon20
+kTypeMask	dnn/contrib/rapidjson/document.h	/^        kTypeMask = 0xFF    \/\/ bitwise-and with mask of 0xFF can be optimized by compiler$/;"	e	enum:GenericValue::__anon20
+kUint64Flag	dnn/contrib/rapidjson/document.h	/^        kUint64Flag = 0x2000,$/;"	e	enum:GenericValue::__anon20
+kUintFlag	dnn/contrib/rapidjson/document.h	/^        kUintFlag = 0x800,$/;"	e	enum:GenericValue::__anon20
 length	dnn/contrib/rapidjson/document.h	/^        SizeType length;$/;"	m	struct:GenericValue::String
 length	dnn/contrib/rapidjson/document.h	/^    const SizeType length; \/\/!< length of the string (excluding the trailing NULL terminator)$/;"	m	struct:GenericStringRef
 members	dnn/contrib/rapidjson/document.h	/^        Member* members;$/;"	m	struct:GenericValue::Object
@@ -546,11 +583,11 @@ kUTF16LE	dnn/contrib/rapidjson/encodings.h	/^    kUTF16LE = 1,   \/\/!< UTF-16 l
 kUTF32BE	dnn/contrib/rapidjson/encodings.h	/^    kUTF32BE = 4    \/\/!< UTF-32 big endian.$/;"	e	enum:UTFType
 kUTF32LE	dnn/contrib/rapidjson/encodings.h	/^    kUTF32LE = 3,   \/\/!< UTF-32 little endian.$/;"	e	enum:UTFType
 kUTF8	dnn/contrib/rapidjson/encodings.h	/^    kUTF8 = 0,      \/\/!< UTF-8.$/;"	e	enum:UTFType
-supportUnicode	dnn/contrib/rapidjson/encodings.h	/^    enum { supportUnicode = 0 };$/;"	e	enum:ASCII::__anon4
-supportUnicode	dnn/contrib/rapidjson/encodings.h	/^    enum { supportUnicode = 1 };$/;"	e	enum:AutoUTF::__anon5
-supportUnicode	dnn/contrib/rapidjson/encodings.h	/^    enum { supportUnicode = 1 };$/;"	e	enum:UTF16::__anon2
-supportUnicode	dnn/contrib/rapidjson/encodings.h	/^    enum { supportUnicode = 1 };$/;"	e	enum:UTF32::__anon3
-supportUnicode	dnn/contrib/rapidjson/encodings.h	/^    enum { supportUnicode = 1 };$/;"	e	enum:UTF8::__anon1
+supportUnicode	dnn/contrib/rapidjson/encodings.h	/^    enum { supportUnicode = 0 };$/;"	e	enum:ASCII::__anon18
+supportUnicode	dnn/contrib/rapidjson/encodings.h	/^    enum { supportUnicode = 1 };$/;"	e	enum:AutoUTF::__anon19
+supportUnicode	dnn/contrib/rapidjson/encodings.h	/^    enum { supportUnicode = 1 };$/;"	e	enum:UTF16::__anon16
+supportUnicode	dnn/contrib/rapidjson/encodings.h	/^    enum { supportUnicode = 1 };$/;"	e	enum:UTF32::__anon17
+supportUnicode	dnn/contrib/rapidjson/encodings.h	/^    enum { supportUnicode = 1 };$/;"	e	enum:UTF8::__anon15
 GetParseError_En	dnn/contrib/rapidjson/error/en.h	/^inline const RAPIDJSON_ERROR_CHARTYPE* GetParseError_En(ParseErrorCode parseErrorCode) {$/;"	f
 RAPIDJSON_ERROR_EN_H__	dnn/contrib/rapidjson/error/en.h	22;"	d
 Clear	dnn/contrib/rapidjson/error/error.h	/^    void Clear() { Set(kParseErrorNone); }$/;"	f	struct:ParseResult
@@ -727,7 +764,7 @@ Significand	dnn/contrib/rapidjson/internal/ieee754.h	/^    uint64_t Significand(
 ToBias	dnn/contrib/rapidjson/internal/ieee754.h	/^    uint64_t ToBias() const { return (u & kSignMask) ? ~u + 1 : u | kSignMask; }$/;"	f	class:internal::Double
 Uint64Value	dnn/contrib/rapidjson/internal/ieee754.h	/^    uint64_t Uint64Value() const { return u; }$/;"	f	class:internal::Double
 Value	dnn/contrib/rapidjson/internal/ieee754.h	/^    double Value() const { return d; }$/;"	f	class:internal::Double
-d	dnn/contrib/rapidjson/internal/ieee754.h	/^        double d;$/;"	m	union:internal::Double::__anon8
+d	dnn/contrib/rapidjson/internal/ieee754.h	/^        double d;$/;"	m	union:internal::Double::__anon12
 internal	dnn/contrib/rapidjson/internal/ieee754.h	/^namespace internal {$/;"	n
 kDenormalExponent	dnn/contrib/rapidjson/internal/ieee754.h	/^    static const int kDenormalExponent = 1 - kExponentBias;$/;"	m	class:internal::Double
 kExponentBias	dnn/contrib/rapidjson/internal/ieee754.h	/^    static const int kExponentBias = 0x3FF;$/;"	m	class:internal::Double
@@ -736,7 +773,7 @@ kHiddenBit	dnn/contrib/rapidjson/internal/ieee754.h	/^    static const uint64_t 
 kSignMask	dnn/contrib/rapidjson/internal/ieee754.h	/^    static const uint64_t kSignMask = RAPIDJSON_UINT64_C2(0x80000000, 0x00000000);$/;"	m	class:internal::Double
 kSignificandMask	dnn/contrib/rapidjson/internal/ieee754.h	/^    static const uint64_t kSignificandMask = RAPIDJSON_UINT64_C2(0x000FFFFF, 0xFFFFFFFF);$/;"	m	class:internal::Double
 kSignificandSize	dnn/contrib/rapidjson/internal/ieee754.h	/^    static const int kSignificandSize = 52;$/;"	m	class:internal::Double
-u	dnn/contrib/rapidjson/internal/ieee754.h	/^        uint64_t u;$/;"	m	union:internal::Double::__anon8
+u	dnn/contrib/rapidjson/internal/ieee754.h	/^        uint64_t u;$/;"	m	union:internal::Double::__anon12
 GetDigitsLut	dnn/contrib/rapidjson/internal/itoa.h	/^inline const char* GetDigitsLut() {$/;"	f	namespace:internal
 RAPIDJSON_ITOA_	dnn/contrib/rapidjson/internal/itoa.h	22;"	d
 i32toa	dnn/contrib/rapidjson/internal/itoa.h	/^inline char* i32toa(int32_t value, char* buffer) {$/;"	f	namespace:internal
@@ -800,7 +837,7 @@ Type	dnn/contrib/rapidjson/internal/meta.h	/^template <typename T> struct Remove
 Type	dnn/contrib/rapidjson/internal/meta.h	/^template <typename T> struct RemoveConst<const T> { typedef T Type; };$/;"	t	struct:internal::RemoveConst
 Type	dnn/contrib/rapidjson/internal/meta.h	/^template <typename T> struct RemoveSfinaeTag<SfinaeTag&(*)(T)> { typedef T Type; };$/;"	t	struct:internal::RemoveSfinaeTag
 Type	dnn/contrib/rapidjson/internal/meta.h	/^template <typename T> struct Void { typedef void Type; };$/;"	t	struct:internal::Void
-Value	dnn/contrib/rapidjson/internal/meta.h	/^    enum { Value = (sizeof(Check(Host(), 0)) == sizeof(Yes)) };$/;"	e	enum:internal::IsBaseOfImpl::__anon7
+Value	dnn/contrib/rapidjson/internal/meta.h	/^    enum { Value = (sizeof(Check(Host(), 0)) == sizeof(Yes)) };$/;"	e	enum:internal::IsBaseOfImpl::__anon13
 Value	dnn/contrib/rapidjson/internal/meta.h	/^    static const bool Value = Cond;$/;"	m	struct:internal::BoolType
 Void	dnn/contrib/rapidjson/internal/meta.h	/^template <typename T> struct Void { typedef void Type; };$/;"	s	namespace:internal
 Yes	dnn/contrib/rapidjson/internal/meta.h	/^    typedef char (&Yes)[1];$/;"	t	struct:internal::IsBaseOfImpl
@@ -1056,9 +1093,9 @@ SCNxPTR	dnn/contrib/rapidjson/msinttypes/inttypes.h	266;"	d
 _MSC_INTTYPES_H_	dnn/contrib/rapidjson/msinttypes/inttypes.h	38;"	d
 imaxabs	dnn/contrib/rapidjson/msinttypes/inttypes.h	275;"	d
 imaxdiv	dnn/contrib/rapidjson/msinttypes/inttypes.h	/^imaxdiv_t __cdecl imaxdiv(intmax_t numer, intmax_t denom)$/;"	f
-imaxdiv_t	dnn/contrib/rapidjson/msinttypes/inttypes.h	/^} imaxdiv_t;$/;"	t	typeref:struct:__anon6
-quot	dnn/contrib/rapidjson/msinttypes/inttypes.h	/^   intmax_t quot;$/;"	m	struct:__anon6
-rem	dnn/contrib/rapidjson/msinttypes/inttypes.h	/^   intmax_t rem;$/;"	m	struct:__anon6
+imaxdiv_t	dnn/contrib/rapidjson/msinttypes/inttypes.h	/^} imaxdiv_t;$/;"	t	typeref:struct:__anon14
+quot	dnn/contrib/rapidjson/msinttypes/inttypes.h	/^   intmax_t quot;$/;"	m	struct:__anon14
+rem	dnn/contrib/rapidjson/msinttypes/inttypes.h	/^   intmax_t rem;$/;"	m	struct:__anon14
 strtoimax	dnn/contrib/rapidjson/msinttypes/inttypes.h	303;"	d
 strtoumax	dnn/contrib/rapidjson/msinttypes/inttypes.h	304;"	d
 wcstoimax	dnn/contrib/rapidjson/msinttypes/inttypes.h	307;"	d
@@ -1293,9 +1330,9 @@ Take	dnn/contrib/rapidjson/rapidjson.h	/^    Ch Take() { return *src_++; }$/;"	f
 Tell	dnn/contrib/rapidjson/rapidjson.h	/^    size_t Tell() const { return static_cast<size_t>(src_ - head_); }$/;"	f	struct:GenericStringStream
 Tell	dnn/contrib/rapidjson/rapidjson.h	/^    size_t Tell() { return static_cast<size_t>(src_ - head_); }$/;"	f	struct:GenericInsituStringStream
 Type	dnn/contrib/rapidjson/rapidjson.h	/^enum Type {$/;"	g
-copyOptimization	dnn/contrib/rapidjson/rapidjson.h	/^    enum { copyOptimization = 0 };$/;"	e	enum:StreamTraits::__anon10
-copyOptimization	dnn/contrib/rapidjson/rapidjson.h	/^    enum { copyOptimization = 1 };$/;"	e	enum:StreamTraits::__anon11
-copyOptimization	dnn/contrib/rapidjson/rapidjson.h	/^    enum { copyOptimization = 1 };$/;"	e	enum:StreamTraits::__anon12
+copyOptimization	dnn/contrib/rapidjson/rapidjson.h	/^    enum { copyOptimization = 0 };$/;"	e	enum:StreamTraits::__anon23
+copyOptimization	dnn/contrib/rapidjson/rapidjson.h	/^    enum { copyOptimization = 1 };$/;"	e	enum:StreamTraits::__anon24
+copyOptimization	dnn/contrib/rapidjson/rapidjson.h	/^    enum { copyOptimization = 1 };$/;"	e	enum:StreamTraits::__anon25
 dst_	dnn/contrib/rapidjson/rapidjson.h	/^    Ch* dst_;$/;"	m	struct:GenericInsituStringStream
 head_	dnn/contrib/rapidjson/rapidjson.h	/^    Ch* head_;$/;"	m	struct:GenericInsituStringStream
 head_	dnn/contrib/rapidjson/rapidjson.h	/^    const Ch* head_;    \/\/!< Original head of the string.$/;"	m	struct:GenericStringStream
@@ -1308,7 +1345,7 @@ kStringType	dnn/contrib/rapidjson/rapidjson.h	/^    kStringType = 5,    \/\/!< s
 kTrueType	dnn/contrib/rapidjson/rapidjson.h	/^    kTrueType = 2,      \/\/!< true$/;"	e	enum:Type
 src_	dnn/contrib/rapidjson/rapidjson.h	/^    Ch* src_;$/;"	m	struct:GenericInsituStringStream
 src_	dnn/contrib/rapidjson/rapidjson.h	/^    const Ch* src_;     \/\/!< Current read position.$/;"	m	struct:GenericStringStream
-value	dnn/contrib/rapidjson/rapidjson.h	/^template <> struct STATIC_ASSERTION_FAILURE<true> { enum { value = 1 }; };$/;"	e	enum:STATIC_ASSERTION_FAILURE::__anon9
+value	dnn/contrib/rapidjson/rapidjson.h	/^template <> struct STATIC_ASSERTION_FAILURE<true> { enum { value = 1 }; };$/;"	e	enum:STATIC_ASSERTION_FAILURE::__anon22
 Base	dnn/contrib/rapidjson/reader.h	/^        typedef NumberStream<InputStream, false> Base;$/;"	t	class:GenericReader::NumberStream
 BaseReaderHandler	dnn/contrib/rapidjson/reader.h	/^struct BaseReaderHandler {$/;"	s
 Bool	dnn/contrib/rapidjson/reader.h	/^    bool Bool(bool) { return static_cast<Override&>(*this).Default(); }$/;"	f	struct:BaseReaderHandler
@@ -1515,133 +1552,281 @@ kDefaultLevelDepth	dnn/contrib/rapidjson/writer.h	/^    static const size_t kDef
 level_stack_	dnn/contrib/rapidjson/writer.h	/^    internal::Stack<StackAllocator> level_stack_;$/;"	m	class:Writer
 os_	dnn/contrib/rapidjson/writer.h	/^    OutputStream* os_;$/;"	m	class:Writer
 valueCount	dnn/contrib/rapidjson/writer.h	/^        size_t valueCount;  \/\/!< number of values in this level$/;"	m	struct:Writer::Level
+ProtoMessage	dnn/core.h	/^typedef google::protobuf::Message* ProtoMessage;$/;"	t
 KNOWN_TYPES	dnn/generate_protos.py	/^KNOWN_TYPES = { $/;"	v
 PROTO_FILE	dnn/generate_protos.py	/^PROTO_FILE = "generated.proto"$/;"	v
+VECTOR_RE	dnn/generate_protos.py	/^VECTOR_RE = re.compile("vector<([^ ]*?)>")$/;"	v
 args	dnn/generate_protos.py	/^    args = parser.parse_args() $/;"	v
 generateProtos	dnn/generate_protos.py	/^def generateProtos(structures, package, dst):$/;"	f
 parseSources	dnn/generate_protos.py	/^def parseSources(src):$/;"	f
 parser	dnn/generate_protos.py	/^    parser = argparse.ArgumentParser()$/;"	v
 structures	dnn/generate_protos.py	/^    structures = parseSources(args.source_path)$/;"	v
+def_value	dnn/inputs/input.cpp	/^const double InputBase::def_value = 0.0;$/;"	m	class:dnn::InputBase	file:
+dnn	dnn/inputs/input.cpp	/^namespace dnn {$/;"	n	file:
 Input	dnn/inputs/input.h	/^class Input : public InputBase {$/;"	c	namespace:dnn
-InputBase	dnn/inputs/input.h	/^class InputBase {$/;"	c	namespace:dnn
+InputBase	dnn/inputs/input.h	/^class InputBase : public SerializableBase {$/;"	c	namespace:dnn
 InputInterface	dnn/inputs/input.h	/^struct InputInterface {$/;"	s	namespace:dnn
-c	dnn/inputs/input.h	/^    const Constants c;$/;"	m	class:dnn::Input
+c	dnn/inputs/input.h	/^    Constants c;$/;"	m	class:dnn::Input
+def_value	dnn/inputs/input.h	/^    static const double def_value;$/;"	m	class:dnn::InputBase
 dnn	dnn/inputs/input.h	/^namespace dnn {$/;"	n
-getValue	dnn/inputs/input.h	/^    retDoubleDelegate getValue;$/;"	m	struct:dnn::InputInterface
-getValueDefault	dnn/inputs/input.h	/^    static double getValueDefault() {$/;"	f	class:dnn::InputBase
+getValue	dnn/inputs/input.h	/^    retRefDoubleAtTimeDelegate getValue;$/;"	m	struct:dnn::InputInterface
+getValueDefault	dnn/inputs/input.h	/^    static const double& getValueDefault(const Time &t) {$/;"	f	class:dnn::InputBase
 interface	dnn/inputs/input.h	/^    typedef InputInterface interface;$/;"	t	class:dnn::InputBase
 provideDefaultInterface	dnn/inputs/input.h	/^    static void provideDefaultInterface(InputInterface &i) {$/;"	f	class:dnn::InputBase
 s	dnn/inputs/input.h	/^    State s;$/;"	m	class:dnn::Input
-Parent	dnn/inputs/ts_input.h	/^	typedef Input<TSInputC, TSInputState> Parent;$/;"	t	class:dnn::TSInput
-TSInput	dnn/inputs/ts_input.h	/^class TSInput : public Input<TSInputC, TSInputState> {$/;"	c	namespace:dnn
-TSInputC	dnn/inputs/ts_input.h	/^struct TSInputC : public Serializable<Protos::TSInputC> {$/;"	s	namespace:dnn
-TSInputState	dnn/inputs/ts_input.h	/^struct TSInputState : public Serializable<Protos::TSInputState> {$/;"	s	namespace:dnn
-dnn	dnn/inputs/ts_input.h	/^namespace dnn {$/;"	n
-dt	dnn/inputs/ts_input.h	/^    double dt;$/;"	m	struct:dnn::TSInputC
-getValue	dnn/inputs/ts_input.h	/^	double getValue() {$/;"	f	class:dnn::TSInput
-index	dnn/inputs/ts_input.h	/^    size_t index;$/;"	m	struct:dnn::TSInputState
-processStream	dnn/inputs/ts_input.h	/^    void processStream(Stream &str) {$/;"	f	struct:dnn::TSInputC
-processStream	dnn/inputs/ts_input.h	/^    void processStream(Stream &str) {$/;"	f	struct:dnn::TSInputState
+serial_process	dnn/inputs/input.h	/^    void serial_process() {$/;"	f	class:dnn::Input
+InputTimeSeries	dnn/inputs/input_time_series.h	/^class InputTimeSeries : public Input<InputTimeSeriesC, InputTimeSeriesState> {$/;"	c	namespace:dnn
+InputTimeSeriesC	dnn/inputs/input_time_series.h	/^    InputTimeSeriesC() : dt(1.0) {}$/;"	f	struct:dnn::InputTimeSeriesC
+InputTimeSeriesC	dnn/inputs/input_time_series.h	/^struct InputTimeSeriesC : public Serializable<Protos::InputTimeSeriesC> {$/;"	s	namespace:dnn
+InputTimeSeriesState	dnn/inputs/input_time_series.h	/^    InputTimeSeriesState() : index(0), _t(0) {}$/;"	f	struct:dnn::InputTimeSeriesState
+InputTimeSeriesState	dnn/inputs/input_time_series.h	/^struct InputTimeSeriesState : public Serializable<Protos::InputTimeSeriesState> {$/;"	s	namespace:dnn
+Parent	dnn/inputs/input_time_series.h	/^    typedef Input<InputTimeSeriesC, InputTimeSeriesState> Parent;$/;"	t	class:dnn::InputTimeSeries
+_t	dnn/inputs/input_time_series.h	/^    double _t;$/;"	m	struct:dnn::InputTimeSeriesState
+dnn	dnn/inputs/input_time_series.h	/^namespace dnn {$/;"	n
+dt	dnn/inputs/input_time_series.h	/^    double dt;$/;"	m	struct:dnn::InputTimeSeriesC
+getDuration	dnn/inputs/input_time_series.h	/^    double getDuration() {$/;"	f	class:dnn::InputTimeSeries
+getValue	dnn/inputs/input_time_series.h	/^	const double& getValue(const Time &t) {$/;"	f	class:dnn::InputTimeSeries
+index	dnn/inputs/input_time_series.h	/^    size_t index;$/;"	m	struct:dnn::InputTimeSeriesState
+name	dnn/inputs/input_time_series.h	/^    const string name() const {$/;"	f	class:dnn::InputTimeSeries
+provideInterface	dnn/inputs/input_time_series.h	/^    void provideInterface(InputInterface &i) {$/;"	f	class:dnn::InputTimeSeries
+serial_process	dnn/inputs/input_time_series.h	/^    void serial_process() {$/;"	f	struct:dnn::InputTimeSeriesC
+serial_process	dnn/inputs/input_time_series.h	/^    void serial_process() {$/;"	f	struct:dnn::InputTimeSeriesState
+setTimeSeries	dnn/inputs/input_time_series.h	/^    void setTimeSeries(const string& filename, const string& format) {$/;"	f	class:dnn::InputTimeSeries
+ts	dnn/inputs/input_time_series.h	/^    InterfacedPtr<TimeSeries> ts;$/;"	m	class:dnn::InputTimeSeries
 dnn	dnn/io/serialize.cpp	/^namespace dnn {$/;"	n	file:
-ASSERT_FIELDS	dnn/io/serialize.h	75;"	d
-End	dnn/io/serialize.h	/^    enum EndMarker { End };$/;"	e	enum:dnn::SerializableBase::EndMarker
-EndMarker	dnn/io/serialize.h	/^    enum EndMarker { End };$/;"	g	class:dnn::SerializableBase
+ASSERT_FIELDS	dnn/io/serialize.h	208;"	d
+EndMarker	dnn/io/serialize.h	/^    enum EndMarker { end };$/;"	g	class:dnn::SerializableBase
+ProcessMode	dnn/io/serialize.h	/^    enum ProcessMode { ProcessingInput, ProcessingOutput };$/;"	g	class:dnn::SerializableBase
+ProcessingInput	dnn/io/serialize.h	/^    enum ProcessMode { ProcessingInput, ProcessingOutput };$/;"	e	enum:dnn::SerializableBase::ProcessMode
+ProcessingOutput	dnn/io/serialize.h	/^    enum ProcessMode { ProcessingInput, ProcessingOutput };$/;"	e	enum:dnn::SerializableBase::ProcessMode
+ProtoMessage	dnn/io/serialize.h	/^typedef google::protobuf::Message* ProtoMessage;$/;"	t
+ProtoType	dnn/io/serialize.h	/^    typedef Proto ProtoType;$/;"	t	class:dnn::Serializable
+ProtoType	dnn/io/serialize.h	/^    typedef Protos::EmptyProto ProtoType;$/;"	t	class:dnn::SerializableBase
 Self	dnn/io/serialize.h	/^    typedef Serializable<Proto> Self;$/;"	t	class:dnn::Serializable
-Serializable	dnn/io/serialize.h	/^    Serializable() : mess(nullptr) {}$/;"	f	class:dnn::Serializable
-Serializable	dnn/io/serialize.h	/^class Serializable : public SerializableBase, public Object {$/;"	c	namespace:dnn
-SerializableBase	dnn/io/serialize.h	/^    SerializableBase() : _ack_stream(nullptr) {}$/;"	f	class:dnn::SerializableBase
-SerializableBase	dnn/io/serialize.h	/^class SerializableBase  {$/;"	c	namespace:dnn
-_ack_stream	dnn/io/serialize.h	/^    Stream *_ack_stream;$/;"	m	class:dnn::SerializableBase
-acquire	dnn/io/serialize.h	/^    Serializable& acquire(Stream &str) {$/;"	f	class:dnn::Serializable
-acquire	dnn/io/serialize.h	/^    SerializableBase& acquire(Stream &str) {$/;"	f	class:dnn::SerializableBase
+Self	dnn/io/serialize.h	/^    typedef SerializableBase Self;$/;"	t	class:dnn::SerializableBase
+Serializable	dnn/io/serialize.h	/^class Serializable : public SerializableBase {$/;"	c	namespace:dnn
+SerializableBase	dnn/io/serialize.h	/^    SerializableBase() : mode(ProcessingOutput), messages(nullptr), header(nullptr) {$/;"	f	class:dnn::SerializableBase
+SerializableBase	dnn/io/serialize.h	/^class SerializableBase  : public Object {$/;"	c	namespace:dnn
+addMessage	dnn/io/serialize.h	/^    void addMessage(ProtoMessage m) {$/;"	f	class:dnn::SerializableBase
+begin	dnn/io/serialize.h	/^    Serializable& begin() {$/;"	f	class:dnn::Serializable
+begin	dnn/io/serialize.h	/^    SerializableBase& begin() {$/;"	f	class:dnn::SerializableBase
+clean	dnn/io/serialize.h	/^    void clean() {$/;"	f	class:dnn::SerializableBase
+copyM	dnn/io/serialize.h	/^    static ProtoMessage copyM(ProtoMessage m) {$/;"	f	class:dnn::SerializableBase
+currentMessage	dnn/io/serialize.h	/^    ProtoMessage currentMessage() {$/;"	f	class:dnn::SerializableBase
+deleteCurrentMessage	dnn/io/serialize.h	/^    void deleteCurrentMessage() {$/;"	f	class:dnn::SerializableBase
 dnn	dnn/io/serialize.h	/^namespace dnn {$/;"	n
-field_descr	dnn/io/serialize.h	/^	const google::protobuf::FieldDescriptor* field_descr;$/;"	m	class:dnn::Serializable
-mess	dnn/io/serialize.h	/^	google::protobuf::Message* mess;$/;"	m	class:dnn::Serializable
-operator <<	dnn/io/serialize.h	/^  	Serializable& operator << (EndMarker v) {$/;"	f	class:dnn::Serializable
-operator <<	dnn/io/serialize.h	/^  	Serializable& operator << (double &v) {$/;"	f	class:dnn::Serializable
-operator <<	dnn/io/serialize.h	/^  	Serializable& operator << (size_t &v) {$/;"	f	class:dnn::Serializable
-operator <<	dnn/io/serialize.h	/^  	Serializable& operator << (string &v) {$/;"	f	class:dnn::Serializable
-operator <<	dnn/io/serialize.h	/^  	Serializable& operator << (string v) {$/;"	f	class:dnn::Serializable
+end	dnn/io/serialize.h	/^    enum EndMarker { end };$/;"	e	enum:dnn::SerializableBase::EndMarker
+field_descr	dnn/io/serialize.h	/^    const google::protobuf::FieldDescriptor* field_descr;$/;"	m	class:dnn::Serializable
+getDeserialized	dnn/io/serialize.h	/^    void getDeserialized(vector<ProtoMessage> &inp_mess) {$/;"	f	class:dnn::SerializableBase
+getHeader	dnn/io/serialize.h	/^    Protos::ClassName* getHeader() {$/;"	f	class:dnn::SerializableBase
+getHeader	dnn/io/serialize.h	/^    static Protos::ClassName* getHeader(vector<ProtoMessage> &messages) {$/;"	f	class:dnn::SerializableBase
+getSerialized	dnn/io/serialize.h	/^    vector<ProtoMessage>& getSerialized() {$/;"	f	class:dnn::SerializableBase
+hasProto	dnn/io/serialize.h	/^    static const bool hasProto = false;$/;"	m	class:dnn::SerializableBase
+hasProto	dnn/io/serialize.h	/^    static const bool hasProto = true;$/;"	m	class:dnn::Serializable
+header	dnn/io/serialize.h	/^    Protos::ClassName *header;$/;"	m	class:dnn::SerializableBase
+messages	dnn/io/serialize.h	/^    vector<ProtoMessage> *messages;$/;"	m	class:dnn::SerializableBase
+mode	dnn/io/serialize.h	/^    ProcessMode mode;$/;"	m	class:dnn::SerializableBase
+name	dnn/io/serialize.h	/^    const string name() const {$/;"	f	class:dnn::Serializable
+newProto	dnn/io/serialize.h	/^    ProtoMessage newProto() {$/;"	f	class:dnn::Serializable
+newProto	dnn/io/serialize.h	/^    virtual ProtoMessage newProto() {$/;"	f	class:dnn::SerializableBase
 operator <<	dnn/io/serialize.h	/^    Serializable& operator << (bool &v) {$/;"	f	class:dnn::Serializable
-readBinaryMessage	dnn/io/serialize.h	/^    static bool readBinaryMessage(google::protobuf::Message* mess, istream *str) {$/;"	f	class:dnn::SerializableBase
-reflection	dnn/io/serialize.h	/^	const google::protobuf::Reflection* reflection;$/;"	m	class:dnn::Serializable
-writeBinaryMessage	dnn/io/serialize.h	/^    static void writeBinaryMessage(google::protobuf::Message* mess, ostream *str) {$/;"	f	class:dnn::SerializableBase
-~Serializable	dnn/io/serialize.h	/^    ~Serializable() {$/;"	f	class:dnn::Serializable
+operator <<	dnn/io/serialize.h	/^    Serializable& operator << (const char *vraw) {$/;"	f	class:dnn::Serializable
+operator <<	dnn/io/serialize.h	/^    Serializable& operator << (double &v) {$/;"	f	class:dnn::Serializable
+operator <<	dnn/io/serialize.h	/^    Serializable& operator << (int &v) {$/;"	f	class:dnn::Serializable
+operator <<	dnn/io/serialize.h	/^    Serializable& operator << (size_t &v) {$/;"	f	class:dnn::Serializable
+operator <<	dnn/io/serialize.h	/^    Serializable& operator << (string &v) {$/;"	f	class:dnn::Serializable
+operator <<	dnn/io/serialize.h	/^    Serializable& operator << (vector<double> &v) {$/;"	f	class:dnn::Serializable
+operator <<	dnn/io/serialize.h	/^    Serializable& operator << (vector<size_t> &v) {$/;"	f	class:dnn::Serializable
+operator <<	dnn/io/serialize.h	/^    Serializable& operator << (vector<string> &v) {$/;"	f	class:dnn::Serializable
+operator <<	dnn/io/serialize.h	/^    SerializableBase& operator << (InterfacedPtr<T> &b) {$/;"	f	class:dnn::SerializableBase
+operator <<	dnn/io/serialize.h	/^    SerializableBase& operator << (SerializableBase &b) {$/;"	f	class:dnn::SerializableBase
+operator <<	dnn/io/serialize.h	/^    SerializableBase& operator << (const char *vraw) {$/;"	f	class:dnn::SerializableBase
+operator <<	dnn/io/serialize.h	/^    void operator << (EndMarker e) {$/;"	f	class:dnn::Serializable
+operator <<	dnn/io/serialize.h	/^    void operator << (EndMarker e) {$/;"	f	class:dnn::SerializableBase
+~SerializableBase	dnn/io/serialize.h	/^    virtual ~SerializableBase() {$/;"	f	class:dnn::SerializableBase
+P	dnn/io/stream.cpp	49;"	d	file:
 dnn	dnn/io/stream.cpp	/^namespace dnn {$/;"	n	file:
-operator <<	dnn/io/stream.cpp	/^Stream& Stream::operator << (SerializableBase &v) {$/;"	f	class:dnn::Stream
+jsonReader	dnn/io/stream.cpp	/^void Stream::jsonReader(string name, const Value &v, vector<ProtoMessage> &messages) {$/;"	f	class:dnn::Stream
+protoReader	dnn/io/stream.cpp	/^void Stream::protoReader(vector<ProtoMessage> &messages) {$/;"	f	class:dnn::Stream
+readObject	dnn/io/stream.cpp	/^SerializableBase* Stream::readObject() {$/;"	f	class:dnn::Stream
+readObjectProtos	dnn/io/stream.cpp	/^vector<ProtoMessage> Stream::readObjectProtos() {$/;"	f	class:dnn::Stream
+writeObject	dnn/io/stream.cpp	/^void Stream::writeObject(SerializableBase *b) {$/;"	f	class:dnn::Stream
 Binary	dnn/io/stream.h	/^    enum Repr { Binary, Text };$/;"	e	enum:dnn::Stream::Repr
 Repr	dnn/io/stream.h	/^    enum Repr { Binary, Text };$/;"	g	class:dnn::Stream
-Stream	dnn/io/stream.h	/^    Stream(istream &str, Repr _r = Binary) : _input_str(&str), r(_r), _output_str(nullptr) {}$/;"	f	class:dnn::Stream
-Stream	dnn/io/stream.h	/^    Stream(ostream &str, Repr _r = Binary) : _output_str(&str), r(_r), _input_str(nullptr) {}$/;"	f	class:dnn::Stream
+Stream	dnn/io/stream.h	/^    Stream(istream &str, Repr _r = Binary, bool _destroy_stream=false) $/;"	f	class:dnn::Stream
+Stream	dnn/io/stream.h	/^    Stream(ostream &str, Repr _r = Binary, bool _destroy_stream=false) $/;"	f	class:dnn::Stream
 Stream	dnn/io/stream.h	/^class Stream {$/;"	c	namespace:dnn
 Text	dnn/io/stream.h	/^    enum Repr { Binary, Text };$/;"	e	enum:dnn::Stream::Repr
 _input_str	dnn/io/stream.h	/^    istream *_input_str;$/;"	m	class:dnn::Stream
 _output_str	dnn/io/stream.h	/^    ostream *_output_str;$/;"	m	class:dnn::Stream
+codedIn	dnn/io/stream.h	/^    CodedInputStream *codedIn;$/;"	m	class:dnn::Stream
+codedOut	dnn/io/stream.h	/^    CodedOutputStream *codedOut;$/;"	m	class:dnn::Stream
+destroy_stream	dnn/io/stream.h	/^    bool destroy_stream;$/;"	m	class:dnn::Stream
 dnn	dnn/io/stream.h	/^namespace dnn {$/;"	n
+document	dnn/io/stream.h	/^    Document document;$/;"	m	class:dnn::Stream
 getInputStream	dnn/io/stream.h	/^    istream& getInputStream() {$/;"	f	class:dnn::Stream
 getOutputStream	dnn/io/stream.h	/^    ostream& getOutputStream() {$/;"	f	class:dnn::Stream
 getRepr	dnn/io/stream.h	/^    Repr getRepr() {$/;"	f	class:dnn::Stream
 isInput	dnn/io/stream.h	/^    bool isInput() {$/;"	f	class:dnn::Stream
 isOutput	dnn/io/stream.h	/^    bool isOutput() {$/;"	f	class:dnn::Stream
+iterator	dnn/io/stream.h	/^    Value::ConstMemberIterator iterator;$/;"	m	class:dnn::Stream
 r	dnn/io/stream.h	/^    Repr r;$/;"	m	class:dnn::Stream
+readBinaryMessage	dnn/io/stream.h	/^    bool readBinaryMessage(ProtoMessage mess, istream *str) {        $/;"	f	class:dnn::Stream
+readObject	dnn/io/stream.h	/^    T* readObject() {$/;"	f	class:dnn::Stream
+writeBinaryMessage	dnn/io/stream.h	/^    void writeBinaryMessage(ProtoMessage mess, ostream *str) {$/;"	f	class:dnn::Stream
+zeroIn	dnn/io/stream.h	/^    IstreamInputStream *zeroIn;$/;"	m	class:dnn::Stream
+zeroOut	dnn/io/stream.h	/^    OstreamOutputStream *zeroOut;$/;"	m	class:dnn::Stream
+~Stream	dnn/io/stream.h	/^    ~Stream() {$/;"	f	class:dnn::Stream
 Layer	dnn/layers/layer.h	/^class Layer {$/;"	c	namespace:dnn
 dnn	dnn/layers/layer.h	/^namespace dnn {$/;"	n
-C	dnn/neurons/leaky_integrate_and_fire.h	/^	double C;$/;"	m	struct:dnn::LeakyIntegrateAndFireC
+C	dnn/neurons/leaky_integrate_and_fire.h	/^    double C;$/;"	m	struct:dnn::LeakyIntegrateAndFireC
 LeakyIntegrateAndFire	dnn/neurons/leaky_integrate_and_fire.h	/^class LeakyIntegrateAndFire : public SpikeNeuron<LeakyIntegrateAndFireC, LeakyIntegrateAndFireState> {$/;"	c	namespace:dnn
 LeakyIntegrateAndFireC	dnn/neurons/leaky_integrate_and_fire.h	/^    LeakyIntegrateAndFireC() : R(1.0), C(50.0) {}$/;"	f	struct:dnn::LeakyIntegrateAndFireC
 LeakyIntegrateAndFireC	dnn/neurons/leaky_integrate_and_fire.h	/^struct LeakyIntegrateAndFireC : public Serializable<Protos::LeakyIntegrateAndFireC> {$/;"	s	namespace:dnn
 LeakyIntegrateAndFireState	dnn/neurons/leaky_integrate_and_fire.h	/^    LeakyIntegrateAndFireState() : p(0.0), u(0.0), fired(false) {}$/;"	f	struct:dnn::LeakyIntegrateAndFireState
 LeakyIntegrateAndFireState	dnn/neurons/leaky_integrate_and_fire.h	/^struct LeakyIntegrateAndFireState : public Serializable<Protos::LeakyIntegrateAndFireState>  {$/;"	s	namespace:dnn
-R	dnn/neurons/leaky_integrate_and_fire.h	/^	double R;$/;"	m	struct:dnn::LeakyIntegrateAndFireC
+R	dnn/neurons/leaky_integrate_and_fire.h	/^    double R;$/;"	m	struct:dnn::LeakyIntegrateAndFireC
 calculateDynamics	dnn/neurons/leaky_integrate_and_fire.h	/^    void calculateDynamics(const Time& t) {$/;"	f	class:dnn::LeakyIntegrateAndFire
 dnn	dnn/neurons/leaky_integrate_and_fire.h	/^namespace dnn {$/;"	n
 fired	dnn/neurons/leaky_integrate_and_fire.h	/^    bool fired;$/;"	m	struct:dnn::LeakyIntegrateAndFireState
-fired	dnn/neurons/leaky_integrate_and_fire.h	/^    const bool& fired() {$/;"	f	class:dnn::LeakyIntegrateAndFire
 getFiringProbability	dnn/neurons/leaky_integrate_and_fire.h	/^    const double& getFiringProbability() {$/;"	f	class:dnn::LeakyIntegrateAndFire
-p	dnn/neurons/leaky_integrate_and_fire.h	/^	double p;$/;"	m	struct:dnn::LeakyIntegrateAndFireState
-processStream	dnn/neurons/leaky_integrate_and_fire.h	/^    void processStream(Stream &str) {$/;"	f	struct:dnn::LeakyIntegrateAndFireC
-processStream	dnn/neurons/leaky_integrate_and_fire.h	/^    void processStream(Stream &str) {$/;"	f	struct:dnn::LeakyIntegrateAndFireState
+leak	dnn/neurons/leaky_integrate_and_fire.h	/^    double leak;$/;"	m	struct:dnn::LeakyIntegrateAndFireC
+name	dnn/neurons/leaky_integrate_and_fire.h	/^    const string name() const {$/;"	f	class:dnn::LeakyIntegrateAndFire
+p	dnn/neurons/leaky_integrate_and_fire.h	/^    double p;$/;"	m	struct:dnn::LeakyIntegrateAndFireState
 propagateSynapseSpike	dnn/neurons/leaky_integrate_and_fire.h	/^    void propagateSynapseSpike(const SynSpike &sp) {$/;"	f	class:dnn::LeakyIntegrateAndFire
 provideInterface	dnn/neurons/leaky_integrate_and_fire.h	/^    void provideInterface(SpikeNeuronInterface &i) {$/;"	f	class:dnn::LeakyIntegrateAndFire
+pullFiring	dnn/neurons/leaky_integrate_and_fire.h	/^    bool pullFiring() {$/;"	f	class:dnn::LeakyIntegrateAndFire
 reset	dnn/neurons/leaky_integrate_and_fire.h	/^    void reset() {$/;"	f	class:dnn::LeakyIntegrateAndFire
-u	dnn/neurons/leaky_integrate_and_fire.h	/^	double u;$/;"	m	struct:dnn::LeakyIntegrateAndFireState
+serial_process	dnn/neurons/leaky_integrate_and_fire.h	/^    void serial_process() {$/;"	f	struct:dnn::LeakyIntegrateAndFireC
+serial_process	dnn/neurons/leaky_integrate_and_fire.h	/^    void serial_process() {$/;"	f	struct:dnn::LeakyIntegrateAndFireState
+u	dnn/neurons/leaky_integrate_and_fire.h	/^    double u;$/;"	m	struct:dnn::LeakyIntegrateAndFireState
+dnn	dnn/neurons/spike_neuron.cpp	/^namespace dnn {$/;"	n	file:
+global_neuron_index	dnn/neurons/spike_neuron.cpp	/^	size_t global_neuron_index = 0;$/;"	m	namespace:dnn	file:
 SpikeNeuron	dnn/neurons/spike_neuron.h	/^class SpikeNeuron : public SpikeNeuronBase {$/;"	c	namespace:dnn
-SpikeNeuronBase	dnn/neurons/spike_neuron.h	/^class SpikeNeuronBase {$/;"	c	namespace:dnn
+SpikeNeuronBase	dnn/neurons/spike_neuron.h	/^	SpikeNeuronBase() {$/;"	f	class:dnn::SpikeNeuronBase
+SpikeNeuronBase	dnn/neurons/spike_neuron.h	/^class SpikeNeuronBase : public SerializableBase {$/;"	c	namespace:dnn
+SpikeNeuronInfo	dnn/neurons/spike_neuron.h	/^struct SpikeNeuronInfo : public Serializable<Protos::SpikeNeuronInfo> {$/;"	s	namespace:dnn
 SpikeNeuronInterface	dnn/neurons/spike_neuron.h	/^struct SpikeNeuronInterface {$/;"	s	namespace:dnn
-act_f	dnn/neurons/spike_neuron.h	/^	InterfacedPtr<ActFunctionBase> act_f;$/;"	m	class:dnn::SpikeNeuron
-c	dnn/neurons/spike_neuron.h	/^	const Constants c;$/;"	m	class:dnn::SpikeNeuron
+__calculateDynamicsDefault	dnn/neurons/spike_neuron.h	/^	static void __calculateDynamicsDefault(const Time &t) {$/;"	f	class:dnn::SpikeNeuronBase
+__getFiringProbabilityDefault	dnn/neurons/spike_neuron.h	/^	static const double& __getFiringProbabilityDefault() {$/;"	f	class:dnn::SpikeNeuronBase
+__propagateSynapseSpikeDefault	dnn/neurons/spike_neuron.h	/^	static void __propagateSynapseSpikeDefault(const SynSpike &s) {$/;"	f	class:dnn::SpikeNeuronBase
+__pullFiringDefault	dnn/neurons/spike_neuron.h	/^	static bool __pullFiringDefault() {$/;"	f	class:dnn::SpikeNeuronBase
+_id	dnn/neurons/spike_neuron.h	/^	size_t _id;$/;"	m	class:dnn::SpikeNeuronBase
+act_f	dnn/neurons/spike_neuron.h	/^	InterfacedPtr<ActFunctionBase> act_f;$/;"	m	class:dnn::SpikeNeuronBase
+act_function_is_set	dnn/neurons/spike_neuron.h	/^	bool act_function_is_set;$/;"	m	struct:dnn::SpikeNeuronInfo
+addSynapse	dnn/neurons/spike_neuron.h	/^	void addSynapse(InterfacedPtr<SynapseBase> syn) {$/;"	f	class:dnn::SpikeNeuronBase
+axonDelay	dnn/neurons/spike_neuron.h	/^	inline const double& axonDelay() {$/;"	f	class:dnn::SpikeNeuronBase
+axon_delay	dnn/neurons/spike_neuron.h	/^	double axon_delay;$/;"	m	class:dnn::SpikeNeuronBase
+axon_delay	dnn/neurons/spike_neuron.h	/^	double axon_delay;$/;"	m	struct:dnn::SpikeNeuronInfo
+c	dnn/neurons/spike_neuron.h	/^	Constants c;$/;"	m	class:dnn::SpikeNeuron
 calculateDynamics	dnn/neurons/spike_neuron.h	/^	calculateDynamicsDelegate calculateDynamics;$/;"	m	struct:dnn::SpikeNeuronInterface
 dnn	dnn/neurons/spike_neuron.h	/^namespace dnn {$/;"	n
-fired	dnn/neurons/spike_neuron.h	/^	getBoolDelegate fired;$/;"	m	struct:dnn::SpikeNeuronInterface
 getFiringProbability	dnn/neurons/spike_neuron.h	/^	getDoubleDelegate getFiringProbability;$/;"	m	struct:dnn::SpikeNeuronInterface
+getInfo	dnn/neurons/spike_neuron.h	/^	SpikeNeuronInfo getInfo() {$/;"	f	class:dnn::SpikeNeuron
+getInput	dnn/neurons/spike_neuron.h	/^	InputBase& getInput() {$/;"	f	class:dnn::SpikeNeuronBase
+getSynapses	dnn/neurons/spike_neuron.h	/^	inline vector<InterfacedPtr<SynapseBase>>& getSynapses() {$/;"	f	class:dnn::SpikeNeuronBase
+id	dnn/neurons/spike_neuron.h	/^	inline const size_t& id() {$/;"	f	class:dnn::SpikeNeuronBase
+id	dnn/neurons/spike_neuron.h	/^	size_t id;$/;"	m	struct:dnn::SpikeNeuronInfo
+info	dnn/neurons/spike_neuron.h	/^	SpikeNeuronInfo info;$/;"	m	class:dnn::SpikeNeuron
+input	dnn/neurons/spike_neuron.h	/^	InterfacedPtr<InputBase> input;$/;"	m	class:dnn::SpikeNeuronBase
+inputIsSet	dnn/neurons/spike_neuron.h	/^	bool inputIsSet() {$/;"	f	class:dnn::SpikeNeuronBase
+input_is_set	dnn/neurons/spike_neuron.h	/^	bool input_is_set;$/;"	m	struct:dnn::SpikeNeuronInfo
 interface	dnn/neurons/spike_neuron.h	/^	typedef SpikeNeuronInterface interface;$/;"	t	class:dnn::SpikeNeuronBase
+num_of_synapses	dnn/neurons/spike_neuron.h	/^	size_t num_of_synapses;$/;"	m	struct:dnn::SpikeNeuronInfo
 propagateSynapseSpike	dnn/neurons/spike_neuron.h	/^	propSynSpikeDelegate propagateSynapseSpike;$/;"	m	struct:dnn::SpikeNeuronInterface
 provideDefaultInterface	dnn/neurons/spike_neuron.h	/^	static void provideDefaultInterface(SpikeNeuronInterface &i) {$/;"	f	class:dnn::SpikeNeuronBase
+pullFiring	dnn/neurons/spike_neuron.h	/^	getBoolCopyDelegate pullFiring;$/;"	m	struct:dnn::SpikeNeuronInterface
 s	dnn/neurons/spike_neuron.h	/^	State s;$/;"	m	class:dnn::SpikeNeuron
-setActFunction	dnn/neurons/spike_neuron.h	/^	void setActFunction(ActFunctionBase *_act_f) { act_f.set(_act_f); }$/;"	f	class:dnn::SpikeNeuron
-syns	dnn/neurons/spike_neuron.h	/^	vector<InterfacedPtr<SynapseBase>> syns;$/;"	m	class:dnn::SpikeNeuron
+serial_process	dnn/neurons/spike_neuron.h	/^	void serial_process() {$/;"	f	class:dnn::SpikeNeuron
+serial_process	dnn/neurons/spike_neuron.h	/^	void serial_process() {$/;"	f	struct:dnn::SpikeNeuronInfo
+setActFunction	dnn/neurons/spike_neuron.h	/^	void setActFunction(ActFunctionBase *_act_f) { act_f.set(_act_f); }$/;"	f	class:dnn::SpikeNeuronBase
+setAxonDelay	dnn/neurons/spike_neuron.h	/^	void setAxonDelay(double d) {$/;"	f	class:dnn::SpikeNeuronBase
+setInput	dnn/neurons/spike_neuron.h	/^	void setInput(InputBase *_input) { input.set(_input); }$/;"	f	class:dnn::SpikeNeuronBase
+stat	dnn/neurons/spike_neuron.h	/^	Statistics stat;$/;"	m	class:dnn::SpikeNeuronBase
+syns	dnn/neurons/spike_neuron.h	/^	vector<InterfacedPtr<SynapseBase>> syns;$/;"	m	class:dnn::SpikeNeuronBase
+Builder	dnn/sim/builder.h	/^	Builder(const Constants &_c) : c(_c), input_stream(nullptr) {$/;"	f	class:dnn::Builder
+Builder	dnn/sim/builder.h	/^class Builder {$/;"	c	namespace:dnn
+Layer	dnn/sim/builder.h	/^	struct Layer {$/;"	s	class:dnn::Builder
+buildNeurons	dnn/sim/builder.h	/^	vector<InterfacedPtr<SpikeNeuronBase>> buildNeurons() {$/;"	f	class:dnn::Builder
+buildObjectFromConstants	dnn/sim/builder.h	/^	static T* buildObjectFromConstants(const string &name, const map<string, string> &object_const_map) {$/;"	f	class:dnn::Builder
+c	dnn/sim/builder.h	/^	const Constants &c;$/;"	m	class:dnn::Builder
+connectLayers	dnn/sim/builder.h	/^	void connectLayers(Layer &pre, Layer &post, const string &conn_conf_s) {$/;"	f	class:dnn::Builder
+dnn	dnn/sim/builder.h	/^namespace dnn {$/;"	n
+input_stream	dnn/sim/builder.h	/^	Stream *input_stream;$/;"	m	class:dnn::Builder
+neurons	dnn/sim/builder.h	/^		vector<InterfacedPtr<SpikeNeuronBase>> neurons;$/;"	m	struct:dnn::Builder::Layer
+setInputModelStream	dnn/sim/builder.h	/^	void setInputModelStream(Stream *s) {$/;"	f	class:dnn::Builder
+Layer	dnn/sim/layer.h	/^struct Layer {$/;"	s
+neurons	dnn/sim/layer.h	/^	vector<InterfacedPtr<SpikeNeuronBase>> neurons;$/;"	m	struct:Layer
+Conn	dnn/sim/network.h	/^	Conn(size_t _n_id, size_t _syn_id) : n_id(_n_id), syn_id(_syn_id) {}$/;"	f	class:dnn::Conn
+Conn	dnn/sim/network.h	/^class Conn : public Printable {$/;"	c	namespace:dnn
+Network	dnn/sim/network.h	/^	Network(vector<InterfacedPtr<SpikeNeuronBase>>& neurons) {$/;"	f	class:dnn::Network
+Network	dnn/sim/network.h	/^class Network : public Printable {$/;"	c	namespace:dnn
+conn_map	dnn/sim/network.h	/^	vector<vector<Conn>> conn_map;$/;"	m	class:dnn::Network
+dnn	dnn/sim/network.h	/^namespace dnn {$/;"	n
+n_id	dnn/sim/network.h	/^	size_t n_id;$/;"	m	class:dnn::Conn
+print	dnn/sim/network.h	/^	void print(std::ostream &str) const {$/;"	f	class:dnn::Network
+print	dnn/sim/network.h	/^	void print(std::ostream& str) const {$/;"	f	class:dnn::Conn
+spikes_list	dnn/sim/network.h	/^	SpikesList spikes_list;$/;"	m	class:dnn::Network
+syn_id	dnn/sim/network.h	/^	size_t syn_id;$/;"	m	class:dnn::Conn
+Sim	dnn/sim/sim.h	/^	Sim(const Constants &_c) : c(_c), duration(0.0) {$/;"	f	class:dnn::Sim
+Sim	dnn/sim/sim.h	/^class Sim {$/;"	c	namespace:dnn
+build	dnn/sim/sim.h	/^	void build(Stream* input_stream = nullptr) {$/;"	f	class:dnn::Sim
+c	dnn/sim/sim.h	/^	const Constants &c;$/;"	m	class:dnn::Sim
+dnn	dnn/sim/sim.h	/^namespace dnn {$/;"	n
+duration	dnn/sim/sim.h	/^	double duration;$/;"	m	class:dnn::Sim
+net	dnn/sim/sim.h	/^	uptr<Network> net;$/;"	m	class:dnn::Sim
+neurons	dnn/sim/sim.h	/^	vector<InterfacedPtr<SpikeNeuronBase>> neurons;$/;"	m	class:dnn::Sim
+run	dnn/sim/sim.h	/^	void run(size_t jobs) {$/;"	f	class:dnn::Sim
+runWorker	dnn/sim/sim.h	/^	static void runWorker(Sim &s, size_t from, size_t to, SpinningBarrier &barrier) {$/;"	f	class:dnn::Sim
+saveStat	dnn/sim/sim.h	/^	void saveStat(Stream &str) {$/;"	f	class:dnn::Sim
+serialize	dnn/sim/sim.h	/^	void serialize(Stream &output_stream) {$/;"	f	class:dnn::Sim
 StaticSynapse	dnn/synapses/static_synapse.h	/^class StaticSynapse : public Synapse<StaticSynapseC, StaticSynapseState> {$/;"	c	namespace:dnn
 StaticSynapseC	dnn/synapses/static_synapse.h	/^    StaticSynapseC() : psp_decay(15.0), amp(1.0) {}$/;"	f	struct:dnn::StaticSynapseC
-StaticSynapseC	dnn/synapses/static_synapse.h	/^struct StaticSynapseC {$/;"	s	namespace:dnn
+StaticSynapseC	dnn/synapses/static_synapse.h	/^struct StaticSynapseC : public Serializable<Protos::StaticSynapseC>  {$/;"	s	namespace:dnn
 StaticSynapseState	dnn/synapses/static_synapse.h	/^    StaticSynapseState() : x(0.0) {}$/;"	f	struct:dnn::StaticSynapseState
-StaticSynapseState	dnn/synapses/static_synapse.h	/^struct StaticSynapseState {$/;"	s	namespace:dnn
+StaticSynapseState	dnn/synapses/static_synapse.h	/^struct StaticSynapseState : public Serializable<Protos::StaticSynapseState>  {$/;"	s	namespace:dnn
 amp	dnn/synapses/static_synapse.h	/^    double amp;$/;"	m	struct:dnn::StaticSynapseC
 calculateDynamics	dnn/synapses/static_synapse.h	/^    void calculateDynamics(const Time &t) {$/;"	f	class:dnn::StaticSynapse
 dnn	dnn/synapses/static_synapse.h	/^namespace dnn {$/;"	n
+getMembranePotential	dnn/synapses/static_synapse.h	/^    const double& getMembranePotential() {$/;"	f	class:dnn::StaticSynapse
+name	dnn/synapses/static_synapse.h	/^    const string name() const {$/;"	f	class:dnn::StaticSynapse
 propagateSpike	dnn/synapses/static_synapse.h	/^    void propagateSpike() {$/;"	f	class:dnn::StaticSynapse
 provideInterface	dnn/synapses/static_synapse.h	/^    void provideInterface(SynapseInterface &i) {$/;"	f	class:dnn::StaticSynapse
 psp_decay	dnn/synapses/static_synapse.h	/^    double psp_decay;$/;"	m	struct:dnn::StaticSynapseC
+serial_process	dnn/synapses/static_synapse.h	/^    void serial_process() {$/;"	f	struct:dnn::StaticSynapseC
+serial_process	dnn/synapses/static_synapse.h	/^    void serial_process() {$/;"	f	struct:dnn::StaticSynapseState
 x	dnn/synapses/static_synapse.h	/^    double x;$/;"	m	struct:dnn::StaticSynapseState
 Synapse	dnn/synapses/synapse.h	/^class Synapse : public SynapseBase {$/;"	c	namespace:dnn
-SynapseBase	dnn/synapses/synapse.h	/^class SynapseBase {$/;"	c	namespace:dnn
+SynapseBase	dnn/synapses/synapse.h	/^class SynapseBase : public SerializableBase {$/;"	c	namespace:dnn
+SynapseInfo	dnn/synapses/synapse.h	/^struct SynapseInfo : public Serializable<Protos::SynapseInfo> {$/;"	s	namespace:dnn
 SynapseInterface	dnn/synapses/synapse.h	/^struct SynapseInterface {$/;"	s	namespace:dnn
-c	dnn/synapses/synapse.h	/^	const Constants c;$/;"	m	class:dnn::Synapse
+c	dnn/synapses/synapse.h	/^	Constants c;$/;"	m	class:dnn::Synapse
 calculateDynamics	dnn/synapses/synapse.h	/^	calculateDynamicsDelegate calculateDynamics;$/;"	m	struct:dnn::SynapseInterface
+dendrite_delay	dnn/synapses/synapse.h	/^	double dendrite_delay;$/;"	m	class:dnn::SynapseBase
+dendrite_delay	dnn/synapses/synapse.h	/^	double dendrite_delay;$/;"	m	struct:dnn::SynapseInfo
 dnn	dnn/synapses/synapse.h	/^namespace dnn {$/;"	n
+getIdPre	dnn/synapses/synapse.h	/^	inline const size_t& getIdPre() { $/;"	f	class:dnn::SynapseBase
+getInfo	dnn/synapses/synapse.h	/^	SynapseInfo getInfo() {$/;"	f	class:dnn::Synapse
+getMembranePotential	dnn/synapses/synapse.h	/^	getDoubleDelegate getMembranePotential;$/;"	m	struct:dnn::SynapseInterface
+id_pre	dnn/synapses/synapse.h	/^	size_t id_pre;$/;"	m	class:dnn::SynapseBase
+id_pre	dnn/synapses/synapse.h	/^	size_t id_pre;$/;"	m	struct:dnn::SynapseInfo
 interface	dnn/synapses/synapse.h	/^	typedef SynapseInterface interface;$/;"	t	class:dnn::SynapseBase
 propagateSpike	dnn/synapses/synapse.h	/^	stateDelegate propagateSpike;$/;"	m	struct:dnn::SynapseInterface
 provideDefaultInterface	dnn/synapses/synapse.h	/^	static void provideDefaultInterface(SynapseInterface &i) {$/;"	f	class:dnn::SynapseBase
 s	dnn/synapses/synapse.h	/^	State s;$/;"	m	class:dnn::Synapse
+serial_process	dnn/synapses/synapse.h	/^	void serial_process() {$/;"	f	class:dnn::Synapse
+serial_process	dnn/synapses/synapse.h	/^	void serial_process() {$/;"	f	struct:dnn::SynapseInfo
+setDendriteDelay	dnn/synapses/synapse.h	/^	void setDendriteDelay(double _dendrite_delay) {$/;"	f	class:dnn::SynapseBase
+setIdPre	dnn/synapses/synapse.h	/^	void setIdPre(size_t _id_pre) {$/;"	f	class:dnn::SynapseBase
+setWeight	dnn/synapses/synapse.h	/^	void setWeight(double w) {$/;"	f	class:dnn::SynapseBase
+weight	dnn/synapses/synapse.h	/^	double weight;$/;"	m	class:dnn::SynapseBase
+weight	dnn/synapses/synapse.h	/^	double weight;$/;"	m	struct:dnn::SynapseInfo
+Barrier	dnn/util/barrier.h	/^    explicit Barrier(std::size_t count) : _count{count} { }$/;"	f	class:Barrier
+Barrier	dnn/util/barrier.h	/^class Barrier$/;"	c
+_count	dnn/util/barrier.h	/^    std::size_t _count;$/;"	m	class:Barrier
+_cv	dnn/util/barrier.h	/^    std::condition_variable _cv;$/;"	m	class:Barrier
+_mutex	dnn/util/barrier.h	/^    std::mutex _mutex;$/;"	m	class:Barrier
+wait	dnn/util/barrier.h	/^    void wait()$/;"	f	class:Barrier
 Distribution	dnn/util/distributions.h	/^class Distribution : public Printable {$/;"	c	namespace:dnn
 ExpDistribution	dnn/util/distributions.h	/^    ExpDistribution(double _gain, double _rate) : gain(_gain), rate(_rate) {}$/;"	f	class:dnn::ExpDistribution
 ExpDistribution	dnn/util/distributions.h	/^class ExpDistribution : public Distribution<double> {$/;"	c	namespace:dnn
@@ -1656,6 +1841,7 @@ getSample	dnn/util/distributions.h	/^    double getSample() {$/;"	f	class:dnn::E
 getSample	dnn/util/distributions.h	/^    double getSample() {$/;"	f	class:dnn::NormalDistribution
 getSample	dnn/util/distributions.h	/^    double getSample() {$/;"	f	class:dnn::UniformDistribution
 mu	dnn/util/distributions.h	/^    double mu;$/;"	m	class:dnn::NormalDistribution
+parseDistribution	dnn/util/distributions.h	/^uptr<Distribution<T>> parseDistribution(const string &str_init) {$/;"	f	namespace:dnn
 print	dnn/util/distributions.h	/^    void print(std::ostream& str) const {$/;"	f	class:dnn::ExpDistribution
 print	dnn/util/distributions.h	/^    void print(std::ostream& str) const {$/;"	f	class:dnn::NormalDistribution
 print	dnn/util/distributions.h	/^    void print(std::ostream& str) const {$/;"	f	class:dnn::UniformDistribution
@@ -2183,218 +2369,177 @@ vfastsinfull	dnn/util/fastapprox/fasttrig.h	/^vfastsinfull (const v4sf x)$/;"	f
 vfasttan	dnn/util/fastapprox/fasttrig.h	/^vfasttan (const v4sf x)$/;"	f
 vfasttanfull	dnn/util/fastapprox/fasttrig.h	/^vfasttanfull (const v4sf x)$/;"	f
 __SSE_H_	dnn/util/fastapprox/sse.h	42;"	d
-array	dnn/util/fastapprox/sse.h	/^typedef union { v4sf f; float array[4]; } v4sfindexer;$/;"	m	union:__anon19::__anon20
-array	dnn/util/fastapprox/sse.h	/^typedef union { v4si i; int array[4]; } v4siindexer;$/;"	m	union:__anon19::__anon21
-f	dnn/util/fastapprox/sse.h	/^typedef union { v4sf f; float array[4]; } v4sfindexer;$/;"	m	union:__anon19::__anon20
-f	dnn/util/fastapprox/sse.h	/^typedef union { v4sf f; v4si i; } v4sfv4sipun;$/;"	m	union:__anon19::__anon22
-i	dnn/util/fastapprox/sse.h	/^typedef union { v4sf f; v4si i; } v4sfv4sipun;$/;"	m	union:__anon19::__anon22
-i	dnn/util/fastapprox/sse.h	/^typedef union { v4si i; int array[4]; } v4siindexer;$/;"	m	union:__anon19::__anon21
+array	dnn/util/fastapprox/sse.h	/^typedef union { v4sf f; float array[4]; } v4sfindexer;$/;"	m	union:__anon8::__anon9
+array	dnn/util/fastapprox/sse.h	/^typedef union { v4si i; int array[4]; } v4siindexer;$/;"	m	union:__anon8::__anon10
+f	dnn/util/fastapprox/sse.h	/^typedef union { v4sf f; float array[4]; } v4sfindexer;$/;"	m	union:__anon8::__anon9
+f	dnn/util/fastapprox/sse.h	/^typedef union { v4sf f; v4si i; } v4sfv4sipun;$/;"	m	union:__anon8::__anon11
+i	dnn/util/fastapprox/sse.h	/^typedef union { v4sf f; v4si i; } v4sfv4sipun;$/;"	m	union:__anon8::__anon11
+i	dnn/util/fastapprox/sse.h	/^typedef union { v4si i; int array[4]; } v4siindexer;$/;"	m	union:__anon8::__anon10
 v2dil	dnn/util/fastapprox/sse.h	59;"	d
-v4sf	dnn/util/fastapprox/sse.h	/^typedef __m128 v4sf;$/;"	t	namespace:__anon19
+v4sf	dnn/util/fastapprox/sse.h	/^typedef __m128 v4sf;$/;"	t	namespace:__anon8
 v4sf_fabs	dnn/util/fastapprox/sse.h	76;"	d
 v4sf_index	dnn/util/fastapprox/sse.h	63;"	d
 v4sf_to_v4si	dnn/util/fastapprox/sse.h	56;"	d
-v4sfindexer	dnn/util/fastapprox/sse.h	/^typedef union { v4sf f; float array[4]; } v4sfindexer;$/;"	t	namespace:__anon19	typeref:union:__anon19::__anon20
+v4sfindexer	dnn/util/fastapprox/sse.h	/^typedef union { v4sf f; float array[4]; } v4sfindexer;$/;"	t	namespace:__anon8	typeref:union:__anon8::__anon9
 v4sfl	dnn/util/fastapprox/sse.h	58;"	d
-v4sfv4sipun	dnn/util/fastapprox/sse.h	/^typedef union { v4sf f; v4si i; } v4sfv4sipun;$/;"	t	namespace:__anon19	typeref:union:__anon19::__anon22
-v4si	dnn/util/fastapprox/sse.h	/^typedef __m128i v4si;$/;"	t	namespace:__anon19
+v4sfv4sipun	dnn/util/fastapprox/sse.h	/^typedef union { v4sf f; v4si i; } v4sfv4sipun;$/;"	t	namespace:__anon8	typeref:union:__anon8::__anon11
+v4si	dnn/util/fastapprox/sse.h	/^typedef __m128i v4si;$/;"	t	namespace:__anon8
 v4si_index	dnn/util/fastapprox/sse.h	69;"	d
 v4si_to_v4sf	dnn/util/fastapprox/sse.h	55;"	d
-v4siindexer	dnn/util/fastapprox/sse.h	/^typedef union { v4si i; int array[4]; } v4siindexer;$/;"	t	namespace:__anon19	typeref:union:__anon19::__anon21
+v4siindexer	dnn/util/fastapprox/sse.h	/^typedef union { v4si i; int array[4]; } v4siindexer;$/;"	t	namespace:__anon8	typeref:union:__anon8::__anon10
 v4sil	dnn/util/fastapprox/sse.h	60;"	d
 InterfacedPtr	dnn/util/interfaced_ptr.h	/^	InterfacedPtr() : _ptr(nullptr) {$/;"	f	class:dnn::InterfacedPtr
 InterfacedPtr	dnn/util/interfaced_ptr.h	/^	InterfacedPtr(T *ptr_to_set) : _ptr(ptr_to_set) {$/;"	f	class:dnn::InterfacedPtr
 InterfacedPtr	dnn/util/interfaced_ptr.h	/^class InterfacedPtr {$/;"	c	namespace:dnn
 _ptr	dnn/util/interfaced_ptr.h	/^	T *_ptr;$/;"	m	class:dnn::InterfacedPtr
 dnn	dnn/util/interfaced_ptr.h	/^namespace dnn {$/;"	n
-getInterface	dnn/util/interfaced_ptr.h	/^	typename T::interface& getInterface() {$/;"	f	class:dnn::InterfacedPtr
 i	dnn/util/interfaced_ptr.h	/^	typename T::interface i;$/;"	m	class:dnn::InterfacedPtr
-ptr	dnn/util/interfaced_ptr.h	/^	T* ptr() {$/;"	f	class:dnn::InterfacedPtr
+ifc	dnn/util/interfaced_ptr.h	/^	typename T::interface& ifc() {$/;"	f	class:dnn::InterfacedPtr
+isSet	dnn/util/interfaced_ptr.h	/^	bool isSet() {$/;"	f	class:dnn::InterfacedPtr
+ptr	dnn/util/interfaced_ptr.h	/^	inline T* ptr() {$/;"	f	class:dnn::InterfacedPtr
+ref	dnn/util/interfaced_ptr.h	/^	inline T& ref() {$/;"	f	class:dnn::InterfacedPtr
 set	dnn/util/interfaced_ptr.h	/^	void set(T *ptr_to_set) {$/;"	f	class:dnn::InterfacedPtr
+Json	dnn/util/json.h	/^class Json {$/;"	c	namespace:dnn
+JsonToProtobuf	dnn/util/json.h	/^	static void JsonToProtobuf(const Value &v, ProtoMessage m) {$/;"	f	class:dnn::Json
+__getDoubleVal	dnn/util/json.h	/^	static bool __getDoubleVal(const Value &v, const string name, double &d) {$/;"	f	class:dnn::Json
+__getStringVal	dnn/util/json.h	/^	static bool __getStringVal(const Value &v, const string name, string &d) {$/;"	f	class:dnn::Json
+checkVal	dnn/util/json.h	/^	static bool checkVal(const Value &v, const string name) {$/;"	f	class:dnn::Json
+dnn	dnn/util/json.h	/^namespace dnn {$/;"	n
+getArray	dnn/util/json.h	/^	static const Value& getArray(const Value &v, const string name) {$/;"	f	class:dnn::Json
+getDoubleVal	dnn/util/json.h	/^	static double getDoubleVal(const Value &v, const string name) {$/;"	f	class:dnn::Json
+getDoubleValDef	dnn/util/json.h	/^	static double getDoubleValDef(const Value &v, const string name, double def) {$/;"	f	class:dnn::Json
+getIntVal	dnn/util/json.h	/^	static size_t getIntVal(const Value &v, const string name) {$/;"	f	class:dnn::Json
+getRidOfComments	dnn/util/json.h	/^	static void getRidOfComments(string &inp_s) {$/;"	f	class:dnn::Json
+getStringVal	dnn/util/json.h	/^	static string getStringVal(const Value &v, const string name) {$/;"	f	class:dnn::Json
+getStringValDef	dnn/util/json.h	/^	static string getStringValDef(const Value &v, const string name, string def) {$/;"	f	class:dnn::Json
+getUintVal	dnn/util/json.h	/^	static size_t getUintVal(const Value &v, const string name) {$/;"	f	class:dnn::Json
+getUintVector	dnn/util/json.h	/^	static vector<size_t> getUintVector(const Value &v, const string name) {$/;"	f	class:dnn::Json
+getVal	dnn/util/json.h	/^	static const Value& getVal(const Value &v, const string name) {$/;"	f	class:dnn::Json
+parseProtobuf	dnn/util/json.h	/^	static Document* parseProtobuf(google::protobuf::Message* mess) {$/;"	f	class:dnn::Json
+parseString	dnn/util/json.h	/^	static Document parseString(string &p) {$/;"	f	class:dnn::Json
+parseStringC	dnn/util/json.h	/^	static Document parseStringC(const string &p) {$/;"	f	class:dnn::Json
+stringify	dnn/util/json.h	/^	static string stringify(const Value &v) {$/;"	f	class:dnn::Json
 dnn	dnn/util/matrix.h	/^namespace dnn {$/;"	n
-Arg	dnn/util/optionparser/opt.h	/^struct Arg: public option::Arg$/;"	s
-NonEmpty	dnn/util/optionparser/opt.h	/^  static option::ArgStatus NonEmpty(const option::Option& option, bool msg)$/;"	f	struct:Arg
-Numeric	dnn/util/optionparser/opt.h	/^  static option::ArgStatus Numeric(const option::Option& option, bool msg)$/;"	f	struct:Arg
-Required	dnn/util/optionparser/opt.h	/^  static option::ArgStatus Required(const option::Option& option, bool msg)$/;"	f	struct:Arg
-Unknown	dnn/util/optionparser/opt.h	/^  static option::ArgStatus Unknown(const option::Option& option, bool msg)$/;"	f	struct:Arg
-printError	dnn/util/optionparser/opt.h	/^  static void printError(const char* msg1, const option::Option& opt, const char* msg2)$/;"	f	struct:Arg
-ARG_IGNORE	dnn/util/optionparser/optionparser.h	/^  ARG_IGNORE,$/;"	e	enum:option::ArgStatus
-ARG_ILLEGAL	dnn/util/optionparser/optionparser.h	/^  ARG_ILLEGAL$/;"	e	enum:option::ArgStatus
-ARG_NONE	dnn/util/optionparser/optionparser.h	/^  ARG_NONE,$/;"	e	enum:option::ArgStatus
-ARG_OK	dnn/util/optionparser/optionparser.h	/^  ARG_OK,$/;"	e	enum:option::ArgStatus
-Action	dnn/util/optionparser/optionparser.h	/^struct Parser::Action$/;"	s	class:option::Parser
-Arg	dnn/util/optionparser/optionparser.h	/^struct Arg$/;"	s	namespace:option
-ArgStatus	dnn/util/optionparser/optionparser.h	/^enum ArgStatus$/;"	g	namespace:option
-CheckArg	dnn/util/optionparser/optionparser.h	/^typedef ArgStatus (*CheckArg)(const Option& option, bool msg);$/;"	t	namespace:option
-CountOptionsAction	dnn/util/optionparser/optionparser.h	/^  CountOptionsAction(unsigned* buffer_max_) :$/;"	f	class:option::Stats::CountOptionsAction
-CountOptionsAction	dnn/util/optionparser/optionparser.h	/^class Stats::CountOptionsAction: public Parser::Action$/;"	c	class:option::Stats
-Descriptor	dnn/util/optionparser/optionparser.h	/^struct Descriptor$/;"	s	namespace:option
-FunctionWriter	dnn/util/optionparser/optionparser.h	/^    FunctionWriter(Function* w) :$/;"	f	struct:option::PrintUsageImplementation::FunctionWriter
-FunctionWriter	dnn/util/optionparser/optionparser.h	/^  struct FunctionWriter: public IStringWriter$/;"	s	struct:option::PrintUsageImplementation
-IStringWriter	dnn/util/optionparser/optionparser.h	/^  struct IStringWriter$/;"	s	struct:option::PrintUsageImplementation
-LinePartIterator	dnn/util/optionparser/optionparser.h	/^    LinePartIterator(const Descriptor usage[]) :$/;"	f	class:option::PrintUsageImplementation::LinePartIterator
-LinePartIterator	dnn/util/optionparser/optionparser.h	/^  class LinePartIterator$/;"	c	struct:option::PrintUsageImplementation
-LineWrapper	dnn/util/optionparser/optionparser.h	/^    LineWrapper(int x1, int x2) :$/;"	f	class:option::PrintUsageImplementation::LineWrapper
-LineWrapper	dnn/util/optionparser/optionparser.h	/^  class LineWrapper$/;"	c	struct:option::PrintUsageImplementation
-MSC_Builtin_CLZ	dnn/util/optionparser/optionparser.h	/^struct MSC_Builtin_CLZ$/;"	s	namespace:option
-None	dnn/util/optionparser/optionparser.h	/^  static ArgStatus None(const Option&, bool)$/;"	f	struct:option::Arg
-OPTIONPARSER_H_	dnn/util/optionparser/optionparser.h	215;"	d
-OStreamWriter	dnn/util/optionparser/optionparser.h	/^    OStreamWriter(OStream& o) :$/;"	f	struct:option::PrintUsageImplementation::OStreamWriter
-OStreamWriter	dnn/util/optionparser/optionparser.h	/^  struct OStreamWriter: public IStringWriter$/;"	s	struct:option::PrintUsageImplementation
-Option	dnn/util/optionparser/optionparser.h	/^  Option() :$/;"	f	class:option::Option
-Option	dnn/util/optionparser/optionparser.h	/^  Option(const Descriptor* desc_, const char* name_, const char* arg_)$/;"	f	class:option::Option
-Option	dnn/util/optionparser/optionparser.h	/^  Option(const Option& orig)$/;"	f	class:option::Option
-Option	dnn/util/optionparser/optionparser.h	/^class Option$/;"	c	namespace:option
-Optional	dnn/util/optionparser/optionparser.h	/^  static ArgStatus Optional(const Option& option, bool)$/;"	f	struct:option::Arg
-Parser	dnn/util/optionparser/optionparser.h	/^  Parser() :$/;"	f	class:option::Parser
-Parser	dnn/util/optionparser/optionparser.h	/^  Parser(bool gnu, const Descriptor usage[], int argc, char** argv, Option options[], Option buffer[],$/;"	f	class:option::Parser
-Parser	dnn/util/optionparser/optionparser.h	/^  Parser(bool gnu, const Descriptor usage[], int argc, const char** argv, Option options[], Option buffer[],$/;"	f	class:option::Parser
-Parser	dnn/util/optionparser/optionparser.h	/^  Parser(const Descriptor usage[], int argc, char** argv, Option options[], Option buffer[], int min_abbr_len = 0,$/;"	f	class:option::Parser
-Parser	dnn/util/optionparser/optionparser.h	/^  Parser(const Descriptor usage[], int argc, const char** argv, Option options[], Option buffer[], int min_abbr_len = 0,$/;"	f	class:option::Parser
-Parser	dnn/util/optionparser/optionparser.h	/^class Parser$/;"	c	namespace:option
-PrintUsageImplementation	dnn/util/optionparser/optionparser.h	/^struct PrintUsageImplementation$/;"	s	namespace:option
-Stats	dnn/util/optionparser/optionparser.h	/^  Stats() :$/;"	f	struct:option::Stats
-Stats	dnn/util/optionparser/optionparser.h	/^  Stats(bool gnu, const Descriptor usage[], int argc, char** argv, int min_abbr_len = 0, \/\/$/;"	f	struct:option::Stats
-Stats	dnn/util/optionparser/optionparser.h	/^  Stats(bool gnu, const Descriptor usage[], int argc, const char** argv, int min_abbr_len = 0, \/\/$/;"	f	struct:option::Stats
-Stats	dnn/util/optionparser/optionparser.h	/^  Stats(const Descriptor usage[], int argc, char** argv, int min_abbr_len = 0, \/\/$/;"	f	struct:option::Stats
-Stats	dnn/util/optionparser/optionparser.h	/^  Stats(const Descriptor usage[], int argc, const char** argv, int min_abbr_len = 0, \/\/$/;"	f	struct:option::Stats
-Stats	dnn/util/optionparser/optionparser.h	/^struct Stats$/;"	s	namespace:option
-StoreOptionAction	dnn/util/optionparser/optionparser.h	/^  StoreOptionAction(Parser& parser_, Option options_[], Option buffer_[], int bufmax_) :$/;"	f	class:option::Parser::StoreOptionAction
-StoreOptionAction	dnn/util/optionparser/optionparser.h	/^class Parser::StoreOptionAction: public Parser::Action$/;"	c	class:option::Parser
-StreamWriter	dnn/util/optionparser/optionparser.h	/^    StreamWriter(Function* w, Stream* s) :$/;"	f	struct:option::PrintUsageImplementation::StreamWriter
-StreamWriter	dnn/util/optionparser/optionparser.h	/^  struct StreamWriter: public IStringWriter$/;"	s	struct:option::PrintUsageImplementation
-SyscallWriter	dnn/util/optionparser/optionparser.h	/^    SyscallWriter(Syscall* w, int f) :$/;"	f	struct:option::PrintUsageImplementation::SyscallWriter
-SyscallWriter	dnn/util/optionparser/optionparser.h	/^  struct SyscallWriter: public IStringWriter$/;"	s	struct:option::PrintUsageImplementation
-TemporaryWriter	dnn/util/optionparser/optionparser.h	/^    TemporaryWriter(const Temporary& u) :$/;"	f	struct:option::PrintUsageImplementation::TemporaryWriter
-TemporaryWriter	dnn/util/optionparser/optionparser.h	/^  struct TemporaryWriter: public IStringWriter$/;"	s	struct:option::PrintUsageImplementation
-__builtin_clz	dnn/util/optionparser/optionparser.h	233;"	d
-add	dnn/util/optionparser/optionparser.h	/^  void add(bool gnu, const Descriptor usage[], int argc, char** argv, int min_abbr_len = 0, \/\/$/;"	f	struct:option::Stats
-add	dnn/util/optionparser/optionparser.h	/^  void add(const Descriptor usage[], int argc, char** argv, int min_abbr_len = 0, \/\/$/;"	f	struct:option::Stats
-add	dnn/util/optionparser/optionparser.h	/^  void add(const Descriptor usage[], int argc, const char** argv, int min_abbr_len = 0, \/\/$/;"	f	struct:option::Stats
-add	dnn/util/optionparser/optionparser.h	/^inline void Stats::add(bool gnu, const Descriptor usage[], int argc, const char** argv, int min_abbr_len,$/;"	f	class:option::Stats
-append	dnn/util/optionparser/optionparser.h	/^  void append(Option* new_last)$/;"	f	class:option::Option
-arg	dnn/util/optionparser/optionparser.h	/^  const char* arg;$/;"	m	class:option::Option
-buf_empty	dnn/util/optionparser/optionparser.h	/^    bool buf_empty()$/;"	f	class:option::PrintUsageImplementation::LineWrapper
-buf_full	dnn/util/optionparser/optionparser.h	/^    bool buf_full()$/;"	f	class:option::PrintUsageImplementation::LineWrapper
-buf_next	dnn/util/optionparser/optionparser.h	/^    void buf_next()$/;"	f	class:option::PrintUsageImplementation::LineWrapper
-buf_store	dnn/util/optionparser/optionparser.h	/^    void buf_store(const char* data, int len)$/;"	f	class:option::PrintUsageImplementation::LineWrapper
-buffer	dnn/util/optionparser/optionparser.h	/^  Option* buffer;$/;"	m	class:option::Parser::StoreOptionAction
-buffer_max	dnn/util/optionparser/optionparser.h	/^  unsigned buffer_max;$/;"	m	struct:option::Stats
-buffer_max	dnn/util/optionparser/optionparser.h	/^  unsigned* buffer_max;$/;"	m	class:option::Stats::CountOptionsAction
-bufmask	dnn/util/optionparser/optionparser.h	/^    static const int bufmask = 15; \/\/!< Must be a power of 2 minus 1.$/;"	m	class:option::PrintUsageImplementation::LineWrapper
-bufmax	dnn/util/optionparser/optionparser.h	/^  int bufmax; \/\/! Number of slots in @c buffer. @c -1 means "large enough".$/;"	m	class:option::Parser::StoreOptionAction
-builtin_clz	dnn/util/optionparser/optionparser.h	/^  static int builtin_clz(unsigned x)$/;"	f	struct:option::MSC_Builtin_CLZ
-check_arg	dnn/util/optionparser/optionparser.h	/^  const CheckArg check_arg;$/;"	m	struct:option::Descriptor
-col	dnn/util/optionparser/optionparser.h	/^    int col; \/\/!< Index of current column.$/;"	m	class:option::PrintUsageImplementation::LinePartIterator
-column	dnn/util/optionparser/optionparser.h	/^    int column()$/;"	f	class:option::PrintUsageImplementation::LinePartIterator
-count	dnn/util/optionparser/optionparser.h	/^  int count()$/;"	f	class:option::Option
-data	dnn/util/optionparser/optionparser.h	/^    const char* data()$/;"	f	class:option::PrintUsageImplementation::LinePartIterator
-datbuf	dnn/util/optionparser/optionparser.h	/^    const char* datbuf[bufmask + 1];$/;"	m	class:option::PrintUsageImplementation::LineWrapper
-desc	dnn/util/optionparser/optionparser.h	/^  const Descriptor* desc;$/;"	m	class:option::Option
-err	dnn/util/optionparser/optionparser.h	/^  bool err; \/\/!< @internal @brief see error()$/;"	m	class:option::Parser
-error	dnn/util/optionparser/optionparser.h	/^  bool error()$/;"	f	class:option::Parser
-fd	dnn/util/optionparser/optionparser.h	/^    int fd;$/;"	m	struct:option::PrintUsageImplementation::SyscallWriter
-finished	dnn/util/optionparser/optionparser.h	/^  bool finished(int numargs, const char** args)$/;"	f	class:option::Parser::StoreOptionAction
-finished	dnn/util/optionparser/optionparser.h	/^  virtual bool finished(int numargs, const char** args)$/;"	f	struct:option::Parser::Action
-first	dnn/util/optionparser/optionparser.h	/^  Option* first()$/;"	f	class:option::Option
-flush	dnn/util/optionparser/optionparser.h	/^    void flush(IStringWriter& write)$/;"	f	class:option::PrintUsageImplementation::LineWrapper
-fwrite	dnn/util/optionparser/optionparser.h	/^    Function* fwrite;$/;"	m	struct:option::PrintUsageImplementation::StreamWriter
-head	dnn/util/optionparser/optionparser.h	/^    int head; \/\/!< @brief index for next write$/;"	m	class:option::PrintUsageImplementation::LineWrapper
-help	dnn/util/optionparser/optionparser.h	/^  const char* help;$/;"	m	struct:option::Descriptor
-hit_target_line	dnn/util/optionparser/optionparser.h	/^    bool hit_target_line; \/\/!< Flag whether we encountered a part with line index target_line_in_block in the current cell.$/;"	m	class:option::PrintUsageImplementation::LinePartIterator
-indent	dnn/util/optionparser/optionparser.h	/^  static void indent(IStringWriter& write, int& x, int want_x)$/;"	f	struct:option::PrintUsageImplementation
-index	dnn/util/optionparser/optionparser.h	/^  const unsigned index;$/;"	m	struct:option::Descriptor
-index	dnn/util/optionparser/optionparser.h	/^  int index() const$/;"	f	class:option::Option
-init	dnn/util/optionparser/optionparser.h	/^  void init(const Descriptor* desc_, const char* name_, const char* arg_)$/;"	f	class:option::Option
-instr	dnn/util/optionparser/optionparser.h	/^  static bool instr(char ch, const char* st)$/;"	f	class:option::Parser
-isFirst	dnn/util/optionparser/optionparser.h	/^  bool isFirst() const$/;"	f	class:option::Option
-isLast	dnn/util/optionparser/optionparser.h	/^  bool isLast() const$/;"	f	class:option::Option
-isTagged	dnn/util/optionparser/optionparser.h	/^  static bool isTagged(Option* ptr)$/;"	f	class:option::Option
-isWideChar	dnn/util/optionparser/optionparser.h	/^  static bool isWideChar(unsigned ch)$/;"	f	struct:option::PrintUsageImplementation
-last	dnn/util/optionparser/optionparser.h	/^  Option* last()$/;"	f	class:option::Option
-len	dnn/util/optionparser/optionparser.h	/^    int len; \/\/!< Length of the current part (that ptr points at) in BYTES$/;"	m	class:option::PrintUsageImplementation::LinePartIterator
-lenbuf	dnn/util/optionparser/optionparser.h	/^    int lenbuf[bufmask + 1];$/;"	m	class:option::PrintUsageImplementation::LineWrapper
-length	dnn/util/optionparser/optionparser.h	/^    int length()$/;"	f	class:option::PrintUsageImplementation::LinePartIterator
-line	dnn/util/optionparser/optionparser.h	/^    int line()$/;"	f	class:option::PrintUsageImplementation::LinePartIterator
-line_in_block	dnn/util/optionparser/optionparser.h	/^    int line_in_block; \/\/!< Line index within the current cell of the current part.$/;"	m	class:option::PrintUsageImplementation::LinePartIterator
-longopt	dnn/util/optionparser/optionparser.h	/^  const char* const longopt;$/;"	m	struct:option::Descriptor
-max_line_in_block	dnn/util/optionparser/optionparser.h	/^    int max_line_in_block; \/\/!< Greatest index of a line within the block. This is the number of \\\\v within the cell with the most \\\\vs.$/;"	m	class:option::PrintUsageImplementation::LinePartIterator
-name	dnn/util/optionparser/optionparser.h	/^  const char* name;$/;"	m	class:option::Option
-namelen	dnn/util/optionparser/optionparser.h	/^  int namelen;$/;"	m	class:option::Option
-next	dnn/util/optionparser/optionparser.h	/^    bool next()$/;"	f	class:option::PrintUsageImplementation::LinePartIterator
-next	dnn/util/optionparser/optionparser.h	/^  Option* next()$/;"	f	class:option::Option
-nextRow	dnn/util/optionparser/optionparser.h	/^    bool nextRow()$/;"	f	class:option::PrintUsageImplementation::LinePartIterator
-nextTable	dnn/util/optionparser/optionparser.h	/^    bool nextTable()$/;"	f	class:option::PrintUsageImplementation::LinePartIterator
-next_	dnn/util/optionparser/optionparser.h	/^  Option* next_;$/;"	m	class:option::Option
-nextwrap	dnn/util/optionparser/optionparser.h	/^  Option* nextwrap()$/;"	f	class:option::Option
-nonOption	dnn/util/optionparser/optionparser.h	/^  const char* nonOption(int i)$/;"	f	class:option::Parser
-nonOptions	dnn/util/optionparser/optionparser.h	/^  const char** nonOptions()$/;"	f	class:option::Parser
-nonOptionsCount	dnn/util/optionparser/optionparser.h	/^  int nonOptionsCount()$/;"	f	class:option::Parser
-nonop_args	dnn/util/optionparser/optionparser.h	/^  const char** nonop_args; \/\/!< @internal @brief see nonOptions()$/;"	m	class:option::Parser
-nonop_count	dnn/util/optionparser/optionparser.h	/^  int nonop_count; \/\/!< @internal @brief see nonOptionsCount()$/;"	m	class:option::Parser
-op_count	dnn/util/optionparser/optionparser.h	/^  int op_count; \/\/!< @internal @brief see optionsCount()$/;"	m	class:option::Parser
-operator ()	dnn/util/optionparser/optionparser.h	/^    virtual void operator()(const char* str, int size)$/;"	f	struct:option::PrintUsageImplementation::FunctionWriter
-operator ()	dnn/util/optionparser/optionparser.h	/^    virtual void operator()(const char* str, int size)$/;"	f	struct:option::PrintUsageImplementation::OStreamWriter
-operator ()	dnn/util/optionparser/optionparser.h	/^    virtual void operator()(const char* str, int size)$/;"	f	struct:option::PrintUsageImplementation::StreamWriter
-operator ()	dnn/util/optionparser/optionparser.h	/^    virtual void operator()(const char* str, int size)$/;"	f	struct:option::PrintUsageImplementation::SyscallWriter
-operator ()	dnn/util/optionparser/optionparser.h	/^    virtual void operator()(const char* str, int size)$/;"	f	struct:option::PrintUsageImplementation::TemporaryWriter
-operator ()	dnn/util/optionparser/optionparser.h	/^    virtual void operator()(const char*, int)$/;"	f	struct:option::PrintUsageImplementation::IStringWriter
-operator =	dnn/util/optionparser/optionparser.h	/^  void operator=(const Option& orig)$/;"	f	class:option::Option
-operator Option*	dnn/util/optionparser/optionparser.h	/^  operator Option*()$/;"	f	class:option::Option
-operator const Option*	dnn/util/optionparser/optionparser.h	/^  operator const Option*() const$/;"	f	class:option::Option
-option	dnn/util/optionparser/optionparser.h	/^namespace option$/;"	n
-options	dnn/util/optionparser/optionparser.h	/^  Option* options;$/;"	m	class:option::Parser::StoreOptionAction
-optionsCount	dnn/util/optionparser/optionparser.h	/^  int optionsCount()$/;"	f	class:option::Parser
-options_max	dnn/util/optionparser/optionparser.h	/^  unsigned options_max;$/;"	m	struct:option::Stats
-ostream	dnn/util/optionparser/optionparser.h	/^    OStream& ostream;$/;"	m	struct:option::PrintUsageImplementation::OStreamWriter
-output	dnn/util/optionparser/optionparser.h	/^    void output(IStringWriter& write, const char* data, int len)$/;"	f	class:option::PrintUsageImplementation::LineWrapper
-parse	dnn/util/optionparser/optionparser.h	/^  void parse(bool gnu, const Descriptor usage[], int argc, char** argv, Option options[], Option buffer[],$/;"	f	class:option::Parser
-parse	dnn/util/optionparser/optionparser.h	/^  void parse(const Descriptor usage[], int argc, char** argv, Option options[], Option buffer[], int min_abbr_len = 0,$/;"	f	class:option::Parser
-parse	dnn/util/optionparser/optionparser.h	/^  void parse(const Descriptor usage[], int argc, const char** argv, Option options[], Option buffer[],$/;"	f	class:option::Parser
-parse	dnn/util/optionparser/optionparser.h	/^inline void Parser::parse(bool gnu, const Descriptor usage[], int argc, const char** argv, Option options[],$/;"	f	class:option::Parser
-parser	dnn/util/optionparser/optionparser.h	/^  Parser& parser;$/;"	m	class:option::Parser::StoreOptionAction
-perform	dnn/util/optionparser/optionparser.h	/^  bool perform(Option& option)$/;"	f	class:option::Parser::StoreOptionAction
-perform	dnn/util/optionparser/optionparser.h	/^  bool perform(Option&)$/;"	f	class:option::Stats::CountOptionsAction
-perform	dnn/util/optionparser/optionparser.h	/^  virtual bool perform(Option&)$/;"	f	struct:option::Parser::Action
-prev	dnn/util/optionparser/optionparser.h	/^  Option* prev()$/;"	f	class:option::Option
-prev_	dnn/util/optionparser/optionparser.h	/^  Option* prev_;$/;"	m	class:option::Option
-prevwrap	dnn/util/optionparser/optionparser.h	/^  Option* prevwrap()$/;"	f	class:option::Option
-printUsage	dnn/util/optionparser/optionparser.h	/^  static void printUsage(IStringWriter& write, const Descriptor usage[], int width = 80, \/\/$/;"	f	struct:option::PrintUsageImplementation
-printUsage	dnn/util/optionparser/optionparser.h	/^void printUsage(Function* prn, Stream* stream, const Descriptor usage[], int width = 80, int last_column_min_percent =$/;"	f	namespace:option
-printUsage	dnn/util/optionparser/optionparser.h	/^void printUsage(Function* prn, const Descriptor usage[], int width = 80, int last_column_min_percent = 50,$/;"	f	namespace:option
-printUsage	dnn/util/optionparser/optionparser.h	/^void printUsage(OStream& prn, const Descriptor usage[], int width = 80, int last_column_min_percent = 50,$/;"	f	namespace:option
-printUsage	dnn/util/optionparser/optionparser.h	/^void printUsage(Syscall* prn, int fd, const Descriptor usage[], int width = 80, int last_column_min_percent = 50,$/;"	f	namespace:option
-printUsage	dnn/util/optionparser/optionparser.h	/^void printUsage(const Temporary& prn, const Descriptor usage[], int width = 80, int last_column_min_percent = 50,$/;"	f	namespace:option
-process	dnn/util/optionparser/optionparser.h	/^    void process(IStringWriter& write, const char* data, int len)$/;"	f	class:option::PrintUsageImplementation::LineWrapper
-ptr	dnn/util/optionparser/optionparser.h	/^    const char* ptr; \/\/!< Ptr to current part within the current row.$/;"	m	class:option::PrintUsageImplementation::LinePartIterator
-restartRow	dnn/util/optionparser/optionparser.h	/^    void restartRow()$/;"	f	class:option::PrintUsageImplementation::LinePartIterator
-restartTable	dnn/util/optionparser/optionparser.h	/^    void restartTable()$/;"	f	class:option::PrintUsageImplementation::LinePartIterator
-rowdesc	dnn/util/optionparser/optionparser.h	/^    const Descriptor* rowdesc; \/\/!< The Descriptor that contains the current row.$/;"	m	class:option::PrintUsageImplementation::LinePartIterator
-rowstart	dnn/util/optionparser/optionparser.h	/^    const char* rowstart; \/\/!< Ptr to 1st character of current row within rowdesc->help.$/;"	m	class:option::PrintUsageImplementation::LinePartIterator
-screenLength	dnn/util/optionparser/optionparser.h	/^    int screenLength()$/;"	f	class:option::PrintUsageImplementation::LinePartIterator
-screenlen	dnn/util/optionparser/optionparser.h	/^    int screenlen; \/\/!< Length of the current part in screen columns (taking narrow\/wide chars into account).$/;"	m	class:option::PrintUsageImplementation::LinePartIterator
-shift	dnn/util/optionparser/optionparser.h	/^  static void shift(const char** args, int count)$/;"	f	class:option::Parser
-shortopt	dnn/util/optionparser/optionparser.h	/^  const char* const shortopt;$/;"	m	struct:option::Descriptor
-stream	dnn/util/optionparser/optionparser.h	/^    Stream* stream;$/;"	m	struct:option::PrintUsageImplementation::StreamWriter
-streq	dnn/util/optionparser/optionparser.h	/^  static bool streq(const char* st1, const char* st2)$/;"	f	class:option::Parser
-streqabbr	dnn/util/optionparser/optionparser.h	/^  static bool streqabbr(const char* st1, const char* st2, long long min)$/;"	f	class:option::Parser
-tablestart	dnn/util/optionparser/optionparser.h	/^    const Descriptor* tablestart; \/\/!< The 1st descriptor of the current table.$/;"	m	class:option::PrintUsageImplementation::LinePartIterator
-tag	dnn/util/optionparser/optionparser.h	/^  static Option* tag(Option* ptr)$/;"	f	class:option::Option
-tail	dnn/util/optionparser/optionparser.h	/^    int tail; \/\/!< @brief index for next read - 1 (i.e. increment tail BEFORE read)$/;"	m	class:option::PrintUsageImplementation::LineWrapper
-target_line_in_block	dnn/util/optionparser/optionparser.h	/^    int target_line_in_block; \/\/!< Line index of the parts we should return to the user on this iteration.$/;"	m	class:option::PrintUsageImplementation::LinePartIterator
-type	dnn/util/optionparser/optionparser.h	/^  const int type;$/;"	m	struct:option::Descriptor
-type	dnn/util/optionparser/optionparser.h	/^  int type() const$/;"	f	class:option::Option
-untag	dnn/util/optionparser/optionparser.h	/^  static Option* untag(Option* ptr)$/;"	f	class:option::Option
-update_length	dnn/util/optionparser/optionparser.h	/^    void update_length()$/;"	f	class:option::PrintUsageImplementation::LinePartIterator
-upmax	dnn/util/optionparser/optionparser.h	/^  static void upmax(int& i1, int i2)$/;"	f	struct:option::PrintUsageImplementation
-userstream	dnn/util/optionparser/optionparser.h	/^    const Temporary& userstream;$/;"	m	struct:option::PrintUsageImplementation::TemporaryWriter
-width	dnn/util/optionparser/optionparser.h	/^    int width;$/;"	m	class:option::PrintUsageImplementation::LineWrapper
-workhorse	dnn/util/optionparser/optionparser.h	/^inline bool Parser::workhorse(bool gnu, const Descriptor usage[], int numargs, const char** args, Action& action,$/;"	f	class:option::Parser
-write	dnn/util/optionparser/optionparser.h	/^    Function* write;$/;"	m	struct:option::PrintUsageImplementation::FunctionWriter
-write	dnn/util/optionparser/optionparser.h	/^    Syscall* write;$/;"	m	struct:option::PrintUsageImplementation::SyscallWriter
-write_one_line	dnn/util/optionparser/optionparser.h	/^    void write_one_line(IStringWriter& write)$/;"	f	class:option::PrintUsageImplementation::LineWrapper
-wrote_something	dnn/util/optionparser/optionparser.h	/^    bool wrote_something;$/;"	m	class:option::PrintUsageImplementation::LineWrapper
-x	dnn/util/optionparser/optionparser.h	/^    int x;$/;"	m	class:option::PrintUsageImplementation::LineWrapper
+OptionParser	dnn/util/option_parser.h	/^	OptionParser(int argc, char **argv) {$/;"	f	class:OptionParser
+OptionParser	dnn/util/option_parser.h	/^class OptionParser {$/;"	c
+cast	dnn/util/option_parser.h	/^T cast(string &s) {$/;"	f
+cast	dnn/util/option_parser.h	/^double cast(string &s) {$/;"	f
+cast	dnn/util/option_parser.h	/^int cast(string &s) {$/;"	f
+cast	dnn/util/option_parser.h	/^size_t cast(string &s) {$/;"	f
+cast	dnn/util/option_parser.h	/^string cast(string &s) {$/;"	f
+getRawOptions	dnn/util/option_parser.h	/^	vector<string>& getRawOptions() {$/;"	f	class:OptionParser
+loption	dnn/util/option_parser.h	/^	void loption(string long_opt, T &src, bool required = true, bool as_flag = false) {$/;"	f	class:OptionParser
+option	dnn/util/option_parser.h	/^	void option(string long_opt, string short_opt, T &src, bool required = true, bool as_flag = false) {$/;"	f	class:OptionParser
+opts	dnn/util/option_parser.h	/^	vector<string> opts;$/;"	m	class:OptionParser
+H_PRETTY_PRINT	dnn/util/pretty_print.h	12;"	d
+Int	dnn/util/pretty_print.h	/^        template <std::size_t I> struct Int { };$/;"	s	struct:pretty_print::print_container_helper::printer
+_array	dnn/util/pretty_print.h	/^        const T * const _array;$/;"	m	struct:pretty_print::array_wrapper_n
+_n	dnn/util/pretty_print.h	/^        size_t _n;$/;"	m	struct:pretty_print::array_wrapper_n
+array_wrapper_n	dnn/util/pretty_print.h	/^        array_wrapper_n(const T * const a, size_t n) : _array(a), _n(n) { }$/;"	f	struct:pretty_print::array_wrapper_n
+array_wrapper_n	dnn/util/pretty_print.h	/^    struct array_wrapper_n$/;"	s	namespace:pretty_print
+base	dnn/util/pretty_print.h	/^        std::unique_ptr<custom_delims_base> base;$/;"	m	struct:pretty_print::custom_delims
+beg_value	dnn/util/pretty_print.h	/^            static bool const beg_value = sizeof(f<T>(nullptr)) == sizeof(yes);$/;"	m	struct:pretty_print::detail::has_begin_end
+begin	dnn/util/pretty_print.h	/^        const_iterator begin() const$/;"	f	struct:pretty_print::bucket_print_wrapper
+begin	dnn/util/pretty_print.h	/^        inline const_iterator begin() const { return _array; }$/;"	f	struct:pretty_print::array_wrapper_n
+bucket_print	dnn/util/pretty_print.h	/^bucket_print(const T & m, typename T::size_type n)$/;"	f
+bucket_print_wrapper	dnn/util/pretty_print.h	/^        bucket_print_wrapper(const T & m, size_type bucket) : m_map(m), n(bucket) { }$/;"	f	struct:pretty_print::bucket_print_wrapper
+bucket_print_wrapper	dnn/util/pretty_print.h	/^    struct bucket_print_wrapper$/;"	s	namespace:pretty_print
+const_iterator	dnn/util/pretty_print.h	/^        typedef const T * const_iterator;$/;"	t	struct:pretty_print::array_wrapper_n
+const_iterator	dnn/util/pretty_print.h	/^        typedef typename T::const_local_iterator const_iterator;$/;"	t	struct:pretty_print::bucket_print_wrapper
+container_	dnn/util/pretty_print.h	/^        const T & container_;$/;"	m	struct:pretty_print::print_container_helper
+custom_delims	dnn/util/pretty_print.h	/^        custom_delims(const Container & c) : base(new custom_delims_wrapper<Container, Delims>(c)) { }$/;"	f	struct:pretty_print::custom_delims
+custom_delims	dnn/util/pretty_print.h	/^    struct custom_delims$/;"	s	namespace:pretty_print
+custom_delims_base	dnn/util/pretty_print.h	/^    struct custom_delims_base$/;"	s	namespace:pretty_print
+custom_delims_wrapper	dnn/util/pretty_print.h	/^        custom_delims_wrapper(const T & t_) : t(t_) { }$/;"	f	struct:pretty_print::custom_delims_wrapper
+custom_delims_wrapper	dnn/util/pretty_print.h	/^    struct custom_delims_wrapper : custom_delims_base$/;"	s	namespace:pretty_print
+delimiter	dnn/util/pretty_print.h	/^        const char_type * delimiter;$/;"	m	struct:pretty_print::delimiters_values
+delimiters	dnn/util/pretty_print.h	/^    struct delimiters$/;"	s	namespace:pretty_print
+delimiters	dnn/util/pretty_print.h	/^    struct delimiters< ::std::multiset<T, TComp, TAllocator>, char> { static const delimiters_values<char> values; };$/;"	s	namespace:pretty_print
+delimiters	dnn/util/pretty_print.h	/^    struct delimiters< ::std::multiset<T, TComp, TAllocator>, wchar_t> { static const delimiters_values<wchar_t> values; };$/;"	s	namespace:pretty_print
+delimiters	dnn/util/pretty_print.h	/^    struct delimiters< ::std::set<T, TComp, TAllocator>, char> { static const delimiters_values<char> values; };$/;"	s	namespace:pretty_print
+delimiters	dnn/util/pretty_print.h	/^    struct delimiters< ::std::set<T, TComp, TAllocator>, wchar_t> { static const delimiters_values<wchar_t> values; };$/;"	s	namespace:pretty_print
+delimiters	dnn/util/pretty_print.h	/^    struct delimiters< ::std::unordered_multiset<T, THash, TEqual, TAllocator>, char> { static const delimiters_values<char> values; };$/;"	s	namespace:pretty_print
+delimiters	dnn/util/pretty_print.h	/^    struct delimiters< ::std::unordered_multiset<T, THash, TEqual, TAllocator>, wchar_t> { static const delimiters_values<wchar_t> values; };$/;"	s	namespace:pretty_print
+delimiters	dnn/util/pretty_print.h	/^    struct delimiters< ::std::unordered_set<T, THash, TEqual, TAllocator>, char> { static const delimiters_values<char> values; };$/;"	s	namespace:pretty_print
+delimiters	dnn/util/pretty_print.h	/^    struct delimiters< ::std::unordered_set<T, THash, TEqual, TAllocator>, wchar_t> { static const delimiters_values<wchar_t> values; };$/;"	s	namespace:pretty_print
+delimiters	dnn/util/pretty_print.h	/^    template <typename ...Args> struct delimiters< ::std::tuple<Args...>, wchar_t> { static const delimiters_values<wchar_t> values; };$/;"	s	namespace:pretty_print
+delimiters	dnn/util/pretty_print.h	/^    template <typename ...Args> struct delimiters<std::tuple<Args...>, char> { static const delimiters_values<char> values; };$/;"	s	namespace:pretty_print
+delimiters	dnn/util/pretty_print.h	/^    template <typename T1, typename T2> struct delimiters< ::std::pair<T1, T2>, wchar_t> { static const delimiters_values<wchar_t> values; };$/;"	s	namespace:pretty_print
+delimiters	dnn/util/pretty_print.h	/^    template <typename T1, typename T2> struct delimiters<std::pair<T1, T2>, char> { static const delimiters_values<char> values; };$/;"	s	namespace:pretty_print
+delimiters	dnn/util/pretty_print.h	/^    template <typename T> struct delimiters<T, char> { static const delimiters_values<char> values; };$/;"	s	namespace:pretty_print
+delimiters	dnn/util/pretty_print.h	/^    template <typename T> struct delimiters<T, wchar_t> { static const delimiters_values<wchar_t> values; };$/;"	s	namespace:pretty_print
+delimiters_values	dnn/util/pretty_print.h	/^    struct delimiters_values$/;"	s	namespace:pretty_print
+detail	dnn/util/pretty_print.h	/^    namespace detail$/;"	n	namespace:pretty_print
+end	dnn/util/pretty_print.h	/^        const_iterator end() const$/;"	f	struct:pretty_print::bucket_print_wrapper
+end	dnn/util/pretty_print.h	/^        inline const_iterator end() const { return _array + _n; }$/;"	f	struct:pretty_print::array_wrapper_n
+end_value	dnn/util/pretty_print.h	/^            static bool const end_value = sizeof(g<T>(nullptr)) == sizeof(yes);$/;"	m	struct:pretty_print::detail::has_begin_end
+has_begin_end	dnn/util/pretty_print.h	/^        struct has_begin_end : private sfinae_base$/;"	s	namespace:pretty_print::detail
+has_const_iterator	dnn/util/pretty_print.h	/^        struct has_const_iterator : private sfinae_base$/;"	s	namespace:pretty_print::detail
+is_container	dnn/util/pretty_print.h	/^    struct is_container : public std::integral_constant<bool,$/;"	s	namespace:pretty_print
+is_container	dnn/util/pretty_print.h	/^    struct is_container<T[N]> : std::true_type { };$/;"	s	namespace:pretty_print
+is_container	dnn/util/pretty_print.h	/^    struct is_container<char[N]> : std::false_type { };$/;"	s	namespace:pretty_print
+is_container	dnn/util/pretty_print.h	/^    struct is_container<std::pair<T1, T2>> : std::true_type { };$/;"	s	namespace:pretty_print
+is_container	dnn/util/pretty_print.h	/^    struct is_container<std::tuple<Args...>> : std::true_type { };$/;"	s	namespace:pretty_print
+is_container	dnn/util/pretty_print.h	/^    struct is_container<std::valarray<T>> : std::true_type { };$/;"	s	namespace:pretty_print
+m_map	dnn/util/pretty_print.h	/^        const T & m_map;$/;"	m	struct:pretty_print::bucket_print_wrapper
+n	dnn/util/pretty_print.h	/^        const size_type n;$/;"	m	struct:pretty_print::bucket_print_wrapper
+operator ()	dnn/util/pretty_print.h	/^        inline void operator()(ostream_type & stream) const$/;"	f	struct:pretty_print::print_container_helper
+operator <<	dnn/util/pretty_print.h	/^    inline std::basic_ostream<TChar, TCharTraits> & operator<<($/;"	f	namespace:pretty_print
+operator <<	dnn/util/pretty_print.h	/^    inline std::basic_ostream<TChar, TCharTraits> & operator<<(std::basic_ostream<TChar, TCharTraits> & s, const custom_delims<Delims> & p)$/;"	f	namespace:pretty_print
+operator <<	dnn/util/pretty_print.h	/^    operator<<(basic_ostream<TChar, TCharTraits> & stream, const T & container)$/;"	f	namespace:std
+postfix	dnn/util/pretty_print.h	/^        const char_type * postfix;$/;"	m	struct:pretty_print::delimiters_values
+prefix	dnn/util/pretty_print.h	/^        const char_type * prefix;$/;"	m	struct:pretty_print::delimiters_values
+pretty_print	dnn/util/pretty_print.h	/^namespace pretty_print$/;"	n
+pretty_print_array	dnn/util/pretty_print.h	/^inline pretty_print::array_wrapper_n<T> pretty_print_array(const T * const a, size_t n)$/;"	f
+print_body	dnn/util/pretty_print.h	/^            static void print_body(const U & c, ostream_type & stream)$/;"	f	struct:pretty_print::print_container_helper::printer
+print_body	dnn/util/pretty_print.h	/^        static void print_body(const element_type & c, ostream_type & stream)$/;"	f	struct:pretty_print::print_container_helper::printer
+print_body	dnn/util/pretty_print.h	/^        static void print_body(const std::pair<T1, T2> & c, ostream_type & stream)$/;"	f	struct:pretty_print::print_container_helper::printer
+print_container_helper	dnn/util/pretty_print.h	/^        print_container_helper(const T & container)$/;"	f	struct:pretty_print::print_container_helper
+print_container_helper	dnn/util/pretty_print.h	/^    struct print_container_helper$/;"	s	namespace:pretty_print
+printer	dnn/util/pretty_print.h	/^        struct printer$/;"	s	struct:pretty_print::print_container_helper
+printer	dnn/util/pretty_print.h	/^    struct print_container_helper<T, TChar, TCharTraits, TDelimiters>::printer<std::pair<T1, T2>>$/;"	s	class:pretty_print::print_container_helper
+printer	dnn/util/pretty_print.h	/^    struct print_container_helper<T, TChar, TCharTraits, TDelimiters>::printer<std::tuple<Args...>>$/;"	s	class:pretty_print::print_container_helper
+sfinae_base	dnn/util/pretty_print.h	/^        struct sfinae_base$/;"	s	namespace:pretty_print::detail
+size_type	dnn/util/pretty_print.h	/^        typedef typename T::size_type size_type;$/;"	t	struct:pretty_print::bucket_print_wrapper
+std	dnn/util/pretty_print.h	/^namespace std$/;"	n
+stream	dnn/util/pretty_print.h	/^        std::ostream & stream(std::ostream & s)$/;"	f	struct:pretty_print::custom_delims_wrapper
+stream	dnn/util/pretty_print.h	/^        std::wostream & stream(std::wostream & s)$/;"	f	struct:pretty_print::custom_delims_wrapper
+t	dnn/util/pretty_print.h	/^        const T & t;$/;"	m	struct:pretty_print::custom_delims_wrapper
+tuple_print	dnn/util/pretty_print.h	/^        static void tuple_print(const element_type & c, ostream_type & stream, Int<N>)$/;"	f	struct:pretty_print::print_container_helper::printer
+tuple_print	dnn/util/pretty_print.h	/^        static void tuple_print(const element_type & c, ostream_type & stream,$/;"	f	struct:pretty_print::print_container_helper::printer
+tuple_print	dnn/util/pretty_print.h	/^        static void tuple_print(const element_type &, ostream_type &, Int<sizeof...(Args)>)$/;"	f	struct:pretty_print::print_container_helper::printer
+value	dnn/util/pretty_print.h	/^            static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);$/;"	m	struct:pretty_print::detail::has_const_iterator
+value_type	dnn/util/pretty_print.h	/^        typedef T value_type;$/;"	t	struct:pretty_print::array_wrapper_n
+values	dnn/util/pretty_print.h	/^        static const type values; $/;"	m	struct:pretty_print::delimiters
+values	dnn/util/pretty_print.h	/^    const delimiters_values<char> delimiters< ::std::multiset<T, TComp, TAllocator>, char>::values = { "{", ", ", "}" };$/;"	m	class:pretty_print::delimiters
+values	dnn/util/pretty_print.h	/^    const delimiters_values<char> delimiters< ::std::set<T, TComp, TAllocator>, char>::values = { "{", ", ", "}" };$/;"	m	class:pretty_print::delimiters
+values	dnn/util/pretty_print.h	/^    const delimiters_values<char> delimiters< ::std::unordered_multiset<T, THash, TEqual, TAllocator>, char>::values = { "{", ", ", "}" };$/;"	m	class:pretty_print::delimiters
+values	dnn/util/pretty_print.h	/^    const delimiters_values<char> delimiters< ::std::unordered_set<T, THash, TEqual, TAllocator>, char>::values = { "{", ", ", "}" };$/;"	m	class:pretty_print::delimiters
+values	dnn/util/pretty_print.h	/^    const delimiters_values<wchar_t> delimiters< ::std::multiset<T, TComp, TAllocator>, wchar_t>::values = { L"{", L", ", L"}" };$/;"	m	class:pretty_print::delimiters
+values	dnn/util/pretty_print.h	/^    const delimiters_values<wchar_t> delimiters< ::std::set<T, TComp, TAllocator>, wchar_t>::values = { L"{", L", ", L"}" };$/;"	m	class:pretty_print::delimiters
+values	dnn/util/pretty_print.h	/^    const delimiters_values<wchar_t> delimiters< ::std::unordered_multiset<T, THash, TEqual, TAllocator>, wchar_t>::values = { L"{", L", ", L"}" };$/;"	m	class:pretty_print::delimiters
+values	dnn/util/pretty_print.h	/^    const delimiters_values<wchar_t> delimiters< ::std::unordered_set<T, THash, TEqual, TAllocator>, wchar_t>::values = { L"{", L", ", L"}" };$/;"	m	class:pretty_print::delimiters
+values	dnn/util/pretty_print.h	/^    struct delimiters< ::std::multiset<T, TComp, TAllocator>, char> { static const delimiters_values<char> values; };$/;"	m	struct:pretty_print::delimiters
+values	dnn/util/pretty_print.h	/^    struct delimiters< ::std::multiset<T, TComp, TAllocator>, wchar_t> { static const delimiters_values<wchar_t> values; };$/;"	m	struct:pretty_print::delimiters
+values	dnn/util/pretty_print.h	/^    struct delimiters< ::std::set<T, TComp, TAllocator>, char> { static const delimiters_values<char> values; };$/;"	m	struct:pretty_print::delimiters
+values	dnn/util/pretty_print.h	/^    struct delimiters< ::std::set<T, TComp, TAllocator>, wchar_t> { static const delimiters_values<wchar_t> values; };$/;"	m	struct:pretty_print::delimiters
+values	dnn/util/pretty_print.h	/^    struct delimiters< ::std::unordered_multiset<T, THash, TEqual, TAllocator>, char> { static const delimiters_values<char> values; };$/;"	m	struct:pretty_print::delimiters
+values	dnn/util/pretty_print.h	/^    struct delimiters< ::std::unordered_multiset<T, THash, TEqual, TAllocator>, wchar_t> { static const delimiters_values<wchar_t> values; };$/;"	m	struct:pretty_print::delimiters
+values	dnn/util/pretty_print.h	/^    struct delimiters< ::std::unordered_set<T, THash, TEqual, TAllocator>, char> { static const delimiters_values<char> values; };$/;"	m	struct:pretty_print::delimiters
+values	dnn/util/pretty_print.h	/^    struct delimiters< ::std::unordered_set<T, THash, TEqual, TAllocator>, wchar_t> { static const delimiters_values<wchar_t> values; };$/;"	m	struct:pretty_print::delimiters
+values	dnn/util/pretty_print.h	/^    template <typename ...Args> const delimiters_values<char> delimiters<std::tuple<Args...>, char>::values = { "(", ", ", ")" };$/;"	m	class:pretty_print::delimiters
+values	dnn/util/pretty_print.h	/^    template <typename ...Args> const delimiters_values<wchar_t> delimiters< ::std::tuple<Args...>, wchar_t>::values = { L"(", L", ", L")" };$/;"	m	class:pretty_print::delimiters
+values	dnn/util/pretty_print.h	/^    template <typename ...Args> struct delimiters< ::std::tuple<Args...>, wchar_t> { static const delimiters_values<wchar_t> values; };$/;"	m	struct:pretty_print::delimiters
+values	dnn/util/pretty_print.h	/^    template <typename ...Args> struct delimiters<std::tuple<Args...>, char> { static const delimiters_values<char> values; };$/;"	m	struct:pretty_print::delimiters
+values	dnn/util/pretty_print.h	/^    template <typename T1, typename T2> const delimiters_values<char> delimiters<std::pair<T1, T2>, char>::values = { "(", ", ", ")" };$/;"	m	class:pretty_print::delimiters
+values	dnn/util/pretty_print.h	/^    template <typename T1, typename T2> const delimiters_values<wchar_t> delimiters< ::std::pair<T1, T2>, wchar_t>::values = { L"(", L", ", L")" };$/;"	m	class:pretty_print::delimiters
+values	dnn/util/pretty_print.h	/^    template <typename T1, typename T2> struct delimiters< ::std::pair<T1, T2>, wchar_t> { static const delimiters_values<wchar_t> values; };$/;"	m	struct:pretty_print::delimiters
+values	dnn/util/pretty_print.h	/^    template <typename T1, typename T2> struct delimiters<std::pair<T1, T2>, char> { static const delimiters_values<char> values; };$/;"	m	struct:pretty_print::delimiters
+values	dnn/util/pretty_print.h	/^    template <typename T> const delimiters_values<char> delimiters<T, char>::values = { "[", ", ", "]" };$/;"	m	class:pretty_print::delimiters
+values	dnn/util/pretty_print.h	/^    template <typename T> const delimiters_values<wchar_t> delimiters<T, wchar_t>::values = { L"[", L", ", L"]" };$/;"	m	class:pretty_print::delimiters
+values	dnn/util/pretty_print.h	/^    template <typename T> struct delimiters<T, char> { static const delimiters_values<char> values; };$/;"	m	struct:pretty_print::delimiters
+values	dnn/util/pretty_print.h	/^    template <typename T> struct delimiters<T, wchar_t> { static const delimiters_values<wchar_t> values; };$/;"	m	struct:pretty_print::delimiters
+~custom_delims_base	dnn/util/pretty_print.h	/^        virtual ~custom_delims_base() { }$/;"	f	struct:pretty_print::custom_delims_base
 PCG_128BIT_CONSTANT	dnn/util/random/pcg_extras.hpp	84;"	d
 PCG_EXTRAS_HPP_INCLUDED	dnn/util/random/pcg_extras.hpp	36;"	d
 PCG_NOINLINE	dnn/util/random/pcg_extras.hpp	60;"	d
@@ -2521,8 +2666,8 @@ PCG_UINT128_HPP_INCLUDED	dnn/util/random/pcg_uint128.hpp	39;"	d
 addwithcarry	dnn/util/random/pcg_uint128.hpp	/^inline UInt addwithcarry(UInt x, UInt y, bool carryin, bool* carryout)$/;"	f	namespace:pcg_extras
 bitcount_t	dnn/util/random/pcg_uint128.hpp	/^    typedef uint8_t bitcount_t;$/;"	t	namespace:pcg_extras
 clog2	dnn/util/random/pcg_uint128.hpp	/^inline bitcount_t clog2(UInt v)$/;"	f	namespace:pcg_extras
-d	dnn/util/random/pcg_uint128.hpp	/^        } d;$/;"	m	union:pcg_extras::uint_x4::__anon23	typeref:struct:pcg_extras::uint_x4::__anon23::__anon25
-da	dnn/util/random/pcg_uint128.hpp	/^        UIntX2 da[2];$/;"	m	union:pcg_extras::uint_x4::__anon23
+d	dnn/util/random/pcg_uint128.hpp	/^        } d;$/;"	m	union:pcg_extras::uint_x4::__anon1	typeref:struct:pcg_extras::uint_x4::__anon1::__anon3
+da	dnn/util/random/pcg_uint128.hpp	/^        UIntX2 da[2];$/;"	m	union:pcg_extras::uint_x4::__anon1
 divmod	dnn/util/random/pcg_uint128.hpp	/^    divmod(const uint_x4<UInt,UIntX2>& orig_dividend,$/;"	f	namespace:pcg_extras
 flog2	dnn/util/random/pcg_uint128.hpp	/^bitcount_t flog2(const uint_x4<U,V>& v)$/;"	f	namespace:pcg_extras
 flog2	dnn/util/random/pcg_uint128.hpp	/^inline bitcount_t flog2(uint32_t v)$/;"	f	namespace:pcg_extras
@@ -2554,14 +2699,89 @@ trailingzeros	dnn/util/random/pcg_uint128.hpp	/^inline bitcount_t trailingzeros(
 uint_x4	dnn/util/random/pcg_uint128.hpp	/^    constexpr uint_x4(UInt v3, UInt v2, UInt v1, UInt v0)$/;"	f	class:pcg_extras::uint_x4
 uint_x4	dnn/util/random/pcg_uint128.hpp	/^    constexpr uint_x4(UIntX2 v23, UIntX2 v01)$/;"	f	class:pcg_extras::uint_x4
 uint_x4	dnn/util/random/pcg_uint128.hpp	/^class uint_x4 {$/;"	c	namespace:pcg_extras
-v0	dnn/util/random/pcg_uint128.hpp	/^            UInt v0, v1, v2, v3;$/;"	m	struct:pcg_extras::uint_x4::__anon23::__anon24
-v01	dnn/util/random/pcg_uint128.hpp	/^            UIntX2 v01, v23;$/;"	m	struct:pcg_extras::uint_x4::__anon23::__anon25
-v1	dnn/util/random/pcg_uint128.hpp	/^            UInt v0, v1, v2, v3;$/;"	m	struct:pcg_extras::uint_x4::__anon23::__anon24
-v2	dnn/util/random/pcg_uint128.hpp	/^            UInt v0, v1, v2, v3;$/;"	m	struct:pcg_extras::uint_x4::__anon23::__anon24
-v23	dnn/util/random/pcg_uint128.hpp	/^            UIntX2 v01, v23;$/;"	m	struct:pcg_extras::uint_x4::__anon23::__anon25
-v3	dnn/util/random/pcg_uint128.hpp	/^            UInt v0, v1, v2, v3;$/;"	m	struct:pcg_extras::uint_x4::__anon23::__anon24
-w	dnn/util/random/pcg_uint128.hpp	/^        } w;$/;"	m	union:pcg_extras::uint_x4::__anon23	typeref:struct:pcg_extras::uint_x4::__anon23::__anon24
-wa	dnn/util/random/pcg_uint128.hpp	/^        UInt wa[4];$/;"	m	union:pcg_extras::uint_x4::__anon23
+v0	dnn/util/random/pcg_uint128.hpp	/^            UInt v0, v1, v2, v3;$/;"	m	struct:pcg_extras::uint_x4::__anon1::__anon2
+v01	dnn/util/random/pcg_uint128.hpp	/^            UIntX2 v01, v23;$/;"	m	struct:pcg_extras::uint_x4::__anon1::__anon3
+v1	dnn/util/random/pcg_uint128.hpp	/^            UInt v0, v1, v2, v3;$/;"	m	struct:pcg_extras::uint_x4::__anon1::__anon2
+v2	dnn/util/random/pcg_uint128.hpp	/^            UInt v0, v1, v2, v3;$/;"	m	struct:pcg_extras::uint_x4::__anon1::__anon2
+v23	dnn/util/random/pcg_uint128.hpp	/^            UIntX2 v01, v23;$/;"	m	struct:pcg_extras::uint_x4::__anon1::__anon3
+v3	dnn/util/random/pcg_uint128.hpp	/^            UInt v0, v1, v2, v3;$/;"	m	struct:pcg_extras::uint_x4::__anon1::__anon2
+w	dnn/util/random/pcg_uint128.hpp	/^        } w;$/;"	m	union:pcg_extras::uint_x4::__anon1	typeref:struct:pcg_extras::uint_x4::__anon1::__anon2
+wa	dnn/util/random/pcg_uint128.hpp	/^        UInt wa[4];$/;"	m	union:pcg_extras::uint_x4::__anon1
+SpikesList	dnn/util/spikes_list.h	/^struct SpikesList : public SerializableBase {$/;"	s	namespace:dnn
+SpikesListInfo	dnn/util/spikes_list.h	/^struct SpikesListInfo : public Serializable<Protos::SpikesListInfo> {$/;"	s	namespace:dnn
+SpikesSequence	dnn/util/spikes_list.h	/^struct SpikesSequence : public Serializable<Protos::SpikesSequence> {$/;"	s	namespace:dnn
+dnn	dnn/util/spikes_list.h	/^namespace dnn {$/;"	n
+getInfo	dnn/util/spikes_list.h	/^	SpikesListInfo getInfo() {$/;"	f	struct:dnn::SpikesList
+name	dnn/util/spikes_list.h	/^	const string name() const {$/;"	f	struct:dnn::SpikesList
+seq	dnn/util/spikes_list.h	/^	vector<SpikesSequence> seq;$/;"	m	struct:dnn::SpikesList
+serial_process	dnn/util/spikes_list.h	/^	void serial_process() {$/;"	f	struct:dnn::SpikesList
+serial_process	dnn/util/spikes_list.h	/^	void serial_process() {$/;"	f	struct:dnn::SpikesListInfo
+serial_process	dnn/util/spikes_list.h	/^	void serial_process() {$/;"	f	struct:dnn::SpikesSequence
+size	dnn/util/spikes_list.h	/^	size_t size;$/;"	m	struct:dnn::SpikesListInfo
+ts_info	dnn/util/spikes_list.h	/^	TimeSeriesInfo ts_info;$/;"	m	struct:dnn::SpikesList
+vals	dnn/util/spikes_list.h	/^	vector<double> vals;$/;"	m	struct:dnn::SpikesSequence
+SpinningBarrier	dnn/util/spinning_barrier.h	/^    SpinningBarrier (unsigned int n) : n_ (n), nwait_ (0), step_(0) {}$/;"	f	class:dnn::SpinningBarrier
+SpinningBarrier	dnn/util/spinning_barrier.h	/^class SpinningBarrier$/;"	c	namespace:dnn
+dnn	dnn/util/spinning_barrier.h	/^namespace dnn {$/;"	n
+n_	dnn/util/spinning_barrier.h	/^    const unsigned int n_;$/;"	m	class:dnn::SpinningBarrier
+nwait_	dnn/util/spinning_barrier.h	/^    std::atomic<unsigned int> nwait_;$/;"	m	class:dnn::SpinningBarrier
+step_	dnn/util/spinning_barrier.h	/^    std::atomic<unsigned int> step_;$/;"	m	class:dnn::SpinningBarrier
+wait	dnn/util/spinning_barrier.h	/^    bool wait ()$/;"	f	class:dnn::SpinningBarrier
+Stat	dnn/util/statistics.h	/^	Stat() : low_lim(-1), high_lim(-1), __counter(0) {}$/;"	f	struct:dnn::Stat
+Stat	dnn/util/statistics.h	/^struct Stat : public Serializable<Protos::Stat> {$/;"	s	namespace:dnn
+Statistics	dnn/util/statistics.h	/^	Statistics() : low_lim(-1), high_lim(-1), _on(false) {$/;"	f	class:dnn::Statistics
+Statistics	dnn/util/statistics.h	/^class Statistics : public SerializableBase {$/;"	c	namespace:dnn
+StatisticsInfo	dnn/util/statistics.h	/^struct StatisticsInfo : public Serializable<Protos::StatisticsInfo> {$/;"	s	namespace:dnn
+__counter	dnn/util/statistics.h	/^	size_t __counter;$/;"	m	struct:dnn::Stat
+_on	dnn/util/statistics.h	/^	bool _on;$/;"	m	class:dnn::Statistics
+add	dnn/util/statistics.h	/^	inline void add(const string &name, const double &v) {$/;"	f	class:dnn::Statistics
+add	dnn/util/statistics.h	/^	void add(const double &s) {$/;"	f	struct:dnn::Stat
+dnn	dnn/util/statistics.h	/^namespace dnn {$/;"	n
+getInfo	dnn/util/statistics.h	/^	StatisticsInfo getInfo() {$/;"	f	class:dnn::Statistics
+high_lim	dnn/util/statistics.h	/^	int high_lim;$/;"	m	class:dnn::Statistics
+high_lim	dnn/util/statistics.h	/^	int high_lim;$/;"	m	struct:dnn::Stat
+high_lim	dnn/util/statistics.h	/^	size_t high_lim;$/;"	m	struct:dnn::StatisticsInfo
+low_lim	dnn/util/statistics.h	/^	int low_lim;$/;"	m	class:dnn::Statistics
+low_lim	dnn/util/statistics.h	/^	int low_lim;$/;"	m	struct:dnn::Stat
+low_lim	dnn/util/statistics.h	/^	size_t low_lim;$/;"	m	struct:dnn::StatisticsInfo
+name	dnn/util/statistics.h	/^	const string name() const {$/;"	f	class:dnn::Statistics
+name	dnn/util/statistics.h	/^	string name;$/;"	m	struct:dnn::Stat
+on	dnn/util/statistics.h	/^	const bool&	on() {$/;"	f	class:dnn::Statistics
+serial_process	dnn/util/statistics.h	/^	void serial_process() {$/;"	f	class:dnn::Statistics
+serial_process	dnn/util/statistics.h	/^	void serial_process() {$/;"	f	struct:dnn::Stat
+serial_process	dnn/util/statistics.h	/^	void serial_process() {$/;"	f	struct:dnn::StatisticsInfo
+stat_names	dnn/util/statistics.h	/^	vector<string> stat_names;$/;"	m	struct:dnn::StatisticsInfo
+stats	dnn/util/statistics.h	/^	map<string, Stat> stats;$/;"	m	class:dnn::Statistics
+turnOn	dnn/util/statistics.h	/^	void turnOn() {$/;"	f	class:dnn::Statistics
+vals	dnn/util/statistics.h	/^	vector<double> vals;$/;"	m	struct:dnn::Stat
+dnn	dnn/util/time_series.cpp	/^namespace dnn {$/;"	n	file:
+TimeSeries	dnn/util/time_series.h	/^	TimeSeries() {}$/;"	f	struct:dnn::TimeSeries
+TimeSeries	dnn/util/time_series.h	/^	TimeSeries(const string &filename, const string &format) {$/;"	f	struct:dnn::TimeSeries
+TimeSeries	dnn/util/time_series.h	/^struct TimeSeries : public SerializableBase {$/;"	s	namespace:dnn
+TimeSeriesData	dnn/util/time_series.h	/^struct TimeSeriesData : public Serializable<Protos::TimeSeriesData> {$/;"	s	namespace:dnn
+TimeSeriesInfo	dnn/util/time_series.h	/^struct TimeSeriesInfo : public Serializable<Protos::TimeSeriesInfo> {$/;"	s	namespace:dnn
+TimeSeriesInterface	dnn/util/time_series.h	/^struct TimeSeriesInterface {$/;"	s	namespace:dnn
+addLabelAtPos	dnn/util/time_series.h	/^	void addLabelAtPos(const string &lab, size_t pos) {$/;"	f	struct:dnn::TimeSeriesInfo
+convertUcrTimeSeriesLine	dnn/util/time_series.h	/^	static void convertUcrTimeSeriesLine(const string &line, vector<double> &ts_data, string &lab) {$/;"	f	struct:dnn::TimeSeries
+data	dnn/util/time_series.h	/^	TimeSeriesData data;$/;"	m	struct:dnn::TimeSeries
+dnn	dnn/util/time_series.h	/^namespace dnn {$/;"	n
+getValueAt	dnn/util/time_series.h	/^	const double& getValueAt(const size_t &index) {$/;"	f	struct:dnn::TimeSeries
+getValueAt	dnn/util/time_series.h	/^	getValueAtIndexDelegate getValueAt;$/;"	m	struct:dnn::TimeSeriesInterface
+getValueAtDefault	dnn/util/time_series.h	/^	static const double& getValueAtDefault(const size_t &index) {$/;"	f	struct:dnn::TimeSeries
+info	dnn/util/time_series.h	/^	TimeSeriesInfo info;$/;"	m	struct:dnn::TimeSeries
+interface	dnn/util/time_series.h	/^	typedef TimeSeriesInterface interface;$/;"	t	struct:dnn::TimeSeries
+labels_ids	dnn/util/time_series.h	/^	vector<size_t> labels_ids;$/;"	m	struct:dnn::TimeSeriesInfo
+labels_timeline	dnn/util/time_series.h	/^	vector<size_t> labels_timeline;$/;"	m	struct:dnn::TimeSeriesInfo
+length	dnn/util/time_series.h	/^	size_t length() {$/;"	f	struct:dnn::TimeSeries
+name	dnn/util/time_series.h	/^	const string name() const {$/;"	f	struct:dnn::TimeSeries
+provideDefaultInterface	dnn/util/time_series.h	/^	static void provideDefaultInterface(TimeSeriesInterface &i) {$/;"	f	struct:dnn::TimeSeries
+provideInterface	dnn/util/time_series.h	/^	virtual void provideInterface(TimeSeriesInterface &i) {$/;"	f	struct:dnn::TimeSeries
+readFromFile	dnn/util/time_series.h	/^	void readFromFile(const string &filename, const string &format) {$/;"	f	struct:dnn::TimeSeries
+serial_process	dnn/util/time_series.h	/^	void serial_process() {$/;"	f	struct:dnn::TimeSeries
+serial_process	dnn/util/time_series.h	/^	void serial_process() {$/;"	f	struct:dnn::TimeSeriesData
+serial_process	dnn/util/time_series.h	/^	void serial_process() {$/;"	f	struct:dnn::TimeSeriesInfo
+unique_labels	dnn/util/time_series.h	/^	vector<string> unique_labels;$/;"	m	struct:dnn::TimeSeriesInfo
+vals	dnn/util/time_series.h	/^	vector<double> vals;$/;"	m	struct:dnn::TimeSeriesData
 dispatchOnThreads	dnn/util/util.cpp	/^vector<IndexSlice> dispatchOnThreads(size_t elements_size, size_t jobs) {$/;"	f	namespace:dnn
 dnn	dnn/util/util.cpp	/^namespace dnn {$/;"	n	file:
 getExp	dnn/util/util.cpp	/^double getExp(double rate) {$/;"	f	namespace:dnn
@@ -2571,7 +2791,9 @@ getNorm	dnn/util/util.cpp	/^double getNorm() {$/;"	f	namespace:dnn
 getUnif	dnn/util/util.cpp	/^double getUnif() {$/;"	f	namespace:dnn
 getUnifBetween	dnn/util/util.cpp	/^double getUnifBetween(double low, double high) {$/;"	f	namespace:dnn
 normal_distr_var	dnn/util/util.cpp	/^double normal_distr_var = -1;$/;"	m	namespace:dnn	file:
+parseArgOptionsPairs	dnn/util/util.cpp	/^map<string, string> parseArgOptionsPairs(const vector<string> &opts) {$/;"	f	namespace:dnn
 parseParenthesis	dnn/util/util.cpp	/^vector<double> parseParenthesis(const string &s) {$/;"	f	namespace:dnn
+replaceAll	dnn/util/util.cpp	/^void replaceAll( string &s, const string &search, const string &replace ) {$/;"	f	namespace:dnn
 sampleDelay	dnn/util/util.cpp	/^double sampleDelay(double gain, double rate) {$/;"	f	namespace:dnn
 split	dnn/util/util.cpp	/^vector<string> split(const string &s, char delim) {$/;"	f	namespace:dnn
 splitBySubstr	dnn/util/util.cpp	/^vector<string> splitBySubstr(const string &s_inp, const string &delimiter) {$/;"	f	namespace:dnn
@@ -2584,27 +2806,16 @@ trim	dnn/util/util.cpp	/^void trim(string &str) {$/;"	f	namespace:dnn
 trimC	dnn/util/util.cpp	/^string trimC(const string &str) {$/;"	f	namespace:dnn
 IndexSlice	dnn/util/util.h	/^    IndexSlice(size_t _from, size_t _to) : from(_from), to(_to) {}$/;"	f	struct:dnn::IndexSlice
 IndexSlice	dnn/util/util.h	/^struct IndexSlice {$/;"	s	namespace:dnn
-PI	dnn/util/util.h	17;"	d
+PI	dnn/util/util.h	20;"	d
+TRY	dnn/util/util.h	44;"	d
 dnn	dnn/util/util.h	/^namespace dnn {$/;"	n
 from	dnn/util/util.h	/^    size_t from;$/;"	m	struct:dnn::IndexSlice
 to	dnn/util/util.h	/^    size_t to;$/;"	m	struct:dnn::IndexSlice
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
-ARG_CONSTANTS	tools/dnn_sim/dnn_sim.cpp	/^	enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_CONSTANTS, ARG_INPUT,$/;"	e	enum:opts::optionIndex	file:
-ARG_HELP	tools/dnn_sim/dnn_sim.cpp	/^	enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_CONSTANTS, ARG_INPUT,$/;"	e	enum:opts::optionIndex	file:
-ARG_INPUT	tools/dnn_sim/dnn_sim.cpp	/^	enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_CONSTANTS, ARG_INPUT,$/;"	e	enum:opts::optionIndex	file:
-ARG_JOBS	tools/dnn_sim/dnn_sim.cpp	/^    	                ARG_OUT_STAT, ARG_OUT_SPIKES, ARG_JOBS ,ARG_PRECALC,$/;"	e	enum:opts::optionIndex	file:
-ARG_MODEL_LOAD	tools/dnn_sim/dnn_sim.cpp	/^        	            ARG_MODEL_SAVE, ARG_MODEL_LOAD, ARG_T_MAX, ARG_OUT_P_STAT, ARG_NO_LEARNING};$/;"	e	enum:opts::optionIndex	file:
-ARG_MODEL_SAVE	tools/dnn_sim/dnn_sim.cpp	/^        	            ARG_MODEL_SAVE, ARG_MODEL_LOAD, ARG_T_MAX, ARG_OUT_P_STAT, ARG_NO_LEARNING};$/;"	e	enum:opts::optionIndex	file:
-ARG_NO_LEARNING	tools/dnn_sim/dnn_sim.cpp	/^        	            ARG_MODEL_SAVE, ARG_MODEL_LOAD, ARG_T_MAX, ARG_OUT_P_STAT, ARG_NO_LEARNING};$/;"	e	enum:opts::optionIndex	file:
-ARG_OUT_P_STAT	tools/dnn_sim/dnn_sim.cpp	/^        	            ARG_MODEL_SAVE, ARG_MODEL_LOAD, ARG_T_MAX, ARG_OUT_P_STAT, ARG_NO_LEARNING};$/;"	e	enum:opts::optionIndex	file:
-ARG_OUT_SPIKES	tools/dnn_sim/dnn_sim.cpp	/^    	                ARG_OUT_STAT, ARG_OUT_SPIKES, ARG_JOBS ,ARG_PRECALC,$/;"	e	enum:opts::optionIndex	file:
-ARG_OUT_STAT	tools/dnn_sim/dnn_sim.cpp	/^    	                ARG_OUT_STAT, ARG_OUT_SPIKES, ARG_JOBS ,ARG_PRECALC,$/;"	e	enum:opts::optionIndex	file:
-ARG_PRECALC	tools/dnn_sim/dnn_sim.cpp	/^    	                ARG_OUT_STAT, ARG_OUT_SPIKES, ARG_JOBS ,ARG_PRECALC,$/;"	e	enum:opts::optionIndex	file:
-ARG_T_MAX	tools/dnn_sim/dnn_sim.cpp	/^        	            ARG_MODEL_SAVE, ARG_MODEL_LOAD, ARG_T_MAX, ARG_OUT_P_STAT, ARG_NO_LEARNING};$/;"	e	enum:opts::optionIndex	file:
-ARG_UNKNOWN	tools/dnn_sim/dnn_sim.cpp	/^	enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_CONSTANTS, ARG_INPUT,$/;"	e	enum:opts::optionIndex	file:
 DnnSimOpts	tools/dnn_sim/dnn_sim.cpp	/^    DnnSimOpts() : jobs(1), precalc(false), Tmax(0.0) {}$/;"	f	struct:DnnSimOpts
 DnnSimOpts	tools/dnn_sim/dnn_sim.cpp	/^struct DnnSimOpts {$/;"	s	file:
 Tmax	tools/dnn_sim/dnn_sim.cpp	/^    double Tmax;$/;"	m	struct:DnnSimOpts	file:
+add_opts	tools/dnn_sim/dnn_sim.cpp	/^    dnn::OptMods add_opts;$/;"	m	struct:DnnSimOpts	file:
 const_file	tools/dnn_sim/dnn_sim.cpp	/^    string const_file;$/;"	m	struct:DnnSimOpts	file:
 input	tools/dnn_sim/dnn_sim.cpp	/^    string input;$/;"	m	struct:DnnSimOpts	file:
 jobs	tools/dnn_sim/dnn_sim.cpp	/^    int jobs;$/;"	m	struct:DnnSimOpts	file:
@@ -2612,11 +2823,10 @@ main	tools/dnn_sim/dnn_sim.cpp	/^int main(int argc, char **argv) {$/;"	f
 model_load	tools/dnn_sim/dnn_sim.cpp	/^    string model_load;$/;"	m	struct:DnnSimOpts	file:
 model_save	tools/dnn_sim/dnn_sim.cpp	/^    string model_save;$/;"	m	struct:DnnSimOpts	file:
 no_learning	tools/dnn_sim/dnn_sim.cpp	/^    bool no_learning;$/;"	m	struct:DnnSimOpts	file:
-optionIndex	tools/dnn_sim/dnn_sim.cpp	/^	enum  optionIndex { ARG_UNKNOWN, ARG_HELP, ARG_CONSTANTS, ARG_INPUT,$/;"	g	struct:opts	file:
-opts	tools/dnn_sim/dnn_sim.cpp	/^struct opts {$/;"	s	file:
 out_p_stat_file	tools/dnn_sim/dnn_sim.cpp	/^    string out_p_stat_file;$/;"	m	struct:DnnSimOpts	file:
 out_spikes	tools/dnn_sim/dnn_sim.cpp	/^    string out_spikes;$/;"	m	struct:DnnSimOpts	file:
 out_stat_file	tools/dnn_sim/dnn_sim.cpp	/^    string out_stat_file;$/;"	m	struct:DnnSimOpts	file:
-parseOptions	tools/dnn_sim/dnn_sim.cpp	/^DnnSimOpts parseOptions(int argc, char **argv) {$/;"	f
 precalc	tools/dnn_sim/dnn_sim.cpp	/^    bool precalc;$/;"	m	struct:DnnSimOpts	file:
-usage	tools/dnn_sim/dnn_sim.cpp	/^const option::Descriptor usage[] =$/;"	v
+usage	tools/dnn_sim/dnn_sim.cpp	/^const char * usage = R"USAGE($/;"	v
+main	tools/dumptool/dumptool.cpp	/^int main(int argc, char **argv) {$/;"	f
+usage	tools/dumptool/dumptool.cpp	/^const char * usage = R"USAGE($/;"	v

@@ -9,6 +9,7 @@
 #include <dnn/io/serialize.h>
 #include <dnn/util/time_series.h>
 #include <dnn/util/statistics.h>
+#include <dnn/util/spikes_list.h>
 
 #include "factory.h"
 
@@ -46,6 +47,9 @@ Factory::Factory() {
 	REG_TYPE(Statistics);
 	REG_TYPE(StatisticsInfo);
 	REG_TYPE(Stat);
+	REG_TYPE(SpikesList);
+	REG_TYPE(SpikesListInfo);
+	REG_TYPE(SpikesSequence);
 }
 
 Factory::~Factory() {
