@@ -14,15 +14,31 @@
 class RSim : public dnn::Sim {
 public:
     RSim(RConstants *rc) : Sim(*rc)  {
-//        global_neuron_index = 0;
+        global_neuron_index = 0;
+        Sim::build();
     }
     ~RSim() { }
+    
     void print() {
         cout << *this;
     }
+    
     void run(size_t jobs=1) {
         Sim::run(jobs);
     }
+    
+    void setTimeSeries(const Rcpp::NumericVector &v) {
+        Rcpp::List tsl;
+        tsl["values"] = v;
+        TimeSeries* ts = RProto::convertBack<TimeSeries>(tsl, "TimeSeries");
+        for(auto &n: neurons) {
+            if(n.ref().inputIsSet()) {
+                n.ref().getInput().setTimeSeries(ts);
+                duration = std::max(duration, n.ref().getInput().getDuration());
+            }
+        }
+    }
+
     Rcpp::List getStat() {
         Rcpp::List out;
         for(auto &n: neurons) {

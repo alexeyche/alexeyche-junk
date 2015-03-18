@@ -7,9 +7,11 @@ RCPP_MODULE(dnnMod) {
     .constructor<RConstants*>()
     .method("print", &RSim::print, "Print Sim instance")
     .method("run", &RSim::run, "Run simulation")
+    .method("getStat", &RSim::getStat, "get stat")
+    .method("setTimeSeries", &RSim::setTimeSeries, "Setting time series")
+
 //    .method("getSpikes", &RSim::getSpikes, "get spikes")
 //    .method("getModel", &RSim::getModel, "get model")
-//    .method("getStat", &RSim::getStat, "get stat")
 //    .method("collectStat", &RSim::collectStat, "turn on collect stat")
 //    .method("setInputSpikesList", &RSim::setInputSpikesList, "Set LabeledSpikesList as input spikes")
     ;

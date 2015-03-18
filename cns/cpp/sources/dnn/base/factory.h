@@ -43,7 +43,8 @@ public:
     SpikeNeuronBase* createSpikeNeuron(string name);
     ActFunctionBase* createActFunction(string name);
 
-    TimeSeries& getCachedTimeSeries(const string &name, const string& filename, const string& format);
+    TimeSeries* createTimeSeries();
+    TimeSeries& getCachedTimeSeries(const string& filename, const string& format);
 
     static Factory& inst();
 
@@ -60,7 +61,7 @@ private:
 
     vector<SerializableBase*> objects;
     vector<ProtoMessage> proto_objects;
-    map<string, TimeSeries*> ts_map;
+    map< pair<string, string>, TimeSeries*> ts_map;
 };
 
 

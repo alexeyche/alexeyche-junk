@@ -36,10 +36,27 @@ public:
             if(!st) { ERR("Can't cast"); }
             
             for(auto &p: st->stats) {
-                out[p.first] = Rcpp::wrap(p.second.vals);
+                out[p.first] = Rcpp::wrap(p.second.values);
             }
         } 
         return out;
+    }
+    
+    template <typename T>
+    static T* convertBack(const Rcpp::List &list, const string &name) {
+        SerializableBase* o = convertBack(list, name);
+        T* oc = dynamic_cast<T*>(o);
+        if(!oc) { ERR("Can't cast"); }
+        return oc;
+    }
+
+    static SerializableBase* convertBack(const Rcpp::List &list, const string &name) {
+        if(name == "TimeSeries") {
+            TimeSeries* ts = Factory::inst().createTimeSeries();
+            ts->data.values = Rcpp::as<vector<double>>(list["values"]);
+            return ts;
+        }
+        ERR("Can't convert " << name );
     } 
     void print() {
         cout << "RProto instance. run instance$read() method to read protobuf\n";

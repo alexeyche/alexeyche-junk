@@ -37,10 +37,10 @@ struct TimeSeriesInfo : public Serializable<Protos::TimeSeriesInfo> {
 /*@GENERATE_PROTO@*/
 struct TimeSeriesData : public Serializable<Protos::TimeSeriesData> {
 	void serial_process() {
-		begin() << "vals: " << vals << Self::end;
+		begin() << "values: " << values << Self::end;
 	}
 
-	vector<double> vals;
+	vector<double> values;
 };
 
 struct TimeSeriesInterface {
@@ -69,17 +69,17 @@ struct TimeSeries : public SerializableBase {
 			string line;
 			while (std::getline(f, line)) {
 				string lab;
-				convertUcrTimeSeriesLine(line, data.vals, lab);
-				info.addLabelAtPos(lab, data.vals.size());
+				convertUcrTimeSeriesLine(line, data.values, lab);
+				info.addLabelAtPos(lab, data.values.size());
 			}
 		}
 	}
 	size_t length() {
-		return data.vals.size();
+		return data.values.size();
 	}
 
 	const double& getValueAt(const size_t &index) {
-		return data.vals[index];	
+		return data.values[index];	
 	}
 	virtual void provideInterface(TimeSeriesInterface &i) {
 		i.getValueAt = MakeDelegate(this, &TimeSeries::getValueAt);

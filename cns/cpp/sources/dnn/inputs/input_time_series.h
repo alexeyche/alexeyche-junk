@@ -40,7 +40,7 @@ public:
 	const double& getValue(const Time &t) {
         s._t += t.dt;
         if(fmod(s._t, c.dt) > 0.0001) return InputBase::def_value;
-        return ts.ref().data.vals[s.index++];
+        return ts.ref().data.values[s.index++];
 	}
     void provideInterface(InputInterface &i) {
         i.getValue = MakeDelegate(this, &InputTimeSeries::getValue);

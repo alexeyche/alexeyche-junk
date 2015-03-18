@@ -27,7 +27,7 @@ message Stat {
     required int32 low_lim = 1;
     required int32 high_lim = 2;
     required string name = 3;
-    repeated double vals = 4;
+    repeated double values = 4;
 }
 
 message StatisticsInfo {
@@ -37,7 +37,7 @@ message StatisticsInfo {
 }
 
 message SpikesSequence {
-    repeated double vals = 1;
+    repeated double values = 1;
 }
 
 message SpikesListInfo {
@@ -51,7 +51,7 @@ message TimeSeriesInfo {
 }
 
 message TimeSeriesData {
-    repeated double vals = 1;
+    repeated double values = 1;
 }
 
 message LeakyIntegrateAndFireC {

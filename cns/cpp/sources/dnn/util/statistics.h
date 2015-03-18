@@ -11,14 +11,14 @@ struct Stat : public Serializable<Protos::Stat> {
 
 	void serial_process() {
 		begin() << "name: " << name << ", "
-		        << "vals: " << vals << ", "
+		        << "values: " << values << ", "
 		        << "low_lim: " << low_lim << ", "
 		        << "high_lim: " << high_lim << Self::end;
 	}
 
 	void add(const double &s) {
 		if ( ((low_lim > 0) && (__counter < low_lim)) || ((high_lim > 0) && (__counter >= high_lim)) ) { __counter++; return; }
-		vals.push_back(s);
+		values.push_back(s);
 		__counter++;
 	}
 
@@ -28,7 +28,7 @@ struct Stat : public Serializable<Protos::Stat> {
 	int high_lim;
 
 	string name;
-	vector<double> vals;
+	vector<double> values;
 };
 
 /*@GENERATE_PROTO@*/

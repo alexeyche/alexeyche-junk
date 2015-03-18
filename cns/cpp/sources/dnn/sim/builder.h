@@ -65,7 +65,6 @@ public:
 						terminate();
 					}
 					TimeSeries &ts = Factory::inst().getCachedTimeSeries(
-						inp->name(), 
 						Json::getStringVal(file_conf, "filename"),
 						Json::getStringVal(file_conf, "format")
 					);

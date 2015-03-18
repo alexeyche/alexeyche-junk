@@ -112,12 +112,19 @@ ActFunctionBase* Factory::createActFunction(string name) {
 	return p;
 }
 
-TimeSeries& Factory::getCachedTimeSeries(const string &name, const string& filename, const string& format) {
-    if(ts_map.find(name) == ts_map.end()) {
-        ts_map[name] = new TimeSeries(filename, format);
-        objects.push_back(ts_map[name]);
+TimeSeries* Factory::createTimeSeries() {
+	TimeSeries *o = new TimeSeries();
+	objects.push_back(o);
+	return o;
+}
+
+TimeSeries& Factory::getCachedTimeSeries(const string& filename, const string& format) {
+    auto p = std::make_pair(filename, format);
+    if(ts_map.find(p) == ts_map.end()) {
+        ts_map[p] = createTimeSeries();
+        ts_map[p]->readFromFile(filename, format);
     }
-    return *(ts_map[name]);
+    return *(ts_map[p]);
 }
 
 pair<Factory::object_iter, Factory::object_iter> Factory::getObjectsSlice(const string& name) {

@@ -21,6 +21,10 @@ private:
 			d = f_v.GetDouble();
 			return true;
 		}
+		if(f_v.IsUint()) {
+			d = f_v.GetUint();
+			return true;
+		}
 		if (f_v.IsString()) {
 			uptr<Distribution<double>> distr = parseDistribution<double>(f_v.GetString());
 			d = distr->getSample();
@@ -102,14 +106,20 @@ public:
 		cerr << name << " expected as int\n";
 		terminate();
 	}
-	static const Value& getArray(const Value &v, const string name) {
-		const Value &f_v = getVal(v, name);
-		if (!f_v.IsArray()) {
-			cerr << name << " must be array\n";
-			terminate();
+	
+	static Value getArray(const Value &v, const string name) {
+		Value f_v;
+		const Value &f_src = getVal(v, name);
+		Document d;
+		f_v.CopyFrom(f_src, d.GetAllocator());
+		if (f_v.IsArray()) {
+			return f_v;	
 		}
-		return f_v;
+		Value f_v_arr(kArrayType);
+		f_v_arr.PushBack(f_v, d.GetAllocator());
+		return f_v_arr;
 	}
+
 	static vector<size_t> getUintVector(const Value &v, const string name) {
 		vector<size_t> ret;
 		const Value &f_v = getArray(v, name);

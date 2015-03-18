@@ -9,10 +9,10 @@ namespace dnn {
 /*@GENERATE_PROTO@*/
 struct SpikesSequence : public Serializable<Protos::SpikesSequence> {
 	void serial_process() {
-		begin() << "vals: " << vals << Self::end;
+		begin() << "values: " << values << Self::end;
 	}
 
-	vector<double> vals;
+	vector<double> values;
 };
 
 /*@GENERATE_PROTO@*/
@@ -56,7 +56,7 @@ struct SpikesList : public SerializableBase {
 		(*this) << Self::end;
 	}
 	vector<double>& operator [](const size_t &i) {
-		return seq[i].vals;
+		return seq[i].values;
 	}
 	TimeSeriesInfo ts_info;
 	vector<SpikesSequence> seq;
