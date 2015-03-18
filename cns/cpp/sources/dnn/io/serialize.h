@@ -16,6 +16,7 @@ typedef google::protobuf::Message* ProtoMessage;
 
 namespace dnn {
 
+class Factory;
 
 class SerializableBase  : public Object {
 friend class Factory;

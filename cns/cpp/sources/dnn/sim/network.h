@@ -72,6 +72,9 @@ public:
 			cout << "\n";
 		}	
 	}
+	SpikesList& spikesList() {
+		return spikes_list;
+	}
 private:
 	vector<vector<Conn>> conn_map;
 	SpikesList spikes_list;

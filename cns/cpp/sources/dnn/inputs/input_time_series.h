@@ -46,8 +46,8 @@ public:
         i.getValue = MakeDelegate(this, &InputTimeSeries::getValue);
     }
 
-    void setTimeSeries(const string& filename, const string& format) {
-        ts.set(Factory::inst().getCachedTimeSeries(name(), filename, format));
+    void setTimeSeries(TimeSeries *_ts) {
+        ts.set(_ts);
     }
     double getDuration() {
         if(ts.isSet()) {

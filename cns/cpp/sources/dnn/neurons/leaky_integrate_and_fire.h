@@ -69,6 +69,7 @@ public:
 
         s.u += t.dt * ( -(s.u - c.leak)/c.R + input.ifc().getValue(t) + syns_pot) / c.C; 
         
+        s.fired = false;
         if(getUnif() < act_f.ifc().prob(s.u)) {
             s.fired = true;
         }
@@ -76,10 +77,8 @@ public:
         stat.add("u", s.u);
     }
 
-    bool pullFiring() {
-        bool acc = s.fired;
-        s.fired = false;
-        return acc;
+    const bool& fired() {
+        return s.fired;
     }
     const double& getFiringProbability() {
         return s.p;
@@ -87,7 +86,7 @@ public:
 
     void provideInterface(SpikeNeuronInterface &i) {
         i.calculateDynamics = MakeDelegate(this, &LeakyIntegrateAndFire::calculateDynamics);
-        i.pullFiring = MakeDelegate(this, &LeakyIntegrateAndFire::pullFiring);
+        i.fired = MakeDelegate(this, &LeakyIntegrateAndFire::fired);
         i.getFiringProbability = MakeDelegate(this, &LeakyIntegrateAndFire::getFiringProbability);
         i.propagateSynapseSpike = MakeDelegate(this, &LeakyIntegrateAndFire::propagateSynapseSpike);
     }

@@ -1,9 +1,9 @@
 
-#include <dnn/neurons/leaky_integrate_and_fire.h>
-#include <dnn/act_functions/determ.h>
-#include <dnn/synapses/static_synapse.h>
-#include <dnn/inputs/input_time_series.h>
-#include <dnn/io/stream.h>
+//#include <dnn/neurons/leaky_integrate_and_fire.h>
+//#include <dnn/act_functions/determ.h>
+//#include <dnn/synapses/static_synapse.h>
+//#include <dnn/inputs/input_time_series.h>
+//#include <dnn/io/stream.h>
 #include <dnn/base/constants.h>
 #include <dnn/sim/sim.h>
 #include <dnn/util/option_parser.h>
@@ -56,7 +56,7 @@ int main(int argc, char **argv) {
 	
 	OptionParser optp(argc, argv);
 	optp.option("--const", "-c", sopt.const_file, true);
-	optp.option("--output", "-o", sopt.out_spikes, true);
+	optp.option("--output", "-o", sopt.out_spikes, false);
 	optp.option("--jobs", "-j", sopt.jobs, false);
 	optp.loption("--stat", sopt.out_stat_file, false);
 	optp.option("--help", "-h", need_help, false, true);
@@ -90,5 +90,10 @@ int main(int argc, char **argv) {
 		ofstream f(sopt.out_stat_file);
 		Stream str(f, Stream::Binary);
 		s.saveStat(str);
+	}
+	if(!sopt.out_spikes.empty()) {
+		ofstream f(sopt.out_spikes);
+		Stream str(f, Stream::Binary);
+		s.saveSpikes(str);
 	}
 }

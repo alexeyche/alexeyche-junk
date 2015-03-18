@@ -16,7 +16,7 @@ struct SpikeNeuronInterface {
 	calculateDynamicsDelegate calculateDynamics;
 	propSynSpikeDelegate propagateSynapseSpike;
 	getDoubleDelegate getFiringProbability;
-	getBoolCopyDelegate pullFiring;
+	getBoolDelegate fired;
 };
 extern size_t global_neuron_index;
 
@@ -52,7 +52,7 @@ public:
 	virtual void propagateSynapseSpike(const SynSpike &s) = 0;
 	virtual void calculateDynamics(const Time &t) = 0;
 	virtual const double& getFiringProbability() = 0;
-	virtual bool pullFiring() = 0;
+	virtual const bool& fired() = 0;
 
 
 	static void __calculateDynamicsDefault(const Time &t) {
@@ -67,13 +67,13 @@ public:
 		cerr << "Calling inapropriate default interface function\n";
 		terminate();
 	}
-	static bool __pullFiringDefault() {
+	static const bool& __firedDefault() {
 		cerr << "Calling inapropriate default interface function\n";
 		terminate();
 	}
 	static void provideDefaultInterface(SpikeNeuronInterface &i) {
 		i.calculateDynamics = &SpikeNeuronBase::__calculateDynamicsDefault;
-		i.pullFiring = &SpikeNeuronBase::__pullFiringDefault;
+		i.fired = &SpikeNeuronBase::__firedDefault;
 		i.getFiringProbability = &SpikeNeuronBase::__getFiringProbabilityDefault;
 		i.propagateSynapseSpike =  &SpikeNeuronBase::__propagateSynapseSpikeDefault;
 	}
@@ -99,7 +99,9 @@ public:
 	inline vector<InterfacedPtr<SynapseBase>>& getSynapses() {
 		return syns;
 	}
-
+	const Statistics& getStat() const {
+		return stat;
+	}
 protected:
 	size_t _id;
 	double axon_delay;

@@ -71,7 +71,6 @@ public:
 		return info;
 	}
 	void serial_process() {
-
 		StatisticsInfo info;
 		if (mode == ProcessingOutput) {
 			info = getInfo();
@@ -87,7 +86,7 @@ public:
 		_on = true;
 	}
 
-	const bool&	on() {
+	const bool&	on() const {
 		return _on;
 	}
 	inline void add(const string &name, const double &v) {

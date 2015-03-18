@@ -40,11 +40,17 @@ struct SimConfiguration : public Printable {
 
 
 struct Constants : public Printable {
-	Constants(const string& fname, OptMods mods = OptMods()) {
-		std::ifstream ifs(fname);
-		std::string const_json((std::istreambuf_iterator<char>(ifs)),
-		                       std::istreambuf_iterator<char>());
-
+	enum ReadMod {FromString, FromFile};
+	Constants(const string& s, OptMods mods = OptMods(), ReadMod mod = FromFile) {
+		string const_json;
+		if(mod == FromFile) {
+			std::ifstream ifs(s);
+			const_json = std::string((std::istreambuf_iterator<char>(ifs)),
+			                       std::istreambuf_iterator<char>());
+		} else
+		if(mod == FromString) {
+			const_json = s;
+		}
 		for(auto it=mods.begin(); it != mods.end(); ++it) {
 			replaceAll(const_json, it->first, it->second);
 		}

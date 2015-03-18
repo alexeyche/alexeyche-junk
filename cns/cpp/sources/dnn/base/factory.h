@@ -43,7 +43,7 @@ public:
     SpikeNeuronBase* createSpikeNeuron(string name);
     ActFunctionBase* createActFunction(string name);
 
-    TimeSeries* getCachedTimeSeries(const string &name, const string& filename, const string& format);
+    TimeSeries& getCachedTimeSeries(const string &name, const string& filename, const string& format);
 
     static Factory& inst();
 

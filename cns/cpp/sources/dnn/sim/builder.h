@@ -1,6 +1,7 @@
 #pragma once
 
 
+
 namespace dnn {
 
 
@@ -63,7 +64,12 @@ public:
 						cerr << "Failed to set input file for " << o->name() << "\n";
 						terminate();
 					}
-					inp->setTimeSeries(Json::getStringVal(file_conf, "filename"), Json::getStringVal(file_conf, "format"));
+					TimeSeries &ts = Factory::inst().getCachedTimeSeries(
+						inp->name(), 
+						Json::getStringVal(file_conf, "filename"),
+						Json::getStringVal(file_conf, "format")
+					);
+					inp->setTimeSeries(&ts);
 				}
 			}
 			layers.push_back(layer);

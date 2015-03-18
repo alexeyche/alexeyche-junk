@@ -26,7 +26,7 @@ public:
         i.getValue = &InputBase::getValueDefault;
     }
 
-    virtual void setTimeSeries(const string& filename, const string& format) = 0;
+    virtual void setTimeSeries(TimeSeries *_ts) = 0;
     virtual double getDuration() = 0;
 };
 

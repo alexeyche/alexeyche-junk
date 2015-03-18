@@ -1,14 +1,17 @@
 #pragma once
 
-#include <dnn/base/factory.h>
+
+#include <dnn/io/stream.h>
 #include <dnn/util/spinning_barrier.h>
+#include <dnn/neurons/spike_neuron.h>
+#include <dnn/base/constants.h>
 
 #include "builder.h"
 #include "network.h"
 
 namespace dnn {
 
-class Sim {
+class Sim : public Printable {
 public:
 	Sim(const Constants &_c) : c(_c), duration(0.0) {
 	}
@@ -38,16 +41,21 @@ public:
 			}
 		}
 	}
-	
+	void saveSpikes(Stream &str) {
+		if(!net.get()) {
+			cerr << "Sim network was not found. You need to build sim\n";
+			terminate();
+		}
+		str.writeObject(&net->spikesList());
+	}	
 	
 	static void runWorker(Sim &s, size_t from, size_t to, SpinningBarrier &barrier) {
 		Time t(s.c.sim_conf.dt);
 
 		for(; t<s.duration; ++t) {
-			for(size_t i=from; i<to; ++i) {
-				
+			for(size_t i=from; i<to; ++i) {				
 				s.neurons[i].ifc().calculateDynamics(t);
-				if(s.neurons[i].ifc().pullFiring()) {
+				if(s.neurons[i].ifc().fired()) {
 					cout << s.neurons[i].ref().id() << " made spike\n";
 					s.net->propagateSpike(s.neurons[i].ref(), t.t);
 				}
@@ -68,9 +76,11 @@ public:
 			t.join();
 		}
 	}
+	void print(std::ostream &str) const {
+		str << "Sim\n";
+	}
 
-
-private:
+protected:
 	double duration;
 	const Constants &c;
 	vector<InterfacedPtr<SpikeNeuronBase>> neurons;

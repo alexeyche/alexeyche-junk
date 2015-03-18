@@ -50,6 +50,8 @@ Factory::Factory() {
 	REG_TYPE(SpikesList);
 	REG_TYPE(SpikesListInfo);
 	REG_TYPE(SpikesSequence);
+	REG_TYPE(TimeSeriesInfo);
+	REG_TYPE(TimeSeriesData);
 }
 
 Factory::~Factory() {
@@ -110,12 +112,12 @@ ActFunctionBase* Factory::createActFunction(string name) {
 	return p;
 }
 
-TimeSeries* Factory::getCachedTimeSeries(const string &name, const string& filename, const string& format) {
+TimeSeries& Factory::getCachedTimeSeries(const string &name, const string& filename, const string& format) {
     if(ts_map.find(name) == ts_map.end()) {
         ts_map[name] = new TimeSeries(filename, format);
         objects.push_back(ts_map[name]);
     }
-    return ts_map[name];
+    return *(ts_map[name]);
 }
 
 pair<Factory::object_iter, Factory::object_iter> Factory::getObjectsSlice(const string& name) {
