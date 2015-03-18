@@ -11,8 +11,10 @@ struct SynapseInterface {
 	getDoubleDelegate getMembranePotential;
 };
 
+class Network;
 
 class SynapseBase : public SerializableBase {
+friend class Network;
 public:
 	typedef SynapseInterface interface;
 
@@ -57,8 +59,12 @@ struct SynapseInfo : public Serializable<Protos::SynapseInfo> {
 	double weight;
 };
 
+
+
 template <typename Constants, typename State>
 class Synapse : public SynapseBase {
+
+public:	
 	SynapseInfo getInfo() {
 		SynapseInfo info;
 		info.id_pre = id_pre;

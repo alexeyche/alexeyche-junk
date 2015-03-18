@@ -44,9 +44,17 @@ typedef FastDelegate1<const Time&> calculateDynamicsDelegate;
 typedef FastDelegate1<const size_t&, const double&> getValueAtIndexDelegate;
 
 struct SynSpike {
+    SynSpike(const size_t &_n_id, const size_t &_syn_id, const double &_t)
+    : n_id(_n_id)
+    , syn_id(_syn_id)
+    , t(_t) {}
+    
     double t;
     size_t n_id;
     size_t syn_id;
+    bool operator<(const SynSpike& rhs) const {
+        return t > rhs.t;
+    }
 };
 
 struct Time {
@@ -54,7 +62,7 @@ struct Time {
     void operator ++() {
         t+=dt;
     }
-    bool operator<(const double &dur) {
+    bool operator<(const double &dur) const {
         return t < dur;
     }
     double t;

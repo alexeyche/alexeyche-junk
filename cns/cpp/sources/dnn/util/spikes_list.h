@@ -55,7 +55,9 @@ struct SpikesList : public SerializableBase {
 		}
 		(*this) << Self::end;
 	}
-
+	vector<double>& operator [](const size_t &i) {
+		return seq[i].vals;
+	}
 	TimeSeriesInfo ts_info;
 	vector<SpikesSequence> seq;
 };

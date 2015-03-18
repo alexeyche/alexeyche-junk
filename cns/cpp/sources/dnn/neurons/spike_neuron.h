@@ -21,10 +21,12 @@ struct SpikeNeuronInterface {
 extern size_t global_neuron_index;
 
 class Builder;
+class Network;
 
 class SpikeNeuronBase : public SerializableBase {
 friend class Builder;
 friend class Sim;
+friend class Network;
 public:
 	SpikeNeuronBase() {
 		_id = global_neuron_index++;
@@ -32,7 +34,7 @@ public:
 
 	typedef SpikeNeuronInterface interface;
 
-	inline const size_t& id() {
+	inline const size_t& id() const {
 		return _id;
 	}
 	inline const double& axonDelay() {
@@ -107,6 +109,7 @@ protected:
 	InterfacedPtr<InputBase> input;
 
 	Statistics stat;
+	priority_queue<SynSpike> input_spikes;
 };
 
 /*@GENERATE_PROTO@*/

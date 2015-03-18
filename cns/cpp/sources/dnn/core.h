@@ -18,7 +18,7 @@
 #include <mutex>
 #include <condition_variable>
 #include <cstdlib>
-
+#include <queue>
 typedef google::protobuf::Message* ProtoMessage;
 
 using std::map;
@@ -39,6 +39,7 @@ using std::min;
 using std::ofstream;
 using std::ifstream;
 using std::multimap;
+using std::priority_queue;
 
 template <typename T>
 using uptr = std::unique_ptr<T>;

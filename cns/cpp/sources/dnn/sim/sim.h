@@ -49,6 +49,7 @@ public:
 				s.neurons[i].ifc().calculateDynamics(t);
 				if(s.neurons[i].ifc().pullFiring()) {
 					cout << s.neurons[i].ref().id() << " made spike\n";
+					s.net->propagateSpike(s.neurons[i].ref(), t.t);
 				}
 			}
 			barrier.wait();

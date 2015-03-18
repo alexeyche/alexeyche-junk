@@ -55,6 +55,13 @@ public:
     }
 
     void calculateDynamics(const Time& t) {
+        while(!input_spikes.empty()) {
+            const SynSpike& sp = input_spikes.top();
+            if(sp.t >= t.t) break;
+            syns[ sp.syn_id ].ifc().propagateSpike();
+            input_spikes.pop();   
+        }
+
         double syns_pot = 0.0;
         for(auto &s: syns) {
             syns_pot += s.ifc().getMembranePotential();
