@@ -1,10 +1,13 @@
 #pragma once
 
 
+#include <dnn/base/base.h>
+
+namespace dnn {
+
 template <typename T>
 T cast(string &s) {
-	cerr << "Can't cast " << s << "\n";
-	terminate();
+	throw dnnException()<< "Can't cast " << s << "\n";
 }
 
 template <>
@@ -44,8 +47,7 @@ public:
 					it = opts.erase(it);
 				} else {
 					if ( (it + 1) == opts.end() ) {
-						cerr << "Can't find value for option " << long_opt << "\n";
-						terminate();
+						throw dnnException()<< "Can't find value for option " << long_opt << "\n";
 					}
 					src = cast<T>(*(++it));
 					it = opts.erase(it - 1, it + 1);
@@ -56,8 +58,7 @@ public:
 			}
 		}
 		if ((!found) && (required)) {
-			cerr << "Can't find value for option " << long_opt << "\n";
-			terminate();
+			throw dnnException()<< "Can't find value for option " << long_opt << "\n";
 		}
 
 	}
@@ -72,3 +73,6 @@ private:
 
 	vector<string> opts;
 };
+
+
+}

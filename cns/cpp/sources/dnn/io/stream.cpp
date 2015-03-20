@@ -15,8 +15,7 @@ namespace dnn {
 
 void Stream::writeObject(SerializableBase *b) {
 	if (!isOutput()) {
-		cerr << "Stream isn't open in output mode. Need output stream\n";
-		terminate();
+		throw dnnException()<< "Stream isn't open in output mode. Need output stream\n";
 	}
 
 	vector<ProtoMessage> messages = b->getSerialized();
@@ -84,8 +83,7 @@ void Stream::jsonReader(string name, const Value &v, vector<ProtoMessage> &messa
 		if (!Factory::inst().isProtoType(name)) {
 			// trying to deduce proto name
 			if (!Factory::inst().isProtoType(name + string("C"))) {
-				cerr <<  "Erros while reading " << name << ": unkwnown proto type\n";
-				terminate();
+				throw dnnException()<<  "Erros while reading " << name << ": unkwnown proto type\n";
 			}
 			name += string("C");
 			Protos::ClassName *ccl = new Protos::ClassName;
@@ -105,8 +103,7 @@ vector<ProtoMessage> Stream::readObjectProtos() {
 	}
 	if (r == Text) {
 		if (!iterator->value.IsObject()) {
-			cerr << "Fail to read " << Json::stringify(iterator->value) << ". Expected object\n";
-			terminate();
+			throw dnnException()<< "Fail to read " << Json::stringify(iterator->value) << ". Expected object\n";
 		}
 		if (iterator == document.MemberEnd()) {
 			return messages;
@@ -120,17 +117,15 @@ vector<ProtoMessage> Stream::readObjectProtos() {
 SerializableBase* Stream::readObject() {
 
 	if (!isInput()) {
-		cerr << "Stream isn't open in input mode. Need input stream\n";
-		terminate();
+		throw dnnException()<< "Stream isn't open in input mode. Need input stream\n";
 	}
 
 	vector<ProtoMessage> messages = readObjectProtos();
-
-	assert(messages.size() > 0);
-	// for(auto &m : messages) {
-	// 	cout << m->GetTypeName() << " =================\n";
-	// 	cout << m->DebugString();
-	// }
+	
+	if(messages.size() == 0) {
+		return nullptr;
+	}
+	
 	std::reverse(messages.begin(), messages.end());
 
 	Protos::ClassName *head = SerializableBase::getHeader(messages);

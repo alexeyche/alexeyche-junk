@@ -7,6 +7,7 @@
 #include <dnn/contrib/rapidjson/filestream.h>
 
 #include <dnn/util/json.h>
+#include <dnn/base/exceptions.h>
 
 namespace dnn {
 
@@ -54,8 +55,8 @@ struct Constants : public Printable {
 		for(auto it=mods.begin(); it != mods.end(); ++it) {
 			replaceAll(const_json, it->first, it->second);
 		}
-		Document document = Json::parseString(const_json);
 
+		Document document = Json::parseString(const_json);		
 
 		fill(Json::getVal(document, "neurons"), neurons);
 		fill(Json::getVal(document, "act_functions"), act_functions);
@@ -75,13 +76,11 @@ struct Constants : public Printable {
 			const string k = itr->name.GetString();
 			vector<string> aff = splitBySubstr(k, "->");
 			if (aff.size() != 2) {
-				cerr << "conn_map configuration not right: need 2 afferents separated by \"->\"\n";
-				terminate();
+				throw dnnException() << "conn_map configuration not right: need 2 afferents separated by \"->\"\n";
 			}
 
 			const pair<size_t, size_t> aff_p(stoi(aff[0]), stoi(aff[1]));
 			const Value &conns = itr->value;
-			if (!conns.IsArray()) { cerr << "conn_map must be array\n"; terminate(); }
 
 			for (SizeType i = 0; i < conns.Size(); i++) {
 				const Value &v = conns[i];

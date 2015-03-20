@@ -15,6 +15,7 @@ set(SOURCES
     matrix.h
     util.h
     util.cpp
+    json.cpp
     #spikes_list.cpp
     #spikes_queue.cpp
 )

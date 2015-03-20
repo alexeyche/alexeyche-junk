@@ -32,8 +32,7 @@ public:
 
     }
     virtual ProtoMessage newProto() {
-        cerr << "That shouldn't be called. This method for non protobuf Serializable classes\n";
-        terminate();
+        throw dnnException()<< "That shouldn't be called. This method for non protobuf Serializable classes\n";
     }
 
     virtual ~SerializableBase() {
@@ -59,14 +58,12 @@ public:
     }
     static Protos::ClassName* getHeader(vector<ProtoMessage> &messages) {
         if(messages.size() == 0) {
-            cerr << "Trying to get header from empty messages stack\n";
-            terminate();
+            throw dnnException()<< "Trying to get header from empty messages stack\n";
         }
         Protos::ClassName *head = dynamic_cast<Protos::ClassName*>(messages.back());
         if(!head) {
-            cerr << "There is no header on the top of the stack\n";
-            cerr << "Got " << messages.back()->GetTypeName() << "\n";
-            terminate();
+            throw dnnException()<< "There is no header on the top of the stack\n";
+            throw dnnException()<< "Got " << messages.back()->GetTypeName() << "\n";
         }
         return head;
     }
@@ -75,8 +72,7 @@ public:
         if(messages) {
             return getHeader(*messages);
         }
-        cerr << "Null messages stack\n";
-        terminate();
+        throw dnnException()<< "Null messages stack\n";
     }
 
     SerializableBase& begin() {
@@ -91,10 +87,9 @@ public:
             messages->push_back(header);
         }
         if(mode == ProcessingInput) {
-            Protos::ClassName *head = getHeader();
+            Protos::ClassName *head = getHeader();            
             if(name() != head->class_name()) {
-                cerr << "Error while deserializing. Wrong class name header: " << name() << " != " << head->class_name() << "\n";
-                terminate();
+                throw dnnException()<< "Error while deserializing. Wrong class name header: " << name() << " != " << head->class_name() << "\n";
             }
             deleteCurrentMessage();
         }
@@ -102,7 +97,7 @@ public:
     }
     void operator << (EndMarker e) {
         if(mode == ProcessingInput) {
-            deleteCurrentMessage();
+            //deleteCurrentMessage();
         }
     }
 
@@ -116,10 +111,7 @@ public:
             }
         } else
         if(mode == ProcessingInput) {
-            // cout << "Deserializing " << b.name() << "\n";
-            b.getDeserialized(*messages);
-            //cout << "deleting " << currentMessage()->GetTypeName() << "\n";
-            //deleteCurrentMessage();
+            b.getDeserialized(*messages);            
         }
 
         return *this;
@@ -129,8 +121,7 @@ public:
     SerializableBase& operator << (InterfacedPtr<T> &b) {
         if(mode == ProcessingOutput) {
             if(!b.isSet()) {
-                cerr << "Failed to serialize InterfacePtr: it is without an pointer\n";
-                terminate();
+                throw dnnException()<< "Failed to serialize InterfacePtr: it is without an pointer\n";
             }            
             (*this) << b.ref();
         } else
@@ -139,8 +130,7 @@ public:
 
             T* p = dynamic_cast<T*>(pb);
             if(!p) {
-                cerr << name() << ": cast error while deserializing interfaced ptr, got " << pb->name() << "\n";
-                terminate();
+                throw dnnException()<< name() << ": cast error while deserializing interfaced ptr, got " << pb->name() << "\n";
             }            
             b.set(p);
             (*this) << b.ref();
@@ -179,8 +169,7 @@ public:
     ProtoMessage currentMessage() {
         assert(messages);
         if(messages->size() == 0) {
-            cerr << "Trying to get from empty vector of messages\n";
-            terminate();
+            throw dnnException()<< "Trying to get from empty vector of messages\n";
         }
         return messages->back();
     }
@@ -191,7 +180,8 @@ public:
             // for(size_t i=0; i<(messages->size()-1); ++i) {
             //     cout << (*messages)[i]->GetTypeName() << ", ";
             // }
-            // cout << " || " << messages->back()->GetTypeName() << "\n";
+            //cout << " || " << messages->back()->GetTypeName() << "\n";
+
             delete messages->back();
             messages->pop_back();
         }
@@ -208,8 +198,7 @@ class Serializable : public SerializableBase {
 public:
     #define ASSERT_FIELDS() \
     if((messages->size() == 0)||(!field_descr)) {\
-        cerr << "Wrong using of Serializable class.\n"; \
-        terminate(); \
+        throw dnnException()<< "Wrong using of Serializable class.\n"; \
     }\
 
     typedef Serializable<Proto> Self;
@@ -220,8 +209,7 @@ public:
         Proto _fake_m;
         vector<string> spl = split(_fake_m.GetTypeName(), '.');
         if(spl[0] != "Protos") {
-            cerr << "Expection Protos:: typename\n";
-            terminate();
+            throw dnnException()<< "Expection Protos:: typename\n";
         }
         string ret;
         for(size_t i=1; i<spl.size(); ++i) {
@@ -236,8 +224,7 @@ public:
 
     Serializable& operator << (const char *vraw) {
         if(messages->size() == 0) {
-            cerr << "Serialaling without begin()\n";
-            terminate();
+            throw dnnException()<< "Serialaling without begin()\n";
         }
 
         string v = string(vraw);
@@ -253,8 +240,7 @@ public:
         field_descr = descriptor->FindFieldByName(fname);
 
         if(!field_descr) {
-            cerr << "Can't find proto field by name " << fname << "\n";
-            terminate();
+            throw dnnException()<< "Can't find proto field by name " << fname << "\n";
         }
         return *this;
     }
@@ -375,8 +361,7 @@ public:
         if(mode == ProcessingInput) {
             Protos::ClassName *head = getHeader();
             if(name() != head->class_name()) {
-                cerr << "Error while deserializing. Wrong class name header: " << name() << " != " << head->class_name() << "\n";
-                terminate();
+                throw dnnException()<< "Error while deserializing. Wrong class name header: " << name() << " != " << head->class_name() << "\n";
             }
             deleteCurrentMessage();
         }

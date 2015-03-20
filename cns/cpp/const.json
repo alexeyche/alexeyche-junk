@@ -1,7 +1,7 @@
 {
     "inputs" : {
         "InputTimeSeries" : {
-            "dt" : 2.0
+            "dt" : 1.0
         }
     },
     "neurons" : {
@@ -30,21 +30,32 @@
                 "act_function" : "Determ",
                 "axon_delay" : "Exp(12,5)",
                 "input" : "InputTimeSeries"
+            },
+            {
+                "size" : 50,
+                "neuron" : "LeakyIntegrateAndFire",
+                "act_function" : "Determ",
+                "axon_delay" : "Exp(12,5)"
             }
         ],
         "conn_map" : {
-            "0->0" : [
-                { "prob" : 0.5, "start_weight" : "Norm(10.6, 0.1)", "synapse" : "StaticSynapse", "dendrite_delay" : 0 }
+            "0->1" : [
+                { "prob" : 0.5, "start_weight" : 0.05, "synapse" : "StaticSynapse", "dendrite_delay" : "Exp(12,5)" }
             ]
         },
         "dt" : 1.0,
         "seed" : -1,
-        "neurons_to_listen" : [25],
+        "neurons_to_listen" : [25,51],
         "files" : {
             "InputTimeSeries" : { 
-                "filename" : "@input-file",
+                "filename" : "@ucr-input-file",
                 "format" : "ucr-ts"
+            },
+            "InputTimeSeries" : { 
+                "filename" : "@pb-input-file",
+                "format" : "protobin"
             }
+
         }
     }
 }    

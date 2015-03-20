@@ -28,8 +28,7 @@ public:
     , codedIn(nullptr) 
     {
         if((_input_str)&&(!_input_str->good())) {
-            cerr << "Input filestream isn't open\n";
-            terminate();
+            throw dnnException()<< "Input filestream isn't open\n";
         }
         if(r == Binary) {        
             zeroIn = new IstreamInputStream(_input_str);
@@ -57,8 +56,7 @@ public:
     , codedOut(nullptr) 
     {
         if((_output_str)&&(!_output_str->good())) {
-            cerr << "Output filestream isn't open\n";
-            terminate();
+            throw dnnException()<< "Output filestream isn't open\n";
         }
         if(r == Binary) {
             zeroOut = new OstreamOutputStream(_output_str);
@@ -85,13 +83,11 @@ public:
     }
     istream& getInputStream() {
         if(_input_str) return *_input_str;
-        cerr << "Stream is wrongly opened or used\n";
-        terminate();
+        throw dnnException()<< "Stream is wrongly opened or used\n";
     }
     ostream& getOutputStream() {
         if(_output_str) return *_output_str;
-        cerr << "Stream is wrongly opened or used\n";
-        terminate();
+        throw dnnException()<< "Stream is wrongly opened or used\n";
     }
 
     void writeObject(SerializableBase *b);
@@ -104,8 +100,7 @@ public:
         
         T *d = dynamic_cast<T*>(b);
         if(!d) {
-            cerr << "Failed to cast from " << b->name() << "\n";
-            terminate();
+            throw dnnException()<< "Failed to cast from " << b->name() << "\n";
         }
         return d;
     }
@@ -124,8 +119,7 @@ public:
         }
         CodedInputStream::Limit limit = codedIn->PushLimit(size);
         if(!mess->ParseFromCodedStream(codedIn)) {
-                cerr << "Can't parse message with size " << size << "\n";
-                terminate();
+                throw dnnException()<< "Can't parse message with size " << size << "\n";
         }
         codedIn->PopLimit(limit);
         return true;
@@ -133,7 +127,7 @@ public:
 
     void writeBinaryMessage(ProtoMessage mess, ostream *str) {
         if(!mess) {
-            cerr << "Trying to write null binary message\n";
+            throw dnnException()<< "Trying to write null binary message\n";
         }
         google::protobuf::uint32 size = mess->ByteSize();
         codedOut->WriteVarint32(size);

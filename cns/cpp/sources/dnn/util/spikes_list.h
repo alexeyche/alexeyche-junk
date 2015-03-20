@@ -50,6 +50,11 @@ struct SpikesList : public SerializableBase {
 		}
 
 		(*this) << "SpikesList: "  << info;
+		
+		if (mode == ProcessingInput) {
+			seq.resize(info.size);
+		}
+
 		for(size_t i=0; i<info.size; ++i) {
 			(*this) << seq[i];
 		}

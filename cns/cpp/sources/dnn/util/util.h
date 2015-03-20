@@ -29,7 +29,7 @@ double getNorm();
 string strip_white(const string& input);
 string strip_comments(const string& input, const string& delimiters);
 long getFileSize(string filename);
-
+bool fileExists(const std::string& name);
 bool strStartsWith(const string &s, const string &prefix);
 
 struct IndexSlice {
@@ -45,8 +45,7 @@ vector<IndexSlice> dispatchOnThreads(size_t elements_size, size_t jobs);
 	try {	\
 		X;	\
 	} catch {	\
-		cerr << "Error!\n"; \
-		terminate();	\
+		throw dnnException()<< "Error!\n"; \
 	}\
 
 

@@ -22,23 +22,59 @@ public:
             ifstream f(protofile);
             Stream str(f, Stream::Binary);
             SerializableBase* o = str.readObject();
-            values = convertToList(o);
+            if (!o) {
+                ERR("Can't read protofile " << protofile << "\n");
+            }
+            vector<SerializableBase*> obj;
+            obj.push_back(o);
+            while(true) {
+                SerializableBase* o = str.readObject();
+                if(!o) break;
+                obj.push_back(o);
+            }
+            
+            if(obj.size() == 1) { 
+                values = convertToList(o);
+            } else {
+                vector<Rcpp::List> ret;
+                for(auto &o: obj) {
+                    ret.push_back(convertToList(o));                    
+                }
+                values = Rcpp::wrap(ret);
+            }
+            for(auto& o: obj) {
+                Factory::inst().deleteLast();
+            }
         }
         return values;
     }
-    void write(Rcpp::List &o) {
+    void write(Rcpp::List &o, const string& name) {
+        SerializableBase* b = convertBack(o, name);
+        ofstream f(protofile);
+        Stream str(f, Stream::Binary);
+        str.writeObject(b);
     }
     
-    static Rcpp::List convertToList(const SerializableBase *o) {
+    static Rcpp::List convertToList(SerializableBase *o) {
         Rcpp::List out;
         if(o->name() == "Statistics") {
-            const Statistics *st = dynamic_cast<const Statistics*>(o);
-            if(!st) { ERR("Can't cast"); }
-            
-            for(auto &p: st->stats) {
-                out[p.first] = Rcpp::wrap(p.second.values);
+            Statistics *od = dynamic_cast<Statistics*>(o);
+            if(!od) { ERR("Can't cast"); }
+            StatisticsInfo info = od->getInfo();
+            for(auto &name: info.stat_names) {
+                out[name] = Rcpp::wrap(od->getStats()[name].values);
             }
         } 
+        if(o->name() == "SpikesList") {
+            SpikesList *od = dynamic_cast<SpikesList*>(o);
+            if(!od) { ERR("Can't cast"); }
+            
+            vector<vector<double>> sp; 
+            for(auto &seq : od->seq) {
+                sp.push_back(seq.values);
+            }
+            out = Rcpp::wrap(sp);
+        }
         return out;
     }
     
@@ -56,6 +92,7 @@ public:
             ts->data.values = Rcpp::as<vector<double>>(list["values"]);
             return ts;
         }
+
         ERR("Can't convert " << name );
     } 
     void print() {

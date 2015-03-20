@@ -25,10 +25,9 @@ class Network;
 
 class SpikeNeuronBase : public SerializableBase {
 friend class Builder;
-friend class Sim;
 friend class Network;
 public:
-	SpikeNeuronBase() {
+	SpikeNeuronBase() : input_queue_lock(ATOMIC_FLAG_INIT) {
 		_id = global_neuron_index++;
 	}
 
@@ -39,9 +38,6 @@ public:
 	}
 	inline const double& axonDelay() {
 		return axon_delay;
-	}
-	void setAxonDelay(double d) {
-		axon_delay = d;
 	}
 
 	virtual void provideInterface(SpikeNeuronInterface &i) = 0;
@@ -56,20 +52,16 @@ public:
 
 
 	static void __calculateDynamicsDefault(const Time &t) {
-		cerr << "Calling inapropriate default interface function\n";
-		terminate();
+		throw dnnException()<< "Calling inapropriate default interface function\n";
 	}
 	static void __propagateSynapseSpikeDefault(const SynSpike &s) {
-		cerr << "Calling inapropriate default interface function\n";
-		terminate();
+		throw dnnException()<< "Calling inapropriate default interface function\n";
 	}
 	static const double& __getFiringProbabilityDefault() {
-		cerr << "Calling inapropriate default interface function\n";
-		terminate();
+		throw dnnException()<< "Calling inapropriate default interface function\n";
 	}
 	static const bool& __firedDefault() {
-		cerr << "Calling inapropriate default interface function\n";
-		terminate();
+		throw dnnException()<< "Calling inapropriate default interface function\n";
 	}
 	static void provideDefaultInterface(SpikeNeuronInterface &i) {
 		i.calculateDynamics = &SpikeNeuronBase::__calculateDynamicsDefault;
@@ -87,8 +79,7 @@ public:
 	}
 	InputBase& getInput() {
 		if(!input.isSet()) {
-			cerr << "Trying to get input which is not set\n";
-			terminate();
+			throw dnnException()<< "Trying to get input which is not set\n";
 		}
 		return input.ref();
 	}
@@ -99,8 +90,35 @@ public:
 	inline vector<InterfacedPtr<SynapseBase>>& getSynapses() {
 		return syns;
 	}
-	const Statistics& getStat() const {
+	Statistics& getStat() {
+		size_t syn_id = 0;
+		for(auto &s: syns) {
+			if(s.ref().getStat().on()) {
+				Statistics& syn_st = s.ref().getStat();
+				for(auto it=syn_st.getStats().begin(); it != syn_st.getStats().end(); ++it) {
+					stat.getStats()[it->first + std::to_string(syn_id)] = it->second;	
+				}						
+			}
+			syn_id++;
+		}
 		return stat;
+	}
+
+	inline void enqueueSpike(const SynSpike && sp) {
+		while (input_queue_lock.test_and_set(std::memory_order_acquire));
+		input_spikes.push(sp);
+		input_queue_lock.clear(std::memory_order_release);
+	}
+
+	inline void readInputSpikes(const Time &t) {
+		while (input_queue_lock.test_and_set(std::memory_order_acquire)) {}
+        while(!input_spikes.empty()) {
+            const SynSpike& sp = input_spikes.top();
+            if(sp.t >= t.t) break;
+            syns[ sp.syn_id ].ifc().propagateSpike();
+            input_spikes.pop();   
+        }
+        input_queue_lock.clear(std::memory_order_release);        
 	}
 protected:
 	size_t _id;
@@ -111,7 +129,9 @@ protected:
 	InterfacedPtr<InputBase> input;
 
 	Statistics stat;
+
 	priority_queue<SynSpike> input_spikes;
+	std::atomic_flag input_queue_lock;
 };
 
 /*@GENERATE_PROTO@*/
@@ -170,6 +190,9 @@ public:
 		}
 		if (info.input_is_set) {
 			(*this) << "Input: " << input;
+		}
+		if(mode == ProcessingInput) {
+			syns.resize(info.num_of_synapses);
 		}
 		for (size_t i = 0; i < info.num_of_synapses; ++i) {
 			(*this) << "Synapse: " << syns[i];

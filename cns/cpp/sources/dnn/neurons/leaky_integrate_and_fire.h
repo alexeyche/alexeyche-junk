@@ -55,23 +55,22 @@ public:
     }
 
     void calculateDynamics(const Time& t) {
-        while(!input_spikes.empty()) {
-            const SynSpike& sp = input_spikes.top();
-            if(sp.t >= t.t) break;
-            syns[ sp.syn_id ].ifc().propagateSpike();
-            input_spikes.pop();   
-        }
-
+        readInputSpikes(t);
+        
         double syns_pot = 0.0;
         for(auto &s: syns) {
-            syns_pot += s.ifc().getMembranePotential();
+            double x = s.ifc().getMembranePotential();
+            syns_pot += x;
         }
-
-        s.u += t.dt * ( -(s.u - c.leak)/c.R + input.ifc().getValue(t) + syns_pot) / c.C; 
+        s.u += t.dt * ( -(s.u - c.leak)/c.R + input.ifc().getValue(t) + syns_pot) / c.C;
         
         s.fired = false;
         if(getUnif() < act_f.ifc().prob(s.u)) {
             s.fired = true;
+        }
+        
+        for(auto &s: syns) {
+            s.ifc().calculateDynamics(t);
         }
 
         stat.add("u", s.u);

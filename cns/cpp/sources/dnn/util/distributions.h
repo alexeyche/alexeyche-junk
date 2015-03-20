@@ -62,29 +62,25 @@ uptr<Distribution<T>> parseDistribution(const string &str_init) {
     if (strStartsWith(str_init, "Exp")) {
         vector<double> params = parseParenthesis(str_init);
         if (params.size() != 2) {
-            cerr << "Bad parameters to Exp distribution: " << str_init << "\n";
-            terminate();
+            throw dnnException()<< "Bad parameters to Exp distribution: " << str_init << "\n";
         }
         return uptr<ExpDistribution>(new ExpDistribution(params[0], params[1]));
     }
     if (strStartsWith(str_init, "Norm")) {
         vector<double> params = parseParenthesis(str_init);
         if (params.size() != 2) {
-            cerr << "Bad parameters to Norm distribution: " << str_init << "\n";
-            terminate();
+            throw dnnException()<< "Bad parameters to Norm distribution: " << str_init << "\n";
         }
         return uptr<NormalDistribution>(new NormalDistribution(params[0], params[1]));
     }
     if (strStartsWith(str_init, "Unif")) {
         vector<double> params = parseParenthesis(str_init);
         if (params.size() != 2) {
-            cerr << "Bad parameters to Unif distribution: " << str_init << "\n";
-            terminate();
+            throw dnnException()<< "Bad parameters to Unif distribution: " << str_init << "\n";
         }
         return uptr<UniformDistribution>(new UniformDistribution(params[0], params[1]));
     }
-    cerr << "Unknown Distribution " << str_init << "\n";
-    terminate();
+    throw dnnException()<< "Unknown Distribution " << str_init << "\n";
 }
 
 

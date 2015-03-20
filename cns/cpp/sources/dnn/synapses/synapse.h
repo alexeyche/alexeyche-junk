@@ -1,6 +1,7 @@
 #pragma once
 
 #include <dnn/io/serialize.h>
+#include <dnn/util/statistics.h>
 
 namespace dnn {
 
@@ -8,42 +9,41 @@ namespace dnn {
 struct SynapseInterface {
 	stateDelegate propagateSpike;
 	calculateDynamicsDelegate calculateDynamics;
-	getDoubleDelegate getMembranePotential;
+	retDoubleDelegate getMembranePotential;
 };
 
 class Network;
+class SpikeNeuronBase;
+class Builder;
 
 class SynapseBase : public SerializableBase {
 friend class Network;
+friend class SpikeNeuronBase;
+friend class Builder;
 public:
 	typedef SynapseInterface interface;
 
-	void setIdPre(size_t _id_pre) {
-		id_pre = _id_pre;
-	}
-	void setDendriteDelay(double _dendrite_delay) {
-		dendrite_delay = _dendrite_delay;
-	}
-	void setWeight(double w) {
-		weight = w;
-	}	
 	inline const size_t& getIdPre() { 
 		return id_pre;
 	}
 
 	virtual void propagateSpike() = 0;
+	virtual double getMembranePotential() = 0;
 	virtual void calculateDynamics(const Time &t) = 0;
-	virtual const double& getMembranePotential() = 0;
 	virtual void provideInterface(SynapseInterface &i) = 0;
 
 	static void provideDefaultInterface(SynapseInterface &i) {
-		cerr << "No default interface for Synapse\n";
-		terminate();
+		throw dnnException()<< "No default interface for Synapse\n";
+	}
+	Statistics& getStat() {
+		return stat; 
 	}
 protected:
 	size_t id_pre;
 	double dendrite_delay;
 	double weight;
+
+	Statistics stat;
 };
 
 

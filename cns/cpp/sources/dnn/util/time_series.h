@@ -1,6 +1,7 @@
 #pragma once
 
-#include <dnn/io/serialize.h>
+#include <dnn/io/stream.h>
+#include <dnn/util/pretty_print.h>
 
 namespace dnn {
 
@@ -60,25 +61,35 @@ struct TimeSeries : public SerializableBase {
 
 	
 	void readFromFile(const string &filename, const string &format) {
-		if(format == "ucr-ts") {
-			ifstream f(filename);
-			if(!f.is_open()) {
-				cerr << "Can't open file " << filename << "\n";
-				terminate();
-			}
+		ifstream f(filename);
+		if(!f.is_open()) {
+			throw dnnException()<< "Can't open file " << filename << "\n";
+		}
+		if(format == "ucr-ts") {			
 			string line;
 			while (std::getline(f, line)) {
 				string lab;
 				convertUcrTimeSeriesLine(line, data.values, lab);
 				info.addLabelAtPos(lab, data.values.size());
 			}
+		} else 
+		if(format == "protobin") {
+			SerializableBase* o = Stream(f, Stream::Binary).readObject();
+			TimeSeries* inp_ts = dynamic_cast<TimeSeries*>(o);
+			if(!inp_ts) {
+				throw dnnException() << "Failed to cast " << o->name() << " to TimeSeries\n";
+			}
+			(*this) = *inp_ts;
+			Factory::inst().deleteLast();
+		} else {
+			throw dnnException() << "TimeSeries: unknown format " << format << "\n";
 		}
 	}
 	size_t length() {
 		return data.values.size();
 	}
 
-	const double& getValueAt(const size_t &index) {
+	const double& getValueAt(const size_t &index) {		
 		return data.values[index];	
 	}
 	virtual void provideInterface(TimeSeriesInterface &i) {
@@ -86,8 +97,7 @@ struct TimeSeries : public SerializableBase {
 	}
 	
 	static const double& getValueAtDefault(const size_t &index) {
-		cerr << "Calling inapropriate default function method\n";
-		terminate(); 
+		throw dnnException()<< "Calling inapropriate default function method\n";
 	}
 	static void provideDefaultInterface(TimeSeriesInterface &i) {
 		i.getValueAt = &TimeSeries::getValueAtDefault;

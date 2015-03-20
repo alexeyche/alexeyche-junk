@@ -50,6 +50,7 @@ Factory::Factory() {
 	REG_TYPE(SpikesList);
 	REG_TYPE(SpikesListInfo);
 	REG_TYPE(SpikesSequence);
+	REG_TYPE(TimeSeries);
 	REG_TYPE(TimeSeriesInfo);
 	REG_TYPE(TimeSeriesData);
 }
@@ -65,6 +66,7 @@ void Factory::deleteLast() {
 	for (auto it = p.first; it != p.second; ++it) {
 		if (it->second == objects.size()-1) { 
 			objects_map.erase(it);
+			break;
 		}
 	}
 	delete objects.back();
@@ -73,8 +75,7 @@ void Factory::deleteLast() {
 
 SerializableBase* Factory::createObject(string name) {
 	if (typemap.find(name) == typemap.end()) {
-		cerr << "Failed to find method to construct type " << name << "\n";
-		terminate();
+		throw dnnException()<< "Failed to find method to construct type " << name << "\n";
 	}
 	SerializableBase* o = typemap[name]();
 	objects.push_back(o);
@@ -84,8 +85,7 @@ SerializableBase* Factory::createObject(string name) {
 
 ProtoMessage Factory::createProto(string name) {
 	if (prototypemap.find(name) == prototypemap.end()) {
-		cerr << "Failed to find method to construct proto type " << name << "\n";
-		terminate();
+		throw dnnException()<< "Failed to find method to construct proto type " << name << "\n";
 	}
 	ProtoMessage o = prototypemap[name]();
 	return o;
@@ -96,8 +96,7 @@ SpikeNeuronBase* Factory::createSpikeNeuron(string name) {
 	SerializableBase *b = createObject(name);
 	SpikeNeuronBase *p = dynamic_cast<SpikeNeuronBase*>(b);
 	if (!p) {
-		cerr << "Error to cast " << b->name() << " to SpikeNeuronBase" << "\n";
-		terminate();
+		throw dnnException()<< "Error to cast " << b->name() << " to SpikeNeuronBase" << "\n";
 	}
 	return p;
 }
@@ -106,16 +105,13 @@ ActFunctionBase* Factory::createActFunction(string name) {
 	SerializableBase *b = createObject(name);
 	ActFunctionBase *p = dynamic_cast<ActFunctionBase*>(b);
 	if (!p) {
-		cerr << "Error to cast " << b->name() << " to ActFunctionBase" << "\n";
-		terminate();
+		throw dnnException()<< "Error to cast " << b->name() << " to ActFunctionBase" << "\n";
 	}
 	return p;
 }
 
 TimeSeries* Factory::createTimeSeries() {
-	TimeSeries *o = new TimeSeries();
-	objects.push_back(o);
-	return o;
+	return static_cast<TimeSeries*>(createObject("TimeSeries"));
 }
 
 TimeSeries& Factory::getCachedTimeSeries(const string& filename, const string& format) {

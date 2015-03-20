@@ -1,6 +1,7 @@
 #pragma once
 
 #include <dnn/io/serialize.h>
+#include <dnn/base/exceptions.h>
 
 namespace dnn {
 
@@ -21,8 +22,7 @@ public:
     virtual void provideInterface(ActFunctionInterface &i) = 0;
 
 	static double __default(const double &u) { 
-		cerr << "Calling inapropriate default interface function\n";
-		terminate();
+		throw dnnException() << "Calling inapropriate default interface function\n";
 	}
 	
 	static void provideDefaultInterface(ActFunctionInterface &i) {

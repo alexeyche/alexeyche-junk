@@ -2,6 +2,7 @@
 
 require(Rdnn)
 require(rjson)
+
 setwd("~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts")
 
 source('plot_stat.R')
@@ -16,7 +17,12 @@ cjson = toJSON(cr)
 const = RConstants$new(cjson)
 s = RSim$new(const)
 
-s$setTimeSeries(c(1,1,1,1,1,1))
+x = 6.5 + 6.5 * sin(seq(1,1000)/10)
+RProto$new("/home/alexeyche/cpp/build/input.pb")$write(list(values=x), "TimeSeries")
+
+s$setTimeSeries(x)
 s$run(4)
 stat = s$getStat()
-
+net = s$getSpikes()
+prast(net)
+plotl(stat[[1]][[1]])

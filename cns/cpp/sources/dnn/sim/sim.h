@@ -36,15 +36,16 @@ public:
 	}
 	void saveStat(Stream &str) {
 		for(auto &n: neurons) {
-			if(n.ref().stat.on()) {
-				str.writeObject(&n.ref().stat); 
+			if(n.ref().getStat().on()) {
+				Statistics& st = n.ref().getStat();
+				str.writeObject(&st); 
 			}
+
 		}
 	}
 	void saveSpikes(Stream &str) {
 		if(!net.get()) {
-			cerr << "Sim network was not found. You need to build sim\n";
-			terminate();
+			throw dnnException()<< "Sim network was not found. You need to build sim\n";
 		}
 		str.writeObject(&net->spikesList());
 	}	
@@ -56,7 +57,6 @@ public:
 			for(size_t i=from; i<to; ++i) {				
 				s.neurons[i].ifc().calculateDynamics(t);
 				if(s.neurons[i].ifc().fired()) {
-					cout << s.neurons[i].ref().id() << " made spike\n";
 					s.net->propagateSpike(s.neurons[i].ref(), t.t);
 				}
 			}
@@ -65,6 +65,9 @@ public:
 		
 	}
 	void run(size_t jobs) {
+		if(fabs(duration) < 0.00001) {
+			throw dnnException() << "Duration of simulation is " << duration << ". Check that input data was provided\n";
+		}
 		vector<IndexSlice> slices = dispatchOnThreads(neurons.size(), jobs);
 		vector<std::thread> threads;
 		

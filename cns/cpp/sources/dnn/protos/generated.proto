@@ -26,8 +26,7 @@ message SynapseInfo {
 message Stat {
     required int32 low_lim = 1;
     required int32 high_lim = 2;
-    required string name = 3;
-    repeated double values = 4;
+    repeated double values = 3;
 }
 
 message StatisticsInfo {

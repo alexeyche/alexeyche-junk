@@ -9,8 +9,7 @@ RCPP_MODULE(dnnMod) {
     .method("run", &RSim::run, "Run simulation")
     .method("getStat", &RSim::getStat, "get stat")
     .method("setTimeSeries", &RSim::setTimeSeries, "Setting time series")
-
-//    .method("getSpikes", &RSim::getSpikes, "get spikes")
+    .method("getSpikes", &RSim::getSpikes, "get spikes")
 //    .method("getModel", &RSim::getModel, "get model")
 //    .method("collectStat", &RSim::collectStat, "turn on collect stat")
 //    .method("setInputSpikesList", &RSim::setInputSpikesList, "Set LabeledSpikesList as input spikes")

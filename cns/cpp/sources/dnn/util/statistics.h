@@ -2,6 +2,7 @@
 
 #include <dnn/protos/generated.pb.h>
 #include <dnn/io/serialize.h>
+#include <regex>
 
 namespace dnn {
 
@@ -10,8 +11,7 @@ struct Stat : public Serializable<Protos::Stat> {
 	Stat() : low_lim(-1), high_lim(-1), __counter(0) {}
 
 	void serial_process() {
-		begin() << "name: " << name << ", "
-		        << "values: " << values << ", "
+		begin() << "values: " << values << ", "
 		        << "low_lim: " << low_lim << ", "
 		        << "high_lim: " << high_lim << Self::end;
 	}
@@ -27,7 +27,6 @@ struct Stat : public Serializable<Protos::Stat> {
 	int low_lim;
 	int high_lim;
 
-	string name;
 	vector<double> values;
 };
 
@@ -43,6 +42,25 @@ struct StatisticsInfo : public Serializable<Protos::StatisticsInfo> {
 	vector<string> stat_names;
 };
 
+
+
+struct stringLessThan : public std::binary_function< string, string, bool >
+{
+	stringLessThan() 
+	: e(".*?([0-9]+).*?") {}
+
+    bool operator()( const string &e1, const string &e2 ) const
+    {
+        std::smatch sm1, sm2; 
+    	std::regex_match (e1,sm1,e);
+    	std::regex_match (e2,sm2,e);
+    	if((sm1.size() == 2)&&(sm2.size() == 2)) {
+    		return std::stoi(sm1[1]) < std::stoi(sm2[1]);
+    	}    	
+        return e1 < e2;
+    }
+    std::regex e;
+};
 
 class Statistics : public SerializableBase {
 public:
@@ -66,6 +84,7 @@ public:
 		for (auto it = stats.begin(); it != stats.end(); ++it) {
 			info.stat_names.push_back(it->first);
 		}
+		std::sort(info.stat_names.begin(), info.stat_names.end(), stringLessThan());
 		info.low_lim = low_lim;
 		info.high_lim = high_lim;
 		return info;
@@ -89,11 +108,13 @@ public:
 	const bool&	on() const {
 		return _on;
 	}
+	inline void add(const string &name, size_t sub_ind, const double &v) {
+		add(name + std::to_string(sub_ind), v);
+	}
 	inline void add(const string &name, const double &v) {
 		if (!_on) return;
 		if (stats.find(name) == stats.end()) {
 			Stat s;
-			s.name = name;
 			s.low_lim = low_lim;
 			s.high_lim = high_lim;
 			stats[name] = s;
@@ -101,6 +122,10 @@ public:
 		stats[name].add(v);
 	}
 
+	map<string, Stat>& getStats() {
+		return stats;
+	}
+	
 	map<string, Stat> stats;
 	int low_lim;
 	int high_lim;

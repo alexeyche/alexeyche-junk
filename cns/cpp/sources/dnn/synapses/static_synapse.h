@@ -40,10 +40,12 @@ public:
         s.x += c.amp;
     }
     void calculateDynamics(const Time &t) {
-        s.x -= t.dt * s.x/c.psp_decay;
+        stat.add("x", s.x);
+        s.x -= t.dt * s.x/c.psp_decay;   
     }
-    const double& getMembranePotential() {
-        return s.x;
+
+    double getMembranePotential() {
+        return weight * s.x;
     }
 
     void provideInterface(SynapseInterface &i) {

@@ -13,9 +13,11 @@
 
 class RSim : public dnn::Sim {
 public:
-    RSim(RConstants *rc) : Sim(*rc)  {
+    RSim(RConstants *rc) try : Sim(*rc)  {
         global_neuron_index = 0;
         Sim::build();
+    } catch (std::exception &e) {
+        ERR("\nCan't build Sim: " << e.what() << "\n");
     }
     ~RSim() { }
     
@@ -49,6 +51,12 @@ public:
             }
         }
         return out;
+    }
+    Rcpp::List getSpikes() {
+        if(!net.get()) {
+            throw dnnException()<< "Sim network was not found. You need to build sim\n";
+        }
+        return RProto::convertToList(&net->spikesList());
     }
 };
 

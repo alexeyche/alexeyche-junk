@@ -39,7 +39,7 @@ public:
 
 	const double& getValue(const Time &t) {
         s._t += t.dt;
-        if(fmod(s._t, c.dt) > 0.0001) return InputBase::def_value;
+        if(fmod(s._t, c.dt) > 0.0001) return InputBase::def_value;        
         return ts.ref().data.values[s.index++];
 	}
     void provideInterface(InputInterface &i) {
@@ -47,6 +47,7 @@ public:
     }
 
     void setTimeSeries(TimeSeries *_ts) {
+        s.index = 0;
         ts.set(_ts);
     }
     double getDuration() {

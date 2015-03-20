@@ -25,17 +25,18 @@
 ##                                                                                              ##
 ##################################################################################################
 
+PKG_CXXFLAGS = -std=c++11
+
+PKG_CPPFLAGS=-I"/home/alexeyche/dnn/include"
+
+PKG_LIBS = -L"~/dnn/lib" -ldnn  $(LIBS) 
 
 
-PKG_CFLAGS=-I"/home/alexeyche/prog/alexeyche-junk/cns/c/snn_sim" -DMATHLIB_STANDALONE
-
-PKG_LIBS=-L/home/alexeyche/prog/alexeyche-junk/cns/c/snn_sim $(LIBS) 
-
-OBJECTS.root=test.o
+OBJECTS.root=RSim.o  mod.o 
 
 OBJECTS=  $(OBJECTS.root)
 
-all: before $(SHLIB) after
+all: $(SHLIB) before  after
 
 clean:
 	rm -f $(OBJECTS)

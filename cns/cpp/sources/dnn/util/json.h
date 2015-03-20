@@ -44,8 +44,7 @@ public:
 	static const Value& getVal(const Value &v, const string name) {
 		auto m = v.FindMember(name.c_str());
 		if (m == v.MemberEnd()) {
-			cerr << "Erros while finding field: " << name << "\n";
-			terminate();
+			throw dnnException()<< "Erros while finding field: " << name << "\n";
 		}
 		return m->value;
 	}
@@ -59,8 +58,7 @@ public:
 		if (__getDoubleVal(v, name, d)) {
 			return d;
 		}
-		cerr << name << " expected as double\n";
-		terminate();
+		throw dnnException()<< name << " expected as double\n";
 	}
 
 
@@ -78,8 +76,7 @@ public:
 		if (__getStringVal(v, name, s)) {
 			return s;
 		}
-		cerr << name << " expected as string\n";
-		terminate();
+		throw dnnException()<< name << " expected as string\n";
 	}
 	static string getStringValDef(const Value &v, const string name, string def) {
 		if (!checkVal(v, name)) return def;
@@ -95,22 +92,19 @@ public:
 		if (f_v.IsUint()) {
 			return f_v.GetUint();
 		}
-		cerr << name << " expected as uint\n";
-		terminate();
+		throw dnnException()<< name << " expected as uint\n";
 	}
 	static size_t getIntVal(const Value &v, const string name) {
 		const Value &f_v = getVal(v, name);
 		if (f_v.IsInt()) {
 			return f_v.GetInt();
 		}
-		cerr << name << " expected as int\n";
-		terminate();
+		throw dnnException()<< name << " expected as int\n";
 	}
 	
 	static Value getArray(const Value &v, const string name) {
 		Value f_v;
-		const Value &f_src = getVal(v, name);
-		Document d;
+		const Value &f_src = getVal(v, name);		
 		f_v.CopyFrom(f_src, d.GetAllocator());
 		if (f_v.IsArray()) {
 			return f_v;	
@@ -125,8 +119,7 @@ public:
 		const Value &f_v = getArray(v, name);
 		for (SizeType i = 0; i < f_v.Size(); i++) {
 			if (!f_v[i].IsUint()) {
-				cerr << "Element " << i << " of " << name << " is not an uint type\n";
-				terminate();
+				throw dnnException()<< "Element " << i << " of " << name << " is not an uint type\n";
 			}
 			ret.push_back(f_v[i].GetUint());
 		}
@@ -166,7 +159,7 @@ public:
 	static Document parseStringC(const string &p) {
 		Document document;
 
-		document.Parse(p.c_str());
+		document.Parse(p.c_str());		
 
 		if (document.HasParseError()) {
 			vector<string> spl = split(p, '\n');
@@ -178,9 +171,8 @@ public:
 				offset -= spl[line_num].size();
 				line_num++;
 			}
-			cerr << "Parse JSON error:\n";
-			cerr << GetParseError_En(document.GetParseError()) << line_num + 1 << ":" << offset << "\n";
-			terminate();
+			throw dnnException() << "Parse JSON error:\n" 
+							     << GetParseError_En(document.GetParseError()) << line_num + 1 << ":" << offset << "\n";
 		}
 		return document;
 	}
@@ -207,11 +199,11 @@ public:
 		string err;
 		pbjson::jsonobject2pb(&cv, m, err);
 		if (!err.empty()) {
-			cerr << "Found errors while converting json to protobuf:\n";
-			cerr << err << "\n";
-			terminate();
+			throw dnnException()<< "Found errors while converting json to protobuf:\n";
+			throw dnnException()<< err << "\n";
 		}
 	}
+	static Document d;
 };
 
 }
