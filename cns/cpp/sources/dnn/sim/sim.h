@@ -52,11 +52,16 @@ public:
 	
 	static void runWorker(Sim &s, size_t from, size_t to, SpinningBarrier &barrier) {
 		Time t(s.c.sim_conf.dt);
+		
+		for(size_t i=from; i<to; ++i) {				
+			s.neurons[i].ref().reset();
+		}
+		barrier.wait();
 
 		for(; t<s.duration; ++t) {
 			for(size_t i=from; i<to; ++i) {				
 				s.neurons[i].ifc().calculateDynamics(t);
-				if(s.neurons[i].ifc().fired()) {
+				if(s.neurons[i].ifc().pullFiring()) {
 					s.net->propagateSpike(s.neurons[i].ref(), t.t);
 				}
 			}
@@ -68,6 +73,7 @@ public:
 		if(fabs(duration) < 0.00001) {
 			throw dnnException() << "Duration of simulation is " << duration << ". Check that input data was provided\n";
 		}
+
 		vector<IndexSlice> slices = dispatchOnThreads(neurons.size(), jobs);
 		vector<std::thread> threads;
 		
@@ -79,6 +85,7 @@ public:
 			t.join();
 		}
 	}
+
 	void print(std::ostream &str) const {
 		str << "Sim\n";
 		str << "\t" << neurons.size() << " ready to simulate for " << duration << "ms\n";

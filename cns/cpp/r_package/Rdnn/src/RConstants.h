@@ -12,8 +12,7 @@
 
 class RConstants : public dnn::Constants {
 public:
-    RConstants(std::string _const_json) : Constants(_const_json, dnn::OptMods(), Constants::FromString) { 
-    	sim_conf.files.clear();
+    RConstants(std::string _const_json) : Constants(_const_json, dnn::OptMods(), Constants::FromString) {    	
     }
     void print() {
         cout << *this;

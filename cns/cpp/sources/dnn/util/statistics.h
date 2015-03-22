@@ -37,8 +37,8 @@ struct StatisticsInfo : public Serializable<Protos::StatisticsInfo> {
 		        << "low_lim: "    << low_lim    << ", "
 		        << "high_lim: "   << high_lim << Self::end;
 	}
-	size_t low_lim;
-	size_t high_lim;
+	int low_lim;
+	int high_lim;
 	vector<string> stat_names;
 };
 
@@ -47,7 +47,7 @@ struct StatisticsInfo : public Serializable<Protos::StatisticsInfo> {
 struct stringLessThan : public std::binary_function< string, string, bool >
 {
 	stringLessThan() 
-	: e(".*?([0-9]+).*?") {}
+	: e(".*?([0-9]+).*?", std::regex_constants::basic) {}
 
     bool operator()( const string &e1, const string &e2 ) const
     {
@@ -94,6 +94,7 @@ public:
 		if (mode == ProcessingOutput) {
 			info = getInfo();
 		}
+
 		begin() << "info: " << info << ", ";
 		for (auto it = info.stat_names.begin(); it != info.stat_names.end(); ++it) {
 			(*this) << "stat: " << stats[*it] << ", ";

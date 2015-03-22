@@ -68,6 +68,10 @@ void Stream::protoReader(vector<ProtoMessage> &messages) {
 
 void Stream::jsonReader(string name, const Value &v, vector<ProtoMessage> &messages) {
 	// json to protobuf
+	vector<string> name_spl = split(name, '_');
+	if(name_spl.size()>0) {
+		name = name_spl[0];
+	} 
 	Protos::ClassName *cl = new Protos::ClassName;
 	cl->set_class_name(name);
 	messages.push_back(cl);
@@ -80,6 +84,7 @@ void Stream::jsonReader(string name, const Value &v, vector<ProtoMessage> &messa
 		}
 	}
 	if (!has_object) {
+
 		if (!Factory::inst().isProtoType(name)) {
 			// trying to deduce proto name
 			if (!Factory::inst().isProtoType(name + string("C"))) {

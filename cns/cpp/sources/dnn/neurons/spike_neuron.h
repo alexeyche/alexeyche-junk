@@ -16,7 +16,7 @@ struct SpikeNeuronInterface {
 	calculateDynamicsDelegate calculateDynamics;
 	propSynSpikeDelegate propagateSynapseSpike;
 	getDoubleDelegate getFiringProbability;
-	getBoolDelegate fired;
+	getBoolCopyDelegate pullFiring;
 };
 extern size_t global_neuron_index;
 
@@ -48,7 +48,7 @@ public:
 	virtual void propagateSynapseSpike(const SynSpike &s) = 0;
 	virtual void calculateDynamics(const Time &t) = 0;
 	virtual const double& getFiringProbability() = 0;
-	virtual const bool& fired() = 0;
+	virtual bool pullFiring() = 0;
 
 
 	static void __calculateDynamicsDefault(const Time &t) {
@@ -60,12 +60,12 @@ public:
 	static const double& __getFiringProbabilityDefault() {
 		throw dnnException()<< "Calling inapropriate default interface function\n";
 	}
-	static const bool& __firedDefault() {
+	static bool __pullFiringDefault() {
 		throw dnnException()<< "Calling inapropriate default interface function\n";
 	}
 	static void provideDefaultInterface(SpikeNeuronInterface &i) {
 		i.calculateDynamics = &SpikeNeuronBase::__calculateDynamicsDefault;
-		i.fired = &SpikeNeuronBase::__firedDefault;
+		i.pullFiring = &SpikeNeuronBase::__pullFiringDefault;
 		i.getFiringProbability = &SpikeNeuronBase::__getFiringProbabilityDefault;
 		i.propagateSynapseSpike =  &SpikeNeuronBase::__propagateSynapseSpikeDefault;
 	}
@@ -79,7 +79,7 @@ public:
 	}
 	InputBase& getInput() {
 		if(!input.isSet()) {
-			throw dnnException()<< "Trying to get input which is not set\n";
+			throw dnnException() << "Trying to get input which is not set\n";
 		}
 		return input.ref();
 	}

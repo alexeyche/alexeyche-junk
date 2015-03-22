@@ -55,17 +55,19 @@ int main(int argc, char **argv) {
 	bool need_help = false;
 	
 	OptionParser optp(argc, argv);
+	optp.option("--help", "-h", need_help, false, true);
+	if(need_help) { 
+		cout << usage;
+		return 0; 
+	}
 	optp.option("--const", "-c", sopt.const_file, true);
 	optp.option("--output", "-o", sopt.out_spikes, false);
 	optp.option("--jobs", "-j", sopt.jobs, false);
 	optp.option("--save", "-s", sopt.model_save, false);
 	optp.option("--load", "-l", sopt.model_load, false);
 	optp.loption("--stat", sopt.out_stat_file, false);
-	optp.option("--help", "-h", need_help, false, true);
-	if(need_help) { 
-		cout << usage;
-		return 0; 
-	}
+	
+	
 
 	vector<string> rest_opts = optp.getRawOptions();
 	sopt.add_opts = parseArgOptionsPairs(rest_opts);

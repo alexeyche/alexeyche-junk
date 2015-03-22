@@ -56,11 +56,12 @@ public:
 				if (!inp) {
 					throw dnnException()<< "Failed to set input file for " << o->name() << "\n";
 				}
-				if(!fileExists(Json::getStringVal(file_conf, "filename"))) {
+				string fname = Json::getStringVal(file_conf, "filename");
+				if(fname.find("@") == 0) {
 					continue;
 				}
 				TimeSeries &ts = Factory::inst().getCachedTimeSeries(
-					Json::getStringVal(file_conf, "filename"),
+					fname,
 					Json::getStringVal(file_conf, "format")
 				);
 				inp->setTimeSeries(&ts);
@@ -91,6 +92,9 @@ public:
 
 	static void turnOnStatistics(vector<InterfacedPtr<SpikeNeuronBase>> &neurons, const vector<size_t> &ids) {
 		for(auto it=ids.cbegin(); it != ids.cend(); ++it) {
+			if(*it >= neurons.size()) {
+				throw dnnException() << "Can't find neuron " << *it << " to listenn\n";
+			}
 			neurons[*it].ref().stat.turnOn();
 			for(auto s: neurons[*it].ref().getSynapses()) {
 				s.ref().stat.turnOn();

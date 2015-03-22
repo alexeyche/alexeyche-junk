@@ -5,6 +5,7 @@
 #include <dnn/neurons/leaky_integrate_and_fire.h>
 #include <dnn/act_functions/determ.h>
 #include <dnn/synapses/static_synapse.h>
+#include <dnn/synapses/std_synapse.h>
 #include <dnn/inputs/input_time_series.h>
 #include <dnn/io/serialize.h>
 #include <dnn/util/time_series.h>
@@ -41,6 +42,7 @@ Factory::Factory() {
 	REG_TYPE_WITH_STATE_AND_CONST(LeakyIntegrateAndFire);
 	REG_TYPE(SpikeNeuronInfo);
 	REG_TYPE_WITH_STATE_AND_CONST(StaticSynapse);
+	REG_TYPE_WITH_STATE_AND_CONST(STDSynapse);
 	REG_TYPE(SynapseInfo);
 	REG_TYPE_WITH_CONST(Determ);
 	REG_TYPE_WITH_STATE_AND_CONST(InputTimeSeries);
