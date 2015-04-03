@@ -1,35 +1,65 @@
 #pragma once
 
-
+#include <dnn/io/serialize.h>
+#include <dnn/util/time_series.h>
 
 namespace dnn {
 
+
 struct InputInterface {
-    retDoubleDelegate getValue;
+    retRefDoubleAtTimeDelegate getValue;
 };
 
-
-class InputBase {
+class InputBase : public SerializableBase {
 public:
     typedef InputInterface interface;
+    
 
-    virtual double getValue() = 0;
+    virtual const double& getValue(const Time &t) = 0;
     virtual void provideInterface(InputInterface &i) = 0;
-
-    static double getValueDefault() {
-        return 0.0;
+    
+    static const double def_value;
+    static const double& getValueDefault(const Time &t) {
+        return def_value;
     }
     static void provideDefaultInterface(InputInterface &i) {
         i.getValue = &InputBase::getValueDefault;
     }
+
+    virtual void setTimeSeries(TimeSeries *_ts) = 0;
+    virtual double getDuration() = 0;
 };
 
 
 
+// /*@GENERATE_PROTO@*/
+// struct InputInfo : public Serializable<Protos::InputInfo> {
+//     InputInfo() : layer_id(0) {}
+
+//     void serial_process() {
+//         begin() << "layer_id: " << layer_id << Self::end;
+//     }
+
+//     size_t layer_id;
+// };
+
 template <typename Constants, typename State>
 class Input : public InputBase {
+public:    
+    void serial_process() {
+        begin() << "Constants: " << c << ", ";
+
+        if (messages->size() == 0) {
+            (*this) << Self::end;
+            return;
+        }
+
+        (*this) << "State: " << s << Self::end;
+    }
+    private:    
+    
 protected:
-    const Constants c;
+    Constants c;
     State s;
 };
 

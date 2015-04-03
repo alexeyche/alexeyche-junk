@@ -13,10 +13,10 @@
 
 
 typedef google::protobuf::Message* ProtoMessage;
-typedef pair<string, ProtoMessage> NamedMessage;
 
 namespace dnn {
 
+class Factory;
 
 class SerializableBase  : public Object {
 friend class Factory;
@@ -25,19 +25,27 @@ public:
     enum EndMarker { end };
 
     typedef SerializableBase Self;
+    static const bool hasProto = false;
+    typedef Protos::EmptyProto ProtoType;
 
-    SerializableBase() : mode(ProcessingOutput) {
+    SerializableBase() : mode(ProcessingOutput), messages(nullptr), header(nullptr) {
 
     }
     virtual ProtoMessage newProto() {
-        cerr << "That shouldn't be called. This method for non protobuf Serializable classes\n";
-        terminate();
+        throw dnnException()<< "That shouldn't be called. This method for non protobuf Serializable classes\n";
     }
 
     virtual ~SerializableBase() {
-        for(auto &m: messages) {
-            delete m.second;
+        if(mode == ProcessingOutput) {
+            if(messages) clean();
         }
+    }
+    
+    void clean() {
+        for(auto &m: *messages) {
+            delete m;
+        }
+        delete messages;
     }
 
     virtual void serial_process() = 0;
@@ -48,27 +56,62 @@ public:
         copy_m->CopyFrom(*m);
         return copy_m;
     }
-
-    void operator << (EndMarker e) {
-        if(mode == ProcessingInput) {
-            cout << "Deleting " << lastMessage()->GetTypeName() << "\n";
-            deleteLastMessage();
+    static Protos::ClassName* getHeader(vector<ProtoMessage> &messages) {
+        if(messages.size() == 0) {
+            throw dnnException()<< "Trying to get header from empty messages stack\n";
         }
+        Protos::ClassName *head = dynamic_cast<Protos::ClassName*>(messages.back());
+        if(!head) {
+            throw dnnException()<< "There is no header on the top of the stack\n";
+            throw dnnException()<< "Got " << messages.back()->GetTypeName() << "\n";
+        }
+        return head;
+    }
+
+    Protos::ClassName* getHeader() {
+        if(messages) {
+            return getHeader(*messages);
+        }
+        throw dnnException()<< "Null messages stack\n";
     }
 
     SerializableBase& begin() {
+        assert(messages);
+        if(mode == ProcessingOutput) {
+            header = new Protos::ClassName;
+
+            header->set_class_name(name());
+            header->set_has_proto(false);
+            header->set_size(0);
+
+            messages->push_back(header);
+        }
+        if(mode == ProcessingInput) {
+            Protos::ClassName *head = getHeader();            
+            if(name() != head->class_name()) {
+                throw dnnException()<< "Error while deserializing. Wrong class name header: " << name() << " != " << head->class_name() << "\n";
+            }
+            deleteCurrentMessage();
+        }
         return *this;
     }
+    void operator << (EndMarker e) {
+        if(mode == ProcessingInput) {
+            //deleteCurrentMessage();
+        }
+    }
+
+    
 
     SerializableBase& operator << (SerializableBase &b) {
         if(mode == ProcessingOutput) {
+            header->set_size(header->size()+1);
             for(auto &m: b.getSerialized()) {
-                addMessage(m.first, m.second);
+                addMessage(m);
             }
         } else
         if(mode == ProcessingInput) {
-            b.getDeserialized(messages);
-            deleteLastMessage();
+            b.getDeserialized(*messages);            
         }
 
         return *this;
@@ -78,77 +121,74 @@ public:
     SerializableBase& operator << (InterfacedPtr<T> &b) {
         if(mode == ProcessingOutput) {
             if(!b.isSet()) {
-                cerr << "Failed to serialize InterfacePtr: it is without an pointer\n";
-                terminate();
-            }
-            Protos::ClassName *cl = new Protos::ClassName;
-            cl->set_class_name(b.ref().name());
-            messages.push_back(NamedMessage("ClassName", cl));
+                throw dnnException()<< "Failed to serialize InterfacePtr: it is without an pointer\n";
+            }            
             (*this) << b.ref();
         } else
         if(mode == ProcessingInput) {
-            cout << lastMessage()->GetTypeName() << "\n";
-            Protos::ClassName *cl = static_cast<Protos::ClassName*>(lastMessage());
-            
-            SerializableBase* o = Factory::inst().createObject(cl->class_name());
-            deleteLastMessage();
-            
-            T* p = dynamic_cast<T*>(o);
+            SerializableBase *pb = Factory::inst().createObject(getHeader()->class_name());
+
+            T* p = dynamic_cast<T*>(pb);
             if(!p) {
-                cerr << "Failed to cast " << o->name() << "\n";
-                terminate();
-            }
+                throw dnnException()<< name() << ": cast error while deserializing interfaced ptr, got " << pb->name() << "\n";
+            }            
             b.set(p);
             (*this) << b.ref();
         }
         return *this;
     }
 
-    vector<NamedMessage>& getSerialized() {
+    vector<ProtoMessage>& getSerialized() {
+        if((mode == ProcessingOutput) && (messages)) clean();
         mode = ProcessingOutput;
-        while(messages.size()>0) deleteLastMessage();
+        
+        messages = new vector<ProtoMessage>;
+
 
         serial_process();
-        return messages;
+        return *messages;
     }
 
-    void getDeserialized(vector<NamedMessage> &inp_mess) {
+    void getDeserialized(vector<ProtoMessage> &inp_mess) {
         mode = ProcessingInput;
-        for(auto &m: inp_mess) {
-            messages.push_back(NamedMessage(m.first, copyM(m.second)));
-        }
+        
+        if(messages) clean();
+        messages = &inp_mess;
+
         serial_process();
     }
 
     SerializableBase& operator << (const char *vraw) {
         return *this;
     }
-    void addMessage(string name, ProtoMessage m) {
-        messages.push_back( NamedMessage(name, copyM(m)) );
+    void addMessage(ProtoMessage m) {
+        assert(messages);
+        messages->push_back( copyM(m) );
     }
 
-    ProtoMessage lastMessage() {
-        if(messages.size() == 0) {
-            cerr << "Trying to get from empty vector of messages\n";
-            terminate();
+    ProtoMessage currentMessage() {
+        assert(messages);
+        if(messages->size() == 0) {
+            throw dnnException()<< "Trying to get from empty vector of messages\n";
         }
-        return messages.back().second;
+        return messages->back();
     }
-    const string& lastMessageName() {
-        if(messages.size() == 0) {
-            cerr << "Trying to get from empty vector of messages\n";
-            terminate();
-        }
-        return messages.back().first;
-    }
-    void deleteLastMessage() {
-        if(!messages.empty()) {
-            delete messages.back().second;
-            messages.pop_back();
+    void deleteCurrentMessage() {
+        assert(messages);
+        if(!messages->empty()) {
+            // cout << name() << " stack: \n\t";
+            // for(size_t i=0; i<(messages->size()-1); ++i) {
+            //     cout << (*messages)[i]->GetTypeName() << ", ";
+            // }
+            //cout << " || " << messages->back()->GetTypeName() << "\n";
+
+            delete messages->back();
+            messages->pop_back();
         }
     }
 protected:
-    vector<NamedMessage> messages;
+    vector<ProtoMessage> *messages;
+    Protos::ClassName *header;
     ProcessMode mode;
 };
 
@@ -157,19 +197,19 @@ template <typename Proto>
 class Serializable : public SerializableBase {
 public:
     #define ASSERT_FIELDS() \
-    if((!messages.size() != 0)||(!field_descr)) {\
-        cerr << "Wrong using of Serializable class.\n"; \
-        terminate(); \
+    if((messages->size() == 0)||(!field_descr)) {\
+        throw dnnException()<< "Wrong using of Serializable class.\n"; \
     }\
 
     typedef Serializable<Proto> Self;
+    typedef Proto ProtoType;
+    static const bool hasProto = true;
 
     const string name() const {
         Proto _fake_m;
         vector<string> spl = split(_fake_m.GetTypeName(), '.');
         if(spl[0] != "Protos") {
-            cerr << "Expection Protos:: typename\n";
-            terminate();
+            throw dnnException()<< "Expection Protos:: typename\n";
         }
         string ret;
         for(size_t i=1; i<spl.size(); ++i) {
@@ -183,9 +223,8 @@ public:
     }
 
     Serializable& operator << (const char *vraw) {
-        if(messages.size() == 0) {
-            cerr << "Serialaling without begin()\n";
-            terminate();
+        if(messages->size() == 0) {
+            throw dnnException()<< "Serialaling without begin()\n";
         }
 
         string v = string(vraw);
@@ -195,23 +234,22 @@ public:
         string fname = v_spl[0];
         trim(fname);
         
-        cout << messages.size() << "\n";
-        cout << "Filling fname " << fname << " (" << lastMessage()->GetTypeName()  << ")\n";
-        const google::protobuf::Descriptor* descriptor = lastMessage()->GetDescriptor();
+        //cout << messages->size() << "\n";
+        // cout << "Filling fname " << fname << " (" << currentMessage()->GetTypeName()  << ")\n";
+        const google::protobuf::Descriptor* descriptor = currentMessage()->GetDescriptor();
         field_descr = descriptor->FindFieldByName(fname);
 
         if(!field_descr) {
-            cerr << "Can't find proto field by name " << fname << "\n";
-            terminate();
+            throw dnnException()<< "Can't find proto field by name " << fname << "\n";
         }
         return *this;
     }
     Serializable& operator << (double &v) {
         ASSERT_FIELDS()
         if(mode == ProcessingOutput) {
-            lastMessage()->GetReflection()->SetDouble(lastMessage(), field_descr, v);
+            currentMessage()->GetReflection()->SetDouble(currentMessage(), field_descr, v);
         } else {
-            v = lastMessage()->GetReflection()->GetDouble(*lastMessage(), field_descr);
+            v = currentMessage()->GetReflection()->GetDouble(*currentMessage(), field_descr);
         }
         return *this;
     }
@@ -219,9 +257,9 @@ public:
     Serializable& operator << (bool &v) {
         ASSERT_FIELDS()
         if(mode == ProcessingOutput) {
-            lastMessage()->GetReflection()->SetBool(lastMessage(), field_descr, v);
+            currentMessage()->GetReflection()->SetBool(currentMessage(), field_descr, v);
         } else {
-            v = lastMessage()->GetReflection()->GetBool(*lastMessage(), field_descr);
+            v = currentMessage()->GetReflection()->GetBool(*currentMessage(), field_descr);
         }
         return *this;
     }
@@ -229,35 +267,103 @@ public:
     Serializable& operator << (size_t &v) {
         ASSERT_FIELDS()
         if(mode == ProcessingOutput) {
-            lastMessage()->GetReflection()->SetUInt32(lastMessage(), field_descr, v);
+            currentMessage()->GetReflection()->SetUInt32(currentMessage(), field_descr, v);
         } else {
-            v = lastMessage()->GetReflection()->GetUInt32(*lastMessage(), field_descr);
+            v = currentMessage()->GetReflection()->GetUInt32(*currentMessage(), field_descr);
         }
         return *this;
     }
-
+    Serializable& operator << (int &v) {
+        ASSERT_FIELDS()
+        if(mode == ProcessingOutput) {
+            currentMessage()->GetReflection()->SetInt32(currentMessage(), field_descr, v);
+        } else {
+            v = currentMessage()->GetReflection()->GetInt32(*currentMessage(), field_descr);
+        }
+        return *this;
+    }
     Serializable& operator << (string &v) {
         ASSERT_FIELDS()
         if(mode == ProcessingOutput) {
-           lastMessage()->GetReflection()->SetString(lastMessage(), field_descr, v);
+
+           currentMessage()->GetReflection()->SetString(currentMessage(), field_descr, v);
         } else {
-           v = lastMessage()->GetReflection()->GetString(*lastMessage(), field_descr);
+           v = currentMessage()->GetReflection()->GetString(*currentMessage(), field_descr);
         }
         return *this;
     }
-
+    Serializable& operator << (vector<string> &v) {
+        ASSERT_FIELDS()
+        if(mode == ProcessingOutput) {
+            for(size_t i=0; i<v.size(); ++i) {
+                currentMessage()->GetReflection()->AddString(currentMessage(), field_descr, v[i]);
+            }
+        } else {
+            size_t cur = currentMessage()->GetReflection()->FieldSize(*currentMessage(), field_descr);
+            for(size_t i=0; i<cur; ++i) {
+                string subv = currentMessage()->GetReflection()->GetRepeatedString(*currentMessage(), field_descr, i);
+                v.push_back(subv);
+            }
+        }
+        return *this;
+    }
+    Serializable& operator << (vector<size_t> &v) {
+        ASSERT_FIELDS()
+        if(mode == ProcessingOutput) {
+            for(size_t i=0; i<v.size(); ++i) {
+                currentMessage()->GetReflection()->AddUInt32(currentMessage(), field_descr, v[i]);
+            }
+        } else {
+            size_t cur = currentMessage()->GetReflection()->FieldSize(*currentMessage(), field_descr);
+            for(size_t i=0; i<cur; ++i) {
+                size_t subv = currentMessage()->GetReflection()->GetRepeatedUInt32(*currentMessage(), field_descr, i);
+                v.push_back(subv);
+            }
+        }
+        return *this;
+    }
+    Serializable& operator << (vector<double> &v) {
+        ASSERT_FIELDS()
+        if(mode == ProcessingOutput) {
+            for(size_t i=0; i<v.size(); ++i) {
+                currentMessage()->GetReflection()->AddDouble(currentMessage(), field_descr, v[i]);
+            }
+        } else {
+            size_t cur = currentMessage()->GetReflection()->FieldSize(*currentMessage(), field_descr);
+            for(size_t i=0; i<cur; ++i) {
+                double subv = currentMessage()->GetReflection()->GetRepeatedDouble(*currentMessage(), field_descr, i);
+                v.push_back(subv);
+            }
+        }
+        return *this;
+    }
     void operator << (EndMarker e) {
-       if(mode == ProcessingInput) {
-            cout << "Deleting " << lastMessage()->GetTypeName() << "\n";
-            deleteLastMessage();
-        } 
+        if(mode == ProcessingInput) {
+            deleteCurrentMessage();
+        }
     }
 
 
     Serializable& begin() {
         if(mode == ProcessingOutput) {
+            header = new Protos::ClassName;
+
+            header->set_class_name(name());
+            header->set_has_proto(true);
+            header->set_size(0);
+            
+            messages->push_back(header);
+            
             ProtoMessage mess = new Proto;
-            addMessage(name(), mess);
+            
+            messages->push_back(mess);
+        }
+        if(mode == ProcessingInput) {
+            Protos::ClassName *head = getHeader();
+            if(name() != head->class_name()) {
+                throw dnnException()<< "Error while deserializing. Wrong class name header: " << name() << " != " << head->class_name() << "\n";
+            }
+            deleteCurrentMessage();
         }
         return *this;
     }

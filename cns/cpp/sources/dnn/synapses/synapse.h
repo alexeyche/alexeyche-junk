@@ -1,6 +1,7 @@
 #pragma once
 
 #include <dnn/io/serialize.h>
+#include <dnn/util/statistics.h>
 
 namespace dnn {
 
@@ -8,31 +9,95 @@ namespace dnn {
 struct SynapseInterface {
 	stateDelegate propagateSpike;
 	calculateDynamicsDelegate calculateDynamics;
+	retDoubleDelegate getMembranePotential;
 };
 
+class Network;
+class SpikeNeuronBase;
+class Builder;
 
 class SynapseBase : public SerializableBase {
+friend class Network;
+friend class SpikeNeuronBase;
+friend class Builder;
 public:
 	typedef SynapseInterface interface;
 
-	virtual void propagateSpike() = 0;
-	virtual void calculateDynamics(const Time &t) = 0;
+	inline const size_t& getIdPre() { 
+		return id_pre;
+	}
 
+	virtual void propagateSpike() = 0;
+	virtual double getMembranePotential() = 0;
+	virtual void calculateDynamics(const Time &t) = 0;
 	virtual void provideInterface(SynapseInterface &i) = 0;
 
 	static void provideDefaultInterface(SynapseInterface &i) {
-		cerr << "No default interface for Synapse\n";
-		terminate();
+		throw dnnException()<< "No default interface for Synapse\n";
 	}
+	Statistics& getStat() {
+		return stat; 
+	}
+protected:
+	size_t id_pre;
+	double dendrite_delay;
+	double weight;
+
+	Statistics stat;
 };
+
+
+/*@GENERATE_PROTO@*/
+struct SynapseInfo : public Serializable<Protos::SynapseInfo> {
+	void serial_process() {
+		begin() << "id_pre: " 		  << id_pre 		<< ", " \
+		        << "dendrite_delay: " << dendrite_delay << ", " \
+		        << "weight: " 		  << weight 		<< Self::end;
+	}
+	size_t id_pre;
+	double dendrite_delay;
+	double weight;
+};
+
 
 
 template <typename Constants, typename State>
 class Synapse : public SynapseBase {
 
+public:	
+	SynapseInfo getInfo() {
+		SynapseInfo info;
+		info.id_pre = id_pre;
+		info.dendrite_delay = dendrite_delay;
+		info.weight = weight;
+		return info;
+	}
+
+	void serial_process() {
+		begin() << "Constants: " << c;
+
+		if (messages->size() == 0) {
+			(*this) << Self::end;
+			return;
+		}
+
+		(*this) << "State: " << s;
+
+		if (messages->size() == 0) {
+			(*this) << Self::end;
+			return;
+		}
+		SynapseInfo info;
+		if (mode == ProcessingOutput) {
+			info = getInfo();
+		}
+
+		(*this) << "SynapseInfo: "   << info;
+		(*this) << Self::end;
+	}
 protected:
 	State s;
-	const Constants c;
+	Constants c;
 };
 
 

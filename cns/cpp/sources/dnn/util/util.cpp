@@ -115,14 +115,24 @@ long getFileSize(string filename) {
     return rc == 0 ? stat_buf.st_size : -1;
 }
 
+bool fileExists(const std::string& name) {
+    ifstream f(name.c_str());
+    if (f.good()) {
+        f.close();
+        return true;
+    } else {
+        f.close();
+        return false;
+    }   
+}
+
 bool strStartsWith(const string &s, const string &prefix) {
     return s.substr(0, prefix.size()) == prefix;
 }
 
 vector<double> parseParenthesis(const string &s) {
     if((std::count(s.begin(), s.end(), '(') != 1)||(std::count(s.begin(), s.end(), ')') != 1)) {
-        cerr << "Bad string to parse parenthesis: " << s << "\n";
-        terminate();
+        throw dnnException()<< "Bad string to parse parenthesis: " << s << "\n";
     }
     vector<string> left_side = split(s, '(');
     vector<string> right_side = split(left_side.back(), ')');
@@ -153,6 +163,39 @@ vector<IndexSlice> dispatchOnThreads(size_t elements_size, size_t jobs) {
     }
     return out;
 }
-
+void replaceAll( string &s, const string &search, const string &replace ) {
+    for( size_t pos = 0; ; pos += replace.length() ) {
+        // Locate the substring to replace
+        pos = s.find( search, pos );
+        if( pos == string::npos ) break;
+        // Replace by erasing and inserting
+        s.erase( pos, search.length() );
+        s.insert( pos, replace );
+    }
+}
+map<string, string> parseArgOptionsPairs(const vector<string> &opts) {
+    map<string, string> opt_pairs;
+    for(size_t i=0; i<opts.size(); i+=2) {
+        if ((i+1) >= opts.size()) {
+            throw dnnException()<< "Free option without an argument: " << opts[i] << "\n";
+        }
+        string optname = opts[i];
+        string optvalue =  opts[i+1];
+        
+        size_t startpos = optname.find_first_not_of("--");
+        if( string::npos != startpos ) {
+            optname = optname.substr( startpos );
+        } else {
+            throw dnnException()<< "Free option must be like that: --free-option\n" << "\t got " << optname << "\n";
+        }
+        opt_pairs.insert(
+            std::make_pair(
+                "@" + optname, 
+                optvalue
+            )
+        );
+    }
+    return opt_pairs;
+}
 
 }

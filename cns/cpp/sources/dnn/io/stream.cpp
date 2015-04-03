@@ -9,36 +9,37 @@ namespace dnn {
 //     v.processStream(*this);
 //     return *this;
 // }
+
+
+
+
 void Stream::writeObject(SerializableBase *b) {
-	if(!isOutput()) {
-		cerr << "Stream isn't open in output mode. Need output stream\n";
-		terminate();
+	if (!isOutput()) {
+		throw dnnException()<< "Stream isn't open in output mode. Need output stream\n";
 	}
 
-	vector<NamedMessage> messages = b->getSerialized();
-	Protos::ClassName cl;
-	cl.set_class_name(b->name());
-	cl.set_size(messages.size());
+	vector<ProtoMessage> messages = b->getSerialized();
 
-	if(getRepr() == Text) {
+	if (getRepr() == Text) {
+		vector<string> buff;
 		Document d;
 		Value o(kObjectType);
 		Value sub_o(kObjectType);
-		for(auto &m: messages) {
-			Document *sub_d = Json::parseProtobuf(m.second);
-			sub_o.AddMember(StringRef(m.first.c_str()), *sub_d, d.GetAllocator());
+		for (auto &m : messages) {
+			Document *sub_d = Json::parseProtobuf(m);
+			buff.push_back(m->GetTypeName());
+			sub_o.AddMember(StringRef(buff.back().c_str()), *sub_d, d.GetAllocator());
 		}
-		o.AddMember(StringRef(cl.class_name().c_str()), sub_o, d.GetAllocator());
+		string temps = b->name();
+		o.AddMember(StringRef(temps.c_str()), sub_o, d.GetAllocator());
 
 		(*_output_str) << Json::stringify(o);
-	} else
-	if(getRepr() == Binary) {
-		writeBinaryMessage(&cl, _output_str);
-		for(auto &m : messages) {
-			Protos::ClassName sub_cl;
-			sub_cl.set_class_name(m.first);
-			writeBinaryMessage(&sub_cl, _output_str);
-			writeBinaryMessage(m.second, _output_str);
+	} else if (getRepr() == Binary) {
+		for (auto &m : messages) {
+			// cout << "==============================\n";
+			// cout << m->GetTypeName() << "\n";
+			// cout << m->DebugString();
+			writeBinaryMessage(m, _output_str);
 		}
 	}
 
@@ -46,30 +47,96 @@ void Stream::writeObject(SerializableBase *b) {
 
 #define P(condition) {if(!condition) { printf( "\n FAILURE in %s, line %d\n", __FILE__, __LINE__ );exit( 1 );}}
 
+void Stream::protoReader(vector<ProtoMessage> &messages) {
+	Protos::ClassName *cl = new Protos::ClassName;
+	bool ok = readBinaryMessage(cl, _input_str);
+	if (!ok) return;
+
+	messages.push_back(cl);
+
+	if (cl->has_proto()) {
+		ProtoMessage pr = Factory::inst().createProto(cl->class_name());
+		P(readBinaryMessage(pr, _input_str));
+		messages.push_back(pr);
+	}
+
+	for (size_t i = 0; i < cl->size(); ++i) {
+		protoReader(messages);
+	}
+
+}
+
+void Stream::jsonReader(string name, const Value &v, vector<ProtoMessage> &messages) {
+	// json to protobuf
+	vector<string> name_spl = split(name, '_');
+	if(name_spl.size()>0) {
+		name = name_spl[0];
+	} 
+	Protos::ClassName *cl = new Protos::ClassName;
+	cl->set_class_name(name);
+	messages.push_back(cl);
+
+	bool has_object = false;
+	for (Value::ConstMemberIterator itr = v.MemberBegin(); itr != v.MemberEnd(); ++itr) {
+		if (itr->value.IsObject()) {
+			jsonReader(itr->name.GetString(), itr->value, messages);
+			has_object = true;
+		}
+	}
+	if (!has_object) {
+
+		if (!Factory::inst().isProtoType(name)) {
+			// trying to deduce proto name
+			if (!Factory::inst().isProtoType(name + string("C"))) {
+				throw dnnException()<<  "Erros while reading " << name << ": unkwnown proto type\n";
+			}
+			name += string("C");
+			Protos::ClassName *ccl = new Protos::ClassName;
+			ccl->set_class_name(name);
+			messages.push_back(ccl);
+		}
+		ProtoMessage m = Factory::inst().createProto(name);
+		Json::JsonToProtobuf(v, m);
+		messages.push_back(m);
+	}
+}
+
+vector<ProtoMessage> Stream::readObjectProtos() {
+	vector<ProtoMessage> messages;
+	if (r == Binary) {
+		protoReader(messages);
+	}
+	if (r == Text) {
+		if (!iterator->value.IsObject()) {
+			throw dnnException()<< "Fail to read " << Json::stringify(iterator->value) << ". Expected object\n";
+		}
+		if (iterator == document.MemberEnd()) {
+			return messages;
+		}
+		jsonReader(iterator->name.GetString(), iterator->value, messages);
+		iterator++;
+	}
+	return messages;
+}
+
 SerializableBase* Stream::readObject() {
-	if(!isInput()) {
-		cerr << "Stream isn't open in input mode. Need input stream\n";
-		terminate();
-	}
-	Protos::ClassName cl;
-	P(readBinaryMessage(&cl, _input_str));
 
-	assert(cl.has_size());
-	SerializableBase* o = Factory::inst().createObject(cl.class_name());
-
-	vector<NamedMessage> messages;
-	for(size_t i=0; i<cl.size(); ++i) {
-		Protos::ClassName sub_cl;
-		P(readBinaryMessage(&sub_cl, _input_str));
-		cout << "Creating " << sub_cl.class_name() << "\n";
-		SerializableBase *sub_o = Factory::inst().createObject(sub_cl.class_name());
-		ProtoMessage m = sub_o->newProto();
-		P(readBinaryMessage(m, _input_str));
-		messages.push_back( NamedMessage(sub_o->name(), m) );
+	if (!isInput()) {
+		throw dnnException()<< "Stream isn't open in input mode. Need input stream\n";
 	}
+
+	vector<ProtoMessage> messages = readObjectProtos();
+	
+	if(messages.size() == 0) {
+		return nullptr;
+	}
+	
 	std::reverse(messages.begin(), messages.end());
-	o->getDeserialized(messages);
 
+	Protos::ClassName *head = SerializableBase::getHeader(messages);
+
+	SerializableBase *o = Factory::inst().createObject(head->class_name());
+	o->getDeserialized(messages);
 	return o;
 }
 

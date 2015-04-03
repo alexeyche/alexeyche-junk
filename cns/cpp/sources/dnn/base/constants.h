@@ -5,161 +5,115 @@
 #include <dnn/contrib/rapidjson/stringbuffer.h>
 #include <dnn/contrib/rapidjson/prettywriter.h>
 #include <dnn/contrib/rapidjson/filestream.h>
-#include <dnn/contrib/rapidjson/error/en.h>
 
-#include <dnn/util/distributions.h>
 #include <dnn/util/json.h>
+#include <dnn/base/exceptions.h>
 
 namespace dnn {
 
 using namespace rapidjson;
 
-struct LayerConfiguration : public Printable {
-	LayerConfiguration(size_t _size, string _neuron, string _act_function, uptr<Distribution<double>> _axon_delay_distr) :
-		size(_size), neuron(_neuron), act_function(_act_function), axon_delay_distr(std::move(_axon_delay_distr)) {}
-	
-	LayerConfiguration(LayerConfiguration&& other) : 
-		size(other.size), neuron(other.neuron), act_function(other.act_function), axon_delay_distr(std::move(other.axon_delay_distr)) {}
-
-	size_t size;
-	string neuron;
-	string act_function;
-	uptr<Distribution<double>> axon_delay_distr;
-
-	void print(ostream &o) const {
-		o << "size: " << size << ", neuron: " << neuron << ", act_function: " << act_function << ", axon_delay_distr: " << *(axon_delay_distr.get());
-		//axon_delay_distr->print(o);
-	}
-private:
-	LayerConfiguration(const LayerConfiguration& other) {}	
-    LayerConfiguration& operator=(const LayerConfiguration& other) { return *this; }
-};
-
-struct ConnConfiguration : public Printable {
-	ConnConfiguration(double _prob, string _synapse, uptr<Distribution<double>> _weight_distr, uptr<Distribution<double>> _dendrite_delay_distr) :
-			prob(_prob), synapse(_synapse), weight_distr(std::move(_weight_distr)), dendrite_delay_distr(std::move(_dendrite_delay_distr)) {}
-	
-	ConnConfiguration(ConnConfiguration&& other) : 
-		prob(other.prob), synapse(other.synapse), weight_distr(std::move(other.weight_distr)), dendrite_delay_distr(std::move(other.dendrite_delay_distr)) {}
-
-	double prob;
-	string synapse;
-	uptr<Distribution<double>> weight_distr;
-	uptr<Distribution<double>> dendrite_delay_distr;
-
-	void print(ostream &o) const {
-		o << "prob: " <<  prob << ", synapse: " << synapse <<  ", weight_distr: " << *(weight_distr.get()) << ", dendrite_delay_distr: " << *(dendrite_delay_distr.get());
-	}
-private:
-    ConnConfiguration(const ConnConfiguration& other) {}
-    ConnConfiguration& operator=(const ConnConfiguration& other) { return *this; }
-};
 
 struct SimConfiguration : public Printable {
-	vector<LayerConfiguration> layers;
-	map< pair<size_t, size_t>, ConnConfiguration> conn_map;
+	vector<string> layers;
+	multimap< pair<size_t, size_t>, string> conn_map;
 	double dt;
 	int seed;
-	vector<size_t> neurons_to_listen; 
-
+	vector<size_t> neurons_to_listen;
+	map<string, string> files;
+	
 	void print(ostream &o) const {
 		o << "layers: \n";
-		for(auto &v : layers) {
+		for (auto &v : layers) {
 			o << "\t" <<  v << "\n";
 		}
 		o << "conn_map: \n";
-		for(auto &v : conn_map) {
+		for (auto &v : conn_map) {
 			o << "\t" <<  v.first.first << "->" << v.first.second << " " << v.second << "\n";
 		}
 		o << "dt: " << dt << "\n";
 		o << "seed: " << seed << "\n";
 		o << "neurons_to_listen: ";
-		for(auto &v : neurons_to_listen) { o << v << ", "; }
+		for (auto &v : neurons_to_listen) { o << v << ", "; }
 		o << "\n";
 	}
 };
 
 
 struct Constants : public Printable {
-	Constants(const string& fname) {
-		std::ifstream ifs(fname);
-		std::string const_json((std::istreambuf_iterator<char>(ifs)),
-                 std::istreambuf_iterator<char>());
-		
-		Document document;
-
-		
-		document.Parse(const_json.c_str());
-		
-		if(document.HasParseError()) {
-			vector<string> spl = split(const_json, '\n');
-			int offset = document.GetErrorOffset();
-			size_t line_num = 0;
-			while(line_num < spl.size()) {
-				cout << line_num+1 << ": " <<  spl[line_num]  << "\n";
-				if( (offset - (int)spl[line_num].size())<0 ) { cout << " == somewhere in that structure an error\n"; break; }
-				offset -= spl[line_num].size();
-				line_num++;
-			}
-			cerr << "Parse JSON error:\n";
-			cerr << GetParseError_En(document.GetParseError()) << line_num+1 << ":" << offset << "\n";
-			terminate();
+	enum ReadMod {FromString, FromFile};
+	Constants(const string& s, OptMods mods = OptMods(), ReadMod mod = FromFile) {
+		string const_json;
+		if(mod == FromFile) {
+			std::ifstream ifs(s);
+			const_json = std::string((std::istreambuf_iterator<char>(ifs)),
+			                       std::istreambuf_iterator<char>());
+		} else
+		if(mod == FromString) {
+			const_json = s;
 		}
+		for(auto it=mods.begin(); it != mods.end(); ++it) {
+			replaceAll(const_json, it->first, it->second);
+		}
+
+		Document document = Json::parseString(const_json);		
 
 		fill(Json::getVal(document, "neurons"), neurons);
 		fill(Json::getVal(document, "act_functions"), act_functions);
 		fill(Json::getVal(document, "synapses"), synapses);
+		fill(Json::getVal(document, "inputs"), inputs);
 
 		const Value &sim_conf_doc = Json::getVal(document, "sim_configuration");
 		const Value &layers_doc = Json::getArray(sim_conf_doc, "layers");
-		
+
 		for (SizeType i = 0; i < layers_doc.Size(); i++) {
 			const Value &v = layers_doc[i];
-			LayerConfiguration lc(
-				Json::getUintVal(v, "size"), 
-				Json::getStringVal(v, "neuron"), 
-				Json::getStringVal(v, "act_function"),
-				parseDistribution<double>(Json::getStringValDef(v, "axon_delay_distr", "Exp(0,0)"))
-			);
-			sim_conf.layers.push_back(std::move(lc));
+			sim_conf.layers.push_back(Json::stringify(v));
 		}
 		const Value &conn_map_doc = Json::getVal(sim_conf_doc, "conn_map");
 
 		for (Value::ConstMemberIterator itr = conn_map_doc.MemberBegin(); itr != conn_map_doc.MemberEnd(); ++itr) {
 			const string k = itr->name.GetString();
 			vector<string> aff = splitBySubstr(k, "->");
-            if(aff.size() != 2) {
-                cerr << "conn_map configuration not right: need 2 afferents separated by \"->\"\n";
-                terminate();
-            }
+			if (aff.size() != 2) {
+				throw dnnException() << "conn_map configuration not right: need 2 afferents separated by \"->\"\n";
+			}
 
-            const pair<size_t, size_t> aff_p(stoi(aff[0]), stoi(aff[1]));
-            const Value &conns = itr->value;
-            if(!conns.IsArray()) { cerr << "conn_map must be array\n"; terminate(); }
+			const pair<size_t, size_t> aff_p(stoi(aff[0]), stoi(aff[1]));
+			const Value &conns = itr->value;
 
-            for (SizeType i = 0; i < conns.Size(); i++) {
-            	const Value &v = conns[i];
-            	ConnConfiguration conn_conf(
-            		Json::getDoubleVal(v, "prob"), 
-            		Json::getStringVal(v, "synapse"),	
-            		parseDistribution<double>(Json::getStringVal(v, "weight_distr")),
-            		parseDistribution<double>(Json::getStringValDef(v, "dendrite_delay_distr", "Exp(0,0)"))
-            	);
-            	sim_conf.conn_map.insert( pair<pair<size_t,size_t>, ConnConfiguration>(aff_p, std::move(conn_conf)) );
-            }
+			for (SizeType i = 0; i < conns.Size(); i++) {
+				const Value &v = conns[i];
+				sim_conf.conn_map.insert( pair<pair<size_t, size_t>, string>(aff_p, Json::stringify(v) ));
+			}
 		}
 		sim_conf.dt = Json::getDoubleVal(sim_conf_doc, "dt");
 		sim_conf.seed = Json::getIntVal(sim_conf_doc, "seed");
+		if(sim_conf.seed < 0) {
+			std::srand ( unsigned ( std::time(0) ) );
+		} else {
+			std::srand ( sim_conf.seed );
+		}
 		sim_conf.neurons_to_listen = Json::getUintVector(sim_conf_doc, "neurons_to_listen");
+		const Value &files_doc = Json::getVal(sim_conf_doc, "files");
+		for (Value::ConstMemberIterator itr = files_doc.MemberBegin(); itr != files_doc.MemberEnd(); ++itr) {
+			const string k = itr->name.GetString();
+			sim_conf.files[k] = Json::stringify(itr->value);
+		}
 	}
-			
+
 
 	static void fill(const Value &v, map<string, string> &m) {
 		for (Value::ConstMemberIterator itr = v.MemberBegin(); itr != v.MemberEnd(); ++itr) {
-		    m[itr->name.GetString()] = Json::stringify(itr->value);
+			Document d;
+			Value cv(kObjectType);
+			Value copy_v;
+			copy_v.CopyFrom(itr->value, d.GetAllocator());
+			cv.AddMember(StringRef(itr->name.GetString()), copy_v, d.GetAllocator());
+			m[itr->name.GetString()] = Json::stringify(cv);
 		}
 	}
-	
+
 	void print(ostream &o) const {
 		print_section("neurons: ", neurons, o);
 		print_section("act_functions: ", act_functions, o);
@@ -169,17 +123,19 @@ struct Constants : public Printable {
 	}
 	static void print_section(const string &sect_name, const map<string, string> &m, ostream &o) {
 		o << sect_name << "\n";
-		for(auto it = m.begin(); it != m.end(); ++it) {
+		for (auto it = m.begin(); it != m.end(); ++it) {
 			o << "\t" << it->first << ": ";
-			for( auto &s: split(it->second, '\n') ) {
-				o << "\t" <<  s << "\n";	
+			for ( auto &s : split(it->second, '\n') ) {
+				o << "\t" <<  s << "\n";
 			}
 		}
 	}
 
+
 	map<string, string> neurons;
 	map<string, string> act_functions;
 	map<string, string> synapses;
+	map<string, string> inputs;
 	SimConfiguration sim_conf;
 };
 

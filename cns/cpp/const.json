@@ -1,19 +1,38 @@
 {
+    "inputs" : {
+        "InputTimeSeries" : {
+            "dt" : 1.0
+        }
+    },
     "neurons" : {
         "LeakyIntegrateAndFire" : {
-            "R" : 1.0,
-            "C" : 10
+            "gL" : 0.1,
+            "C" : 1.0,
+            "leak" : 5.0,
+            "rest_pot" : 0.0,
+            "tau_ref" : 2.0,
+            "noise" : 0.5
         }
     },
     "act_functions" : {
         "Determ" : {
-            "treshold" : 10.0        
+            "treshold" : 10.0
         }
     },        
     "synapses" : {
         "StaticSynapse" : {
             "psp_decay" : 15.0,
             "amp" : 1.0
+        },
+        "StaticSynapse_inh" : {
+            "psp_decay" : 30.0,
+            "amp" : -1.0
+        },
+        "STDSynapse" : {
+            "psp_decay" : 2.0,
+            "amp" : 1.0,
+            "gamma" : 0.65,
+            "tau_d" : 400
         }
     },
     "sim_configuration" : {
@@ -22,16 +41,34 @@
                 "size" : 50,
                 "neuron" : "LeakyIntegrateAndFire",
                 "act_function" : "Determ",
-                "axon_delay_distr" : "Exp(0,0)"
+                "axon_delay" : "Exp(12,5)",
+                "input" : "InputTimeSeries"
+            },
+            {
+                "size" : 50,
+                "neuron" : "LeakyIntegrateAndFire",
+                "act_function" : "Determ",
+                "axon_delay" : "Exp(12,5)"
             }
         ],
         "conn_map" : {
-            "0->0" : [
-                { "prob" : 0.5, "weight_distr" : "Norm(10.6, 0.1)", "synapse" : "StaticSynapse", "dendrite_delay_distr" : "Exp(0,0)" }
+            "0->1" : [
+                { "prob" : 0.5, "synapse" : "STDSynapse", "dendrite_delay" : "Exp(12,5)", "start_weight" : 1 }
             ]
         },
         "dt" : 1.0,
         "seed" : -1,
-        "neurons_to_listen" : [25]
+        "neurons_to_listen" : [25,51],
+        "files" : {
+            "InputTimeSeries" : { 
+                "filename" : "@ucr-input",
+                "format" : "ucr-ts"
+            },
+            "InputTimeSeries" : { 
+                "filename" : "@pb-input",
+                "format" : "protobin"
+            }
+
+        }
     }
 }    

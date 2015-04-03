@@ -25,6 +25,7 @@ set(DIRS
     base
     contrib
     neurons
+    inputs
 )
 
 foreach(dir ${DIRS})
@@ -44,7 +45,22 @@ target_link_libraries(dnn
 
 )
 install(TARGETS dnn  DESTINATION lib/ COMPONENT)
-install(DIRECTORY ../sources DESTINATION include/dnn
-    FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp")
-install(DIRECTORY ${CMAKE_BINARY_DIR}/protos DESTINATION include/dnn
-    FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp")
+
+install(
+    DIRECTORY 
+    ${PROJECT_SOURCE_DIR}
+    DESTINATION 
+    include
+    FILES_MATCHING 
+    PATTERN "*.h" 
+    PATTERN "*.hpp"
+)
+install(
+    DIRECTORY 
+    ${CMAKE_BINARY_DIR}/dnn/protos 
+    DESTINATION 
+    include/dnn
+    FILES_MATCHING 
+    PATTERN "*.h" 
+    PATTERN "*.hpp"
+)

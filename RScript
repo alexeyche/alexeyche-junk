@@ -6,9 +6,9 @@ for var in "$@"; do
     args=$args" "$var    
 done
 if [ -z "$args" ]; then
-    /usr/local/bin/R -q --no-save
+    /usr/bin/R -q --no-save
 else    
     file=$R_CUSTOM
     R_CUSTOM=
-    /usr/local/bin/R -q --no-save -f $file --args $args
+    /usr/bin/R -q --no-save -f $file --args $args
 fi

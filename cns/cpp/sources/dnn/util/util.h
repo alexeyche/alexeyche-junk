@@ -29,7 +29,7 @@ double getNorm();
 string strip_white(const string& input);
 string strip_comments(const string& input, const string& delimiters);
 long getFileSize(string filename);
-
+bool fileExists(const std::string& name);
 bool strStartsWith(const string &s, const string &prefix);
 
 struct IndexSlice {
@@ -37,6 +37,7 @@ struct IndexSlice {
     size_t from;
     size_t to;
 };
+void replaceAll( string &s, const string &search, const string &replace );
 
 vector<IndexSlice> dispatchOnThreads(size_t elements_size, size_t jobs);
 
@@ -44,13 +45,12 @@ vector<IndexSlice> dispatchOnThreads(size_t elements_size, size_t jobs);
 	try {	\
 		X;	\
 	} catch {	\
-		cerr << "Error!\n"; \
-		terminate();	\
+		throw dnnException()<< "Error!\n"; \
 	}\
 
 
 vector<double> parseParenthesis(const string &s);
-
+map<string, string> parseArgOptionsPairs(const vector<string> &opts);
 
 
 }

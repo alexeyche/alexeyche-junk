@@ -17,25 +17,57 @@ class Stream {
 public:
     enum Repr { Binary, Text };
 
-    Stream(istream &str, Repr _r = Binary) : _input_str(&str), r(_r), _output_str(nullptr), zeroOut(nullptr), codedOut(nullptr) {
+    Stream(istream &str, Repr _r = Binary, bool _destroy_stream=false) 
+    : _input_str(&str)
+    , r(_r)
+    , destroy_stream(_destroy_stream)
+    , _output_str(nullptr)
+    , zeroOut(nullptr)
+    , codedOut(nullptr)
+    ,zeroIn(nullptr)
+    , codedIn(nullptr) 
+    {
         if((_input_str)&&(!_input_str->good())) {
-            cerr << "Input filestream isn't open\n";
-            terminate();
+            throw dnnException()<< "Input filestream isn't open\n";
         }
-        zeroIn = new IstreamInputStream(_input_str);
-        codedIn = new CodedInputStream(zeroIn);
-        codedIn->SetTotalBytesLimit(300.0 * 1024 * 1024,300.0 * 1024 * 1024);
+        if(r == Binary) {        
+            zeroIn = new IstreamInputStream(_input_str);
+            codedIn = new CodedInputStream(zeroIn);
+            codedIn->SetTotalBytesLimit(300.0 * 1024 * 1024,300.0 * 1024 * 1024);
+        }
+        if(r == Text) {
+            string jstr((std::istreambuf_iterator<char>(*_input_str)), std::istreambuf_iterator<char>());
+            document = Json::parseString(jstr);
+            assert(document.IsObject());
+            iterator = document.MemberBegin();
+        }
+
+
 
     }
-    Stream(ostream &str, Repr _r = Binary) : _output_str(&str), r(_r), _input_str(nullptr), zeroIn(nullptr), codedIn(nullptr) {
+    Stream(ostream &str, Repr _r = Binary, bool _destroy_stream=false) 
+    : _output_str(&str)
+    , r(_r)
+    , _input_str(nullptr)
+    , destroy_stream(_destroy_stream)
+    , zeroIn(nullptr)
+    , codedIn(nullptr)
+    , zeroOut(nullptr)
+    , codedOut(nullptr) 
+    {
         if((_output_str)&&(!_output_str->good())) {
-            cerr << "Output filestream isn't open\n";
-            terminate();
+            throw dnnException()<< "Output filestream isn't open\n";
         }
-        zeroOut = new OstreamOutputStream(_output_str);
-        codedOut = new CodedOutputStream(zeroOut);
+        if(r == Binary) {
+            zeroOut = new OstreamOutputStream(_output_str);
+            codedOut = new CodedOutputStream(zeroOut);
+        }
     }
     ~Stream() {
+        if(destroy_stream) {
+            if(_output_str) delete _output_str;
+            if(_input_str) delete _input_str;
+        }
         if(codedIn)  delete codedIn;
         if(zeroIn)   delete zeroIn;
         if(codedOut) delete codedOut;
@@ -49,20 +81,33 @@ public:
         if(_input_str) return true;
         return false;
     }
-     istream& getInputStream() {
+    istream& getInputStream() {
         if(_input_str) return *_input_str;
-        cerr << "Stream is wrongly opened or used\n";
-        terminate();
+        throw dnnException()<< "Stream is wrongly opened or used\n";
     }
     ostream& getOutputStream() {
         if(_output_str) return *_output_str;
-        cerr << "Stream is wrongly opened or used\n";
-        terminate();
+        throw dnnException()<< "Stream is wrongly opened or used\n";
     }
 
     void writeObject(SerializableBase *b);
     SerializableBase* readObject();
 
+    template <typename T>
+    T* readObject() {
+        SerializableBase *b = readObject();
+        if(!b) return nullptr;
+        
+        T *d = dynamic_cast<T*>(b);
+        if(!d) {
+            throw dnnException()<< "Failed to cast from " << b->name() << "\n";
+        }
+        return d;
+    }
+    vector<ProtoMessage> readObjectProtos();
+    void protoReader(vector<ProtoMessage> &messages);
+    void jsonReader(string name, const Value &v, vector<ProtoMessage> &messages);
+    
     Repr getRepr() {
         return r;
     }
@@ -74,8 +119,7 @@ public:
         }
         CodedInputStream::Limit limit = codedIn->PushLimit(size);
         if(!mess->ParseFromCodedStream(codedIn)) {
-                cerr << "Can't parse message with size " << size << "\n";
-                terminate();
+                throw dnnException()<< "Can't parse message with size " << size << "\n";
         }
         codedIn->PopLimit(limit);
         return true;
@@ -83,13 +127,12 @@ public:
 
     void writeBinaryMessage(ProtoMessage mess, ostream *str) {
         if(!mess) {
-            cerr << "Trying to write null binary message\n";
+            throw dnnException()<< "Trying to write null binary message\n";
         }
         google::protobuf::uint32 size = mess->ByteSize();
         codedOut->WriteVarint32(size);
         mess->SerializeToCodedStream(codedOut);
     }
-
 
 private:
     istream *_input_str;
@@ -102,6 +145,9 @@ private:
     CodedInputStream *codedIn;
 
     Repr r;
+    Document document;
+    Value::ConstMemberIterator iterator;
+    bool destroy_stream;
 };
 
 }

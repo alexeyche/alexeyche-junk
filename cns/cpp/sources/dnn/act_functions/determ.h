@@ -24,7 +24,7 @@ public:
     const string name() const {
         return "Determ";
     }
-    double prob(const double &u) {
+    double prob(const double &u) {        
         if(u >= c.treshold) {
             return 1.0;
         }
