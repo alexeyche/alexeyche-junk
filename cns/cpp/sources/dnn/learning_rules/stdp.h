@@ -58,6 +58,7 @@ public:
 
     void reset() {
         s.y = 0;
+        s.x.resize(n->getSynapses().size());
         for(auto &v: s.x) {
             v = 0;
         }

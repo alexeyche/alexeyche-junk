@@ -73,7 +73,7 @@ public:
 
 	void setLearningRule(LearningRuleBase *_lrule) { 
 		lrule.set(_lrule); 
-		lrule.ref().setNeuron(this);
+		lrule.ref().linkWithNeuron(this);
 	}
 	void setActFunction(ActFunctionBase *_act_f) { 
 		act_f.set(_act_f);
@@ -154,13 +154,15 @@ struct SpikeNeuronInfo : public Serializable<Protos::SpikeNeuronInfo> {
 		        << "axon_delay: " << axon_delay << ", " \
 		        << "num_of_synapses: " << num_of_synapses << ", " \
 		        << "act_function_is_set: " << act_function_is_set << ", " \
-		        << "input_is_set: " << input_is_set << Self::end;
+		        << "input_is_set: " << input_is_set
+		        << "lrule_is_set: " << lrule_is_set << Self::end;
 	}
 	size_t id;
 	double axon_delay;
 	size_t num_of_synapses;
 	bool act_function_is_set;
 	bool input_is_set;
+	bool lrule_is_set;
 };
 
 template <typename Constants, typename State>
@@ -173,6 +175,7 @@ public:
 		info.num_of_synapses = syns.size();
 		info.act_function_is_set = act_f.isSet();
 		info.input_is_set = input.isSet();
+		info.lrule_is_set = lrule.isSet();
 		return info;
 	}
 
@@ -203,6 +206,10 @@ public:
 		}
 		if (info.input_is_set) {
 			(*this) << "Input: " << input;
+		}
+		if (info.lrule_is_set) {
+			(*this) << "LearningRule: " << lrule;
+			lrule.ref().linkWithNeuron(this);
 		}
 		if(mode == ProcessingInput) {
 			syns.resize(info.num_of_synapses);

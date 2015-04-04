@@ -36,11 +36,12 @@ public:
 	Statistics& getStat() {
 		return stat;
 	}
-	
-	virtual void linkWithNeuron(SpikeNeuronBase *_neuron) = 0;
-
+	void linkWithNeuron(SpikeNeuronBase *_n) {
+		n = _n;
+	}
 protected:
 	Statistics stat;
+	SpikeNeuronBase *n;
 };
 
 template <typename Constants, typename State>

@@ -93,6 +93,7 @@ public:
 
     void propagateSynapseSpike(const SynSpike &sp) {
         syns[ sp.syn_id ].ifc().propagateSpike();
+        lrule.ifc().propagateSynapseSpike(sp);
     }
 
     void calculateDynamics(const Time& t) {
