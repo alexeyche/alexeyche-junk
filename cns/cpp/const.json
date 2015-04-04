@@ -8,15 +8,28 @@
         "LeakyIntegrateAndFire" : {
             "gL" : 0.1,
             "C" : 1.0,
-            "leak" : 5.0,
-            "rest_pot" : 0.0,
+            "leak" : -70.0,
+            "rest_pot" : -70.0,
             "tau_ref" : 2.0,
-            "noise" : 0.5
+            "noise" : 0 
+        },
+        "AdaptIntegrateAndFire" : {
+            "gL" : 0.1,
+            "C" : 1.0,
+            "leak" : -65.0,
+            "rest_pot" : -70.0,
+            "tau_ref" : 2.0,
+            "noise" : 1.5,
+            "tau_adapt" : 80.0,
+            "kd" : 30.0,
+            "vK" : -80.0,
+            "adapt_amp" : 0.2,
+            "gKCa" : 5.0
         }
     },
     "act_functions" : {
         "Determ" : {
-            "treshold" : 10.0
+            "treshold" : -60.0
         }
     },        
     "synapses" : {
@@ -35,30 +48,34 @@
             "tau_d" : 400
         }
     },
+    "learning_rules" : {
+        "Stdp" : {
+            "tau_plus" : 30.0, // ms
+            "tau_minus" : 50.0, // ms
+            "a_plus" : 1.0,
+            "a_minus" : 1.5,
+            "learning_rate" : 1.0
+        }
+    },
     "sim_configuration" : {
         "layers" : [
             {
                 "size" : 50,
                 "neuron" : "LeakyIntegrateAndFire",
                 "act_function" : "Determ",
-                "axon_delay" : "Exp(12,5)",
+                "learning_rule" : "Stdp",
+                "axon_delay" : 0,
                 "input" : "InputTimeSeries"
-            },
-            {
-                "size" : 50,
-                "neuron" : "LeakyIntegrateAndFire",
-                "act_function" : "Determ",
-                "axon_delay" : "Exp(12,5)"
             }
         ],
         "conn_map" : {
-            "0->1" : [
-                { "prob" : 0.5, "synapse" : "STDSynapse", "dendrite_delay" : "Exp(12,5)", "start_weight" : 1 }
-            ]
+            #"0->1" : [
+            #    { "prob" : 0.5, "synapse" : "STDSynapse", "dendrite_delay" : 0, "start_weight" : 1 }
+            #]
         },
         "dt" : 1.0,
         "seed" : -1,
-        "neurons_to_listen" : [25,51],
+        "neurons_to_listen" : [25],
         "files" : {
             "InputTimeSeries" : { 
                 "filename" : "@ucr-input",

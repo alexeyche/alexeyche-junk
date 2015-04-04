@@ -73,7 +73,6 @@ int main(int argc, char **argv) {
 	sopt.add_opts = parseArgOptionsPairs(rest_opts);
 	
 	Constants c(sopt.const_file, sopt.add_opts);
-
 	Sim s(c);
 
 	if (!sopt.model_load.empty()) {

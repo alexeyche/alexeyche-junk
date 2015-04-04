@@ -8,6 +8,7 @@
 #include <dnn/inputs/input.h>
 #include <dnn/io/serialize.h>
 #include <dnn/util/statistics.h>
+#include <dnn/learning_rules/learning_rule.h>
 
 namespace dnn {
 
@@ -70,9 +71,14 @@ public:
 		i.propagateSynapseSpike =  &SpikeNeuronBase::__propagateSynapseSpikeDefault;
 	}
 
-	// void setLearningRule(LearningRule *_lrule) { lrule = _lrule; }
-	void setActFunction(ActFunctionBase *_act_f) { act_f.set(_act_f); }
-	
+	void setLearningRule(LearningRuleBase *_lrule) { 
+		lrule.set(_lrule); 
+		lrule.ref().setNeuron(this);
+	}
+	void setActFunction(ActFunctionBase *_act_f) { 
+		act_f.set(_act_f);
+	}
+
 	void setInput(InputBase *_input) { input.set(_input); }
 	bool inputIsSet() {
 		return input.isSet();
@@ -96,10 +102,16 @@ public:
 			if(s.ref().getStat().on()) {
 				Statistics& syn_st = s.ref().getStat();
 				for(auto it=syn_st.getStats().begin(); it != syn_st.getStats().end(); ++it) {
-					stat.getStats()[it->first + std::to_string(syn_id)] = it->second;	
+					stat.getStats()[s.ref().name() + "_" +  it->first + std::to_string(syn_id)] = it->second;	
 				}						
 			}
 			syn_id++;
+		}
+		if((lrule.isSet())&&(lrule.ref().getStat().on())) {
+			Statistics &lrule_st = lrule.ref().getStat();
+			for(auto it=lrule_st.getStats().begin(); it != lrule_st.getStats().end(); ++it) {
+				stat.getStats()[ lrule.ref().name() + "_" + it->first ] = it->second;
+			}
 		}
 		return stat;
 	}
@@ -127,6 +139,7 @@ protected:
 
 	InterfacedPtr<ActFunctionBase> act_f;
 	InterfacedPtr<InputBase> input;
+	InterfacedPtr<LearningRuleBase> lrule;
 
 	Statistics stat;
 

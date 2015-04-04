@@ -3,6 +3,7 @@
 
 #include <dnn/base/base.h>
 #include <dnn/neurons/leaky_integrate_and_fire.h>
+#include <dnn/neurons/adapt_integrate_and_fire.h>
 #include <dnn/act_functions/determ.h>
 #include <dnn/synapses/static_synapse.h>
 #include <dnn/synapses/std_synapse.h>
@@ -11,6 +12,7 @@
 #include <dnn/util/time_series.h>
 #include <dnn/util/statistics.h>
 #include <dnn/util/spikes_list.h>
+#include <dnn/learning_rules/stdp.h>
 
 #include "factory.h"
 
@@ -39,19 +41,24 @@ Factory& Factory::inst() {
 
 
 Factory::Factory() {
-	REG_TYPE_WITH_STATE_AND_CONST(LeakyIntegrateAndFire);
 	REG_TYPE(SpikeNeuronInfo);
+	REG_TYPE(SynapseInfo);
+	
+	REG_TYPE_WITH_STATE_AND_CONST(LeakyIntegrateAndFire);
+	REG_TYPE_WITH_STATE_AND_CONST(AdaptIntegrateAndFire);
 	REG_TYPE_WITH_STATE_AND_CONST(StaticSynapse);
 	REG_TYPE_WITH_STATE_AND_CONST(STDSynapse);
-	REG_TYPE(SynapseInfo);
 	REG_TYPE_WITH_CONST(Determ);
 	REG_TYPE_WITH_STATE_AND_CONST(InputTimeSeries);
+	REG_TYPE_WITH_STATE_AND_CONST(Stdp);
+	
 	REG_TYPE(Statistics);
 	REG_TYPE(StatisticsInfo);
 	REG_TYPE(Stat);
 	REG_TYPE(SpikesList);
 	REG_TYPE(SpikesListInfo);
 	REG_TYPE(SpikesSequence);
+	
 	REG_TYPE(TimeSeries);
 	REG_TYPE(TimeSeriesInfo);
 	REG_TYPE(TimeSeriesData);

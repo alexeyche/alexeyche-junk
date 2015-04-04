@@ -141,3 +141,13 @@ plot_stat = function(stat, cr, net, model, neuron_to_read =2, syn_id=58, t_plot=
         }
     }
 }
+
+plot_st =function(stat, name) {
+    X = NULL
+    for(st in names(stat)) {
+        if(grepl(sprintf("^%s", name), st)) {
+            X = rbind(X, stat[[st]])       
+        }
+    }
+    plotl(colMeans(X))
+}

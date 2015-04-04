@@ -36,6 +36,10 @@ public:
 					if (!act_function.empty()) {
 						n.ref().setActFunction(buildObjectFromConstants<ActFunctionBase>(act_function, c.act_functions));
 					}
+					const string learning_rule = Json::getStringValDef(layer_conf, "learning_rule", "");
+					if (!learning_rule.empty()) {
+						n.ref().setLearningRule(buildObjectFromConstants<LearningRuleBase>(learning_rule, c.learning_rules));
+					}
 					const string input = Json::getStringValDef(layer_conf, "input", "");
 					if (!input.empty()) {
 						n.ref().setInput(buildObjectFromConstants<InputBase>(input, c.inputs));
@@ -45,24 +49,40 @@ public:
 			}
 			layers.push_back(layer);
 		}
+
+		// precreate time series
+		multimap<string, pair<string, string>> ts_map;
 		for (auto it = c.sim_conf.files.begin(); it != c.sim_conf.files.end(); ++it) {
-			const string &obj_name = it->first;
+			const string &obj_name = it->first;			
 			Document file_conf = Json::parseStringC(it->second);
 			
+			string fname = Json::getStringVal(file_conf, "filename");
+			if(fname.find("@") == 0) {
+				continue;
+			}
+			string format = Json::getStringVal(file_conf, "format");
+			Factory::inst().getCachedTimeSeries(
+				fname,
+				format
+			);
+			ts_map.insert( std::make_pair(obj_name, std::make_pair(fname, format)) );
+		}
+		// assign cached time series to inputs
+		for (auto it = ts_map.begin(); it != ts_map.end(); ++it) {
+			const string &obj_name = it->first;
+			const string &fname = it->second.first;
+			const string &format = it->second.second;
+
 			auto p = Factory::inst().getObjectsSlice(obj_name);
-			for (auto oit = p.first; oit != p.second; ++oit) {
+			for (auto oit = p.first; oit != p.second; ++oit) {				
 				SerializableBase *o = Factory::inst().getObject(oit);
 				InputBase* inp = dynamic_cast<InputBase*>(o);
 				if (!inp) {
 					throw dnnException()<< "Failed to set input file for " << o->name() << "\n";
 				}
-				string fname = Json::getStringVal(file_conf, "filename");
-				if(fname.find("@") == 0) {
-					continue;
-				}
 				TimeSeries &ts = Factory::inst().getCachedTimeSeries(
 					fname,
-					Json::getStringVal(file_conf, "format")
+					format
 				);
 				inp->setTimeSeries(&ts);
 			}
@@ -98,6 +118,9 @@ public:
 			neurons[*it].ref().stat.turnOn();
 			for(auto s: neurons[*it].ref().getSynapses()) {
 				s.ref().stat.turnOn();
+			}
+			if(neurons[*it].ref().lrule.isSet()) {
+				neurons[*it].ref().lrule.ref().stat.turnOn();
 			}
 		}
 	}

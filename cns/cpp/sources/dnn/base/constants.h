@@ -62,6 +62,7 @@ struct Constants : public Printable {
 		fill(Json::getVal(document, "act_functions"), act_functions);
 		fill(Json::getVal(document, "synapses"), synapses);
 		fill(Json::getVal(document, "inputs"), inputs);
+		fill(Json::getVal(document, "learning_rules"), learning_rules);
 
 		const Value &sim_conf_doc = Json::getVal(document, "sim_configuration");
 		const Value &layers_doc = Json::getArray(sim_conf_doc, "layers");
@@ -115,9 +116,11 @@ struct Constants : public Printable {
 	}
 
 	void print(ostream &o) const {
+		print_section("inputs: ", inputs, o);
 		print_section("neurons: ", neurons, o);
 		print_section("act_functions: ", act_functions, o);
 		print_section("synapses: ", synapses, o);
+		print_section("learning_rules: ", learning_rules, o);
 		o << "sim_configuration: \n";
 		o << sim_conf;
 	}
@@ -136,6 +139,7 @@ struct Constants : public Printable {
 	map<string, string> act_functions;
 	map<string, string> synapses;
 	map<string, string> inputs;
+	map<string, string> learning_rules;
 	SimConfiguration sim_conf;
 };
 
