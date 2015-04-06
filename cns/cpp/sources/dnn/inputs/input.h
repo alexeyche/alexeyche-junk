@@ -16,12 +16,16 @@ public:
     
 
     virtual const double& getValue(const Time &t) = 0;
-    virtual void provideInterface(InputInterface &i) = 0;
     
+    template <typename T>
+    void provideInterface(InputInterface &i) {
+        i.getValue = MakeDelegate(static_cast<T*>(this), &T::getValue);
+    }
     static const double def_value;
     static const double& getValueDefault(const Time &t) {
         return def_value;
     }
+
     static void provideDefaultInterface(InputInterface &i) {
         i.getValue = &InputBase::getValueDefault;
     }

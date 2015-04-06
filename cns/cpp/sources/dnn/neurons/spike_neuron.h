@@ -14,7 +14,7 @@ namespace dnn {
 
 
 struct SpikeNeuronInterface {
-	calculateDynamicsDelegate calculateDynamics;
+	calculateNeuronDynamicsDelegate calculateDynamics;
 	propSynSpikeDelegate propagateSynapseSpike;
 	getDoubleDelegate getFiringProbability;
 	getBoolCopyDelegate pullFiring;
@@ -41,18 +41,24 @@ public:
 		return axon_delay;
 	}
 
-	virtual void provideInterface(SpikeNeuronInterface &i) = 0;
-
+	template <typename T>
+	void provideInterface(SpikeNeuronInterface &i) {
+        i.calculateDynamics = MakeDelegate(static_cast<T*>(this), &T::calculateDynamics);
+        i.pullFiring = MakeDelegate(static_cast<T*>(this), &T::pullFiring);
+        i.getFiringProbability = MakeDelegate(static_cast<T*>(this), &T::getFiringProbability);
+        i.propagateSynapseSpike = MakeDelegate(static_cast<T*>(this), &T::propagateSynapseSpike);
+        ifc = i;
+	}
 	virtual void reset() = 0;
 
 	// runtime
 	virtual void propagateSynapseSpike(const SynSpike &s) = 0;
-	virtual void calculateDynamics(const Time &t) = 0;
+	virtual void calculateDynamics(const Time& t, const double &Iinput, const double &Isyn) = 0;
 	virtual const double& getFiringProbability() = 0;
 	virtual bool pullFiring() = 0;
 
 
-	static void __calculateDynamicsDefault(const Time &t) {
+	static void __calculateDynamicsDefault(const Time &t, const double &Iinput, const double &Isyn) {
 		throw dnnException()<< "Calling inapropriate default interface function\n";
 	}
 	static void __propagateSynapseSpikeDefault(const SynSpike &s) {
@@ -132,6 +138,21 @@ public:
         }
         input_queue_lock.clear(std::memory_order_release);        
 	}
+	inline void calculateDynamicsInternal(const Time &t) {
+        readInputSpikes(t);
+        const double& Iinput = input.ifc().getValue(t);
+		double Isyn = 0.0;
+        for(auto &s: syns) {
+            double x = s.ifc().getMembranePotential();
+            Isyn += x;
+        }
+        ifc.calculateDynamics(t, Iinput, Isyn);
+        
+        for(auto &s: syns) {
+            s.ifc().calculateDynamics(t);
+        }
+        lrule.ifc().calculateDynamics(t);
+	}
 protected:
 	size_t _id;
 	double axon_delay;
@@ -145,6 +166,8 @@ protected:
 
 	priority_queue<SynSpike> input_spikes;
 	std::atomic_flag input_queue_lock;
+
+	SpikeNeuronInterface ifc;
 };
 
 /*@GENERATE_PROTO@*/

@@ -113,7 +113,7 @@ public:
 	static void turnOnStatistics(vector<InterfacedPtr<SpikeNeuronBase>> &neurons, const vector<size_t> &ids) {
 		for(auto it=ids.cbegin(); it != ids.cend(); ++it) {
 			if(*it >= neurons.size()) {
-				throw dnnException() << "Can't find neuron " << *it << " to listenn\n";
+				throw dnnException() << "Can't find neuron " << *it << " to listen\n";
 			}
 			neurons[*it].ref().stat.turnOn();
 			for(auto s: neurons[*it].ref().getSynapses()) {

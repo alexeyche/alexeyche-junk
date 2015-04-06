@@ -92,8 +92,10 @@ struct TimeSeries : public SerializableBase {
 	const double& getValueAt(const size_t &index) {		
 		return data.values[index];	
 	}
-	virtual void provideInterface(TimeSeriesInterface &i) {
-		i.getValueAt = MakeDelegate(this, &TimeSeries::getValueAt);
+	
+	template <typename T>
+	void provideInterface(TimeSeriesInterface &i) {
+		i.getValueAt = MakeDelegate(static_cast<T*>(this), &T::getValueAt);
 	}
 	
 	static const double& getValueAtDefault(const size_t &index) {

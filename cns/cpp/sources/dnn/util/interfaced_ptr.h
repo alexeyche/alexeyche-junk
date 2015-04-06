@@ -3,11 +3,13 @@
 namespace dnn {
 
 
+
+
 template <typename T>
 class InterfacedPtr {
 public:
 	InterfacedPtr(T *ptr_to_set) : _ptr(ptr_to_set) {
-		_ptr->provideInterface(i);
+		_ptr->template provideInterface<T>(i);
 	}
 
 	InterfacedPtr() : _ptr(nullptr) {
@@ -25,7 +27,7 @@ public:
 			throw dnnException()<< "InterfacedPtr is already set\n";
 		}
 		_ptr = ptr_to_set;
-		_ptr->provideInterface(i);
+		_ptr->template provideInterface<T>(i);
 	}
 	
 	bool isSet() {
@@ -40,6 +42,7 @@ private:
 	T *_ptr;
 	typename T::interface i;
 };
+
 
 
 

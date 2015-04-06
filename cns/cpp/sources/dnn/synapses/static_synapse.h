@@ -48,11 +48,7 @@ public:
         return weight * s.x;
     }
 
-    void provideInterface(SynapseInterface &i) {
-        i.propagateSpike = MakeDelegate(this, &StaticSynapse::propagateSpike);
-        i.calculateDynamics = MakeDelegate(this, &StaticSynapse::calculateDynamics);
-        i.getMembranePotential = MakeDelegate(this, &StaticSynapse::getMembranePotential);
-    }
+
 };
 
 

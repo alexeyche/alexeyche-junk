@@ -33,12 +33,6 @@ public:
     double probDeriv(const double &u) {
         return 0.0;
     }
-
-    void provideInterface(ActFunctionInterface &i) {
-        i.prob = MakeDelegate(this, &Determ::prob);
-        i.probDeriv = MakeDelegate(this, &Determ::probDeriv);
-    }
-
 };
 
 

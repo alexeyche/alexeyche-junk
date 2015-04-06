@@ -72,10 +72,7 @@ public:
         stat.add("y", s.y);
     }
 
-    void provideInterface(LearningRuleInterface &i) {
-        i.calculateDynamics = MakeDelegate(this, &Stdp::calculateDynamics);
-        i.propagateSynapseSpike = MakeDelegate(this, &Stdp::propagateSynapseSpike);
-    }
+    
 };
 
 }

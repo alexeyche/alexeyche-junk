@@ -95,27 +95,16 @@ public:
         syns[ sp.syn_id ].ifc().propagateSpike();
         lrule.ifc().propagateSynapseSpike(sp);
     }
-
-    void calculateDynamics(const Time& t) {
-        readInputSpikes(t);
-        
-        const double& input_current = input.ifc().getValue(t);
-        
-        
+    void calculateDynamics(const Time& t, const double &Iinput, const double &Isyn) {
         if(s.ref_time < 0.001) {
-            double syns_pot = 0.0;
-            for(auto &s: syns) {
-                double x = s.ifc().getMembranePotential();
-                syns_pot += x;
-            }
             double Ia = c.gKCa * (s.Ca/(s.Ca + c.kd)) * (s.u - c.vK);
             stat.add("Ia", Ia);
             
             s.u += t.dt * ( 
                 - c.gL * (s.u - c.leak) 
                 + c.noise * getNorm() 
-                + input_current 
-                + syns_pot 
+                + Iinput 
+                + Isyn 
                 - Ia
                 ) / c.C;
             s.p = act_f.ifc().prob(s.u);
@@ -130,11 +119,7 @@ public:
         } else {
             s.ref_time -= t.dt;
         }
-
         s.Ca += t.dt * ( - s.Ca/c.tau_adapt ); 
-        for(auto &s: syns) {
-            s.ifc().calculateDynamics(t);
-        }
         stat.add("u", s.u);
         stat.add("Ca", s.Ca);
     }
@@ -147,13 +132,6 @@ public:
     
     const double& getFiringProbability() {
         return s.p;
-    }
-
-    void provideInterface(SpikeNeuronInterface &i) {
-        i.calculateDynamics = MakeDelegate(this, &AdaptIntegrateAndFire::calculateDynamics);
-        i.pullFiring = MakeDelegate(this, &AdaptIntegrateAndFire::pullFiring);
-        i.getFiringProbability = MakeDelegate(this, &AdaptIntegrateAndFire::getFiringProbability);
-        i.propagateSynapseSpike = MakeDelegate(this, &AdaptIntegrateAndFire::propagateSynapseSpike);
     }
 };
 

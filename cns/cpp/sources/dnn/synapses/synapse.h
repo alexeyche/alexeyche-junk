@@ -30,7 +30,13 @@ public:
 	virtual void propagateSpike() = 0;
 	virtual double getMembranePotential() = 0;
 	virtual void calculateDynamics(const Time &t) = 0;
-	virtual void provideInterface(SynapseInterface &i) = 0;
+	
+	template <typename T>
+	void provideInterface(SynapseInterface &i) {
+        i.propagateSpike = MakeDelegate(static_cast<T*>(this), &T::propagateSpike);
+        i.calculateDynamics = MakeDelegate(static_cast<T*>(this), &T::calculateDynamics);
+        i.getMembranePotential = MakeDelegate(static_cast<T*>(this), &T::getMembranePotential);
+    }
 
 	static void provideDefaultInterface(SynapseInterface &i) {
 		throw dnnException()<< "No default interface for Synapse\n";

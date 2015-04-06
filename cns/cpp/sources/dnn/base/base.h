@@ -44,6 +44,7 @@ typedef FastDelegate1<const Time&,const double&> retRefDoubleAtTimeDelegate;
 typedef FastDelegate1<const Time&,double> getDoubleAtTimeDelegate;
 typedef FastDelegate1<const Time&> calculateDynamicsDelegate;
 typedef FastDelegate1<const size_t&, const double&> getValueAtIndexDelegate;
+typedef FastDelegate3<const Time&, const double&, const double&> calculateNeuronDynamicsDelegate;
 
 struct SynSpike {
     SynSpike(const size_t &_n_id, const size_t &_syn_id, const double &_t)

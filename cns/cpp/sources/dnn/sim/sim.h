@@ -50,23 +50,27 @@ public:
 		str.writeObject(&net->spikesList());
 	}	
 	
-	static void runWorker(Sim &s, size_t from, size_t to, SpinningBarrier &barrier) {
-		Time t(s.c.sim_conf.dt);
-		
-		for(size_t i=from; i<to; ++i) {				
-			s.neurons[i].ref().reset();
-		}
-		barrier.wait();
+	static void runWorker(Sim &s, size_t from, size_t to, SpinningBarrier &barrier, std::exception_ptr &error) {
+		try {
+			Time t(s.c.sim_conf.dt);
 
-		for(; t<s.duration; ++t) {
 			for(size_t i=from; i<to; ++i) {				
-				s.neurons[i].ifc().calculateDynamics(t);
-				if(s.neurons[i].ifc().pullFiring()) {
-					s.net->propagateSpike(s.neurons[i].ref(), t.t);
-				}
+				s.neurons[i].ref().reset();
 			}
 			barrier.wait();
-		}		
+			for(; t<s.duration; ++t) {
+				for(size_t i=from; i<to; ++i) {				
+					s.neurons[i].ref().calculateDynamicsInternal(t);
+					
+					if(s.neurons[i].ifc().pullFiring()) {
+						s.net->propagateSpike(s.neurons[i].ref(), t.t);
+					}
+				}
+				barrier.wait();
+			}		
+		} catch(...) {
+			error = std::current_exception();
+		}
 		
 	}
 	void run(size_t jobs) {
@@ -76,13 +80,20 @@ public:
 
 		vector<IndexSlice> slices = dispatchOnThreads(neurons.size(), jobs);
 		vector<std::thread> threads;
-		
+		vector<std::exception_ptr> errors;
+
 		SpinningBarrier barrier(jobs);		
 		for(auto &slice: slices) {
-			threads.emplace_back(Sim::runWorker, std::ref(*this), slice.from, slice.to, std::ref(barrier));
+			errors.emplace_back();
+			threads.emplace_back(Sim::runWorker, std::ref(*this), slice.from, slice.to, std::ref(barrier), std::ref(errors.back()));
 		}
 		for(auto &t: threads) {
 			t.join();
+		}
+		for(auto &eptr: errors) {
+			if(eptr) {
+				std::rethrow_exception(eptr);
+			}
 		}
 	}
 
@@ -95,6 +106,7 @@ protected:
 	double duration;
 	const Constants &c;
 	vector<InterfacedPtr<SpikeNeuronBase>> neurons;
+
 	uptr<Network> net;
 };
 

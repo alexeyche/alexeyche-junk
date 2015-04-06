@@ -60,7 +60,7 @@
     "sim_configuration" : {
         "layers" : [
             {
-                "size" : 50,
+                "size" : 1000,
                 "neuron" : "LeakyIntegrateAndFire",
                 "act_function" : "Determ",
                 "learning_rule" : "Stdp",

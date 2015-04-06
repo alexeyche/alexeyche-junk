@@ -57,12 +57,6 @@ public:
     double getMembranePotential() {
         return weight * s.x;
     }
-
-    void provideInterface(SynapseInterface &i) {
-        i.propagateSpike = MakeDelegate(this, &STDSynapse::propagateSpike);
-        i.calculateDynamics = MakeDelegate(this, &STDSynapse::calculateDynamics);
-        i.getMembranePotential = MakeDelegate(this, &STDSynapse::getMembranePotential);
-    }
 };
 
 

@@ -1,5 +1,13 @@
 package Protos;
 
+message InputTimeSeriesC {
+    required double dt = 1;
+}
+
+message InputTimeSeriesState {
+    required uint32 index = 1;
+}
+
 message StdpC {
     required double tau_plus = 1;
     required double tau_minus = 2;
@@ -11,52 +19,6 @@ message StdpC {
 message StdpState {
     required double y = 1;
     repeated double x = 2;
-}
-
-message LeakyIntegrateAndFireC {
-    required double gL = 1;
-    required double C = 2;
-    required double leak = 3;
-    required double rest_pot = 4;
-    required double tau_ref = 5;
-    required double noise = 6;
-}
-
-message LeakyIntegrateAndFireState {
-    required bool fired = 1;
-    required double p = 2;
-    required double u = 3;
-    required double ref_time = 4;
-}
-
-message SpikeNeuronInfo {
-    required uint32 id = 1;
-    required double axon_delay = 2;
-    required uint32 num_of_synapses = 3;
-    required bool act_function_is_set = 4;
-    required bool input_is_set = 5;
-}
-
-message AdaptIntegrateAndFireC {
-    required double gL = 1;
-    required double C = 2;
-    required double leak = 3;
-    required double rest_pot = 4;
-    required double tau_ref = 5;
-    required double noise = 6;
-    required double tau_adapt = 7;
-    required double kd = 8;
-    required double vK = 9;
-    required double adapt_amp = 10;
-    required double gKCa = 11;
-}
-
-message AdaptIntegrateAndFireState {
-    required bool fired = 1;
-    required double p = 2;
-    required double u = 3;
-    required double ref_time = 4;
-    required double Ca = 5;
 }
 
 message StaticSynapseC {
@@ -86,14 +48,6 @@ message SynapseInfo {
     required double weight = 3;
 }
 
-message InputTimeSeriesC {
-    required double dt = 1;
-}
-
-message InputTimeSeriesState {
-    required uint32 index = 1;
-}
-
 message Stat {
     required int32 low_lim = 1;
     required int32 high_lim = 2;
@@ -106,6 +60,14 @@ message StatisticsInfo {
     repeated string stat_names = 3;
 }
 
+message SpikesSequence {
+    repeated double values = 1;
+}
+
+message SpikesListInfo {
+    required uint32 size = 1;
+}
+
 message TimeSeriesInfo {
     repeated uint32 labels_ids = 1;
     repeated string unique_labels = 2;
@@ -116,12 +78,51 @@ message TimeSeriesData {
     repeated double values = 1;
 }
 
-message SpikesSequence {
-    repeated double values = 1;
+message LeakyIntegrateAndFireC {
+    required double gL = 1;
+    required double C = 2;
+    required double leak = 3;
+    required double rest_pot = 4;
+    required double tau_ref = 5;
+    required double noise = 6;
 }
 
-message SpikesListInfo {
-    required uint32 size = 1;
+message LeakyIntegrateAndFireState {
+    required bool fired = 1;
+    required double p = 2;
+    required double u = 3;
+    required double ref_time = 4;
+}
+
+message SpikeNeuronInfo {
+    required uint32 id = 1;
+    required double axon_delay = 2;
+    required uint32 num_of_synapses = 3;
+    required bool act_function_is_set = 4;
+    required bool input_is_set = 5;
+    required bool lrule_is_set = 6;
+}
+
+message AdaptIntegrateAndFireC {
+    required double gL = 1;
+    required double C = 2;
+    required double leak = 3;
+    required double rest_pot = 4;
+    required double tau_ref = 5;
+    required double noise = 6;
+    required double tau_adapt = 7;
+    required double kd = 8;
+    required double vK = 9;
+    required double adapt_amp = 10;
+    required double gKCa = 11;
+}
+
+message AdaptIntegrateAndFireState {
+    required bool fired = 1;
+    required double p = 2;
+    required double u = 3;
+    required double ref_time = 4;
+    required double Ca = 5;
 }
 
 message DetermC {

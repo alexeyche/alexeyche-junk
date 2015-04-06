@@ -20,6 +20,9 @@
 #include <cstdlib>
 #include <queue>
 #include <atomic>
+#include <stdexcept>
+#include <exception>
+
 typedef google::protobuf::Message* ProtoMessage;
 
 using std::map;

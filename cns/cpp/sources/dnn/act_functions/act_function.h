@@ -19,8 +19,11 @@ public:
 	virtual double prob(const double &u) = 0;
     virtual double probDeriv(const double &u) = 0;
 
-    virtual void provideInterface(ActFunctionInterface &i) = 0;
-
+    template <typename T>
+	void provideInterface(ActFunctionInterface &i) {
+        i.prob = MakeDelegate(static_cast<T*>(this), &T::prob);
+        i.probDeriv = MakeDelegate(static_cast<T*>(this), &T::probDeriv);
+    }
 	static double __default(const double &u) { 
 		throw dnnException() << "Calling inapropriate default interface function\n";
 	}

@@ -29,7 +29,11 @@ public:
 		i.calculateDynamics = &LearningRuleBase::__calculateDynamicsDefault;
 		i.propagateSynapseSpike =  &LearningRuleBase::__propagateSynapseSpikeDefault;
 	}
-	virtual void provideInterface(LearningRuleInterface &i) = 0;
+	template <typename T>
+	void provideInterface(LearningRuleInterface &i) {
+        i.calculateDynamics = MakeDelegate(static_cast<T*>(this), &T::calculateDynamics);
+        i.propagateSynapseSpike = MakeDelegate(static_cast<T*>(this), &T::propagateSynapseSpike);
+    }
 	virtual void propagateSynapseSpike(const SynSpike &s) = 0;
 	virtual void calculateDynamics(const Time &t) = 0;
 	

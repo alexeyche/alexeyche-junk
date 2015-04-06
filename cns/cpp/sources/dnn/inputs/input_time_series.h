@@ -42,9 +42,7 @@ public:
         if(fmod(s._t, c.dt) > 0.0001) return InputBase::def_value;        
         return ts.ref().data.values[s.index++];
 	}
-    void provideInterface(InputInterface &i) {
-        i.getValue = MakeDelegate(this, &InputTimeSeries::getValue);
-    }
+
 
     void setTimeSeries(TimeSeries *_ts) {
         s.index = 0;
