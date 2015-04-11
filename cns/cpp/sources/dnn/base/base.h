@@ -37,6 +37,7 @@ typedef FastDelegate1<const double&, double> funDelegate;
 typedef FastDelegate1<const SynSpike&> propSynSpikeDelegate;
 typedef FastDelegate1<const double&> attachDelegate;
 typedef FastDelegate0<const bool&> getBoolDelegate;
+typedef FastDelegate0<bool&> getBoolMutDelegate;
 typedef FastDelegate0<bool> getBoolCopyDelegate;
 typedef FastDelegate0<const double&> getDoubleDelegate;
 typedef FastDelegate0<double> retDoubleDelegate;

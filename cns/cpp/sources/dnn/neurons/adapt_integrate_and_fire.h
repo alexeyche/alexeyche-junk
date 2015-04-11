@@ -57,7 +57,6 @@ struct AdaptIntegrateAndFireState : public Serializable<Protos::AdaptIntegrateAn
     AdaptIntegrateAndFireState() 
     : p(0.0)
     , u(0.0)
-    , fired(false)
     , ref_time(0.0)
     , Ca(0.0)
     {}
@@ -66,10 +65,8 @@ struct AdaptIntegrateAndFireState : public Serializable<Protos::AdaptIntegrateAn
         begin() << "p: "        << p << ", " 
                 << "u: "        << u << ", " 
                 << "ref_time: " << ref_time << ", " 
-                << "fired: "    << fired << ", "
                 << "Ca: "       << Ca << Self::end;
-    }
-    bool fired;
+    }    
     double p;
     double u;
     double ref_time;
@@ -86,15 +83,10 @@ public:
     void reset() {
         s.p = 0.0;
         s.u = c.rest_pot;
-        s.ref_time = 0.0;
-        s.fired = false;
+        s.ref_time = 0.0;        
         s.Ca = 0.0;
     }
 
-    void propagateSynapseSpike(const SynSpike &sp) {
-        syns[ sp.syn_id ].ifc().propagateSpike();
-        lrule.ifc().propagateSynapseSpike(sp);
-    }
     void calculateDynamics(const Time& t, const double &Iinput, const double &Isyn) {
         if(s.ref_time < 0.001) {
             double Ia = c.gKCa * (s.Ca/(s.Ca + c.kd)) * (s.u - c.vK);
@@ -111,7 +103,7 @@ public:
             
             
             if(getUnif() < s.p) {
-                s.fired = true;
+                setFired(true);
                 s.u = c.rest_pot;
                 s.ref_time = c.tau_ref;
                 s.Ca += c.adapt_amp;
@@ -122,12 +114,6 @@ public:
         s.Ca += t.dt * ( - s.Ca/c.tau_adapt ); 
         stat.add("u", s.u);
         stat.add("Ca", s.Ca);
-    }
-
-    bool pullFiring() {
-        bool acc = s.fired;
-        s.fired = false;
-        return acc;
     }
     
     const double& getFiringProbability() {

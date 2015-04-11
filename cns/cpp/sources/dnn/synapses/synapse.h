@@ -44,10 +44,14 @@ public:
 	Statistics& getStat() {
 		return stat; 
 	}
+	inline bool& fired() {
+		return _fired;
+	}
 protected:
 	size_t id_pre;
 	double dendrite_delay;
 	double weight;
+	bool _fired;
 
 	Statistics stat;
 };

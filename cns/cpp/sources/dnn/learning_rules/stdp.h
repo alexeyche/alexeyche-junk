@@ -65,13 +65,27 @@ public:
     }
 
     void propagateSynapseSpike(const SynSpike &sp) {
+        s.x[sp.syn_id] += 1;
     }
 
     void calculateDynamics(const Time& t) {
-        
-        stat.add("y", s.y);
-    }
+        if(n->fired()) {
+            s.y += 1;
+        }
+        vector<InterfacedPtr<SynapseBase>> &syns = n->getSynapses();
+        for(size_t syn_id=0; syn_id < syns.size(); ++syn_id) {
+            
+            double dw = c.learning_rate * ( c.a_plus  * s.x[syn_id] * n->fired() -  \
+                                            c.a_minus * s.y * syns[syn_id].ref().fired() );
 
+            syns[syn_id].ref().weight += dw;
+            s.x[syn_id] += - s.x[syn_id]/c.tau_plus;
+        }
+        s.y += - s.y/c.tau_minus;
+
+        stat.add("y", s.y);
+
+    }
     
 };
 

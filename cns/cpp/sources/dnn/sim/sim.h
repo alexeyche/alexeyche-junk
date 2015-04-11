@@ -50,28 +50,32 @@ public:
 		str.writeObject(&net->spikesList());
 	}	
 	
-	static void runWorker(Sim &s, size_t from, size_t to, SpinningBarrier &barrier, std::exception_ptr &error) {
-		try {
-			Time t(s.c.sim_conf.dt);
+	inline static void runWorkerRoutine(Sim &s, size_t from, size_t to, SpinningBarrier &barrier) {
+		Time t(s.c.sim_conf.dt);
 
+		for(size_t i=from; i<to; ++i) {				
+			s.neurons[i].ref().reset();
+		}
+		barrier.wait();
+		for(; t<s.duration; ++t) {
 			for(size_t i=from; i<to; ++i) {				
-				s.neurons[i].ref().reset();
+				s.neurons[i].ref().calculateDynamicsInternal(t);
+				
+				if(s.neurons[i].ref().fired()) {
+					s.net->propagateSpike(s.neurons[i].ref(), t.t);
+					s.neurons[i].ref().setFired(false);
+				}
 			}
 			barrier.wait();
-			for(; t<s.duration; ++t) {
-				for(size_t i=from; i<to; ++i) {				
-					s.neurons[i].ref().calculateDynamicsInternal(t);
-					
-					if(s.neurons[i].ifc().pullFiring()) {
-						s.net->propagateSpike(s.neurons[i].ref(), t.t);
-					}
-				}
-				barrier.wait();
-			}		
+		}		
+	}
+
+	static void runWorker(Sim &s, size_t from, size_t to, SpinningBarrier &barrier, std::exception_ptr &error) {
+		try {
+			runWorkerRoutine(s, from, to, barrier);
 		} catch(...) {
 			error = std::current_exception();
-		}
-		
+		}		
 	}
 	void run(size_t jobs) {
 		if(fabs(duration) < 0.00001) {

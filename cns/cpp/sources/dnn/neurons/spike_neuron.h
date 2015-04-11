@@ -16,8 +16,7 @@ namespace dnn {
 struct SpikeNeuronInterface {
 	calculateNeuronDynamicsDelegate calculateDynamics;
 	propSynSpikeDelegate propagateSynapseSpike;
-	getDoubleDelegate getFiringProbability;
-	getBoolCopyDelegate pullFiring;
+	getDoubleDelegate getFiringProbability;	
 };
 extern size_t global_neuron_index;
 
@@ -28,7 +27,7 @@ class SpikeNeuronBase : public SerializableBase {
 friend class Builder;
 friend class Network;
 public:
-	SpikeNeuronBase() : input_queue_lock(ATOMIC_FLAG_INIT) {
+	SpikeNeuronBase() : input_queue_lock(ATOMIC_FLAG_INIT), _fired(false) {
 		_id = global_neuron_index++;
 	}
 
@@ -40,22 +39,30 @@ public:
 	inline const double& axonDelay() {
 		return axon_delay;
 	}
+	inline const bool& fired() const {
+		return _fired;
+	}
+	
+	inline void setFired(const bool& f) {
+		_fired = f;
+	}
 
 	template <typename T>
 	void provideInterface(SpikeNeuronInterface &i) {
-        i.calculateDynamics = MakeDelegate(static_cast<T*>(this), &T::calculateDynamics);
-        i.pullFiring = MakeDelegate(static_cast<T*>(this), &T::pullFiring);
+        i.calculateDynamics = MakeDelegate(static_cast<T*>(this), &T::calculateDynamics);        
         i.getFiringProbability = MakeDelegate(static_cast<T*>(this), &T::getFiringProbability);
         i.propagateSynapseSpike = MakeDelegate(static_cast<T*>(this), &T::propagateSynapseSpike);
         ifc = i;
 	}
 	virtual void reset() = 0;
 
-	// runtime
-	virtual void propagateSynapseSpike(const SynSpike &s) = 0;
+	// runtime	
+	virtual void propagateSynapseSpike(const SynSpike &sp) {
+        syns[ sp.syn_id ].ifc().propagateSpike();
+        lrule.ifc().propagateSynapseSpike(sp);
+    }
 	virtual void calculateDynamics(const Time& t, const double &Iinput, const double &Isyn) = 0;
-	virtual const double& getFiringProbability() = 0;
-	virtual bool pullFiring() = 0;
+	virtual const double& getFiringProbability() = 0;	
 
 
 	static void __calculateDynamicsDefault(const Time &t, const double &Iinput, const double &Isyn) {
@@ -67,12 +74,9 @@ public:
 	static const double& __getFiringProbabilityDefault() {
 		throw dnnException()<< "Calling inapropriate default interface function\n";
 	}
-	static bool __pullFiringDefault() {
-		throw dnnException()<< "Calling inapropriate default interface function\n";
-	}
+	
 	static void provideDefaultInterface(SpikeNeuronInterface &i) {
 		i.calculateDynamics = &SpikeNeuronBase::__calculateDynamicsDefault;
-		i.pullFiring = &SpikeNeuronBase::__pullFiringDefault;
 		i.getFiringProbability = &SpikeNeuronBase::__getFiringProbabilityDefault;
 		i.propagateSynapseSpike =  &SpikeNeuronBase::__propagateSynapseSpikeDefault;
 	}
@@ -134,6 +138,7 @@ public:
             const SynSpike& sp = input_spikes.top();
             if(sp.t >= t.t) break;
             syns[ sp.syn_id ].ifc().propagateSpike();
+            syns[ sp.syn_id ].ref().fired = true;
             input_spikes.pop();   
         }
         input_queue_lock.clear(std::memory_order_release);        
@@ -148,12 +153,14 @@ public:
         }
         ifc.calculateDynamics(t, Iinput, Isyn);
         
+        lrule.ifc().calculateDynamics(t);
         for(auto &s: syns) {
             s.ifc().calculateDynamics(t);
+            s.ref().fired() = false;
         }
-        lrule.ifc().calculateDynamics(t);
 	}
 protected:
+	bool _fired;
 	size_t _id;
 	double axon_delay;
 	vector<InterfacedPtr<SynapseBase>> syns;

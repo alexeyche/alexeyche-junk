@@ -41,18 +41,15 @@ struct LeakyIntegrateAndFireC : public Serializable<Protos::LeakyIntegrateAndFir
 struct LeakyIntegrateAndFireState : public Serializable<Protos::LeakyIntegrateAndFireState>  {
     LeakyIntegrateAndFireState() 
     : p(0.0)
-    , u(0.0)
-    , fired(false)
+    , u(0.0)    
     , ref_time(0.0)
     {}
 
     void serial_process() {
         begin() << "p: "        << p << ", " 
                 << "u: "        << u << ", " 
-                << "ref_time: " << ref_time << ", " 
-                << "fired: "    << fired << Self::end;
-    }
-    bool fired;
+                << "ref_time: " << ref_time << Self::end;
+    }    
     double p;
     double u;
     double ref_time;
@@ -68,13 +65,7 @@ public:
     void reset() {
         s.p = 0.0;
         s.u = c.rest_pot;
-        s.ref_time = 0.0;
-        s.fired = false;
-    }
-
-    void propagateSynapseSpike(const SynSpike &sp) {
-        syns[ sp.syn_id ].ifc().propagateSpike();
-        lrule.ifc().propagateSynapseSpike(sp);
+        s.ref_time = 0.0;        
     }
 
     void calculateDynamics(const Time& t, const double &Iinput, const double &Isyn) {
@@ -83,7 +74,7 @@ public:
             s.p = act_f.ifc().prob(s.u);
             
             if(getUnif() < s.p) {
-                s.fired = true;
+                setFired(true);
                 s.u = c.rest_pot;
                 s.ref_time = c.tau_ref;
             }
@@ -92,13 +83,7 @@ public:
         }
         stat.add("u", s.u);
     }
-
-    bool pullFiring() {
-        bool acc = s.fired;
-        s.fired = false;
-        return acc;
-    }
-    
+   
     const double& getFiringProbability() {
         return s.p;
     }
