@@ -2,6 +2,7 @@
 
 #include <dnn/util/pretty_print.h>
 #include <dnn/util/spikes_list.h>
+#include <dnn/util/act_vector.h>
 
 namespace dnn {
 
@@ -22,11 +23,13 @@ public:
 	Network(vector<InterfacedPtr<SpikeNeuronBase>>& neurons) : spikes_list(neurons.size()) {
 		conn_map.resize(neurons.size());
 		for(auto &n: neurons) {
-			vector<InterfacedPtr<SynapseBase>>& syns = n.ref().getSynapses();
-            for(size_t con_i=0; con_i <syns.size(); con_i++) {
-                conn_map[ syns[con_i].ref().getIdPre() ].push_back(
+			ActVector<InterfacedPtr<SynapseBase>>& syns = n.ref().getSynapses();
+            size_t con_i = 0;
+            for(auto &s: syns) {
+            	conn_map[ s.ref().getIdPre() ].push_back(
                 	Conn(n.ref(), con_i)
                 );
+                ++con_i;
             }
         }
 	}
@@ -41,7 +44,7 @@ public:
 	        	SynSpike(
 	        		  neuron.id() /* source of spike */
 	        		, conn.syn_id /* destination synapse */
-	        		, t  + neuron.axon_delay + conn.neuron.syns[conn.syn_id].ref().dendrite_delay /* time of spike */
+	        		, t  + neuron.axon_delay + conn.neuron.syns.get(conn.syn_id).ref().dendrite_delay /* time of spike */
 	        	)
 	        );
 	    }

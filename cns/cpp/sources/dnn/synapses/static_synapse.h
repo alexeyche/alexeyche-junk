@@ -36,6 +36,9 @@ public:
     const string name() const {
         return "StaticSynapse";
     }
+    void reset() {
+        s.x = 0;
+    }
     void propagateSpike() {
         s.x += c.amp;
     }
@@ -45,6 +48,7 @@ public:
     }
 
     double getMembranePotential() {
+        
         return weight * s.x;
     }
 

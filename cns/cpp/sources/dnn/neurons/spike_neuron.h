@@ -9,6 +9,7 @@
 #include <dnn/io/serialize.h>
 #include <dnn/util/statistics.h>
 #include <dnn/learning_rules/learning_rule.h>
+#include <dnn/util/act_vector.h>
 
 namespace dnn {
 
@@ -53,6 +54,15 @@ public:
         i.getFiringProbability = MakeDelegate(static_cast<T*>(this), &T::getFiringProbability);
         i.propagateSynapseSpike = MakeDelegate(static_cast<T*>(this), &T::propagateSynapseSpike);
         ifc = i;
+	}
+	inline void resetInternal() {
+		reset();
+		if(lrule.isSet()) {
+			lrule.ref().reset();
+		}
+		for(auto &s: syns) {
+			s.ref().reset();
+		}
 	}
 	virtual void reset() = 0;
 
@@ -103,7 +113,7 @@ public:
 	void addSynapse(InterfacedPtr<SynapseBase> syn) {
 		syns.push_back(syn);
 	}
-	inline vector<InterfacedPtr<SynapseBase>>& getSynapses() {
+	inline ActVector<InterfacedPtr<SynapseBase>>& getSynapses() {
 		return syns;
 	}
 	Statistics& getStat() {
@@ -137,24 +147,37 @@ public:
         while(!input_spikes.empty()) {
             const SynSpike& sp = input_spikes.top();
             if(sp.t >= t.t) break;
-            syns[ sp.syn_id ].ifc().propagateSpike();
-            syns[ sp.syn_id ].ref().fired = true;
+            auto &s = syns[sp.syn_id];
+            s.ref().fired() = true;
+            ifc.propagateSynapseSpike(sp);
             input_spikes.pop();   
         }
         input_queue_lock.clear(std::memory_order_release);        
 	}
 	inline void calculateDynamicsInternal(const Time &t) {
         readInputSpikes(t);
+
         const double& Iinput = input.ifc().getValue(t);
+
 		double Isyn = 0.0;
-        for(auto &s: syns) {
+        auto syn_id_it = syns.ibegin();
+        while(syn_id_it != syns.iend()) {
+            auto &s = syns[syn_id_it];
             double x = s.ifc().getMembranePotential();
-            Isyn += x;
+            if(fabs(x) < 0.0001) {
+            	syns.setInactive(syn_id_it);
+            } else {
+            	Isyn += x;
+	        	++syn_id_it;	
+            }
+            
         }
+
         ifc.calculateDynamics(t, Iinput, Isyn);
         
         lrule.ifc().calculateDynamics(t);
-        for(auto &s: syns) {
+        for(auto syn_id_it = syns.ibegin(); syn_id_it != syns.iend(); ++syn_id_it) {
+            auto &s = syns[syn_id_it];
             s.ifc().calculateDynamics(t);
             s.ref().fired() = false;
         }
@@ -163,7 +186,7 @@ protected:
 	bool _fired;
 	size_t _id;
 	double axon_delay;
-	vector<InterfacedPtr<SynapseBase>> syns;
+	ActVector<InterfacedPtr<SynapseBase>> syns;
 
 	InterfacedPtr<ActFunctionBase> act_f;
 	InterfacedPtr<InputBase> input;

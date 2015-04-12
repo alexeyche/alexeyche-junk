@@ -18,19 +18,8 @@ s = RSim$new(const)
 
 len = 10000
 t = seq(1,len)/1000
-Iin = 1.0 +0.8*cos(2*pi*3.5*t + 0.8)
-#I0 = 1.5
-#Iin = sapply(1:length(t), function(i) I0)
+Iin = 1.5 +0.8*cos(2*pi*3.5*t + 0.8)
 RProto$new("/home/alexeyche/cpp/build/input.pb")$write(list(values=Iin), "TimeSeries")
-
-# act_f = cr$sim_configuration$layers[[1]]$act_function
-# tr = cr$act_functions[[act_f]]$treshold
-# liaf_c = cr$neurons$LeakyIntegrateAndFire
-# tau_m = 1/liaf_c$gL
-# R = tau_m/liaf_c$C
-# rate = 1000*(liaf_c$tau_ref + tau_m*log(R*I0/(R*I0 - (tr-liaf_c$rest_pot)) ))^(-1)
-
-
 
 
 s$setTimeSeries(Iin)
@@ -40,15 +29,24 @@ stat = s$getStat()
 net = s$getSpikes()
 
 sim_rate = 1000*length(net[[1]])/10000.0
-prast(net,T0=0, Tmax=1000)
-
-
-plotl(stat[[1]][["u"]][1:1000])
-
-# dtsp = 1/(sim_rate/1000)
-# liaf_c$rest_pot + R*I0 *(1-exp(-dtsp/tau_m))
+prast(net,T0=1000, Tmax=2000)
 
 
 
-#plot_st(stat[[1]],"x")
-#plotl(stat[[2]][["Ca"]][1:1000])
+get_st = function(stat, name) {
+    X = NULL
+    for(st in names(stat)) {
+        if(grepl(sprintf("^%s", name), st)) {
+            X = rbind(X, stat[[st]])       
+        }
+    }
+    return(X)
+}
+
+par(mfrow=c(3,1))
+plotl(stat[[1]][["Stdp_y"]][1:1000])
+plotl(stat[[1]][["Stdp_x1"]][1:1000])
+plotl(stat[[1]][["Stdp_w1"]][1:1000])
+plot_st(stat[[1]], "Stdp_w")
+
+

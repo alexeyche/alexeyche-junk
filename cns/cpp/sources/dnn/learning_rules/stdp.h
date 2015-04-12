@@ -72,19 +72,26 @@ public:
         if(n->fired()) {
             s.y += 1;
         }
-        vector<InterfacedPtr<SynapseBase>> &syns = n->getSynapses();
-        for(size_t syn_id=0; syn_id < syns.size(); ++syn_id) {
-            
-            double dw = c.learning_rate * ( c.a_plus  * s.x[syn_id] * n->fired() -  \
-                                            c.a_minus * s.y * syns[syn_id].ref().fired() );
+        auto &syns = n->getSynapses();
+        for(auto syn_id_it = syns.ibegin(); syn_id_it != syns.iend(); ++syn_id_it) {
+            auto &syn = syns[syn_id_it].ref();
+            double dw = c.learning_rate * ( c.a_plus  * s.x[*syn_id_it] * n->fired() -  \
+                                            c.a_minus * s.y * syn.fired() );
 
-            syns[syn_id].ref().weight += dw;
-            s.x[syn_id] += - s.x[syn_id]/c.tau_plus;
+            syn.getMutWeight() += dw;
+            s.x[*syn_id_it] += - s.x[*syn_id_it]/c.tau_plus;
         }
         s.y += - s.y/c.tau_minus;
-
-        stat.add("y", s.y);
-
+        
+        if(stat.on()) {
+            size_t i=0; 
+            for(auto &syn: syns) {
+                stat.add("x", i, s.x[i]);
+                stat.add("w", i, syn.ref().getWeight());
+                ++i;
+            }
+            stat.add("y", s.y);
+        }
     }
     
 };

@@ -42,6 +42,12 @@ public:
     const string name() const {
         return "STDSynapse";
     }
+    
+    void reset() {
+        s.x = 0.0;
+        s.res = 1.0;
+    }
+
     void propagateSpike() {
         s.x += c.amp * s.res;
         s.res -= (1 - c.gamma) * s.res;
