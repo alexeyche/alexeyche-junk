@@ -9,7 +9,7 @@
             "tau_m" : 5.0,
             "rest_pot" : 0.0,
             "tau_ref" : 2.0,
-            "noise" : 0 
+            "noise" : 1.5
         },
         "AdaptIntegrateAndFire" : {
             "tau_m" : 5.0,
@@ -50,13 +50,13 @@
             "tau_minus" : 50.0, // ms
             "a_plus" : 1.0,
             "a_minus" : 1.5,
-            "learning_rate" : 1.0
+            "learning_rate" : 0.001
         }
     },
     "sim_configuration" : {
         "layers" : [
             {
-                "size" : 1000,
+                "size" : 100,
                 "neuron" : "LeakyIntegrateAndFire",
                 "act_function" : "Determ",
                 "learning_rule" : "Stdp",
@@ -65,13 +65,13 @@
             }
         ],
         "conn_map" : {
-            #"0->1" : [
-            #    { "prob" : 0.5, "synapse" : "STDSynapse", "dendrite_delay" : 0, "start_weight" : 1 }
-            #]
+            "0->0" : [
+                { "prob" : 0.5, "synapse" : "StaticSynapse_inh", "dendrite_delay" : 0, "start_weight" : 0.1 }
+            ]
         },
         "dt" : 1.0,
         "seed" : -1,
-        "neurons_to_listen" : [25],
+        "neurons_to_listen" : [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16],
         "files" : {
             "InputTimeSeries" : { 
                 "filename" : "@ucr-input",

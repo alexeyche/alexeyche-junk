@@ -50,11 +50,12 @@ public:
 		str.writeObject(&net->spikesList());
 	}	
 	
-	inline static void runWorkerRoutine(Sim &s, size_t from, size_t to, SpinningBarrier &barrier) {
+
+	static void runWorker(Sim &s, size_t from, size_t to, SpinningBarrier &barrier) {
 		Time t(s.c.sim_conf.dt);
 
 		for(size_t i=from; i<to; ++i) {				
-			s.neurons[i].ref().reset();
+			s.neurons[i].ref().resetInternal();
 		}
 		barrier.wait();
 		for(; t<s.duration; ++t) {
@@ -67,15 +68,8 @@ public:
 				}
 			}
 			barrier.wait();
-		}		
-	}
-
-	static void runWorker(Sim &s, size_t from, size_t to, SpinningBarrier &barrier, std::exception_ptr &error) {
-		try {
-			runWorkerRoutine(s, from, to, barrier);
-		} catch(...) {
-			error = std::current_exception();
-		}		
+		}
+		barrier.wait();
 	}
 	void run(size_t jobs) {
 		if(fabs(duration) < 0.00001) {
@@ -84,21 +78,15 @@ public:
 
 		vector<IndexSlice> slices = dispatchOnThreads(neurons.size(), jobs);
 		vector<std::thread> threads;
-		vector<std::exception_ptr> errors;
 
 		SpinningBarrier barrier(jobs);		
 		for(auto &slice: slices) {
-			errors.emplace_back();
-			threads.emplace_back(Sim::runWorker, std::ref(*this), slice.from, slice.to, std::ref(barrier), std::ref(errors.back()));
+			threads.emplace_back(Sim::runWorker, std::ref(*this), slice.from, slice.to, std::ref(barrier));
 		}
 		for(auto &t: threads) {
 			t.join();
 		}
-		for(auto &eptr: errors) {
-			if(eptr) {
-				std::rethrow_exception(eptr);
-			}
-		}
+		
 	}
 
 	void print(std::ostream &str) const {

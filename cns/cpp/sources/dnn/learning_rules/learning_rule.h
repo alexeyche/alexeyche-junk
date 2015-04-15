@@ -34,9 +34,11 @@ public:
         i.calculateDynamics = MakeDelegate(static_cast<T*>(this), &T::calculateDynamics);
         i.propagateSynapseSpike = MakeDelegate(static_cast<T*>(this), &T::propagateSynapseSpike);
     }
+
 	virtual void propagateSynapseSpike(const SynSpike &s) = 0;
 	virtual void calculateDynamics(const Time &t) = 0;
-	
+	virtual void reset() = 0;
+		
 	Statistics& getStat() {
 		return stat;
 	}

@@ -22,10 +22,12 @@
 #include <atomic>
 #include <stdexcept>
 #include <exception>
+#include <unordered_set>
 
 typedef google::protobuf::Message* ProtoMessage;
 
 using std::map;
+using std::set;
 using std::cout;
 using std::move;
 using std::vector;
@@ -42,6 +44,7 @@ using std::ofstream;
 using std::ifstream;
 using std::multimap;
 using std::priority_queue;
+using std::unordered_set;
 
 template <typename T>
 using uptr = std::unique_ptr<T>;

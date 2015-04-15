@@ -30,7 +30,8 @@ public:
 	virtual void propagateSpike() = 0;
 	virtual double getMembranePotential() = 0;
 	virtual void calculateDynamics(const Time &t) = 0;
-	
+	virtual void reset() = 0;
+		
 	template <typename T>
 	void provideInterface(SynapseInterface &i) {
         i.propagateSpike = MakeDelegate(static_cast<T*>(this), &T::propagateSpike);
@@ -46,6 +47,12 @@ public:
 	}
 	inline bool& fired() {
 		return _fired;
+	}
+	inline double& getMutWeight() {
+		return weight;
+	}
+	inline const double& getWeight() {
+		return weight;
 	}
 protected:
 	size_t id_pre;
