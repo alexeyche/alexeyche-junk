@@ -21,6 +21,7 @@ friend class Network;
 friend class SpikeNeuronBase;
 friend class Builder;
 public:
+	SynapseBase() : _fired(false) {}
 	typedef SynapseInterface interface;
 
 	inline const size_t& getIdPre() { 
@@ -45,7 +46,10 @@ public:
 	Statistics& getStat() {
 		return stat; 
 	}
-	inline bool& fired() {
+	inline void setFired(bool fired) {
+		_fired = fired;
+	}
+	inline const double fired() const {
 		return _fired;
 	}
 	inline double& getMutWeight() {

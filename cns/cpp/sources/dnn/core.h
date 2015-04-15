@@ -23,6 +23,7 @@
 #include <stdexcept>
 #include <exception>
 #include <unordered_set>
+#include <set>
 
 typedef google::protobuf::Message* ProtoMessage;
 

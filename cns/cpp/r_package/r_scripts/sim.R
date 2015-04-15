@@ -18,7 +18,7 @@ s = RSim$new(const)
 
 len = 10000
 t = seq(1,len)/1000
-Iin = 1.5 +0.8*cos(2*pi*3.5*t + 0.8)
+Iin = 0.0 +0.8*cos(2*pi*3.5*t + 0.8)
 RProto$new("/home/alexeyche/cpp/build/input.pb")$write(list(values=Iin), "TimeSeries")
 
 
@@ -42,11 +42,11 @@ get_st = function(stat, name) {
     }
     return(X)
 }
-
-par(mfrow=c(3,1))
-plotl(stat[[1]][["Stdp_y"]][1:1000])
-plotl(stat[[1]][["Stdp_x1"]][1:1000])
-plotl(stat[[1]][["Stdp_w1"]][1:1000])
-plot_st(stat[[1]], "Stdp_w")
+# 
+# par(mfrow=c(3,1))
+# plotl(stat[[1]][["Stdp_y"]][1:1000])
+# plotl(stat[[1]][["Stdp_x1"]][1:1000])
+# plotl(stat[[1]][["Stdp_w1"]][1:1000])
+# plot_st(stat[[1]], "Stdp_w")
 
 

@@ -148,7 +148,7 @@ public:
             const SynSpike& sp = input_spikes.top();
             if(sp.t >= t.t) break;
             auto &s = syns[sp.syn_id];
-            s.ref().fired() = true;
+            s.ref().setFired(true);
             ifc.propagateSynapseSpike(sp);
             input_spikes.pop();   
         }
@@ -172,14 +172,14 @@ public:
             }
             
         }
-
+        
         ifc.calculateDynamics(t, Iinput, Isyn);
         
         lrule.ifc().calculateDynamics(t);
         for(auto syn_id_it = syns.ibegin(); syn_id_it != syns.iend(); ++syn_id_it) {
             auto &s = syns[syn_id_it];
             s.ifc().calculateDynamics(t);
-            s.ref().fired() = false;
+            s.ref().setFired(false);
         }
 	}
 protected:

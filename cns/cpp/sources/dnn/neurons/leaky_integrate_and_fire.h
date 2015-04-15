@@ -12,7 +12,7 @@ namespace dnn {
 struct LeakyIntegrateAndFireC : public Serializable<Protos::LeakyIntegrateAndFireC> {
     LeakyIntegrateAndFireC() 
     : 
-    , tau_m(5.0)
+      tau_m(5.0)
     , rest_pot(0.0) 
     , tau_ref(2.0)
     , noise(0.0)

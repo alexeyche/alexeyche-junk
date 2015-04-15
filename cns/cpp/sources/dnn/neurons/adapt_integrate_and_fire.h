@@ -12,7 +12,7 @@ namespace dnn {
 struct AdaptIntegrateAndFireC : public Serializable<Protos::AdaptIntegrateAndFireC> {
     AdaptIntegrateAndFireC() 
     : 
-    , tau_m(5.0)
+      tau_m(1.0)
     , rest_pot(-70.0) 
     , tau_ref(2.0)
     , noise(1.5)
