@@ -11,9 +11,8 @@ namespace dnn {
 /*@GENERATE_PROTO@*/
 struct AdaptIntegrateAndFireC : public Serializable<Protos::AdaptIntegrateAndFireC> {
     AdaptIntegrateAndFireC() 
-    : gL(0.1)
-    , C(1.0)
-    , leak(-65.0)
+    : 
+    , tau_m(5.0)
     , rest_pot(-70.0) 
     , tau_ref(2.0)
     , noise(1.5)
@@ -25,9 +24,7 @@ struct AdaptIntegrateAndFireC : public Serializable<Protos::AdaptIntegrateAndFir
     {}
 
     void serial_process() {
-        begin() << "gL: " << gL << ", " 
-                << "C: " << C << ", "
-                << "leak: " << leak << ", "
+        begin() << "tau_m: " << tau_m << ", "
                 << "rest_pot: " << rest_pot << ", "
                 << "tau_ref: " << tau_ref << ", "
                 << "noise: " << noise << ", "
@@ -38,9 +35,7 @@ struct AdaptIntegrateAndFireC : public Serializable<Protos::AdaptIntegrateAndFir
                 << "gKCa: " << gKCa << Self::end;
     }
 
-    double gL;
-    double C;
-    double leak;
+    double tau_m;
     double rest_pot;
     double tau_ref;
     double noise;
@@ -93,12 +88,12 @@ public:
             stat.add("Ia", Ia);
             
             s.u += t.dt * ( 
-                - c.gL * (s.u - c.leak) 
+                - s.u
                 + c.noise * getNorm() 
                 + Iinput 
                 + Isyn 
                 - Ia
-                ) / c.C;
+                ) / c.tau_m;
             s.p = act_f.ifc().prob(s.u);
             
             

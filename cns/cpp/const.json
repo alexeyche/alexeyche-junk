@@ -6,17 +6,13 @@
     },
     "neurons" : {
         "LeakyIntegrateAndFire" : {
-            "gL" : 0.1,
-            "C" : 1.0,
-            "leak" : -70.0,
-            "rest_pot" : -70.0,
+            "tau_m" : 5.0,
+            "rest_pot" : 0.0,
             "tau_ref" : 2.0,
             "noise" : 0 
         },
         "AdaptIntegrateAndFire" : {
-            "gL" : 0.1,
-            "C" : 1.0,
-            "leak" : -65.0,
+            "tau_m" : 5.0,
             "rest_pot" : -70.0,
             "tau_ref" : 2.0,
             "noise" : 1.5,

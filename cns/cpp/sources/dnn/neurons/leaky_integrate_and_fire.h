@@ -11,26 +11,21 @@ namespace dnn {
 /*@GENERATE_PROTO@*/
 struct LeakyIntegrateAndFireC : public Serializable<Protos::LeakyIntegrateAndFireC> {
     LeakyIntegrateAndFireC() 
-    : gL(0.1)
-    , C(1.0)
-    , leak(5.0)
+    : 
+    , tau_m(5.0)
     , rest_pot(0.0) 
     , tau_ref(2.0)
     , noise(0.0)
     {}
 
     void serial_process() {
-        begin() << "gL: " << gL << ", " 
-                << "C: " << C << ", "
-                << "leak: " << leak << ", "
+        begin() << "tau_m: " << tau_m << ", "
                 << "rest_pot: " << rest_pot << ", "
                 << "tau_ref: " << tau_ref << ", "
                 << "noise: " << noise << Self::end;
     }
 
-    double gL;
-    double C;
-    double leak;
+    double tau_m;
     double rest_pot;
     double tau_ref;
     double noise;
@@ -70,7 +65,7 @@ public:
 
     void calculateDynamics(const Time& t, const double &Iinput, const double &Isyn) {
         if(s.ref_time < 0.001) {
-            s.u += t.dt * ( - c.gL * (s.u - c.leak) + c.noise*getNorm() + Iinput + Isyn) / c.C;
+            s.u += t.dt * ( - s.u  + c.noise*getNorm() + Iinput + Isyn) / c.tau_m;
             s.p = act_f.ifc().prob(s.u);
             
             if(getUnif() < s.p) {
