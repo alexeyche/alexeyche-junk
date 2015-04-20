@@ -21,7 +21,7 @@ RProto$new("/home/alexeyche/cpp/build/input.pb")$write(list(values=Iin), "TimeSe
 
 source("./ucr_data_to_spikes.R")
 spikes = spikes_complect[["train"]]$values
-#spikes = sapply(spikes_complect[["train"]]$values, function(x) x[x<10000])
+spikes = sapply(spikes_complect[["train"]]$values, function(x) x[x<10000])
 s$setInputSpikes(spikes, "SpikeSequenceNeuron")
 
 s$run(4)
@@ -30,7 +30,7 @@ stat = s$getStat()
 net = s$getSpikes()
 m = s$getModel()
 
-prast(net,i=102, plen=400)
+prast(net,T0=0,Tmax=10000)
 
 lsize = sapply(cr$sim_configuration$layers, function(x) x$size)
 w = m[["w"]]
@@ -38,8 +38,17 @@ maps = getWeightMaps(5,5, w, lsize)
 #plotl(maps[[2]][5,])
 #gr_pl(t(w))
 
-#plotl(get_st(stat[[6]], "u")[1:100])
+plotl(get_st(stat[[1]], "u")[1:1000])
+plotl(get_st(stat[[1]], "u")[1:1000])
 #plotl(stat[[6]][[1]][1:1000])
+y = get_st(stat[[1]],"Stdp_y")
+x = get_st(stat[[1]], "Stdp_x")
+wl = get_st(stat[[1]], "Stdp_w")
+
+# par(mfrow=c(3,1))
+# plot(x[2,0:2200], type="l", ylab="x")
+# plot(y[1600:2200], type="l", ylab="y")
+# plot(wl[3,1600:2200], type="l", ylab="w")
 
 
 s$saveModel("/home/alexeyche/cpp/build/model.pb")

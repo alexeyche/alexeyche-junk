@@ -93,7 +93,7 @@
                 { 
                     "type" : "DifferenceOfGaussians", 
                     "dendrite_delay" : "Exp(0,0)", 
-                    "start_weight" : 0.1,
+                    "start_weight" : 0.05,
                     "synapse" : "StaticSynapse", 
                     "inh_synapse" : "StaticSynapse_inh" 
                 }

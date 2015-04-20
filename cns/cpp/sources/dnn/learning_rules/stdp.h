@@ -73,13 +73,21 @@ public:
             s.y += 1;
         }
         auto &syns = n->getSynapses();
-        for(auto syn_id_it = s.x.ibegin(); syn_id_it != s.x.iend(); ++syn_id_it) {
-            auto &syn = syns[syn_id_it].ref();
-            double dw = c.learning_rate * ( c.a_plus  * s.x[*syn_id_it] * n->fired() -  \
-                                            c.a_minus * s.y * syn.fired() );
+        
+        auto x_id_it = s.x.ibegin();
+        while(x_id_it != s.x.iend()) {            
+            if(fabs(s.x[x_id_it]) < 0.0001) {
+                s.x.setInactive(x_id_it);
+            } else {
+                const size_t &syn_id = *x_id_it;
+                auto &syn = syns.get(syn_id).ref();
+                double dw = c.learning_rate * ( c.a_plus  * s.x[x_id_it] * n->fired() -  \
+                                                c.a_minus * s.y * syn.fired() );
 
-            syn.mutWeight() += dw;
-            s.x[*syn_id_it] += - s.x[*syn_id_it]/c.tau_plus;
+                syn.mutWeight() += dw;
+                s.x[x_id_it] += - s.x[x_id_it]/c.tau_plus;
+                ++x_id_it;
+            }
         }
         s.y += - s.y/c.tau_minus;
         
