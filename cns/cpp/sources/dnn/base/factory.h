@@ -40,12 +40,6 @@ public:
     ProtoMessage createProto(string name);
     void deleteLast();
 
-    SpikeNeuronBase* createSpikeNeuron(string name);
-    ActFunctionBase* createActFunction(string name);
-
-    TimeSeries* createTimeSeries();
-    TimeSeries& getCachedTimeSeries(const string& filename, const string& format);
-
     static Factory& inst();
 
     pair<object_iter, object_iter> getObjectsSlice(const string& name);
@@ -53,7 +47,16 @@ public:
     SerializableBase* getObject(object_iter &it) {
         return objects[it->second];
     }
-
+    template <typename T> 
+    T* createObject(string name) {
+        SerializableBase* b = createObject(name);
+        T *p = dynamic_cast<T*>(b);
+        if (!p) {
+            throw dnnException()<< "Error to cast create object to its base" << "\n";
+        }
+        return p;
+    }
+    SerializableBase* getCachedObject(const string& filename);
 private:
     static entity_map_type typemap;
     static proto_map_type prototypemap;
@@ -61,7 +64,7 @@ private:
 
     vector<SerializableBase*> objects;
     vector<ProtoMessage> proto_objects;
-    map< pair<string, string>, TimeSeries*> ts_map;
+    map<string, SerializableBase*> cache_map;
 };
 
 

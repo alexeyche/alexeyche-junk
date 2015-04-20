@@ -29,9 +29,6 @@ public:
     static void provideDefaultInterface(InputInterface &i) {
         i.getValue = &InputBase::getValueDefault;
     }
-
-    virtual void setTimeSeries(TimeSeries *_ts) = 0;
-    virtual double getDuration() = 0;
 };
 
 

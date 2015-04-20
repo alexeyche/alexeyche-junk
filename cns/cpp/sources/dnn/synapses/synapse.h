@@ -24,9 +24,10 @@ public:
 	SynapseBase() : _fired(false) {}
 	typedef SynapseInterface interface;
 
-	inline const size_t& getIdPre() { 
-		return id_pre;
+	inline const size_t& idPre() { 
+		return _id_pre;
 	}
+	inline size_t& mutIdPre() { return _id_pre; }
 
 	virtual void propagateSpike() = 0;
 	virtual double getMembranePotential() = 0;
@@ -41,7 +42,7 @@ public:
     }
 
 	static void provideDefaultInterface(SynapseInterface &i) {
-		throw dnnException()<< "No default interface for Synapse\n";
+		throw dnnException() << "There is no default implementation for synapse\n";
 	}
 	Statistics& getStat() {
 		return stat; 
@@ -52,16 +53,16 @@ public:
 	inline const double fired() const {
 		return _fired;
 	}
-	inline double& getMutWeight() {
-		return weight;
+	inline double& mutWeight() {
+		return _weight;
 	}
-	inline const double& getWeight() {
-		return weight;
+	inline const double& weight() {
+		return _weight;
 	}
 protected:
-	size_t id_pre;
+	size_t _id_pre;
 	double dendrite_delay;
-	double weight;
+	double _weight;
 	bool _fired;
 
 	Statistics stat;
@@ -88,9 +89,9 @@ class Synapse : public SynapseBase {
 public:	
 	SynapseInfo getInfo() {
 		SynapseInfo info;
-		info.id_pre = id_pre;
+		info.id_pre = _id_pre;
 		info.dendrite_delay = dendrite_delay;
-		info.weight = weight;
+		info.weight = _weight;
 		return info;
 	}
 

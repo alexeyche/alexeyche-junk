@@ -151,3 +151,32 @@ plot_st =function(stat, name) {
     }
     plotl(colMeans(X))
 }
+
+getWeightMaps = function(xi, yi, w, lsize) {
+    prev_l_size = 1
+    maps = vector("list")
+    for(l in lsize) {
+        col_size = sqrt(l)
+        map = matrix(0, nrow=col_size, ncol=col_size)
+        for(i in 1:col_size) {
+            for(j in 1:col_size) {
+                src_neuron_id = prev_l_size + xi + (yi-1)*col_size
+                dst_neuron_id = prev_l_size + i + (j-1)*col_size            
+                map[i, j] = w[src_neuron_id, dst_neuron_id]
+            }
+        }
+        maps[[length(maps)+1]] = map
+        prev_l_size = l
+    }
+    return(maps)    
+}
+
+get_st = function(stat, name) {
+    X = NULL
+    for(st in names(stat)) {
+        if(grepl(sprintf("^%s", name), st)) {
+            X = rbind(X, stat[[st]])       
+        }
+    }
+    return(X)
+}

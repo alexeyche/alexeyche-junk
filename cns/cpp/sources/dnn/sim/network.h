@@ -26,7 +26,7 @@ public:
 			ActVector<InterfacedPtr<SynapseBase>>& syns = n.ref().getSynapses();
             size_t con_i = 0;
             for(auto &s: syns) {
-            	conn_map[ s.ref().getIdPre() ].push_back(
+            	conn_map[ s.ref().idPre() ].push_back(
                 	Conn(n.ref(), con_i)
                 );
                 ++con_i;

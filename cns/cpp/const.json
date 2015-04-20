@@ -5,11 +5,14 @@
         }
     },
     "neurons" : {
+        "SpikeSequenceNeuron" : {
+            "dt" : 1.0
+        },
         "LeakyIntegrateAndFire" : {
-            "tau_m" : 1.0,
+            "tau_m" : 5.0,
             "rest_pot" : 0.0,
             "tau_ref" : 2.0,
-            "noise" : 1.0
+            "noise" : 0.1
         },
         "AdaptIntegrateAndFire" : {
             "tau_m" : 5.0,
@@ -30,7 +33,7 @@
     },        
     "synapses" : {
         "StaticSynapse" : {
-            "psp_decay" : 15.0,
+            "psp_decay" : 10.0,
             "amp" : 1.0
         },
         "StaticSynapse_inh" : {
@@ -46,38 +49,66 @@
     },
     "learning_rules" : {
         "Stdp" : {
-            "tau_plus" : 30.0, // ms
-            "tau_minus" : 50.0, // ms
+            "tau_plus" : 30.0, 
+            "tau_minus" : 50.0,
             "a_plus" : 1.0,
             "a_minus" : 1.5,
-            "learning_rate" : 0.000
+            "learning_rate" : 0.01
         }
+    },
+    "connections" : {
+        "Stochastic" : {
+            "prob" : 0.5
+       },
+       "DifferenceOfGaussians" : {
+           "sigma" : 2.0,
+           "k" : 2
+       }
     },
     "sim_configuration" : {
         "layers" : [
             {
                 "size" : 100,
+                "neuron" : "SpikeSequenceNeuron",
+                "axon_delay" : 0
+            },
+            {
+                "size" : 100,
                 "neuron" : "LeakyIntegrateAndFire",
                 "act_function" : "Determ",
-                "axon_delay" : 0,
-                "input" : "InputTimeSeries"
+                "learning_rule" : "Stdp",
+                "axon_delay" : 0
             }
         ],
         "conn_map" : {
+            "0->1" : [
+                { 
+                    "type" : "Stochastic", 
+                    "dendrite_delay" : "Exp(0,0)",
+                    "start_weight" : 0.5,
+                    "synapse" : "StaticSynapse" 
+                }
+            ],
+            "1->1" : [
+                { 
+                    "type" : "DifferenceOfGaussians", 
+                    "dendrite_delay" : "Exp(0,0)", 
+                    "start_weight" : 0.1,
+                    "synapse" : "StaticSynapse", 
+                    "inh_synapse" : "StaticSynapse_inh" 
+                }
+            ]
         },
         "dt" : 1.0,
         "seed" : -1,
-        "neurons_to_listen" : [0],
+        "neurons_to_listen" : [100],
         "files" : {
             "InputTimeSeries" : { 
-                "filename" : "@ucr-input",
-                "format" : "ucr-ts"
+                "filename" : "@pb-input"
             },
-            "InputTimeSeries" : { 
-                "filename" : "@pb-input",
-                "format" : "protobin"
+            "SpikeSequenceNeuron" : {
+                "filename" : "@spike-input"
             }
-
         }
     }
 }    

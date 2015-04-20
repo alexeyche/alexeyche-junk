@@ -8,8 +8,9 @@ private:
     std::mutex _mutex;
     std::condition_variable _cv;
     std::size_t _count;
+    bool _fail;
 public:
-    explicit Barrier(std::size_t count) : _count{count} { }
+    explicit Barrier(std::size_t count) : _count{count}, _fail(false) { }
     void wait()
     {
         std::unique_lock<std::mutex> lock{_mutex};
@@ -18,5 +19,8 @@ public:
         } else {
             _cv.wait(lock, [this] { return _count == 0; });
         }
+    }
+    void fail() {
+        _fail = true;
     }
 };

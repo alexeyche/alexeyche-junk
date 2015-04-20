@@ -1,12 +1,12 @@
 
 
-require(Rsnn)
+require(Rdnn)
 source('./ucr_ts.R')
 source('./interpolate_ts.R')
 
-ts_dir = '~/prog/sim/ts'
+ts_dir = '~/prog/ts'
 
-sample_size = 512
+sample_size = 60
 
 data = synth # synthetic control
 #data = starlight_curves

@@ -87,10 +87,32 @@ public:
     }
 
     static SerializableBase* convertBack(const Rcpp::List &list, const string &name) {
+        TimeSeriesInfo ts_info;
+        if( (name == "TimeSeries") || (name == "SpikesList") ) {
+            if(list.containsElementNamed("ts_info")) {
+                Rcpp::List ts_info_l = list["ts_info"];
+                ts_info.labels_ids = Rcpp::as<vector<size_t>>(ts_info_l["labels_ids"]);
+                ts_info.unique_labels = Rcpp::as<vector<string>>(ts_info_l["unique_labels"]);
+                ts_info.labels_timeline = Rcpp::as<vector<size_t>>(ts_info_l["labels_timeline"]);
+            }
+        }
         if(name == "TimeSeries") {
-            TimeSeries* ts = Factory::inst().createTimeSeries();
+            TimeSeries* ts = Factory::inst().createObject<TimeSeries>(name);
             ts->data.values = Rcpp::as<vector<double>>(list["values"]);
+            ts->info = ts_info;
             return ts;
+        }
+        if(name == "SpikesList") {
+            Rcpp::List spikes = list["values"];
+            SpikesList *sl = Factory::inst().createObject<SpikesList>("SpikesList");
+
+            for(auto &sp_v: spikes) {
+                SpikesSequence sp_seq;
+                sp_seq.values = Rcpp::as<vector<double>>(sp_v);
+                sl->seq.push_back(sp_seq);
+            }
+            sl->ts_info = ts_info;
+            return sl;
         }
 
         ERR("Can't convert " << name );

@@ -4,6 +4,7 @@
 #include <dnn/util/util.h>
 #include <dnn/util/json.h>
 #include <dnn/util/interfaced_ptr.h>
+#include <dnn/util/act_vector.h>
 #include <dnn/base/base.h>
 #include <dnn/base/factory.h>
 #include <dnn/protos/base.pb.h>
@@ -186,6 +187,12 @@ public:
             messages->pop_back();
         }
     }
+    virtual void setAsInput(SerializableBase *b) {
+
+    }
+    virtual double getSimDuration() {
+        return 0.0;
+    }
 protected:
     vector<ProtoMessage> *messages;
     Protos::ClassName *header;
@@ -322,6 +329,21 @@ public:
         }
         return *this;
     }
+    Serializable& operator << (ActVector<double> &v) {
+        ASSERT_FIELDS()
+        if(mode == ProcessingOutput) {
+            for(size_t i=0; i<v.size(); ++i) {
+                currentMessage()->GetReflection()->AddDouble(currentMessage(), field_descr, v[i]);
+            }
+        } else {
+            size_t cur = currentMessage()->GetReflection()->FieldSize(*currentMessage(), field_descr);
+            for(size_t i=0; i<cur; ++i) {
+                double subv = currentMessage()->GetReflection()->GetRepeatedDouble(*currentMessage(), field_descr, i);
+                v.push_back(subv);
+            }
+        }
+        return *this;
+    }
     Serializable& operator << (vector<double> &v) {
         ASSERT_FIELDS()
         if(mode == ProcessingOutput) {
@@ -372,6 +394,15 @@ public:
 private:
     const google::protobuf::FieldDescriptor* field_descr;
 };
+
+template <typename T>
+T* as(SerializableBase *b) {
+    T* p = dynamic_cast<T*>(b);
+    if(!p) {
+        throw dnnException() << "Failed to cast: " << b->name() << "\n";
+    } 
+    return p;
+}
 
 
 

@@ -41,10 +41,8 @@ public:
             assert(document.IsObject());
             iterator = document.MemberBegin();
         }
-
-
-
     }
+    
     Stream(ostream &str, Repr _r = Binary, bool _destroy_stream=false) 
     : _output_str(&str)
     , r(_r)

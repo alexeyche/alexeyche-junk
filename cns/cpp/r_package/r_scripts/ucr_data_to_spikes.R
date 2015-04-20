@@ -1,9 +1,9 @@
 
-require(Rsnn)
+require(Rdnn)
 setwd("~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts")
 source("ucr_ts.R")
 
-ts_dir = "~/prog/sim/ts"
+ts_dir = "~/prog/ts"
 sample_size = 60
 data_name = synth
 c(data_train, data_test) := read_ts_file(data_name, sample_size, ts_dir)
@@ -16,7 +16,7 @@ max_train = max(sapply(data_train, function(x) max(x$data)))
 max_test = max(sapply(data_test, function(x) max(x$data)))
 max_val = max(max_train, max_test)
 
-N = 50
+N = 100
 dt = 5
 gap_between_patterns = 100
 
@@ -50,12 +50,21 @@ for(data_part in names(data_complect)) {
     spikes_complect[[data_part]] = sp
 }
 
-dst_dir= "/home/alexeyche/prog/sim/spikes"
+dst_dir= "/home/alexeyche/prog/spikes"
 dir.create(dst_dir, FALSE, TRUE)
 for(data_part in names(spikes_complect)) {
-    labs = unique(spikes_complect[[data_part]]$labels)
+    spl = spikes_complect[[data_part]]
+    labs = unique(spl$labels)
+    out = list(
+        ts_info = list(
+            unique_labels = as.character(labs),
+            labels_ids = sapply(spl$labels, function(l) which(l == unique(spl$labels))) - 1,
+            labels_timeline = spl$timeline
+        ),
+        values = spl$spikes_list
+    )   
     fname = sprintf("%s/%s_%s_len_%s_classes_%s.pb", dst_dir, data_name, length(sel), length(labs), data_part)
-    prw = RProto$new(fname)
-    prw$write(spikes_complect[[data_part]], "LabeledSpikesList")
+    RProto$new(fname)$write(out, "SpikesList")
+    spikes_complect[["train"]] = out
 }
-prast(spikes_complect[["train"]]$spikes,T0=110000,Tmax=111000)
+prast(spikes_complect[["train"]]$values,T0=0,Tmax=1000)

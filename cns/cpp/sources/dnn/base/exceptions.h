@@ -20,5 +20,9 @@ struct dnnException : public std::exception
   	stringstream ss;  	
 };
 
+struct dnnInterrupt : public std::exception {
+
+};
+
 
 }

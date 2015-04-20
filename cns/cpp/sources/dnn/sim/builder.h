@@ -1,6 +1,6 @@
 #pragma once
 
-
+#include <dnn/connections/connection.h>
 
 namespace dnn {
 
@@ -23,7 +23,11 @@ public:
 		for (const string &lc : c.sim_conf.layers) {
 			Layer layer;
 			Document layer_conf = Json::parseStringC(lc);
-			for (size_t ni = 0; ni < Json::getUintVal(layer_conf, "size"); ++ni) {
+			size_t layer_size = Json::getUintVal(layer_conf, "size");
+			size_t col_size = floor(sqrt(layer_size));
+			size_t xi = 0;
+			size_t yi = 0;
+			for (size_t ni = 0; ni < layer_size; ++ni) {
 				InterfacedPtr<SpikeNeuronBase> n;
 
 				if (input_stream) {
@@ -44,14 +48,18 @@ public:
 					if (!input.empty()) {
 						n.ref().setInput(buildObjectFromConstants<InputBase>(input, c.inputs));
 					}
+					n.ref().setCoordinates(xi, yi, col_size);
+					xi++;
+					if((xi>0)&&(xi % col_size == 0)) {
+						yi++;
+						xi = 0;
+					}
 				}
 				layer.neurons.push_back(n);
 			}
 			layers.push_back(layer);
 		}
 
-		// precreate time series
-		multimap<string, pair<string, string>> ts_map;
 		for (auto it = c.sim_conf.files.begin(); it != c.sim_conf.files.end(); ++it) {
 			const string &obj_name = it->first;			
 			Document file_conf = Json::parseStringC(it->second);
@@ -60,33 +68,17 @@ public:
 			if(fname.find("@") == 0) {
 				continue;
 			}
-			string format = Json::getStringVal(file_conf, "format");
-			Factory::inst().getCachedTimeSeries(
-				fname,
-				format
-			);
-			ts_map.insert( std::make_pair(obj_name, std::make_pair(fname, format)) );
-		}
-		// assign cached time series to inputs
-		for (auto it = ts_map.begin(); it != ts_map.end(); ++it) {
-			const string &obj_name = it->first;
-			const string &fname = it->second.first;
-			const string &format = it->second.second;
-
-			auto p = Factory::inst().getObjectsSlice(obj_name);
-			for (auto oit = p.first; oit != p.second; ++oit) {				
-				SerializableBase *o = Factory::inst().getObject(oit);
-				InputBase* inp = dynamic_cast<InputBase*>(o);
-				if (!inp) {
-					throw dnnException()<< "Failed to set input file for " << o->name() << "\n";
-				}
-				TimeSeries &ts = Factory::inst().getCachedTimeSeries(
-					fname,
-					format
+			auto slice = Factory::inst().getObjectsSlice(obj_name);
+			for(auto it=slice.first; it != slice.second; ++it) {
+				Factory::inst().getObject(it)->setAsInput(
+					Factory::inst().getCachedObject(
+	            	    fname
+	            	)
 				);
-				inp->setTimeSeries(&ts);
 			}
 		}
+		
+		
 		if (!input_stream) {
 			for (auto it = c.sim_conf.conn_map.begin(); it != c.sim_conf.conn_map.end(); ++it) {
 				size_t l_id_pre = it->first.first;
@@ -126,16 +118,32 @@ public:
 	}
 	void connectLayers(Layer &pre, Layer &post, const string &conn_conf_s) {
 		Document conn_conf = Json::parseStringC(conn_conf_s);
+		ConnectionBase *conn = buildObjectFromConstants<ConnectionBase>(Json::getStringVal(conn_conf, "type"), c.connections);
+
 		for (auto &npre : pre.neurons) {
 			for (auto &npost : post.neurons) {
-				if (getUnif() < Json::getDoubleValDef(conn_conf, "prob", 1.0)) {
-					InterfacedPtr<SynapseBase> syn(
-					    buildObjectFromConstants<SynapseBase>(Json::getStringVal(conn_conf, "synapse"), c.synapses)
-					);
-					syn.ref().id_pre = npre.ref().id();
-					syn.ref().dendrite_delay = Json::getDoubleValDef(conn_conf, "dendrite_delay", 0.0);
-					syn.ref().weight = Json::getDoubleVal(conn_conf, "start_weight");
-					npost.ref().addSynapse(syn);
+				ConnectionRecipe connection_recipe = conn->getConnectionRecipe(npre.ref(), npost.ref());
+				if (connection_recipe.exists) {
+					SynapseBase *syn;					
+					if(!connection_recipe.inhibitory) {
+					    syn = buildObjectFromConstants<SynapseBase>(
+					    	Json::getStringVal(conn_conf, "synapse"), 
+					    	c.synapses
+					    );
+					} else {
+						string inh_synapse_type = Json::getStringValDef(conn_conf, "inh_synapse", "");
+						if(inh_synapse_type.empty()) {
+							throw dnnException() << "Connection " << conn->name() << " demands inhibitory synapse type to be pointed in constants\n";
+						}
+					    syn = buildObjectFromConstants<SynapseBase>(
+					    	inh_synapse_type,
+					    	c.synapses
+					    );
+					}
+					syn->mutIdPre() = npre.ref().id();
+					syn->dendrite_delay = Json::getDoubleValDef(conn_conf, "dendrite_delay", 0.0);
+					syn->mutWeight() = connection_recipe.amplitude * Json::getDoubleVal(conn_conf, "start_weight");
+					npost.ref().addSynapse(InterfacedPtr<SynapseBase>(syn));
 				}
 			}
 		}

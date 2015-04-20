@@ -1,9 +1,8 @@
 
-
-
 #include <dnn/base/base.h>
 #include <dnn/neurons/leaky_integrate_and_fire.h>
 #include <dnn/neurons/adapt_integrate_and_fire.h>
+#include <dnn/neurons/spike_sequence_neuron.h>
 #include <dnn/act_functions/determ.h>
 #include <dnn/synapses/static_synapse.h>
 #include <dnn/synapses/std_synapse.h>
@@ -13,6 +12,8 @@
 #include <dnn/util/statistics.h>
 #include <dnn/util/spikes_list.h>
 #include <dnn/learning_rules/stdp.h>
+#include <dnn/connections/stochastic.h>
+#include <dnn/connections/difference_of_gaussians.h>
 
 #include "factory.h"
 
@@ -48,7 +49,10 @@ Factory::Factory() {
 	REG_TYPE_WITH_STATE_AND_CONST(AdaptIntegrateAndFire);
 	REG_TYPE_WITH_STATE_AND_CONST(StaticSynapse);
 	REG_TYPE_WITH_STATE_AND_CONST(STDSynapse);
+	REG_TYPE_WITH_STATE_AND_CONST(SpikeSequenceNeuron);
 	REG_TYPE_WITH_CONST(Determ);
+	REG_TYPE_WITH_CONST(Stochastic);
+	REG_TYPE_WITH_CONST(DifferenceOfGaussians);
 	REG_TYPE_WITH_STATE_AND_CONST(InputTimeSeries);
 	REG_TYPE_WITH_STATE_AND_CONST(Stdp);
 	
@@ -101,36 +105,17 @@ ProtoMessage Factory::createProto(string name) {
 }
 
 
-SpikeNeuronBase* Factory::createSpikeNeuron(string name) {
-	SerializableBase *b = createObject(name);
-	SpikeNeuronBase *p = dynamic_cast<SpikeNeuronBase*>(b);
-	if (!p) {
-		throw dnnException()<< "Error to cast " << b->name() << " to SpikeNeuronBase" << "\n";
-	}
-	return p;
-}
 
-ActFunctionBase* Factory::createActFunction(string name) {
-	SerializableBase *b = createObject(name);
-	ActFunctionBase *p = dynamic_cast<ActFunctionBase*>(b);
-	if (!p) {
-		throw dnnException()<< "Error to cast " << b->name() << " to ActFunctionBase" << "\n";
-	}
-	return p;
-}
+SerializableBase* Factory::getCachedObject(const string& filename) {	
+    if(cache_map.find(filename) == cache_map.end()) {
+        ifstream f(filename);
+        Stream s(f, Stream::Binary);
 
-TimeSeries* Factory::createTimeSeries() {
-	return static_cast<TimeSeries*>(createObject("TimeSeries"));
-}
-
-TimeSeries& Factory::getCachedTimeSeries(const string& filename, const string& format) {
-    auto p = std::make_pair(filename, format);
-    if(ts_map.find(p) == ts_map.end()) {
-        ts_map[p] = createTimeSeries();
-        ts_map[p]->readFromFile(filename, format);
+        cache_map[filename] = s.readObject();
     }
-    return *(ts_map[p]);
+    return cache_map[filename];
 }
+
 
 pair<Factory::object_iter, Factory::object_iter> Factory::getObjectsSlice(const string& name) {
 	return objects_map.equal_range(name);

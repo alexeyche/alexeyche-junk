@@ -10,6 +10,7 @@
 #include <dnn/util/statistics.h>
 #include <dnn/learning_rules/learning_rule.h>
 #include <dnn/util/act_vector.h>
+#include <dnn/util/spikes_list.h>
 
 namespace dnn {
 
@@ -29,13 +30,30 @@ friend class Builder;
 friend class Network;
 public:
 	SpikeNeuronBase() : input_queue_lock(ATOMIC_FLAG_INIT), _fired(false) {
-		_id = global_neuron_index++;
+		_id = global_neuron_index++;		
 	}
 
 	typedef SpikeNeuronInterface interface;
 
 	inline const size_t& id() const {
 		return _id;
+	}
+	inline void setCoordinates(size_t xi, size_t yi, size_t colSize) {
+		_xi = xi;
+		_yi = yi;
+		_colSize = colSize;
+	}
+	inline const size_t localId() {
+		return xi() + colSize()*yi();
+	}
+	inline const size_t& xi() const {
+		return _xi;
+	}
+	inline const size_t& yi() const {
+		return _yi;
+	}
+	inline const size_t& colSize() {
+		return _colSize;
 	}
 	inline const double& axonDelay() {
 		return axon_delay;
@@ -176,15 +194,34 @@ public:
         ifc.calculateDynamics(t, Iinput, Isyn);
         
         lrule.ifc().calculateDynamics(t);
+        // if(stat.on()) {
+       	// 	for(auto &s: syns) {
+       	// 		s.ifc().calculateDynamics(t);
+        //     	s.ref().setFired(false);	
+       	// 	}
+        // } else {
         for(auto syn_id_it = syns.ibegin(); syn_id_it != syns.iend(); ++syn_id_it) {
             auto &s = syns[syn_id_it];
             s.ifc().calculateDynamics(t);
             s.ref().setFired(false);
         }
+	    // }
 	}
+	
+	double getSimDuration() {
+		if(input.isSet()) {
+			return input.ref().getSimDuration();
+		}
+		return 0.0;
+	}
+
 protected:
 	bool _fired;
 	size_t _id;
+	size_t _xi;
+	size_t _yi;
+	size_t _colSize;
+
 	double axon_delay;
 	ActVector<InterfacedPtr<SynapseBase>> syns;
 
@@ -204,6 +241,8 @@ protected:
 struct SpikeNeuronInfo : public Serializable<Protos::SpikeNeuronInfo> {
 	void serial_process() {
 		begin() << "id: " << id << ", " \
+				<< "xi: " << xi << ", " \
+				<< "yi: " << yi << ", " \
 		        << "axon_delay: " << axon_delay << ", " \
 		        << "num_of_synapses: " << num_of_synapses << ", " \
 		        << "act_function_is_set: " << act_function_is_set << ", " \
@@ -211,6 +250,8 @@ struct SpikeNeuronInfo : public Serializable<Protos::SpikeNeuronInfo> {
 		        << "lrule_is_set: " << lrule_is_set << Self::end;
 	}
 	size_t id;
+	size_t xi;
+	size_t yi;
 	double axon_delay;
 	size_t num_of_synapses;
 	bool act_function_is_set;
@@ -224,6 +265,8 @@ public:
 	SpikeNeuronInfo getInfo() {
 		SpikeNeuronInfo info;
 		info.id = id();
+		info.xi = xi();
+		info.yi = yi();
 		info.axon_delay = axonDelay();
 		info.num_of_synapses = syns.size();
 		info.act_function_is_set = act_f.isSet();

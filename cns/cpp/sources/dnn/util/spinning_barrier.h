@@ -6,12 +6,14 @@ namespace dnn {
 class SpinningBarrier
 {
 public:
-    SpinningBarrier (unsigned int n) : n_ (n), nwait_ (0), step_(0) {}
+    SpinningBarrier (unsigned int n) : n_ (n), nwait_ (0), step_(0), _fail(false) {}
 
     bool wait ()
     {
         unsigned int step = step_.load ();
-
+        if(_fail.load()) {
+            throw dnnInterrupt();
+        }
         if (nwait_.fetch_add (1) == n_ - 1)
         {
             /* OK, last thread to come.  */
@@ -22,16 +24,17 @@ public:
         else
         {
             /* Run in circles and scream like a little girl.  */
-            while (step_.load () == step)
-                ;
+            while (step_.load () == step) { if(_fail.load()) break; }
             return false;
         }
     }
-
+    void fail() {
+        _fail.store(true);
+    }
 protected:
     /* Number of synchronized threads. */
     const unsigned int n_;
-
+    std::atomic<bool> _fail;
     /* Number of threads currently spinning.  */
     std::atomic<unsigned int> nwait_;
 

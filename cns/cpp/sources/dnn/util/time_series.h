@@ -125,7 +125,7 @@ struct TimeSeries : public SerializableBase {
 	       }
 	   }
 	}
-
+	
 	TimeSeriesInfo info;
 	TimeSeriesData data;
 };

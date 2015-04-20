@@ -46,7 +46,7 @@ struct StdpState : public Serializable<Protos::StdpState>  {
     }
 
     double y;
-    vector<double> x;
+    ActVector<double> x;
 };
 
 
@@ -73,12 +73,12 @@ public:
             s.y += 1;
         }
         auto &syns = n->getSynapses();
-        for(auto syn_id_it = syns.ibegin(); syn_id_it != syns.iend(); ++syn_id_it) {
+        for(auto syn_id_it = s.x.ibegin(); syn_id_it != s.x.iend(); ++syn_id_it) {
             auto &syn = syns[syn_id_it].ref();
             double dw = c.learning_rate * ( c.a_plus  * s.x[*syn_id_it] * n->fired() -  \
                                             c.a_minus * s.y * syn.fired() );
 
-            syn.getMutWeight() += dw;
+            syn.mutWeight() += dw;
             s.x[*syn_id_it] += - s.x[*syn_id_it]/c.tau_plus;
         }
         s.y += - s.y/c.tau_minus;
@@ -87,7 +87,7 @@ public:
             size_t i=0; 
             for(auto &syn: syns) {
                 stat.add("x", i, s.x[i]);
-                stat.add("w", i, syn.ref().getWeight());
+                stat.add("w", i, syn.ref().weight());
                 ++i;
             }
             stat.add("y", s.y);

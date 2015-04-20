@@ -43,12 +43,15 @@ public:
         return ts.ref().data.values[s.index++];
 	}
 
-
-    void setTimeSeries(TimeSeries *_ts) {
+    void setAsInput(SerializableBase *b) {
         s.index = 0;
-        ts.set(_ts);
+        if(ts.ptr()) {
+            throw dnnException() << "Trying to set input time series two times\n";
+        }
+        ts.set(as<TimeSeries>(b));
     }
-    double getDuration() {
+
+    double getSimDuration() {
         if(ts.isSet()) {
             return ts.ref().length() * c.dt;
         }

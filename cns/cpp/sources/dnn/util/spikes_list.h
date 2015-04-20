@@ -60,8 +60,13 @@ struct SpikesList : public SerializableBase {
 		}
 		(*this) << Self::end;
 	}
+	
 	vector<double>& operator [](const size_t &i) {
 		return seq[i].values;
+	}
+
+	inline const size_t size() const {
+		return seq.size();
 	}
 	TimeSeriesInfo ts_info;
 	vector<SpikesSequence> seq;

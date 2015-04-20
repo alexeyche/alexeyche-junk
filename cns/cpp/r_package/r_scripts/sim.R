@@ -1,12 +1,10 @@
 
-
 require(Rdnn)
 require(rjson)
 
 setwd("~/prog/alexeyche-junk/cns/cpp/r_package/r_scripts")
 
 source('plot_stat.R')
-source('gen_poisson.R')
 
 const = "/home/alexeyche/cpp/const.json"
 cr = fromJSON(parseConst(const))
@@ -21,32 +19,29 @@ t = seq(1,len)/1000
 Iin = 0.0 +0.8*cos(2*pi*3.5*t + 0.8)
 RProto$new("/home/alexeyche/cpp/build/input.pb")$write(list(values=Iin), "TimeSeries")
 
+source("./ucr_data_to_spikes.R")
+spikes = spikes_complect[["train"]]$values
+#spikes = sapply(spikes_complect[["train"]]$values, function(x) x[x<10000])
+s$setInputSpikes(spikes, "SpikeSequenceNeuron")
 
-s$setTimeSeries(Iin)
 s$run(4)
 
 stat = s$getStat()
 net = s$getSpikes()
+m = s$getModel()
 
-sim_rate = 1000*length(net[[1]])/10000.0
-prast(net,T0=1000, Tmax=2000)
+prast(net,i=102, plen=400)
+
+lsize = sapply(cr$sim_configuration$layers, function(x) x$size)
+w = m[["w"]]
+maps = getWeightMaps(5,5, w, lsize)
+#plotl(maps[[2]][5,])
+#gr_pl(t(w))
+
+#plotl(get_st(stat[[6]], "u")[1:100])
+#plotl(stat[[6]][[1]][1:1000])
 
 
-
-get_st = function(stat, name) {
-    X = NULL
-    for(st in names(stat)) {
-        if(grepl(sprintf("^%s", name), st)) {
-            X = rbind(X, stat[[st]])       
-        }
-    }
-    return(X)
-}
-# 
-# par(mfrow=c(3,1))
-# plotl(stat[[1]][["Stdp_y"]][1:1000])
-# plotl(stat[[1]][["Stdp_x1"]][1:1000])
-# plotl(stat[[1]][["Stdp_w1"]][1:1000])
-# plot_st(stat[[1]], "Stdp_w")
+s$saveModel("/home/alexeyche/cpp/build/model.pb")
 
 

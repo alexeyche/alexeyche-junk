@@ -61,7 +61,7 @@ public:
     }
 
     double getMembranePotential() {
-        return weight * s.x;
+        return weight() * s.x;
     }
 };
 

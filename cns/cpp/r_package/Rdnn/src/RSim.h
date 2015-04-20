@@ -26,21 +26,42 @@ public:
     }
     
     void run(size_t jobs=1) {
-        Sim::run(jobs);
+        try {
+            Sim::run(jobs);
+        } catch(std::exception &e) {
+            ERR("Sim run failed: " << e.what() << "\n" );
+        }
     }
     
-    void setTimeSeries(const Rcpp::NumericVector &v) {
+    void setTimeSeries(const Rcpp::NumericVector &v, const string &obj_name) {
         Rcpp::List tsl;
         tsl["values"] = v;
         TimeSeries* ts = RProto::convertBack<TimeSeries>(tsl, "TimeSeries");
+        auto slice = Factory::inst().getObjectsSlice(obj_name);
+        for(auto it=slice.first; it != slice.second; ++it) {
+            Factory::inst().getObject(it)->setAsInput(
+                ts
+            );
+        }        
         for(auto &n: neurons) {
-            if(n.ref().inputIsSet()) {
-                n.ref().getInput().setTimeSeries(ts);
-                duration = std::max(duration, n.ref().getInput().getDuration());
-            }
+            duration = std::max(duration, n.ref().getSimDuration());
         }
     }
 
+    void setInputSpikes(const Rcpp::List &l, const string &obj_name) {
+        Rcpp::List sl;
+        sl["values"] = l;
+        SpikesList* sp_l = RProto::convertBack<SpikesList>(sl, "SpikesList");
+        auto slice = Factory::inst().getObjectsSlice(obj_name);
+        for(auto it=slice.first; it != slice.second; ++it) {
+            Factory::inst().getObject(it)->setAsInput(
+                sp_l
+            );
+        }        
+        for(auto &n: neurons) {
+            duration = std::max(duration, n.ref().getSimDuration());
+        }
+    }
     Rcpp::List getStat() {
         Rcpp::List out;
         for(auto &n: neurons) {
@@ -51,6 +72,23 @@ public:
             }
         }
         return out;
+    }
+    Rcpp::List getModel() {
+        Rcpp::NumericMatrix w(neurons.size(), neurons.size());
+        
+        for(auto &n: neurons) {
+            for(auto &syn: n.ref().getSynapses()) {
+                w(syn.ref().idPre(), n.ref().id()) = syn.ref().weight();
+            }
+        }
+        return Rcpp::List::create(
+            Rcpp::Named("w") = w
+        );
+    }
+    void saveModel(const string &fname) {
+        ofstream fstr(fname);
+        Stream str_out(fstr, Stream::Binary);
+        serialize(str_out);
     }
     Rcpp::List getSpikes() {
         if(!net.get()) {
