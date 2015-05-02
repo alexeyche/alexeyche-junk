@@ -16,7 +16,7 @@ class SerializableBase;
 class Stream {
 public:
     enum Repr { Binary, Text };
-
+    
     Stream(istream &str, Repr _r = Binary, bool _destroy_stream=false) 
     : _input_str(&str)
     , r(_r)

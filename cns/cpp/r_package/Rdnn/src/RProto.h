@@ -16,29 +16,45 @@ public:
     RProto(std::string _protofile) : protofile(_protofile) {
     }
     Rcpp::List& read() {
+        return _read(true);
+    }
+    Rcpp::List& rawRead() {
+        return _read(false);
+    }
+
+    Rcpp::List& _read(bool simplify = true) {
         if(values.size() == 0) {
             if(getFileSize(protofile) == 0) return values;
 
             ifstream f(protofile);
-            Stream str(f, Stream::Binary);
-            SerializableBase* o = str.readObject();
-            if (!o) {
-                ERR("Can't read protofile " << protofile << "\n");
-            }
             vector<SerializableBase*> obj;
-            obj.push_back(o);
-            while(true) {
-                SerializableBase* o = str.readObject();
-                if(!o) break;
-                obj.push_back(o);
-            }
             
-            if(obj.size() == 1) { 
-                values = convertToList(o);
+            try {
+                Stream str(f, Stream::Binary);
+                
+                SerializableBase* o = str.readObject();
+                
+                if (!o) {
+                    ERR("Can't read protofile " << protofile << "\n");
+                }
+                
+                while(o) {
+                    obj.push_back(o);
+                    o = str.readObject();                    
+                }
+            } catch(...) {
+                ERR("Can't open " << protofile << " for reading\n");
+            }
+
+            if((obj.size() == 1)&&(simplify)) { 
+                values = convertToList(obj[0]);
             } else {
                 vector<Rcpp::List> ret;
                 for(auto &o: obj) {
-                    ret.push_back(convertToList(o));                    
+                    Rcpp::List l = convertToList(o);
+                    if(l.size()>0) {
+                        ret.push_back(l);                    
+                    }
                 }
                 values = Rcpp::wrap(ret);
             }
@@ -73,7 +89,36 @@ public:
             for(auto &seq : od->seq) {
                 sp.push_back(seq.values);
             }
-            out = Rcpp::wrap(sp);
+            out = Rcpp::List::create(
+                  Rcpp::Named("values") = Rcpp::wrap(sp)
+                , Rcpp::Named("ts_info") = Rcpp::List::create(
+                      Rcpp::Named("labels_ids") = Rcpp::wrap(od->ts_info.labels_ids)
+                    , Rcpp::Named("unique_labels") = Rcpp::wrap(od->ts_info.unique_labels)
+                    , Rcpp::Named("labels_timeline") = Rcpp::wrap(od->ts_info.labels_timeline)
+                )
+            );
+        }
+        SpikeNeuronBase* nb = dynamic_cast<SpikeNeuronBase*>(o);
+        if(nb) {
+            vector<double> weights;
+            vector<double> ids_pre;
+            for(auto &s: nb->getSynapses()) {
+                weights.push_back(s.ref().weight());
+                ids_pre.push_back(s.ref().idPre());
+            }
+            
+            out = Rcpp::List::create(
+                  Rcpp::Named("xi") = nb->xi()
+                , Rcpp::Named("yi") = nb->yi()
+                , Rcpp::Named("axon_delay") = nb->axonDelay()
+                , Rcpp::Named("id") = nb->id()
+                , Rcpp::Named("colSize") = nb->colSize()
+                , Rcpp::Named("localId") = nb->localId()
+                , Rcpp::Named("synapses") = Rcpp::List::create(
+                      Rcpp::Named("weights") = Rcpp::wrap(weights)
+                    , Rcpp::Named("ids_pre") = Rcpp::wrap(ids_pre)
+                )
+            );
         }
         return out;
     }

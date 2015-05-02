@@ -1,6 +1,7 @@
 
-neuron_to_read = 2; syn_id=58; t_plot=1:1000
-plot_stat = function(stat, cr, net, model, neuron_to_read =2, syn_id=58, t_plot=1:1000) {
+plot_stat_old = function(stat, cr, net, model, neuron_to_read =2, syn_id=58, t_plot=1:1000) {
+    neuron_to_read = 2; syn_id=58; t_plot=1:1000
+
     if(length(stat)==0) return
     listen_neuron = cr$sim_configuration$neurons_to_listen
     
@@ -179,4 +180,42 @@ get_st = function(stat, name) {
         }
     }
     return(X)
+}
+
+plot_one_stat = function(stat, stname, synid, T0, T1) {
+    sid = grep(sprintf("^%s", stname), names(stat))
+    if(length(sid)>0) {
+        if(length(sid)>1) {
+            if(is.null(synid)) {
+                v = rowMeans(do.call(cbind, stat[sid])) 
+            } else {
+                v = stat[[sprintf("%s%d", stname, synid)]]
+            }
+        } else {
+            v = stat[[sid]]
+        }
+        tx = seq(T0,T1, length.out=length(v))
+        return(
+            xyplot(v~tx, type="l", xlim=c(T0,T1), ylab=stname, xlab="time", col="black")
+        )
+    }
+}
+
+plot_stat = function(stat, synid=NULL, T0=0, T1=1000) {
+    stat_names = unique(sub("([^ _0-9]+_[^ _0-9]+).*", "\\1", names(stat)))
+    plots = list()
+    for(n in stat_names) {
+        pl = plot_one_stat(stat, n, synid, T0, T1)    
+        plots[[n]] = pl
+    }
+    acc_y = 0
+    more = TRUE
+    for(i in 1:length(plots)) {
+        if(i == length(plots)) {
+            more = FALSE
+        }
+        print(plots[[i]], position = c(0, acc_y, 1, acc_y + 1/length(plots)), more=more)
+        acc_y = acc_y + 1/length(plots)
+    }
+    
 }

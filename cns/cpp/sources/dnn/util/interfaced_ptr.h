@@ -23,9 +23,6 @@ public:
 		return *_ptr;
 	}
 	void set(T *ptr_to_set) {
-		if(_ptr) {
-			throw dnnException()<< "InterfacedPtr is already set\n";
-		}
 		_ptr = ptr_to_set;
 		_ptr->template provideInterface<T>(i);
 	}

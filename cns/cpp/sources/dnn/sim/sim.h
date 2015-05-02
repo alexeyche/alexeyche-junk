@@ -13,8 +13,8 @@ namespace dnn {
 
 class Sim : public Printable {
 public:
-	Sim(const Constants &_c) : c(_c), duration(0.0) {
-	}
+	Sim(const Constants &_c) : c(_c), duration(0.0) {}
+	
 	void build(Stream* input_stream = nullptr) {
 		Builder b(c);
 		if(input_stream) {
@@ -35,7 +35,7 @@ public:
 	void saveStat(Stream &str) {
 		for(auto &n: neurons) {
 			if(n.ref().getStat().on()) {
-				Statistics& st = n.ref().getStat();
+				Statistics st = n.ref().getStat();
 				str.writeObject(&st); 
 			}
 		}
@@ -59,6 +59,7 @@ public:
 				s.neurons[i].ref().calculateDynamicsInternal(t);
 				
 				if(s.neurons[i].ref().fired()) {
+					//cout << "Spiked " << s.neurons[i].ref().id() << " at " << t.t << "\n";					
 					s.net->propagateSpike(s.neurons[i].ref(), t.t);
 					s.neurons[i].ref().setFired(false);
 				}
@@ -67,6 +68,7 @@ public:
 		}
 		barrier.wait();
 	}
+
 	static void runWorker(Sim &s, size_t from, size_t to, SpinningBarrier &barrier, std::exception_ptr &eptr) {
 		try {
 			runWorkerRoutine(s, from, to, barrier);		
@@ -113,7 +115,12 @@ public:
 		}
 		
 	}
-
+	void setMaxDuration(const double Tmax) {
+		if(fabs(duration) < 0.00001) {
+			throw dnnException() << "Setting max duration for empty sim\n";
+		}
+		duration = min(Tmax, duration);
+	}
 	void print(std::ostream &str) const {
 		str << "Sim\n";
 		str << "\t" << neurons.size() << " ready to simulate for " << duration << "ms\n";
@@ -123,7 +130,6 @@ protected:
 	double duration;
 	const Constants &c;
 	vector<InterfacedPtr<SpikeNeuronBase>> neurons;
-
 	uptr<Network> net;
 };
 

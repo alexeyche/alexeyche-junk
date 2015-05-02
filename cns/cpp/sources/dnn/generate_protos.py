@@ -11,7 +11,7 @@ KNOWN_TYPES = {
     "string"    : "string",
     "bool"       : "bool", 
 }
-VECTOR_RE = re.compile("vector<([^ ]*?)>")
+VECTOR_RE = re.compile("(?:vector|ActVector)+<([^ ]*?)>")
 
 PROTO_FILE = "generated.proto"
 
@@ -25,7 +25,6 @@ def generateProtos(structures, package, dst):
                 if KNOWN_TYPES.get(f[0]) is None:
                     m = VECTOR_RE.match(f[0])
                     if m is None:
-                        print "Can't understand type {}".format(f[0])
                         sys.exit(1)
                     f_ptr.write("    repeated %s %s = %s;\n" % (KNOWN_TYPES[ m.group(1) ], f[1], str(i+1)))
                 else:
@@ -60,7 +59,7 @@ def parseSources(src):
                         else:
                             m = re.match(
                                 "(%s)[\W]+([^_]+[^ ]*);[\W]*$" % "|".join(
-                                    KNOWN_TYPES.keys() + [ "vector<{}>".format(t) for t in KNOWN_TYPES.keys() ]
+                                    KNOWN_TYPES.keys() + [ "(?:vector|ActVector)+<{}>".format(t) for t in KNOWN_TYPES.keys() ]
                                 ), 
                                 l
                             )

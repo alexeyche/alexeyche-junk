@@ -63,7 +63,6 @@ void Stream::protoReader(vector<ProtoMessage> &messages) {
 	for (size_t i = 0; i < cl->size(); ++i) {
 		protoReader(messages);
 	}
-
 }
 
 void Stream::jsonReader(string name, const Value &v, vector<ProtoMessage> &messages) {
@@ -84,7 +83,6 @@ void Stream::jsonReader(string name, const Value &v, vector<ProtoMessage> &messa
 		}
 	}
 	if (!has_object) {
-
 		if (!Factory::inst().isProtoType(name)) {
 			// trying to deduce proto name
 			if (!Factory::inst().isProtoType(name + string("C"))) {

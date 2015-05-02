@@ -34,7 +34,7 @@ public:
 					n.set(input_stream->readObject<SpikeNeuronBase>());
 				} else {
 					n.set(buildObjectFromConstants<SpikeNeuronBase>(Json::getStringVal(layer_conf, "neuron"), c.neurons));
-					n.ref().axon_delay = Json::getDoubleValDef(layer_conf, "axon_delay", 0.0);
+					n.ref().mutAxonDelay() = Json::getDoubleValDef(layer_conf, "axon_delay", 0.0);
 
 					const string act_function = Json::getStringValDef(layer_conf, "act_function", "");
 					if (!act_function.empty()) {
@@ -50,7 +50,7 @@ public:
 					}
 					n.ref().setCoordinates(xi, yi, col_size);
 					xi++;
-					if((xi>0)&&(xi % col_size == 0)) {
+					if(xi % col_size == 0) {
 						yi++;
 						xi = 0;
 					}
@@ -124,7 +124,7 @@ public:
 			for (auto &npost : post.neurons) {
 				ConnectionRecipe connection_recipe = conn->getConnectionRecipe(npre.ref(), npost.ref());
 				if (connection_recipe.exists) {
-					SynapseBase *syn;					
+					SynapseBase *syn(nullptr);					
 					if(!connection_recipe.inhibitory) {
 					    syn = buildObjectFromConstants<SynapseBase>(
 					    	Json::getStringVal(conn_conf, "synapse"), 
@@ -140,8 +140,10 @@ public:
 					    	c.synapses
 					    );
 					}
+					assert(syn);
+					
 					syn->mutIdPre() = npre.ref().id();
-					syn->dendrite_delay = Json::getDoubleValDef(conn_conf, "dendrite_delay", 0.0);
+					syn->mutDendriteDelay() = Json::getDoubleValDef(conn_conf, "dendrite_delay", 0.0);
 					syn->mutWeight() = connection_recipe.amplitude * Json::getDoubleVal(conn_conf, "start_weight");
 					npost.ref().addSynapse(InterfacedPtr<SynapseBase>(syn));
 				}
@@ -153,7 +155,7 @@ public:
 	static T* buildObjectFromConstants(const string &name, const map<string, string> &object_const_map) {
 		auto cptr = object_const_map.find(name);
 		if ( cptr == object_const_map.end() ) {
-			throw dnnException() << "Trying to build " << name << " from constants and can't find them\n";
+			throw dnnException() << "Trying to build " << name << " from constants and can't find him\n";
 		}
 
 		istringstream *ss = new istringstream(cptr->second);

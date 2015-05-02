@@ -89,4 +89,4 @@ typedef union { v4sf f; v4si i; } v4sfv4sipun;
 
 #endif // __SSE_H_
 
-}
+

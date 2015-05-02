@@ -29,7 +29,7 @@ Examples:
 )USAGE";
 
 struct DnnSimOpts {
-    DnnSimOpts() : jobs(1), precalc(false), Tmax(0.0) {}
+    DnnSimOpts() : jobs(1), precalc(false), Tmax(-1.0) {}
     string input;
     string const_file;
     string out_spikes;
@@ -37,7 +37,7 @@ struct DnnSimOpts {
     string out_p_stat_file;
     string model_save;
     string model_load;
-    int jobs;
+    size_t jobs;
     bool precalc;
     bool no_learning;
     double Tmax;
@@ -66,6 +66,7 @@ int main(int argc, char **argv) {
 	optp.option("--save", "-s", sopt.model_save, false);
 	optp.option("--load", "-l", sopt.model_load, false);
 	optp.loption("--stat", sopt.out_stat_file, false);
+	optp.option("--T-max", "-T", sopt.Tmax, false);
 	
 	
 
@@ -81,6 +82,9 @@ int main(int argc, char **argv) {
 		s.build(&str_in);
 	} else {
 		s.build();
+	}
+	if(sopt.Tmax>0.0) {
+		s.setMaxDuration(sopt.Tmax);
 	}
 	s.run(sopt.jobs);
 
@@ -99,4 +103,5 @@ int main(int argc, char **argv) {
 		Stream str(f, Stream::Binary);
 		s.saveSpikes(str);
 	}
+	return 0;
 }

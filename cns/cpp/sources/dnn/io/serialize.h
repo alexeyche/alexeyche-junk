@@ -63,8 +63,8 @@ public:
         }
         Protos::ClassName *head = dynamic_cast<Protos::ClassName*>(messages.back());
         if(!head) {
-            throw dnnException()<< "There is no header on the top of the stack\n";
-            throw dnnException()<< "Got " << messages.back()->GetTypeName() << "\n";
+            throw dnnException()<< "There is no header on the top of the stack\n" \
+                                << "Got " << messages.back()->GetTypeName() << "\n";
         }
         return head;
     }
@@ -193,6 +193,7 @@ public:
     virtual double getSimDuration() {
         return 0.0;
     }
+    
 protected:
     vector<ProtoMessage> *messages;
     Protos::ClassName *header;
@@ -306,8 +307,8 @@ public:
                 currentMessage()->GetReflection()->AddString(currentMessage(), field_descr, v[i]);
             }
         } else {
-            size_t cur = currentMessage()->GetReflection()->FieldSize(*currentMessage(), field_descr);
-            for(size_t i=0; i<cur; ++i) {
+            int cur = currentMessage()->GetReflection()->FieldSize(*currentMessage(), field_descr);
+            for(int i=0; i<cur; ++i) {
                 string subv = currentMessage()->GetReflection()->GetRepeatedString(*currentMessage(), field_descr, i);
                 v.push_back(subv);
             }
@@ -321,8 +322,8 @@ public:
                 currentMessage()->GetReflection()->AddUInt32(currentMessage(), field_descr, v[i]);
             }
         } else {
-            size_t cur = currentMessage()->GetReflection()->FieldSize(*currentMessage(), field_descr);
-            for(size_t i=0; i<cur; ++i) {
+            int cur = currentMessage()->GetReflection()->FieldSize(*currentMessage(), field_descr);
+            for(int i=0; i<cur; ++i) {
                 size_t subv = currentMessage()->GetReflection()->GetRepeatedUInt32(*currentMessage(), field_descr, i);
                 v.push_back(subv);
             }
@@ -336,8 +337,8 @@ public:
                 currentMessage()->GetReflection()->AddDouble(currentMessage(), field_descr, v[i]);
             }
         } else {
-            size_t cur = currentMessage()->GetReflection()->FieldSize(*currentMessage(), field_descr);
-            for(size_t i=0; i<cur; ++i) {
+            int cur = currentMessage()->GetReflection()->FieldSize(*currentMessage(), field_descr);
+            for(int i=0; i<cur; ++i) {
                 double subv = currentMessage()->GetReflection()->GetRepeatedDouble(*currentMessage(), field_descr, i);
                 v.push_back(subv);
             }
@@ -351,8 +352,8 @@ public:
                 currentMessage()->GetReflection()->AddDouble(currentMessage(), field_descr, v[i]);
             }
         } else {
-            size_t cur = currentMessage()->GetReflection()->FieldSize(*currentMessage(), field_descr);
-            for(size_t i=0; i<cur; ++i) {
+            int cur = currentMessage()->GetReflection()->FieldSize(*currentMessage(), field_descr);
+            for(int i=0; i<cur; ++i) {
                 double subv = currentMessage()->GetReflection()->GetRepeatedDouble(*currentMessage(), field_descr, i);
                 v.push_back(subv);
             }

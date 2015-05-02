@@ -55,8 +55,11 @@ public:
 	inline const size_t& colSize() {
 		return _colSize;
 	}
-	inline const double& axonDelay() {
-		return axon_delay;
+	inline const double& axonDelay() const {
+		return _axonDelay;
+	}
+	inline double& mutAxonDelay() {
+		return _axonDelay;
 	}
 	inline const bool& fired() const {
 		return _fired;
@@ -134,28 +137,41 @@ public:
 	inline ActVector<InterfacedPtr<SynapseBase>>& getSynapses() {
 		return syns;
 	}
-	Statistics& getStat() {
+	Statistics getStat() {
+		Statistics statc = stat;
+		auto& rstat = statc.getStats();
+		auto it = rstat.begin();
+		while(it != rstat.end()) {
+			if(!strStartsWith(it->first, name())) {
+				rstat[name() + "_" + it->first ] = it->second;
+				it = rstat.erase(it);
+			} else {
+				++it;
+			}
+		}
+
 		size_t syn_id = 0;
 		for(auto &s: syns) {
 			if(s.ref().getStat().on()) {
 				Statistics& syn_st = s.ref().getStat();
 				for(auto it=syn_st.getStats().begin(); it != syn_st.getStats().end(); ++it) {
-					stat.getStats()[s.ref().name() + "_" +  it->first + std::to_string(syn_id)] = it->second;	
+					rstat[s.ref().name() + "_" +  it->first + std::to_string(syn_id)] = it->second;	
 				}						
 			}
-			syn_id++;
+			++syn_id;
 		}
 		if((lrule.isSet())&&(lrule.ref().getStat().on())) {
 			Statistics &lrule_st = lrule.ref().getStat();
 			for(auto it=lrule_st.getStats().begin(); it != lrule_st.getStats().end(); ++it) {
-				stat.getStats()[ lrule.ref().name() + "_" + it->first ] = it->second;
+				rstat[ lrule.ref().name() + "_" + it->first ] = it->second;
 			}
 		}
-		return stat;
+		return statc;
 	}
 
 	inline void enqueueSpike(const SynSpike && sp) {
 		while (input_queue_lock.test_and_set(std::memory_order_acquire));
+		//cout << "Neuron " << id() << " is enqueueing spike " << sp << "\n";
 		input_spikes.push(sp);
 		input_queue_lock.clear(std::memory_order_release);
 	}
@@ -165,6 +181,7 @@ public:
         while(!input_spikes.empty()) {
             const SynSpike& sp = input_spikes.top();
             if(sp.t >= t.t) break;
+            //cout << "Neuron " << id() << " is reading spike " << sp << "\n";
             auto &s = syns[sp.syn_id];
             s.ref().setFired(true);
             ifc.propagateSynapseSpike(sp);
@@ -179,9 +196,11 @@ public:
 
 		double Isyn = 0.0;
         auto syn_id_it = syns.ibegin();
+        // if((_id == 101)&&(t.t>=2500)) cout << "Synapses: ";
         while(syn_id_it != syns.iend()) {
             auto &s = syns[syn_id_it];
             double x = s.ifc().getMembranePotential();
+            // if((_id == 101)&&(t.t>=2500)) cout << "(" << s.ref().idPre() << ", x: " << x << ", " << "w: " << s.ref().weight() << "), "; 
             if(fabs(x) < 0.0001) {
             	syns.setInactive(syn_id_it);
             } else {
@@ -190,22 +209,22 @@ public:
             }
             
         }
-        
+        // if((_id == 101)&&(t.t>=2500)) cout << "\n";
         ifc.calculateDynamics(t, Iinput, Isyn);
         
         lrule.ifc().calculateDynamics(t);
-        // if(stat.on()) {
-       	// 	for(auto &s: syns) {
-       	// 		s.ifc().calculateDynamics(t);
-        //     	s.ref().setFired(false);	
-       	// 	}
-        // } else {
-        for(auto syn_id_it = syns.ibegin(); syn_id_it != syns.iend(); ++syn_id_it) {
-            auto &s = syns[syn_id_it];
-            s.ifc().calculateDynamics(t);
-            s.ref().setFired(false);
-        }
-	    // }
+        if(stat.on()) {
+       		for(auto &s: syns) {
+       			s.ifc().calculateDynamics(t);
+            	s.ref().setFired(false);	
+       		}
+        } else {
+	        for(auto syn_id_it = syns.ibegin(); syn_id_it != syns.iend(); ++syn_id_it) {
+	            auto &s = syns[syn_id_it];
+	            s.ifc().calculateDynamics(t);
+	            s.ref().setFired(false);
+	        }
+	    }
 	}
 	
 	double getSimDuration() {
@@ -222,7 +241,7 @@ protected:
 	size_t _yi;
 	size_t _colSize;
 
-	double axon_delay;
+	double _axonDelay;
 	ActVector<InterfacedPtr<SynapseBase>> syns;
 
 	InterfacedPtr<ActFunctionBase> act_f;
@@ -243,7 +262,8 @@ struct SpikeNeuronInfo : public Serializable<Protos::SpikeNeuronInfo> {
 		begin() << "id: " << id << ", " \
 				<< "xi: " << xi << ", " \
 				<< "yi: " << yi << ", " \
-		        << "axon_delay: " << axon_delay << ", " \
+				<< "colSize: " << colSize << ", " \
+		        << "axonDelay: " << axonDelay << ", " \
 		        << "num_of_synapses: " << num_of_synapses << ", " \
 		        << "act_function_is_set: " << act_function_is_set << ", " \
 		        << "input_is_set: " << input_is_set
@@ -252,7 +272,8 @@ struct SpikeNeuronInfo : public Serializable<Protos::SpikeNeuronInfo> {
 	size_t id;
 	size_t xi;
 	size_t yi;
-	double axon_delay;
+	size_t colSize;
+	double axonDelay;
 	size_t num_of_synapses;
 	bool act_function_is_set;
 	bool input_is_set;
@@ -267,7 +288,8 @@ public:
 		info.id = id();
 		info.xi = xi();
 		info.yi = yi();
-		info.axon_delay = axonDelay();
+		info.colSize = colSize();
+		info.axonDelay = axonDelay();
 		info.num_of_synapses = syns.size();
 		info.act_function_is_set = act_f.isSet();
 		info.input_is_set = input.isSet();
@@ -312,6 +334,13 @@ public:
 		}
 		for (size_t i = 0; i < info.num_of_synapses; ++i) {
 			(*this) << "Synapse: " << syns[i];
+		}
+		if(mode == ProcessingInput) {
+			_xi = info.xi;
+			_yi = info.yi;
+			_id = info.id;
+			_colSize = info.colSize;
+			_axonDelay = info.axonDelay;
 		}
 		(*this) << Self::end;
 	}

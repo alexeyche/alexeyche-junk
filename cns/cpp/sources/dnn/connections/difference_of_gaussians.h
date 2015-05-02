@@ -6,15 +6,17 @@ namespace dnn {
 
 /*@GENERATE_PROTO@*/
 struct DifferenceOfGaussiansC : public Serializable<Protos::DifferenceOfGaussiansC> {
-    DifferenceOfGaussiansC() : sigma(5.0), k(2) {}
+    DifferenceOfGaussiansC() : a(3.0), b(3.0), r(1) {}
 
     void serial_process() {
-        begin() << "sigma: " << sigma << ", "
-        		<< "k: " 	 << k 	  << Self::end;
+        begin() << "a: " << a << ", "
+                << "b: " << b << ", "
+        		<< "r: " << r << Self::end;
     }
 
-    double sigma;
-    double k;
+    double a;
+    double b;
+    double r;
 };
 
 
@@ -28,8 +30,8 @@ public:
     }
     ConnectionRecipe getConnectionRecipe(const SpikeNeuronBase &left, const SpikeNeuronBase &right) {
     	ConnectionRecipe recipe;
-    	double v = 2*gaussFunction(right.xi(), right.yi(), left.xi(), left.yi(), c.sigma) - \
-    				 gaussFunction(right.xi(), right.yi(), left.xi(), left.yi(), c.k*c.sigma);
+    	double v = (1+c.a) * gaussFunction(right.xi(), right.yi(), left.xi(), left.yi(), c.r) - \
+    				  c.a * gaussFunction(right.xi(), right.yi(), left.xi(), left.yi(), c.b*c.r);
 
     	recipe.exists = true;
     	if(v<0) {

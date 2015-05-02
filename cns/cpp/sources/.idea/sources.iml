@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="CPP_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <content url="file://$USER_HOME$/.clion10/system/cmake/generated/54c390a/54c390a/Debug/dnn/protos/base.pb.cc">
+      <sourceFolder url="file://$USER_HOME$/.clion10/system/cmake/generated/54c390a/54c390a/Debug/dnn/protos/base.pb.cc" isTestSource="false" />
+    </content>
+    <content url="file://$USER_HOME$/.clion10/system/cmake/generated/54c390a/54c390a/Debug/dnn/protos/generated.pb.cc">
+      <sourceFolder url="file://$USER_HOME$/.clion10/system/cmake/generated/54c390a/54c390a/Debug/dnn/protos/generated.pb.cc" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$" />
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>

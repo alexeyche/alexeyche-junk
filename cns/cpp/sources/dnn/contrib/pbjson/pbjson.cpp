@@ -470,7 +470,7 @@ namespace pbjson
             if (!field)
                 field = ref->FindKnownExtensionByName(name);
             if (!field)
-                continue; // TODO: we should not fail here, instead write this value into an unknown field
+                continue;
             if (itr->value.GetType() == rapidjson::kNullType) {
                 ref->ClearField(msg, field);
                 continue;

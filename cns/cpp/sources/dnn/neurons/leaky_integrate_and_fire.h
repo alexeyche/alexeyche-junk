@@ -64,11 +64,14 @@ public:
     }
 
     void calculateDynamics(const Time& t, const double &Iinput, const double &Isyn) {
+        // if((_id == 101)&&(t.t>=2500)) {
+        //     cout << "Neuron: (Iinput: " << Iinput << ", " << "Isyn: " << Isyn << ", du: " << t.dt * ( - s.u  + c.noise*getNorm() + Iinput + Isyn) / c.tau_m << ")\n";
+        // }
         if(s.ref_time < 0.001) {
             s.u += t.dt * ( - s.u  + c.noise*getNorm() + Iinput + Isyn) / c.tau_m;
             s.p = act_f.ifc().prob(s.u);
-            
-            if(getUnif() < s.p) {
+
+            if(s.p > getUnif()) {
                 setFired(true);
                 s.u = c.rest_pot;
                 s.ref_time = c.tau_ref;
@@ -77,6 +80,7 @@ public:
             s.ref_time -= t.dt;
         }
         stat.add("u", s.u);
+        stat.add("p", s.p);
     }
    
     const double& getFiringProbability() {

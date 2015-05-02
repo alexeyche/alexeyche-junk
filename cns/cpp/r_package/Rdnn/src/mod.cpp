@@ -23,6 +23,7 @@ RCPP_MODULE(dnnMod) {
     Rcpp::class_<RProto>("RProto")
     .constructor<std::string>()
     .method("read", &RProto::read, "Reading protobuf")
+    .method("rawRead", &RProto::rawRead, "Reading protobuf without simplifying")
     .method("write", &RProto::write, "Write protobuf")
     .method("print", &RProto::print, "Print proto instance")
     ;

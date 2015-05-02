@@ -136,4 +136,4 @@ vfasterexp (const v4sf p)
 
 #endif // __FAST_EXP_H_
 
-}
+

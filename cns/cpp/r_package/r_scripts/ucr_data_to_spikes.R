@@ -18,10 +18,11 @@ max_val = max(max_train, max_test)
 
 N = 100
 dt = 5
-gap_between_patterns = 100
+gap_between_patterns = 0
 
 intercept = seq(min_val, max_val, length.out=N)
 
+#sel = c(1:10)
 #sel = c(1:10, 51:60, 101:110, 151:160)
 sel = c(1:length(data_train))
 data_complect = list(train=data_train, test=data_test)
@@ -50,21 +51,30 @@ for(data_part in names(data_complect)) {
     spikes_complect[[data_part]] = sp
 }
 
-dst_dir= "/home/alexeyche/prog/spikes"
+dst_dir= "/home/alexeyche/dnn/spikes"
+ts_dst_dir= "/home/alexeyche/dnn/ts"
 dir.create(dst_dir, FALSE, TRUE)
+dir.create(ts_dst_dir, FALSE, TRUE)
 for(data_part in names(spikes_complect)) {
     spl = spikes_complect[[data_part]]
     labs = unique(spl$labels)
+    ts_info = list(
+        unique_labels = as.character(labs),
+        labels_ids = sapply(spl$labels, function(l) which(l == unique(spl$labels))) - 1,
+        labels_timeline = spl$timeline
+    )
     out = list(
-        ts_info = list(
-            unique_labels = as.character(labs),
-            labels_ids = sapply(spl$labels, function(l) which(l == unique(spl$labels))) - 1,
-            labels_timeline = spl$timeline
-        ),
+        ts_info = ts_info,
         values = spl$spikes_list
     )   
     fname = sprintf("%s/%s_%s_len_%s_classes_%s.pb", dst_dir, data_name, length(sel), length(labs), data_part)
     RProto$new(fname)$write(out, "SpikesList")
-    spikes_complect[["train"]] = out
+    spikes_complect[[data_part]] = out
+    ts_out = list(
+        ts_info = ts_info,
+        values = unlist(lapply(data_complect[[data_part]], function(x) x$data))
+    )
+    fname = sprintf("%s/%s_%s_len_%s_classes_%s.pb", ts_dst_dir, data_name, length(sel), length(labs), data_part)
+    RProto$new(fname)$write(ts_out, "TimeSeries")
 }
 prast(spikes_complect[["train"]]$values,T0=0,Tmax=1000)

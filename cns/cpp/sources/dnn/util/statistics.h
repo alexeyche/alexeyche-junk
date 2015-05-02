@@ -47,13 +47,13 @@ struct StatisticsInfo : public Serializable<Protos::StatisticsInfo> {
 struct stringLessThan : public std::binary_function< string, string, bool >
 {
 	stringLessThan() 
-	: e(".*?([0-9]+).*?", std::regex_constants::basic) {}
+	: e("^([0-9]+)", std::regex_constants::basic) {}
 
     bool operator()( const string &e1, const string &e2 ) const
     {
         std::smatch sm1, sm2; 
     	std::regex_match (e1,sm1,e);
-    	std::regex_match (e2,sm2,e);
+    	std::regex_match (e2,sm2,e);    	
     	if((sm1.size() == 2)&&(sm2.size() == 2)) {
     		return std::stoi(sm1[1]) < std::stoi(sm2[1]);
     	}    	

@@ -13,8 +13,9 @@ message StochasticC {
 }
 
 message DifferenceOfGaussiansC {
-    required double sigma = 1;
-    required double k = 2;
+    required double a = 1;
+    required double b = 2;
+    required double r = 3;
 }
 
 message StdpC {
@@ -23,6 +24,8 @@ message StdpC {
     required double a_plus = 3;
     required double a_minus = 4;
     required double learning_rate = 5;
+    required double w_max = 6;
+    required double w_min = 7;
 }
 
 message StdpState {
@@ -52,8 +55,8 @@ message STDSynapseState {
 }
 
 message SynapseInfo {
-    required uint32 id_pre = 1;
-    required double dendrite_delay = 2;
+    required uint32 idPre = 1;
+    required double dendriteDelay = 2;
     required double weight = 3;
 }
 
@@ -104,11 +107,12 @@ message SpikeNeuronInfo {
     required uint32 id = 1;
     required uint32 xi = 2;
     required uint32 yi = 3;
-    required double axon_delay = 4;
-    required uint32 num_of_synapses = 5;
-    required bool act_function_is_set = 6;
-    required bool input_is_set = 7;
-    required bool lrule_is_set = 8;
+    required uint32 colSize = 4;
+    required double axonDelay = 5;
+    required uint32 num_of_synapses = 6;
+    required bool act_function_is_set = 7;
+    required bool input_is_set = 8;
+    required bool lrule_is_set = 9;
 }
 
 message AdaptIntegrateAndFireC {

@@ -32,7 +32,7 @@ plotl <- function(x) {
 
 
 
-require(lattice)
+require(lattice, quietly=TRUE)
 
 plot_rastl <- function(raster, lab="",T0=0, Tmax=Inf, i=-1, plen=-1) {
     x <- c()
@@ -79,7 +79,7 @@ measureSpikeCor = function(net, dt) {
     return(cor_m)    
 }
 
-parseConst = function(const) {
+readConst = function(const) {
     const_cont = scan(const,what=character(), sep="\n")
     const_cont = gsub("(//|#).*","", const_cont)
     const_cont = paste(const_cont, sep="\n", collapse="")

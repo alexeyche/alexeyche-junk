@@ -44,7 +44,7 @@ public:
 	        	SynSpike(
 	        		  neuron.id() /* source of spike */
 	        		, conn.syn_id /* destination synapse */
-	        		, t  + neuron.axon_delay + conn.neuron.syns.get(conn.syn_id).ref().dendrite_delay /* time of spike */
+	        		, t  + neuron.axonDelay() + conn.neuron.syns.get(conn.syn_id).ref().dendriteDelay() /* time of spike */
 	        	)
 	        );
 	    }

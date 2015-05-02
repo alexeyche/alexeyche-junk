@@ -68,7 +68,8 @@ public:
             if(n.ref().getStat().on()) {
                 stringstream ss;
                 ss << n.ref().name() << "_" << n.ref().id();
-                out[ss.str()] = RProto::convertToList(&n.ref().getStat());
+                Statistics st = n.ref().getStat();
+                out[ss.str()] = RProto::convertToList(&st);
             }
         }
         return out;

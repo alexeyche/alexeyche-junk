@@ -44,9 +44,9 @@ int main(int argc, char **argv) {
             vector<string> type_subs = split(type, '.');
             assert(type_subs.size() == 2);
             cout << type_subs[1] << " {\n";
-            string s = m->DebugString();
+            string ds = m->DebugString();
             string acc;
-            vector<string> lines = split(s, '\n');
+            vector<string> lines = split(ds, '\n');
             for(auto &l: lines) {
                 acc += "    " + l + '\n';
             }

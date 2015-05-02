@@ -25,9 +25,9 @@ public:
 	typedef SynapseInterface interface;
 
 	inline const size_t& idPre() { 
-		return _id_pre;
+		return _idPre;
 	}
-	inline size_t& mutIdPre() { return _id_pre; }
+	inline size_t& mutIdPre() { return _idPre; }
 
 	virtual void propagateSpike() = 0;
 	virtual double getMembranePotential() = 0;
@@ -40,9 +40,20 @@ public:
         i.calculateDynamics = MakeDelegate(static_cast<T*>(this), &T::calculateDynamics);
         i.getMembranePotential = MakeDelegate(static_cast<T*>(this), &T::getMembranePotential);
     }
+	static void __defaultPropagateSpike() { 
+		throw dnnException() << "Calling inapropriate default interface function\n";
+	}
+	static void __defaultCalculateDynamics(const Time &t) { 
+		throw dnnException() << "Calling inapropriate default interface function\n";
+	}
+	static double __defaultGetMembranePotential() { 
+		throw dnnException() << "Calling inapropriate default interface function\n";
+	}
 
 	static void provideDefaultInterface(SynapseInterface &i) {
-		throw dnnException() << "There is no default implementation for synapse\n";
+		i.propagateSpike = &SynapseBase::__defaultPropagateSpike;
+        i.calculateDynamics = &SynapseBase::__defaultCalculateDynamics;
+        i.getMembranePotential = &SynapseBase::__defaultGetMembranePotential;
 	}
 	Statistics& getStat() {
 		return stat; 
@@ -59,9 +70,16 @@ public:
 	inline const double& weight() {
 		return _weight;
 	}
+	inline const double& dendriteDelay() {
+		return _dendriteDelay;
+	}
+	inline double& mutDendriteDelay() { 
+		return _dendriteDelay; 
+	}
+
 protected:
-	size_t _id_pre;
-	double dendrite_delay;
+	size_t _idPre;
+	double _dendriteDelay;
 	double _weight;
 	bool _fired;
 
@@ -72,12 +90,12 @@ protected:
 /*@GENERATE_PROTO@*/
 struct SynapseInfo : public Serializable<Protos::SynapseInfo> {
 	void serial_process() {
-		begin() << "id_pre: " 		  << id_pre 		<< ", " \
-		        << "dendrite_delay: " << dendrite_delay << ", " \
+		begin() << "idPre: " 		  << idPre 		<< ", " \
+		        << "dendriteDelay: " << dendriteDelay << ", " \
 		        << "weight: " 		  << weight 		<< Self::end;
 	}
-	size_t id_pre;
-	double dendrite_delay;
+	size_t idPre;
+	double dendriteDelay;
 	double weight;
 };
 
@@ -89,8 +107,8 @@ class Synapse : public SynapseBase {
 public:	
 	SynapseInfo getInfo() {
 		SynapseInfo info;
-		info.id_pre = _id_pre;
-		info.dendrite_delay = dendrite_delay;
+		info.idPre = _idPre;
+		info.dendriteDelay = _dendriteDelay;
 		info.weight = _weight;
 		return info;
 	}
@@ -115,6 +133,13 @@ public:
 		}
 
 		(*this) << "SynapseInfo: "   << info;
+		
+		if (mode == ProcessingInput) {
+			_weight = info.weight;
+			_idPre = info.idPre;
+			_dendriteDelay = info.dendriteDelay;
+		}
+
 		(*this) << Self::end;
 	}
 protected:

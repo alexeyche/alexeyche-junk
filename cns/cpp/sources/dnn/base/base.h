@@ -47,7 +47,7 @@ typedef FastDelegate1<const Time&> calculateDynamicsDelegate;
 typedef FastDelegate1<const size_t&, const double&> getValueAtIndexDelegate;
 typedef FastDelegate3<const Time&, const double&, const double&> calculateNeuronDynamicsDelegate;
 
-struct SynSpike {
+struct SynSpike : public Printable {
     SynSpike(const size_t &_n_id, const size_t &_syn_id, const double &_t)
     : n_id(_n_id)
     , syn_id(_syn_id)
@@ -58,6 +58,9 @@ struct SynSpike {
     size_t syn_id;
     bool operator<(const SynSpike& rhs) const {
         return t > rhs.t;
+    }
+    void print(std::ostream &str) const {
+        str << "SynSpike(t: " << t << ", n_id: " << n_id << ", syn_id: " << syn_id << ")";
     }
 };
 
