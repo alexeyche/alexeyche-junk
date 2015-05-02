@@ -38,8 +38,13 @@ public:
 
     SerializableBase* createObject(string name);
     ProtoMessage createProto(string name);
-    void deleteLast();
-
+    
+    void registrationOff() {
+        registration_is_on = false;
+    }
+    void registrationOn() {
+        registration_is_on = true;
+    }
     static Factory& inst();
 
     pair<object_iter, object_iter> getObjectsSlice(const string& name);
@@ -58,6 +63,7 @@ public:
     }
     SerializableBase* getCachedObject(const string& filename);
 private:
+    bool registration_is_on;
     static entity_map_type typemap;
     static proto_map_type prototypemap;
     multimap<string, size_t> objects_map;

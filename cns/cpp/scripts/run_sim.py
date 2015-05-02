@@ -68,7 +68,8 @@ class DnnSim(object):
         self.epochs = self.dget(kwargs, "epochs", 1)
         self.jobs = self.dget(kwargs, "jobs", multiprocessing.cpu_count())
         self.insp_script = self.dget(kwargs, "insp_script", self.INSP_SCRIPT)
-        
+        self.T_max = self.dget(kwargs, "T_max", None)
+ 
         if not os.path.exists(self.working_dir):
             os.makedirs(self.working_dir)
         for f in os.listdir(self.working_dir):
@@ -128,6 +129,9 @@ class DnnSim(object):
             cmd += [
                 "--load", prev_model
             ]
+        if not self.T_max is None:
+            cmd += list(self.get_opt("T_max"))
+
         for k, v in self.add_options.items():
             cmd += [str_to_opt(k), v]
 

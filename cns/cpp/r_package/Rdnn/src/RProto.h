@@ -28,10 +28,12 @@ public:
 
             ifstream f(protofile);
             vector<SerializableBase*> obj;
-            
+
+                
             try {
                 Stream str(f, Stream::Binary);
                 
+                Factory::inst().registrationOff();
                 SerializableBase* o = str.readObject();
                 
                 if (!o) {
@@ -48,6 +50,7 @@ public:
 
             if((obj.size() == 1)&&(simplify)) { 
                 values = convertToList(obj[0]);
+                delete obj[0];
             } else {
                 vector<Rcpp::List> ret;
                 for(auto &o: obj) {
@@ -55,12 +58,11 @@ public:
                     if(l.size()>0) {
                         ret.push_back(l);                    
                     }
+                    delete o;
                 }
                 values = Rcpp::wrap(ret);
             }
-            for(auto& o: obj) {
-                Factory::inst().deleteLast();
-            }
+            Factory::inst().registrationOn();            
         }
         return values;
     }

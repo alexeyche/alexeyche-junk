@@ -85,3 +85,12 @@ readConst = function(const) {
     const_cont = paste(const_cont, sep="\n", collapse="")
     return(const_cont)
 }
+
+blank_net = function(N) {
+    if(N<=0) return(list())
+    net = list()
+    for(i in 1:N) {
+        net[[i]] = numeric(0)
+    }   
+    return(net)
+}

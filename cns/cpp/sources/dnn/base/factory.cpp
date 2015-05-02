@@ -41,7 +41,7 @@ Factory& Factory::inst() {
 	registerType<name##State>(string(#name) + string("State"));\
 
 
-Factory::Factory() {
+Factory::Factory() : registration_is_on(true) {
 	REG_TYPE(SpikeNeuronInfo);
 	REG_TYPE(SynapseInfo);
 	
@@ -74,25 +74,16 @@ Factory::~Factory() {
 	}
 }
 
-void Factory::deleteLast() {
-	auto p = objects_map.equal_range(objects.back()->name());
-	for (auto it = p.first; it != p.second; ++it) {
-		if (it->second == objects.size()-1) { 
-			objects_map.erase(it);
-			break;
-		}
-	}
-	delete objects.back();
-	objects.pop_back();
-}
 
 SerializableBase* Factory::createObject(string name) {
 	if (typemap.find(name) == typemap.end()) {
 		throw dnnException()<< "Failed to find method to construct type " << name << "\n";
 	}
 	SerializableBase* o = typemap[name]();
-	objects.push_back(o);
-	objects_map.insert(std::make_pair(o->name(), objects.size()-1));
+	if(registration_is_on) {
+		objects.push_back(o);
+		objects_map.insert(std::make_pair(o->name(), objects.size()-1));
+	}
 	return o;
 }
 
