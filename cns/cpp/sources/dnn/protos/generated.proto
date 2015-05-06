@@ -13,9 +13,25 @@ message StochasticC {
 }
 
 message DifferenceOfGaussiansC {
-    required double a = 1;
-    required double b = 2;
-    required double r = 3;
+    required int32 dimension = 1;
+    required double a = 2;
+    required double b = 3;
+    required double r = 4;
+}
+
+message StdpTimeC {
+    required double tau_plus = 1;
+    required double tau_minus = 2;
+    required double a_plus = 3;
+    required double a_minus = 4;
+    required double learning_rate = 5;
+    required double w_max = 6;
+    required double w_min = 7;
+}
+
+message StdpTimeState {
+    required double y = 1;
+    repeated double x = 2;
 }
 
 message StdpC {

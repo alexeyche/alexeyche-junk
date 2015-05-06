@@ -21,7 +21,7 @@ args <- commandArgs(trailingOnly = FALSE)
 if(length(grep("RStudio", args))>0) {
     WD = sprintf("~/dnn/runs/%s", system("ls -t ~/dnn/runs | head -n 1", intern=TRUE))
     EP=1
-    T1=10000
+    T1=1000
 }
 
 pfx_f = function(s) s
@@ -44,8 +44,8 @@ LAYER_MAP = convStr(Sys.getenv('LAYER_MAP'), NULL)
 SAVE_PIC_IN_FILES = convStr(Sys.getenv('SAVE_PIC_IN_FILES'), "yes") %in% c("yes", "1", "True", "true")
 
 if(length(grep("RStudio", args))>0) {
-    STAT_SYN_ID=78
-    LAYER_MAP="1:12:12"
+    STAT_SYN_ID=100
+    LAYER_MAP=NULL #"1:7:7"
     SAVE_PIC_IN_FILES = FALSE
 }
 
@@ -146,22 +146,76 @@ if (file.exists(STAT_FNAME)) {
 }
 
 if ( (!is.null(input))&&(!is.null(model))&&(!is.null(net)) ) {
-    PATTERN_LAYERS = c(1)
+    PATTERN_LAYER = c(1)
     
     patterns = list()
+    last_pattern_time = 0
     for(lt_i in 1:length(input$ts_info$labels_timeline)) {
         lt = input$ts_info$labels_timeline[lt_i]
         li = input$ts_info$labels_ids[lt_i]
         lab = input$ts_info$unique_labels[li+1]
-        patterns[[lt_i+1]] = blank_net(length(net$values))
+        patterns[[lt_i]] = list()
+        patterns[[lt_i]]$values = blank_net(length(net$values))
+        patterns[[lt_i]]$label_id = li
         for(ni in 1:length(net$values)) {
             sp = net$values[[ni]]
             for(sp_t in sp) {
-                if((sp_t<lt)||(sp_t>lt)) next
-                patterns[[lt_i+1]][[ni]] = c(patterns[[lt_i+1]][[ni]], sp_t)
+                if((sp_t<last_pattern_time)||(sp_t>lt)) next
+                patterns[[lt_i]]$values[[ni]] = c(patterns[[lt_i]]$values[[ni]], sp_t-last_pattern_time)
             }        
         }
+        last_pattern_time = lt
     }
+    bin_patterns = list()
+    last_pattern_time = 0
+    for(lt_i in 1:length(input$ts_info$labels_timeline)) {
+        lt = input$ts_info$labels_timeline[lt_i]
+        li = input$ts_info$labels_ids[lt_i]
+        bin_patterns[[lt_i]] = list()
+        bin_patterns[[lt_i]]$label_id = li
+        dur = lt-last_pattern_time
+        bin_patterns[[lt_i]]$pattern = matrix(0, ncol=dur,nrow=length(patterns[[lt_i]]$values))
+        for(ni in 1:length(patterns[[lt_i]]$values)) {
+            bin_patterns[[lt_i]]$pattern[ni, patterns[[lt_i]]$values[[ni]] ] = 1
+        }
+        last_pattern_time = lt
+    }
+    lab_pattern = list()
+    map_patterns = list()
+    for(p in patterns) {
+        layers_maps = list()
+        for(ni in 1:length(model)) {
+            
+            n = model[[ni]]
+            if(n$localId == 0) layers_maps[[length(layers_maps)+1]] = matrix(0, nrow=n$colSize, ncol=n$colSize)
+            
+            layers_maps[[length(layers_maps)]][n$xi+1, n$yi+1] = length(p$values[[n$id+1]])
+            
+        }
+        map_patterns[[length(map_patterns)+1]] = list(map=layers_maps[[PATTERN_LAYER+1]], label=p$label)
+        if( (p$label_id+1) > length(lab_pattern) ) {
+            lab_pattern[[p$label_id+1]] = layers_maps[[PATTERN_LAYER+1]]
+        } else {
+            lab_pattern[[p$label_id+1]] = (lab_pattern[[p$label_id+1]] + layers_maps[[PATTERN_LAYER+1]])/2
+        }
+    }
+    lab_errors = matrix(0, nrow=length(map_patterns), ncol=length(lab_pattern))
+    for(pi in 1:length(map_patterns)) {
+        p = map_patterns[[pi]]
+        for(lpi in 1:length(lab_pattern)) {
+            lp = lab_pattern[[lpi]]
+            lab_errors[pi, lpi] = sum( (p$map - lp)^2 )
+        }
+    }
+    
+#     lab_errors_pic = sprintf("%s/5_%s", tmp_d, pfx_f("lab_errors.png"))
+#     if(SAVE_PIC_IN_FILES) png(lab_errors_pic, width=1024, height=768)
+#     print(gr_pl(lab_errors))
+#     if(SAVE_PIC_IN_FILES) {
+#         dev.off()
+#         cat("Lab errors pic filename: ", lab_errors_pic, "\n")
+#         pic_files = c(pic_files, lab_errors_pic)
+#     }
 }
 
 

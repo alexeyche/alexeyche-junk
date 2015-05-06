@@ -17,14 +17,15 @@ max_test = max(sapply(data_test, function(x) max(x$data)))
 max_val = max(max_train, max_test)
 
 N = 100
-dt = 10
+dt = 5
 gap_between_patterns = 100
 
 intercept = seq(min_val, max_val, length.out=N)
 
 #sel = c(1:10)
-sel = c(1:10, 51:60, 101:110, 151:160)
+#sel = c(1:10, 51:60, 101:110, 151:160)
 #sel = c(1:length(data_train))
+sel = c(151:200)
 data_complect = list(train=data_train, test=data_test)
 spikes_complect = list()
 

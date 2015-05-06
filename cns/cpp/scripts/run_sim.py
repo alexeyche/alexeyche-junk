@@ -62,27 +62,11 @@ class DnnSim(object):
         self.const = self.dget(kwargs, "const", self.CONST_JSON)
         self.runs_dir = self.dget(kwargs, "runs_dir", self.RUNS_DIR)
         self.working_dir = self.dget(kwargs, "working_dir", self.get_wd())
-        self.dnn_sim_bin = self.dget(kwargs, "dnn_sim_bin", self.DNN_SIM_BIN)
-        self.add_options = self.dget(kwargs, "add_options", {})
-        self.stat = self.dget(kwargs, "stat", False)
-        self.epochs = self.dget(kwargs, "epochs", 1)
-        self.jobs = self.dget(kwargs, "jobs", multiprocessing.cpu_count())
-        self.insp_script = self.dget(kwargs, "insp_script", self.INSP_SCRIPT)
-        self.T_max = self.dget(kwargs, "T_max", None)
- 
-        if not os.path.exists(self.working_dir):
-            os.makedirs(self.working_dir)
-        for f in os.listdir(self.working_dir):
-            f = os.path.join(self.working_dir, f)
-            if os.path.isdir(f):
-                shutil.rmtree(f)
-            else:
-                os.remove(f)
 
-        for k, v in self.add_options.items():
-            if os.path.exists(v):
-                shutil.copy(v, os.path.join(self.working_dir, k) + ".pb")
-        shutil.copy(self.const, self.working_dir)
+        if os.path.exists(self.working_dir):
+            self.continue_in_wd()
+        else:
+            os.mkdir(self.working_dir)
 
         logFormatter = logging.Formatter("%(asctime)s [%(levelname)s]  %(message)-100s")
         rootLogger = logging.getLogger()
@@ -95,6 +79,22 @@ class DnnSim(object):
         consoleHandler.setFormatter(logFormatter)
         rootLogger.setLevel(logging.DEBUG)
         rootLogger.addHandler(consoleHandler)
+
+
+
+        self.dnn_sim_bin = self.dget(kwargs, "dnn_sim_bin", self.DNN_SIM_BIN)
+        self.add_options = self.dget(kwargs, "add_options", {})
+        self.stat = self.dget(kwargs, "stat", False)
+        self.epochs = self.dget(kwargs, "epochs", 1)
+        self.jobs = self.dget(kwargs, "jobs", multiprocessing.cpu_count())
+        self.insp_script = self.dget(kwargs, "insp_script", self.INSP_SCRIPT)
+        self.T_max = self.dget(kwargs, "T_max", None)
+ 
+        for k, v in self.add_options.items():
+            if os.path.exists(v):
+                shutil.copy(v, os.path.join(self.working_dir, k) + ".pb")
+        shutil.copy(self.const, self.working_dir)
+
 
 
     staticmethod
@@ -139,10 +139,11 @@ class DnnSim(object):
     
     def construct_inspect_cmd(self):
         env = {
-            "T1" : "10000",
+            "T1" : "100000",
             "COPY_PICS" : "yes",
             "EP" : str(self.current_epoch),
-            "OPEN_PIC" : "no"
+            "OPEN_PIC" : "no",
+            "SP_PIX0" : "{}".format(1024*3),
         }
         cmd = [
               self.insp_script
@@ -169,7 +170,8 @@ class DnnSim(object):
                 logging.error("\n\t"+stdout)
             if stderr:
                 logging.error("\n\t"+stderr)
-         
+            sys.exit(-1.0) 
+
     def run(self):
         for self.current_epoch in xrange(self.current_epoch, self.epochs+1):
             logging.info("")
@@ -179,81 +181,42 @@ class DnnSim(object):
             with pushd(self.working_dir):
                 self.run_proc(**self.construct_inspect_cmd())
 
+    def continue_in_wd(self):
+        max_ep = 0
+        for f in os.listdir(self.working_dir):
+            f_spl = f.split("_")
+            if len(f_spl) > 1 and "model" in f:
+                max_ep = max(max_ep, int(f_spl[0]))
+        if max_ep>0:
+            while True:
+                ans = raw_input("%s already exists and %s epochs was done here. Continue learning? (y/n): " % (os.path.basename(self.working_dir), max_ep))
+                if ans in ["Y","y"]:
+                    self.current_epoch = max_ep + 1
+                    break
+                elif ans in ["N", "n"]:
+                    logging.info("Cleaning %s ... " % self.working_dir)
+                    for f in os.listdir(self.working_dir):
+                        os.remove(os.path.join(self.working_dir, f))
+                    break                        
+                else:
+                    logging.warning("incomprehensible answer")
+
+
     def get_wd(self):
         const_hex = md5.new(open(self.const).read()).hexdigest()
-        wd = None
         i = 0
 
         while i<1000:
-            wd = os.path.join(self.runs_dir, const_hex + "_%04d" % i)
-            if not os.path.exists(wd):
+            self.working_dir = os.path.join(self.runs_dir, const_hex + "_%04d" % i)
+            if not os.path.exists(self.working_dir):
                 break
             if self.old_dir:
                 break
             i+=1
     
-        if os.path.exists(wd):
-            max_ep = 0
-            for f in os.listdir(wd):
-                f_spl = f.split("_")
-                if len(f_spl) > 1 and "model" in f:
-                    max_ep = max(max_ep, int(f_spl[0]))
-            if max_ep>0:
-                while True:
-                    ans = raw_input("%s already exists and %s epochs was done here. Continue learning? (y/n): " % (os.path.basename(wd), max_ep))
-                    if ans in ["Y","y"]:
-                        self.current_epoch = max_ep + 1
-                        break
-                    elif ans in ["N", "n"]:
-                        print "Cleaning %s ... " % wd
-                        for f in os.listdir(wd):
-                            os.remove(os.path.join(wd, f))
-                        break                        
-                    else:
-                        print "incomprehensible answer"
-        else:
-            os.mkdir(wd)
-        return wd
+        return self.working_dir
 
 
-def main(args):
-    const_hex = md5.new(open(self.const).read()).hexdigest()
-    i=0
-    wd = args.working_dir
-
-    start_ep = 0
-    if not wd:
-        while i<1000:
-            new_wd = os.path.join(args.runs_dir, const_hex + "_%04d" % i)
-            if not os.path.exists(new_wd):
-                if not args.old_dir or not wd:
-                    wd = new_wd
-                break
-            wd = new_wd
-            i+=1
-        
-        if os.path.exists(wd):
-            import pdb; pdb.set_trace()
-            max_ep = 0
-            for f in os.listdir(wd):
-                f_spl = f.split("_")
-                if len(f_spl) > 1 and "model" in f:
-                    max_ep = max(max_ep, int(f_spl[0]))
-            if max_ep>=0:
-                while True:
-                    ans = raw_input("%s already exists and %s epochs was done here. Continue learning? (y/n): " % (os.path.basename(wd), max_ep))
-                    if ans in ["Y","y"]:
-                        start_ep = max_ep + 1
-                        break
-                    elif ans in ["N", "n"]:
-                        print "Cleaning %s ... " % wd
-                        for f in os.listdir(wd):
-                            os.remove(os.path.join(wd, f))
-                        break                        
-                    else:
-                        print "incomprehensible answer"
-        else:
-            os.mkdir(wd)
 
 
     

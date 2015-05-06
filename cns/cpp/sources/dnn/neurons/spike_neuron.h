@@ -43,7 +43,7 @@ public:
 		_yi = yi;
 		_colSize = colSize;
 	}
-	inline const size_t localId() {
+	inline const size_t localId() const {
 		return xi() + colSize()*yi();
 	}
 	inline const size_t& xi() const {
@@ -52,7 +52,7 @@ public:
 	inline const size_t& yi() const {
 		return _yi;
 	}
-	inline const size_t& colSize() {
+	inline const size_t& colSize() const {
 		return _colSize;
 	}
 	inline const double& axonDelay() const {

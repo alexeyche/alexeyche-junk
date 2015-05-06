@@ -10,14 +10,14 @@ namespace dnn {
 
 
 /*@GENERATE_PROTO@*/
-struct StdpC : public Serializable<Protos::StdpC> {
-    StdpC() 
-    : tau_plus(30.0)
-    , tau_minus(50.0)
-    , a_plus(1.0)
-    , a_minus(1.5)
+struct StdpTimeC : public Serializable<Protos::StdpTimeC> {
+    StdpTimeC() 
+    : tau_plus(11.0)
+    , tau_minus(10.0)
+    , a_plus(0.0016)
+    , a_minus(0.0055)
     , learning_rate(1.0)
-    , w_max(5.0)
+    , w_max(1.0)
     , w_min(0.0)
     {}
 
@@ -42,9 +42,9 @@ struct StdpC : public Serializable<Protos::StdpC> {
 
 
 /*@GENERATE_PROTO@*/
-struct StdpState : public Serializable<Protos::StdpState>  {
-    StdpState() 
-    : y(0.0)
+struct StdpTimeState : public Serializable<Protos::StdpTimeState>  {
+    StdpTimeState() 
+    : y(-1.0)
     {}
 
     void serial_process() {
@@ -57,42 +57,51 @@ struct StdpState : public Serializable<Protos::StdpState>  {
 };
 
 
-class Stdp : public LearningRule<StdpC, StdpState> {
+class StdpTime : public LearningRule<StdpTimeC, StdpTimeState> {
 public:
     const string name() const {
-        return "Stdp";
+        return "StdpTime";
     }
 
     void reset() {
-        s.y = 0;
+        s.y = -1.0;
         s.x.resize(n->getSynapses().size());
         for(auto &v: s.x) {
-            v = 0;
+            v = -1.0;
         }
     }
 
     void propagateSynapseSpike(const SynSpike &sp) {
-        s.x[sp.syn_id] += 1;
+        s.x[sp.syn_id] = sp.t;
     }
+    static constexpr double WINDOW_LEN = 100.0;
 
     void calculateDynamics(const Time& t) {
         if(n->fired()) {
-            s.y += 1;
+            s.y = t.t;
         }
         auto &syns = n->getSynapses();
         
         auto x_id_it = s.x.ibegin();
-        //if((n->id() == 101)&&(t.t>=2500)) cout << "Stdp: ";
+        //if((n->id() == 101)&&(t.t>=2500)) cout << "StdpTime: ";
         while(x_id_it != s.x.iend()) {            
-            if(fabs(s.x[x_id_it]) < 0.0001) {
+            double time_diff = s.y - s.x[x_id_it];
+            if(fabs(time_diff) >= WINDOW_LEN) {
                 s.x.setInactive(x_id_it);
             } else {
                 const size_t &syn_id = *x_id_it;
                 auto &syn = syns.get(syn_id).ref();
-                double dw = c.learning_rate * ( 
-                    c.a_plus  * s.x[x_id_it] * n->fired() - \
-                    c.a_minus * s.y * syn.fired() 
-                );
+                if( (!(n->fired()||syn.fired()) )||(s.x[x_id_it]<0.0)||(s.y<0.0)) {
+                    ++x_id_it;
+                    continue;
+                }
+                double dw;
+                if(time_diff>=0.0) {
+                    dw = c.learning_rate * exp(-syn.weight()) * c.a_plus * exp(-time_diff/c.tau_plus); // LTP 
+                } else {
+                    dw = - c.learning_rate * syn.weight() * c.a_minus * exp(time_diff/c.tau_minus);  // LTD
+                }
+                
                 // if(syns.get(syn_id).ifc().getMembranePotential()<0) {
                 //     dw = -dw;
                 // }
@@ -102,13 +111,10 @@ public:
                 }
 
                 //if((n->id() == 101)&&(t.t>=2500)) cout << "(id_pre: " << syn.idPre() << ", dw: " << dw << ", s.y: " << s.y << ", s.x: " << s.x[x_id_it] << "), ";
-                
-                s.x[x_id_it] += - s.x[x_id_it]/c.tau_plus;
                 ++x_id_it;
             }
         }
         //if((n->id() == 101)&&(t.t>=2500)) cout << "\n";
-        s.y += - s.y/c.tau_minus;
         
         if(stat.on()) {
             size_t i=0; 

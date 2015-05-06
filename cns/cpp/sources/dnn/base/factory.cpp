@@ -12,6 +12,8 @@
 #include <dnn/util/statistics.h>
 #include <dnn/util/spikes_list.h>
 #include <dnn/learning_rules/stdp.h>
+#include <dnn/learning_rules/stdp_time.h>
+
 #include <dnn/connections/stochastic.h>
 #include <dnn/connections/difference_of_gaussians.h>
 
@@ -55,6 +57,7 @@ Factory::Factory() : registration_is_on(true) {
 	REG_TYPE_WITH_CONST(DifferenceOfGaussians);
 	REG_TYPE_WITH_STATE_AND_CONST(InputTimeSeries);
 	REG_TYPE_WITH_STATE_AND_CONST(Stdp);
+	REG_TYPE_WITH_STATE_AND_CONST(StdpTime);
 	
 	REG_TYPE(Statistics);
 	REG_TYPE(StatisticsInfo);

@@ -122,6 +122,9 @@ public:
 
 		for (auto &npre : pre.neurons) {
 			for (auto &npost : post.neurons) {
+				if(npre.ref().id() == npost.ref().id()) {
+					continue;
+				}
 				ConnectionRecipe connection_recipe = conn->getConnectionRecipe(npre.ref(), npost.ref());
 				if (connection_recipe.exists) {
 					SynapseBase *syn(nullptr);					
