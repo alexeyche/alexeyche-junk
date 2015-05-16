@@ -61,6 +61,7 @@ class DnnSim(object):
         self.old_dir = self.dget(kwargs, "old_dir", False)
         self.const = self.dget(kwargs, "const", self.CONST_JSON)
         self.runs_dir = self.dget(kwargs, "runs_dir", self.RUNS_DIR)
+        self.inspection = self.dget(kwargs, "inspection", True)
         self.working_dir = self.dget(kwargs, "working_dir", self.get_wd())
 
         if os.path.exists(self.working_dir):
@@ -70,6 +71,8 @@ class DnnSim(object):
 
         logFormatter = logging.Formatter("%(asctime)s [%(levelname)s]  %(message)-100s")
         rootLogger = logging.getLogger()
+        rootLogger.setLevel(logging.DEBUG)
+        
         fileHandler = logging.FileHandler("{0}/{1}".format(self.working_dir, "run_sim.log"), mode='w')
         fileHandler.setFormatter(logFormatter)
         rootLogger.addHandler(fileHandler)
@@ -77,9 +80,7 @@ class DnnSim(object):
         consoleHandler = logging.StreamHandler(sys.stdout)
         consoleHandler.emit = add_coloring_to_emit_ansi(consoleHandler.emit)
         consoleHandler.setFormatter(logFormatter)
-        rootLogger.setLevel(logging.DEBUG)
         rootLogger.addHandler(consoleHandler)
-
 
 
         self.dnn_sim_bin = self.dget(kwargs, "dnn_sim_bin", self.DNN_SIM_BIN)
@@ -139,11 +140,11 @@ class DnnSim(object):
     
     def construct_inspect_cmd(self):
         env = {
-            "T1" : "100000",
+            "T1" : "30000",
             "COPY_PICS" : "yes",
             "EP" : str(self.current_epoch),
             "OPEN_PIC" : "no",
-            "SP_PIX0" : "{}".format(1024*3),
+            "SP_PIX0" : "{}".format(1024*10),
         }
         cmd = [
               self.insp_script
@@ -174,12 +175,13 @@ class DnnSim(object):
 
     def run(self):
         for self.current_epoch in xrange(self.current_epoch, self.epochs+1):
-            logging.info("")
+            #logging.info("")
             logging.info("Running epoch {}:".format(self.current_epoch))
             self.run_proc(**self.construct_cmd())
-            logging.info("inspecting ... ")
-            with pushd(self.working_dir):
-                self.run_proc(**self.construct_inspect_cmd())
+            if self.inspection:
+                logging.info("inspecting ... ")
+                with pushd(self.working_dir):
+                    self.run_proc(**self.construct_inspect_cmd())
 
     def continue_in_wd(self):
         max_ep = 0
@@ -246,7 +248,10 @@ if __name__ == '__main__':
                         '--stat',
                         action='store_true',
                         help='Save statistics')
-
+    parser.add_argument('-ni', 
+                        '--no-insp',
+                        action='store_true',
+                        help='No inspection after every epoch')
     parser.add_argument('-r', 
                         '--runs-dir', 
                         required=False,
@@ -277,6 +282,7 @@ if __name__ == '__main__':
         "epochs" : args.epochs,
         "jobs" : args.jobs,
         "old_dir" : args.old_dir,
+        "inspection" : not args.no_insp,
     }
     if len(other) % 2 != 0:
         raise Exception("Got not paired add options: {}".format(" ".join(other)))

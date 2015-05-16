@@ -50,7 +50,7 @@ public:
     	if(v<0) {
     		recipe.inhibitory = true;
     	}
-    	recipe.amplitude = fabs(v);
+    	//recipe.amplitude = fabs(v);
     	return recipe;
     }
 };

@@ -32,3 +32,5 @@ for(i in 1:num_of_patterns) {
 
 
 RProto$new(fname)$write(ts_out, "SpikesList")
+
+prast(ts_out$values,T0=0,Tmax=1000)
