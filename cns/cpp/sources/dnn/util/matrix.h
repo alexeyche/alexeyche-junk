@@ -1,6 +1,5 @@
 #pragma once
 
-namespace dnn {
 
 // #include <snnlib/core.h>
 // #include <snnlib/util/json/json_box.h>
@@ -102,5 +101,55 @@ namespace dnn {
 
 
 // };
+
+#include <dnn/io/serialize.h>
+#include <dnn/protos/generated.pb.h>
+
+namespace dnn {
+
+/*@GENERATE_PROTO@*/
+class DoubleMatrix : public Serializable<Protos::DoubleMatrix> {
+public:
+    void serial_process() {
+    	begin() << "ncol_v: " << ncol_v << ", " 
+    			<< "nrow_v: " << nrow_v << ", " 
+    			<< "vals: " << vals << Self::end;
+
+    }
+    DoubleMatrix() : nrow_v(0), ncol_v(0) {
+    }
+
+    double getElement(size_t i, size_t j) const {
+        assert( (nrow_v != 0) && (ncol_v != 0) );
+        return vals[j*nrow_v + i];
+    }
+    void setElement(size_t i, size_t j, double val) {
+        assert( (nrow_v != 0) && (ncol_v != 0) );
+        vals[j*nrow_v + i] = val;
+    }
+    void allocate(size_t nr, size_t nc) {
+        if((nrow_v != 0)&&(ncol_v != 0)) vals.clear();
+        nrow_v = nr;
+        ncol_v = nc;
+        vals.resize(nrow_v*ncol_v);
+	}
+    void fill(double val) {
+	    for(size_t i=0; i<nrow_v; i++) {
+    	    for(size_t j=0; j<ncol_v; j++) {
+        	    setElement(i, j, val);
+        	}
+    	}
+	}
+
+	inline const size_t& ncol() const { return ncol_v; } 	
+	inline const size_t& nrow() const { return nrow_v; } 	
+private:
+
+	size_t ncol_v;
+	size_t nrow_v;
+	vector<double> vals;
+};
+
+
 
 }

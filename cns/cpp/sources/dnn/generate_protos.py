@@ -58,7 +58,7 @@ def parseSources(src):
                             struct['fields'] = []
                         else:
                             m = re.match(
-                                "(%s)[\W]+([^_]+[^ ]*);[\W]*$" % "|".join(
+                                "(%s)[\W]+([^ ]*);[\W]*$" % "|".join(
                                     KNOWN_TYPES.keys() + [ "(?:vector|ActVector)+<{}>".format(t) for t in KNOWN_TYPES.keys() ]
                                 ), 
                                 l

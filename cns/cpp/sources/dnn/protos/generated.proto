@@ -127,12 +127,14 @@ message InputTimeSeriesC {
 
 message InputTimeSeriesState {
     required uint32 index = 1;
+    required double _t = 2;
 }
 
 message Stat {
-    required int32 low_lim = 1;
-    required int32 high_lim = 2;
-    repeated double values = 3;
+    required uint32 __counter = 1;
+    required int32 low_lim = 2;
+    required int32 high_lim = 3;
+    repeated double values = 4;
 }
 
 message StatisticsInfo {
@@ -149,6 +151,16 @@ message TimeSeriesInfo {
 
 message TimeSeriesData {
     repeated double values = 1;
+}
+
+message TimeSeriesDimInfo {
+    required uint32 size = 1;
+}
+
+message DoubleMatrix {
+    required uint32 ncol_v = 1;
+    required uint32 nrow_v = 2;
+    repeated double vals = 3;
 }
 
 message SpikesSequence {

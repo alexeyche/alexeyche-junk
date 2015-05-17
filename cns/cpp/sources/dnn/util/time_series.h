@@ -32,7 +32,7 @@ struct TimeSeriesInfo : public Serializable<Protos::TimeSeriesInfo> {
 
 	vector<size_t> labels_ids;
 	vector<string> unique_labels;
-	vector<size_t> labels_timeline;
+	vector<size_t> labels_timeline;	
 };
 
 /*@GENERATE_PROTO@*/
@@ -42,6 +42,16 @@ struct TimeSeriesData : public Serializable<Protos::TimeSeriesData> {
 	}
 
 	vector<double> values;
+};
+
+/*@GENERATE_PROTO@*/
+struct TimeSeriesDimInfo : public Serializable<Protos::TimeSeriesDimInfo> {
+	TimeSeriesDimInfo() : size(0) {}
+	void serial_process() {
+		begin() << "size: " << size << Self::end;
+	}
+
+	size_t size;
 };
 
 struct TimeSeriesInterface {
@@ -66,11 +76,13 @@ struct TimeSeries : public SerializableBase {
 			throw dnnException()<< "Can't open file " << filename << "\n";
 		}
 		if(format == "ucr-ts") {			
+			dim.size = 1; // Only one dim TS support
+			data.resize(dim.size); 
 			string line;
 			while (std::getline(f, line)) {
 				string lab;
-				convertUcrTimeSeriesLine(line, data.values, lab);
-				info.addLabelAtPos(lab, data.values.size());
+				convertUcrTimeSeriesLine(line, data[0].values, lab);
+				info.addLabelAtPos(lab, data[0].values.size());
 			}
 		} else 
 		if(format == "protobin") {
@@ -88,13 +100,15 @@ struct TimeSeries : public SerializableBase {
 		}
 	}
 	size_t length() {
-		return data.values.size();
+		return data[0].values.size();
 	}
 
 	const double& getValueAt(const size_t &index) {		
-		return data.values[index];	
+		return data[0].values[index];	
 	}
-	
+	const double& getValueAtDim(const size_t &index, const size_t &dim) {		
+		return data[dim].values[index];	
+	}
 	template <typename T>
 	void provideInterface(TimeSeriesInterface &i) {
 		i.getValueAt = MakeDelegate(static_cast<T*>(this), &T::getValueAt);
@@ -108,7 +122,14 @@ struct TimeSeries : public SerializableBase {
 	}
 
 	void serial_process() {
-		begin() << "info: " << info << ", " << "data: " << data << Self::end;
+		begin() << "dim: " << dim;
+		if (mode == ProcessingInput) {
+			data.resize(dim.size);
+		}
+		for(size_t i=0; i<dim.size; ++i) {
+			(*this) << data[i];
+		}
+		(*this) << "info: " << info << Self::end;
 	}
 	static void convertUcrTimeSeriesLine(const string &line, vector<double> &ts_data, string &lab) {
 	   vector<string> els = split(line, ' ');
@@ -127,9 +148,10 @@ struct TimeSeries : public SerializableBase {
 	       }
 	   }
 	}
-	
+
+	TimeSeriesDimInfo dim;
 	TimeSeriesInfo info;
-	TimeSeriesData data;
+	vector<TimeSeriesData> data;
 };
 
 }

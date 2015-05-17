@@ -28,11 +28,11 @@ M = 100
 L = 100
 
 set.seed(1)
-#filters = matrix(rnorm(M*L), nrow=L, ncol=M)
-#filters = norm(filters)
+filters = matrix(rnorm(M*L), nrow=L, ncol=M)
+filters = norm(filters)
 
-#fi = filters
-#fi = norm(fi)
+fi = filters
+fi = norm(fi)
 
 i = 1 
 s_thr = 0.1
@@ -68,7 +68,8 @@ for(i in 1:(length(xt)-L)) {
         si = si_v[s_i]
         grad = 1*s*delta
         fi[si, ] = fi[si, ] + grad    
-   }   }
+   }   
+
 }
     
 plot(x_start, ylim=c(min(x,x_start), max(x,x_start)), type="l")

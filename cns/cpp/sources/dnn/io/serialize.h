@@ -117,7 +117,8 @@ public:
 
         return *this;
     }
-
+    
+    
     template <typename T>
     SerializableBase& operator << (InterfacedPtr<T> &b) {
         if(mode == ProcessingOutput) {

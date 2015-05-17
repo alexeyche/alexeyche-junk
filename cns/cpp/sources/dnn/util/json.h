@@ -40,6 +40,14 @@ private:
 		}
 		return false;
 	}
+	static bool __getBoolVal(const Value &v, const string name, bool &d) {
+		const Value &f_v = getVal(v, name);
+		if (f_v.IsBool()) {
+			d = f_v.GetBool();
+			return true;
+		}
+		return false;
+	}
 public:
 	static const Value& getVal(const Value &v, const string name) {
 		auto m = v.FindMember(name.c_str());
@@ -78,6 +86,14 @@ public:
 		}
 		throw dnnException()<< name << " expected as string\n";
 	}
+	static bool getBoolVal(const Value &v, const string name) {
+		bool s;
+		if (__getBoolVal(v, name, s)) {
+			return s;
+		}
+		throw dnnException()<< name << " expected as bool\n";
+	}
+
 	static string getStringValDef(const Value &v, const string name, string def) {
 		if (!checkVal(v, name)) return def;
 		string s;
