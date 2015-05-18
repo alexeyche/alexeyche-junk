@@ -51,7 +51,7 @@ int main(int argc, char **argv) {
     optp.option("--help", "-h", input_file, false, true);
     optp.option("--filter", "-f", filter_file);
     optp.option("--spikes", "-s", spikes_file);
-    optp.option("--config", "-c", config_file, false, "");
+    optp.option("--config", "-c", config_file, false);
 
     if(need_help) {
         printHelp();
@@ -61,7 +61,8 @@ int main(int argc, char **argv) {
     
     if(!config_file.empty()) {
         std::ifstream ifs(config_file);
-        string config_json_str((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
+        string config_json_str((std::istreambuf_iterator<char>(ifs)),
+                 std::istreambuf_iterator<char>());
         Document d = Json::parseString(config_json_str);      
         c.deserializeFromJson(d);
     }

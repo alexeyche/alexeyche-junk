@@ -118,6 +118,12 @@ public:
     }
     DoubleMatrix() : nrow_v(0), ncol_v(0) {
     }
+    DoubleMatrix(const vector<double> &v) {
+    	allocate(v.size(), 1);
+    	for(size_t i=0; i<v.size(); ++i) {
+    		setElement(i, 0, v[i]);
+    	}
+    }
 
     double getElement(size_t i, size_t j) const {
         assert( (nrow_v != 0) && (ncol_v != 0) );

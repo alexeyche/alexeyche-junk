@@ -2,10 +2,15 @@
 #define RPROTO_READ_H
 
 #include <dnn/io/stream.h>
+#include <dnn/util/matrix.h>
+#include <R.h>
+#include <Rinternals.h>
 
 #undef PI
 #define STRICT_R_HEADERS
 #include <Rcpp.h>
+
+
 
 #include "common.h"
 
@@ -100,6 +105,20 @@ public:
                 )
             );
         }
+        if(o->name() == "DoubleMatrix") {
+            DoubleMatrix *m = dynamic_cast<DoubleMatrix*>(o);
+            if(!m) { ERR("Can't cast"); }
+            
+            Rcpp::NumericMatrix rm(m->nrow(), m->ncol());
+            for(size_t i=0; i<m->nrow(); ++i) {
+                for(size_t j=0; j<m->ncol(); ++j) {
+                    rm(i,j) = m->getElement(i,j);
+                }
+            }
+            out = Rcpp::List::create(
+                Rcpp::Named("DoubleMatrix") = rm
+            );
+        }
         SpikeNeuronBase* nb = dynamic_cast<SpikeNeuronBase*>(o);
         if(nb) {
             vector<double> weights;
@@ -145,7 +164,23 @@ public:
         }
         if(name == "TimeSeries") {
             TimeSeries* ts = Factory::inst().createObject<TimeSeries>(name);
-            ts->data.values = Rcpp::as<vector<double>>(list["values"]);
+            SEXP values = list["values"];
+            if(Rf_isMatrix(values)) {
+                Rcpp::NumericMatrix m(values); 
+                ts->dim.size = m.nrow();
+                ts->data.resize(ts->dim.size);
+                for(size_t i=0; i<m.nrow(); ++i) {                    
+                    for(size_t j=0; j<m.ncol(); ++j) {
+                        ts->data[i].values.push_back(m(i,j));
+                    }
+                }
+
+            } else {
+                ts->dim.size = 1;
+                ts->data.resize(ts->dim.size);
+                ts->data[0].values = Rcpp::as<vector<double>>(values);
+            }
+            
             ts->info = ts_info;
             return ts;
         }

@@ -74,21 +74,30 @@ public:
 		for(size_t i=from; i<(from+filter.ncol()); ++i) {
 			x.push_back(ts.data[dim].values[i]);
 		}
+		{
+			DoubleMatrix xser(x); 
+			ofstream of("./xser.pb");
+			Stream(of, Stream::Binary).writeObject(&xser);
+		}
+
 		vector<double> s;
 		vector<size_t> winners_id;
 		for(size_t i=0; i<c.learn_iterations; ++i) {			
-			double max_s = 0;
+			double max_s = -100;
 			size_t max_fi = 0;
+
 			for(size_t fi=0; fi<filter.ncol(); ++fi) {
 				double s_f=0;
 				for(size_t xi=0; xi<x.size(); ++xi) {
-					s_f += x[i] * filter.getElement(xi, fi);
+					s_f += x[i] * filter.getElement(xi, fi);					
 				}
 				if (max_s<s_f) {
 					max_s = s_f;
 					max_fi = fi;
 				}
 			}
+			
+			cout << "s: " << max_s << ", " << "fi: " << max_fi << "\n";
 			s.push_back(max_s);
 			winners_id.push_back(max_fi);
 
@@ -107,14 +116,15 @@ public:
 
 	static vector<FilterMatch> run(const TimeSeries &ts, const MPLConfig &c, DoubleMatrix &filter) {
 		if((!c.continue_learning)&&(c.learn)) {
-			for(size_t i=0; i<filter.nrow(); ++i) {
+			filter.allocate(c.filters_num, c.filter_size);
+			for(size_t i=0; i<c.filters_num; ++i) {
 				double acc = 0.0;
-		        for(size_t j=0; j<filter.ncol(); ++j) {
+		        for(size_t j=0; j<c.filter_size; ++j) {
 		        	filter.setElement(i, j, getNorm());
 		        	acc += filter.getElement(i, j) * filter.getElement(i, j);		        	
 		        }
 		        double n = sqrt(acc);
-		        for(size_t j=0; j<filter.ncol(); ++j) {
+		        for(size_t j=0; j<c.filter_size; ++j) {
 		        	filter.setElement(i, j, filter.getElement(i, j)/n);
 		        }
 		    }
