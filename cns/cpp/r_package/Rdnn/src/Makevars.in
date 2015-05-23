@@ -32,7 +32,7 @@ PKG_CPPFLAGS=-I"@DNN_INCLUDE@"
 PKG_LIBS = -L"@DNN_LIB@" -ldnn  $(LIBS) 
 
 
-OBJECTS.root=RSim.o  mod.o 
+OBJECTS.root=RSim.o  RMpl.o mod.o 
 
 OBJECTS=  $(OBJECTS.root)
 

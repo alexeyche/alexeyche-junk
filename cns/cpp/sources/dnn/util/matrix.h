@@ -116,6 +116,25 @@ public:
     			<< "vals: " << vals << Self::end;
 
     }
+    double& operator () (size_t i, size_t j) {
+        assert( (nrow_v != 0) && (ncol_v != 0) );
+        if( ! ( (i<nrow_v) && (j<ncol_v) ) ) {
+            throw dnnException() << "assert: " << i << "<" << nrow_v << " && " << j << "<" << ncol_v << "\n";
+        }
+        return vals[j*nrow_v + i];
+    }
+    
+    double operator () (size_t i, size_t j) const {
+        assert( (nrow_v != 0) && (ncol_v != 0) );
+        if( ! ( (i<nrow_v) && (j<ncol_v) ) ) {
+            throw dnnException() << "assert: " << i << "<" << nrow_v << " && " << j << "<" << ncol_v << "\n";
+        }
+        return vals[j*nrow_v + i];
+    }
+    DoubleMatrix(size_t _nrow, size_t _ncol) {
+        allocate(_nrow, _ncol);
+    }
+
     DoubleMatrix() : nrow_v(0), ncol_v(0) {
     }
     DoubleMatrix(const vector<double> &v) {
@@ -127,10 +146,16 @@ public:
 
     double getElement(size_t i, size_t j) const {
         assert( (nrow_v != 0) && (ncol_v != 0) );
+        if( ! ( (i<nrow_v) && (j<ncol_v) ) ) {
+            throw dnnException() << "assert: " << i << "<" << nrow_v << " && " << j << "<" << ncol_v << "\n";
+        }
         return vals[j*nrow_v + i];
     }
     void setElement(size_t i, size_t j, double val) {
         assert( (nrow_v != 0) && (ncol_v != 0) );
+        if( ! ( (i<nrow_v) && (j<ncol_v) ) ) {
+            throw dnnException() << "assert: " << i << "<" << nrow_v << " && " << j << "<" << ncol_v << "\n";
+        }
         vals[j*nrow_v + i] = val;
     }
     void allocate(size_t nr, size_t nc) {

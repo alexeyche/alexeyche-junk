@@ -89,11 +89,11 @@ public:
     }
 
     void writeObject(SerializableBase *b);
-    SerializableBase* readObject();
-
+    SerializableBase* readBaseObject(SerializableBase *o = nullptr);    
+        
     template <typename T>
-    T* readObject() {
-        SerializableBase *b = readObject();
+    T* readObject(T *o = nullptr) {
+        SerializableBase *b = readBaseObject(o);
         if(!b) return nullptr;
         
         T *d = dynamic_cast<T*>(b);

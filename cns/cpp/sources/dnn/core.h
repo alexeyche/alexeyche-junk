@@ -24,6 +24,7 @@
 #include <exception>
 #include <unordered_set>
 #include <set>
+#include <future>
 
 typedef google::protobuf::Message* ProtoMessage;
 
@@ -35,6 +36,7 @@ using std::vector;
 using std::accumulate;
 using std::stringstream;
 using std::istringstream;
+using std::ostringstream;
 using std::string;
 using std::ostream;
 using std::istream;

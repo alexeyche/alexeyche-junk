@@ -16,7 +16,7 @@ set(DNN_SRCS ${DNN_SRCS} ${DIR_SRCS} PARENT_SCOPE)
 
 # executable
 add_executable(mpl
-    mpl.cpp
+    mpl_main.cpp
 )
 
 

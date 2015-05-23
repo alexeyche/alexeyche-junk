@@ -87,13 +87,9 @@ struct TimeSeries : public SerializableBase {
 		} else 
 		if(format == "protobin") {
 			Factory::inst().registrationOff();
-			SerializableBase* o = Stream(f, Stream::Binary).readObject();
-			TimeSeries* inp_ts = dynamic_cast<TimeSeries*>(o);
-			if(!inp_ts) {
-				throw dnnException() << "Failed to cast " << o->name() << " to TimeSeries\n";
-			}
+			TimeSeries* inp_ts = Stream(f, Stream::Binary).readObject<TimeSeries>();			
 			(*this) = *inp_ts;
-			delete o;
+			delete inp_ts;
 			Factory::inst().registrationOn();	
 		} else {
 			throw dnnException() << "TimeSeries: unknown format " << format << "\n";

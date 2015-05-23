@@ -25,13 +25,11 @@ Matching Pursuit Learning tool
 )USAGE";
 
 void printHelp() {
-    MPLConfig c;
-    Document d = c.serializeToJson();
-    StringBuffer sb;
-    PrettyWriter<StringBuffer> writer(sb);
-    d.Accept(writer);
-    string json_struct_str = sb.GetString();
-    printf(usage, json_struct_str.c_str());
+    MatchingPursuitConfig c;
+    ostringstream s;
+    Stream(s, Stream::Text).writeObject(&c);
+    string json_str = s.str();
+    printf(usage, json_str.c_str());
 }
 
 int main(int argc, char **argv) {
@@ -46,37 +44,44 @@ int main(int argc, char **argv) {
     string spikes_file;
     string config_file;
     string filter_file;
-    bool need_help;
-    optp.option("--input", "-i", input_file, true);
-    optp.option("--help", "-h", input_file, false, true);
-    optp.option("--filter", "-f", filter_file);
-    optp.option("--spikes", "-s", spikes_file);
-    optp.option("--config", "-c", config_file, false);
-
+    bool need_help = false;
+    optp.option("--help", "-h", need_help, false, true);
     if(need_help) {
         printHelp();
         return 0;
     }
-    MPLConfig c;
+    optp.option("--input", "-i", input_file, true);
+    optp.option("--filter", "-f", filter_file);
+    optp.option("--spikes", "-s", spikes_file);
+    optp.option("--config", "-c", config_file, false);
+
+    
+    MatchingPursuitConfig c;
     
     if(!config_file.empty()) {
         std::ifstream ifs(config_file);
-        string config_json_str((std::istreambuf_iterator<char>(ifs)),
-                 std::istreambuf_iterator<char>());
-        Document d = Json::parseString(config_json_str);      
-        c.deserializeFromJson(d);
+        Stream(ifs, Stream::Text).readObject<MatchingPursuitConfig>(&c);        
     }
-    DoubleMatrix filter;
-    if( (!c.learn) || c.continue_learning ) {
+    MatchingPursuit mpl(c);
+
+    if( (fileExists(filter_file)) && ( (!c.learn) || c.continue_learning )) {
         std::ifstream ifs(filter_file);
         Factory::inst().registrationOff();
         DoubleMatrix *f = Stream(ifs, Stream::Binary).readObject<DoubleMatrix>();
-        filter = *f;
+        
+        mpl.setFilter(*f);
+        
         delete f;
         Factory::inst().registrationOn();
     }
+
     std::ifstream ifs(input_file);
     TimeSeries *ts = Stream(ifs, Stream::Binary).readObject<TimeSeries>();
-    vector<MPL::FilterMatch> matches = MPL::run(*ts, c, filter);
+    
+    mpl.run(*ts, 0);
+
+    std::ofstream ofs(filter_file);
+    DoubleMatrix f = mpl.getFilter();
+    Stream(ofs, Stream::Binary).writeObject(&f);
     return 0;
 }

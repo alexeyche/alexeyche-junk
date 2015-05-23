@@ -32,6 +32,7 @@ public:
     SerializableBase() : mode(ProcessingOutput), messages(nullptr), header(nullptr) {
 
     }
+
     virtual ProtoMessage newProto() {
         throw dnnException()<< "That shouldn't be called. This method for non protobuf Serializable classes\n";
     }
@@ -141,7 +142,7 @@ public:
     }
 
     vector<ProtoMessage>& getSerialized() {
-        if((mode == ProcessingOutput) && (messages)) clean();
+        if ((mode == ProcessingOutput) && (messages)) clean();
         mode = ProcessingOutput;
         
         messages = new vector<ProtoMessage>;

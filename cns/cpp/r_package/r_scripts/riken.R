@@ -17,7 +17,7 @@ labels = c()
 values = c()
 timeline = c()
 for(i in 1:d[3]) {
-    values = cbind(values, t(sapply(1:d[1], function(j) norm(data$EEGDATA[j,,i]))) )
+    values = matrix(norm(data$EEGDATA[1,,1]), nrow=1) #cbind(values, t(sapply(1:d[1], function(j) norm(data$EEGDATA[j,,i]))) )
     labels = c(labels, data$LABELS[i,])
     timeline = c(timeline, ncol(values))               
 }
@@ -28,8 +28,8 @@ ts_info = list(
     labels_ids = sapply(labels, function(l) which(l == unique(labels))) - 1,
     labels_timeline = timeline
 )
-
-pr = RProto$new(path.expand(sprintf("~/dnn/ts/riken_%s.pb", name)))
+dst_f = path.expand(sprintf("~/dnn/ts/riken_%s.pb", name))
+pr = RProto$new(dst_f)
 pr$write(list(values=values, ts_info=ts_info), "TimeSeries")
 
 

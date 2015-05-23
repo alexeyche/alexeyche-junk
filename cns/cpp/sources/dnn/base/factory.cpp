@@ -11,6 +11,7 @@
 #include <dnn/util/time_series.h>
 #include <dnn/util/statistics.h>
 #include <dnn/util/matrix.h>
+#include <dnn/mpl/mpl.h>
 #include <dnn/util/spikes_list.h>
 #include <dnn/learning_rules/stdp.h>
 #include <dnn/learning_rules/stdp_time.h>
@@ -73,6 +74,7 @@ Factory::Factory() : registration_is_on(true) {
 	REG_TYPE(TimeSeriesData);
 
 	REG_TYPE(DoubleMatrix);
+	REG_TYPE(MatchingPursuitConfig)
 }
 
 Factory::~Factory() {
@@ -109,7 +111,7 @@ SerializableBase* Factory::getCachedObject(const string& filename) {
         ifstream f(filename);
         Stream s(f, Stream::Binary);
 
-        cache_map[filename] = s.readObject();
+        cache_map[filename] = s.readBaseObject();
     }
     return cache_map[filename];
 }

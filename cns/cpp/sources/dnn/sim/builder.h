@@ -165,6 +165,9 @@ public:
 		Stream s(*ss, Stream::Text);
 		T* n = s.readObject<T>();
 		delete ss;
+		if(!n) {
+			throw dnnException() << "Null object from constants: " << name << "\n";
+		}
 		return n;
 	}
 
@@ -176,7 +179,6 @@ public:
 private:
 	Stream *input_stream;
 	const Constants &c;
-
 };
 
 }

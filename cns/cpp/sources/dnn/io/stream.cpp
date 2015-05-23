@@ -23,22 +23,27 @@ void Stream::writeObject(SerializableBase *b) {
 	if (getRepr() == Text) {
 		vector<string> buff;
 		Document d;
-		Value o(kObjectType);
-		Value sub_o(kObjectType);
-		for (auto &m : messages) {
-			Document *sub_d = Json::parseProtobuf(m);
-			buff.push_back(m->GetTypeName());
-			sub_o.AddMember(StringRef(buff.back().c_str()), *sub_d, d.GetAllocator());
-		}
+		Value o(kObjectType);		
 		string temps = b->name();
-		o.AddMember(StringRef(temps.c_str()), sub_o, d.GetAllocator());
+		if(!Factory::inst().isProtoType(temps)) {
+			Value sub_o(kObjectType);
+			for (auto &m : messages) {
+				if(m->GetTypeName() != "Protos.ClassName") {
+					Document *sub_d = Json::parseProtobuf(m);
+					buff.push_back(m->GetTypeName());
+					sub_o.AddMember(StringRef(buff.back().c_str()), *sub_d, d.GetAllocator());
+				}
+			}
+			o.AddMember(StringRef(temps.c_str()), sub_o, d.GetAllocator());
+		} else {
+			assert(messages.size() == 2);
+			Document *sub_d = Json::parseProtobuf(messages[1]);
+			o.AddMember(StringRef(temps.c_str()), *sub_d, d.GetAllocator());
+		}
 
 		(*_output_str) << Json::stringify(o);
 	} else if (getRepr() == Binary) {
 		for (auto &m : messages) {
-			// cout << "==============================\n";
-			// cout << m->GetTypeName() << "\n";
-			// cout << m->DebugString();
 			writeBinaryMessage(m, _output_str);
 		}
 	}
@@ -117,8 +122,7 @@ vector<ProtoMessage> Stream::readObjectProtos() {
 	return messages;
 }
 
-SerializableBase* Stream::readObject() {
-
+SerializableBase* Stream::readBaseObject(SerializableBase *o) {
 	if (!isInput()) {
 		throw dnnException()<< "Stream isn't open in input mode. Need input stream\n";
 	}
@@ -126,18 +130,21 @@ SerializableBase* Stream::readObject() {
 	vector<ProtoMessage> messages = readObjectProtos();
 	
 	if(messages.size() == 0) {
-		return nullptr;
+		return nullptr;		
 	}
 	
 	std::reverse(messages.begin(), messages.end());
 
 	Protos::ClassName *head = SerializableBase::getHeader(messages);
-
-	SerializableBase *o = Factory::inst().createObject(head->class_name());
-	o->getDeserialized(messages);
-	return o;
+	if(!o) {
+		SerializableBase *new_o = Factory::inst().createObject(head->class_name());	
+		new_o->getDeserialized(messages);
+		return new_o;
+	} else {
+		o->getDeserialized(messages);
+		return o;
+	}
 }
-
 
 }
 

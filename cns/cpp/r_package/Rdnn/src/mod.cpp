@@ -27,6 +27,14 @@ RCPP_MODULE(dnnMod) {
     .method("write", &RProto::write, "Write protobuf")
     .method("print", &RProto::print, "Print proto instance")
     ;
+    Rcpp::class_<RMatchingPursuit>("RMatchingPursuit")
+    .constructor<const Rcpp::List>()
+    .method("run", &RMatchingPursuit::run, "Running an algorithm")
+    .method("setFilter", &RMatchingPursuit::setFilter, "Set filter")
+    .method("getFilter", &RMatchingPursuit::getFilter, "Get filter")
+    .method("print", &RMatchingPursuit::print, "Print mpl instance")
+    .method("restore", &RMatchingPursuit::restore, "Restore time series")
+    ;
 //    Rcpp::class_<RGammatoneFB>("RGammatoneFB")
 //    .constructor()
 //    .method("calc", &RGammatoneFB::calc, "Run calculations")

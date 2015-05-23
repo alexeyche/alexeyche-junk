@@ -3,6 +3,7 @@
 
 #include <dnn/io/stream.h>
 #include <dnn/util/matrix.h>
+#include <dnn/mpl/mpl.h>
 #include <R.h>
 #include <Rinternals.h>
 
@@ -39,7 +40,7 @@ public:
                 Stream str(f, Stream::Binary);
                 
                 Factory::inst().registrationOff();
-                SerializableBase* o = str.readObject();
+                SerializableBase* o = str.readBaseObject();
                 
                 if (!o) {
                     ERR("Can't read protofile " << protofile << "\n");
@@ -47,7 +48,7 @@ public:
                 
                 while(o) {
                     obj.push_back(o);
-                    o = str.readObject();                    
+                    o = str.readBaseObject();                    
                 }
             } catch(...) {
                 ERR("Can't open " << protofile << " for reading\n");
@@ -87,7 +88,23 @@ public:
             for(auto &name: info.stat_names) {
                 out[name] = Rcpp::wrap(od->getStats()[name].values);
             }
-        } 
+        }
+        if(o->name() == "TimeSeries") {
+            TimeSeries *od = dynamic_cast<TimeSeries*>(o);
+            if(!od) { ERR("Can't cast"); }
+            vector<vector<double>> ts_vals; 
+            for(auto &d : od->data) {
+                ts_vals.push_back(d.values);
+            }
+            out = Rcpp::List::create(
+                  Rcpp::Named("values") = Rcpp::wrap(ts_vals)
+                , Rcpp::Named("ts_info") = Rcpp::List::create(
+                      Rcpp::Named("labels_ids") = Rcpp::wrap(od->info.labels_ids)
+                    , Rcpp::Named("unique_labels") = Rcpp::wrap(od->info.unique_labels)
+                    , Rcpp::Named("labels_timeline") = Rcpp::wrap(od->info.labels_timeline)
+                )
+            );
+        }  
         if(o->name() == "SpikesList") {
             SpikesList *od = dynamic_cast<SpikesList*>(o);
             if(!od) { ERR("Can't cast"); }
@@ -140,6 +157,24 @@ public:
                     , Rcpp::Named("ids_pre") = Rcpp::wrap(ids_pre)
                 )
             );
+        }
+        if(o->name() == "MatchingPursuitConfig") {
+            MatchingPursuitConfig *m = dynamic_cast<MatchingPursuitConfig*>(o);
+            if(!m) { ERR("Can't cast"); }
+            
+            out = Rcpp::List::create(
+                Rcpp::Named("threshold") = m->threshold,
+                Rcpp::Named("learn_iterations") = m->learn_iterations,
+                Rcpp::Named("jobs") = m->jobs,
+                Rcpp::Named("learning_rate") = m->learning_rate,
+                Rcpp::Named("filters_num") = m->filters_num,
+                Rcpp::Named("filter_size") = m->filter_size,
+                Rcpp::Named("learn") = m->learn,
+                Rcpp::Named("continue_learning") = m->continue_learning,
+                Rcpp::Named("batch_size") = m->batch_size,
+                Rcpp::Named("seed") = m->seed
+            );
+            
         }
         return out;
     }
@@ -195,6 +230,33 @@ public:
             }
             sl->ts_info = ts_info;
             return sl;
+        }
+        if(name == "DoubleMatrix") {
+            Rcpp::NumericMatrix m = list[0];
+            DoubleMatrix *r = Factory::inst().createObject<DoubleMatrix>("DoubleMatrix");
+            r->allocate(m.nrow(), m.ncol());
+            for(size_t i=0; i<m.nrow(); ++i) {
+                for(size_t j=0; j<m.ncol(); ++j) {
+                    r->setElement(i,j, m(i,j));
+                }
+            }
+            return r;
+        }
+        if(name == "MatchingPursuitConfig") {
+            MatchingPursuitConfig *c = Factory::inst().createObject<MatchingPursuitConfig>("MatchingPursuitConfig");
+
+            if(list.containsElementNamed("threshold")) c->threshold = list["threshold"];
+            if(list.containsElementNamed("learn_iterations")) c->learn_iterations = list["learn_iterations"];
+            if(list.containsElementNamed("jobs")) c->jobs = list["jobs"];
+            if(list.containsElementNamed("learning_rate")) c->learning_rate = list["learning_rate"];
+            if(list.containsElementNamed("filters_num")) c->filters_num = list["filters_num"];
+            if(list.containsElementNamed("filter_size")) c->filter_size = list["filter_size"];
+            if(list.containsElementNamed("learn")) c->learn = list["learn"];
+            if(list.containsElementNamed("continue_learning")) c->continue_learning = list["continue_learning"];
+            if(list.containsElementNamed("batch_size")) c->batch_size = list["batch_size"];
+            if(list.containsElementNamed("seed")) c->seed = list["seed"];
+
+            return c;
         }
 
         ERR("Can't convert " << name );
