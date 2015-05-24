@@ -24,7 +24,7 @@ L = 100
 set.seed(1)
 filters = matrix(rnorm(M*L), nrow=M, ncol=L)
 fi = t(sapply(1:M, function(i) norm(filters[i,])))
-fi = start_f
+
 # fi = gbd("filter.pb")
 
 i = 1 
@@ -45,10 +45,10 @@ for(ep in 1:max_ep) {
         x_start = xt[i:(i+L-1)]
         x = x_start
         
-        x_p = gbd(sprintf("%d_x%d.pb", ep, i-1))
-        if (sum(x-x_p) > 0.00001) {
-            stop("Bad val")    
-        }
+#         x_p = gbd(sprintf("%d_x%d.pb", ep, i-1))
+#         if (sum(x-x_p) > 0.00001) {
+#             stop("Bad val")    
+#         }
         
         #     
         s_v = NULL
@@ -67,24 +67,24 @@ for(ep in 1:max_ep) {
             s_v = c(s_v, s)
             si_v = c(si_v, si)
         }
-        si_vp = gbd(sprintf("%s_winners_id%d.pb", ep, i-1))
-        if( sum(si_vp[1:10] - si_v[1:10]+1)>0.0001) {
-            stop("Bad val")
-        }
-        s_vp = gbd(sprintf("%s_s%d.pb", ep, i-1))
-        if( sum(s_vp - s_v)>0.0001) {
-            stop("Bad val")
-        }
+#         si_vp = gbd(sprintf("%s_winners_id%d.pb", ep, i-1))
+#         if( sum(si_vp[1:10] - si_v[1:10]+1)>0.0001) {
+#             stop("Bad val")
+#         }
+#         s_vp = gbd(sprintf("%s_s%d.pb", ep, i-1))
+#         if( sum(s_vp - s_v)>0.0001) {
+#             stop("Bad val")
+#         }
         x_d = colSums(s_v*fi[si_v,])
-        x_dp = gbd(sprintf("%d_xdes%d.pb",ep, i-1))
-        if( sum(x_dp - x_d)>0.0001) {
-            stop("Bad val")
-        }
+#         x_dp = gbd(sprintf("%d_xdes%d.pb",ep, i-1))
+#         if( sum(x_dp - x_d)>0.0001) {
+#             stop("Bad val")
+#         }
         delta = x_start - x_d
-        delta_p = gbd(sprintf("%d_deltas%d.pb",ep, i-1))
-        if( sum(delta_p - delta)>0.0001) {
-            stop("Bad val")
-        }
+#         delta_p = gbd(sprintf("%d_deltas%d.pb",ep, i-1))
+#         if( sum(delta_p - delta)>0.0001) {
+#             stop("Bad val")
+#         }
         delta_sum = delta_sum + sum(delta^2)    
         deltas = c(deltas, delta)
         for(s_i in 1:length(si_v)) {
@@ -95,10 +95,10 @@ for(ep in 1:max_ep) {
         }
     }
     cat("delta; ", delta_sum, "\n")
-    grad_p = gbd(sprintf("%d_dfilter.pb", ep))
-    if( sum(grad_p - grad_m)>0.0001) {
-        stop("Bad val")
-    }
+#     grad_p = gbd(sprintf("%d_dfilter.pb", ep))
+#     if( sum(grad_p - grad_m)>0.0001) {
+#         stop("Bad val")
+#     }
     
     fi = fi + 0.1*grad_m    
     fi = t(sapply(1:M, function(i) norm(fi[i,])))

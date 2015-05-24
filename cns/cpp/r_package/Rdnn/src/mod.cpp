@@ -31,6 +31,7 @@ RCPP_MODULE(dnnMod) {
     .constructor<const Rcpp::List>()
     .method("run", &RMatchingPursuit::run, "Running an algorithm")
     .method("setFilter", &RMatchingPursuit::setFilter, "Set filter")
+    .method("setConf", &RMatchingPursuit::setConf, "Set conf")
     .method("getFilter", &RMatchingPursuit::getFilter, "Get filter")
     .method("print", &RMatchingPursuit::print, "Print mpl instance")
     .method("restore", &RMatchingPursuit::restore, "Restore time series")

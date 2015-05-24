@@ -28,13 +28,12 @@ public:
 			"TimeSeries"
 		);
 		Factory::inst().registrationOn();
-		vector<dnn::MatchingPursuit::FilterMatch> matches = MatchingPursuit::run(*ts, 0);
-
+		dnn::MatchingPursuit::MPLReturn ret = MatchingPursuit::run(*ts, 0);
 		delete ts;
 
 		Rcpp::List matches_l;
 
-		for(auto &m: matches) {
+		for(auto &m: ret.matches) {
 			matches_l.push_back(
 				Rcpp::List::create(
 					Rcpp::Named("t") = m.t,
@@ -43,7 +42,11 @@ public:
 				)
 			);
 		}
-		return matches_l;
+		return Rcpp::List::create(
+			Rcpp::Named("spikes") = matches_l, 
+			Rcpp::Named("restored") = Rcpp::wrap(ret.restored),
+			Rcpp::Named("accum_error") = Rcpp::wrap(ret.accum_error)
+		);
 	}
 	void setFilter(const Rcpp::NumericMatrix m) {
 		dnn::MatchingPursuit::setFilter(
@@ -55,9 +58,18 @@ public:
 			)
 		);
 	}
+	void setConf(const Rcpp::List conf) {
+		Factory::inst().registrationOff();
+		MatchingPursuitConfig *in_c = RProto::convertBack<dnn::MatchingPursuitConfig>(conf, "MatchingPursuitConfig");
+		MatchingPursuit::c = *in_c;
+		delete in_c;
+		Factory::inst().registrationOn();
+	}
+
 	Rcpp::NumericMatrix getFilter() {
 		return RProto::convertToList(&filter)[0];
 	}
+
 	Rcpp::NumericVector restore(const Rcpp::List matches_l) {
 		vector<FilterMatch> matches;
 		for(auto &mr: matches_l) {

@@ -23,6 +23,7 @@ struct MatchingPursuitConfig : public Serializable<Protos::MatchingPursuitConfig
 	, continue_learning(false)
 	, batch_size(1000)
 	, seed(-1)
+	, noise_sd(0.0)
 	{}
 
 	int seed;
@@ -35,6 +36,7 @@ struct MatchingPursuitConfig : public Serializable<Protos::MatchingPursuitConfig
 	bool learn;
 	bool continue_learning;
 	size_t batch_size;
+	double noise_sd;
 
 	void serial_process() {
         begin() <<
@@ -47,7 +49,8 @@ struct MatchingPursuitConfig : public Serializable<Protos::MatchingPursuitConfig
 					"learn: " << learn << ", " <<
 					"continue_learning: " << continue_learning <<
 					"batch_size: " << batch_size <<
-					"seed: " << seed 
+					"seed: " << seed <<
+					"noise_sd: " << noise_sd
 				<< Self::end;
 	}    
  //    Document serializeToJson() {
@@ -129,7 +132,7 @@ public:
 		
 		for(auto &m: matches) {
 			for(size_t i=0; i<filter.ncol(); ++i) {
-				restored[m.t + i] = m.s * filter(m.fi, i);
+				restored[m.t + i] += m.s * filter(m.fi, i) + c.noise_sd * getNorm();
 			}
 		}
 		return restored;
@@ -141,14 +144,22 @@ public:
 			r.dfilter.allocate(self.filter.nrow(), self.filter.ncol());
 			r.dfilter.fill(0.0);
 		}
-		for(size_t ti=from; ti<(to-self.filter.ncol()); ++ti) {
-			vector<double> x;
-			for(size_t i=ti; i<(ti+self.filter.ncol()); ++i) {
-				if(i >= ts.data[dim].values.size()) {
-					throw dnnException() << "Trying to get value out of input data: " << dim << ":" << i << "\n";
-				}
-				x.push_back(ts.data[dim].values[i]);
+		vector<double> x;
+		for(size_t i=from; i<(to-self.filter.ncol()); ++i) {
+			if(i >= ts.data[dim].values.size()) {
+				throw dnnException() << "Trying to get value out of input data: " << dim << ":" << i << "\n";
 			}
+			x.push_back(ts.data[dim].values[i]);
+		}
+
+		for(size_t ti=0; ti<x.size(); ++ti) {
+			// vector<double> x;
+			// for(size_t i=ti; i<(ti+self.filter.ncol()); ++i) {
+			// 	if(i >= ts.data[dim].values.size()) {
+			// 		throw dnnException() << "Trying to get value out of input data: " << dim << ":" << i << "\n";
+			// 	}
+			// 	x.push_back(ts.data[dim].values[i]);
+			// }
 			// {
 			// 	DoubleMatrix mm(x);
 			// 	char buf[100];
@@ -157,16 +168,20 @@ public:
 			// 	Stream(of, Stream::Binary).writeObject(&mm);
 			// }
 
-			vector<double> s;
-			vector<size_t> winners_id;
+			// vector<double> s;
+			// vector<size_t> winners_id;
+
+			vector<FilterMatch> matches;
 			for(size_t i=0; i<self.c.learn_iterations; ++i) {			
 				double max_s = -100;
 				size_t max_fi = 0;
 
 				for(size_t fi=0; fi<self.filter.nrow(); ++fi) {
 					double s_f=0;
-					for(size_t xi=0; xi<x.size(); ++xi) {
-						s_f += x[xi] * self.filter(fi, xi);					
+					for(size_t xi=ti; xi<(ti+self.filter.ncol()); ++xi) {
+					//for(size_t xi=0; xi<x.size(); ++xi) {
+						//s_f += x[xi] * self.filter(fi, xi);					
+						s_f += x[xi] * self.filter(fi, xi-ti);					
 					}
 
 					if (max_s<s_f) {
@@ -174,53 +189,44 @@ public:
 						max_fi = fi;
 					}
 				}
-
-				if(fabs(max_s)<1e-10) {
-					break;
-				}
-				
-				//cout << "s: " << max_s << ", " << "fi: " << max_fi << "\n";
-				s.push_back(max_s);
-				winners_id.push_back(max_fi);
-
-				double res_acc=0;
-				for(size_t xi=0; xi<x.size(); ++xi) {
-					x[xi] -= max_s * self.filter(max_fi, xi);
-					res_acc += x[xi]*x[xi];				
-				}
 				if(max_s>=self.c.threshold) {
-					r.matches.push_back(FilterMatch(max_fi, max_s, ti));
+					FilterMatch m(max_fi, max_s, ti);
 
-				} else 
-				if(!self.c.learn) {
+					for(size_t xi=ti; xi<(ti+self.filter.ncol()); ++xi) {
+					//for(size_t xi=0; xi<x.size(); ++xi) {
+						//x[xi] -= m.s * self.filter(m.fi, xi);
+						x[xi] -= m.s * self.filter(m.fi, xi-ti);						
+					}
+					matches.push_back(m);
+				} else {
 					break;
 				}
 			}
-			if (self.c.learn) {
-				vector<double> x_des;
-				x_des.resize(x.size());
-				
-				for(size_t wi=0; wi<winners_id.size(); ++wi) {
-					for(size_t xi=0; xi<x.size(); ++xi) {
-						if(wi == 0) x_des[xi] = 0.0;
+			r.matches.insert(r.matches.end(), matches.begin(), matches.end());
+			// if ((self.c.learn) && (matches.size() > 0)) {
+			// 	vector<double> x_des;
+			// 	x_des.resize(x.size());
+			// 	for(size_t mi=0; mi<matches.size(); ++mi) {
+			// 		for(size_t xi=0; xi<x.size(); ++xi) {
+			// 			if(mi == 0) x_des[xi] = 0.0;
 
-						x_des[xi] += s[wi] * self.filter(winners_id[wi], xi);
-					}
-				}
+			// 			x_des[xi] += matches[mi].s * self.filter(matches[mi].fi, xi);
+			// 		}
+			// 	}
 
-				vector<double> deltas;
-				deltas.resize(x.size());
-				for(size_t xi=0; xi<x.size(); ++xi) {
-					const double &x_start = ts.data[dim].values[ti+xi];
-					deltas[xi] = x_start - x_des[xi];
+			// 	vector<double> deltas;
+			// 	deltas.resize(x.size());
+			// 	for(size_t xi=0; xi<x.size(); ++xi) {
+			// 		const double &x_start = ts.data[dim].values[ti+xi];
+			// 		deltas[xi] = x_start - x_des[xi];
 					
-					r.accum_error += deltas[xi] * deltas[xi];
-				}
-				for(size_t wi=0; wi<winners_id.size(); ++wi) {
-					for(size_t xi=0; xi<x.size(); ++xi) {
-						r.dfilter(winners_id[wi], xi) += s[wi] * deltas[xi];  
-					}
-				}
+			// 		r.accum_error += deltas[xi] * deltas[xi];
+			// 	}
+			// 	for(auto &m: matches) {
+			// 		for(size_t xi=0; xi<x.size(); ++xi) {
+			// 			r.dfilter(m.fi, xi) += m.s * deltas[xi];  
+			// 		}
+			// 	}
 				
 				
 				// {
@@ -256,16 +262,24 @@ public:
 				// 	Stream(of, Stream::Binary).writeObject(&mm);
 				// }
 				
-			}
+			// }
 			
 		}	
 
 		return r;
 	}
-
-	vector<FilterMatch> run(const TimeSeries &ts, const size_t dim) {
+	
+	struct MPLReturn {
+		MPLReturn() : accum_error(0.0) {}
 		vector<FilterMatch> matches;
+		double accum_error;
+		vector<double> restored;
+	};
+
+	MPLReturn run(const TimeSeries &ts, const size_t dim) {
+		MPLReturn ret;
 		for(size_t bi=0; bi<ts.data[dim].values.size(); bi+=c.batch_size) { 
+			vector<FilterMatch> matches;
 			vector<IndexSlice> slices = dispatchOnThreads(c.batch_size, c.jobs);
 			vector<std::future<SubSeqRet>> futures;
 			for(auto &slice: slices) {
@@ -282,36 +296,67 @@ public:
 				);
 				cout << "Running worker on slice " << bi+slice.from << ": " << bi+slice.to << "\n";
 			}
-			double accum_error = 0;
+			
 			for(auto &fret: futures) {
 				SubSeqRet ret = fret.get();
 				for(auto &m: ret.matches) {
 					matches.push_back(m);
 				}
-				accum_error += ret.accum_error;
+				//accum_error += ret.accum_error;
+			}
 				// {
 				// 	char buf[100];
 				// 	sprintf(buf, "%zu_dfilter.pb", ep);
 				// 	ofstream o(buf);
 				// 	Stream(o, Stream::Binary).writeObject(&ret.dfilter);
 				// }
-				if(c.learn) {
-					for(size_t i=0; i<filter.nrow(); ++i) {
-						double acc = 0.0;
-						for(size_t j=0; j<filter.ncol(); ++j) {
-							filter(i, j) += c.learning_rate * ret.dfilter(i, j);
-							acc += filter(i, j) * filter(i, j);
-						}
-						double n = sqrt(acc);
-						for(size_t j=0; j<filter.ncol(); ++j) {
-							filter(i, j) = filter(i, j)/n;
-						}
+			if(c.learn) {
+				double accum_error = 0;
+
+				vector<double> restored;
+				restored.resize(c.batch_size);
+				for(auto &r: restored) r = 0.0;
+
+				for(auto &m: matches) {
+					for(size_t i=0; i<filter.ncol(); ++i) {
+						restored[m.t + i - bi] = m.s * filter(m.fi, i);
 					}
 				}
+				for(auto &m: matches) {
+					double acc = 0.0;
+					for(size_t i=0; i<filter.ncol(); ++i) {
+						double delta = ts.data[dim].values[m.t+i] - restored[m.t + i - bi];
+						filter(m.fi, i) += c.learning_rate * m.s * delta;
+						
+						accum_error += delta * delta;
+						acc += filter(m.fi, i);
+					}
+					double n = sqrt(acc);
+					for(size_t i=0; i<filter.ncol(); ++i) {
+						filter(m.fi, i) = filter(m.fi, i)/n;
+					}
+				}
+				
+				ret.restored.insert(ret.restored.end(), restored.begin(), restored.end());
+				ret.accum_error += accum_error;
+
+				// for(size_t i=0; i<filter.nrow(); ++i) {
+				// 	double acc = 0.0;
+				// 	for(size_t j=0; j<filter.ncol(); ++j) {
+				// 		filter(i, j) += c.learning_rate * ret.dfilter(i, j);
+				// 		acc += filter(i, j) * filter(i, j);
+				// 	}
+				// 	double n = sqrt(acc);
+				// 	for(size_t j=0; j<filter.ncol(); ++j) {
+				// 		filter(i, j) = filter(i, j)/n;
+				// 	}
+				// }
+				
+
 			}
-			cout << "Got accumulated error on batch " << bi << ": " << accum_error << "\n";
+			ret.matches.insert(ret.matches.end(), matches.begin(), matches.end());
 		}
-		return matches;
+		return ret;
 	}
 	const DoubleMatrix& getFilter() {
 		return filter;

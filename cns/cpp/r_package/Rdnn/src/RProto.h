@@ -172,7 +172,8 @@ public:
                 Rcpp::Named("learn") = m->learn,
                 Rcpp::Named("continue_learning") = m->continue_learning,
                 Rcpp::Named("batch_size") = m->batch_size,
-                Rcpp::Named("seed") = m->seed
+                Rcpp::Named("seed") = m->seed,
+                Rcpp::Named("noise_sd") = m->noise_sd
             );
             
         }
@@ -255,6 +256,7 @@ public:
             if(list.containsElementNamed("continue_learning")) c->continue_learning = list["continue_learning"];
             if(list.containsElementNamed("batch_size")) c->batch_size = list["batch_size"];
             if(list.containsElementNamed("seed")) c->seed = list["seed"];
+            if(list.containsElementNamed("noise_sd")) c->noise_sd = list["noise_sd"];
 
             return c;
         }
