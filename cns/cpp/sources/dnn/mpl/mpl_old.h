@@ -114,10 +114,13 @@ public:
 		vector<FilterMatch> matches;
 		DoubleMatrix dfilter;
 		
+		vector<double> s;
+		vector<size_t> winners_id;
 		double accum_error;
 	};
 	
 	vector<double> restore(const vector<FilterMatch> matches) {
+		TimeSeries ts;
 		size_t max_t=0;
 		for(auto &m: matches) {
 			max_t = std::max(max_t, (size_t)m.t);
@@ -142,23 +145,43 @@ public:
 			r.dfilter.fill(0.0);
 		}
 		vector<double> x;
-		for(size_t i=from; i<to; ++i) {
+		for(size_t i=from; i<(to-self.filter.ncol()); ++i) {
 			if(i >= ts.data[dim].values.size()) {
 				throw dnnException() << "Trying to get value out of input data: " << dim << ":" << i << "\n";
 			}
 			x.push_back(ts.data[dim].values[i]);
 		}
 
-		for(size_t ti=0; ti<(x.size()-self.filter.ncol()); ++ti) {
-			size_t ti_f = ti+self.filter.ncol();
+		for(size_t ti=0; ti<x.size(); ++ti) {
+			// vector<double> x;
+			// for(size_t i=ti; i<(ti+self.filter.ncol()); ++i) {
+			// 	if(i >= ts.data[dim].values.size()) {
+			// 		throw dnnException() << "Trying to get value out of input data: " << dim << ":" << i << "\n";
+			// 	}
+			// 	x.push_back(ts.data[dim].values[i]);
+			// }
+			// {
+			// 	DoubleMatrix mm(x);
+			// 	char buf[100];
+			// 	sprintf(buf, "%zu_x%zu.pb", self.ep, ti);
+			// 	ofstream of(buf);
+			// 	Stream(of, Stream::Binary).writeObject(&mm);
+			// }
+
+			// vector<double> s;
+			// vector<size_t> winners_id;
+
+			vector<FilterMatch> matches;
 			for(size_t i=0; i<self.c.learn_iterations; ++i) {			
 				double max_s = -100;
 				size_t max_fi = 0;
 
 				for(size_t fi=0; fi<self.filter.nrow(); ++fi) {
 					double s_f=0;
-					for(size_t xi=ti; xi<ti_f; ++xi) {
-						s_f += x[xi] * self.filter(fi, xi-ti);				
+					for(size_t xi=ti; xi<(ti+self.filter.ncol()); ++xi) {
+					//for(size_t xi=0; xi<x.size(); ++xi) {
+						//s_f += x[xi] * self.filter(fi, xi);					
+						s_f += x[xi] * self.filter(fi, xi-ti);					
 					}
 
 					if (max_s<s_f) {
@@ -167,44 +190,82 @@ public:
 					}
 				}
 				if(max_s>=self.c.threshold) {
-					FilterMatch m(max_fi, max_s, ti + from);
+					FilterMatch m(max_fi, max_s, ti);
 
-					for(size_t xi=ti; xi<ti_f; ++xi) {
+					for(size_t xi=ti; xi<(ti+self.filter.ncol()); ++xi) {
+					//for(size_t xi=0; xi<x.size(); ++xi) {
+						//x[xi] -= m.s * self.filter(m.fi, xi);
 						x[xi] -= m.s * self.filter(m.fi, xi-ti);						
 					}
-					r.matches.push_back(m);
+					matches.push_back(m);
 				} else {
 					break;
 				}
 			}
-		}
-		if( (self.c.learn) && (r.matches.size()>0) ) {
-			std::default_random_engine generator;
-			std::normal_distribution<double> distribution(0.0, self.c.noise_sd);
+			r.matches.insert(r.matches.end(), matches.begin(), matches.end());
+			// if ((self.c.learn) && (matches.size() > 0)) {
+			// 	vector<double> x_des;
+			// 	x_des.resize(x.size());
+			// 	for(size_t mi=0; mi<matches.size(); ++mi) {
+			// 		for(size_t xi=0; xi<x.size(); ++xi) {
+			// 			if(mi == 0) x_des[xi] = 0.0;
 
-			vector<double> restored;
-			restored.resize(x.size());
-			for(auto &v: restored) v = 0.0;
-			for(auto &m: r.matches) {
-				for(size_t i=0; i<self.filter.ncol(); ++i) {
-					restored[m.t + i - from] += m.s * self.filter(m.fi, i) + distribution(generator);
-				}
-			}
-			{
-				DoubleMatrix mm(restored);
-				ofstream ff("restored.pb");
-				Stream(ff, Stream::Binary).writeObject(&mm);
-			}
-			for(auto &m: r.matches) {
-				for(size_t i=0; i<self.filter.ncol(); ++i) {
-					// cout << ts.data[dim].values.size() << ", " << restored.size() << "   ";
-					// cout << m.t << ":" << i << ":" << from << "\n";
-					double delta = ts.data[dim].values[m.t + i] - restored[m.t + i - from];
-					r.accum_error += delta * delta;
-					r.dfilter(m.fi, i) += m.s * delta;
-				}
-			}
-		}
+			// 			x_des[xi] += matches[mi].s * self.filter(matches[mi].fi, xi);
+			// 		}
+			// 	}
+
+			// 	vector<double> deltas;
+			// 	deltas.resize(x.size());
+			// 	for(size_t xi=0; xi<x.size(); ++xi) {
+			// 		const double &x_start = ts.data[dim].values[ti+xi];
+			// 		deltas[xi] = x_start - x_des[xi];
+					
+			// 		r.accum_error += deltas[xi] * deltas[xi];
+			// 	}
+			// 	for(auto &m: matches) {
+			// 		for(size_t xi=0; xi<x.size(); ++xi) {
+			// 			r.dfilter(m.fi, xi) += m.s * deltas[xi];  
+			// 		}
+			// 	}
+				
+				
+				// {
+				// 	DoubleMatrix mm(x_des);
+				// 	char buf[100];
+				// 	sprintf(buf, "%zu_xdes%zu.pb", self.ep, ti);
+				// 	ofstream of(buf);
+				// 	Stream(of, Stream::Binary).writeObject(&mm);
+				// }
+				// {
+				// 	DoubleMatrix mm(deltas);
+				// 	char buf[100];
+				// 	sprintf(buf, "%zu_deltas%zu.pb", self.ep, ti);
+				// 	ofstream of(buf);
+				// 	Stream(of, Stream::Binary).writeObject(&mm);
+				// }
+				// {
+				// 	DoubleMatrix mm(s);
+				// 	char buf[100];
+				// 	sprintf(buf, "%zu_s%zu.pb", self.ep, ti);
+				// 	ofstream of(buf);
+				// 	Stream(of, Stream::Binary).writeObject(&mm);
+				// }
+				// {
+				// 	vector<double> www;
+				// 	for(auto &wid: winners_id) {
+				// 		www.push_back(wid);
+				// 	}
+				// 	DoubleMatrix mm(www);
+				// 	char buf[100];
+				// 	sprintf(buf, "%zu_winners_id%zu.pb", self.ep, ti);
+				// 	ofstream of(buf);
+				// 	Stream(of, Stream::Binary).writeObject(&mm);
+				// }
+				
+			// }
+			
+		}	
+
 		return r;
 	}
 	
@@ -216,8 +277,9 @@ public:
 	};
 
 	MPLReturn run(const TimeSeries &ts, const size_t dim) {
-		MPLReturn runret;
+		MPLReturn ret;
 		for(size_t bi=0; bi<ts.data[dim].values.size(); bi+=c.batch_size) { 
+			vector<FilterMatch> matches;
 			vector<IndexSlice> slices = dispatchOnThreads(c.batch_size, c.jobs);
 			vector<std::future<SubSeqRet>> futures;
 			for(auto &slice: slices) {
@@ -234,33 +296,67 @@ public:
 				);
 				cout << "Running worker on slice " << bi+slice.from << ": " << bi+slice.to << "\n";
 			}
-			vector<SubSeqRet> rets;
+			
 			for(auto &fret: futures) {
 				SubSeqRet ret = fret.get();
 				for(auto &m: ret.matches) {
-					runret.matches.push_back(m);
+					matches.push_back(m);
 				}
-				runret.accum_error += ret.accum_error;
-				rets.push_back(ret);
-				runret.matches.insert(runret.matches.end(), ret.matches.begin(), ret.matches.end());
+				//accum_error += ret.accum_error;
 			}
+				// {
+				// 	char buf[100];
+				// 	sprintf(buf, "%zu_dfilter.pb", ep);
+				// 	ofstream o(buf);
+				// 	Stream(o, Stream::Binary).writeObject(&ret.dfilter);
+				// }
 			if(c.learn) {
-				for(auto &ret : rets) {
-					for(size_t i=0; i<filter.nrow(); ++i) {
-						double acc = 0.0;
-						for(size_t j=0; j<filter.ncol(); ++j) {
-							filter(i, j) += c.learning_rate * ret.dfilter(i, j);
-							acc += filter(i, j) * filter(i, j);
-						}
-						double n = sqrt(acc);
-						for(size_t j=0; j<filter.ncol(); ++j) {
-							filter(i, j) = filter(i, j)/n;
-						}
+				double accum_error = 0;
+
+				vector<double> restored;
+				restored.resize(c.batch_size);
+				for(auto &r: restored) r = 0.0;
+
+				for(auto &m: matches) {
+					for(size_t i=0; i<filter.ncol(); ++i) {
+						restored[m.t + i - bi] = m.s * filter(m.fi, i);
 					}
 				}
+				for(auto &m: matches) {
+					double acc = 0.0;
+					for(size_t i=0; i<filter.ncol(); ++i) {
+						double delta = ts.data[dim].values[m.t+i] - restored[m.t + i - bi];
+						filter(m.fi, i) += c.learning_rate * m.s * delta;
+						
+						accum_error += delta * delta;
+						acc += filter(m.fi, i);
+					}
+					double n = sqrt(acc);
+					for(size_t i=0; i<filter.ncol(); ++i) {
+						filter(m.fi, i) = filter(m.fi, i)/n;
+					}
+				}
+				
+				ret.restored.insert(ret.restored.end(), restored.begin(), restored.end());
+				ret.accum_error += accum_error;
+
+				// for(size_t i=0; i<filter.nrow(); ++i) {
+				// 	double acc = 0.0;
+				// 	for(size_t j=0; j<filter.ncol(); ++j) {
+				// 		filter(i, j) += c.learning_rate * ret.dfilter(i, j);
+				// 		acc += filter(i, j) * filter(i, j);
+				// 	}
+				// 	double n = sqrt(acc);
+				// 	for(size_t j=0; j<filter.ncol(); ++j) {
+				// 		filter(i, j) = filter(i, j)/n;
+				// 	}
+				// }
+				
+
 			}
+			ret.matches.insert(ret.matches.end(), matches.begin(), matches.end());
 		}
-		return runret;
+		return ret;
 	}
 	const DoubleMatrix& getFilter() {
 		return filter;
@@ -269,6 +365,7 @@ public:
 		filter = m;
 	}
 protected:
+
 	DoubleMatrix filter;
 	MatchingPursuitConfig c;
 };

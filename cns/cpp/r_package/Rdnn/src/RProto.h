@@ -3,7 +3,7 @@
 
 #include <dnn/io/stream.h>
 #include <dnn/util/matrix.h>
-#include <dnn/mpl/mpl.h>
+#include <dnn/mpl/mpl_old.h>
 #include <R.h>
 #include <Rinternals.h>
 
