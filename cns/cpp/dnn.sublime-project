@@ -2,12 +2,10 @@
 	"folders":
 	[
 		{
-			"follow_symlinks": true,
 			"path": "sources"
+		},
+		{
+			"path": "r_package/Rdnn/src"
 		}
-	],
-	"settings":
-    {
-        "tab_size": 4
-    },
+	]
 }

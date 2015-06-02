@@ -16,8 +16,10 @@ d = dim(data$EEGDATA)
 labels = c()
 values = c()
 timeline = c()
-for(i in 1:d[3]) {
-    values = matrix(norm(data$EEGDATA[1,,1]), nrow=1) #cbind(values, t(sapply(1:d[1], function(j) norm(data$EEGDATA[j,,i]))) )
+for(i in 1:d[3]) {    
+    values = matrix(norm(data$EEGDATA[1,,1]), nrow=1)
+#    values = cbind(values, t(sapply(1:d[1], function(j) norm(data$EEGDATA[j,,i]))) )
+
     labels = c(labels, data$LABELS[i,])
     timeline = c(timeline, ncol(values))               
 }

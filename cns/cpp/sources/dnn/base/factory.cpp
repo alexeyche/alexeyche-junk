@@ -11,7 +11,7 @@
 #include <dnn/util/time_series.h>
 #include <dnn/util/statistics.h>
 #include <dnn/util/matrix.h>
-#include <dnn/mpl/mpl_old.h>
+#include <dnn/mpl/mpl.h>
 #include <dnn/util/spikes_list.h>
 #include <dnn/learning_rules/stdp.h>
 #include <dnn/learning_rules/stdp_time.h>

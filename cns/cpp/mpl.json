@@ -1,14 +1,15 @@
 {
     "MatchingPursuitConfig": {
+        "seed": -1,
         "threshold": 0.1,
-        "learn_iterations": 50,
-        "jobs": 1,
-        "learning_rate": 1.0,
-        "filters_num": 64,
+        "learn_iterations": 100,
+        "jobs": 4,
+        "learning_rate": 1,
+        "filters_num": 100,
         "filter_size": 100,
         "learn": true,
-        "continue_learning": false,
+        "continue_learning": true,
         "batch_size": 1000,
-        "seed" : 1
+        "noise_sd": 0.0
     }
 }

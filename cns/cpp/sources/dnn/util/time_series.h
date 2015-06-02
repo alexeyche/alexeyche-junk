@@ -65,6 +65,11 @@ struct TimeSeries : public SerializableBase {
 	typedef TimeSeriesInterface interface;
 
 	TimeSeries() {}
+	TimeSeries(vector<double> v) {
+		dim_info.size = 1;
+		data.resize(dim_info.size); 
+		data[0].values = v;
+	}
 	TimeSeries(const string &filename, const string &format) {
 		readFromFile(filename, format);
 	}
@@ -76,8 +81,8 @@ struct TimeSeries : public SerializableBase {
 			throw dnnException()<< "Can't open file " << filename << "\n";
 		}
 		if(format == "ucr-ts") {			
-			dim.size = 1; // Only one dim TS support
-			data.resize(dim.size); 
+			dim_info.size = 1; // Only one dim TS support
+			data.resize(dim_info.size); 
 			string line;
 			while (std::getline(f, line)) {
 				string lab;
@@ -97,6 +102,10 @@ struct TimeSeries : public SerializableBase {
 	}
 	size_t length() {
 		return data[0].values.size();
+	}
+	
+	size_t dim() const {
+		return data.size();
 	}
 
 	const double& getValueAt(const size_t &index) {		
@@ -118,11 +127,11 @@ struct TimeSeries : public SerializableBase {
 	}
 
 	void serial_process() {
-		begin() << "dim: " << dim;
+		begin() << "dim_info: " << dim_info;
 		if (mode == ProcessingInput) {
-			data.resize(dim.size);
+			data.resize(dim_info.size);
 		}
-		for(size_t i=0; i<dim.size; ++i) {
+		for(size_t i=0; i<dim_info.size; ++i) {
 			(*this) << data[i];
 		}
 		(*this) << "info: " << info << Self::end;
@@ -145,7 +154,7 @@ struct TimeSeries : public SerializableBase {
 	   }
 	}
 
-	TimeSeriesDimInfo dim;
+	TimeSeriesDimInfo dim_info;
 	TimeSeriesInfo info;
 	vector<TimeSeriesData> data;
 };

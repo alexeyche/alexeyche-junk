@@ -10,9 +10,9 @@ conf = list(
     learn_iterations=100,
     learning_rate=1,
     seed=1,
-    threshold=0.075,
+    threshold=0.1,
     learn=FALSE,
-    noise_sd=0.01
+    noise_sd=0.0
 )
 
 bd = "/home/alexeyche/prog/alexeyche-junk/cns/cpp/build"
@@ -22,7 +22,9 @@ gbd = function(ff) {
 
 
 mpl = RMatchingPursuit$new(conf)
-#mpl$setFilter(gbd("filter.pb"))
+set.seed(1)
+f=matrix(rnorm(64*100), nrow=64, ncol=100)
+mpl$setFilter(f)
 
 max_ep = 300
 

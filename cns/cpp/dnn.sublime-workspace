@@ -4,201 +4,590 @@
 		"selected_items":
 		[
 			[
-				"en",
-				"entity_map_type"
+				"acc",
+				"acc_error"
 			],
 			[
-				"Spik",
-				"SpikeNeuronFactory"
+				"orig",
+				"orig_val"
 			],
 			[
-				"IA",
-				"IAFConstants"
+				"rest",
+				"restored_ts"
 			],
 			[
-				"Spike",
-				"SpikeNeuronFactory"
+				"res",
+				"restored_ts"
 			],
 			[
-				"Spi",
-				"SpikeNeuron"
+				"dim",
+				"dimension"
 			],
 			[
-				"Stat",
-				"StaticSynapse"
+				"left",
+				"left_protobin"
 			],
 			[
-				"TS",
-				"TSInput"
+				"out",
+				"output_ctx"
 			],
 			[
-				"Dete",
-				"Determ"
+				"right",
+				"right_protobin"
 			],
 			[
-				"IAF",
-				"IAFNeuron"
+				"right_",
+				"right_report"
 			],
 			[
-				"IS",
-				"ISpikeNeuron"
+				"left_",
+				"left_report"
 			],
 			[
-				"Sta",
-				"StaticSynapse"
+				"reg_",
+				"reg_map_file"
 			],
 			[
-				"Deter",
-				"DetermConstants"
+				"uploads",
+				"uploads_right"
 			],
 			[
-				"dyna",
-				"dynamic_object"
+				"uplo",
+				"uploads_left"
 			],
 			[
-				"cre",
-				"createObject"
+				"down",
+				"download"
 			],
 			[
-				"typ",
-				"typename"
+				"job_",
+				"job_logs"
 			],
 			[
-				"nam",
-				"namespace"
+				"Intege",
+				"IntegerVector"
 			],
 			[
-				"StateS",
-				"StaticSynapseConstants"
+				"Num",
+				"NumericVector"
 			],
 			[
-				"St",
-				"Stdp"
+				"upload",
+				"upload_dst"
 			],
 			[
-				"Std",
-				"StdpConstants"
+				"no",
+				"no_split"
 			],
 			[
-				"Det",
-				"DetermConstants"
+				"rep",
+				"rep_txt"
 			],
 			[
-				"TSI",
-				"TSInputConstants"
+				"proc",
+				"processing_job_limit"
 			],
 			[
-				"Ser",
+				"files",
+				"files_counter"
+			],
+			[
+				"file",
+				"files_counter"
+			],
+			[
+				"data",
+				"data_dir"
+			],
+			[
+				"geoa",
+				"geoa_file"
+			],
+			[
+				"wor",
+				"working_dir"
+			],
+			[
+				"outp",
+				"output_protobin"
+			],
+			[
+				"uploads_o",
+				"uploads_output_dir"
+			],
+			[
+				"wo",
+				"working_dir"
+			],
+			[
+				"act",
+				"active_stages"
+			],
+			[
+				"Up",
+				"UploadStatus"
+			],
+			[
+				"perf",
+				"performed"
+			],
+			[
+				"pre",
+				"prepare_yt_sample"
+			],
+			[
+				"prep",
+				"prepare_samples"
+			],
+			[
+				"sample",
+				"sample_tables"
+			],
+			[
+				"wait",
+				"wait_all_uploads"
+			],
+			[
+				"run_",
+				"run_upload"
+			],
+			[
+				"logg",
+				"logging_conf"
+			],
+			[
+				"stat",
+				"staticmethod"
+			],
+			[
+				"kwd",
+				"kwdumpwork"
+			],
+			[
+				"bin",
+				"bindir"
+			],
+			[
+				"UPLO",
+				"UPLOAD_WAIT_TIMEOUT"
+			],
+			[
+				"filter",
+				"filter"
+			],
+			[
+				"skyn",
+				"skynetlibs"
+			],
+			[
+				"noah_env",
+				"noah_env_file"
+			],
+			[
+				"noah_",
+				"noah_env"
+			],
+			[
+				"noah_en",
+				"noah_env_file"
+			],
+			[
+				"noah",
+				"noah_env"
+			],
+			[
+				"dst",
+				"dst_kwworm"
+			],
+			[
+				"sa",
+				"sample_table"
+			],
+			[
+				"sampl",
+				"sample_tables"
+			],
+			[
+				"Noa",
+				"NoahStarted"
+			],
+			[
+				"port",
+				"port_shift"
+			],
+			[
+				"op",
+				"output"
+			],
+			[
+				"yt_",
+				"yt_node_exists"
+			],
+			[
+				"add",
+				"additional_args"
+			],
+			[
+				"remove",
+				"remove_yt_node"
+			],
+			[
+				"filt",
+				"filter_size"
+			],
+			[
+				"resto",
+				"restored"
+			],
+			[
+				"set",
+				"setElement"
+			],
+			[
+				"futu",
+				"futures"
+			],
+			[
+				"fu",
+				"futures"
+			],
+			[
+				"run",
+				"runOnSubSeq"
+			],
+			[
+				"conv",
+				"convertToList"
+			],
+			[
+				"lear",
+				"learning_rate"
+			],
+			[
+				"mat",
+				"matches_l"
+			],
+			[
+				"Mat",
+				"MatchingPursuit"
+			],
+			[
+				"yt",
+				"yt_dir"
+			],
+			[
+				"cmd",
+				"cmd_name"
+			],
+			[
+				"sh",
+				"shlex"
+			],
+			[
+				"db_",
+				"db_host"
+			],
+			[
+				"db",
+				"db_dir"
+			],
+			[
+				"zodb",
+				"zodb_start"
+			],
+			[
+				"gen_",
+				"gen_zodb_config"
+			],
+			[
+				"convert",
+				"convertToList"
+			],
+			[
+				"Ma",
+				"MatchingPursuit"
+			],
+			[
+				"Tim",
+				"TimeSeries"
+			],
+			[
+				"Proc",
+				"ProcessingOutput"
+			],
+			[
+				"rem_st",
+				"rem_status"
+			],
+			[
+				"messa",
+				"messages"
+			],
+			[
+				"mess",
+				"messages"
+			],
+			[
+				"null",
+				"nullptr"
+			],
+			[
+				"Seri",
 				"Serializable"
 			],
 			[
-				"Le",
-				"LearningRuleType"
+				"pu",
+				"public"
 			],
 			[
-				"In",
-				"InputType"
+				"ser",
+				"serial_process"
 			],
 			[
-				"Ac",
-				"ActFunctionType"
+				"node",
+				"node_names_to_ids"
 			],
 			[
-				"Input",
-				"InputEval"
+				"out_",
+				"out_nodes"
 			],
 			[
-				"Act",
-				"ActFunctionEval"
+				"build_",
+				"build_with_patch"
 			],
 			[
-				"ty",
-				"typename"
+				"bs_t",
+				"bs_thread_patched"
 			],
 			[
-				"Syn",
-				"SynapseState"
+				"rec",
+				"recurse_tag"
 			],
 			[
-				"Neu",
-				"Neuron"
+				"key",
+				"key_name"
 			],
 			[
-				"State",
-				"StatePtr"
+				"recu",
+				"recurse_level"
 			],
 			[
-				"Ba",
-				"BaseStatePtr"
+				"doc",
+				"doc_query"
 			],
 			[
-				"S",
-				"SynapsesType"
+				"get_",
+				"get_prod_build_conf"
 			],
 			[
-				"Inp",
-				"InputType"
+				"itera",
+				"iterated_doc"
 			],
 			[
-				"Neuron",
-				"NeuronType"
+				"BUILD",
+				"BUILD_CONF_URL"
 			],
 			[
-				"inp",
-				"input_type"
+				"mac",
+				"macro_val"
 			],
 			[
-				"Eval",
-				"EvalObject"
+				"macr",
+				"macro_name"
 			],
 			[
-				"Ob",
-				"ObjectDep"
+				"oxygen",
+				"oxygen_queries"
 			],
 			[
-				"Dyn",
-				"DynamicObjectBase"
+				"src_",
+				"src_tables_args"
+			],
+			[
+				"prob",
+				"prob_selector"
+			],
+			[
+				"tab",
+				"table_index"
+			],
+			[
+				"targ",
+				"target_ctx"
+			],
+			[
+				"for",
+				"format"
+			],
+			[
+				"class",
+				"classmethod"
+			],
+			[
+				"doc_d",
+				"doc_dump"
+			],
+			[
+				"tran",
+				"transform_keys_to_scheme"
+			],
+			[
+				"kwdu",
+				"kwdumpwork_bin"
+			],
+			[
+				"inpu",
+				"input_protobin"
+			],
+			[
+				"map",
+				"map_cfg_content"
+			],
+			[
+				"find",
+				"find_dict_and_patch"
+			],
+			[
+				"te",
+				"temporary_file_name"
+			],
+			[
+				"input",
+				"input_protobin"
+			],
+			[
+				"doc_du",
+				"doc_dump_out"
+			],
+			[
+				"keys",
+				"keys_map_json"
+			],
+			[
+				"giwi_do",
+				"giwi_doc_keys_input"
+			],
+			[
+				"get_gi",
+				"get_giwi_doc_keys"
+			],
+			[
+				"host",
+				"hostcfg"
+			],
+			[
+				"doc_",
+				"doc_dump"
+			],
+			[
+				"host_d",
+				"host_dump_out"
+			],
+			[
+				"output",
+				"output_config"
+			],
+			[
+				"giwi",
+				"giwi_key"
+			],
+			[
+				"regi",
+				"registrationOff"
+			],
+			[
+				"Spike",
+				"SpikesSequence"
+			],
+			[
+				"TimeS",
+				"TimeSeriesInfo"
+			],
+			[
+				"wei",
+				"_weight"
+			],
+			[
+				"axo",
+				"axonDelay"
+			],
+			[
+				"synap",
+				"synapses"
 			]
 		]
 	},
 	"buffers":
 	[
+		{
+			"file": "sources/dnn/mpl/mpl.h",
+			"settings":
+			{
+				"buffer_size": 7656,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "r_package/Rdnn/src/RMpl.h",
+			"settings":
+			{
+				"buffer_size": 2452,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "sources/tools/mpl/mpl_main.cpp",
+			"settings":
+			{
+				"buffer_size": 3387,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "sources/dnn/util/option_parser.h",
+			"settings":
+			{
+				"buffer_size": 1637,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "sources/dnn/util/time_series.h",
+			"settings":
+			{
+				"buffer_size": 4118,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "sources/dnn/io/stream.cpp",
+			"settings":
+			{
+				"buffer_size": 3915,
+				"line_ending": "Unix"
+			}
+		}
 	],
-	"build_system": "make",
+	"build_system": "",
 	"command_palette":
 	{
-		"height": 75.0,
+		"height": 392.0,
 		"selected_items":
 		[
 			[
-				"insta",
-				"Package Control: Install Package"
-			],
-			[
-				"in",
-				"Package Control: Install Package"
+				"Packa",
+				"Package Control: Remove Package"
 			],
 			[
 				"inst",
 				"Package Control: Install Package"
-			],
-			[
-				":",
-				"File: Save All"
-			],
-			[
-				":o",
-				":$ - EOF"
 			]
 		],
 		"width": 449.0
 	},
 	"console":
 	{
-		"height": 653.0,
-		"history":
-		[
-		]
+		"height": 146.0
 	},
 	"distraction_free":
 	{
@@ -209,107 +598,328 @@
 		"side_bar_visible": false,
 		"status_bar_visible": false
 	},
-	"expanded_folders":
-	[
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/act_functions",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/neurons",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/synapses",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/tools",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/tools/dnn_sim"
-	],
 	"file_history":
 	[
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/test.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/test.cpp",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/neurons/spike_neuron.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/neurons/iaf_neuron.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/base/abstract_factory.cpp",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/base/abstract_factory.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/neurons/spike_neuron_factory.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/neurons/spike_neuron_factory.cpp",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/inputs/ts_input.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/util/fast_delegate.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/contrib/rapidjson/filereadstream.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/learning_rules/stdp.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/act_functions/act_function.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/learning_rules/learning_rule.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/synapses/synapse.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/synapses/static_synapse.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/base/CMakeLists.txt",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/const.json",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/neurons/neuron.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/util/spikes_list.cpp",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/util/spikes_list.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/util/spikes_queue.cpp",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/util/spikes_queue.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/contrib/pbjson/bin2ascii.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/util/spinning_barrier.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/act_functions/determ.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/base/factory.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/base/factory.cpp",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/base/type_map.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/base/dynamic_object.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/inputs/input.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/io/serialize.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/CMakeLists.txt",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/util/spinlock.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/base/object.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/io/serialize.cpp",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/core.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/contrib/rapidjson/rapidjson.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/contrib/rapidjson/reader.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/io/stream.cpp",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/io/stream.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/tools/dnn_sim/dnn_sim.cpp",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/io/CMakeLists.txt",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/util/time_series.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/dnn.sublime-project",
-		"/home/alexeyche/.config/sublime-text-3/Packages/User/Preferences.sublime-settings",
-		"/home/alexeyche/.config/sublime-text-3/Packages/Default/Default (Linux).sublime-keymap",
-		"/home/alexeyche/.config/sublime-text-3/Packages/User/Default (Linux).sublime-keymap",
-		"/home/alexeyche/.config/sublime-text-3/Packages/Default/Preferences.sublime-settings",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/try.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/neuron.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/base.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/dynamic_object.h",
-		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/sources/dnn/active_container.h",
-		"/home/alexeyche/prog/snn_sim/snn_sim.sublime-project",
-		"/home/alexeyche/prog/snn_sim/sources/tools/filt/filt_opts.h",
-		"/home/alexeyche/prog/snn_sim/sources/tools/sim/snn_sim.c",
-		"/home/alexeyche/.config/sublime-text-3/Packages/User/make.sublime-build",
-		"/home/alexeyche/prog/snn_sim/sources/snnlib/sim/sim.c"
+		"/home/alexeyche/cpp/sources/dnn/io/serialize.h",
+		"/mnt/twalrus4/arc/local-oxy/tests/noah_test.py",
+		"/mnt/twalrus4/arc/local-oxy/oxygen/oxygen_util.py",
+		"/mnt/twalrus4/arc/local-oxy/core/doer.py",
+		"/mnt/twalrus4/arc/local-oxy/tests/base_diff.py",
+		"/mnt/twalrus4/arc/local-oxy/oxygen/master.py",
+		"/mnt/twalrus4/arc/local-oxy/oxygen/noah.py",
+		"/mnt/twalrus4/arc/local-oxy/handlers/bike_handler.py",
+		"/mnt/twalrus4/arc/local-oxy/oxygen/cm.py",
+		"/mnt/twalrus4/arc/local-oxy/oxygen/bike.py",
+		"/mnt/twalrus4/arc/local-oxy/local-oxy.py",
+		"/mnt/twalrus4/arc/local-oxy/tests/noah_diff.py",
+		"/mnt/twalrus4/arc/local-oxy/handlers/tests_handlers/noah_diff_handler.py",
+		"/mnt/twalrus4/arc/local-oxy/kiwi/kiwi.py",
+		"/mnt/twalrus4/arc/local-oxy/util/util.py",
+		"/mnt/twalrus4/arc/local-oxy/util/io.py",
+		"/mnt/twalrus4/arc/local-oxy/handlers/kiwi_handler.py",
+		"/mnt/twalrus4/arc/local-oxy/core/local_oxy.py",
+		"/mnt/twalrus4/arc/local-oxy/core/async.py",
+		"/mnt/twalrus4/arc/local-oxy/tests/dispatcher_test.py",
+		"/mnt/twalrus4/arc/local-oxy/handlers/downloader_handler.py",
+		"/mnt/twalrus4/arc/local-oxy/handlers/tests_handlers/rollback_attr_handler.py",
+		"/mnt/twalrus4/arc/local-oxy/tests/rollback_attr.py",
+		"/mnt/twalrus4/arc/local-oxy/oxygen/kwworm.py",
+		"/mnt/twalrus4/arc/local-oxy/oxygen/giwibranches.py",
+		"/mnt/twalrus4/arc/local-oxy/handlers/noah_handler.py",
+		"/mnt/twalrus4/arc/local-oxy/tests/diff_tpl.html",
+		"/mnt/twalrus4/arc/local-oxy/handlers/tests_handlers/noah_test_handler.py",
+		"/mnt/twalrus4/arc/arcadia/check/robotcheck/kiwi/oxygen/dump_diff.py",
+		"/mnt/twalrus4/arc/local-oxy/oxygen/noah_env.py",
+		"/mnt/twalrus4/arc/local-oxy/core/errors.py",
+		"/home/alexeyche/cpp/sources/dnn/util/matrix.h",
+		"/mnt/twalrus4/arc/local-oxy/oxygen/kwdumpwork.py",
+		"/mnt/twalrus4/arc/local-oxy/handlers/kwdumpwork_handler.py",
+		"/mnt/twalrus4/arc/local-oxy/tests/uploads_test.py",
+		"/mnt/twalrus4/arc/local-oxy/oxygen/downloader.py",
+		"/mnt/twalrus4/arc/local-oxy/tests/build_shard.py",
+		"/mnt/twalrus4/arc/local-oxy/oxygen/config_gen.py",
+		"/mnt/twalrus4/arc/local-oxy/core/basic_config.py",
+		"/home/alexeyche/cpp/r_package/Rdnn/src/RMpl.h",
+		"/home/alexeyche/cpp/sources/dnn/mpl/mpl.h",
+		"/home/alexeyche/cpp/sources/dnn/mpl/mpl_old.h",
+		"/home/alexeyche/cpp/sources/dnn/util/util.cpp",
+		"/home/alexeyche/cpp/sources/dnn/base/factory.cpp",
+		"/home/alexeyche/cpp/sources/tools/mpl/mpl_main.cpp",
+		"/home/alexeyche/cpp/sources/dnn/io/stream.h",
+		"/home/alexeyche/cpp/mpl.h",
+		"/home/alexeyche/cpp/r_package/Rdnn/src/RProto.h",
+		"/home/alexeyche/cpp/sources/dnn/util/util.h",
+		"/home/alexeyche/cpp/r_package/Rdnn/src/util.h",
+		"/mnt/twalrus4/arc/local-oxy/core/builder.py",
+		"/mnt/twalrus4/arc/local-oxy/handlers/config_gen_handler.py",
+		"/mnt/twalrus4/arc/local-oxy/handlers/tests_handlers/build_shard_handler.py",
+		"/home/alexeyche/cpp/r_package/Rdnn/src/mod.cpp",
+		"/home/alexeyche/cpp/r_package/Rdnn/src/mod.h",
+		"/home/alexeyche/cpp/r_package/Rdnn/src/RSim.h",
+		"/home/alexeyche/cpp/r_package/Rdnn/R/zzz.R",
+		"/mnt/twalrus4/arc/local-oxy/oxygen/noah/conf.py",
+		"/home/alexeyche/cpp/sources/tools/mpl/CMakeLists.txt",
+		"/home/alexeyche/cpp/r_package/Rdnn/src/Makevars.in",
+		"/home/alexeyche/cpp/r_package/Rdnn/src/RMpl.cpp",
+		"/home/alexeyche/cpp/r_package/Rdnn/src/mpl.cpp",
+		"/home/alexeyche/cpp/sources/dnn/sim/sim.h",
+		"/home/alexeyche/cpp/sources/dnn/io/serialize.cpp",
+		"/mnt/twalrus4/arc/local-oxy/util/rem.py",
+		"/mnt/twalrus4/arc/local-oxy/core/local_oxy_args.py",
+		"/home/alexeyche/cpp/sources/dnn/neurons/spike_neuron.h",
+		"/home/alexeyche/cpp/sources/dnn/core.h",
+		"/home/alexeyche/cpp/sources/dnn/base/factory.h",
+		"/home/alexeyche/cpp/sources/dnn/neurons/leaky_integrate_and_fire.h",
+		"/home/alexeyche/cpp/sources/dnn/sim/builder.h",
+		"/home/alexeyche/prog/junk/min_ci/server/templates/tree.html",
+		"/home/alexeyche/prog/junk/min_ci/humongolus/__init__.py",
+		"/home/alexeyche/prog/junk/min_ci/humongolus/field.py",
+		"/home/alexeyche/prog/junk/min_ci/server/static/tpl/NodeView.html",
+		"/home/alexeyche/prog/junk/min_ci/db.py",
+		"/home/alexeyche/prog/junk/min_ci/server/templates/header.html",
+		"/home/alexeyche/prog/junk/min_ci/server/templates/index.html",
+		"/home/alexeyche/prog/junk/min_ci/server.py",
+		"/home/alexeyche/prog/junk/min_ci/server/static/css/styles.css",
+		"/home/alexeyche/prog/junk/min_ci/server/templates/node_details.html",
+		"/home/alexeyche/prog/junk/min_ci/nodes.py",
+		"/home/alexeyche/prog/junk/min_ci/min-ci.py",
+		"/home/alexeyche/prog/junk/min_ci/server_old/public/js/views/nodetree.js",
+		"/home/alexeyche/prog/junk/min_ci/server/static/tpl/NodeTreeView.html",
+		"/mnt/twalrus4/arc/local-oxy/tests/intersect_reducer.py",
+		"/mnt/twalrus4/arc/local-oxy/handlers/tests_handlers/uploads_test_handler.py",
+		"/mnt/twalrus4/arc/local-oxy/oxygen/patch_giwi_dump.py",
+		"/mnt/twalrus4/arc/local-oxy/tests/prob_selector_mapper.py",
+		"/mnt/twalrus4/arc/local-oxy/handlers/tests_handlers/hello_world_handler.py",
+		"/mnt/twalrus4/arc/local-oxy/tests/hello_world.py",
+		"/home/alexeyche/prog/junk/min_ci/server/public/js/utils.js",
+		"/home/alexeyche/prog/junk/min_ci/server/routes/nodes.js",
+		"/home/alexeyche/cpp/sources/dnn/connections/connection.h",
+		"/home/alexeyche/prog/junk/min_ci/server/public/js/views/nodetree.js",
+		"/home/alexeyche/prog/junk/min_ci/server/public/tpl/NodeView.html",
+		"/home/alexeyche/prog/junk/min_ci/handlers/arc_commit_handler.py",
+		"/home/alexeyche/prog/junk/min_ci/server/public/js/models/models.js",
+		"/home/alexeyche/prog/junk/min_ci/server/public/js/main.js",
+		"/home/alexeyche/prog/junk/min_ci/server/public/index.html",
+		"/home/alexeyche/prog/junk/min_ci/server/public/tpl/HeaderView.html",
+		"/home/alexeyche/prog/junk/min_ci/server/public/js/views/nodelist.js",
+		"/home/alexeyche/prog/junk/min_ci/server/public/css/styles.css",
+		"/home/alexeyche/prog/junk/min_ci/server/public/tpl/HomeView.html",
+		"/home/alexeyche/prog/junk/min_ci/server/public/tpl/NodeListItemView.html",
+		"/home/alexeyche/prog/junk/min_ci/server/public/tpl/NodeListView.html",
+		"/home/alexeyche/prog/junk/min_ci/server/public/tpl/NodeTreeView.html",
+		"/home/alexeyche/prog/junk/min_ci/server/public/tpl/LeafItem.html",
+		"/home/alexeyche/prog/junk/min_ci/server/public/tpl/WineView.html",
+		"/home/alexeyche/prog/junk/min_ci/.nodes.py.swp",
+		"/mnt/twalrus4/junk/min_ci/min-ci.log",
+		"/mnt/twalrus4/arc/local-oxy/util/simplepb.py",
+		"/mnt/twalrus4/arc/local-oxy/kiwi/giwi.py",
+		"/mnt/twalrus4/arc/arcadia/check/robotcheck/kiwi/download_protobins.py",
+		"/mnt/twalrus4/arc/local-oxy/oxygen/mapper.py",
+		"/mnt/twalrus4/arc/local-oxy/handlers/tests_handlers/test_all_handler.py",
+		"/home/alexeyche/cpp/sources/dnn/base/base.h",
+		"/home/alexeyche/cpp/sources/dnn/util/time_series.h",
+		"/home/alexeyche/cpp/sources/dnn/synapses/synapse.h",
+		"/home/alexeyche/cpp/sources/dnn/sim/network.h",
+		"/home/alexeyche/cpp/sources/dnn/synapses/static_synapse.h",
+		"/home/alexeyche/cpp/sources/dnn/neurons/spike_sequence_neuron.h",
+		"/home/alexeyche/cpp/sources/dnn/util/spikes_list.h",
+		"/home/alexeyche/cpp/sources/dnn/sim/sim_info.h",
+		"/home/alexeyche/cpp/sources/dnn/util/statistics.h",
+		"/home/alexeyche/cpp/sources/dnn/learning_rules/stdp.h",
+		"/home/alexeyche/cpp/sources/dnn/util/fastapprox/fastexp.h",
+		"/home/alexeyche/cpp/sources/dnn/util/fastapprox/sse.h"
 	],
 	"find":
 	{
-		"height": 35.0
+		"height": 36.0
 	},
 	"find_in_files":
 	{
 		"height": 0.0,
 		"where_history":
 		[
+			""
 		]
 	},
 	"find_state":
 	{
-		"case_sensitive": false,
+		"case_sensitive": true,
 		"find_history":
 		[
-			"SerializableBase::",
-			"readBinaryMessage",
-			"ignore"
+			"restored",
+			"dim\\.",
+			"dim",
+			"dim.",
+			"dim",
+			"err",
+			"accum",
+			"accu",
+			"setp",
+			"link",
+			"start_distribution",
+			"distr",
+			"status_answer",
+			"distr",
+			"deploy_release_step",
+			"deployPackage",
+			"Noah",
+			"noah",
+			"Noah",
+			"open_fd",
+			"write",
+			"waitMe",
+			"\"",
+			"apply",
+			"json.dump",
+			"random",
+			"port_sh",
+			"interr",
+			"repor\n\nrepo",
+			"repor\n\n",
+			"get_uploads_names",
+			"froma",
+			"background_processes",
+			"interrupted",
+			"yt_find",
+			"uploads_status",
+			"wait_all_uploads",
+			"uploads_test_root",
+			"waiting_for_stage",
+			"ATTEMPT",
+			"sample_table",
+			"skynetlibs",
+			"python",
+			"noah_env",
+			"rem_server",
+			"bin",
+			"json.dump",
+			"noah_env",
+			"r",
+			"viewer_por",
+			"getNor",
+			"seed",
+			"__accu",
+			"__acuu",
+			"__acc",
+			"env",
+			"ti",
+			"from",
+			"x_start",
+			"dispatchOnThreads",
+			"get_oxygen_cfg",
+			"config",
+			"pkg",
+			"self.",
+			"scripts_dir",
+			"\"\"",
+			"self.",
+			"zodb_server_conf",
+			"20001",
+			"20000",
+			"= ",
+			"readOb",
+			"getSer",
+			"self.server_port",
+			"rem_dir",
+			"readObject",
+			"jsonR",
+			"urlto",
+			"URLTO",
+			"tempo",
+			"exc",
+			"uploads_tables",
+			"find_handlers",
+			"find_han",
+			"handler",
+			"th",
+			"Docume",
+			"work",
+			"HOST_INDEX_GOOD",
+			"resources_to_save",
+			"else",
+			"need_i",
+			"need_iter",
+			"need_i",
+			"tempo",
+			"merge_stat",
+			"run_co",
+			"merge_in_one",
+			"giwi_down",
+			"giwi_downlo",
+			"giwi_download",
+			"prepare_i",
+			"make_dir",
+			"patch",
+			"\ndoc_query",
+			"MAX_SHARD_SIZE",
+			"class=\"name",
+			"findById",
+			"updateNode",
+			"showAlert",
+			"alert",
+			"addN",
+			"model",
+			"displayValidationErrors",
+			"template",
+			"add-menu",
+			"addM",
+			"add",
+			"tree",
+			"NodeCollection",
+			"NodeView",
+			"LeafItem",
+			"about-menu",
+			"12345",
+			"1234",
+			"self.",
+			".args",
+			"temp"
 		],
 		"highlight": true,
 		"in_selection": false,
 		"preserve_case": false,
-		"regex": false,
+		"regex": true,
 		"replace_history":
 		[
-			""
+			"Bike",
+			"bike",
+			"Bike",
+			"'",
+			"",
+			"= m->",
+			"rem_server_port",
+			"td",
+			"patch_stat",
+			"self.args.",
+			"self.args",
+			"",
+			"host",
+			"output",
+			"host",
+			"output",
+			"host",
+			"",
+			"StdpTime",
+			"DifferenceOfGaussians",
+			"SpikeSequenceNeuron",
+			"InputFileNeuron",
+			"}}",
+			"{{",
+			"}}",
+			"{{",
+			"worker",
+			"InterfacedPtr<SpikeNeuronBase>",
+			"InterfacedPtr2<SpikeNeuronBase>",
+			"self.working_dir",
+			"Stdp",
+			"LearningRule",
+			"out",
+			"AdaptIntegrateAndFire",
+			"messages->",
+			"deleteCurrentMessage",
+			"\\1currentMessage"
 		],
-		"reverse": false,
+		"reverse": true,
 		"show_context": true,
 		"use_buffer2": true,
 		"whole_word": false,
@@ -318,8 +928,172 @@
 	"groups":
 	[
 		{
+			"selected": 2,
 			"sheets":
 			[
+				{
+					"buffer": 0,
+					"file": "sources/dnn/mpl/mpl.h",
+					"settings":
+					{
+						"buffer_size": 7656,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1046,
+								1046
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 846.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "r_package/Rdnn/src/RMpl.h",
+					"settings":
+					{
+						"buffer_size": 2452,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1622,
+								1622
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 692.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "sources/tools/mpl/mpl_main.cpp",
+					"settings":
+					{
+						"buffer_size": 3387,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1904,
+								1904
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 954.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "sources/dnn/util/option_parser.h",
+					"settings":
+					{
+						"buffer_size": 1637,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								524,
+								524
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 612.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "sources/dnn/util/time_series.h",
+					"settings":
+					{
+						"buffer_size": 4118,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2768,
+								2768
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 1998.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "sources/dnn/io/stream.cpp",
+					"settings":
+					{
+						"buffer_size": 3915,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3915,
+								3915
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 2132.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				}
 			]
 		}
 	],
@@ -356,16 +1130,11 @@
 	"menu_visible": true,
 	"output.exec":
 	{
-		"height": 371.0
+		"height": 118.0
 	},
-	"output.find_results":
-	{
-		"height": 0.0
-	},
-	"project": "dnn.sublime-project",
 	"replace":
 	{
-		"height": 64.0
+		"height": 62.0
 	},
 	"save_all_on_build": true,
 	"select_file":
@@ -374,171 +1143,532 @@
 		"selected_items":
 		[
 			[
-				"test.",
-				"dnn/test.cpp"
+				"ser",
+				"sources/dnn/io/serialize.h"
 			],
 			[
-				"spike",
-				"dnn/neurons/spike_neuron.h"
+				"stre",
+				"sources/dnn/io/stream.cpp"
 			],
 			[
-				"facto",
-				"dnn/base/abstract_factory.cpp"
+				"time",
+				"sources/dnn/util/time_series.h"
 			],
 			[
-				"sp",
-				"dnn/neurons/spike_neuron_factory.h"
+				"op",
+				"sources/dnn/util/option_parser.h"
 			],
 			[
-				"ia",
-				"dnn/neurons/iaf_neuron.h"
+				"mpl",
+				"sources/tools/mpl/mpl_main.cpp"
 			],
 			[
-				"test",
-				"dnn/test.cpp"
+				"r",
+				"src/RMpl.h"
 			],
 			[
-				"ab",
-				"dnn/base/abstract_factory.h"
+				"ut",
+				"util/util.py"
 			],
 			[
-				"neu",
-				"dnn/neurons/neuron.h"
+				"ki",
+				"kiwi/kiwi.py"
 			],
 			[
-				"spik",
-				"dnn/neurons/spike_neuron_factory.h"
+				"noa",
+				"handlers/tests_handlers/noah_diff_handler.py"
+			],
+			[
+				"lol",
+				"local-oxy.py"
+			],
+			[
+				"bike",
+				"oxygen/bike.py"
+			],
+			[
+				"cm",
+				"oxygen/cm.py"
+			],
+			[
+				"mas",
+				"oxygen/master.py"
+			],
+			[
+				"uti",
+				"util/util.py"
+			],
+			[
+				"base",
+				"tests/base_diff.py"
+			],
+			[
+				"kik",
+				"kiwi/kiwi.py"
+			],
+			[
+				"kiw",
+				"handlers/kiwi_handler.py"
+			],
+			[
+				"ox",
+				"oxygen/oxygen_util.py"
+			],
+			[
+				"io",
+				"util/io.py"
+			],
+			[
+				"no",
+				"handlers/tests_handlers/noah_diff_handler.py"
+			],
+			[
+				"doe",
+				"core/doer.py"
+			],
+			[
+				"down",
+				"handlers/downloader_handler.py"
+			],
+			[
+				"rol",
+				"tests/rollback_attr.py"
+			],
+			[
+				"kww",
+				"oxygen/kwworm.py"
+			],
+			[
+				"ro",
+				"tests/rollback_attr.py"
+			],
+			[
+				"",
+				"handlers/tests_handlers/rollback_attr_handler.py"
+			],
+			[
+				"giw",
+				"oxygen/giwibranches.py"
+			],
+			[
+				"as",
+				"core/async.py"
+			],
+			[
+				"doer",
+				"core/doer.py"
+			],
+			[
+				"loca",
+				"core/local_oxy.py"
+			],
+			[
+				"dis",
+				"tests/dispatcher_test.py"
+			],
+			[
+				"diff",
+				"tests/diff_tpl.html"
+			],
+			[
+				"err",
+				"core/errors.py"
+			],
+			[
+				"bas",
+				"tests/base_diff.py"
+			],
+			[
+				"rm",
+				"src/RMpl.h"
+			],
+			[
+				"calc",
+				"tests/calculate_all.py"
+			],
+			[
+				"ma",
+				"dnn/util/matrix.h"
+			],
+			[
+				"n",
+				"tests/noah_test.py"
+			],
+			[
+				"bui",
+				"tests/build_shard.py"
+			],
+			[
+				"buid",
+				"tests/build_shard.py"
+			],
+			[
+				"kw",
+				"oxygen/kwdumpwork.py"
+			],
+			[
+				"uplo",
+				"tests/uploads_test.py"
+			],
+			[
+				"dow",
+				"oxygen/downloader.py"
+			],
+			[
+				"local",
+				"core/local_oxy.py"
+			],
+			[
+				"conf",
+				"oxygen/config_gen.py"
+			],
+			[
+				"kiwi",
+				"kiwi/kiwi.py"
+			],
+			[
+				"rmpl",
+				"src/RMpl.h"
 			],
 			[
 				"fa",
-				"dnn/base/factory.h"
+				"sources/dnn/base/factory.cpp"
 			],
 			[
-				"syna",
-				"dnn/synapses/synapse.h"
+				"rpr",
+				"src/RProto.h"
 			],
 			[
-				"stati",
-				"dnn/synapses/static_synapse.h"
+				"u",
+				"sources/dnn/util/util.cpp"
 			],
 			[
-				"stdp",
-				"dnn/learning_rules/stdp.h"
+				"core",
+				"sources/dnn/core.h"
 			],
 			[
-				"lea",
-				"dnn/learning_rules/learning_rule.h"
+				"mp",
+				"sources/dnn/mpl/mpl.h"
 			],
 			[
-				"deter",
-				"dnn/act_functions/determ.h"
+				"build",
+				"core/builder.py"
 			],
 			[
-				"ac",
-				"dnn/act_functions/act_function.h"
+				"buil",
+				"tests/build_shard.py"
+			],
+			[
+				"mod",
+				"src/mod.h"
+			],
+			[
+				"mo",
+				"src/mod.h"
+			],
+			[
+				"rsi",
+				"src/RSim.h"
+			],
+			[
+				"rp",
+				"src/RProto.h"
+			],
+			[
+				"kwd",
+				"oxygen/kwdumpwork.py"
+			],
+			[
+				"asy",
+				"core/async.py"
+			],
+			[
+				"hand",
+				"core/handler.py"
+			],
+			[
+				"rpro",
+				"src/RProto.h"
+			],
+			[
+				"rs",
+				"src/RSim.h"
+			],
+			[
+				"sim.h",
+				"sources/dnn/sim/sim.h"
+			],
+			[
+				"str",
+				"dnn/io/stream.cpp"
+			],
+			[
+				"rem",
+				"util/rem.py"
+			],
+			[
+				"re",
+				"util/rem.py"
+			],
+			[
+				"spik",
+				"sources/dnn/neurons/spike_neuron.h"
+			],
+			[
+				"opt",
+				"sources/dnn/util/option_parser.h"
+			],
+			[
+				"strea",
+				"sources/dnn/io/stream.h"
+			],
+			[
+				"le",
+				"sources/dnn/neurons/leaky_integrate_and_fire.h"
+			],
+			[
+				"node",
+				"server/templates/node_details.html"
+			],
+			[
+				"upl",
+				"tests/uploads_test.py"
+			],
+			[
+				"lo",
+				"local-oxy.py"
+			],
+			[
+				"std_",
+				"dnn/synapses/std_synapse.h"
+			],
+			[
+				"conn",
+				"dnn/connections/difference_of_gaussians.h"
+			],
+			[
+				"arc",
+				"handlers/arc_commit_handler.py"
+			],
+			[
+				"tree",
+				"server/templates/tree.html"
+			],
+			[
+				"ha",
+				"handlers/handler.py"
+			],
+			[
+				"mi",
+				"min-ci.py"
+			],
+			[
+				"ind",
+				"server/templates/index.html"
+			],
+			[
+				"in",
+				"server/templates/index.html"
+			],
+			[
+				"db",
+				"db.py"
+			],
+			[
+				"tr",
+				"server/templates/tree.html"
+			],
+			[
+				"fie",
+				"humongolus/field.py"
+			],
+			[
+				"__",
+				"humongolus/__init__.py"
+			],
+			[
+				"nod",
+				"nodes.py"
+			],
+			[
+				"tre",
+				"server/templates/tree.html"
+			],
+			[
+				"he",
+				"server/templates/header.html"
+			],
+			[
+				"inde",
+				"server/templates/index.html"
+			],
+			[
+				"nodev",
+				"server/static/tpl/NodeView.html"
+			],
+			[
+				"ba",
+				"tests/base_diff.py"
+			],
+			[
+				"uploa",
+				"tests/uploads_test.py"
+			],
+			[
+				"patch",
+				"oxygen/patch_giwi_dump.py"
+			],
+			[
+				"pro",
+				"tests/prob_selector_mapper.py"
+			],
+			[
+				"oxygen",
+				"handlers/oxygen_handler.py"
+			],
+			[
+				"pr",
+				"tests/prob_selector_mapper.py"
+			],
+			[
+				"patc",
+				"oxygen/patch_giwi_dump.py"
+			],
+			[
+				"conne",
+				"dnn/connections/connection.h"
+			],
+			[
+				"sa",
+				"handlers/sandbox_handler.py"
+			],
+			[
+				"han",
+				"handlers/handler.py"
+			],
+			[
+				"ar",
+				"handlers/arc_commit_handler.py"
+			],
+			[
+				"arca",
+				"handlers/arc_commit_handler.py"
+			],
+			[
+				"sim",
+				"util/simplepb.py"
+			],
+			[
+				"giwi",
+				"kiwi/giwi.py"
+			],
+			[
+				"pat",
+				"oxygen/patch_giwi_dump.py"
 			],
 			[
 				"std",
 				"dnn/learning_rules/stdp.h"
 			],
 			[
-				"stat",
-				"dnn/synapses/static_synapse.h"
+				"dif",
+				"dnn/connections/difference_of_gaussians.h"
 			],
 			[
-				"ts",
-				"dnn/inputs/ts_input.h"
+				"base_",
+				"tests/base_diff.py"
 			],
 			[
-				"inpu",
-				"dnn/inputs/input.h"
+				"confg",
+				"oxygen/config_gen.py"
 			],
 			[
-				"dyna",
-				"dnn/base/dynamic_object.h"
+				"disp",
+				"tests/dispatcher_test.py"
 			],
 			[
-				"iaf",
-				"dnn/neurons/iaf_neuron.h"
+				"pa",
+				"oxygen/patch_giwi_dump.py"
 			],
 			[
-				"core",
-				"dnn/core.h"
+				"ui",
+				"util/util.py"
 			],
 			[
-				"ser",
-				"dnn/io/serialize.h"
+				"error",
+				"core/errors.py"
 			],
 			[
-				"seria",
-				"dnn/io/serialize.cpp"
+				"test",
+				"handlers/tests_handlers/test_all_handler.py"
 			],
 			[
-				"snn",
+				"spike",
 				"dnn/neurons/spike_neuron.h"
 			],
 			[
-				"dyn",
-				"dnn/base/dynamic_object.h"
+				"build_",
+				"tests/build_shard.py"
 			],
 			[
-				"dy",
-				"dnn/base/dynamic_object.h"
+				"oxy",
+				"handlers/oxygen_handler.py"
 			],
 			[
-				"strea",
-				"dnn/io/stream.h"
+				"int",
+				"handlers/tests_handlers/integration_handler.py"
+			],
+			[
+				"inte",
+				"tests/integration.py"
+			],
+			[
+				"ada",
+				"sources/dnn/neurons/adapt_integrate_and_fire.h"
 			],
 			[
 				"sta",
-				"dnn/synapses/static_synapse.h"
+				"sources/dnn/synapses/static_synapse.h"
 			],
 			[
-				"dete",
-				"dnn/act_functions/determ.h"
+				"syna",
+				"sources/dnn/synapses/synapse.h"
 			],
 			[
-				"ts_",
-				"dnn/inputs/ts_input.h"
+				"neu",
+				"sources/dnn/neurons/spike_neuron.h"
 			],
 			[
-				"neur",
-				"dnn/neurons/neuron.h"
+				"rproo",
+				"src/RProto.h"
 			],
 			[
-				"str",
-				"dnn/io/stream.h"
+				"bu",
+				"sources/dnn/sim/builder.h"
+			],
+			[
+				"cast",
+				"sources/dnn/util/fastapprox/cast.h"
+			],
+			[
+				"sse",
+				"sources/dnn/util/fastapprox/sse.h"
 			]
 		],
 		"width": 0.0
 	},
 	"select_project":
 	{
-		"height": 0.0,
+		"height": 500.0,
 		"selected_items":
 		[
 		],
-		"width": 0.0
-	},
-	"select_symbol":
-	{
-		"height": 0.0,
-		"selected_items":
-		[
-		],
-		"width": 0.0
-	},
-	"selected_group": 0,
-	"settings":
-	{
+		"width": 380.0
 	},
 	"show_minimap": true,
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 273.0,
-	"status_bar_visible": true,
-	"template_settings":
-	{
-	}
+	"side_bar_width": 195.0,
+	"status_bar_visible": true
 }

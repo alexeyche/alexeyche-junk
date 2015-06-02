@@ -2,7 +2,7 @@
 #define RMPL_H
 
 
-#include <dnn/mpl/mpl_old.h>
+#include <dnn/mpl/mpl.h>
 
 #undef PI
 #define STRICT_R_HEADERS
@@ -31,21 +31,22 @@ public:
 		dnn::MatchingPursuit::MPLReturn ret = MatchingPursuit::run(*ts, 0);
 		delete ts;
 
-		Rcpp::List matches_l;
-
+		Rcpp::NumericVector t;
+		Rcpp::NumericVector s;
+		Rcpp::IntegerVector fi;
 		for(auto &m: ret.matches) {
-			matches_l.push_back(
-				Rcpp::List::create(
-					Rcpp::Named("t") = m.t,
-					Rcpp::Named("fi") = m.fi,
-					Rcpp::Named("s") = m.s
-				)
-			);
+			t.push_back(m.t);
+			fi.push_back(m.fi);
+			s.push_back(m.s);
 		}
+		Rcpp::List matches_l = Rcpp::List::create(
+			Rcpp::Named("t") = t,
+			Rcpp::Named("fi") = fi,
+			Rcpp::Named("s") = s
+		);
 		return Rcpp::List::create(
 			Rcpp::Named("spikes") = matches_l, 
-			Rcpp::Named("restored") = Rcpp::wrap(ret.restored),
-			Rcpp::Named("accum_error") = Rcpp::wrap(ret.accum_error)
+			Rcpp::Named("restored") = Rcpp::wrap(ret.restored)
 		);
 	}
 	void setFilter(const Rcpp::NumericMatrix m) {
@@ -72,10 +73,23 @@ public:
 
 	Rcpp::NumericVector restore(const Rcpp::List matches_l) {
 		vector<FilterMatch> matches;
-		for(auto &mr: matches_l) {
-			Rcpp::List m = mr;
+		Rcpp::NumericVector t = matches_l["t"];
+		Rcpp::NumericVector s = matches_l["s"];
+		Rcpp::IntegerVector fi = matches_l["fi"];
+
+		for(size_t i=0; i<t.size(); ++i) {
+			if(i>=t.size()) {
+				Rcpp::stop("t vector too small");
+			}
+			if(i>=s.size()) {
+				Rcpp::stop("s vector too small");
+			}
+			if(i>=fi.size()) {
+				Rcpp::stop("fi vector too small");
+			}
+			
 			matches.push_back(
-				FilterMatch(Rcpp::as<size_t>(m["fi"]), Rcpp::as<double>(m["s"]), Rcpp::as<double>(m["t"]))
+				FilterMatch(fi[i], s[i], t[i])
 			);
 		}
 		return Rcpp::wrap(dnn::MatchingPursuit::restore(matches));

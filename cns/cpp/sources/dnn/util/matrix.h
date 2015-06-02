@@ -171,7 +171,18 @@ public:
         	}
     	}
 	}
-
+    void norm() {
+        for(size_t i=0; i<nrow(); ++i) {
+            double acc = 0.0;
+            for(size_t j=0; j<ncol(); ++j) {
+                acc += getElement(i, j) * getElement(i, j);                 
+            }
+            double n = sqrt(acc);
+            for(size_t j=0; j<ncol(); ++j) {
+                setElement(i, j, getElement(i, j)/n);
+            }
+        }
+    }
 	inline const size_t& ncol() const { return ncol_v; } 	
 	inline const size_t& nrow() const { return nrow_v; } 	
 private:

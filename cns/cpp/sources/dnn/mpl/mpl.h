@@ -109,15 +109,17 @@ public:
 	};
 
 	struct SubSeqRet {
-		SubSeqRet() : accum_error(0.0) {}
+		SubSeqRet() {}
 		
 		vector<FilterMatch> matches;
 		DoubleMatrix dfilter;
 		
-		double accum_error;
+		vector<double> s;
+		vector<size_t> winners_id;
 	};
 	
 	vector<double> restore(const vector<FilterMatch> matches) {
+		TimeSeries ts;
 		size_t max_t=0;
 		for(auto &m: matches) {
 			max_t = std::max(max_t, (size_t)m.t);
@@ -125,16 +127,20 @@ public:
 		
 		vector<double> restored;
 		restored.resize(max_t + filter.ncol());
-		for(auto &v: restored) v = 0.0;
-		
-		for(auto &m: matches) {
-			for(size_t i=0; i<filter.ncol(); ++i) {
-				restored[m.t + i] += m.s * filter(m.fi, i) + c.noise_sd * getNorm();
-			}
-		}
+		_restore(matches, restored);
 		return restored;
 	}
+	void _restore(const vector<FilterMatch> &matches, vector<double> &restored, size_t from=0) const {
+		std::default_random_engine generator;
+		std::normal_distribution<double> distribution(0.0, c.noise_sd);
 
+		for(auto &v: restored) v = 0.0;
+		for(auto &m: matches) {
+			for(size_t i=0; i<filter.ncol(); ++i) {
+				restored[m.t + i - from] += m.s * filter(m.fi, i) + distribution(generator);
+			}
+		}
+	}
 	static SubSeqRet runOnSubSeq(const MatchingPursuit &self, const TimeSeries &ts, size_t dim, size_t from, size_t to) {
 		SubSeqRet r;
 		if(self.c.learn) {
@@ -158,7 +164,7 @@ public:
 				for(size_t fi=0; fi<self.filter.nrow(); ++fi) {
 					double s_f=0;
 					for(size_t xi=ti; xi<ti_f; ++xi) {
-						s_f += x[xi] * self.filter(fi, xi-ti);				
+						s_f += x[xi] * self.filter(fi, xi-ti);					
 					}
 
 					if (max_s<s_f) {
@@ -167,7 +173,7 @@ public:
 					}
 				}
 				if(max_s>=self.c.threshold) {
-					FilterMatch m(max_fi, max_s, ti + from);
+					FilterMatch m(max_fi, max_s, ti+from);
 
 					for(size_t xi=ti; xi<ti_f; ++xi) {
 						x[xi] -= m.s * self.filter(m.fi, xi-ti);						
@@ -177,30 +183,15 @@ public:
 					break;
 				}
 			}
-		}
+		}	
 		if( (self.c.learn) && (r.matches.size()>0) ) {
-			std::default_random_engine generator;
-			std::normal_distribution<double> distribution(0.0, self.c.noise_sd);
-
 			vector<double> restored;
 			restored.resize(x.size());
-			for(auto &v: restored) v = 0.0;
+			self._restore(r.matches, restored, from);
+
 			for(auto &m: r.matches) {
 				for(size_t i=0; i<self.filter.ncol(); ++i) {
-					restored[m.t + i - from] += m.s * self.filter(m.fi, i) + distribution(generator);
-				}
-			}
-			{
-				DoubleMatrix mm(restored);
-				ofstream ff("restored.pb");
-				Stream(ff, Stream::Binary).writeObject(&mm);
-			}
-			for(auto &m: r.matches) {
-				for(size_t i=0; i<self.filter.ncol(); ++i) {
-					// cout << ts.data[dim].values.size() << ", " << restored.size() << "   ";
-					// cout << m.t << ":" << i << ":" << from << "\n";
 					double delta = ts.data[dim].values[m.t + i] - restored[m.t + i - from];
-					r.accum_error += delta * delta;
 					r.dfilter(m.fi, i) += m.s * delta;
 				}
 			}
@@ -209,16 +200,17 @@ public:
 	}
 	
 	struct MPLReturn {
-		MPLReturn() : accum_error(0.0) {}
+		MPLReturn() {}
 		vector<FilterMatch> matches;
-		double accum_error;
-		vector<double> restored;
 	};
 
 	MPLReturn run(const TimeSeries &ts, const size_t dim) {
 		MPLReturn runret;
 		for(size_t bi=0; bi<ts.data[dim].values.size(); bi+=c.batch_size) { 
-			vector<IndexSlice> slices = dispatchOnThreads(c.batch_size, c.jobs);
+			vector<FilterMatch> matches;
+			vector<IndexSlice> slices = dispatchOnThreads(
+				std::min(ts.data[dim].values.size()-bi, c.batch_size), c.jobs
+			);
 			vector<std::future<SubSeqRet>> futures;
 			for(auto &slice: slices) {
 				futures.push_back(
@@ -234,15 +226,15 @@ public:
 				);
 				cout << "Running worker on slice " << bi+slice.from << ": " << bi+slice.to << "\n";
 			}
+			
 			vector<SubSeqRet> rets;
 			for(auto &fret: futures) {
 				SubSeqRet ret = fret.get();
+				cout << "done\n";
 				for(auto &m: ret.matches) {
 					runret.matches.push_back(m);
 				}
-				runret.accum_error += ret.accum_error;
-				rets.push_back(ret);
-				runret.matches.insert(runret.matches.end(), ret.matches.begin(), ret.matches.end());
+				rets.push_back(ret);				
 			}
 			if(c.learn) {
 				for(auto &ret : rets) {
@@ -265,10 +257,16 @@ public:
 	const DoubleMatrix& getFilter() {
 		return filter;
 	}
+
 	void setFilter(const DoubleMatrix &m) {
-		filter = m;
+		if( (m.nrow() != c.filters_num) || (m.ncol() != c.filter_size)) {
+			throw dnnException() << "Got inappropriate to config matrix: need " << c.filters_num << ":" << c.filter_size << " size \n";
+		}
+
+		filter.norm();
 	}
 protected:
+
 	DoubleMatrix filter;
 	MatchingPursuitConfig c;
 };
