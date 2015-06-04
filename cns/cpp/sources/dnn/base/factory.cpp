@@ -75,6 +75,7 @@ Factory::Factory() : registration_is_on(true) {
 
 	REG_TYPE(DoubleMatrix);
 	REG_TYPE(MatchingPursuitConfig)
+	REG_TYPE(FilterMatch);
 }
 
 Factory::~Factory() {

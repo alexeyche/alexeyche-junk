@@ -4,6 +4,26 @@
 		"selected_items":
 		[
 			[
+				"conv",
+				"convertBack"
+			],
+			[
+				"Fil",
+				"FilterMatch"
+			],
+			[
+				"match",
+				"matches_l"
+			],
+			[
+				"Seri",
+				"SerializableBase"
+			],
+			[
+				"spikes",
+				"spikes_file"
+			],
+			[
 				"acc",
 				"acc_error"
 			],
@@ -256,10 +276,6 @@
 				"runOnSubSeq"
 			],
 			[
-				"conv",
-				"convertToList"
-			],
-			[
 				"lear",
 				"learning_rate"
 			],
@@ -330,10 +346,6 @@
 			[
 				"null",
 				"nullptr"
-			],
-			[
-				"Seri",
-				"Serializable"
 			],
 			[
 				"pu",
@@ -502,71 +514,11 @@
 			[
 				"TimeS",
 				"TimeSeriesInfo"
-			],
-			[
-				"wei",
-				"_weight"
-			],
-			[
-				"axo",
-				"axonDelay"
-			],
-			[
-				"synap",
-				"synapses"
 			]
 		]
 	},
 	"buffers":
 	[
-		{
-			"file": "sources/dnn/mpl/mpl.h",
-			"settings":
-			{
-				"buffer_size": 7656,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "r_package/Rdnn/src/RMpl.h",
-			"settings":
-			{
-				"buffer_size": 2452,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "sources/tools/mpl/mpl_main.cpp",
-			"settings":
-			{
-				"buffer_size": 3387,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "sources/dnn/util/option_parser.h",
-			"settings":
-			{
-				"buffer_size": 1637,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "sources/dnn/util/time_series.h",
-			"settings":
-			{
-				"buffer_size": 4118,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "sources/dnn/io/stream.cpp",
-			"settings":
-			{
-				"buffer_size": 3915,
-				"line_ending": "Unix"
-			}
-		}
 	],
 	"build_system": "",
 	"command_palette":
@@ -600,7 +552,15 @@
 	},
 	"file_history":
 	[
+		"/home/alexeyche/cpp/sources/dnn/base/factory.cpp",
 		"/home/alexeyche/cpp/sources/dnn/io/serialize.h",
+		"/home/alexeyche/cpp/r_package/Rdnn/src/RProto.h",
+		"/home/alexeyche/cpp/sources/dnn/io/stream.cpp",
+		"/home/alexeyche/cpp/sources/dnn/util/time_series.h",
+		"/home/alexeyche/cpp/sources/dnn/util/option_parser.h",
+		"/home/alexeyche/cpp/sources/tools/mpl/mpl_main.cpp",
+		"/home/alexeyche/cpp/sources/dnn/mpl/mpl.h",
+		"/home/alexeyche/cpp/r_package/Rdnn/src/RMpl.h",
 		"/mnt/twalrus4/arc/local-oxy/tests/noah_test.py",
 		"/mnt/twalrus4/arc/local-oxy/oxygen/oxygen_util.py",
 		"/mnt/twalrus4/arc/local-oxy/core/doer.py",
@@ -639,15 +599,10 @@
 		"/mnt/twalrus4/arc/local-oxy/tests/build_shard.py",
 		"/mnt/twalrus4/arc/local-oxy/oxygen/config_gen.py",
 		"/mnt/twalrus4/arc/local-oxy/core/basic_config.py",
-		"/home/alexeyche/cpp/r_package/Rdnn/src/RMpl.h",
-		"/home/alexeyche/cpp/sources/dnn/mpl/mpl.h",
 		"/home/alexeyche/cpp/sources/dnn/mpl/mpl_old.h",
 		"/home/alexeyche/cpp/sources/dnn/util/util.cpp",
-		"/home/alexeyche/cpp/sources/dnn/base/factory.cpp",
-		"/home/alexeyche/cpp/sources/tools/mpl/mpl_main.cpp",
 		"/home/alexeyche/cpp/sources/dnn/io/stream.h",
 		"/home/alexeyche/cpp/mpl.h",
-		"/home/alexeyche/cpp/r_package/Rdnn/src/RProto.h",
 		"/home/alexeyche/cpp/sources/dnn/util/util.h",
 		"/home/alexeyche/cpp/r_package/Rdnn/src/util.h",
 		"/mnt/twalrus4/arc/local-oxy/core/builder.py",
@@ -717,7 +672,6 @@
 		"/mnt/twalrus4/arc/local-oxy/oxygen/mapper.py",
 		"/mnt/twalrus4/arc/local-oxy/handlers/tests_handlers/test_all_handler.py",
 		"/home/alexeyche/cpp/sources/dnn/base/base.h",
-		"/home/alexeyche/cpp/sources/dnn/util/time_series.h",
 		"/home/alexeyche/cpp/sources/dnn/synapses/synapse.h",
 		"/home/alexeyche/cpp/sources/dnn/sim/network.h",
 		"/home/alexeyche/cpp/sources/dnn/synapses/static_synapse.h",
@@ -725,9 +679,7 @@
 		"/home/alexeyche/cpp/sources/dnn/util/spikes_list.h",
 		"/home/alexeyche/cpp/sources/dnn/sim/sim_info.h",
 		"/home/alexeyche/cpp/sources/dnn/util/statistics.h",
-		"/home/alexeyche/cpp/sources/dnn/learning_rules/stdp.h",
-		"/home/alexeyche/cpp/sources/dnn/util/fastapprox/fastexp.h",
-		"/home/alexeyche/cpp/sources/dnn/util/fastapprox/sse.h"
+		"/home/alexeyche/cpp/sources/dnn/learning_rules/stdp.h"
 	],
 	"find":
 	{
@@ -746,6 +698,10 @@
 		"case_sensitive": true,
 		"find_history":
 		[
+			"ts_in",
+			"clean",
+			"spikes",
+			"filter_file",
 			"restored",
 			"dim\\.",
 			"dim",
@@ -869,11 +825,7 @@
 			"NodeView",
 			"LeafItem",
 			"about-menu",
-			"12345",
-			"1234",
-			"self.",
-			".args",
-			"temp"
+			"12345"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -928,172 +880,8 @@
 	"groups":
 	[
 		{
-			"selected": 2,
 			"sheets":
 			[
-				{
-					"buffer": 0,
-					"file": "sources/dnn/mpl/mpl.h",
-					"settings":
-					{
-						"buffer_size": 7656,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1046,
-								1046
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 846.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "r_package/Rdnn/src/RMpl.h",
-					"settings":
-					{
-						"buffer_size": 2452,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1622,
-								1622
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 692.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "sources/tools/mpl/mpl_main.cpp",
-					"settings":
-					{
-						"buffer_size": 3387,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1904,
-								1904
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 954.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "sources/dnn/util/option_parser.h",
-					"settings":
-					{
-						"buffer_size": 1637,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								524,
-								524
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 612.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "sources/dnn/util/time_series.h",
-					"settings":
-					{
-						"buffer_size": 4118,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								2768,
-								2768
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 1998.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "sources/dnn/io/stream.cpp",
-					"settings":
-					{
-						"buffer_size": 3915,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								3915,
-								3915
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 2132.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				}
 			]
 		}
 	],
@@ -1143,8 +931,24 @@
 		"selected_items":
 		[
 			[
+				"rpr",
+				"src/RProto.h"
+			],
+			[
+				"fa",
+				"sources/dnn/base/factory.cpp"
+			],
+			[
+				"rpro",
+				"src/RProto.h"
+			],
+			[
 				"ser",
 				"sources/dnn/io/serialize.h"
+			],
+			[
+				"mpl",
+				"sources/tools/mpl/mpl_main.cpp"
 			],
 			[
 				"stre",
@@ -1157,10 +961,6 @@
 			[
 				"op",
 				"sources/dnn/util/option_parser.h"
-			],
-			[
-				"mpl",
-				"sources/tools/mpl/mpl_main.cpp"
 			],
 			[
 				"r",
@@ -1331,14 +1131,6 @@
 				"src/RMpl.h"
 			],
 			[
-				"fa",
-				"sources/dnn/base/factory.cpp"
-			],
-			[
-				"rpr",
-				"src/RProto.h"
-			],
-			[
 				"u",
 				"sources/dnn/util/util.cpp"
 			],
@@ -1385,10 +1177,6 @@
 			[
 				"hand",
 				"core/handler.py"
-			],
-			[
-				"rpro",
-				"src/RProto.h"
 			],
 			[
 				"rs",

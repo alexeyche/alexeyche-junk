@@ -52,7 +52,9 @@ struct MatchingPursuitConfig : public Serializable<Protos::MatchingPursuitConfig
 					"seed: " << seed <<
 					"noise_sd: " << noise_sd
 				<< Self::end;
-	}    
+	}
+
+
  //    Document serializeToJson() {
  //    	Document d;
  //    	d.SetObject();
@@ -78,6 +80,20 @@ struct MatchingPursuitConfig : public Serializable<Protos::MatchingPursuitConfig
 	// }
 };
 
+/*@GENERATE_PROTO@*/
+struct FilterMatch : public Serializable<Protos::FilterMatch>  {
+	FilterMatch() : fi(0), s(0.0), t(0) {}
+	FilterMatch(size_t _fi, double _s, double _t) : fi(_fi), s(_s), t(_t) {}
+	void serial_process() {
+		begin() << "fi: " << fi << ", " << "s: " << s << ", " << "t: " << t << Self::end;
+	}
+
+	size_t fi;
+	double s;
+	size_t t;
+};
+
+
 
 class MatchingPursuit {
 public:	
@@ -101,12 +117,7 @@ public:
 	    }
 	}
 
-	struct FilterMatch {
-		FilterMatch(size_t _fi, double _s, double _t) : fi(_fi), s(_s), t(_t) {}
-		size_t fi;
-		double s;
-		size_t t;
-	};
+	
 
 	struct SubSeqRet {
 		SubSeqRet() {}
@@ -118,7 +129,7 @@ public:
 		vector<size_t> winners_id;
 	};
 	
-	vector<double> restore(const vector<FilterMatch> matches) {
+	vector<double> restore(const vector<FilterMatch> &matches) {
 		TimeSeries ts;
 		size_t max_t=0;
 		for(auto &m: matches) {
@@ -262,11 +273,11 @@ public:
 		if( (m.nrow() != c.filters_num) || (m.ncol() != c.filter_size)) {
 			throw dnnException() << "Got inappropriate to config matrix: need " << c.filters_num << ":" << c.filter_size << " size \n";
 		}
+		filter = m;
 
 		filter.norm();
 	}
 protected:
-
 	DoubleMatrix filter;
 	MatchingPursuitConfig c;
 };

@@ -34,7 +34,25 @@ plotl <- function(x) {
 
 require(lattice, quietly=TRUE)
 
+prast_mpl = function(spikes,T0=0, Tmax=Inf) {
+    x = c()
+    y = c()
+    cex = c()
+     
+    for(i in 1:length(spikes)) {
+        t = spikes[[i]]$t
+        if((t<T0)||(t>Tmax)) next
+        x = c(x, t)
+        y = c(y, spikes[[i]]$fi)
+        cex = c(cex, spikes[[i]]$s)
+    }
+    xyplot(y ~ x, list(x = x, y = y), xlim=c(T0, max(x)), cex=cex*10,  col = "black")
+}
+
 plot_rastl <- function(raster, lab="",T0=0, Tmax=Inf, i=-1, plen=-1) {
+    if( "t" %in% names(raster[[1]])) {
+        return(prast_mpl(raster, T0, Tmax))
+    }
     x <- c()
     y <- c()
     if((i>0)&&(plen>0)) {

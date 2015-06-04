@@ -1,29 +1,12 @@
 
 require(Rdnn)
 
-prast = function(spikes,T0=0, Tmax=Inf) {
-    x = c()
-    y = c()
-    cex = c()
-    tv = spikes$t
-    sv = spikes$s
-    fiv = spikes$fi
-    
-    for(i in 1:length(tv)) {
-        if((tv[i]<T0)||(tv[i])>Tmax) next
-        x = c(x, tv[i])
-        y = c(y, fiv[i])
-        cex = c(cex, sv[i])
-        
-    }
-    xyplot(y ~ x, list(x = x, y = y), xlim=c(T0, max(x)), cex=cex*10,  col = "black")
-}
 
 v = RProto$new("/home/alexeyche/dnn/ts/riken_14chan_3LRR.pb")$read()
 
 conf = list(
     filters_num=32,
-    batch_size=1000,
+    batch_size=100000,
     jobs=4,
     learn_iterations=100,
     learning_rate=0.5,
@@ -42,9 +25,9 @@ err = function(r, x) {
 }
 
 mpl = RMatchingPursuit$new(conf)
-set.seed(1)
-f=matrix(norm(rnorm(32*100)), nrow=32, ncol=100)
-mpl$setFilter(f)
+#set.seed(1)
+#f=matrix(norm(rnorm(32*100)), nrow=32, ncol=100)
+#mpl$setFilter(f)
 
 
 max_ep = 101

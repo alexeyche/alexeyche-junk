@@ -57,7 +57,7 @@ public:
             if((obj.size() == 1)&&(simplify)) { 
                 values = convertToList(obj[0]);
                 delete obj[0];
-            } else {
+            } else {                
                 vector<Rcpp::List> ret;
                 for(auto &o: obj) {
                     Rcpp::List l = convertToList(o);
@@ -177,6 +177,15 @@ public:
             );
             
         }
+        if(o->name() == "FilterMatch") {
+            FilterMatch *m = dynamic_cast<FilterMatch*>(o);
+            if(!m) { ERR("Can't cast"); }
+            out = Rcpp::List::create(
+                Rcpp::Named("t") = m->t,
+                Rcpp::Named("fi") = m->fi,
+                Rcpp::Named("s") = m->s
+            );
+        }
         return out;
     }
     
@@ -203,8 +212,8 @@ public:
             SEXP values = list["values"];
             if(Rf_isMatrix(values)) {
                 Rcpp::NumericMatrix m(values); 
-                ts->dim.size = m.nrow();
-                ts->data.resize(ts->dim.size);
+                ts->dim_info.size = m.nrow();
+                ts->data.resize(ts->dim_info.size);
                 for(size_t i=0; i<m.nrow(); ++i) {                    
                     for(size_t j=0; j<m.ncol(); ++j) {
                         ts->data[i].values.push_back(m(i,j));
@@ -212,8 +221,8 @@ public:
                 }
 
             } else {
-                ts->dim.size = 1;
-                ts->data.resize(ts->dim.size);
+                ts->dim_info.size = 1;
+                ts->data.resize(ts->dim_info.size);
                 ts->data[0].values = Rcpp::as<vector<double>>(values);
             }
             
@@ -260,7 +269,14 @@ public:
 
             return c;
         }
+        if(name == "FilterMatch") {
+            FilterMatch *m = Factory::inst().createObject<FilterMatch>("FilterMatch");
+            m->fi = list["fi"];
+            m->t = list["t"];
+            m->s = list["s"];
 
+            return m;
+        }
         ERR("Can't convert " << name );
     } 
     void print() {

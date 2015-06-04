@@ -39,15 +39,18 @@ public:
 
     virtual ~SerializableBase() {
         if(mode == ProcessingOutput) {
-            if(messages) clean();
+    
         }
     }
     
     void clean() {
-        for(auto &m: *messages) {
-            delete m;
+        if(messages) {
+            for(auto &m: *messages) {
+                delete m;
+            }
+            delete messages;
+            messages = nullptr;
         }
-        delete messages;
     }
 
     virtual void serial_process() = 0;
@@ -195,6 +198,11 @@ public:
     virtual double getSimDuration() {
         return 0.0;
     }
+    // SerializableBase(const SerializableBase &obj) {
+
+    // }
+    // SerializableBase& operator =(const SerializableBase &obj) { return *this; }
+    
     
 protected:
     vector<ProtoMessage> *messages;

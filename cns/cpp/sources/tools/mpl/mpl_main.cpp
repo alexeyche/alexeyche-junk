@@ -88,11 +88,20 @@ int main(int argc, char **argv) {
         throw dnnException() << "Can't find dimension with index " << dimension << " in input time series\n";
     }
     MatchingPursuit::MPLReturn r = mpl.run(*ts, dimension);
-
-    std::ofstream ofs(filter_file);
-    DoubleMatrix f = mpl.getFilter();
-    Stream(ofs, Stream::Binary).writeObject(&f);
+    {
+        std::ofstream ofs(filter_file);
+        DoubleMatrix f = mpl.getFilter();
+        Stream(ofs, Stream::Binary).writeObject(&f);
+    }
+    {
+        std::ofstream ofs(spikes_file);
+        Stream s(ofs, Stream::Binary);
+        for(auto &m: r.matches) {
+            s.writeObject(&m);    
+        }        
+    }
     
+
     if(!restored_ts.empty()) {
         vector<double> v = mpl.restore(r.matches);
         TimeSeries ts_rest(v);
