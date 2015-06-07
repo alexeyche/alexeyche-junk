@@ -1,25 +1,5 @@
 package Protos;
 
-message InputTimeSeriesC {
-    required double dt = 1;
-}
-
-message InputTimeSeriesState {
-    required uint32 index = 1;
-    required double _t = 2;
-}
-
-message StochasticC {
-    required double prob = 1;
-}
-
-message DifferenceOfGaussiansC {
-    required int32 dimension = 1;
-    required double a = 2;
-    required double b = 3;
-    required double r = 4;
-}
-
 message StdpTimeC {
     required double tau_plus = 1;
     required double tau_minus = 2;
@@ -50,72 +30,24 @@ message StdpState {
     repeated double x = 2;
 }
 
-message StaticSynapseC {
-    required double psp_decay = 1;
-    required double amp = 2;
+message StochasticC {
+    required double prob = 1;
 }
 
-message StaticSynapseState {
-    required double x = 1;
+message DifferenceOfGaussiansC {
+    required int32 dimension = 1;
+    required double a = 2;
+    required double b = 3;
+    required double r = 4;
 }
 
-message STDSynapseC {
-    required double psp_decay = 1;
-    required double amp = 2;
-    required double gamma = 3;
-    required double tau_d = 4;
+message SpikeSequenceNeuronC {
+    required double dt = 1;
 }
 
-message STDSynapseState {
-    required double x = 1;
-    required double res = 2;
-}
-
-message SynapseInfo {
-    required uint32 idPre = 1;
-    required double dendriteDelay = 2;
-    required double weight = 3;
-}
-
-message Stat {
-    required uint32 __counter = 1;
-    required int32 low_lim = 2;
-    required int32 high_lim = 3;
-    repeated double values = 4;
-}
-
-message StatisticsInfo {
-    required int32 low_lim = 1;
-    required int32 high_lim = 2;
-    repeated string stat_names = 3;
-}
-
-message DoubleMatrix {
-    required uint32 ncol_v = 1;
-    required uint32 nrow_v = 2;
-    repeated double vals = 3;
-}
-
-message SpikesSequence {
-    repeated double values = 1;
-}
-
-message SpikesListInfo {
-    required uint32 size = 1;
-}
-
-message TimeSeriesInfo {
-    repeated uint32 labels_ids = 1;
-    repeated string unique_labels = 2;
-    repeated uint32 labels_timeline = 3;
-}
-
-message TimeSeriesData {
-    repeated double values = 1;
-}
-
-message TimeSeriesDimInfo {
-    required uint32 size = 1;
+message SpikeSequenceNeuronState {
+    required double p = 1;
+    required uint32 index = 2;
 }
 
 message LeakyIntegrateAndFireC {
@@ -162,13 +94,40 @@ message AdaptIntegrateAndFireState {
     required double Ca = 4;
 }
 
-message SpikeSequenceNeuronC {
+message StaticSynapseC {
+    required double psp_decay = 1;
+    required double amp = 2;
+}
+
+message StaticSynapseState {
+    required double x = 1;
+}
+
+message STDSynapseC {
+    required double psp_decay = 1;
+    required double amp = 2;
+    required double gamma = 3;
+    required double tau_d = 4;
+}
+
+message STDSynapseState {
+    required double x = 1;
+    required double res = 2;
+}
+
+message SynapseInfo {
+    required uint32 idPre = 1;
+    required double dendriteDelay = 2;
+    required double weight = 3;
+}
+
+message InputTimeSeriesC {
     required double dt = 1;
 }
 
-message SpikeSequenceNeuronState {
-    required double p = 1;
-    required uint32 index = 2;
+message InputTimeSeriesState {
+    required uint32 index = 1;
+    required double _t = 2;
 }
 
 message MatchingPursuitConfig {
@@ -189,6 +148,47 @@ message FilterMatch {
     required uint32 fi = 1;
     required double s = 2;
     required uint32 t = 3;
+}
+
+message Stat {
+    required uint32 __counter = 1;
+    required int32 low_lim = 2;
+    required int32 high_lim = 3;
+    repeated double values = 4;
+}
+
+message StatisticsInfo {
+    required int32 low_lim = 1;
+    required int32 high_lim = 2;
+    repeated string stat_names = 3;
+}
+
+message TimeSeriesInfo {
+    repeated uint32 labels_ids = 1;
+    repeated string unique_labels = 2;
+    repeated uint32 labels_timeline = 3;
+}
+
+message TimeSeriesData {
+    repeated double values = 1;
+}
+
+message TimeSeriesDimInfo {
+    required uint32 size = 1;
+}
+
+message DoubleMatrix {
+    required uint32 ncol_v = 1;
+    required uint32 nrow_v = 2;
+    repeated double vals = 3;
+}
+
+message SpikesSequence {
+    repeated double values = 1;
+}
+
+message SpikesListInfo {
+    required uint32 size = 1;
 }
 
 message DetermC {

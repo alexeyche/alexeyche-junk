@@ -3,13 +3,13 @@
         "seed": -1,
         "threshold": 0.07,
         "learn_iterations": 100,
-        "jobs": 4,
+        "jobs": 3,
         "learning_rate": 0.01,
-        "filters_num": 32,
+        "filters_num": 50,
         "filter_size": 100,
         "learn": true,
         "continue_learning": true,
-        "batch_size": 100000,
+        "batch_size": 350000,
         "noise_sd": 0.0
     }
 }

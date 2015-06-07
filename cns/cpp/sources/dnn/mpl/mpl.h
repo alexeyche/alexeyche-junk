@@ -235,13 +235,13 @@ public:
 						bi+slice.to
 					)
 				);
-				cout << "Running worker on slice " << bi+slice.from << ": " << bi+slice.to << "\n";
+				//cout << "Running worker on slice " << bi+slice.from << ": " << bi+slice.to << "\n";
 			}
 			
 			vector<SubSeqRet> rets;
 			for(auto &fret: futures) {
 				SubSeqRet ret = fret.get();
-				cout << "done\n";
+				//cout << "done\n";
 				for(auto &m: ret.matches) {
 					runret.matches.push_back(m);
 				}

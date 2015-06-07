@@ -57,16 +57,20 @@ public:
             if((obj.size() == 1)&&(simplify)) { 
                 values = convertToList(obj[0]);
                 delete obj[0];
-            } else {                
-                vector<Rcpp::List> ret;
-                for(auto &o: obj) {
-                    Rcpp::List l = convertToList(o);
-                    if(l.size()>0) {
-                        ret.push_back(l);                    
+            } else {
+                if(obj[0]->name() == "FilterMatch") {
+                    values = convertFilterMatches(obj);
+                } else {
+                    vector<Rcpp::List> ret;
+                    for(auto &o: obj) {
+                        Rcpp::List l = convertToList(o);
+                        if(l.size()>0) {
+                            ret.push_back(l);                    
+                        }
+                        delete o;
                     }
-                    delete o;
+                    values = Rcpp::wrap(ret);
                 }
-                values = Rcpp::wrap(ret);
             }
             Factory::inst().registrationOn();            
         }
@@ -79,6 +83,25 @@ public:
         str.writeObject(b);
     }
     
+    static Rcpp::List convertFilterMatches(vector<SerializableBase*> &obj) {
+        vector<double> t;
+        vector<size_t> fi;
+        vector<double> s;
+        for(auto &o: obj) {
+            FilterMatch *m = dynamic_cast<FilterMatch*>(o);
+            if(!m) { ERR("Can't cast"); }
+            t.push_back(m->t);
+            fi.push_back(m->fi);
+            s.push_back(m->s);
+        }
+
+        return Rcpp::List::create(
+            Rcpp::Named("t") = Rcpp::wrap(t),
+            Rcpp::Named("fi") = Rcpp::wrap(fi),
+            Rcpp::Named("s") = Rcpp::wrap(s)
+        );
+    }
+
     static Rcpp::List convertToList(SerializableBase *o) {
         Rcpp::List out;
         if(o->name() == "Statistics") {
@@ -278,7 +301,20 @@ public:
             return m;
         }
         ERR("Can't convert " << name );
-    } 
+    }
+    static vector<FilterMatch> convertBackFilterMatches(const Rcpp::List &matches_l) {
+        vector<FilterMatch> matches;
+        Rcpp::NumericVector t = matches_l["t"];
+        Rcpp::NumericVector s = matches_l["s"];
+        Rcpp::IntegerVector fi = matches_l["fi"];
+        for(size_t i=0; i<t.size(); ++i) {
+            matches.push_back(
+                FilterMatch(fi[i], s[i], t[i])
+            );
+        }
+        return matches;
+
+    }
     void print() {
         cout << "RProto instance. run instance$read() method to read protobuf\n";
     }

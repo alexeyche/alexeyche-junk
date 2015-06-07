@@ -31,11 +31,11 @@ public:
 		dnn::MatchingPursuit::MPLReturn ret = MatchingPursuit::run(*ts, 0);
 		delete ts;
 
-		Rcpp::List matches_l;
+		vector<SerializableBase*> vv;
 		for(auto &m: ret.matches) {
-			matches_l.push_back(RProto::convertToList(&m));
+			vv.push_back(&m);
 		}
-		
+		Rcpp::List matches_l = RProto::convertFilterMatches(vv);
 		// Rcpp::NumericVector t;
 		// Rcpp::NumericVector s;
 		// Rcpp::IntegerVector fi;
@@ -76,16 +76,7 @@ public:
 	}
 
 	Rcpp::NumericVector restore(const Rcpp::List matches_l) {
-		vector<FilterMatch> matches;
-		
-		Factory::inst().registrationOff();
-		for(size_t i=0; i<matches_l.size(); ++i) {
-			FilterMatch *m = RProto::convertBack<FilterMatch>(matches_l[i], "FilterMatch");
-			matches.push_back(*m);
-			delete m;
-		}
-		Factory::inst().registrationOn();
-		
+		vector<FilterMatch> matches = RProto::convertBackFilterMatches(matches_l);
 		return Rcpp::wrap(dnn::MatchingPursuit::restore(matches));
 	}
 	void print() {

@@ -38,19 +38,22 @@ prast_mpl = function(spikes,T0=0, Tmax=Inf) {
     x = c()
     y = c()
     cex = c()
-     
-    for(i in 1:length(spikes)) {
-        t = spikes[[i]]$t
-        if((t<T0)||(t>Tmax)) next
-        x = c(x, t)
-        y = c(y, spikes[[i]]$fi)
-        cex = c(cex, spikes[[i]]$s)
+    tv = spikes$t
+    sv = spikes$s
+    fiv = spikes$fi
+    
+    for(i in 1:length(tv)) {
+        if((tv[i]<T0)||(tv[i])>Tmax) next
+        x = c(x, tv[i])
+        y = c(y, fiv[i])
+        cex = c(cex, sv[i])
+        
     }
     xyplot(y ~ x, list(x = x, y = y), xlim=c(T0, max(x)), cex=cex*10,  col = "black")
 }
 
 plot_rastl <- function(raster, lab="",T0=0, Tmax=Inf, i=-1, plen=-1) {
-    if( "t" %in% names(raster[[1]])) {
+    if( "t" %in% names(raster)) {
         return(prast_mpl(raster, T0, Tmax))
     }
     x <- c()
