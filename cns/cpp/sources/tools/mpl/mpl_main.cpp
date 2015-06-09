@@ -56,7 +56,7 @@ int main(int argc, char **argv) {
     }
     optp.option("--input", "-i", input_file, true);
     optp.option("--filter", "-f", filter_file);
-    optp.option("--spikes", "-s", spikes_file);
+    optp.option("--spikes", "-s", spikes_file, false);
     optp.option("--config", "-c", config_file, false);
     optp.option("--dim", "-d", dimension, false);
     optp.option("--restored", "-r", restored_ts, false);
@@ -88,18 +88,19 @@ int main(int argc, char **argv) {
         throw dnnException() << "Can't find dimension with index " << dimension << " in input time series\n";
     }
     MatchingPursuit::MPLReturn r = mpl.run(*ts, dimension);
-    {
+    if(c.learn) {
         std::ofstream ofs(filter_file);
         DoubleMatrix f = mpl.getFilter();
         Stream(ofs, Stream::Binary).writeObject(&f);
     }
-    {
+    if(!spikes_file.empty()) {
         std::ofstream ofs(spikes_file);
         Stream s(ofs, Stream::Binary);
         for(auto &m: r.matches) {
             s.writeObject(&m);    
-        }        
+        }
     }
+    
     
 
     if(!restored_ts.empty()) {
@@ -108,11 +109,17 @@ int main(int argc, char **argv) {
         std::ofstream s(restored_ts);
         Stream(s, Stream::Binary).writeObject(&ts_rest);
         double acc_error = 0;
-        for(size_t vi=0; vi<v.size(); ++vi) {
+        for(size_t vi=0; vi<ts->length(); ++vi) {
             const double& orig_val = ts->getValueAtDim(vi, dimension);
-            acc_error += (orig_val - v[vi])*(orig_val - v[vi]);
+            double rest_val;
+            if(vi < v.size()) {
+                rest_val = v[vi];
+            } else {
+                rest_val = 0.0;
+            }
+            acc_error += (orig_val - rest_val)*(orig_val - rest_val);
         }
-        cout << "\nAccumulated error: " << acc_error << "\n";
+        cout << "\nAccumulated error: " << acc_error/ts->length() << "\n";
         // Document d;
         // d.SetObject();
         // d.AddMember("accum_error", acc_error, d.GetAllocator());
