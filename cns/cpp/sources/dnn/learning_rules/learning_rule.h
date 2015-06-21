@@ -3,6 +3,7 @@
 #include <dnn/io/serialize.h>
 #include <dnn/util/statistics.h>
 #include <dnn/neurons/spike_neuron.h>
+#include <dnn/util/ptr.h>
 
 namespace dnn {
 
@@ -43,15 +44,12 @@ public:
 	Statistics& getStat() {
 		return stat;
 	}
-	void linkWithNeuron(SpikeNeuronBase *_n) {
-		n = _n;
-	}
+	virtual void linkWithNeuron(SpikeNeuronBase &_n) = 0;
 protected:
 	Statistics stat;
-	SpikeNeuronBase *n;
 };
 
-template <typename Constants, typename State>
+template <typename Constants, typename State, typename Neuron>
 class LearningRule : public LearningRuleBase {
 public:	
 	void serial_process() {
@@ -63,7 +61,12 @@ public:
 		(*this) << "State: " << s << Self::end;
 	}
 
+	void linkWithNeuron(Neuron &_n) {
+		n.set(_n);
+	}
 protected:
+	Ptr<Neuron> n;
+
 	State s;
 	Constants c;
 };

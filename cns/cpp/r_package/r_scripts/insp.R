@@ -44,7 +44,7 @@ LAYER_MAP = convStr(Sys.getenv('LAYER_MAP'), NULL)
 SAVE_PIC_IN_FILES = convStr(Sys.getenv('SAVE_PIC_IN_FILES'), "yes") %in% c("yes", "1", "True", "true")
 
 if(length(grep("RStudio", args))>0) {
-    STAT_SYN_ID=100
+    STAT_SYN_ID=40
     LAYER_MAP=NULL #"1:7:7"
     SAVE_PIC_IN_FILES = FALSE
 }
@@ -59,7 +59,7 @@ model = NULL
 net = NULL
 
 if(file.exists(CONST_FNAME)) {
-    const = fromJSON(file=CONST_FNAME)
+    const = fromJSON(readConst(CONST_FNAME))
     lsize = sapply(const$sim_configuration$layers, function(x) x$size)
     
     inputs = sapply(const$sim_configuration$files, function(x) x$filename)

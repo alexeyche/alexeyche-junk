@@ -27,7 +27,6 @@ def add_coloring_to_emit_ansi(fn):
         else:
             color = '\x1b[0m' # normal
         args[0].msg = color + args[0].msg +  '\x1b[0m'  # normal
-        #print "after"
         return fn(*args)
     return new 
 
@@ -64,23 +63,25 @@ class DnnSim(object):
         self.inspection = self.dget(kwargs, "inspection", True)
         self.working_dir = self.dget(kwargs, "working_dir", self.get_wd())
 
-        if os.path.exists(self.working_dir):
-            self.continue_in_wd()
-        else:
-            os.mkdir(self.working_dir)
-
         logFormatter = logging.Formatter("%(asctime)s [%(levelname)s]  %(message)-100s")
         rootLogger = logging.getLogger()
         rootLogger.setLevel(logging.DEBUG)
-        
-        fileHandler = logging.FileHandler("{0}/{1}".format(self.working_dir, "run_sim.log"), mode='w')
-        fileHandler.setFormatter(logFormatter)
-        rootLogger.addHandler(fileHandler)
 
         consoleHandler = logging.StreamHandler(sys.stdout)
         consoleHandler.emit = add_coloring_to_emit_ansi(consoleHandler.emit)
         consoleHandler.setFormatter(logFormatter)
         rootLogger.addHandler(consoleHandler)
+
+        if os.path.exists(self.working_dir):
+            self.continue_in_wd()
+        else:
+            os.mkdir(self.working_dir)
+
+        
+        fileHandler = logging.FileHandler("{0}/{1}".format(self.working_dir, "run_sim.log"), mode='w')
+        fileHandler.setFormatter(logFormatter)
+        rootLogger.addHandler(fileHandler)
+
 
 
         self.dnn_sim_bin = self.dget(kwargs, "dnn_sim_bin", self.DNN_SIM_BIN)
@@ -140,11 +141,11 @@ class DnnSim(object):
     
     def construct_inspect_cmd(self):
         env = {
-            "T1" : "30000",
+            "T1" : "2000",
             "COPY_PICS" : "yes",
             "EP" : str(self.current_epoch),
             "OPEN_PIC" : "no",
-            "SP_PIX0" : "{}".format(1024*10),
+            "SP_PIX0" : "{}".format(1024*2),
         }
         cmd = [
               self.insp_script
@@ -171,11 +172,10 @@ class DnnSim(object):
                 logging.error("\n\t"+stdout)
             if stderr:
                 logging.error("\n\t"+stderr)
-            sys.exit(-1.0) 
+            sys.exit(-1)
 
     def run(self):
         for self.current_epoch in xrange(self.current_epoch, self.epochs+1):
-            #logging.info("")
             logging.info("Running epoch {}:".format(self.current_epoch))
             self.run_proc(**self.construct_cmd())
             if self.inspection:

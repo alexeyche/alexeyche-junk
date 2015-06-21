@@ -14,7 +14,6 @@ public:
 
 
 	Builder(const Constants &_c) : c(_c), input_stream(nullptr) {
-
 	}
 
 
@@ -24,7 +23,7 @@ public:
 			Layer layer;
 			Document layer_conf = Json::parseStringC(lc);
 			size_t layer_size = Json::getUintVal(layer_conf, "size");
-			size_t col_size = floor(sqrt(layer_size));
+			size_t col_size = ceil(sqrt(layer_size));
 			size_t xi = 0;
 			size_t yi = 0;
 			for (size_t ni = 0; ni < layer_size; ++ni) {

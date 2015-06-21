@@ -3,7 +3,9 @@
 #include <dnn/neurons/leaky_integrate_and_fire.h>
 #include <dnn/neurons/adapt_integrate_and_fire.h>
 #include <dnn/neurons/spike_sequence_neuron.h>
+#include <dnn/neurons/srm_neuron.h>
 #include <dnn/act_functions/determ.h>
+#include <dnn/act_functions/exp_threshold.h>
 #include <dnn/synapses/static_synapse.h>
 #include <dnn/synapses/std_synapse.h>
 #include <dnn/inputs/input_time_series.h>
@@ -54,7 +56,9 @@ Factory::Factory() : registration_is_on(true) {
 	REG_TYPE_WITH_STATE_AND_CONST(StaticSynapse);
 	REG_TYPE_WITH_STATE_AND_CONST(STDSynapse);
 	REG_TYPE_WITH_STATE_AND_CONST(SpikeSequenceNeuron);
+	REG_TYPE_WITH_STATE_AND_CONST(SRMNeuron);
 	REG_TYPE_WITH_CONST(Determ);
+	REG_TYPE_WITH_CONST(ExpThreshold);
 	REG_TYPE_WITH_CONST(Stochastic);
 	REG_TYPE_WITH_CONST(DifferenceOfGaussians);
 	REG_TYPE_WITH_STATE_AND_CONST(InputTimeSeries);

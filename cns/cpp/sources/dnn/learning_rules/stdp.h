@@ -57,7 +57,7 @@ struct StdpState : public Serializable<Protos::StdpState>  {
 };
 
 
-class Stdp : public LearningRule<StdpC, StdpState> {
+class Stdp : public LearningRule<StdpC, StdpState, SpikeNeuronBase> {
 public:
     const string name() const {
         return "Stdp";
@@ -65,7 +65,7 @@ public:
 
     void reset() {
         s.y = 0;
-        s.x.resize(n->getSynapses().size());
+        s.x.resize(n.ref().getSynapses().size());
         for(auto &v: s.x) {
             v = 0;
         }
@@ -76,13 +76,13 @@ public:
     }
 
     void calculateDynamics(const Time& t) {
-        if(n->fired()) {
+        if(n.ref().fired()) {
             s.y += 1;
         }
-        auto &syns = n->getSynapses();
+        auto &syns = n.ref().getSynapses();
         
         auto x_id_it = s.x.ibegin();
-        //if((n->id() == 101)&&(t.t>=2500)) cout << "Stdp: ";
+        //if((n.ref().id() == 101)&&(t.t>=2500)) cout << "Stdp: ";
         while(x_id_it != s.x.iend()) {            
             if(fabs(s.x[x_id_it]) < 0.0001) {
                 s.x.setInactive(x_id_it);
@@ -90,7 +90,7 @@ public:
                 const size_t &syn_id = *x_id_it;
                 auto &syn = syns.get(syn_id).ref();
                 double dw = c.learning_rate * ( 
-                    c.a_plus  * s.x[x_id_it] * n->fired() - \
+                    c.a_plus  * s.x[x_id_it] * n.ref().fired() - \
                     c.a_minus * s.y * syn.fired() 
                 );
                 // if(syns.get(syn_id).ifc().getMembranePotential()<0) {
@@ -101,13 +101,13 @@ public:
                     syn.mutWeight() = new_weight;    
                 }
 
-                //if((n->id() == 101)&&(t.t>=2500)) cout << "(id_pre: " << syn.idPre() << ", dw: " << dw << ", s.y: " << s.y << ", s.x: " << s.x[x_id_it] << "), ";
+                //if((n.ref().id() == 101)&&(t.t>=2500)) cout << "(id_pre: " << syn.idPre() << ", dw: " << dw << ", s.y: " << s.y << ", s.x: " << s.x[x_id_it] << "), ";
                 
                 s.x[x_id_it] += - s.x[x_id_it]/c.tau_plus;
                 ++x_id_it;
             }
         }
-        //if((n->id() == 101)&&(t.t>=2500)) cout << "\n";
+        //if((n.ref().id() == 101)&&(t.t>=2500)) cout << "\n";
         s.y += - s.y/c.tau_minus;
         
         if(stat.on()) {

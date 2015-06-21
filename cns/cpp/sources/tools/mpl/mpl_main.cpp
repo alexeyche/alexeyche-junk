@@ -119,7 +119,7 @@ int main(int argc, char **argv) {
             }
             acc_error += (orig_val - rest_val)*(orig_val - rest_val);
         }
-        cout << "\nAccumulated error: " << acc_error/ts->length() << "\n";
+        cout << "\nAccumulated error: " << 1000*acc_error/ts->length() << "\n";
         // Document d;
         // d.SetObject();
         // d.AddMember("accum_error", acc_error, d.GetAllocator());

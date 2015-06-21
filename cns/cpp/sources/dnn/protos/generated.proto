@@ -35,6 +35,21 @@ message StdpTimeState {
     repeated double x = 2;
 }
 
+message OptimalStdpC {
+    required double tau_c = 1;
+    required double tau_mean = 2;
+    required double target_rate = 3;
+    required double target_rate_factor = 4;
+    required double weight_decay = 5;
+    required double learning_rate = 6;
+}
+
+message OptimalStdpState {
+    required double p_mean = 1;
+    repeated double C = 2;
+    required double B = 3;
+}
+
 message StdpC {
     required double tau_plus = 1;
     required double tau_minus = 2;
@@ -78,10 +93,9 @@ message SynapseInfo {
 }
 
 message Stat {
-    required uint32 __counter = 1;
-    required int32 low_lim = 2;
-    required int32 high_lim = 3;
-    repeated double values = 4;
+    required int32 low_lim = 1;
+    required int32 high_lim = 2;
+    repeated double values = 3;
 }
 
 message StatisticsInfo {
@@ -143,6 +157,22 @@ message SpikeNeuronInfo {
     required bool lrule_is_set = 9;
 }
 
+message SRMNeuronC {
+    required double u_rest = 1;
+    required double amp_refr = 2;
+    required double amp_adapt = 3;
+    required double tau_refr = 4;
+    required double tau_adapt = 5;
+}
+
+message SRMNeuronState {
+    required double u = 1;
+    required double p = 2;
+    required double M = 3;
+    required double gr = 4;
+    required double ga = 5;
+}
+
 message AdaptIntegrateAndFireC {
     required double tau_m = 1;
     required double rest_pot = 2;
@@ -193,5 +223,12 @@ message FilterMatch {
 
 message DetermC {
     required double treshold = 1;
+}
+
+message ExpThresholdC {
+    required double amp = 1;
+    required double beta = 2;
+    required double threshold = 3;
+    required double p_rest = 4;
 }
 

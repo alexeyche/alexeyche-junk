@@ -55,7 +55,7 @@ if(length(grep("RStudio", args))==0) dev.off()
 
 r = RProto$new(pfx_f("restored.pb"))$read()[["values"]][[1]]
 
-idx = 1:1000 + 300000
+idx = 1:1000 + 0
 x = v[idx]
 x_d = r[idx]
 delta = x - x_d
@@ -125,3 +125,5 @@ axis(1, ylim=c(min(freq), max(freq)))
 
 if(length(grep("RStudio", args))==0) dev.off()
 cat("Information:", inf,"\n")
+
+

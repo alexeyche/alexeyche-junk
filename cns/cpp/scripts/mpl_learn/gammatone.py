@@ -1,4 +1,5 @@
 
+import logging
 import numpy as np
 
 def safe_log(v):
@@ -19,6 +20,7 @@ def gammatone(**kwargs):
     log_freq = kwargs["log_freq"]
 
     time = np.linspace(0, Tmax, L)
+    logging.info("{}".format(str(kwargs)))
     if log_freq:
         freq = np.exp(np.linspace(safe_log(lb), safe_log(hb), fnum))
     else:

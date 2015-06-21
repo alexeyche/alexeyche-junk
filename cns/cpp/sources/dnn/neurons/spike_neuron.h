@@ -114,7 +114,7 @@ public:
 
 	void setLearningRule(LearningRuleBase *_lrule) { 
 		lrule.set(_lrule); 
-		lrule.ref().linkWithNeuron(this);
+		lrule.ref().linkWithNeuron(*this);
 	}
 	void setActFunction(ActFunctionBase *_act_f) { 
 		act_f.set(_act_f);
@@ -171,7 +171,6 @@ public:
 
 	inline void enqueueSpike(const SynSpike && sp) {
 		while (input_queue_lock.test_and_set(std::memory_order_acquire));
-		//cout << "Neuron " << id() << " is enqueueing spike " << sp << "\n";
 		input_spikes.push(sp);
 		input_queue_lock.clear(std::memory_order_release);
 	}
@@ -181,7 +180,6 @@ public:
         while(!input_spikes.empty()) {
             const SynSpike& sp = input_spikes.top();
             if(sp.t >= t.t) break;
-            //cout << "Neuron " << id() << " is reading spike " << sp << "\n";
             auto &s = syns[sp.syn_id];
             s.ref().setFired(true);
             ifc.propagateSynapseSpike(sp);
@@ -196,20 +194,16 @@ public:
 
 		double Isyn = 0.0;
         auto syn_id_it = syns.ibegin();
-        // if((_id == 101)&&(t.t>=2500)) cout << "Synapses: ";
         while(syn_id_it != syns.iend()) {
             auto &s = syns[syn_id_it];
             double x = s.ifc().getMembranePotential();
-            // if((_id == 101)&&(t.t>=2500)) cout << "(" << s.ref().idPre() << ", x: " << x << ", " << "w: " << s.ref().weight() << "), "; 
             if(fabs(x) < 0.0001) {
             	syns.setInactive(syn_id_it);
             } else {
             	Isyn += x;
 	        	++syn_id_it;	
             }
-            
         }
-        // if((_id == 101)&&(t.t>=2500)) cout << "\n";
         ifc.calculateDynamics(t, Iinput, Isyn);
         
         lrule.ifc().calculateDynamics(t);
@@ -327,7 +321,7 @@ public:
 		}
 		if (info.lrule_is_set) {
 			(*this) << "LearningRule: " << lrule;
-			lrule.ref().linkWithNeuron(this);
+			lrule.ref().linkWithNeuron(*this);
 		}
 		if(mode == ProcessingInput) {
 			syns.resize(info.num_of_synapses);
@@ -346,7 +340,6 @@ public:
 	}
 
 protected:
-	SpikeNeuronInfo info;
 	State s;
 	Constants c;
 };

@@ -57,7 +57,7 @@ struct StdpTimeState : public Serializable<Protos::StdpTimeState>  {
 };
 
 
-class StdpTime : public LearningRule<StdpTimeC, StdpTimeState> {
+class StdpTime : public LearningRule<StdpTimeC, StdpTimeState, SpikeNeuronBase> {
 public:
     const string name() const {
         return "StdpTime";
@@ -65,7 +65,7 @@ public:
 
     void reset() {
         s.y = -1.0;
-        s.x.resize(n->getSynapses().size());
+        s.x.resize(n.ref().getSynapses().size());
         for(auto &v: s.x) {
             v = -1.0;
         }
@@ -77,13 +77,13 @@ public:
     static constexpr double WINDOW_LEN = 100.0;
 
     void calculateDynamics(const Time& t) {
-        if(n->fired()) {
+        if(n.ref().fired()) {
             s.y = t.t;
         }
-        auto &syns = n->getSynapses();
+        auto &syns = n.ref().getSynapses();
         
         auto x_id_it = s.x.ibegin();
-        //if((n->id() == 101)&&(t.t>=2500)) cout << "StdpTime: ";
+        //if((n.ref().id() == 101)&&(t.t>=2500)) cout << "StdpTime: ";
         while(x_id_it != s.x.iend()) {            
             double time_diff = s.y - s.x[x_id_it];
             if(fabs(time_diff) >= WINDOW_LEN) {
@@ -91,7 +91,7 @@ public:
             } else {
                 const size_t &syn_id = *x_id_it;
                 auto &syn = syns.get(syn_id).ref();
-                if( (!(n->fired()||syn.fired()) )||(s.x[x_id_it]<0.0)||(s.y<0.0)) {
+                if( (!(n.ref().fired()||syn.fired()) )||(s.x[x_id_it]<0.0)||(s.y<0.0)) {
                     ++x_id_it;
                     continue;
                 }
@@ -110,11 +110,11 @@ public:
                     syn.mutWeight() = new_weight;    
                 }
 
-                //if((n->id() == 101)&&(t.t>=2500)) cout << "(id_pre: " << syn.idPre() << ", dw: " << dw << ", s.y: " << s.y << ", s.x: " << s.x[x_id_it] << "), ";
+                //if((n.ref().id() == 101)&&(t.t>=2500)) cout << "(id_pre: " << syn.idPre() << ", dw: " << dw << ", s.y: " << s.y << ", s.x: " << s.x[x_id_it] << "), ";
                 ++x_id_it;
             }
         }
-        //if((n->id() == 101)&&(t.t>=2500)) cout << "\n";
+        //if((n.ref().id() == 101)&&(t.t>=2500)) cout << "\n";
         
         if(stat.on()) {
             size_t i=0; 

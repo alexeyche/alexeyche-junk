@@ -24,11 +24,24 @@
             "vK" : -0.1,
             "adapt_amp" : 0.01,
             "gKCa" : 5.0
+        },
+        "SRMNeuron" : {
+            "u_rest" : 0.0,
+            "amp_adapt" : 1.0,
+            "amp_refr" : 100,
+            "tau_refr" : 2.0,
+            "tau_adapt" : 500.0
         }
     },
     "act_functions" : {
         "Determ" : {
             "treshold" : 1.0
+        },
+        "ExpThreshold" : {
+            "p_rest" : 0.1,
+            "threshold" : 0.25,
+            "beta" : 15.0,
+            "amp"   : 10.0
         }
     },        
     "synapses" : {
@@ -62,7 +75,7 @@
             "tau_minus" : 10,
             "a_plus" : 0.0016,
             "a_minus" : 0.0055,
-            "learning_rate" : 100.0,
+            "learning_rate" : 0.1,
             "w_max" : 1.0,
             "w_min" : 0.0
         }
@@ -81,14 +94,14 @@
     "sim_configuration" : {
         "layers" : [
             {
-                "size" : 100,
+                "size" : 336,
                 "neuron" : "SpikeSequenceNeuron",
                 "axon_delay" : 0
             },
             {
                 "size" : 100,
-                "neuron" : "LeakyIntegrateAndFire",
-                "act_function" : "Determ",
+                "neuron" : "SRMNeuron",
+                "act_function" : "ExpThreshold",
                 "axon_delay" : 0,
                 "learning_rule" : "Stdp"
             }
@@ -98,23 +111,24 @@
                 { 
                     "type" : "Stochastic", 
                     "dendrite_delay" : "Exp(0,0)",
-                    "start_weight" : 0.4,
-                    "synapse" : "StaticSynapse" 
-                }
-            ],
-            "1->1" : [
-                { 
-                    "type" : "DifferenceOfGaussians",
-                    "dendrite_delay" : "Exp(0,0)",
-                    "start_weight" : 0.01,
-                    "synapse" : "StaticSynapse" ,
-                    "inh_synapse" : "StaticSynapse_inh"
+                    "start_weight" : 0.05,
+                    "synapse" : "StaticSynapse"
                 }
             ]
+            //,
+            //"1->1" : [
+            //    { 
+            //        "type" : "DifferenceOfGaussians",
+            //        "dendrite_delay" : "Exp(0,0)",
+            //        "start_weight" : 0.001,
+            //        "synapse" : "StaticSynapse" ,
+            //        "inh_synapse" : "StaticSynapse_inh"
+            //    }
+            //]
         },
         "dt" : 1.0,
         "seed" : -1,
-        "neurons_to_listen" : [100],
+        "neurons_to_listen" : [366],
         "files" : {
             "InputTimeSeries" : { 
                 "filename" : "@pb-input"

@@ -9,6 +9,10 @@ import subprocess as sub
 from contextlib import contextmanager
 import shutil
 import json
+import scipy.optimize as opt
+
+from multiprocessing import Lock
+from multiprocessing import Queue
 
 import cma
 from gammatone import gammatone
@@ -50,10 +54,10 @@ def pushd(newDir):
     yield
     os.chdir(previousDir)
 
-def scale_to_cma(x, min, max, a, b):
+def scale_to(x, min, max, a, b):
     return ((b-a)*(x - min)/(max-min)) + a
 
-def scale_from_cma(x, min, max, a, b):
+def scale_from(x, min, max, a, b):
     return ((max-min)*(x - a)/(b-a)) + min
 
 logFormatter = logging.Formatter("%(asctime)s [%(threadName)s] [%(levelname)s]  %(message)-100s")
@@ -69,10 +73,10 @@ else:
     rootLogger.setLevel(logging.INFO)
 rootLogger.addHandler(consoleHandler)
 
-def eval(x, id, ret_q):
+def async_eval(x, id, ret_q):
     p = dict(zip(var_names, x))
     for param in p:
-        p[param] = scale_from_cma(p[param], cma_conf[param]["min"], cma_conf[param]['max'], BOUNDS[0], BOUNDS[1])
+        p[param] = scale_from(p[param], cma_conf[param]["min"], cma_conf[param]['max'], BOUNDS[0], BOUNDS[1])
     p.update(cma_conf_consts)
 
     p["fnum"] = int(round(p["fnum"]))
@@ -111,14 +115,28 @@ def eval(x, id, ret_q):
     _, err = stdout[-1].split(":", 2)
     ret_q.put(float(err))
 
+id_lock = Lock()
+id = 0
 
-start_params = dict([ (k, scale_to_cma(v["def"], v["min"], v["max"], BOUNDS[0], BOUNDS[1])) for k, v in cma_conf_learn.iteritems() ])
+def eval(x):
+    with id_lock:
+        global id
+        id += 1
+    ret_q = Queue()
+    async_eval(x, id, ret_q)
+    return ret_q.get()
+
+start_params = dict([ (k, scale_to(v["def"], v["min"], v["max"], BOUNDS[0], BOUNDS[1])) for k, v in cma_conf_learn.iteritems() ])
 
 runs = os.listdir(RUNS_DIR)
 for r in runs:
     fr = pj(RUNS_DIR, r)
     logging.warning("Cleaning {} ... ".format(fr))
     shutil.rmtree(fr)
+
+#initial_guess = [ start_params[p] for p in var_names ]
+#opt.differential_evolution(eval, bounds=[ BOUNDS for _ in xrange(0, len(var_names)) ], disp=True)
+#opt.anneal(eval, initial_guess, lower=BOUNDS[0], upper=BOUNDS[1], full_output=True, disp=True)
 
 es = cma.CMAEvolutionStrategy([ start_params[p] for p in var_names ], SIGMA, { 'bounds' : [ BOUNDS[0], BOUNDS[1] ], 'popsize' : POP_SIZE } )
 id = 0
@@ -133,7 +151,7 @@ while not es.stop():
                 break
             ret_q = multiprocessing.Queue()
             #eval(X_work[0], id, ret_q)
-            p = multiprocessing.Process(target=eval, args = (X_work[0], id , ret_q))
+            p = multiprocessing.Process(target=async_eval, args = (X_work[0], id , ret_q))
             p.start()
             X_work = X_work[1:]
             pool.append( (id, p, ret_q) )       
@@ -151,6 +169,6 @@ while not es.stop():
     es.tell(X, tells)
     es.disp()  # by default sparse, see option verb_disp
 
-ans = dict([ (param, scale_from_cma(es.result()[0][i], cma_conf[param]["min"], cma_conf[param]['max'], BOUNDS[0], BOUNDS[1])) for i, param in enumerate(var_names) ])
+ans = dict([ (param, scale_from(es.result()[0][i], cma_conf[param]["min"], cma_conf[param]['max'], BOUNDS[0], BOUNDS[1])) for i, param in enumerate(var_names) ])
 for k, v in ans.iteritems():
     logging.info("Got optimal values: {}: {}".format(k, v))
