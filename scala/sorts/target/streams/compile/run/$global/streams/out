@@ -1,0 +1,15 @@
+[0m[[0minfo[0m] [0mRunning Sorts InsertionSort[0m
+[0m[[0mdebug[0m] [0mWaiting for threads to exit or System.exit to be called.[0m
+[0m[[0mdebug[0m] [0m  Classpath:[0m
+[0m[[0mdebug[0m] [0m	/home/alexeyche/prog/alexeyche-junk/scala/sorts/target/scala-2.11/classes[0m
+[0m[[0mdebug[0m] [0m	/home/alexeyche/.ivy2/cache/org.scala-lang/scala-library/jars/scala-library-2.11.7.jar[0m
+[0m[[0mdebug[0m] [0m	/home/alexeyche/.ivy2/cache/com.typesafe.scala-logging/scala-logging_2.11/jars/scala-logging_2.11-3.1.0.jar[0m
+[0m[[0mdebug[0m] [0m	/home/alexeyche/.ivy2/cache/org.scala-lang/scala-reflect/jars/scala-reflect-2.11.1.jar[0m
+[0m[[0mdebug[0m] [0m	/home/alexeyche/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.7.jar[0m
+[0m[[0mdebug[0m] [0m	/home/alexeyche/.ivy2/cache/ch.qos.logback/logback-classic/jars/logback-classic-1.1.2.jar[0m
+[0m[[0mdebug[0m] [0m	/home/alexeyche/.ivy2/cache/ch.qos.logback/logback-core/jars/logback-core-1.1.2.jar[0m
+[0m[[0mdebug[0m] [0mWaiting for thread run-main-0 to terminate.[0m
+[0m[[0mdebug[0m] [0m	Thread run-main-0 exited.[0m
+[0m[[0mdebug[0m] [0mInterrupting remaining threads (should be all daemons).[0m
+[0m[[0mdebug[0m] [0mSandboxed run complete..[0m
+[0m[[0mdebug[0m] [0mExited with code 0[0m
