@@ -7,7 +7,7 @@
 		revision="0.1dev1"
 		conf="scala-tool"
 		confs="compile, runtime, test, provided, optional, compile-internal, runtime-internal, test-internal, plugin, sources, docs, pom, scala-tool"
-		date="20150919145844"/>
+		date="20150920195736"/>
 	<dependencies>
 		<module organisation="org.scala-lang" name="scala-compiler">
 			<revision name="2.11.7" status="release" pubdate="20150622231800" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.scala-lang.org/" downloaded="false" searched="false" default="false" conf="default, optional, compile, runtime, optional(default), master" position="0">
@@ -22,7 +22,7 @@
 			</revision>
 		</module>
 		<module organisation="jline" name="jline">
-			<revision name="2.12.1" status="release" pubdate="20150912154606" resolver="sbt-chain" artresolver="sbt-chain" homepage="" downloaded="false" searched="false" default="false" conf="compile, compile(*), master(compile), master" position="5">
+			<revision name="2.12.1" status="release" pubdate="20150210035500" resolver="sbt-chain" artresolver="sbt-chain" homepage="" downloaded="false" searched="false" default="false" conf="compile, compile(*), master(compile), master" position="5">
 				<license name="The BSD License" url="http://www.opensource.org/licenses/bsd-license.php"/>
 				<metadata-artifact status="no" details="" size="3901" time="0" location="/home/alexeyche/.ivy2/cache/jline/jline/ivy-2.12.1.xml" searched="false" origin-is-local="false" origin-location="https://jcenter.bintray.com/jline/jline/2.12.1/jline-2.12.1.pom"/>
 				<caller organisation="org.scala-lang" name="scala-compiler" conf="optional" rev="2.12.1" rev-constraint-default="2.12.1" rev-constraint-dynamic="2.12.1" callerrev="2.11.7"/>
@@ -34,7 +34,7 @@
 			</revision>
 		</module>
 		<module organisation="org.scala-lang.modules" name="scala-parser-combinators_2.11">
-			<revision name="1.0.4" status="release" pubdate="20150912154606" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.scala-lang.org/" downloaded="false" searched="false" default="false" conf="compile, runtime, compile(*), runtime(*), master(compile), master" position="4">
+			<revision name="1.0.4" status="release" pubdate="20150430170700" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.scala-lang.org/" downloaded="false" searched="false" default="false" conf="compile, runtime, compile(*), runtime(*), master(compile), master" position="4">
 				<license name="BSD 3-clause" url="http://opensource.org/licenses/BSD-3-Clause"/>
 				<metadata-artifact status="no" details="" size="2929" time="0" location="/home/alexeyche/.ivy2/cache/org.scala-lang.modules/scala-parser-combinators_2.11/ivy-1.0.4.xml" searched="false" origin-is-local="false" origin-location="https://jcenter.bintray.com/org/scala-lang/modules/scala-parser-combinators_2.11/1.0.4/scala-parser-combinators_2.11-1.0.4.pom"/>
 				<caller organisation="org.scala-lang" name="scala-compiler" conf="default, optional, compile, runtime, master" rev="1.0.4" rev-constraint-default="1.0.4" rev-constraint-dynamic="1.0.4" callerrev="2.11.7"/>
@@ -46,7 +46,7 @@
 			</revision>
 		</module>
 		<module organisation="org.scala-lang.modules" name="scala-xml_2.11">
-			<revision name="1.0.4" status="release" pubdate="20150912154605" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.scala-lang.org/" downloaded="false" searched="false" default="false" conf="compile, runtime, compile(*), runtime(*), master(compile), master" position="3">
+			<revision name="1.0.4" status="release" pubdate="20150430165300" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.scala-lang.org/" downloaded="false" searched="false" default="false" conf="compile, runtime, compile(*), runtime(*), master(compile), master" position="3">
 				<license name="BSD 3-clause" url="http://opensource.org/licenses/BSD-3-Clause"/>
 				<metadata-artifact status="no" details="" size="3137" time="0" location="/home/alexeyche/.ivy2/cache/org.scala-lang.modules/scala-xml_2.11/ivy-1.0.4.xml" searched="false" origin-is-local="false" origin-location="https://jcenter.bintray.com/org/scala-lang/modules/scala-xml_2.11/1.0.4/scala-xml_2.11-1.0.4.pom"/>
 				<caller organisation="org.scala-lang" name="scala-compiler" conf="default, optional, compile, runtime, master" rev="1.0.4" rev-constraint-default="1.0.4" rev-constraint-dynamic="1.0.4" callerrev="2.11.7"/>
@@ -58,7 +58,7 @@
 			</revision>
 		</module>
 		<module organisation="org.scala-lang" name="scala-reflect">
-			<revision name="2.11.7" status="release" pubdate="20150912154605" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.scala-lang.org/" extra-info.apiURL="http://www.scala-lang.org/api/2.11.7/" downloaded="false" searched="false" default="false" conf="compile, runtime, compile(*), runtime(*), master(compile), master" position="2">
+			<revision name="2.11.7" status="release" pubdate="20150622231700" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.scala-lang.org/" extra-info.apiURL="http://www.scala-lang.org/api/2.11.7/" downloaded="false" searched="false" default="false" conf="compile, runtime, compile(*), runtime(*), master(compile), master" position="2">
 				<license name="BSD 3-Clause" url="http://www.scala-lang.org/license.html"/>
 				<metadata-artifact status="no" details="" size="2825" time="0" location="/home/alexeyche/.ivy2/cache/org.scala-lang/scala-reflect/ivy-2.11.7.xml" searched="false" origin-is-local="false" origin-location="https://jcenter.bintray.com/org/scala-lang/scala-reflect/2.11.7/scala-reflect-2.11.7.pom"/>
 				<caller organisation="org.scala-lang" name="scala-compiler" conf="default, optional, compile, runtime, master" rev="2.11.7" rev-constraint-default="2.11.7" rev-constraint-dynamic="2.11.7" callerrev="2.11.7"/>
@@ -70,7 +70,7 @@
 			</revision>
 		</module>
 		<module organisation="org.scala-lang" name="scala-library">
-			<revision name="2.11.7" status="release" pubdate="20150912154602" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.scala-lang.org/" extra-info.apiURL="http://www.scala-lang.org/api/2.11.7/" downloaded="false" searched="false" default="false" conf="default, optional, compile, compile(*), runtime, runtime(*), master(compile), optional(default), master" position="1">
+			<revision name="2.11.7" status="release" pubdate="20150803190311" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.scala-lang.org/" extra-info.apiURL="http://www.scala-lang.org/api/2.11.7/" downloaded="false" searched="false" default="false" conf="default, optional, compile, compile(*), runtime, runtime(*), master(compile), optional(default), master" position="1">
 				<license name="BSD 3-Clause" url="http://www.scala-lang.org/license.html"/>
 				<metadata-artifact status="no" details="" size="2653" time="0" location="/home/alexeyche/.ivy2/cache/org.scala-lang/scala-library/ivy-2.11.7.xml" searched="false" origin-is-local="false" origin-location="https://jcenter.bintray.com/org/scala-lang/scala-library/2.11.7/scala-library-2.11.7.pom"/>
 				<caller organisation="org.scala-lang.modules" name="scala-xml_2.11" conf="compile, runtime" rev="2.11.4" rev-constraint-default="2.11.4" rev-constraint-dynamic="2.11.4" callerrev="1.0.4"/>

@@ -8,8 +8,31 @@
 [0m[[0mdebug[0m] [0m== resolving dependencies sorts#sorts;0.1dev1->com.typesafe.scala-logging#scala-logging_2.11;3.1.0 [compile->default(compile)][0m
 [0m[[0minfo[0m] [0mResolving com.typesafe.scala-logging#scala-logging_2.11;3.1.0 ...[0m
 [0m[[0mdebug[0m] [0msbt-chain: Checking cache for: dependency: com.typesafe.scala-logging#scala-logging_2.11;3.1.0 {compile=[default(compile)]}[0m
-[0m[[0mdebug[0m] [0msbt-chain: module revision found in cache: com.typesafe.scala-logging#scala-logging_2.11;3.1.0[0m
-[0m[[0mdebug[0m] [0m	found com.typesafe.scala-logging#scala-logging_2.11;3.1.0 in sbt-chain[0m
+[0m[[0minfo[0m] [0mResolving com.typesafe.scala-logging#scala-logging_2.11;3.1.0 ...[0m
+[0m[[0mdebug[0m] [0msbt-chain-delegate: Checking cache for: dependency: com.typesafe.scala-logging#scala-logging_2.11;3.1.0 {compile=[default(compile)]}[0m
+[0m[[0mdebug[0m] [0m		tried https://repo.typesafe.com/typesafe/ivy-releases/com.typesafe.scala-logging/scala-logging_2.11/3.1.0/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0mCLIENT ERROR: Not Found url=https://repo.typesafe.com/typesafe/ivy-releases/com.typesafe.scala-logging/scala-logging_2.11/3.1.0/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0m	typesafe-ivy-releases: no ivy file found for com.typesafe.scala-logging#scala-logging_2.11;3.1.0[0m
+[0m[[0mdebug[0m] [0m		tried https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/com.typesafe.scala-logging/scala-logging_2.11/3.1.0/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0mCLIENT ERROR: Not Found url=https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/com.typesafe.scala-logging/scala-logging_2.11/3.1.0/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0m	sbt-plugin-releases: no ivy file found for com.typesafe.scala-logging#scala-logging_2.11;3.1.0[0m
+[0m[[0mdebug[0m] [0m		tried /home/alexeyche/.ivy2/local/com.typesafe.scala-logging/scala-logging_2.11/3.1.0/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0m	local: no ivy file found for com.typesafe.scala-logging#scala-logging_2.11;3.1.0[0m
+[0m[[0mdebug[0m] [0m		tried https://jcenter.bintray.com/com/typesafe/scala-logging/scala-logging_2.11/3.1.0/scala-logging_2.11-3.1.0.pom[0m
+[0m[[0mdebug[0m] [0m	jcenter: found md file for com.typesafe.scala-logging#scala-logging_2.11;3.1.0[0m
+[0m[[0mdebug[0m] [0m		=> https://jcenter.bintray.com/com/typesafe/scala-logging/scala-logging_2.11/3.1.0/scala-logging_2.11-3.1.0.pom (3.1.0)[0m
+[0m[[0mdebug[0m] [0mdownloading https://jcenter.bintray.com/com/typesafe/scala-logging/scala-logging_2.11/3.1.0/scala-logging_2.11-3.1.0.pom ...[0m
+[0m[[0mdebug[0m] [0m	jcenter: downloading https://jcenter.bintray.com/com/typesafe/scala-logging/scala-logging_2.11/3.1.0/scala-logging_2.11-3.1.0.pom[0m
+[0m[[0mdebug[0m] [0m	jcenter: downloading https://jcenter.bintray.com/com/typesafe/scala-logging/scala-logging_2.11/3.1.0/scala-logging_2.11-3.1.0.pom.sha1[0m
+[0m[[0mdebug[0m] [0msha1 OK for https://jcenter.bintray.com/com/typesafe/scala-logging/scala-logging_2.11/3.1.0/scala-logging_2.11-3.1.0.pom[0m
+[0m[[0mdebug[0m] [0m	[SUCCESSFUL ] com.typesafe.scala-logging#scala-logging_2.11;3.1.0!scala-logging_2.11.pom(pom.original) (276ms)[0m
+[0m[[0mdebug[0m] [0m		tried https://repo.typesafe.com/typesafe/ivy-releases/com.typesafe.scala-logging/scala-logging_2.11/3.1.0/jars/scala-logging_2.11.jar[0m
+[0m[[0mdebug[0m] [0mCLIENT ERROR: Not Found url=https://repo.typesafe.com/typesafe/ivy-releases/com.typesafe.scala-logging/scala-logging_2.11/3.1.0/jars/scala-logging_2.11.jar[0m
+[0m[[0mdebug[0m] [0m		tried https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/com.typesafe.scala-logging/scala-logging_2.11/3.1.0/jars/scala-logging_2.11.jar[0m
+[0m[[0mdebug[0m] [0mCLIENT ERROR: Not Found url=https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/com.typesafe.scala-logging/scala-logging_2.11/3.1.0/jars/scala-logging_2.11.jar[0m
+[0m[[0mdebug[0m] [0m		tried /home/alexeyche/.ivy2/local/com.typesafe.scala-logging/scala-logging_2.11/3.1.0/jars/scala-logging_2.11.jar[0m
+[0m[[0mdebug[0m] [0m		tried https://jcenter.bintray.com/com/typesafe/scala-logging/scala-logging_2.11/3.1.0/scala-logging_2.11-3.1.0.jar[0m
+[0m[[0mdebug[0m] [0m	found com.typesafe.scala-logging#scala-logging_2.11;3.1.0 in jcenter[0m
 [0m[[0mdebug[0m] [0m== resolving dependencies sorts#sorts;0.1dev1->com.typesafe.scala-logging#scala-logging_2.11;3.1.0 [compile->runtime][0m
 [0m[[0mdebug[0m] [0m== resolving dependencies sorts#sorts;0.1dev1->com.typesafe.scala-logging#scala-logging_2.11;3.1.0 [compile->compile][0m
 [0m[[0mdebug[0m] [0mdependency descriptor has been mediated: dependency: org.scala-lang#scala-library;2.11.1 {compile=[compile(*), master(compile)], runtime=[runtime(*)]} => dependency: org.scala-lang#scala-library;2.11.7 {compile=[compile(*), master(compile)], runtime=[runtime(*)]}[0m
@@ -27,8 +50,31 @@
 [0m[[0mdebug[0m] [0mdependency descriptor has been mediated: dependency: org.scala-lang#scala-reflect;2.11.1 {compile=[compile(*), master(compile)], runtime=[runtime(*)]} => dependency: org.scala-lang#scala-reflect;2.11.7 {compile=[compile(*), master(compile)], runtime=[runtime(*)]}[0m
 [0m[[0minfo[0m] [0mResolving org.scala-lang#scala-library;2.11.7 ...[0m
 [0m[[0mdebug[0m] [0msbt-chain: Checking cache for: dependency: org.scala-lang#scala-library;2.11.7 {compile=[compile(*), master(compile)], runtime=[runtime(*)]}[0m
-[0m[[0mdebug[0m] [0msbt-chain: module revision found in cache: org.scala-lang#scala-library;2.11.7[0m
-[0m[[0mdebug[0m] [0m	found org.scala-lang#scala-library;2.11.7 in sbt-chain[0m
+[0m[[0minfo[0m] [0mResolving org.scala-lang#scala-library;2.11.7 ...[0m
+[0m[[0mdebug[0m] [0msbt-chain-delegate: Checking cache for: dependency: org.scala-lang#scala-library;2.11.7 {compile=[compile(*), master(compile)], runtime=[runtime(*)]}[0m
+[0m[[0mdebug[0m] [0m		tried https://repo.typesafe.com/typesafe/ivy-releases/org.scala-lang/scala-library/2.11.7/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0mCLIENT ERROR: Not Found url=https://repo.typesafe.com/typesafe/ivy-releases/org.scala-lang/scala-library/2.11.7/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0m	typesafe-ivy-releases: no ivy file found for org.scala-lang#scala-library;2.11.7[0m
+[0m[[0mdebug[0m] [0m		tried https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/org.scala-lang/scala-library/2.11.7/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0mCLIENT ERROR: Not Found url=https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/org.scala-lang/scala-library/2.11.7/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0m	sbt-plugin-releases: no ivy file found for org.scala-lang#scala-library;2.11.7[0m
+[0m[[0mdebug[0m] [0m		tried /home/alexeyche/.ivy2/local/org.scala-lang/scala-library/2.11.7/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0m	local: no ivy file found for org.scala-lang#scala-library;2.11.7[0m
+[0m[[0mdebug[0m] [0m		tried https://jcenter.bintray.com/org/scala-lang/scala-library/2.11.7/scala-library-2.11.7.pom[0m
+[0m[[0mdebug[0m] [0m	jcenter: found md file for org.scala-lang#scala-library;2.11.7[0m
+[0m[[0mdebug[0m] [0m		=> https://jcenter.bintray.com/org/scala-lang/scala-library/2.11.7/scala-library-2.11.7.pom (2.11.7)[0m
+[0m[[0mdebug[0m] [0mdownloading https://jcenter.bintray.com/org/scala-lang/scala-library/2.11.7/scala-library-2.11.7.pom ...[0m
+[0m[[0mdebug[0m] [0m	jcenter: downloading https://jcenter.bintray.com/org/scala-lang/scala-library/2.11.7/scala-library-2.11.7.pom[0m
+[0m[[0mdebug[0m] [0m	jcenter: downloading https://jcenter.bintray.com/org/scala-lang/scala-library/2.11.7/scala-library-2.11.7.pom.sha1[0m
+[0m[[0mdebug[0m] [0msha1 OK for https://jcenter.bintray.com/org/scala-lang/scala-library/2.11.7/scala-library-2.11.7.pom[0m
+[0m[[0mdebug[0m] [0m	[SUCCESSFUL ] org.scala-lang#scala-library;2.11.7!scala-library.pom(pom.original) (360ms)[0m
+[0m[[0mdebug[0m] [0m		tried https://repo.typesafe.com/typesafe/ivy-releases/org.scala-lang/scala-library/2.11.7/jars/scala-library.jar[0m
+[0m[[0mdebug[0m] [0mCLIENT ERROR: Not Found url=https://repo.typesafe.com/typesafe/ivy-releases/org.scala-lang/scala-library/2.11.7/jars/scala-library.jar[0m
+[0m[[0mdebug[0m] [0m		tried https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/org.scala-lang/scala-library/2.11.7/jars/scala-library.jar[0m
+[0m[[0mdebug[0m] [0mCLIENT ERROR: Not Found url=https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/org.scala-lang/scala-library/2.11.7/jars/scala-library.jar[0m
+[0m[[0mdebug[0m] [0m		tried /home/alexeyche/.ivy2/local/org.scala-lang/scala-library/2.11.7/jars/scala-library.jar[0m
+[0m[[0mdebug[0m] [0m		tried https://jcenter.bintray.com/org/scala-lang/scala-library/2.11.7/scala-library-2.11.7.jar[0m
+[0m[[0mdebug[0m] [0m	found org.scala-lang#scala-library;2.11.7 in jcenter[0m
 [0m[[0mdebug[0m] [0m	[2.11.7] org.scala-lang#scala-library;2.11.7[0m
 [0m[[0mdebug[0m] [0m== resolving dependencies com.typesafe.scala-logging#scala-logging_2.11;3.1.0->org.scala-lang#scala-library;2.11.7 [compile->master(compile)][0m
 [0m[[0mdebug[0m] [0m== resolving dependencies com.typesafe.scala-logging#scala-logging_2.11;3.1.0->org.scala-lang#scala-library;2.11.7 [compile->runtime(*)][0m
@@ -46,8 +92,31 @@
 [0m[[0mdebug[0m] [0mdependency descriptor has been mediated: dependency: org.scala-lang#scala-reflect;2.11.1 {compile=[compile(*), master(compile)], runtime=[runtime(*)]} => dependency: org.scala-lang#scala-reflect;2.11.7 {compile=[compile(*), master(compile)], runtime=[runtime(*)]}[0m
 [0m[[0minfo[0m] [0mResolving org.scala-lang#scala-reflect;2.11.7 ...[0m
 [0m[[0mdebug[0m] [0msbt-chain: Checking cache for: dependency: org.scala-lang#scala-reflect;2.11.7 {compile=[compile(*), master(compile)], runtime=[runtime(*)]}[0m
-[0m[[0mdebug[0m] [0msbt-chain: module revision found in cache: org.scala-lang#scala-reflect;2.11.7[0m
-[0m[[0mdebug[0m] [0m	found org.scala-lang#scala-reflect;2.11.7 in sbt-chain[0m
+[0m[[0minfo[0m] [0mResolving org.scala-lang#scala-reflect;2.11.7 ...[0m
+[0m[[0mdebug[0m] [0msbt-chain-delegate: Checking cache for: dependency: org.scala-lang#scala-reflect;2.11.7 {compile=[compile(*), master(compile)], runtime=[runtime(*)]}[0m
+[0m[[0mdebug[0m] [0m		tried https://repo.typesafe.com/typesafe/ivy-releases/org.scala-lang/scala-reflect/2.11.7/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0mCLIENT ERROR: Not Found url=https://repo.typesafe.com/typesafe/ivy-releases/org.scala-lang/scala-reflect/2.11.7/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0m	typesafe-ivy-releases: no ivy file found for org.scala-lang#scala-reflect;2.11.7[0m
+[0m[[0mdebug[0m] [0m		tried https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/org.scala-lang/scala-reflect/2.11.7/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0mCLIENT ERROR: Not Found url=https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/org.scala-lang/scala-reflect/2.11.7/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0m	sbt-plugin-releases: no ivy file found for org.scala-lang#scala-reflect;2.11.7[0m
+[0m[[0mdebug[0m] [0m		tried /home/alexeyche/.ivy2/local/org.scala-lang/scala-reflect/2.11.7/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0m	local: no ivy file found for org.scala-lang#scala-reflect;2.11.7[0m
+[0m[[0mdebug[0m] [0m		tried https://jcenter.bintray.com/org/scala-lang/scala-reflect/2.11.7/scala-reflect-2.11.7.pom[0m
+[0m[[0mdebug[0m] [0m	jcenter: found md file for org.scala-lang#scala-reflect;2.11.7[0m
+[0m[[0mdebug[0m] [0m		=> https://jcenter.bintray.com/org/scala-lang/scala-reflect/2.11.7/scala-reflect-2.11.7.pom (2.11.7)[0m
+[0m[[0mdebug[0m] [0mdownloading https://jcenter.bintray.com/org/scala-lang/scala-reflect/2.11.7/scala-reflect-2.11.7.pom ...[0m
+[0m[[0mdebug[0m] [0m	jcenter: downloading https://jcenter.bintray.com/org/scala-lang/scala-reflect/2.11.7/scala-reflect-2.11.7.pom[0m
+[0m[[0mdebug[0m] [0m	jcenter: downloading https://jcenter.bintray.com/org/scala-lang/scala-reflect/2.11.7/scala-reflect-2.11.7.pom.sha1[0m
+[0m[[0mdebug[0m] [0msha1 OK for https://jcenter.bintray.com/org/scala-lang/scala-reflect/2.11.7/scala-reflect-2.11.7.pom[0m
+[0m[[0mdebug[0m] [0m	[SUCCESSFUL ] org.scala-lang#scala-reflect;2.11.7!scala-reflect.pom(pom.original) (253ms)[0m
+[0m[[0mdebug[0m] [0m		tried https://repo.typesafe.com/typesafe/ivy-releases/org.scala-lang/scala-reflect/2.11.7/jars/scala-reflect.jar[0m
+[0m[[0mdebug[0m] [0mCLIENT ERROR: Not Found url=https://repo.typesafe.com/typesafe/ivy-releases/org.scala-lang/scala-reflect/2.11.7/jars/scala-reflect.jar[0m
+[0m[[0mdebug[0m] [0m		tried https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/org.scala-lang/scala-reflect/2.11.7/jars/scala-reflect.jar[0m
+[0m[[0mdebug[0m] [0mCLIENT ERROR: Not Found url=https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/org.scala-lang/scala-reflect/2.11.7/jars/scala-reflect.jar[0m
+[0m[[0mdebug[0m] [0m		tried /home/alexeyche/.ivy2/local/org.scala-lang/scala-reflect/2.11.7/jars/scala-reflect.jar[0m
+[0m[[0mdebug[0m] [0m		tried https://jcenter.bintray.com/org/scala-lang/scala-reflect/2.11.7/scala-reflect-2.11.7.jar[0m
+[0m[[0mdebug[0m] [0m	found org.scala-lang#scala-reflect;2.11.7 in jcenter[0m
 [0m[[0mdebug[0m] [0m	[2.11.7] org.scala-lang#scala-reflect;2.11.7[0m
 [0m[[0mdebug[0m] [0m== resolving dependencies org.scala-lang#scala-reflect;2.11.7->org.scala-lang#scala-library;2.11.7 [compile->compile(*)][0m
 [0m[[0mdebug[0m] [0m== resolving dependencies org.scala-lang#scala-reflect;2.11.7->org.scala-lang#scala-library;2.11.7 [compile->master(compile)][0m
@@ -69,8 +138,59 @@
 [0m[[0mdebug[0m] [0mdependency descriptor has been mediated: dependency: org.scala-lang#scala-reflect;2.11.1 {compile=[compile(*), master(compile)], runtime=[runtime(*)]} => dependency: org.scala-lang#scala-reflect;2.11.7 {compile=[compile(*), master(compile)], runtime=[runtime(*)]}[0m
 [0m[[0minfo[0m] [0mResolving org.slf4j#slf4j-api;1.7.7 ...[0m
 [0m[[0mdebug[0m] [0msbt-chain: Checking cache for: dependency: org.slf4j#slf4j-api;1.7.7 {compile=[compile(*), master(compile)], runtime=[runtime(*)]}[0m
-[0m[[0mdebug[0m] [0msbt-chain: module revision found in cache: org.slf4j#slf4j-api;1.7.7[0m
-[0m[[0mdebug[0m] [0m	found org.slf4j#slf4j-api;1.7.7 in sbt-chain[0m
+[0m[[0minfo[0m] [0mResolving org.slf4j#slf4j-api;1.7.7 ...[0m
+[0m[[0mdebug[0m] [0msbt-chain-delegate: Checking cache for: dependency: org.slf4j#slf4j-api;1.7.7 {compile=[compile(*), master(compile)], runtime=[runtime(*)]}[0m
+[0m[[0mdebug[0m] [0m		tried https://repo.typesafe.com/typesafe/ivy-releases/org.slf4j/slf4j-api/1.7.7/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0mCLIENT ERROR: Not Found url=https://repo.typesafe.com/typesafe/ivy-releases/org.slf4j/slf4j-api/1.7.7/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0m	typesafe-ivy-releases: no ivy file found for org.slf4j#slf4j-api;1.7.7[0m
+[0m[[0mdebug[0m] [0m		tried https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/org.slf4j/slf4j-api/1.7.7/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0mCLIENT ERROR: Not Found url=https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/org.slf4j/slf4j-api/1.7.7/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0m	sbt-plugin-releases: no ivy file found for org.slf4j#slf4j-api;1.7.7[0m
+[0m[[0mdebug[0m] [0m		tried /home/alexeyche/.ivy2/local/org.slf4j/slf4j-api/1.7.7/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0m	local: no ivy file found for org.slf4j#slf4j-api;1.7.7[0m
+[0m[[0mdebug[0m] [0m		tried https://jcenter.bintray.com/org/slf4j/slf4j-api/1.7.7/slf4j-api-1.7.7.pom[0m
+[0m[[0mdebug[0m] [0m	jcenter: found md file for org.slf4j#slf4j-api;1.7.7[0m
+[0m[[0mdebug[0m] [0m		=> https://jcenter.bintray.com/org/slf4j/slf4j-api/1.7.7/slf4j-api-1.7.7.pom (1.7.7)[0m
+[0m[[0mdebug[0m] [0mdownloading https://jcenter.bintray.com/org/slf4j/slf4j-api/1.7.7/slf4j-api-1.7.7.pom ...[0m
+[0m[[0mdebug[0m] [0m	jcenter: downloading https://jcenter.bintray.com/org/slf4j/slf4j-api/1.7.7/slf4j-api-1.7.7.pom[0m
+[0m[[0mdebug[0m] [0m	jcenter: downloading https://jcenter.bintray.com/org/slf4j/slf4j-api/1.7.7/slf4j-api-1.7.7.pom.sha1[0m
+[0m[[0mdebug[0m] [0msha1 OK for https://jcenter.bintray.com/org/slf4j/slf4j-api/1.7.7/slf4j-api-1.7.7.pom[0m
+[0m[[0mdebug[0m] [0m	[SUCCESSFUL ] org.slf4j#slf4j-api;1.7.7!slf4j-api.pom(pom.original) (252ms)[0m
+[0m[[0minfo[0m] [0mResolving org.slf4j#slf4j-parent;1.7.7 ...[0m
+[0m[[0mdebug[0m] [0msbt-chain: Checking cache for: dependency: org.slf4j#slf4j-parent;1.7.7 {}[0m
+[0m[[0minfo[0m] [0mResolving org.slf4j#slf4j-parent;1.7.7 ...[0m
+[0m[[0mdebug[0m] [0msbt-chain-delegate: Checking cache for: dependency: org.slf4j#slf4j-parent;1.7.7 {}[0m
+[0m[[0mdebug[0m] [0m		tried https://repo.typesafe.com/typesafe/ivy-releases/org.slf4j/slf4j-parent/1.7.7/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0mCLIENT ERROR: Not Found url=https://repo.typesafe.com/typesafe/ivy-releases/org.slf4j/slf4j-parent/1.7.7/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0m	typesafe-ivy-releases: no ivy file found for org.slf4j#slf4j-parent;1.7.7[0m
+[0m[[0mdebug[0m] [0m		tried https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/org.slf4j/slf4j-parent/1.7.7/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0mCLIENT ERROR: Not Found url=https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/org.slf4j/slf4j-parent/1.7.7/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0m	sbt-plugin-releases: no ivy file found for org.slf4j#slf4j-parent;1.7.7[0m
+[0m[[0mdebug[0m] [0m		tried /home/alexeyche/.ivy2/local/org.slf4j/slf4j-parent/1.7.7/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0m	local: no ivy file found for org.slf4j#slf4j-parent;1.7.7[0m
+[0m[[0mdebug[0m] [0m		tried https://jcenter.bintray.com/org/slf4j/slf4j-parent/1.7.7/slf4j-parent-1.7.7.pom[0m
+[0m[[0mdebug[0m] [0m	jcenter: found md file for org.slf4j#slf4j-parent;1.7.7[0m
+[0m[[0mdebug[0m] [0m		=> https://jcenter.bintray.com/org/slf4j/slf4j-parent/1.7.7/slf4j-parent-1.7.7.pom (1.7.7)[0m
+[0m[[0mdebug[0m] [0mdownloading https://jcenter.bintray.com/org/slf4j/slf4j-parent/1.7.7/slf4j-parent-1.7.7.pom ...[0m
+[0m[[0mdebug[0m] [0m	jcenter: downloading https://jcenter.bintray.com/org/slf4j/slf4j-parent/1.7.7/slf4j-parent-1.7.7.pom[0m
+[0m[[0mdebug[0m] [0m	jcenter: downloading https://jcenter.bintray.com/org/slf4j/slf4j-parent/1.7.7/slf4j-parent-1.7.7.pom.sha1[0m
+[0m[[0mdebug[0m] [0msha1 OK for https://jcenter.bintray.com/org/slf4j/slf4j-parent/1.7.7/slf4j-parent-1.7.7.pom[0m
+[0m[[0mdebug[0m] [0m	[SUCCESSFUL ] org.slf4j#slf4j-parent;1.7.7!slf4j-parent.pom(pom.original) (257ms)[0m
+[0m[[0mdebug[0m] [0m		tried https://repo.typesafe.com/typesafe/ivy-releases/org.slf4j/slf4j-parent/1.7.7/jars/slf4j-parent.jar[0m
+[0m[[0mdebug[0m] [0mCLIENT ERROR: Not Found url=https://repo.typesafe.com/typesafe/ivy-releases/org.slf4j/slf4j-parent/1.7.7/jars/slf4j-parent.jar[0m
+[0m[[0mdebug[0m] [0m		tried https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/org.slf4j/slf4j-parent/1.7.7/jars/slf4j-parent.jar[0m
+[0m[[0mdebug[0m] [0mCLIENT ERROR: Not Found url=https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/org.slf4j/slf4j-parent/1.7.7/jars/slf4j-parent.jar[0m
+[0m[[0mdebug[0m] [0m		tried /home/alexeyche/.ivy2/local/org.slf4j/slf4j-parent/1.7.7/jars/slf4j-parent.jar[0m
+[0m[[0mdebug[0m] [0m		tried https://jcenter.bintray.com/org/slf4j/slf4j-parent/1.7.7/slf4j-parent-1.7.7.jar[0m
+[0m[[0mdebug[0m] [0m		tried https://repo1.maven.org/maven2/org/slf4j/slf4j-parent/1.7.7/slf4j-parent-1.7.7.jar[0m
+[0m[[0mdebug[0m] [0mCLIENT ERROR: Not Found url=https://repo1.maven.org/maven2/org/slf4j/slf4j-parent/1.7.7/slf4j-parent-1.7.7.jar[0m
+[0m[[0mdebug[0m] [0m		tried https://repo.typesafe.com/typesafe/ivy-releases/org.slf4j/slf4j-api/1.7.7/jars/slf4j-api.jar[0m
+[0m[[0mdebug[0m] [0mCLIENT ERROR: Not Found url=https://repo.typesafe.com/typesafe/ivy-releases/org.slf4j/slf4j-api/1.7.7/jars/slf4j-api.jar[0m
+[0m[[0mdebug[0m] [0m		tried https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/org.slf4j/slf4j-api/1.7.7/jars/slf4j-api.jar[0m
+[0m[[0mdebug[0m] [0mCLIENT ERROR: Not Found url=https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/org.slf4j/slf4j-api/1.7.7/jars/slf4j-api.jar[0m
+[0m[[0mdebug[0m] [0m		tried /home/alexeyche/.ivy2/local/org.slf4j/slf4j-api/1.7.7/jars/slf4j-api.jar[0m
+[0m[[0mdebug[0m] [0m		tried https://jcenter.bintray.com/org/slf4j/slf4j-api/1.7.7/slf4j-api-1.7.7.jar[0m
+[0m[[0mdebug[0m] [0m	found org.slf4j#slf4j-api;1.7.7 in jcenter[0m
 [0m[[0mdebug[0m] [0m== resolving dependencies com.typesafe.scala-logging#scala-logging_2.11;3.1.0->org.slf4j#slf4j-api;1.7.7 [compile->master(compile)][0m
 [0m[[0mdebug[0m] [0m== resolving dependencies com.typesafe.scala-logging#scala-logging_2.11;3.1.0->org.slf4j#slf4j-api;1.7.7 [compile->runtime(*)][0m
 [0m[[0mdebug[0m] [0m== resolving dependencies com.typesafe.scala-logging#scala-logging_2.11;3.1.0->org.slf4j#slf4j-api;1.7.7 [compile->compile][0m
@@ -90,15 +210,92 @@
 [0m[[0mdebug[0m] [0m== resolving dependencies sorts#sorts;0.1dev1->ch.qos.logback#logback-classic;1.1.2 [compile->default(compile)][0m
 [0m[[0minfo[0m] [0mResolving ch.qos.logback#logback-classic;1.1.2 ...[0m
 [0m[[0mdebug[0m] [0msbt-chain: Checking cache for: dependency: ch.qos.logback#logback-classic;1.1.2 {compile=[default(compile)]}[0m
-[0m[[0mdebug[0m] [0msbt-chain: module revision found in cache: ch.qos.logback#logback-classic;1.1.2[0m
-[0m[[0mdebug[0m] [0m	found ch.qos.logback#logback-classic;1.1.2 in sbt-chain[0m
+[0m[[0minfo[0m] [0mResolving ch.qos.logback#logback-classic;1.1.2 ...[0m
+[0m[[0mdebug[0m] [0msbt-chain-delegate: Checking cache for: dependency: ch.qos.logback#logback-classic;1.1.2 {compile=[default(compile)]}[0m
+[0m[[0mdebug[0m] [0m		tried https://repo.typesafe.com/typesafe/ivy-releases/ch.qos.logback/logback-classic/1.1.2/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0mCLIENT ERROR: Not Found url=https://repo.typesafe.com/typesafe/ivy-releases/ch.qos.logback/logback-classic/1.1.2/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0m	typesafe-ivy-releases: no ivy file found for ch.qos.logback#logback-classic;1.1.2[0m
+[0m[[0mdebug[0m] [0m		tried https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/ch.qos.logback/logback-classic/1.1.2/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0mCLIENT ERROR: Not Found url=https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/ch.qos.logback/logback-classic/1.1.2/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0m	sbt-plugin-releases: no ivy file found for ch.qos.logback#logback-classic;1.1.2[0m
+[0m[[0mdebug[0m] [0m		tried /home/alexeyche/.ivy2/local/ch.qos.logback/logback-classic/1.1.2/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0m	local: no ivy file found for ch.qos.logback#logback-classic;1.1.2[0m
+[0m[[0mdebug[0m] [0m		tried https://jcenter.bintray.com/ch/qos/logback/logback-classic/1.1.2/logback-classic-1.1.2.pom[0m
+[0m[[0mdebug[0m] [0m	jcenter: found md file for ch.qos.logback#logback-classic;1.1.2[0m
+[0m[[0mdebug[0m] [0m		=> https://jcenter.bintray.com/ch/qos/logback/logback-classic/1.1.2/logback-classic-1.1.2.pom (1.1.2)[0m
+[0m[[0mdebug[0m] [0mdownloading https://jcenter.bintray.com/ch/qos/logback/logback-classic/1.1.2/logback-classic-1.1.2.pom ...[0m
+[0m[[0mdebug[0m] [0m	jcenter: downloading https://jcenter.bintray.com/ch/qos/logback/logback-classic/1.1.2/logback-classic-1.1.2.pom[0m
+[0m[[0mdebug[0m] [0m	jcenter: downloading https://jcenter.bintray.com/ch/qos/logback/logback-classic/1.1.2/logback-classic-1.1.2.pom.sha1[0m
+[0m[[0mdebug[0m] [0msha1 OK for https://jcenter.bintray.com/ch/qos/logback/logback-classic/1.1.2/logback-classic-1.1.2.pom[0m
+[0m[[0mdebug[0m] [0m	[SUCCESSFUL ] ch.qos.logback#logback-classic;1.1.2!logback-classic.pom(pom.original) (302ms)[0m
+[0m[[0minfo[0m] [0mResolving ch.qos.logback#logback-parent;1.1.2 ...[0m
+[0m[[0mdebug[0m] [0msbt-chain: Checking cache for: dependency: ch.qos.logback#logback-parent;1.1.2 {}[0m
+[0m[[0minfo[0m] [0mResolving ch.qos.logback#logback-parent;1.1.2 ...[0m
+[0m[[0mdebug[0m] [0msbt-chain-delegate: Checking cache for: dependency: ch.qos.logback#logback-parent;1.1.2 {}[0m
+[0m[[0mdebug[0m] [0m		tried https://repo.typesafe.com/typesafe/ivy-releases/ch.qos.logback/logback-parent/1.1.2/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0mCLIENT ERROR: Not Found url=https://repo.typesafe.com/typesafe/ivy-releases/ch.qos.logback/logback-parent/1.1.2/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0m	typesafe-ivy-releases: no ivy file found for ch.qos.logback#logback-parent;1.1.2[0m
+[0m[[0mdebug[0m] [0m		tried https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/ch.qos.logback/logback-parent/1.1.2/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0mCLIENT ERROR: Not Found url=https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/ch.qos.logback/logback-parent/1.1.2/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0m	sbt-plugin-releases: no ivy file found for ch.qos.logback#logback-parent;1.1.2[0m
+[0m[[0mdebug[0m] [0m		tried /home/alexeyche/.ivy2/local/ch.qos.logback/logback-parent/1.1.2/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0m	local: no ivy file found for ch.qos.logback#logback-parent;1.1.2[0m
+[0m[[0mdebug[0m] [0m		tried https://jcenter.bintray.com/ch/qos/logback/logback-parent/1.1.2/logback-parent-1.1.2.pom[0m
+[0m[[0mdebug[0m] [0m	jcenter: found md file for ch.qos.logback#logback-parent;1.1.2[0m
+[0m[[0mdebug[0m] [0m		=> https://jcenter.bintray.com/ch/qos/logback/logback-parent/1.1.2/logback-parent-1.1.2.pom (1.1.2)[0m
+[0m[[0mdebug[0m] [0mdownloading https://jcenter.bintray.com/ch/qos/logback/logback-parent/1.1.2/logback-parent-1.1.2.pom ...[0m
+[0m[[0mdebug[0m] [0m	jcenter: downloading https://jcenter.bintray.com/ch/qos/logback/logback-parent/1.1.2/logback-parent-1.1.2.pom[0m
+[0m[[0mdebug[0m] [0m	jcenter: downloading https://jcenter.bintray.com/ch/qos/logback/logback-parent/1.1.2/logback-parent-1.1.2.pom.sha1[0m
+[0m[[0mdebug[0m] [0msha1 OK for https://jcenter.bintray.com/ch/qos/logback/logback-parent/1.1.2/logback-parent-1.1.2.pom[0m
+[0m[[0mdebug[0m] [0m	[SUCCESSFUL ] ch.qos.logback#logback-parent;1.1.2!logback-parent.pom(pom.original) (332ms)[0m
+[0m[[0mdebug[0m] [0m		tried https://repo.typesafe.com/typesafe/ivy-releases/ch.qos.logback/logback-parent/1.1.2/jars/logback-parent.jar[0m
+[0m[[0mdebug[0m] [0mCLIENT ERROR: Not Found url=https://repo.typesafe.com/typesafe/ivy-releases/ch.qos.logback/logback-parent/1.1.2/jars/logback-parent.jar[0m
+[0m[[0mdebug[0m] [0m		tried https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/ch.qos.logback/logback-parent/1.1.2/jars/logback-parent.jar[0m
+[0m[[0mdebug[0m] [0mCLIENT ERROR: Not Found url=https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/ch.qos.logback/logback-parent/1.1.2/jars/logback-parent.jar[0m
+[0m[[0mdebug[0m] [0m		tried /home/alexeyche/.ivy2/local/ch.qos.logback/logback-parent/1.1.2/jars/logback-parent.jar[0m
+[0m[[0mdebug[0m] [0m		tried https://jcenter.bintray.com/ch/qos/logback/logback-parent/1.1.2/logback-parent-1.1.2.jar[0m
+[0m[[0mdebug[0m] [0m		tried https://repo1.maven.org/maven2/ch/qos/logback/logback-parent/1.1.2/logback-parent-1.1.2.jar[0m
+[0m[[0mdebug[0m] [0mCLIENT ERROR: Not Found url=https://repo1.maven.org/maven2/ch/qos/logback/logback-parent/1.1.2/logback-parent-1.1.2.jar[0m
+[0m[[0mdebug[0m] [0m		tried https://repo.typesafe.com/typesafe/ivy-releases/ch.qos.logback/logback-classic/1.1.2/jars/logback-classic.jar[0m
+[0m[[0mdebug[0m] [0mCLIENT ERROR: Not Found url=https://repo.typesafe.com/typesafe/ivy-releases/ch.qos.logback/logback-classic/1.1.2/jars/logback-classic.jar[0m
+[0m[[0mdebug[0m] [0m		tried https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/ch.qos.logback/logback-classic/1.1.2/jars/logback-classic.jar[0m
+[0m[[0mdebug[0m] [0mCLIENT ERROR: Not Found url=https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/ch.qos.logback/logback-classic/1.1.2/jars/logback-classic.jar[0m
+[0m[[0mdebug[0m] [0m		tried /home/alexeyche/.ivy2/local/ch.qos.logback/logback-classic/1.1.2/jars/logback-classic.jar[0m
+[0m[[0mdebug[0m] [0m		tried https://jcenter.bintray.com/ch/qos/logback/logback-classic/1.1.2/logback-classic-1.1.2.jar[0m
+[0m[[0mdebug[0m] [0m	found ch.qos.logback#logback-classic;1.1.2 in jcenter[0m
 [0m[[0mdebug[0m] [0m== resolving dependencies sorts#sorts;0.1dev1->ch.qos.logback#logback-classic;1.1.2 [compile->runtime][0m
 [0m[[0mdebug[0m] [0m== resolving dependencies sorts#sorts;0.1dev1->ch.qos.logback#logback-classic;1.1.2 [compile->compile][0m
 [0m[[0mdebug[0m] [0m== resolving dependencies ch.qos.logback#logback-classic;1.1.2->ch.qos.logback#logback-core;1.1.2 [compile->compile(*)][0m
 [0m[[0minfo[0m] [0mResolving ch.qos.logback#logback-core;1.1.2 ...[0m
-[0m[[0mdebug[0m] [0msbt-chain: Checking cache for: dependency: ch.qos.logback#logback-core;1.1.2 {compile=[compile(*), master(compile)], runtime=[runtime(*)], test=[runtime(*), master(compile)]}[0m
-[0m[[0mdebug[0m] [0msbt-chain: module revision found in cache: ch.qos.logback#logback-core;1.1.2[0m
-[0m[[0mdebug[0m] [0m	found ch.qos.logback#logback-core;1.1.2 in sbt-chain[0m
+[0m[[0mdebug[0m] [0msbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@4affb1e8[0m
+[0m[[0minfo[0m] [0mResolving ch.qos.logback#logback-core;1.1.2 ...[0m
+[0m[[0mdebug[0m] [0msbt-chain-delegate: Checking cache for: sbt.ivyint.MergedDescriptors@4affb1e8[0m
+[0m[[0mdebug[0m] [0m		tried https://repo.typesafe.com/typesafe/ivy-releases/ch.qos.logback/logback-core/1.1.2/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0mCLIENT ERROR: Not Found url=https://repo.typesafe.com/typesafe/ivy-releases/ch.qos.logback/logback-core/1.1.2/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0m	typesafe-ivy-releases: no ivy file found for ch.qos.logback#logback-core;1.1.2[0m
+[0m[[0mdebug[0m] [0m		tried https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/ch.qos.logback/logback-core/1.1.2/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0mCLIENT ERROR: Not Found url=https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/ch.qos.logback/logback-core/1.1.2/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0m	sbt-plugin-releases: no ivy file found for ch.qos.logback#logback-core;1.1.2[0m
+[0m[[0mdebug[0m] [0m		tried /home/alexeyche/.ivy2/local/ch.qos.logback/logback-core/1.1.2/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0m	local: no ivy file found for ch.qos.logback#logback-core;1.1.2[0m
+[0m[[0mdebug[0m] [0m		tried https://jcenter.bintray.com/ch/qos/logback/logback-core/1.1.2/logback-core-1.1.2.pom[0m
+[0m[[0mdebug[0m] [0m	jcenter: found md file for ch.qos.logback#logback-core;1.1.2[0m
+[0m[[0mdebug[0m] [0m		=> https://jcenter.bintray.com/ch/qos/logback/logback-core/1.1.2/logback-core-1.1.2.pom (1.1.2)[0m
+[0m[[0mdebug[0m] [0mdownloading https://jcenter.bintray.com/ch/qos/logback/logback-core/1.1.2/logback-core-1.1.2.pom ...[0m
+[0m[[0mdebug[0m] [0m	jcenter: downloading https://jcenter.bintray.com/ch/qos/logback/logback-core/1.1.2/logback-core-1.1.2.pom[0m
+[0m[[0mdebug[0m] [0m	jcenter: downloading https://jcenter.bintray.com/ch/qos/logback/logback-core/1.1.2/logback-core-1.1.2.pom.sha1[0m
+[0m[[0mdebug[0m] [0msha1 OK for https://jcenter.bintray.com/ch/qos/logback/logback-core/1.1.2/logback-core-1.1.2.pom[0m
+[0m[[0mdebug[0m] [0m	[SUCCESSFUL ] ch.qos.logback#logback-core;1.1.2!logback-core.pom(pom.original) (268ms)[0m
+[0m[[0minfo[0m] [0mResolving ch.qos.logback#logback-parent;1.1.2 ...[0m
+[0m[[0mdebug[0m] [0msbt-chain: Checking cache for: dependency: ch.qos.logback#logback-parent;1.1.2 {}[0m
+[0m[[0mdebug[0m] [0msbt-chain: module revision found in cache: ch.qos.logback#logback-parent;1.1.2[0m
+[0m[[0mdebug[0m] [0m		tried https://repo.typesafe.com/typesafe/ivy-releases/ch.qos.logback/logback-core/1.1.2/jars/logback-core.jar[0m
+[0m[[0mdebug[0m] [0mCLIENT ERROR: Not Found url=https://repo.typesafe.com/typesafe/ivy-releases/ch.qos.logback/logback-core/1.1.2/jars/logback-core.jar[0m
+[0m[[0mdebug[0m] [0m		tried https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/ch.qos.logback/logback-core/1.1.2/jars/logback-core.jar[0m
+[0m[[0mdebug[0m] [0mCLIENT ERROR: Not Found url=https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/ch.qos.logback/logback-core/1.1.2/jars/logback-core.jar[0m
+[0m[[0mdebug[0m] [0m		tried /home/alexeyche/.ivy2/local/ch.qos.logback/logback-core/1.1.2/jars/logback-core.jar[0m
+[0m[[0mdebug[0m] [0m		tried https://jcenter.bintray.com/ch/qos/logback/logback-core/1.1.2/logback-core-1.1.2.jar[0m
+[0m[[0mdebug[0m] [0m	found ch.qos.logback#logback-core;1.1.2 in jcenter[0m
 [0m[[0mdebug[0m] [0m== resolving dependencies ch.qos.logback#logback-classic;1.1.2->ch.qos.logback#logback-core;1.1.2 [compile->master(compile)][0m
 [0m[[0mdebug[0m] [0m== resolving dependencies ch.qos.logback#logback-classic;1.1.2->ch.qos.logback#logback-core;1.1.2 [compile->runtime(*)][0m
 [0m[[0mdebug[0m] [0m== resolving dependencies ch.qos.logback#logback-classic;1.1.2->ch.qos.logback#logback-core;1.1.2 [compile->compile][0m
@@ -339,8 +536,31 @@
 [0m[[0mdebug[0m] [0mdependency descriptor has been mediated: dependency: org.scala-lang#scala-library;2.10.5 {compile=[default(compile)]} => dependency: org.scala-lang#scala-library;2.11.7 {compile=[default(compile)]}[0m
 [0m[[0minfo[0m] [0mResolving org.scala-lang#scala-compiler;2.11.7 ...[0m
 [0m[[0mdebug[0m] [0msbt-chain: Checking cache for: dependency: org.scala-lang#scala-compiler;2.11.7 {compile=[default(compile)]}[0m
-[0m[[0mdebug[0m] [0msbt-chain: module revision found in cache: org.scala-lang#scala-compiler;2.11.7[0m
-[0m[[0mdebug[0m] [0m	found org.scala-lang#scala-compiler;2.11.7 in sbt-chain[0m
+[0m[[0minfo[0m] [0mResolving org.scala-lang#scala-compiler;2.11.7 ...[0m
+[0m[[0mdebug[0m] [0msbt-chain-delegate: Checking cache for: dependency: org.scala-lang#scala-compiler;2.11.7 {compile=[default(compile)]}[0m
+[0m[[0mdebug[0m] [0m		tried https://repo.typesafe.com/typesafe/ivy-releases/org.scala-lang/scala-compiler/2.11.7/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0mCLIENT ERROR: Not Found url=https://repo.typesafe.com/typesafe/ivy-releases/org.scala-lang/scala-compiler/2.11.7/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0m	typesafe-ivy-releases: no ivy file found for org.scala-lang#scala-compiler;2.11.7[0m
+[0m[[0mdebug[0m] [0m		tried https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/org.scala-lang/scala-compiler/2.11.7/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0mCLIENT ERROR: Not Found url=https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/org.scala-lang/scala-compiler/2.11.7/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0m	sbt-plugin-releases: no ivy file found for org.scala-lang#scala-compiler;2.11.7[0m
+[0m[[0mdebug[0m] [0m		tried /home/alexeyche/.ivy2/local/org.scala-lang/scala-compiler/2.11.7/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0m	local: no ivy file found for org.scala-lang#scala-compiler;2.11.7[0m
+[0m[[0mdebug[0m] [0m		tried https://jcenter.bintray.com/org/scala-lang/scala-compiler/2.11.7/scala-compiler-2.11.7.pom[0m
+[0m[[0mdebug[0m] [0m	jcenter: found md file for org.scala-lang#scala-compiler;2.11.7[0m
+[0m[[0mdebug[0m] [0m		=> https://jcenter.bintray.com/org/scala-lang/scala-compiler/2.11.7/scala-compiler-2.11.7.pom (2.11.7)[0m
+[0m[[0mdebug[0m] [0mdownloading https://jcenter.bintray.com/org/scala-lang/scala-compiler/2.11.7/scala-compiler-2.11.7.pom ...[0m
+[0m[[0mdebug[0m] [0m	jcenter: downloading https://jcenter.bintray.com/org/scala-lang/scala-compiler/2.11.7/scala-compiler-2.11.7.pom[0m
+[0m[[0mdebug[0m] [0m	jcenter: downloading https://jcenter.bintray.com/org/scala-lang/scala-compiler/2.11.7/scala-compiler-2.11.7.pom.sha1[0m
+[0m[[0mdebug[0m] [0msha1 OK for https://jcenter.bintray.com/org/scala-lang/scala-compiler/2.11.7/scala-compiler-2.11.7.pom[0m
+[0m[[0mdebug[0m] [0m	[SUCCESSFUL ] org.scala-lang#scala-compiler;2.11.7!scala-compiler.pom(pom.original) (239ms)[0m
+[0m[[0mdebug[0m] [0m		tried https://repo.typesafe.com/typesafe/ivy-releases/org.scala-lang/scala-compiler/2.11.7/jars/scala-compiler.jar[0m
+[0m[[0mdebug[0m] [0mCLIENT ERROR: Not Found url=https://repo.typesafe.com/typesafe/ivy-releases/org.scala-lang/scala-compiler/2.11.7/jars/scala-compiler.jar[0m
+[0m[[0mdebug[0m] [0m		tried https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/org.scala-lang/scala-compiler/2.11.7/jars/scala-compiler.jar[0m
+[0m[[0mdebug[0m] [0mCLIENT ERROR: Not Found url=https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/org.scala-lang/scala-compiler/2.11.7/jars/scala-compiler.jar[0m
+[0m[[0mdebug[0m] [0m		tried /home/alexeyche/.ivy2/local/org.scala-lang/scala-compiler/2.11.7/jars/scala-compiler.jar[0m
+[0m[[0mdebug[0m] [0m		tried https://jcenter.bintray.com/org/scala-lang/scala-compiler/2.11.7/scala-compiler-2.11.7.jar[0m
+[0m[[0mdebug[0m] [0m	found org.scala-lang#scala-compiler;2.11.7 in jcenter[0m
 [0m[[0mdebug[0m] [0m== resolving dependencies org.scala-sbt#classpath;0.13.9->org.scala-lang#scala-compiler;2.11.7 [compile->runtime][0m
 [0m[[0mdebug[0m] [0m== resolving dependencies org.scala-sbt#classpath;0.13.9->org.scala-lang#scala-compiler;2.11.7 [compile->compile][0m
 [0m[[0mdebug[0m] [0m== resolving dependencies org.scala-lang#scala-compiler;2.11.7->org.scala-lang#scala-library;2.11.7 [compile->compile(*)][0m
@@ -376,8 +596,31 @@
 [0m[[0mdebug[0m] [0mdependency descriptor has been mediated: dependency: org.scala-lang#scala-library;2.10.5 {compile=[default(compile)]} => dependency: org.scala-lang#scala-library;2.11.7 {compile=[default(compile)]}[0m
 [0m[[0minfo[0m] [0mResolving org.scala-lang.modules#scala-xml_2.11;1.0.4 ...[0m
 [0m[[0mdebug[0m] [0msbt-chain: Checking cache for: dependency: org.scala-lang.modules#scala-xml_2.11;1.0.4 {compile=[compile(*), master(compile)], runtime=[runtime(*)]}[0m
-[0m[[0mdebug[0m] [0msbt-chain: module revision found in cache: org.scala-lang.modules#scala-xml_2.11;1.0.4[0m
-[0m[[0mdebug[0m] [0m	found org.scala-lang.modules#scala-xml_2.11;1.0.4 in sbt-chain[0m
+[0m[[0minfo[0m] [0mResolving org.scala-lang.modules#scala-xml_2.11;1.0.4 ...[0m
+[0m[[0mdebug[0m] [0msbt-chain-delegate: Checking cache for: dependency: org.scala-lang.modules#scala-xml_2.11;1.0.4 {compile=[compile(*), master(compile)], runtime=[runtime(*)]}[0m
+[0m[[0mdebug[0m] [0m		tried https://repo.typesafe.com/typesafe/ivy-releases/org.scala-lang.modules/scala-xml_2.11/1.0.4/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0mCLIENT ERROR: Not Found url=https://repo.typesafe.com/typesafe/ivy-releases/org.scala-lang.modules/scala-xml_2.11/1.0.4/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0m	typesafe-ivy-releases: no ivy file found for org.scala-lang.modules#scala-xml_2.11;1.0.4[0m
+[0m[[0mdebug[0m] [0m		tried https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/org.scala-lang.modules/scala-xml_2.11/1.0.4/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0mCLIENT ERROR: Not Found url=https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/org.scala-lang.modules/scala-xml_2.11/1.0.4/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0m	sbt-plugin-releases: no ivy file found for org.scala-lang.modules#scala-xml_2.11;1.0.4[0m
+[0m[[0mdebug[0m] [0m		tried /home/alexeyche/.ivy2/local/org.scala-lang.modules/scala-xml_2.11/1.0.4/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0m	local: no ivy file found for org.scala-lang.modules#scala-xml_2.11;1.0.4[0m
+[0m[[0mdebug[0m] [0m		tried https://jcenter.bintray.com/org/scala-lang/modules/scala-xml_2.11/1.0.4/scala-xml_2.11-1.0.4.pom[0m
+[0m[[0mdebug[0m] [0m	jcenter: found md file for org.scala-lang.modules#scala-xml_2.11;1.0.4[0m
+[0m[[0mdebug[0m] [0m		=> https://jcenter.bintray.com/org/scala-lang/modules/scala-xml_2.11/1.0.4/scala-xml_2.11-1.0.4.pom (1.0.4)[0m
+[0m[[0mdebug[0m] [0mdownloading https://jcenter.bintray.com/org/scala-lang/modules/scala-xml_2.11/1.0.4/scala-xml_2.11-1.0.4.pom ...[0m
+[0m[[0mdebug[0m] [0m	jcenter: downloading https://jcenter.bintray.com/org/scala-lang/modules/scala-xml_2.11/1.0.4/scala-xml_2.11-1.0.4.pom[0m
+[0m[[0mdebug[0m] [0m	jcenter: downloading https://jcenter.bintray.com/org/scala-lang/modules/scala-xml_2.11/1.0.4/scala-xml_2.11-1.0.4.pom.sha1[0m
+[0m[[0mdebug[0m] [0msha1 OK for https://jcenter.bintray.com/org/scala-lang/modules/scala-xml_2.11/1.0.4/scala-xml_2.11-1.0.4.pom[0m
+[0m[[0mdebug[0m] [0m	[SUCCESSFUL ] org.scala-lang.modules#scala-xml_2.11;1.0.4!scala-xml_2.11.pom(pom.original) (359ms)[0m
+[0m[[0mdebug[0m] [0m		tried https://repo.typesafe.com/typesafe/ivy-releases/org.scala-lang.modules/scala-xml_2.11/1.0.4/bundles/scala-xml_2.11.jar[0m
+[0m[[0mdebug[0m] [0mCLIENT ERROR: Not Found url=https://repo.typesafe.com/typesafe/ivy-releases/org.scala-lang.modules/scala-xml_2.11/1.0.4/bundles/scala-xml_2.11.jar[0m
+[0m[[0mdebug[0m] [0m		tried https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/org.scala-lang.modules/scala-xml_2.11/1.0.4/bundles/scala-xml_2.11.jar[0m
+[0m[[0mdebug[0m] [0mCLIENT ERROR: Not Found url=https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/org.scala-lang.modules/scala-xml_2.11/1.0.4/bundles/scala-xml_2.11.jar[0m
+[0m[[0mdebug[0m] [0m		tried /home/alexeyche/.ivy2/local/org.scala-lang.modules/scala-xml_2.11/1.0.4/bundles/scala-xml_2.11.jar[0m
+[0m[[0mdebug[0m] [0m		tried https://jcenter.bintray.com/org/scala-lang/modules/scala-xml_2.11/1.0.4/scala-xml_2.11-1.0.4.jar[0m
+[0m[[0mdebug[0m] [0m	found org.scala-lang.modules#scala-xml_2.11;1.0.4 in jcenter[0m
 [0m[[0mdebug[0m] [0mdependency descriptor has been mediated: dependency: org.scala-lang#scala-compiler;2.11.4 {test=[runtime(*), master(compile)]} => dependency: org.scala-lang#scala-compiler;2.11.7 {test=[runtime(*), master(compile)]}[0m
 [0m[[0mdebug[0m] [0mdependency descriptor has been mediated: dependency: org.scala-lang#scala-library;2.11.4 {compile=[compile(*), master(compile)], runtime=[runtime(*)]} => dependency: org.scala-lang#scala-library;2.11.7 {compile=[compile(*), master(compile)], runtime=[runtime(*)]}[0m
 [0m[[0mdebug[0m] [0m== resolving dependencies org.scala-lang.modules#scala-xml_2.11;1.0.4->org.scala-lang#scala-library;2.11.7 [compile->compile(*)][0m
@@ -412,8 +655,31 @@
 [0m[[0mdebug[0m] [0mdependency descriptor has been mediated: dependency: org.scala-lang#scala-library;2.10.5 {compile=[default(compile)]} => dependency: org.scala-lang#scala-library;2.11.7 {compile=[default(compile)]}[0m
 [0m[[0minfo[0m] [0mResolving org.scala-lang.modules#scala-parser-combinators_2.11;1.0.4 ...[0m
 [0m[[0mdebug[0m] [0msbt-chain: Checking cache for: dependency: org.scala-lang.modules#scala-parser-combinators_2.11;1.0.4 {compile=[compile(*), master(compile)], runtime=[runtime(*)]}[0m
-[0m[[0mdebug[0m] [0msbt-chain: module revision found in cache: org.scala-lang.modules#scala-parser-combinators_2.11;1.0.4[0m
-[0m[[0mdebug[0m] [0m	found org.scala-lang.modules#scala-parser-combinators_2.11;1.0.4 in sbt-chain[0m
+[0m[[0minfo[0m] [0mResolving org.scala-lang.modules#scala-parser-combinators_2.11;1.0.4 ...[0m
+[0m[[0mdebug[0m] [0msbt-chain-delegate: Checking cache for: dependency: org.scala-lang.modules#scala-parser-combinators_2.11;1.0.4 {compile=[compile(*), master(compile)], runtime=[runtime(*)]}[0m
+[0m[[0mdebug[0m] [0m		tried https://repo.typesafe.com/typesafe/ivy-releases/org.scala-lang.modules/scala-parser-combinators_2.11/1.0.4/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0mCLIENT ERROR: Not Found url=https://repo.typesafe.com/typesafe/ivy-releases/org.scala-lang.modules/scala-parser-combinators_2.11/1.0.4/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0m	typesafe-ivy-releases: no ivy file found for org.scala-lang.modules#scala-parser-combinators_2.11;1.0.4[0m
+[0m[[0mdebug[0m] [0m		tried https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/org.scala-lang.modules/scala-parser-combinators_2.11/1.0.4/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0mCLIENT ERROR: Not Found url=https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/org.scala-lang.modules/scala-parser-combinators_2.11/1.0.4/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0m	sbt-plugin-releases: no ivy file found for org.scala-lang.modules#scala-parser-combinators_2.11;1.0.4[0m
+[0m[[0mdebug[0m] [0m		tried /home/alexeyche/.ivy2/local/org.scala-lang.modules/scala-parser-combinators_2.11/1.0.4/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0m	local: no ivy file found for org.scala-lang.modules#scala-parser-combinators_2.11;1.0.4[0m
+[0m[[0mdebug[0m] [0m		tried https://jcenter.bintray.com/org/scala-lang/modules/scala-parser-combinators_2.11/1.0.4/scala-parser-combinators_2.11-1.0.4.pom[0m
+[0m[[0mdebug[0m] [0m	jcenter: found md file for org.scala-lang.modules#scala-parser-combinators_2.11;1.0.4[0m
+[0m[[0mdebug[0m] [0m		=> https://jcenter.bintray.com/org/scala-lang/modules/scala-parser-combinators_2.11/1.0.4/scala-parser-combinators_2.11-1.0.4.pom (1.0.4)[0m
+[0m[[0mdebug[0m] [0mdownloading https://jcenter.bintray.com/org/scala-lang/modules/scala-parser-combinators_2.11/1.0.4/scala-parser-combinators_2.11-1.0.4.pom ...[0m
+[0m[[0mdebug[0m] [0m	jcenter: downloading https://jcenter.bintray.com/org/scala-lang/modules/scala-parser-combinators_2.11/1.0.4/scala-parser-combinators_2.11-1.0.4.pom[0m
+[0m[[0mdebug[0m] [0m	jcenter: downloading https://jcenter.bintray.com/org/scala-lang/modules/scala-parser-combinators_2.11/1.0.4/scala-parser-combinators_2.11-1.0.4.pom.sha1[0m
+[0m[[0mdebug[0m] [0msha1 OK for https://jcenter.bintray.com/org/scala-lang/modules/scala-parser-combinators_2.11/1.0.4/scala-parser-combinators_2.11-1.0.4.pom[0m
+[0m[[0mdebug[0m] [0m	[SUCCESSFUL ] org.scala-lang.modules#scala-parser-combinators_2.11;1.0.4!scala-parser-combinators_2.11.pom(pom.original) (249ms)[0m
+[0m[[0mdebug[0m] [0m		tried https://repo.typesafe.com/typesafe/ivy-releases/org.scala-lang.modules/scala-parser-combinators_2.11/1.0.4/bundles/scala-parser-combinators_2.11.jar[0m
+[0m[[0mdebug[0m] [0mCLIENT ERROR: Not Found url=https://repo.typesafe.com/typesafe/ivy-releases/org.scala-lang.modules/scala-parser-combinators_2.11/1.0.4/bundles/scala-parser-combinators_2.11.jar[0m
+[0m[[0mdebug[0m] [0m		tried https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/org.scala-lang.modules/scala-parser-combinators_2.11/1.0.4/bundles/scala-parser-combinators_2.11.jar[0m
+[0m[[0mdebug[0m] [0mCLIENT ERROR: Not Found url=https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/org.scala-lang.modules/scala-parser-combinators_2.11/1.0.4/bundles/scala-parser-combinators_2.11.jar[0m
+[0m[[0mdebug[0m] [0m		tried /home/alexeyche/.ivy2/local/org.scala-lang.modules/scala-parser-combinators_2.11/1.0.4/bundles/scala-parser-combinators_2.11.jar[0m
+[0m[[0mdebug[0m] [0m		tried https://jcenter.bintray.com/org/scala-lang/modules/scala-parser-combinators_2.11/1.0.4/scala-parser-combinators_2.11-1.0.4.jar[0m
+[0m[[0mdebug[0m] [0m	found org.scala-lang.modules#scala-parser-combinators_2.11;1.0.4 in jcenter[0m
 [0m[[0mdebug[0m] [0mdependency descriptor has been mediated: dependency: org.scala-lang#scala-library;2.11.6 {compile=[compile(*), master(compile)], runtime=[runtime(*)]} => dependency: org.scala-lang#scala-library;2.11.7 {compile=[compile(*), master(compile)], runtime=[runtime(*)]}[0m
 [0m[[0mdebug[0m] [0m== resolving dependencies org.scala-lang.modules#scala-parser-combinators_2.11;1.0.4->org.scala-lang#scala-library;2.11.7 [compile->compile(*)][0m
 [0m[[0mdebug[0m] [0mdependency descriptor has been mediated: dependency: org.scala-lang#scala-library;2.11.6 {compile=[compile(*), master(compile)], runtime=[runtime(*)]} => dependency: org.scala-lang#scala-library;2.11.7 {compile=[compile(*), master(compile)], runtime=[runtime(*)]}[0m
@@ -5200,8 +5466,34 @@
 [0m[[0mdebug[0m] [0m== resolving dependencies org.scala-lang#scala-compiler;2.11.7->jline#jline;2.12.1 [optional->compile(*)][0m
 [0m[[0minfo[0m] [0mResolving jline#jline;2.12.1 ...[0m
 [0m[[0mdebug[0m] [0msbt-chain: Checking cache for: dependency: jline#jline;2.12.1 {optional=[compile(*), master(compile)]}[0m
-[0m[[0mdebug[0m] [0msbt-chain: module revision found in cache: jline#jline;2.12.1[0m
-[0m[[0mdebug[0m] [0m	found jline#jline;2.12.1 in sbt-chain[0m
+[0m[[0minfo[0m] [0mResolving jline#jline;2.12.1 ...[0m
+[0m[[0mdebug[0m] [0msbt-chain-delegate: Checking cache for: dependency: jline#jline;2.12.1 {optional=[compile(*), master(compile)]}[0m
+[0m[[0mdebug[0m] [0m		tried https://repo.typesafe.com/typesafe/ivy-releases/jline/jline/2.12.1/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0mCLIENT ERROR: Not Found url=https://repo.typesafe.com/typesafe/ivy-releases/jline/jline/2.12.1/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0m	typesafe-ivy-releases: no ivy file found for jline#jline;2.12.1[0m
+[0m[[0mdebug[0m] [0m		tried https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/jline/jline/2.12.1/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0mCLIENT ERROR: Not Found url=https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/jline/jline/2.12.1/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0m	sbt-plugin-releases: no ivy file found for jline#jline;2.12.1[0m
+[0m[[0mdebug[0m] [0m		tried /home/alexeyche/.ivy2/local/jline/jline/2.12.1/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0m	local: no ivy file found for jline#jline;2.12.1[0m
+[0m[[0mdebug[0m] [0m		tried https://jcenter.bintray.com/jline/jline/2.12.1/jline-2.12.1.pom[0m
+[0m[[0mdebug[0m] [0m	jcenter: found md file for jline#jline;2.12.1[0m
+[0m[[0mdebug[0m] [0m		=> https://jcenter.bintray.com/jline/jline/2.12.1/jline-2.12.1.pom (2.12.1)[0m
+[0m[[0mdebug[0m] [0mdownloading https://jcenter.bintray.com/jline/jline/2.12.1/jline-2.12.1.pom ...[0m
+[0m[[0mdebug[0m] [0m	jcenter: downloading https://jcenter.bintray.com/jline/jline/2.12.1/jline-2.12.1.pom[0m
+[0m[[0mdebug[0m] [0m	jcenter: downloading https://jcenter.bintray.com/jline/jline/2.12.1/jline-2.12.1.pom.sha1[0m
+[0m[[0mdebug[0m] [0msha1 OK for https://jcenter.bintray.com/jline/jline/2.12.1/jline-2.12.1.pom[0m
+[0m[[0mdebug[0m] [0m	[SUCCESSFUL ] jline#jline;2.12.1!jline.pom(pom.original) (624ms)[0m
+[0m[[0minfo[0m] [0mResolving org.sonatype.oss#oss-parent;7 ...[0m
+[0m[[0mdebug[0m] [0msbt-chain: Checking cache for: dependency: org.sonatype.oss#oss-parent;7 {}[0m
+[0m[[0mdebug[0m] [0msbt-chain: module revision found in cache: org.sonatype.oss#oss-parent;7[0m
+[0m[[0mdebug[0m] [0m		tried https://repo.typesafe.com/typesafe/ivy-releases/jline/jline/2.12.1/jars/jline.jar[0m
+[0m[[0mdebug[0m] [0mCLIENT ERROR: Not Found url=https://repo.typesafe.com/typesafe/ivy-releases/jline/jline/2.12.1/jars/jline.jar[0m
+[0m[[0mdebug[0m] [0m		tried https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/jline/jline/2.12.1/jars/jline.jar[0m
+[0m[[0mdebug[0m] [0mCLIENT ERROR: Not Found url=https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/jline/jline/2.12.1/jars/jline.jar[0m
+[0m[[0mdebug[0m] [0m		tried /home/alexeyche/.ivy2/local/jline/jline/2.12.1/jars/jline.jar[0m
+[0m[[0mdebug[0m] [0m		tried https://jcenter.bintray.com/jline/jline/2.12.1/jline-2.12.1.jar[0m
+[0m[[0mdebug[0m] [0m	found jline#jline;2.12.1 in jcenter[0m
 [0m[[0mdebug[0m] [0m== resolving dependencies org.scala-lang#scala-compiler;2.11.7->jline#jline;2.12.1 [optional->master(compile)][0m
 [0m[[0mdebug[0m] [0m== resolving dependencies sorts#sorts;0.1dev1->org.scala-lang#scala-library;2.11.7 [scala-tool->default][0m
 [0m[[0mdebug[0m] [0m== resolving dependencies sorts#sorts;0.1dev1->org.scala-lang#scala-library;2.11.7 [scala-tool->runtime][0m
@@ -5210,12 +5502,42 @@
 [0m[[0mdebug[0m] [0m== resolving dependencies sorts#sorts;0.1dev1->org.scala-lang#scala-library;2.11.7 [scala-tool->optional(default)][0m
 [0m[[0mdebug[0m] [0m	resolved ivy file produced in cache[0m
 [0m[[0mdebug[0m] [0m:: downloading artifacts ::[0m
-[0m[[0mdebug[0m] [0m	[NOT REQUIRED] com.typesafe.scala-logging#scala-logging_2.11;3.1.0!scala-logging_2.11.jar[0m
-[0m[[0mdebug[0m] [0m	[NOT REQUIRED] ch.qos.logback#logback-classic;1.1.2!logback-classic.jar[0m
-[0m[[0mdebug[0m] [0m	[NOT REQUIRED] org.scala-lang#scala-library;2.11.7!scala-library.jar[0m
-[0m[[0mdebug[0m] [0m	[NOT REQUIRED] org.scala-lang#scala-reflect;2.11.7!scala-reflect.jar[0m
-[0m[[0mdebug[0m] [0m	[NOT REQUIRED] org.slf4j#slf4j-api;1.7.7!slf4j-api.jar[0m
-[0m[[0mdebug[0m] [0m	[NOT REQUIRED] ch.qos.logback#logback-core;1.1.2!logback-core.jar[0m
+[0m[[0mdebug[0m] [0m		tried https://jcenter.bintray.com/com/typesafe/scala-logging/scala-logging_2.11/3.1.0/scala-logging_2.11-3.1.0.jar[0m
+[0m[[0minfo[0m] [0mdownloading https://jcenter.bintray.com/com/typesafe/scala-logging/scala-logging_2.11/3.1.0/scala-logging_2.11-3.1.0.jar ...[0m
+[0m[[0mdebug[0m] [0m	jcenter: downloading https://jcenter.bintray.com/com/typesafe/scala-logging/scala-logging_2.11/3.1.0/scala-logging_2.11-3.1.0.jar[0m
+[0m[[0mdebug[0m] [0m	jcenter: downloading https://jcenter.bintray.com/com/typesafe/scala-logging/scala-logging_2.11/3.1.0/scala-logging_2.11-3.1.0.jar.sha1[0m
+[0m[[0mdebug[0m] [0msha1 OK for https://jcenter.bintray.com/com/typesafe/scala-logging/scala-logging_2.11/3.1.0/scala-logging_2.11-3.1.0.jar[0m
+[0m[[0minfo[0m] [0m	[SUCCESSFUL ] com.typesafe.scala-logging#scala-logging_2.11;3.1.0!scala-logging_2.11.jar (289ms)[0m
+[0m[[0mdebug[0m] [0m		tried https://jcenter.bintray.com/ch/qos/logback/logback-classic/1.1.2/logback-classic-1.1.2.jar[0m
+[0m[[0minfo[0m] [0mdownloading https://jcenter.bintray.com/ch/qos/logback/logback-classic/1.1.2/logback-classic-1.1.2.jar ...[0m
+[0m[[0mdebug[0m] [0m	jcenter: downloading https://jcenter.bintray.com/ch/qos/logback/logback-classic/1.1.2/logback-classic-1.1.2.jar[0m
+[0m[[0mdebug[0m] [0m	jcenter: downloading https://jcenter.bintray.com/ch/qos/logback/logback-classic/1.1.2/logback-classic-1.1.2.jar.sha1[0m
+[0m[[0mdebug[0m] [0msha1 OK for https://jcenter.bintray.com/ch/qos/logback/logback-classic/1.1.2/logback-classic-1.1.2.jar[0m
+[0m[[0minfo[0m] [0m	[SUCCESSFUL ] ch.qos.logback#logback-classic;1.1.2!logback-classic.jar (694ms)[0m
+[0m[[0mdebug[0m] [0m		tried https://jcenter.bintray.com/org/scala-lang/scala-library/2.11.7/scala-library-2.11.7.jar[0m
+[0m[[0minfo[0m] [0mdownloading https://jcenter.bintray.com/org/scala-lang/scala-library/2.11.7/scala-library-2.11.7.jar ...[0m
+[0m[[0mdebug[0m] [0m	jcenter: downloading https://jcenter.bintray.com/org/scala-lang/scala-library/2.11.7/scala-library-2.11.7.jar[0m
+[0m[[0mdebug[0m] [0m	jcenter: downloading https://jcenter.bintray.com/org/scala-lang/scala-library/2.11.7/scala-library-2.11.7.jar.sha1[0m
+[0m[[0mdebug[0m] [0msha1 OK for https://jcenter.bintray.com/org/scala-lang/scala-library/2.11.7/scala-library-2.11.7.jar[0m
+[0m[[0minfo[0m] [0m	[SUCCESSFUL ] org.scala-lang#scala-library;2.11.7!scala-library.jar (2661ms)[0m
+[0m[[0mdebug[0m] [0m		tried https://jcenter.bintray.com/org/scala-lang/scala-reflect/2.11.7/scala-reflect-2.11.7.jar[0m
+[0m[[0minfo[0m] [0mdownloading https://jcenter.bintray.com/org/scala-lang/scala-reflect/2.11.7/scala-reflect-2.11.7.jar ...[0m
+[0m[[0mdebug[0m] [0m	jcenter: downloading https://jcenter.bintray.com/org/scala-lang/scala-reflect/2.11.7/scala-reflect-2.11.7.jar[0m
+[0m[[0mdebug[0m] [0m	jcenter: downloading https://jcenter.bintray.com/org/scala-lang/scala-reflect/2.11.7/scala-reflect-2.11.7.jar.sha1[0m
+[0m[[0mdebug[0m] [0msha1 OK for https://jcenter.bintray.com/org/scala-lang/scala-reflect/2.11.7/scala-reflect-2.11.7.jar[0m
+[0m[[0minfo[0m] [0m	[SUCCESSFUL ] org.scala-lang#scala-reflect;2.11.7!scala-reflect.jar (2137ms)[0m
+[0m[[0mdebug[0m] [0m		tried https://jcenter.bintray.com/org/slf4j/slf4j-api/1.7.7/slf4j-api-1.7.7.jar[0m
+[0m[[0minfo[0m] [0mdownloading https://jcenter.bintray.com/org/slf4j/slf4j-api/1.7.7/slf4j-api-1.7.7.jar ...[0m
+[0m[[0mdebug[0m] [0m	jcenter: downloading https://jcenter.bintray.com/org/slf4j/slf4j-api/1.7.7/slf4j-api-1.7.7.jar[0m
+[0m[[0mdebug[0m] [0m	jcenter: downloading https://jcenter.bintray.com/org/slf4j/slf4j-api/1.7.7/slf4j-api-1.7.7.jar.sha1[0m
+[0m[[0mdebug[0m] [0msha1 OK for https://jcenter.bintray.com/org/slf4j/slf4j-api/1.7.7/slf4j-api-1.7.7.jar[0m
+[0m[[0minfo[0m] [0m	[SUCCESSFUL ] org.slf4j#slf4j-api;1.7.7!slf4j-api.jar (583ms)[0m
+[0m[[0mdebug[0m] [0m		tried https://jcenter.bintray.com/ch/qos/logback/logback-core/1.1.2/logback-core-1.1.2.jar[0m
+[0m[[0minfo[0m] [0mdownloading https://jcenter.bintray.com/ch/qos/logback/logback-core/1.1.2/logback-core-1.1.2.jar ...[0m
+[0m[[0mdebug[0m] [0m	jcenter: downloading https://jcenter.bintray.com/ch/qos/logback/logback-core/1.1.2/logback-core-1.1.2.jar[0m
+[0m[[0mdebug[0m] [0m	jcenter: downloading https://jcenter.bintray.com/ch/qos/logback/logback-core/1.1.2/logback-core-1.1.2.jar.sha1[0m
+[0m[[0mdebug[0m] [0msha1 OK for https://jcenter.bintray.com/ch/qos/logback/logback-core/1.1.2/logback-core-1.1.2.jar[0m
+[0m[[0minfo[0m] [0m	[SUCCESSFUL ] ch.qos.logback#logback-core;1.1.2!logback-core.jar (399ms)[0m
 [0m[[0mdebug[0m] [0m	[NOT REQUIRED] org.scala-sbt#sbt;0.13.9!sbt.jar[0m
 [0m[[0mdebug[0m] [0m	[NOT REQUIRED] org.scala-sbt#main;0.13.9!main.jar[0m
 [0m[[0mdebug[0m] [0m	[NOT REQUIRED] org.scala-sbt#compiler-interface;0.13.9!compiler-interface-src.jar[0m
@@ -5244,9 +5566,24 @@
 [0m[[0mdebug[0m] [0m	[NOT REQUIRED] org.scala-sbt#tasks;0.13.9!tasks.jar[0m
 [0m[[0mdebug[0m] [0m	[NOT REQUIRED] org.scala-sbt#tracking;0.13.9!tracking.jar[0m
 [0m[[0mdebug[0m] [0m	[NOT REQUIRED] org.scala-sbt#testing;0.13.9!testing.jar[0m
-[0m[[0mdebug[0m] [0m	[NOT REQUIRED] org.scala-lang#scala-compiler;2.11.7!scala-compiler.jar[0m
-[0m[[0mdebug[0m] [0m	[NOT REQUIRED] org.scala-lang.modules#scala-xml_2.11;1.0.4!scala-xml_2.11.jar(bundle)[0m
-[0m[[0mdebug[0m] [0m	[NOT REQUIRED] org.scala-lang.modules#scala-parser-combinators_2.11;1.0.4!scala-parser-combinators_2.11.jar(bundle)[0m
+[0m[[0mdebug[0m] [0m		tried https://jcenter.bintray.com/org/scala-lang/scala-compiler/2.11.7/scala-compiler-2.11.7.jar[0m
+[0m[[0minfo[0m] [0mdownloading https://jcenter.bintray.com/org/scala-lang/scala-compiler/2.11.7/scala-compiler-2.11.7.jar ...[0m
+[0m[[0mdebug[0m] [0m	jcenter: downloading https://jcenter.bintray.com/org/scala-lang/scala-compiler/2.11.7/scala-compiler-2.11.7.jar[0m
+[0m[[0mdebug[0m] [0m	jcenter: downloading https://jcenter.bintray.com/org/scala-lang/scala-compiler/2.11.7/scala-compiler-2.11.7.jar.sha1[0m
+[0m[[0mdebug[0m] [0msha1 OK for https://jcenter.bintray.com/org/scala-lang/scala-compiler/2.11.7/scala-compiler-2.11.7.jar[0m
+[0m[[0minfo[0m] [0m	[SUCCESSFUL ] org.scala-lang#scala-compiler;2.11.7!scala-compiler.jar (6677ms)[0m
+[0m[[0mdebug[0m] [0m		tried https://jcenter.bintray.com/org/scala-lang/modules/scala-xml_2.11/1.0.4/scala-xml_2.11-1.0.4.jar[0m
+[0m[[0minfo[0m] [0mdownloading https://jcenter.bintray.com/org/scala-lang/modules/scala-xml_2.11/1.0.4/scala-xml_2.11-1.0.4.jar ...[0m
+[0m[[0mdebug[0m] [0m	jcenter: downloading https://jcenter.bintray.com/org/scala-lang/modules/scala-xml_2.11/1.0.4/scala-xml_2.11-1.0.4.jar[0m
+[0m[[0mdebug[0m] [0m	jcenter: downloading https://jcenter.bintray.com/org/scala-lang/modules/scala-xml_2.11/1.0.4/scala-xml_2.11-1.0.4.jar.sha1[0m
+[0m[[0mdebug[0m] [0msha1 OK for https://jcenter.bintray.com/org/scala-lang/modules/scala-xml_2.11/1.0.4/scala-xml_2.11-1.0.4.jar[0m
+[0m[[0minfo[0m] [0m	[SUCCESSFUL ] org.scala-lang.modules#scala-xml_2.11;1.0.4!scala-xml_2.11.jar(bundle) (457ms)[0m
+[0m[[0mdebug[0m] [0m		tried https://jcenter.bintray.com/org/scala-lang/modules/scala-parser-combinators_2.11/1.0.4/scala-parser-combinators_2.11-1.0.4.jar[0m
+[0m[[0minfo[0m] [0mdownloading https://jcenter.bintray.com/org/scala-lang/modules/scala-parser-combinators_2.11/1.0.4/scala-parser-combinators_2.11-1.0.4.jar ...[0m
+[0m[[0mdebug[0m] [0m	jcenter: downloading https://jcenter.bintray.com/org/scala-lang/modules/scala-parser-combinators_2.11/1.0.4/scala-parser-combinators_2.11-1.0.4.jar[0m
+[0m[[0mdebug[0m] [0m	jcenter: downloading https://jcenter.bintray.com/org/scala-lang/modules/scala-parser-combinators_2.11/1.0.4/scala-parser-combinators_2.11-1.0.4.jar.sha1[0m
+[0m[[0mdebug[0m] [0msha1 OK for https://jcenter.bintray.com/org/scala-lang/modules/scala-parser-combinators_2.11/1.0.4/scala-parser-combinators_2.11-1.0.4.jar[0m
+[0m[[0minfo[0m] [0m	[SUCCESSFUL ] org.scala-lang.modules#scala-parser-combinators_2.11;1.0.4!scala-parser-combinators_2.11.jar(bundle) (370ms)[0m
 [0m[[0mdebug[0m] [0m	[NOT REQUIRED] org.scala-sbt#control;0.13.9!control.jar[0m
 [0m[[0mdebug[0m] [0m	[NOT REQUIRED] org.scala-sbt#collections;0.13.9!collections.jar[0m
 [0m[[0mdebug[0m] [0m	[NOT REQUIRED] jline#jline;2.11!jline.jar[0m
@@ -5270,8 +5607,13 @@
 [0m[[0mdebug[0m] [0m	[NOT REQUIRED] org.scala-sbt#test-agent;0.13.9!test-agent.jar[0m
 [0m[[0mdebug[0m] [0m	[NOT REQUIRED] org.scala-sbt#test-interface;1.0!test-interface.jar[0m
 [0m[[0mdebug[0m] [0m	[NOT REQUIRED] org.scala-sbt#apply-macro;0.13.9!apply-macro.jar[0m
-[0m[[0mdebug[0m] [0m	[NOT REQUIRED] jline#jline;2.12.1!jline.jar[0m
-[0m[[0mdebug[0m] [0m:: resolution report :: resolve 1891ms :: artifacts dl 35ms[0m
+[0m[[0mdebug[0m] [0m		tried https://jcenter.bintray.com/jline/jline/2.12.1/jline-2.12.1.jar[0m
+[0m[[0minfo[0m] [0mdownloading https://jcenter.bintray.com/jline/jline/2.12.1/jline-2.12.1.jar ...[0m
+[0m[[0mdebug[0m] [0m	jcenter: downloading https://jcenter.bintray.com/jline/jline/2.12.1/jline-2.12.1.jar[0m
+[0m[[0mdebug[0m] [0m	jcenter: downloading https://jcenter.bintray.com/jline/jline/2.12.1/jline-2.12.1.jar.sha1[0m
+[0m[[0mdebug[0m] [0msha1 OK for https://jcenter.bintray.com/jline/jline/2.12.1/jline-2.12.1.jar[0m
+[0m[[0minfo[0m] [0m	[SUCCESSFUL ] jline#jline;2.12.1!jline.jar (2044ms)[0m
+[0m[[0mdebug[0m] [0m:: resolution report :: resolve 34417ms :: artifacts dl 16364ms[0m
 [0m[[0mdebug[0m] [0m	report for sorts#sorts;0.1dev1 compile produced in /home/alexeyche/prog/alexeyche-junk/scala/sorts/project/target/resolution-cache/reports/sorts-sorts-compile.xml[0m
 [0m[[0mdebug[0m] [0m	report for sorts#sorts;0.1dev1 runtime produced in /home/alexeyche/prog/alexeyche-junk/scala/sorts/project/target/resolution-cache/reports/sorts-sorts-runtime.xml[0m
 [0m[[0mdebug[0m] [0m	report for sorts#sorts;0.1dev1 test produced in /home/alexeyche/prog/alexeyche-junk/scala/sorts/project/target/resolution-cache/reports/sorts-sorts-test.xml[0m
@@ -5285,5 +5627,5 @@
 [0m[[0mdebug[0m] [0m	report for sorts#sorts;0.1dev1 docs produced in /home/alexeyche/prog/alexeyche-junk/scala/sorts/project/target/resolution-cache/reports/sorts-sorts-docs.xml[0m
 [0m[[0mdebug[0m] [0m	report for sorts#sorts;0.1dev1 pom produced in /home/alexeyche/prog/alexeyche-junk/scala/sorts/project/target/resolution-cache/reports/sorts-sorts-pom.xml[0m
 [0m[[0mdebug[0m] [0m	report for sorts#sorts;0.1dev1 scala-tool produced in /home/alexeyche/prog/alexeyche-junk/scala/sorts/project/target/resolution-cache/reports/sorts-sorts-scala-tool.xml[0m
-[0m[[0mdebug[0m] [0m	resolve done (1891ms resolve - 35ms download)[0m
+[0m[[0mdebug[0m] [0m	resolve done (34417ms resolve - 16364ms download)[0m
 [0m[[0minfo[0m] [0mDone updating.[0m

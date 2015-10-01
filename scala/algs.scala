@@ -1,8 +1,8 @@
 #!/usr/bin/env scalas
- 
-/***         
+
+/***
 scalaVersion := "2.11.7"
- 
+
 libraryDependencies +=  "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0"
 libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.1.2"
 */
@@ -28,7 +28,7 @@ def eueler1() {
 
 	breakable {
 		while(true) {
-			var v3 = i3*3 
+			var v3 = i3*3
 			var v5 = i5*5
 			if(v3<tops) {
 				acc += v3
@@ -43,7 +43,7 @@ def eueler1() {
 				break
 			}
 		}
-	}	
+	}
 }
 
 def fibo_seq(top: Int): BigInt = {
@@ -56,11 +56,11 @@ def fibo_seq(top: Int): BigInt = {
 
 	var iter = 0
 	while(fibo < top) {
-		fibo = prev + before_prev 
+		fibo = prev + before_prev
 		before_prev = prev
 
 		// log.debug("%d".format(fibo))
-		
+
 		prev = fibo
 		if(fibo % 2 == 0) {
 			even_acc += fibo

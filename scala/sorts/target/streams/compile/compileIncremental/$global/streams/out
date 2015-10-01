@@ -1,23 +1,47 @@
+[0m[[0mdebug[0m] [0mInvalidating /home/alexeyche/.ivy2/cache/com.typesafe.scala-logging/scala-logging_2.11/jars/scala-logging_2.11-3.1.0.jar: stamp changed from lastModified(1442061969000) to lastModified(1407940680000)[0m
+[0m[[0mdebug[0m] [0mInvalidating /usr/lib/jvm/java-7-openjdk-amd64/jre/lib/rt.jar: stamp changed from lastModified(1437726344000) to lastModified(1429908188000)[0m
 [0m[[0mdebug[0m] [0m[0m
 [0m[[0mdebug[0m] [0mInitial source changes: [0m
 [0m[[0mdebug[0m] [0m	removed:Set()[0m
 [0m[[0mdebug[0m] [0m	added: Set()[0m
-[0m[[0mdebug[0m] [0m	modified: Set(/home/alexeyche/prog/alexeyche-junk/scala/sorts/src/main/scala/sorts.scala)[0m
-[0m[[0mdebug[0m] [0mInvalidated products: Set()[0m
+[0m[[0mdebug[0m] [0m	modified: Set()[0m
+[0m[[0mdebug[0m] [0mInvalidated products: Set(/home/alexeyche/prog/alexeyche-junk/scala/sorts/target/scala-2.11/classes/Sorts$$anonfun$2.class, /home/alexeyche/prog/alexeyche-junk/scala/sorts/target/scala-2.11/classes/Sorts$.class, /home/alexeyche/prog/alexeyche-junk/scala/sorts/target/scala-2.11/classes/BadSort.class, /home/alexeyche/prog/alexeyche-junk/scala/sorts/target/scala-2.11/classes/SortAlgo$class.class, /home/alexeyche/prog/alexeyche-junk/scala/sorts/target/scala-2.11/classes/InsertionSort$$anonfun$sortImpl$1.class, /home/alexeyche/prog/alexeyche-junk/scala/sorts/target/scala-2.11/classes/InsertionSort.class, /home/alexeyche/prog/alexeyche-junk/scala/sorts/target/scala-2.11/classes/SortAlgo.class, /home/alexeyche/prog/alexeyche-junk/scala/sorts/target/scala-2.11/classes/Sorts.class, /home/alexeyche/prog/alexeyche-junk/scala/sorts/target/scala-2.11/classes/Sorts$$anonfun$1.class)[0m
 [0m[[0mdebug[0m] [0mExternal API changes: API Changes: Set()[0m
-[0m[[0mdebug[0m] [0mModified binary dependencies: Set()[0m
-[0m[[0mdebug[0m] [0mInitial directly invalidated sources: Set(/home/alexeyche/prog/alexeyche-junk/scala/sorts/src/main/scala/sorts.scala)[0m
+[0m[[0mdebug[0m] [0mModified binary dependencies: Set(/home/alexeyche/.ivy2/cache/com.typesafe.scala-logging/scala-logging_2.11/jars/scala-logging_2.11-3.1.0.jar, /usr/lib/jvm/java-7-openjdk-amd64/jre/lib/rt.jar)[0m
+[0m[[0mdebug[0m] [0mInitial directly invalidated sources: Set()[0m
 [0m[[0mdebug[0m] [0m[0m
 [0m[[0mdebug[0m] [0mSources indirectly invalidated by:[0m
-[0m[[0mdebug[0m] [0m	product: Set()[0m
-[0m[[0mdebug[0m] [0m	binary dep: Set()[0m
+[0m[[0mdebug[0m] [0m	product: Set(/home/alexeyche/prog/alexeyche-junk/scala/sorts/src/main/scala/sorts.scala)[0m
+[0m[[0mdebug[0m] [0m	binary dep: Set(/home/alexeyche/prog/alexeyche-junk/scala/sorts/src/main/scala/sorts.scala)[0m
 [0m[[0mdebug[0m] [0m	external source: Set()[0m
 [0m[[0mdebug[0m] [0mAll initially invalidated sources: Set(/home/alexeyche/prog/alexeyche-junk/scala/sorts/src/main/scala/sorts.scala)[0m
 [0m[[0mdebug[0m] [0mRecompiling all 1 sources: invalidated sources (1) exceeded 50.0% of all sources[0m
 [0m[[0minfo[0m] [0mCompiling 1 Scala source to /home/alexeyche/prog/alexeyche-junk/scala/sorts/target/scala-2.11/classes...[0m
 [0m[[0mdebug[0m] [0mGetting compiler-interface from component compiler for Scala 2.11.7[0m
+[0m[[0mdebug[0m] [0mPlain interface to Scala compiler 2.11.7  with arguments: [0m
+[0m[[0mdebug[0m] [0m	-nowarn[0m
+[0m[[0mdebug[0m] [0m	-d[0m
+[0m[[0mdebug[0m] [0m	/tmp/sbt_1e137cf9[0m
+[0m[[0mdebug[0m] [0m	-bootclasspath[0m
+[0m[[0mdebug[0m] [0m	/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/resources.jar:/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/rt.jar:/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/sunrsasign.jar:/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/jsse.jar:/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/jce.jar:/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/charsets.jar:/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/rhino.jar:/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/jfr.jar:/usr/lib/jvm/java-7-openjdk-amd64/jre/classes:/home/alexeyche/.ivy2/cache/org.scala-lang/scala-library/jars/scala-library-2.11.7.jar[0m
+[0m[[0mdebug[0m] [0m	-classpath[0m
+[0m[[0mdebug[0m] [0m	/home/alexeyche/.sbt/boot/scala-2.10.5/org.scala-sbt/sbt/0.13.9/xsbti/interface-0.13.9.jar:/home/alexeyche/.sbt/boot/scala-2.10.5/org.scala-sbt/sbt/0.13.9/compiler-interface-src/compiler-interface-src-0.13.9.jar:/home/alexeyche/.ivy2/cache/org.scala-lang/scala-compiler/jars/scala-compiler-2.11.7.jar:/home/alexeyche/.ivy2/cache/org.scala-lang/scala-reflect/jars/scala-reflect-2.11.7.jar:/home/alexeyche/.ivy2/cache/org.scala-lang.modules/scala-xml_2.11/bundles/scala-xml_2.11-1.0.4.jar:/home/alexeyche/.ivy2/cache/org.scala-lang.modules/scala-parser-combinators_2.11/bundles/scala-parser-combinators_2.11-1.0.4.jar:/home/alexeyche/.ivy2/cache/jline/jline/jars/jline-2.12.1.jar[0m
+[0m[[0mdebug[0m] [0m	/tmp/sbt_b4f237de/xsbt/API.scala[0m
+[0m[[0mdebug[0m] [0m	/tmp/sbt_b4f237de/xsbt/Analyzer.scala[0m
+[0m[[0mdebug[0m] [0m	/tmp/sbt_b4f237de/xsbt/Command.scala[0m
+[0m[[0mdebug[0m] [0m	/tmp/sbt_b4f237de/xsbt/Compat.scala[0m
+[0m[[0mdebug[0m] [0m	/tmp/sbt_b4f237de/xsbt/CompilerInterface.scala[0m
+[0m[[0mdebug[0m] [0m	/tmp/sbt_b4f237de/xsbt/ConsoleInterface.scala[0m
+[0m[[0mdebug[0m] [0m	/tmp/sbt_b4f237de/xsbt/DelegatingReporter.scala[0m
+[0m[[0mdebug[0m] [0m	/tmp/sbt_b4f237de/xsbt/Dependency.scala[0m
+[0m[[0mdebug[0m] [0m	/tmp/sbt_b4f237de/xsbt/ExtractAPI.scala[0m
+[0m[[0mdebug[0m] [0m	/tmp/sbt_b4f237de/xsbt/ExtractUsedNames.scala[0m
+[0m[[0mdebug[0m] [0m	/tmp/sbt_b4f237de/xsbt/LocateClassFile.scala[0m
+[0m[[0mdebug[0m] [0m	/tmp/sbt_b4f237de/xsbt/Log.scala[0m
+[0m[[0mdebug[0m] [0m	/tmp/sbt_b4f237de/xsbt/Message.scala[0m
+[0m[[0mdebug[0m] [0m	/tmp/sbt_b4f237de/xsbt/ScaladocInterface.scala[0m
 [0m[[0mdebug[0m] [0mGetting compiler-interface from component compiler for Scala 2.11.7[0m
-[0m[[0mdebug[0m] [0mRunning cached compiler 5124e852, interfacing (CompilerInterface) with Scala compiler version 2.11.7[0m
+[0m[[0mdebug[0m] [0mRunning cached compiler 5874fbae, interfacing (CompilerInterface) with Scala compiler version 2.11.7[0m
 [0m[[0mdebug[0m] [0mCalling Scala compiler with arguments  (CompilerInterface):[0m
 [0m[[0mdebug[0m] [0m	-bootclasspath[0m
 [0m[[0mdebug[0m] [0m	/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/resources.jar:/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/rt.jar:/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/sunrsasign.jar:/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/jsse.jar:/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/jce.jar:/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/charsets.jar:/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/rhino.jar:/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/jfr.jar:/usr/lib/jvm/java-7-openjdk-amd64/jre/classes:/home/alexeyche/.ivy2/cache/org.scala-lang/scala-library/jars/scala-library-2.11.7.jar[0m
@@ -25,7 +49,7 @@
 [0m[[0mdebug[0m] [0m	/home/alexeyche/prog/alexeyche-junk/scala/sorts/target/scala-2.11/classes:/home/alexeyche/.ivy2/cache/com.typesafe.scala-logging/scala-logging_2.11/jars/scala-logging_2.11-3.1.0.jar:/home/alexeyche/.ivy2/cache/org.scala-lang/scala-reflect/jars/scala-reflect-2.11.1.jar:/home/alexeyche/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.7.jar:/home/alexeyche/.ivy2/cache/ch.qos.logback/logback-classic/jars/logback-classic-1.1.2.jar:/home/alexeyche/.ivy2/cache/ch.qos.logback/logback-core/jars/logback-core-1.1.2.jar[0m
 [0m[[33mwarn[0m] [0mthere was one feature warning; re-run with -feature for details[0m
 [0m[[33mwarn[0m] [0mone warning found[0m
-[0m[[0mdebug[0m] [0mScala compilation took 4.586912777 s[0m
+[0m[[0mdebug[0m] [0mScala compilation took 15.019121327 s[0m
 [0m[[0mdebug[0m] [0mNew invalidations:[0m
 [0m[[0mdebug[0m] [0m	Set()[0m
 [0m[[0mdebug[0m] [0mInitial set of included nodes: Set()[0m
