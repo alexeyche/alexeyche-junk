@@ -4,7 +4,7 @@
 		module="sorts"
 		revision="0.1dev1"
 		status="integration"
-		publication="20150919150010"
+		publication="20150920195642"
 		e:scalaVersion="2.11" e:sbtVersion="0.13"
 	>
 		<description>

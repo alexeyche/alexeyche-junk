@@ -7,7 +7,7 @@
 [0m[[0mdebug[0m] [0m== resolving dependencies for default#sorts_2.11;0.1dev1 [compile][0m
 [0m[[0mdebug[0m] [0m== resolving dependencies default#sorts_2.11;0.1dev1->org.scala-lang#scala-library;2.11.7 [compile->default(compile)][0m
 [0m[[0minfo[0m] [0mResolving org.scala-lang#scala-library;2.11.7 ...[0m
-[0m[[0mdebug[0m] [0msbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@4e67e01a[0m
+[0m[[0mdebug[0m] [0msbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@57e19e66[0m
 [0m[[0mdebug[0m] [0msbt-chain: module revision found in cache: org.scala-lang#scala-library;2.11.7[0m
 [0m[[0mdebug[0m] [0m	found org.scala-lang#scala-library;2.11.7 in sbt-chain[0m
 [0m[[0mdebug[0m] [0m	[2.11.7] org.scala-lang#scala-library;2.11.7[0m
@@ -28,8 +28,21 @@
 [0m[[0mdebug[0m] [0m== resolving dependencies com.typesafe.scala-logging#scala-logging_2.11;3.1.0->org.scala-lang#scala-reflect;2.11.1 [compile->compile(*)][0m
 [0m[[0minfo[0m] [0mResolving org.scala-lang#scala-reflect;2.11.1 ...[0m
 [0m[[0mdebug[0m] [0msbt-chain: Checking cache for: dependency: org.scala-lang#scala-reflect;2.11.1 {compile=[compile(*), master(compile)], runtime=[runtime(*)]}[0m
-[0m[[0mdebug[0m] [0msbt-chain: module revision found in cache: org.scala-lang#scala-reflect;2.11.1[0m
-[0m[[0mdebug[0m] [0m	found org.scala-lang#scala-reflect;2.11.1 in sbt-chain[0m
+[0m[[0minfo[0m] [0mResolving org.scala-lang#scala-reflect;2.11.1 ...[0m
+[0m[[0mdebug[0m] [0msbt-chain-delegate: Checking cache for: dependency: org.scala-lang#scala-reflect;2.11.1 {compile=[compile(*), master(compile)], runtime=[runtime(*)]}[0m
+[0m[[0mdebug[0m] [0m		tried /home/alexeyche/.ivy2/local/org.scala-lang/scala-reflect/2.11.1/ivys/ivy.xml[0m
+[0m[[0mdebug[0m] [0m	local: no ivy file found for org.scala-lang#scala-reflect;2.11.1[0m
+[0m[[0mdebug[0m] [0m		tried https://jcenter.bintray.com/org/scala-lang/scala-reflect/2.11.1/scala-reflect-2.11.1.pom[0m
+[0m[[0mdebug[0m] [0m	jcenter: found md file for org.scala-lang#scala-reflect;2.11.1[0m
+[0m[[0mdebug[0m] [0m		=> https://jcenter.bintray.com/org/scala-lang/scala-reflect/2.11.1/scala-reflect-2.11.1.pom (2.11.1)[0m
+[0m[[0mdebug[0m] [0mdownloading https://jcenter.bintray.com/org/scala-lang/scala-reflect/2.11.1/scala-reflect-2.11.1.pom ...[0m
+[0m[[0mdebug[0m] [0m	jcenter: downloading https://jcenter.bintray.com/org/scala-lang/scala-reflect/2.11.1/scala-reflect-2.11.1.pom[0m
+[0m[[0mdebug[0m] [0m	jcenter: downloading https://jcenter.bintray.com/org/scala-lang/scala-reflect/2.11.1/scala-reflect-2.11.1.pom.sha1[0m
+[0m[[0mdebug[0m] [0msha1 OK for https://jcenter.bintray.com/org/scala-lang/scala-reflect/2.11.1/scala-reflect-2.11.1.pom[0m
+[0m[[0mdebug[0m] [0m	[SUCCESSFUL ] org.scala-lang#scala-reflect;2.11.1!scala-reflect.pom(pom.original) (294ms)[0m
+[0m[[0mdebug[0m] [0m		tried /home/alexeyche/.ivy2/local/org.scala-lang/scala-reflect/2.11.1/jars/scala-reflect.jar[0m
+[0m[[0mdebug[0m] [0m		tried https://jcenter.bintray.com/org/scala-lang/scala-reflect/2.11.1/scala-reflect-2.11.1.jar[0m
+[0m[[0mdebug[0m] [0m	found org.scala-lang#scala-reflect;2.11.1 in jcenter[0m
 [0m[[0mdebug[0m] [0m	[2.11.1] org.scala-lang#scala-reflect;2.11.1[0m
 [0m[[0mdebug[0m] [0m== resolving dependencies org.scala-lang#scala-reflect;2.11.1->org.scala-lang#scala-library;2.11.1 [compile->compile(*)][0m
 [0m[[0mdebug[0m] [0m== resolving dependencies org.scala-lang#scala-reflect;2.11.1->org.scala-lang#scala-library;2.11.7 [compile->compile(*)][0m
@@ -428,7 +441,12 @@
 [0m[[0mdebug[0m] [0m	[NOT REQUIRED] org.scala-lang#scala-library;2.11.7!scala-library.jar[0m
 [0m[[0mdebug[0m] [0m	[NOT REQUIRED] com.typesafe.scala-logging#scala-logging_2.11;3.1.0!scala-logging_2.11.jar[0m
 [0m[[0mdebug[0m] [0m	[NOT REQUIRED] ch.qos.logback#logback-classic;1.1.2!logback-classic.jar[0m
-[0m[[0mdebug[0m] [0m	[NOT REQUIRED] org.scala-lang#scala-reflect;2.11.1!scala-reflect.jar[0m
+[0m[[0mdebug[0m] [0m		tried https://jcenter.bintray.com/org/scala-lang/scala-reflect/2.11.1/scala-reflect-2.11.1.jar[0m
+[0m[[0minfo[0m] [0mdownloading https://jcenter.bintray.com/org/scala-lang/scala-reflect/2.11.1/scala-reflect-2.11.1.jar ...[0m
+[0m[[0mdebug[0m] [0m	jcenter: downloading https://jcenter.bintray.com/org/scala-lang/scala-reflect/2.11.1/scala-reflect-2.11.1.jar[0m
+[0m[[0mdebug[0m] [0m	jcenter: downloading https://jcenter.bintray.com/org/scala-lang/scala-reflect/2.11.1/scala-reflect-2.11.1.jar.sha1[0m
+[0m[[0mdebug[0m] [0msha1 OK for https://jcenter.bintray.com/org/scala-lang/scala-reflect/2.11.1/scala-reflect-2.11.1.jar[0m
+[0m[[0minfo[0m] [0m	[SUCCESSFUL ] org.scala-lang#scala-reflect;2.11.1!scala-reflect.jar (5400ms)[0m
 [0m[[0mdebug[0m] [0m	[NOT REQUIRED] org.slf4j#slf4j-api;1.7.7!slf4j-api.jar[0m
 [0m[[0mdebug[0m] [0m	[NOT REQUIRED] ch.qos.logback#logback-core;1.1.2!logback-core.jar[0m
 [0m[[0mdebug[0m] [0m	[NOT REQUIRED] org.scala-lang#scala-compiler;2.11.7!scala-compiler.jar[0m
@@ -436,7 +454,7 @@
 [0m[[0mdebug[0m] [0m	[NOT REQUIRED] org.scala-lang.modules#scala-xml_2.11;1.0.4!scala-xml_2.11.jar(bundle)[0m
 [0m[[0mdebug[0m] [0m	[NOT REQUIRED] org.scala-lang.modules#scala-parser-combinators_2.11;1.0.4!scala-parser-combinators_2.11.jar(bundle)[0m
 [0m[[0mdebug[0m] [0m	[NOT REQUIRED] jline#jline;2.12.1!jline.jar[0m
-[0m[[0mdebug[0m] [0m:: resolution report :: resolve 549ms :: artifacts dl 17ms[0m
+[0m[[0mdebug[0m] [0m:: resolution report :: resolve 481ms :: artifacts dl 5406ms[0m
 [0m[[0mdebug[0m] [0m	report for default#sorts_2.11;0.1dev1 compile produced in /home/alexeyche/prog/alexeyche-junk/scala/sorts/target/resolution-cache/reports/default-sorts_2.11-compile.xml[0m
 [0m[[0mdebug[0m] [0m	report for default#sorts_2.11;0.1dev1 runtime produced in /home/alexeyche/prog/alexeyche-junk/scala/sorts/target/resolution-cache/reports/default-sorts_2.11-runtime.xml[0m
 [0m[[0mdebug[0m] [0m	report for default#sorts_2.11;0.1dev1 test produced in /home/alexeyche/prog/alexeyche-junk/scala/sorts/target/resolution-cache/reports/default-sorts_2.11-test.xml[0m
@@ -450,5 +468,5 @@
 [0m[[0mdebug[0m] [0m	report for default#sorts_2.11;0.1dev1 docs produced in /home/alexeyche/prog/alexeyche-junk/scala/sorts/target/resolution-cache/reports/default-sorts_2.11-docs.xml[0m
 [0m[[0mdebug[0m] [0m	report for default#sorts_2.11;0.1dev1 pom produced in /home/alexeyche/prog/alexeyche-junk/scala/sorts/target/resolution-cache/reports/default-sorts_2.11-pom.xml[0m
 [0m[[0mdebug[0m] [0m	report for default#sorts_2.11;0.1dev1 scala-tool produced in /home/alexeyche/prog/alexeyche-junk/scala/sorts/target/resolution-cache/reports/default-sorts_2.11-scala-tool.xml[0m
-[0m[[0mdebug[0m] [0m	resolve done (549ms resolve - 17ms download)[0m
+[0m[[0mdebug[0m] [0m	resolve done (481ms resolve - 5406ms download)[0m
 [0m[[0minfo[0m] [0mDone updating.[0m
