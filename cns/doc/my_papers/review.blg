@@ -35,15 +35,15 @@ Too many commas in name 1 of "Shouval, H. Z., Castellani, G. C., Blais, B. S., Y
 while executing---line 944 of file unsrt.bst
 You've used 53 entries,
             1791 wiz_defined-function locations,
-            787 strings with 12222 characters,
-and the built_in function-call counts, 12864 in all, are:
-= -- 1242
+            787 strings with 12197 characters,
+and the built_in function-call counts, 12614 in all, are:
+= -- 1167
 > -- 400
 < -- 11
 + -- 158
 - -- 105
-* -- 852
-:= -- 1940
+* -- 827
+:= -- 1915
 add.period$ -- 165
 call.type$ -- 53
 change.case$ -- 43
@@ -64,14 +64,14 @@ purify$ -- 0
 quote$ -- 0
 skip$ -- 269
 stack$ -- 0
-substring$ -- 1142
+substring$ -- 1042
 swap$ -- 136
 text.length$ -- 11
 text.prefix$ -- 0
 top$ -- 0
 type$ -- 0
 warning$ -- 1
-while$ -- 129
+while$ -- 104
 width$ -- 55
 write$ -- 584
 (There were 14 error messages)
