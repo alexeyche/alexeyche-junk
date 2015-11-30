@@ -38,7 +38,16 @@ centering = function(x) {
     }
     return(r)
 }
-
+expansion = function(x) {
+    h = NULL
+    for(i in 1:ncol(x)) {
+        h = cbind(h, x[, i])
+        for(j in 1:i) {
+            h = cbind(h, x[, i]*x[, j])
+        }
+    }
+    return(h)
+}
 
 
 
@@ -50,16 +59,7 @@ xr = matrix(c(x1, x2), ncol=2, nrow=1000)
 
 
 xn = norm(xr)
-
-h = NULL
-for(i in 1:ncol(xn)) {
-    h = cbind(h, xn[, i])
-    for(j in 1:ncol(xn)) {
-        h = cbind(h, xn[, i]*xn[, j])
-    }
-}
-
-
+h = expansion(xn)
 hc = centering(h)
 z = whitening(hc)
 
