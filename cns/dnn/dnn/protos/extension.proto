@@ -1,0 +1,10 @@
+import "google/protobuf/descriptor.proto";
+
+package NDnnProto;
+
+extend google.protobuf.FieldOptions
+{
+    optional string description = 61111;
+    optional string short_option = 61112;
+    optional string default_value = 61113;
+}

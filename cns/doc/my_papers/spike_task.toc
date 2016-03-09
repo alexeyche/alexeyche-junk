@@ -1,0 +1,5 @@
+\select@language {russian}
+\contentsline {section}{\numberline {1}\IeC {\CYRS }\IeC {\cyrp }\IeC {\cyra }\IeC {\cyrishrt }\IeC {\cyrk }\IeC {\cyro }\IeC {\cyrv }\IeC {\cyrery }\IeC {\cyrishrt } \IeC {\cyrk }\IeC {\cyro }\IeC {\cyrd }}{2}{section.1}
+\contentsline {section}{\numberline {2}\IeC {\CYRS }\IeC {\cyrp }\IeC {\cyra }\IeC {\cyrishrt }\IeC {\cyrk }\IeC {\cyro }\IeC {\cyrv }\IeC {\cyrery }\IeC {\cyrishrt } \IeC {\cyrn }\IeC {\cyre }\IeC {\cyrishrt }\IeC {\cyrr }\IeC {\cyro }\IeC {\cyrn }}{2}{section.2}
+\contentsline {subsection}{\numberline {2.1}\IeC {\CYRM }\IeC {\cyro }\IeC {\cyrd }\IeC {\cyre }\IeC {\cyrl }\IeC {\cyrsftsn } Integrate-and-fire}{3}{subsection.2.1}
+\contentsline {section}{\numberline {3}\IeC {\CYRP }\IeC {\cyrr }\IeC {\cyri }\IeC {\cyrm }\IeC {\cyre }\IeC {\cyrr }: \IeC {\cyrk }\IeC {\cyro }\IeC {\cyrd }\IeC {\cyri }\IeC {\cyrr }\IeC {\cyro }\IeC {\cyrv }\IeC {\cyra }\IeC {\cyrn }\IeC {\cyri }\IeC {\cyre } \IeC {\cyrv }\IeC {\cyrr }\IeC {\cyre }\IeC {\cyrm }\IeC {\cyre }\IeC {\cyrn }\IeC {\cyrn }\IeC {\cyro }\IeC {\cyrg }\IeC {\cyro } \IeC {\cyrr }\IeC {\cyrya }\IeC {\cyrd }\IeC {\cyra }}{4}{section.3}

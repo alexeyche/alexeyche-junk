@@ -1,0 +1,15 @@
+\begin{thebibliography}{1}
+
+\bibitem{wiki:epsp}
+Wikipedia.
+\newblock Excitatory postsynaptic potential --- {W}ikipedia{,} the free
+  encyclopedia, 2015.
+\newblock [Online; accessed 10-October-2015].
+
+\bibitem{seung2003learning}
+H~Sebastian Seung.
+\newblock Learning in spiking neural networks by reinforcement of stochastic
+  synaptic transmission.
+\newblock {\em Neuron}, 40:1063--1073, 2003.
+
+\end{thebibliography}

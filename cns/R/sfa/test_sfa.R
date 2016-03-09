@@ -73,7 +73,7 @@ lambda_i = order(prc$values, decreasing=FALSE)
 
 g = NULL
 for(i in lambda_i) {
-    g = cbind(g, t(t(prc$vectors[,i]) %*% t(z)))    
+    g = cbind(g, t(t(prc$vectors[,i]) %*% t(z)))
 }
 
 
