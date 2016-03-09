@@ -5,10 +5,11 @@
 namespace NDnn {
 
 	struct TIndexSlice {
-	    TIndexSlice(ui32 from, ui32 to) : From(from), To(to) {}
+	    TIndexSlice(ui32 from, ui32 to) : From(from), To(to), Size(To-From) {}
 
 	    ui32 From;
 	    ui32 To;
+	    ui32 Size;
 	};
 
 
