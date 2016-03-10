@@ -1,0 +1,6 @@
+package NDnnProtos;
+
+message TDetermConst {
+    required double Threshold = 1;
+}
+

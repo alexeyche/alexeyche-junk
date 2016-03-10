@@ -1,0 +1,8 @@
+package NDnnProtos;
+
+message TSpikeNeuronInnerState {
+    required double Membrane = 1;
+    required double SpikeProbability = 2;
+    required bool Fired = 3;
+}
+

@@ -1,0 +1,20 @@
+package NDnnProtos;
+
+import "integrate_and_fire.proto";
+import "determ.proto";
+import "spike_neuron.proto";
+import "basic_synapse.proto";
+import "sim.proto";
+import "synapse.proto";
+
+message TConfig {
+    optional TIntegrateAndFireConst IntegrateAndFireConst = 1;
+    optional TIntegrateAndFireState IntegrateAndFireState = 2;
+    optional TDetermConst DetermConst = 3;
+    optional TSpikeNeuronInnerState SpikeNeuronInnerState = 4;
+    optional TBasicSynapseConst BasicSynapseConst = 5;
+    optional TBasicSynapseState BasicSynapseState = 6;
+    optional TSimConfiguration SimConfiguration = 7;
+    optional TSynapseInnerState SynapseInnerState = 8;
+}
+

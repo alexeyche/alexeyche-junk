@@ -1,0 +1,11 @@
+package NDnnProtos;
+
+message TSynapseInnerState {
+    required uint32 IdPre = 1;
+    required double DendriteDelay = 2;
+    required double Weight = 3;
+    required double Potential = 4;
+    required bool Fired = 5;
+    required double Amplitude = 6;
+}
+

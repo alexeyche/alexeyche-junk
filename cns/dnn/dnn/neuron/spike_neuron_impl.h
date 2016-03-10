@@ -4,16 +4,29 @@
 #include <atomic>
 
 #include <dnn/util/random.h>
-
+#include <dnn/util/serial.h>
 
 namespace NDnn {
 
 	template <typename TNeuron, typename TConf>	
-	class TSpikeNeuronImpl {
+	class TSpikeNeuronImpl: public ISerialStream {
 	public:
 		TSpikeNeuronImpl()
 			: InputSpikesLock(ATOMIC_FLAG_INIT)
 		{}
+
+		TSpikeNeuronImpl(const TSpikeNeuronImpl& other) {
+			(*this) = other;
+		}
+
+		TSpikeNeuronImpl& operator = (const TSpikeNeuronImpl& other) {
+			if (this != &other) {
+				Neuron = other.Neuron;
+				Activation = other.Activation;
+				Synapses = other.Synapses;
+			}
+			return *this;
+		}
 
 		void CalculateDynamicsInternal(const TTime& t) {
 			ReadInputSpikes(t);
@@ -54,6 +67,13 @@ namespace NDnn {
 		TNeuron& GetNeuron() {
 			return Neuron;
 		}
+
+		void SerialProcess(TSerialStream& serial) override final {
+			serial(Neuron);
+			serial(Activation);
+		}
+
+
 
 	private:
 		TNeuron Neuron;

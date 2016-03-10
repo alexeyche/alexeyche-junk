@@ -3,16 +3,23 @@
 
 #include "activation.h"
 
+#include <dnn/util/serial.h>
+#include <dnn/protos/determ.pb.h>
+
 namespace NDnn {
 
-    struct TDetermC {
-        TDetermC() : Threshold(1.0) {}
+    struct TDetermConst: public IProtoSerial<NDnnProtos::TDetermConst> {
+        TDetermConst() : Threshold(1.0) {}
+
+        void SerialProcess(TProtoSerial& serial) override final {
+            serial(Threshold);
+        }
 
         double Threshold;
     };
 
 
-    class TDeterm : public TActivation<TDetermC> {
+    class TDeterm : public TActivation<TDetermConst> {
     public:
         double SpikeProbability(const double &u) {
             if(u >= c.Threshold) {

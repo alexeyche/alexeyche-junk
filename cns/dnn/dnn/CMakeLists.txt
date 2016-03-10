@@ -35,6 +35,7 @@ SET_TARGET_PROPERTIES(dnn PROPERTIES COMPILE_FLAGS "-fPIC")
 
 
 target_link_libraries(dnn
+    dnn_protos
     ${PROTOBUF_LIBRARY}
     ${CMAKE_THREAD_LIBS_INIT}
     m

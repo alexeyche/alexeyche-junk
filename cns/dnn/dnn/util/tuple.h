@@ -29,12 +29,5 @@ namespace NDnn {
 	    f(I, std::get<I>(t));
 	    ForEachEnumerate<I + 1, FuncT, Tp...>(t, f);
 	  }
-
-
-
-	template < template<template<typename ...> class> class T >
-	struct TConvertInTuple {
-	    typedef typename T<std::tuple>::type type;
-	};
 	
 } // namespace NDnn

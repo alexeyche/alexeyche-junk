@@ -2,15 +2,26 @@
 
 #include "spike_neuron.h"
 
+#include <dnn/util/serial.h>
+#include <dnn/protos/integrate_and_fire.pb.h>
+
+
 namespace NDnn {
 
-	struct TIntegrateAndFireC {//: public ISerial<Protos::IntegrateAndFireC> {
-	    TIntegrateAndFireC()
+	struct TIntegrateAndFireConst: public IProtoSerial<NDnnProtos::TIntegrateAndFireConst> {
+	    TIntegrateAndFireConst()
 	    	: TauMem(5.0)
 		    , RestPotential(0.0)
 		    , TauRef(2.0)
 		    , NoiseAmp(0.0)
 	    {}
+
+        void SerialProcess(TProtoSerial& serial) override final {
+            serial(TauMem);
+            serial(RestPotential);
+            serial(TauRef);
+            serial(NoiseAmp);
+        }
 
 
 	    double TauMem;
@@ -20,15 +31,19 @@ namespace NDnn {
 	};
 
 
-	struct TIntegrateAndFireState {//: public Serializable<Protos::IntegrateAndFireState>  {
+	struct TIntegrateAndFireState: public IProtoSerial<NDnnProtos::TIntegrateAndFireState> {
 	    TIntegrateAndFireState()
 	        : RefTime(0.0)
 	    {}
 
+	    void SerialProcess(TProtoSerial& serial) override final {
+            serial(RefTime);
+        }
+
 	    double RefTime;
 	};
 
-	class TIntegrateAndFire : public TSpikeNeuron<TIntegrateAndFireC, TIntegrateAndFireState> {
+	class TIntegrateAndFire : public TSpikeNeuron<TIntegrateAndFireConst, TIntegrateAndFireState> {
 	public:
 		void Reset() {
 	        MutMembrane() = c.RestPotential;

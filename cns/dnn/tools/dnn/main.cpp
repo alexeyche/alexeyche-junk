@@ -14,10 +14,11 @@ using namespace NDnn;
 int main(int argc, const char** argv) {
 	TLog::Instance().SetLogLevel(TLog::DEBUG_LEVEL);
 
-	TSim<
+	auto sim = BuildSim<
 		TLayer<TIntegrateAndFire, 100, TNeuronConfig<TBasicSynapse, TDeterm>>,
 		TLayer<TIntegrateAndFire, 100>
-	>().Run();
-    
+	>();
+
+	sim.SerializeToTextStream(std::cout);
     return 0;
 }

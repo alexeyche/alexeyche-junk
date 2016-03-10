@@ -5,8 +5,8 @@
 namespace NDnn {
 
 
-struct TBasicSynapseC {
-    TBasicSynapseC() : PspDecay(15.0), Amp(1.0) {}
+struct TBasicSynapseConst {
+    TBasicSynapseConst() : PspDecay(15.0), Amp(1.0) {}
 
     double PspDecay;
     double Amp;
@@ -14,7 +14,7 @@ struct TBasicSynapseC {
 
 struct TBasicSynapseState {};
 
-class TBasicSynapse : public TSynapse<TBasicSynapseC, TBasicSynapseState> {
+class TBasicSynapse : public TSynapse<TBasicSynapseConst, TBasicSynapseState> {
 public:
 
     void Reset() {

@@ -9,13 +9,17 @@
 
 #include <dnn/neuron/integrate_and_fire.h>
 
+#include <utility>
+
 namespace NDnn {
 
-	struct TSimConf {
+	struct TSimConfiguration {
 		ui32 Jobs = 4;
 		double Duration = 1000;
 		double Dt = 1.0;
 	};
+
+
 
 	template <typename ... T>
 	class TSim {
@@ -36,17 +40,21 @@ namespace NDnn {
 			TVector<std::thread> threads;
 
 			ForEachEnumerate(Layers, [&](ui32 layerId, auto& layer) {
-				if (Conf.Jobs == 1) {
-					SimLayer(layer, perLayerJobs[layerId].Size, threads, barrier, /* sync = */ true);	
-				} else {
-					SimLayer(layer, perLayerJobs[layerId].Size, threads, barrier, /* sync = */ false);	
-				}
-				
+				SimLayer(layer, perLayerJobs[layerId].Size, threads, barrier);	
 			});
 
 			for(auto& t: threads) {
 				t.join();
 			}
+		}
+		
+		void SerializeToTextStream(std::ostream& ostr) {
+			TSerialStreamProtoTxt str(ostr);
+			ForEach(Layers, [&](auto& layer) {
+				for (auto& n: layer) {
+					n.SerialProcess(str);
+				}
+			});
 		}
 
 	private:
@@ -70,24 +78,18 @@ namespace NDnn {
 		}
 
 		template <typename L>
-		void SimLayer(L& layer, ui32 jobs, TVector<std::thread>& threads, TSpinningBarrier& barrier, bool sync) {
-			if (sync) {
-				TSelf::RunWorker<L>(*this, layer, 0, layer.Size(), barrier);
-			} else {
-				TVector<TIndexSlice> layerJobSlices = DispatchOnThreads(layer.Size(), jobs);
-				for (const auto& slice: layerJobSlices) {
-					threads.emplace_back(
-						TSelf::RunWorker<L>,
-						std::ref(*this),
-						std::ref(layer),
-						slice.From,
-						slice.To,
-						std::ref(barrier)
-					);	
-				}	
+		void SimLayer(L& layer, ui32 jobs, TVector<std::thread>& threads, TSpinningBarrier& barrier) {
+			TVector<TIndexSlice> layerJobSlices = DispatchOnThreads(layer.Size(), jobs);
+			for (const auto& slice: layerJobSlices) {
+				threads.emplace_back(
+					TSelf::RunWorker<L>,
+					std::ref(*this),
+					std::ref(layer),
+					slice.From,
+					slice.To,
+					std::ref(barrier)
+				);	
 			}
-			
-			
 		}
 
 		template <typename L>
@@ -101,12 +103,19 @@ namespace NDnn {
 				// pass
 			}
 		}
+
+		
 	private:
-		TSimConf Conf;
+		TSimConfiguration Conf;
 
 		std::tuple<T ...> Layers;
 	};
 
+
+	template <typename ... T>
+	auto BuildSim() {
+		return TSim<T...>();
+	}
 
 
 } // namespace NDnn

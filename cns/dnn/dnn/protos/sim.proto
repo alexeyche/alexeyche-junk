@@ -1,0 +1,8 @@
+package NDnnProtos;
+
+message TSimConfiguration {
+    required uint32 Jobs = 1;
+    required double Duration = 2;
+    required double Dt = 3;
+}
+

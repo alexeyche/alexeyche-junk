@@ -1,16 +1,34 @@
 #include "serial.h"
 
+#include <dnn/util/protobuf.h>
+
 namespace NDnn {
 
-    TSerializer::TSerializer(google::protobuf::Message& message, ESerialMode mode)
+    TSerialBase::TSerialBase(ESerialMode mode)
+        : Mode(mode)
+    {
+    }
+
+    bool TSerialBase::IsInput() const {
+        return Mode == ESerialMode::IN;
+    }
+
+    bool TSerialBase::IsOutput() const {
+        return Mode == ESerialMode::OUT;
+    }
+
+
+
+    TProtoSerial::TProtoSerial(google::protobuf::Message& message, ESerialMode mode)
         : Message(message)
-        , Mode(mode)
+        , TSerialBase(mode)
+        , CurrentFieldNumber(1)
     {
         Refl = Message.GetReflection();
         Descr = Message.GetDescriptor();
     }
 
-    void TSerializer::operator() (TString& v, int protoField) {
+    void TProtoSerial::operator() (TString& v, int protoField) {
         switch (Mode) {
             case ESerialMode::IN:
             {
@@ -25,7 +43,22 @@ namespace NDnn {
         }
     }
 
-    void TSerializer::operator() (ui32& v, int protoField) {
+    void TProtoSerial::operator() (double& v, int protoField) {
+        switch (Mode) {
+            case ESerialMode::IN:
+            {
+                v = Refl->GetDouble(Message, Descr->FindFieldByNumber(protoField));
+            }
+            break;
+            case ESerialMode::OUT:
+            {
+                Refl->SetDouble(&Message, Descr->FindFieldByNumber(protoField), v);
+            }
+            break;
+        }
+    }
+
+    void TProtoSerial::operator() (ui32& v, int protoField) {
         switch (Mode) {
             case ESerialMode::IN:
             {
@@ -40,13 +73,28 @@ namespace NDnn {
         }
     }
 
-    //void TSerializer::operator() (TVector<double>& v, int protoField) {
+    void TProtoSerial::operator() (bool& v, int protoField) {
+        switch (Mode) {
+            case ESerialMode::IN:
+            {
+                v = Refl->GetBool(Message, Descr->FindFieldByNumber(protoField));
+            }
+            break;
+            case ESerialMode::OUT:
+            {
+                Refl->SetBool(&Message, Descr->FindFieldByNumber(protoField), v);
+            }
+            break;
+        }
+    }
+
+    //void TProtoSerial::operator() (TVector<double>& v, int protoField) {
     //    TVectorD laVec = NLa::StdToVec(v);
     //    (*this)(laVec, protoField);
     //    v = NLa::VecToStd(laVec);
     //}
 
-    //void TSerializer::operator() (TVectorD& v, int protoField) {
+    //void TProtoSerial::operator() (TVectorD& v, int protoField) {
     //    switch (Mode) {
     //        case ESerialMode::IN:
     //        {
@@ -68,7 +116,7 @@ namespace NDnn {
     //    }
     //}
 
-    //void TSerializer::operator() (TMatrixD& m, int protoField) {
+    //void TProtoSerial::operator() (TMatrixD& m, int protoField) {
     //    switch (Mode) {
     //        case ESerialMode::IN:
     //        {
@@ -98,7 +146,7 @@ namespace NDnn {
     //    }
     //}
 
-    void TSerializer::operator() (google::protobuf::Message& m, int protoField) {
+    void TProtoSerial::operator() (google::protobuf::Message& m, int protoField) {
         switch (Mode) {
             case ESerialMode::IN:
             {
@@ -115,12 +163,77 @@ namespace NDnn {
         }
     }
 
-    bool TSerializer::IsInput() const {
-        return Mode == ESerialMode::IN;
+    TSerialStream::TSerialStream(std::ostream& ostr) 
+        : TSerialBase(ESerialMode::OUT) 
+        , OStr(&ostr)
+    {
     }
 
-    bool TSerializer::IsOutput() const {
-        return Mode == ESerialMode::OUT;
+    TSerialStream::TSerialStream(std::istream& istr)
+        : TSerialBase(ESerialMode::IN) 
+        , IStr(&istr)
+    {
+    } 
+
+    void TSerialStreamProtoBin::operator() (ISerialStream& v) {
+        if (IsInput()) {
+            TSerialStreamProtoBin str(*IStr);
+            v.SerialProcess(str);    
+        } else {
+            TSerialStreamProtoBin str(*OStr);
+            v.SerialProcess(str);    
+        }
+        
     }
+
+    void TSerialStreamProtoTxt::operator() (ISerialStream& v) {
+        if (IsInput()) {
+            TSerialStreamProtoTxt str(*IStr);
+            v.SerialProcess(str);    
+        } else {
+            TSerialStreamProtoTxt str(*OStr);
+            v.SerialProcess(str);    
+        }
+    }
+
+    TSerialStreamProtoBin::TSerialStreamProtoBin(std::ostream& ostr) 
+        : TSerialStream(ostr)
+    {
+    }
+
+    TSerialStreamProtoBin::TSerialStreamProtoBin(std::istream& istr) 
+        : TSerialStream(istr)
+    {
+    }
+
+    TSerialStreamProtoTxt::TSerialStreamProtoTxt(std::ostream& ostr) 
+        : TSerialStream(ostr)
+    {
+    }
+
+    TSerialStreamProtoTxt::TSerialStreamProtoTxt(std::istream& istr) 
+        : TSerialStream(istr)
+    {
+    }
+
+    void TSerialStreamProtoBin::DeserializeProtoFromString(const TString& s, google::protobuf::Message& message) {
+        ENSURE(message.ParseFromString(s), "Failed to deserialize message");
+    }
+
+    void TSerialStreamProtoBin::SerializeProtoToString(const google::protobuf::Message& message, TString& s) {
+        ENSURE(message.SerializeToString(&s), "Failed to serialize message");
+    }
+
+
+    void TSerialStreamProtoTxt::DeserializeProtoFromString(const TString& s, google::protobuf::Message& message) {
+        ReadProtoText(s, message);
+    }
+
+    void TSerialStreamProtoTxt::SerializeProtoToString(const google::protobuf::Message& message, TString& s) {
+        s = ProtoTextToString(message);
+    }
+
+
+
 
 } // namespace NDnn

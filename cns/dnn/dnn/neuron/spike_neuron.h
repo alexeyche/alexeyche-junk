@@ -1,13 +1,23 @@
 #pragma once
 
+#include <dnn/util/serial.h>
+#include <dnn/protos/spike_neuron.pb.h>
+
+
 namespace NDnn {
 
-	struct TSpikeNeuronInnerState {
+	struct TSpikeNeuronInnerState: public IProtoSerial<NDnnProtos::TSpikeNeuronInnerState> {
 		TSpikeNeuronInnerState()
 			: Membrane(0.0)
 			, SpikeProbability(0.0)
 			, Fired(false)
 		{}
+
+		void SerialProcess(TProtoSerial& serial) override final {
+            serial(Membrane);
+            serial(SpikeProbability);
+            serial(Fired);
+        }
 
 		double Membrane;
 		double SpikeProbability;
@@ -15,10 +25,9 @@ namespace NDnn {
 	};
 
 	template <typename TConstants, typename TState>
-	class TSpikeNeuron {
+	class TSpikeNeuron: public ISerialStream {
 	public:
 		TSpikeNeuron()
-			
 		{}
 
 		double& MutMembrane() {
@@ -43,6 +52,12 @@ namespace NDnn {
 		
 		const double& SpikeProbability() const {
 			return InnerState.SpikeProbability;
+		}
+		
+		void SerialProcess(TSerialStream& serial) override final {
+			serial(c); 
+			serial(s);
+			serial(InnerState);
 		}
 
 	private:

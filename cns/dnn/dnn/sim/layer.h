@@ -36,7 +36,12 @@ namespace NDnn {
 		const ui32& GetId() const {
 			return Id;
 		}
-		
+		auto begin() {
+			return Neurons.begin();
+		}
+		auto end() {
+			return Neurons.end();
+		}
 	private:
 		ui32 Id;
 		std::array<TNeuronImplType, size> Neurons;

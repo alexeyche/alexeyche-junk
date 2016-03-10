@@ -3,38 +3,23 @@
 namespace NDnn {
 
     template <typename T>
-    void TSerializer::operator() (ISerial<T>& v, int protoField) {
-        typename ISerial<T>::TProto* mess = GetMutMessage<typename ISerial<T>::TProto>(protoField);
-        TSerializer serial(*mess, Mode);
+    void TProtoSerial::operator() (IProtoSerial<T>& v, int protoField) {
+        typename IProtoSerial<T>::TProto* mess = GetMutMessage<typename IProtoSerial<T>::TProto>(protoField);
+        TProtoSerial serial(*mess, Mode);
         v.SerialProcess(serial);
     }
-        // switch (Mode) {
-        //     case ESerialMode::IN:
-        //     {
-        //         typename ISerial<T>::TProto* mess = GetMutMessage<typename ISerial<T>::TProto>(protoField);
-        //         TSerializer serial(*mess, ESerialMode::IN);
-        //         v.SerialProcess(serial);
-        //     }
-        //     break;
-        //     case ESerialMode::OUT:
-        //     {
-
-
-        //     }
-        //     break;
-        // }
 
     template <typename T>
-    typename ISerial<T>::TProto ISerial<T>::Serialize() {
+    typename IProtoSerial<T>::TProto IProtoSerial<T>::Serialize() {
         TProto mess;
-        TSerializer serial(mess, TSerializer::ESerialMode::OUT);
+        TProtoSerial serial(mess, TProtoSerial::ESerialMode::OUT);
         SerialProcess(serial);
         return mess;
     }
 
     template <typename T>
-    void ISerial<T>::Deserialize(typename ISerial<T>::TProto& proto) {
-        TSerializer serial(proto, TSerializer::ESerialMode::IN);
+    void IProtoSerial<T>::Deserialize(typename IProtoSerial<T>::TProto& proto) {
+        TProtoSerial serial(proto, TProtoSerial::ESerialMode::IN);
         SerialProcess(serial);
     }
 
