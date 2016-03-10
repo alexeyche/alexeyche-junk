@@ -1,11 +1,22 @@
 
 #include <dnn/base/base.h>
 
+#include <dnn/neuron/spike_neuron_impl.h>
+
+#include <dnn/neuron/default_config.h>
+
 namespace NDnn {
 
-	template <typename N, ui32 size>
+	template <typename N, ui32 size, typename TConf = TDefaultConfig>
 	class TLayer {
+	private:
+		using TNeuronImplType = TSpikeNeuronImpl<N, TConf>;
+
 	public:
+		using TNeuronType = N;
+
+		
+
 		TLayer()
 			: Id(0)
 		{}
@@ -14,7 +25,7 @@ namespace NDnn {
 			return size;
 		}
 		
-		N& operator[](ui32 id) {
+		TNeuronImplType& operator[](ui32 id) {
 			return Neurons[id];
 		}
 
@@ -28,7 +39,7 @@ namespace NDnn {
 		
 	private:
 		ui32 Id;
-		std::array<N, size> Neurons;
+		std::array<TNeuronImplType, size> Neurons;
 	};
 
 

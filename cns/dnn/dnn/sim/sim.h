@@ -7,7 +7,7 @@
 #include <dnn/util/thread.h>
 #include <dnn/util/tuple.h>
 
-
+#include <dnn/neuron/integrate_and_fire.h>
 
 namespace NDnn {
 
@@ -27,14 +27,6 @@ namespace NDnn {
 				l.SetId(layerId);
 			});
 		}
-
-		ui32 NeuronsNumber() {
-			ui32 acc = 0;
-			ForEach(Layers, [&](const auto& t) {
-				acc += t.Size();
-			});
-			return acc;
-		}
 		
 		void Run() {
 			L_DEBUG << "Going to run simulation for " << Conf.Duration << " ms in " << Conf.Jobs << " jobs";
@@ -44,7 +36,12 @@ namespace NDnn {
 			TVector<std::thread> threads;
 
 			ForEachEnumerate(Layers, [&](ui32 layerId, auto& layer) {
-				SimLayer(layer, perLayerJobs[layerId].Size, threads, barrier);
+				if (Conf.Jobs == 1) {
+					SimLayer(layer, perLayerJobs[layerId].Size, threads, barrier, /* sync = */ true);	
+				} else {
+					SimLayer(layer, perLayerJobs[layerId].Size, threads, barrier, /* sync = */ false);	
+				}
+				
 			});
 
 			for(auto& t: threads) {
@@ -58,29 +55,38 @@ namespace NDnn {
 		void RunWorkerRoutine(L& layer, ui32 idxFrom, ui32 idxTo, TSpinningBarrier& barrier) {
 			TTime t(Conf.Dt);
 			L_DEBUG << "Entering into simulation of layer " << layer.GetId() << " of neurons " << idxFrom << ":" << idxTo;
-
-			for(ui32 neuronId=idxFrom; neuronId<idxTo; ++neuronId) {
-				layer[neuronId].Reset();	
+			for (ui32 neuronId=idxFrom; neuronId<idxTo; ++neuronId) {
+				layer[neuronId].GetNeuron().Reset();	
 			}
 
-			// for(ui32 neuronId=idxFrom; neuronId<idxTo; ++neuronId) {
-			// 	layer[neuronId].CalculateDynamics(t, 0, 0);
-			// }
+
+			for (; t < Conf.Duration; ++t) {
+				for(ui32 neuronId=idxFrom; neuronId<idxTo; ++neuronId) {
+					layer[neuronId].CalculateDynamicsInternal(t);
+				}
+			}
+			
+
 		}
 
 		template <typename L>
-		void SimLayer(L& layer, ui32 jobs, TVector<std::thread>& threads, TSpinningBarrier& barrier) {
-			TVector<TIndexSlice> layerJobSlices = DispatchOnThreads(layer.Size(), jobs);
-			for (const auto& slice: layerJobSlices) {
-				threads.emplace_back(
-					TSelf::RunWorker<L>,
-					std::ref(*this),
-					std::ref(layer),
-					slice.From,
-					slice.To,
-					std::ref(barrier)
-				);	
+		void SimLayer(L& layer, ui32 jobs, TVector<std::thread>& threads, TSpinningBarrier& barrier, bool sync) {
+			if (sync) {
+				TSelf::RunWorker<L>(*this, layer, 0, layer.Size(), barrier);
+			} else {
+				TVector<TIndexSlice> layerJobSlices = DispatchOnThreads(layer.Size(), jobs);
+				for (const auto& slice: layerJobSlices) {
+					threads.emplace_back(
+						TSelf::RunWorker<L>,
+						std::ref(*this),
+						std::ref(layer),
+						slice.From,
+						slice.To,
+						std::ref(barrier)
+					);	
+				}	
 			}
+			
 			
 		}
 

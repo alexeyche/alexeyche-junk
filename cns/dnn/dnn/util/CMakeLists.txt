@@ -19,6 +19,7 @@ set(SOURCES
     json.cpp
     serial.cpp
     thread.cpp
+    random.cpp
 )
 
 set(DIR_SRCS)

@@ -28,10 +28,9 @@ namespace NDnn {
 	    double RefTime;
 	};
 
-
 	class TIntegrateAndFire : public TSpikeNeuron<TIntegrateAndFireC, TIntegrateAndFireState> {
 	public:
-	    void Reset() {
+		void Reset() {
 	        MutMembrane() = c.RestPotential;
 	        MutSpikeProbability() = 0.0;
 	        s.RefTime = 0.0;

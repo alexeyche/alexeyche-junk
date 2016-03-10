@@ -99,5 +99,19 @@ namespace NDnn {
 	    double Dt;
 	};
 
+	struct TSynSpike {
+	    TSynSpike(const size_t &_n_id, const size_t &_syn_id, const double &_t)
+	    : n_id(_n_id)
+	    , syn_id(_syn_id)
+	    , T(_t) {}
+
+	    double T;
+	    size_t n_id;
+	    size_t syn_id;
+
+	    bool operator<(const TSynSpike& rhs) const {
+	        return T > rhs.T;
+	    }
+	};
 
 } // namespace NDnn
