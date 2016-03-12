@@ -27,17 +27,26 @@ int main(int argc, const char** argv) {
     if (options.verbose()) {
         TLog::Instance().SetLogLevel(TLog::DEBUG_LEVEL);
     }
+    ui32 port;
+
+    TOptional<TConfig> config;
+    if (options.has_config()) {
+        config.emplace(TConfig());
+        ReadProtoTextFromFile(options.config(), *config);
+        port = config->simconfiguration().port();
+    }
+
+    if (options.has_port()) {
+        port = options.port();
+    }
 
     auto sim = BuildSim<
 		TLayer<TIntegrateAndFire, 5, TNeuronConfig<TBasicSynapse, TDeterm>>,
 		TLayer<TIntegrateAndFire, 5>
-	>();
+	>(port);
 
-
-    if (options.has_config()) {
-    	TConfig config;
-    	ReadProtoTextFromFile(options.config(), config);
-    	sim.Deserialize(config);
+    if (config) {
+    	sim.Deserialize(*config);
     }
 	
 	TConfig conf = sim.Serialize();

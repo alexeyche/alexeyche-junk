@@ -5,18 +5,26 @@
 namespace NDnn {
 
 
-struct TBasicSynapseConst {
-    TBasicSynapseConst() : PspDecay(15.0), Amp(1.0) {}
+struct TBasicSynapseConst: public IProtoSerial<NDnnProto::TBasicSynapseConst> {
+    static const auto ProtoFieldNumber = NDnnProto::TLayer::kBasicSynapseConstFieldNumber;
 
-    double PspDecay;
-    double Amp;
+    void SerialProcess(TProtoSerial& serial) override {
+        serial(PspDecay);
+        serial(Amp);
+    }
+
+    double PspDecay = 15.0;
+    double Amp = 1.0;
 };
 
-struct TBasicSynapseState {};
+struct TBasicSynapseState: public IProtoSerial<NDnnProto::TBasicSynapseState> {
+    static const auto ProtoFieldNumber = NDnnProto::TLayer::kBasicSynapseStateFieldNumber;
+
+    void SerialProcess(TProtoSerial& serial) override {}
+};
 
 class TBasicSynapse : public TSynapse<TBasicSynapseConst, TBasicSynapseState> {
 public:
-
     void Reset() {
         MutAmplitude() = c.Amp;
         MutPotential() = 0;

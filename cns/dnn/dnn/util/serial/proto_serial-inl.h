@@ -32,6 +32,16 @@ namespace NDnn {
         return true;
     }
 
+    template <typename T>
+    bool TProtoSerial::operator() (TVector<T>& v, int protoField) {
+        CHECK_FIELD();
+        for (auto& vecVal: v) {
+            (*this)(v, protoField);
+        }
+        return true;
+    }
+
+
     #undef CHECK_FIELD
 
     template <typename T>

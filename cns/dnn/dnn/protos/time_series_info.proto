@@ -1,0 +1,18 @@
+package NDnnProto;
+
+message TLabelPos {
+    optional uint32 LabelId = 1;
+    optional uint32 Start = 2;
+}
+
+message TTimeSeriesInfo {
+    repeated TLabelInfo UniqueLabels = 1;
+    repeated TLabelPos LabelsStart = 2;
+    optional double Dt = 3;
+}
+
+message TLabelInfo {
+    optional string Name = 1;
+    optional uint32 Duration = 2;
+}
+

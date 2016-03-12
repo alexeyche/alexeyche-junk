@@ -19,6 +19,7 @@ set(DNN_SRCS ${DIR_SRCS})
 set(DIRS
     base
     contrib
+    dispatcher
     util
     protos
 )

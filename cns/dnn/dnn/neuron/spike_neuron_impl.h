@@ -3,9 +3,11 @@
 #include <queue>
 #include <atomic>
 
+#include <dnn/util/act_vector.h>
 #include <dnn/util/random.h>
 #include <dnn/util/serial/meta_proto_serial.h>
 #include <dnn/protos/config.pb.h>
+
 
 
 namespace NDnn {
@@ -29,6 +31,21 @@ namespace NDnn {
 			}
 			return *this;
 		}
+		
+		void ReadInputSpikes(const TTime &t) {
+			while (InputSpikesLock.test_and_set(std::memory_order_acquire)) {}
+		    while(!InputSpikes.empty()) {
+		        const TSynSpike& sp = InputSpikes.top();
+		        if(sp.T >= t.T) break;
+		        auto& s = Synapses[sp.syn_id];
+		        
+		        s.MutFired() = true;
+		    	s.PropagateSpike();
+
+		        InputSpikes.pop();
+		    }
+		    InputSpikesLock.clear(std::memory_order_release);
+		}
 
 		void CalculateDynamicsInternal(const TTime& t) {
 			ReadInputSpikes(t);
@@ -50,22 +67,7 @@ namespace NDnn {
 		        Neuron.PostSpikeDynamics(t);
 		    }
 		}
-		
-		void ReadInputSpikes(const TTime &t) {
-			while (InputSpikesLock.test_and_set(std::memory_order_acquire)) {}
-		    while(!InputSpikes.empty()) {
-		        const TSynSpike& sp = InputSpikes.top();
-		        if(sp.T >= t.T) break;
-		        auto& s = Synapses[sp.syn_id];
-		        
-		        s.MutFired() = true;
-		    	s.PropagateSpike();
 
-		        InputSpikes.pop();
-		    }
-		    InputSpikesLock.clear(std::memory_order_release);
-		}
-		
 		TNeuron& GetNeuron() {
 			return Neuron;
 		}
@@ -73,15 +75,16 @@ namespace NDnn {
 		void SerialProcess(TMetaProtoSerial& serial) override final {
 			serial(Neuron);
 			serial(Activation);
+			for (auto& synapse: Synapses) {
+				serial(synapse);
+			}
 		}
-
-
 
 	private:
 		TNeuron Neuron;
 
 		typename TConf::TActivationFunction Activation;
-		std::vector<typename TConf::TSynapse> Synapses;
+		TActVector<typename TConf::TSynapse> Synapses;
 
 		std::priority_queue<TSynSpike> InputSpikes;
 		std::atomic_flag InputSpikesLock;	

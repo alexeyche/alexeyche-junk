@@ -3,7 +3,7 @@ import "extension.proto";
 package NDnnProto;
 
 message TDnnOptions {
-    optional string Port = 1 [
+    optional uint32 Port = 1 [
         (description) = "Input time series port",
         (default_value) = "9090",
         (short_option) = "-p"

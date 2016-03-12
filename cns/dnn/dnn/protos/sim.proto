@@ -4,5 +4,6 @@ message TSimConfiguration {
     optional uint32 Jobs = 1;
     optional double Duration = 2;
     optional double Dt = 3;
+    optional uint32 Port = 4;
 }
 

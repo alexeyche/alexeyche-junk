@@ -97,6 +97,15 @@ namespace NDnn {
                 case google::protobuf::FieldDescriptor::TYPE_BOOL:
                     reflection->SetBool(&message, desc, true);
                     break;
+                case google::protobuf::FieldDescriptor::TYPE_UINT32:
+                    {
+                        ++value_iterator;
+                        if(value_iterator == end_iter) {
+                            throw TDnnException() << "Can't find value for option " << desc->name();
+                        }
+                        reflection->SetUInt32(&message, desc, NStr::As<ui32>(*value_iterator));
+                    }
+                    break;
                 case google::protobuf::FieldDescriptor::TYPE_STRING:
                     {
                         ++value_iterator;

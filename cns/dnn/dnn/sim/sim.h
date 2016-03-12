@@ -2,6 +2,8 @@
 
 #include <dnn/base/base.h>
 
+#include <dnn/dispatcher/dispatcher.h>
+
 #include <dnn/util/spinning_barrier.h>
 #include <dnn/util/log/log.h>
 #include <dnn/util/thread.h>
@@ -20,11 +22,13 @@ namespace NDnn {
 			serial(Jobs);
 			serial(Duration);
 			serial(Dt);
+			serial(Port);
 		}
 
 		ui32 Jobs = 4;
 		double Duration = 1000;
 		double Dt = 1.0;
+		ui32 Port = 9090;
 	};
 
 
@@ -33,8 +37,11 @@ namespace NDnn {
 	class TSim: public IProtoSerial<NDnnProto::TConfig> {
 	public:
 		using TSelf = TSim<T...>;
+		using TParent = IProtoSerial<NDnnProto::TConfig>;
 
-		TSim() {
+		TSim(ui32 port)
+			: Dispatcher(port) 
+		{
 			ForEachEnumerate(Layers, [&](ui32 layerId, auto& l) {
 				l.SetId(layerId);
 			});
@@ -50,7 +57,9 @@ namespace NDnn {
 			ForEachEnumerate(Layers, [&](ui32 layerId, auto& layer) {
 				SimLayer(layer, perLayerJobs[layerId].Size, threads, barrier);	
 			});
-
+			threads.emplace_back([&]() {
+				Dispatcher.MainLoop();
+			});
 			for(auto& t: threads) {
 				t.join();
 			}
@@ -67,6 +76,9 @@ namespace NDnn {
 			ForEach(Layers, [&](auto& layer) {
 				serial(layer, NDnnProto::TConfig::kLayerFieldNumber, /* newMessage = */ true);
 			});
+			if (serial.IsInput()) {
+				Dispatcher.SetPort(Conf.Port);
+			}
 		}
 
 	private:
@@ -75,18 +87,19 @@ namespace NDnn {
 		void RunWorkerRoutine(L& layer, ui32 idxFrom, ui32 idxTo, TSpinningBarrier& barrier) {
 			TTime t(Conf.Dt);
 			L_DEBUG << "Entering into simulation of layer " << layer.GetId() << " of neurons " << idxFrom << ":" << idxTo;
+			
 			for (ui32 neuronId=idxFrom; neuronId<idxTo; ++neuronId) {
 				layer[neuronId].GetNeuron().Reset();	
 			}
 
-
 			for (; t < Conf.Duration; ++t) {
 				for(ui32 neuronId=idxFrom; neuronId<idxTo; ++neuronId) {
+					Dispatcher.GetNeuronInput(layer.GetId(), neuronId);
+
 					layer[neuronId].CalculateDynamicsInternal(t);
 				}
+				barrier.Wait();
 			}
-			
-
 		}
 
 		template <typename L>
@@ -121,12 +134,13 @@ namespace NDnn {
 		TSimConfiguration Conf;
 
 		std::tuple<T ...> Layers;
+		TDispatcher Dispatcher;
 	};
 
 
 	template <typename ... T>
-	auto BuildSim() {
-		return TSim<T...>();
+	auto BuildSim(ui32 port) {
+		return TSim<T...>(port);
 	}
 
 

@@ -38,6 +38,9 @@ namespace NDnn {
         bool operator() (NPb::Message& m, int protoField);
 
         template <typename T>
+        bool operator() (TVector<T>& v, int protoField);
+
+        template <typename T>
         bool operator() (IProtoSerial<T>& v, int protoField);
 
         bool operator() (IMetaProtoSerial& v, int protoField, bool newMessage = false);

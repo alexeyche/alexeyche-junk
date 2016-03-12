@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 2.8)
 set(DIRS
     log
     serial
+    server
+    ts
 )
 
 foreach(dir ${DIRS})
