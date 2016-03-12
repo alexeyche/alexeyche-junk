@@ -15,17 +15,17 @@ endforeach()
 set(DNN_SRCS ${DNN_SRCS} ${DIR_SRCS} PARENT_SCOPE)
 
 # executable
-add_executable(dnn-bin
+add_executable(dnn-sim
     main.cpp
 )
 
-SET_TARGET_PROPERTIES(dnn-bin
-  PROPERTIES OUTPUT_NAME dnn)
+SET_TARGET_PROPERTIES(dnn-sim
+  PROPERTIES OUTPUT_NAME dnn-sim)
 
 include_directories(${CMAKE_SOURCE_DIR}/ego)
 #include_directories(${CMAKE_BINARY_DIR}/protos)
 # link dependencies of executable
-target_link_libraries(dnn-bin
+target_link_libraries(dnn-sim
 	${PROTOBUF_LIBRARY}
     dnn
     m

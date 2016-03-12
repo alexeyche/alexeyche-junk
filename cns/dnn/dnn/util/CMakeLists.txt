@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 
 set(DIRS
     log
+    serial
 )
 
 foreach(dir ${DIRS})
@@ -17,7 +18,6 @@ set(SOURCES
     pretty_print.cpp
     protobuf.cpp
     json.cpp
-    serial.cpp
     thread.cpp
     random.cpp
 )

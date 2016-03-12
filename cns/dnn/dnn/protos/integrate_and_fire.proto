@@ -1,13 +1,13 @@
-package NDnnProtos;
+package NDnnProto;
 
 message TIntegrateAndFireConst {
-    required double TauMem = 1;
-    required double RestPotential = 2;
-    required double TauRef = 3;
-    required double NoiseAmp = 4;
+    optional double TauMem = 1;
+    optional double RestPotential = 2;
+    optional double TauRef = 3;
+    optional double NoiseAmp = 4;
 }
 
 message TIntegrateAndFireState {
-    required double RefTime = 1;
+    optional double RefTime = 1;
 }
 

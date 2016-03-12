@@ -2,19 +2,14 @@
 
 #include "spike_neuron.h"
 
-#include <dnn/util/serial.h>
+#include <dnn/util/serial/proto_serial.h>
 #include <dnn/protos/integrate_and_fire.pb.h>
-
+#include <dnn/protos/config.pb.h>
 
 namespace NDnn {
 
-	struct TIntegrateAndFireConst: public IProtoSerial<NDnnProtos::TIntegrateAndFireConst> {
-	    TIntegrateAndFireConst()
-	    	: TauMem(5.0)
-		    , RestPotential(0.0)
-		    , TauRef(2.0)
-		    , NoiseAmp(0.0)
-	    {}
+	struct TIntegrateAndFireConst: public IProtoSerial<NDnnProto::TIntegrateAndFireConst> {
+		static const auto ProtoFieldNumber = NDnnProto::TLayer::kIntegrateAndFireConstFieldNumber;
 
         void SerialProcess(TProtoSerial& serial) override final {
             serial(TauMem);
@@ -24,23 +19,21 @@ namespace NDnn {
         }
 
 
-	    double TauMem;
-	    double RestPotential;
-	    double TauRef;
-	    double NoiseAmp;
+	    double TauMem = 5.0;
+	    double RestPotential = 0.0;
+	    double TauRef = 2.0;
+	    double NoiseAmp = 0.0;
 	};
 
 
-	struct TIntegrateAndFireState: public IProtoSerial<NDnnProtos::TIntegrateAndFireState> {
-	    TIntegrateAndFireState()
-	        : RefTime(0.0)
-	    {}
+	struct TIntegrateAndFireState: public IProtoSerial<NDnnProto::TIntegrateAndFireState> {
+		static const auto ProtoFieldNumber = NDnnProto::TLayer::kIntegrateAndFireStateFieldNumber;
 
 	    void SerialProcess(TProtoSerial& serial) override final {
             serial(RefTime);
         }
 
-	    double RefTime;
+	    double RefTime = 0.0;
 	};
 
 	class TIntegrateAndFire : public TSpikeNeuron<TIntegrateAndFireConst, TIntegrateAndFireState> {
@@ -56,7 +49,7 @@ namespace NDnn {
 	        s.RefTime = c.TauRef;
 	    }
 
-	    void CalculateDynamics(const TTime& t, const double &Iinput, const double &Isyn) {
+	    void CalculateDynamics(const TTime& t, double Iinput, double Isyn) {
 	        if(s.RefTime < 0.001) {
 	            MutMembrane() += t.Dt * ( - Membrane()  + c.NoiseAmp*0.0 + Iinput + Isyn) / c.TauMem;
 	        } else {
@@ -66,4 +59,3 @@ namespace NDnn {
 	};
 
 } // namespace NDnn
-

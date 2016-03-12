@@ -1,0 +1,21 @@
+import "extension.proto";
+
+package NDnnProto;
+
+message TDnnOptions {
+    optional string Port = 1 [
+        (description) = "Input time series port",
+        (default_value) = "9090",
+        (short_option) = "-p"
+    ];
+
+    optional bool Verbose = 2 [
+        (description) = "Turn on extra logging",
+        (short_option) = "-v"
+    ];
+
+    optional string Config = 3 [
+        (description) = "Read prototext config from file",
+        (short_option) = "-c"
+    ];
+}

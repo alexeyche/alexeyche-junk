@@ -9,11 +9,19 @@
 
 #include <dnn/neuron/integrate_and_fire.h>
 
+#include <dnn/protos/config.pb.h>
+
 #include <utility>
 
 namespace NDnn {
 
-	struct TSimConfiguration {
+	struct TSimConfiguration: public IProtoSerial<NDnnProto::TSimConfiguration> {
+		void SerialProcess(TProtoSerial& serial) override {
+			serial(Jobs);
+			serial(Duration);
+			serial(Dt);
+		}
+
 		ui32 Jobs = 4;
 		double Duration = 1000;
 		double Dt = 1.0;
@@ -22,7 +30,7 @@ namespace NDnn {
 
 
 	template <typename ... T>
-	class TSim {
+	class TSim: public IProtoSerial<NDnnProto::TConfig> {
 	public:
 		using TSelf = TSim<T...>;
 
@@ -34,7 +42,7 @@ namespace NDnn {
 		
 		void Run() {
 			L_DEBUG << "Going to run simulation for " << Conf.Duration << " ms in " << Conf.Jobs << " jobs";
-			TVector<TIndexSlice> perLayerJobs = DispatchOnThreads(Conf.Jobs, std::tuple_size<decltype(Layers)>::value);
+			TVector<TIndexSlice> perLayerJobs = DispatchOnThreads(Conf.Jobs, LayersSize());
 			
 		 	TSpinningBarrier barrier(Conf.Jobs);
 			TVector<std::thread> threads;
@@ -48,12 +56,16 @@ namespace NDnn {
 			}
 		}
 		
-		void SerializeToTextStream(std::ostream& ostr) {
-			TSerialStreamProtoTxt str(ostr);
+		ui32 LayersSize() const {
+			return std::tuple_size<decltype(Layers)>::value;
+		}
+
+		void SerialProcess(TProtoSerial& serial) {
+			serial(Conf, NDnnProto::TConfig::kSimConfigurationFieldNumber);
+			
+			serial.DuplicateSingleRepeated(NDnnProto::TConfig::kLayerFieldNumber, LayersSize());
 			ForEach(Layers, [&](auto& layer) {
-				for (auto& n: layer) {
-					n.SerialProcess(str);
-				}
+				serial(layer, NDnnProto::TConfig::kLayerFieldNumber, /* newMessage = */ true);
 			});
 		}
 

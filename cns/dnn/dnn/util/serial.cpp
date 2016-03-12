@@ -1,6 +1,7 @@
 #include "serial.h"
 
 #include <dnn/util/protobuf.h>
+#include <dnn/util/log/log.h>
 
 namespace NDnn {
 
@@ -17,9 +18,9 @@ namespace NDnn {
         return Mode == ESerialMode::OUT;
     }
 
+    ///////////////////////////////////////////////////////////////////
 
-
-    TProtoSerial::TProtoSerial(google::protobuf::Message& message, ESerialMode mode)
+    TProtoSerial::TProtoSerial(NPb::Message& message, ESerialMode mode)
         : Message(message)
         , TSerialBase(mode)
         , CurrentFieldNumber(1)
@@ -32,12 +33,12 @@ namespace NDnn {
         switch (Mode) {
             case ESerialMode::IN:
             {
-                v = Refl->GetString(Message, Descr->FindFieldByNumber(protoField));
+                v = Refl->GetString(Message, GetFieldDescr(protoField));
             }
             break;
             case ESerialMode::OUT:
             {
-                Refl->SetString(&Message, Descr->FindFieldByNumber(protoField), v);
+                Refl->SetString(&Message, GetFieldDescr(protoField), v);
             }
             break;
         }
@@ -47,12 +48,12 @@ namespace NDnn {
         switch (Mode) {
             case ESerialMode::IN:
             {
-                v = Refl->GetDouble(Message, Descr->FindFieldByNumber(protoField));
+                v = Refl->GetDouble(Message, GetFieldDescr(protoField));
             }
             break;
             case ESerialMode::OUT:
             {
-                Refl->SetDouble(&Message, Descr->FindFieldByNumber(protoField), v);
+                Refl->SetDouble(&Message, GetFieldDescr(protoField), v);
             }
             break;
         }
@@ -62,12 +63,12 @@ namespace NDnn {
         switch (Mode) {
             case ESerialMode::IN:
             {
-                v = Refl->GetUInt32(Message, Descr->FindFieldByNumber(protoField));
+                v = Refl->GetUInt32(Message, GetFieldDescr(protoField));
             }
             break;
             case ESerialMode::OUT:
             {
-                Refl->SetUInt32(&Message, Descr->FindFieldByNumber(protoField), v);
+                Refl->SetUInt32(&Message, GetFieldDescr(protoField), v);
             }
             break;
         }
@@ -77,91 +78,118 @@ namespace NDnn {
         switch (Mode) {
             case ESerialMode::IN:
             {
-                v = Refl->GetBool(Message, Descr->FindFieldByNumber(protoField));
+                v = Refl->GetBool(Message, GetFieldDescr(protoField));
             }
             break;
             case ESerialMode::OUT:
             {
-                Refl->SetBool(&Message, Descr->FindFieldByNumber(protoField), v);
+                Refl->SetBool(&Message, GetFieldDescr(protoField), v);
             }
             break;
         }
     }
 
-    //void TProtoSerial::operator() (TVector<double>& v, int protoField) {
-    //    TVectorD laVec = NLa::StdToVec(v);
-    //    (*this)(laVec, protoField);
-    //    v = NLa::VecToStd(laVec);
-    //}
+#ifdef LA_SYSTEM
+    void TProtoSerial::operator() (TVector<double>& v, int protoField) {
+       TVectorD laVec = NLa::StdToVec(v);
+       (*this)(laVec, protoField);
+       v = NLa::VecToStd(laVec);
+    }
 
-    //void TProtoSerial::operator() (TVectorD& v, int protoField) {
-    //    switch (Mode) {
-    //        case ESerialMode::IN:
-    //        {
-    //            const NDnnProto::TVectorD* vecProto = GetMessage<NDnnProto::TVectorD>(protoField);
-    //            v = TVectorD(vecProto->x_size());
-    //            for (size_t vecIdx=0; vecIdx < v.size(); ++vecIdx) {
-    //                v(vecIdx) = vecProto->x(vecIdx);
-    //            }
-    //        }
-    //        break;
-    //        case ESerialMode::OUT:
-    //        {
-    //            NDnnProto::TVectorD* vecProto = GetMutMessage<NDnnProto::TVectorD>(protoField);
-    //            for (const auto& val: v) {
-    //                vecProto->add_x(val);
-    //            }
-    //        }
-    //        break;
-    //    }
-    //}
+    void TProtoSerial::operator() (TVectorD& v, int protoField) {
+       switch (Mode) {
+           case ESerialMode::IN:
+           {
+               const NDnnProto::TVectorD* vecProto = GetMessage<NDnnProto::TVectorD>(protoField);
+               v = TVectorD(vecProto->x_size());
+               for (size_t vecIdx=0; vecIdx < v.size(); ++vecIdx) {
+                   v(vecIdx) = vecProto->x(vecIdx);
+               }
+           }
+           break;
+           case ESerialMode::OUT:
+           {
+               NDnnProto::TVectorD* vecProto = GetMutMessage<NDnnProto::TVectorD>(protoField);
+               for (const auto& val: v) {
+                   vecProto->add_x(val);
+               }
+           }
+           break;
+       }
+    }
 
-    //void TProtoSerial::operator() (TMatrixD& m, int protoField) {
-    //    switch (Mode) {
-    //        case ESerialMode::IN:
-    //        {
-    //            const NDnnProto::TMatrixD* mat = GetMessage<NDnnProto::TMatrixD>(protoField);
-    //            m = TMatrixD(mat->n_rows(), mat->n_cols());
-    //            for (size_t rowIdx=0; rowIdx < m.n_rows; ++rowIdx) {
-    //                const NDnnProto::TVectorD& row = mat->row(rowIdx);
-    //                for (size_t colIdx=0; colIdx < m.n_cols; ++colIdx) {
-    //                    m(rowIdx, colIdx) = row.x(colIdx);
-    //                }
-    //            }
-    //        }
-    //        break;
-    //        case ESerialMode::OUT:
-    //        {
-    //            NDnnProto::TMatrixD* mat = GetMutMessage<NDnnProto::TMatrixD>(protoField);
-    //            mat->set_n_rows(m.n_rows);
-    //            mat->set_n_cols(m.n_cols);
-    //            for (size_t rowIdx=0; rowIdx < m.n_rows; ++rowIdx) {
-    //                NDnnProto::TVectorD* row = mat->add_row();
-    //                for (size_t colIdx=0; colIdx < m.n_cols; ++colIdx) {
-    //                    row->add_x(m(rowIdx, colIdx));
-    //                }
-    //            }
-    //        }
-    //        break;
-    //    }
-    //}
+    void TProtoSerial::operator() (TMatrixD& m, int protoField) {
+       switch (Mode) {
+           case ESerialMode::IN:
+           {
+               const NDnnProto::TMatrixD* mat = GetMessage<NDnnProto::TMatrixD>(protoField);
+               m = TMatrixD(mat->n_rows(), mat->n_cols());
+               for (size_t rowIdx=0; rowIdx < m.n_rows; ++rowIdx) {
+                   const NDnnProto::TVectorD& row = mat->row(rowIdx);
+                   for (size_t colIdx=0; colIdx < m.n_cols; ++colIdx) {
+                       m(rowIdx, colIdx) = row.x(colIdx);
+                   }
+               }
+           }
+           break;
+           case ESerialMode::OUT:
+           {
+               NDnnProto::TMatrixD* mat = GetMutMessage<NDnnProto::TMatrixD>(protoField);
+               mat->set_n_rows(m.n_rows);
+               mat->set_n_cols(m.n_cols);
+               for (size_t rowIdx=0; rowIdx < m.n_rows; ++rowIdx) {
+                   NDnnProto::TVectorD* row = mat->add_row();
+                   for (size_t colIdx=0; colIdx < m.n_cols; ++colIdx) {
+                       row->add_x(m(rowIdx, colIdx));
+                   }
+               }
+           }
+           break;
+       }
+    }
+#endif
 
-    void TProtoSerial::operator() (google::protobuf::Message& m, int protoField) {
+    void TProtoSerial::operator() (NPb::Message& m, int protoField) {
+        L_DEBUG << "Serial process of message " << m.GetTypeName() << " as " << protoField << " field number in " << Message.GetTypeName();
+        auto* fd = GetFieldDescr(protoField);
         switch (Mode) {
             case ESerialMode::IN:
             {
-                const google::protobuf::Message& messageField = Refl->GetMessage(Message, Descr->FindFieldByNumber(protoField));
-                m.CopyFrom(messageField);
+                if (fd->is_repeated()) {
+                    auto* rfPtr = Refl->MutableRepeatedPtrField<NPb::Message>(&Message, fd);
+                    m.CopyFrom(rfPtr->Get(0));
+                    rfPtr->DeleteSubrange(0, 1);
+                } else {
+                    m.CopyFrom(Refl->GetMessage(Message, fd));
+                }
             }
             break;
             case ESerialMode::OUT:
             {
-                google::protobuf::Message* messageField = Refl->MutableMessage(&Message, Descr->FindFieldByNumber(protoField));
+                NPb::Message* messageField;
+                if (fd->is_repeated()) {
+                    messageField = Refl->AddMessage(&Message, fd);
+                } else {
+                    messageField = Refl->MutableMessage(&Message, fd);
+                }
                 messageField->CopyFrom(m);
             }
             break;
         }
     }
+    
+    void TProtoSerial::operator() (IMetaProtoSerial& v, int protoField) {
+        v.SerialProcess(*this);
+    }
+
+    const NPb::FieldDescriptor* TProtoSerial::GetFieldDescr(int protoField) {
+        const auto* fd = Descr->FindFieldByNumber(protoField);
+        ENSURE(fd, "Can't find field number " << protoField << " in message " << Message.GetTypeName());
+        return fd;
+    }
+
+    /////////////////////////////////////////////////////////////////////////
+
 
     TSerialStream::TSerialStream(std::ostream& ostr) 
         : TSerialBase(ESerialMode::OUT) 
@@ -216,20 +244,20 @@ namespace NDnn {
     {
     }
 
-    void TSerialStreamProtoBin::DeserializeProtoFromString(const TString& s, google::protobuf::Message& message) {
+    void TSerialStreamProtoBin::DeserializeProtoFromString(const TString& s, NPb::Message& message) {
         ENSURE(message.ParseFromString(s), "Failed to deserialize message");
     }
 
-    void TSerialStreamProtoBin::SerializeProtoToString(const google::protobuf::Message& message, TString& s) {
+    void TSerialStreamProtoBin::SerializeProtoToString(const NPb::Message& message, TString& s) {
         ENSURE(message.SerializeToString(&s), "Failed to serialize message");
     }
 
 
-    void TSerialStreamProtoTxt::DeserializeProtoFromString(const TString& s, google::protobuf::Message& message) {
+    void TSerialStreamProtoTxt::DeserializeProtoFromString(const TString& s, NPb::Message& message) {
         ReadProtoText(s, message);
     }
 
-    void TSerialStreamProtoTxt::SerializeProtoToString(const google::protobuf::Message& message, TString& s) {
+    void TSerialStreamProtoTxt::SerializeProtoToString(const NPb::Message& message, TString& s) {
         s = ProtoTextToString(message);
     }
 

@@ -20,6 +20,12 @@ known_types = {
     "pair<size_t, size_t>" : "TUintToUintPair",
 }
 
+distributions = {
+    "TDetermConst" : {
+        "Threshold" : "TMeanDistr"
+    }
+}
+
 
 
 vector_re_str = "(?:TVector|vector|TActVector)+"
@@ -35,8 +41,7 @@ instance_name_from_class = lambda t: re.sub("T([^ ]+)", "\\1", t)
 
 ignore_re = re.compile(".*dnn/(contrib|util/thread|base|neuron/config).*")
 
-config_file_name = "config.proto"
-config_class_name = "TConfig"
+distribution_proto = "distribution.proto"
 
 class TStruct(object):
     def __init__(self, name):
@@ -54,7 +59,14 @@ def GenerateProtos(structures_to_file, package, dst, imports):
             for imp in imports:
                 f_ptr.write("import \"{}\";\n".format(imp))
                 f_ptr.write("\n")
-            
+            # distr_found = False
+            # for structure in structures:
+            #     if distributions.get(structure.name):
+            #         distr_found = True
+            #         break
+            # if distr_found:
+            #     f_ptr.write("import \"{}\";\n".format(distribution_proto))
+            #     f_ptr.write("\n")
             for structure in structures:
                 i = 1
                 f_ptr.write("message %s {\n" % structure.name)
@@ -65,28 +77,15 @@ def GenerateProtos(structures_to_file, package, dst, imports):
                             raise Exception("Can't match {}".format(f[0]))
                         f_ptr.write("    repeated %s %s = %s;\n" % (known_types[ m.group(1) ], f[1], str(i)))
                     else:
-                        f_ptr.write("    required %s %s = %s;\n" % (known_types[ f[0] ], f[1], str(i)))
+                        f_ptr.write("    optional %s %s = %s;\n" % (known_types[ f[0] ], f[1], str(i)))
+                    # distr = distributions.get(structure.name, {}).get(f[1])
                     i += 1
+                    # if distr:
+                    #     f_ptr.write("    optional %s %s = %s;\n" % (distr, f[1] + "Distr", str(i)))
+                    #     i += 1
+                    
                 f_ptr.write("}\n")
-                f_ptr.write("\n")
-    with open(pj(dst, config_file_name), "w") as f_ptr:
-        f_ptr.write("package %s;\n" % package)
-        f_ptr.write("\n")
-            
-        for proto_file in structures_to_file.keys():
-            f_ptr.write("import \"{}\";\n".format(proto_file))
-            
-        f_ptr.write("\n")
-        i = 1
-        f_ptr.write("message {} {{\n".format(config_class_name))
-        for structures in structures_to_file.values():
-            for structure in structures:
-                f_ptr.write("    optional {} {} = {};\n".format(
-                    structure.name, instance_name_from_class(structure.name), i
-                ))
-                i += 1
-        f_ptr.write("}\n")
-        f_ptr.write("\n")
+                f_ptr.write("\n")        
 
 def ParseStructures(src_dir):
     structures_to_file = defaultdict(list)
@@ -137,7 +136,7 @@ if __name__ == "__main__":
     parser.add_argument("-d", "--dest-path", help="Path where to store .proto",
                     type=str, required=True)
     parser.add_argument("-p", "--package", help="Package name, default : %(default)s",
-                    type=str, required=False, default="NDnnProtos")
+                    type=str, required=False, default="NDnnProto")
     parser.add_argument("-i", "--imports", help="Put imports to all messages (separated by ;)",
                     type=str, required=False, default=None)
     args = parser.parse_args()

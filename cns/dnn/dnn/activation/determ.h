@@ -3,19 +3,19 @@
 
 #include "activation.h"
 
-#include <dnn/util/serial.h>
+#include <dnn/util/serial/proto_serial.h>
 #include <dnn/protos/determ.pb.h>
 
 namespace NDnn {
 
-    struct TDetermConst: public IProtoSerial<NDnnProtos::TDetermConst> {
-        TDetermConst() : Threshold(1.0) {}
+    struct TDetermConst: public IProtoSerial<NDnnProto::TDetermConst> {
+        static const auto ProtoFieldNumber = NDnnProto::TLayer::kDetermConstFieldNumber;
 
         void SerialProcess(TProtoSerial& serial) override final {
             serial(Threshold);
         }
 
-        double Threshold;
+        double Threshold = 1.0;
     };
 
 

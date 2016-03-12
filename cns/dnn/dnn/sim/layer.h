@@ -8,14 +8,12 @@
 namespace NDnn {
 
 	template <typename N, ui32 size, typename TConf = TDefaultConfig>
-	class TLayer {
+	class TLayer: public IMetaProtoSerial {
 	private:
 		using TNeuronImplType = TSpikeNeuronImpl<N, TConf>;
 
 	public:
 		using TNeuronType = N;
-
-		
 
 		TLayer()
 			: Id(0)
@@ -42,6 +40,14 @@ namespace NDnn {
 		auto end() {
 			return Neurons.end();
 		}
+
+		void SerialProcess(TMetaProtoSerial& serial) override final {
+			serial.DuplicateSingleRepeated(Size());
+			for (auto& n: Neurons) {
+				serial(n);
+			}
+		}
+
 	private:
 		ui32 Id;
 		std::array<TNeuronImplType, size> Neurons;

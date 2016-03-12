@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 
 set(DIRS
-    dnn
+    dnn_sim
 )
 
 foreach(dir ${DIRS})

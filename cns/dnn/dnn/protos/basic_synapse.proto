@@ -1,8 +1,8 @@
-package NDnnProtos;
+package NDnnProto;
 
 message TBasicSynapseConst {
-    required double PspDecay = 1;
-    required double Amp = 2;
+    optional double PspDecay = 1;
+    optional double Amp = 2;
 }
 
 message TBasicSynapseState {

@@ -1,12 +1,12 @@
 #pragma once
 
-#include <dnn/util/serial.h>
+#include <dnn/util/serial/proto_serial.h>
 #include <dnn/protos/spike_neuron.pb.h>
-
+#include <dnn/protos/config.pb.h>
 
 namespace NDnn {
 
-	struct TSpikeNeuronInnerState: public IProtoSerial<NDnnProtos::TSpikeNeuronInnerState> {
+	struct TSpikeNeuronInnerState: public IProtoSerial<NDnnProto::TSpikeNeuronInnerState> {
 		TSpikeNeuronInnerState()
 			: Membrane(0.0)
 			, SpikeProbability(0.0)
@@ -25,7 +25,7 @@ namespace NDnn {
 	};
 
 	template <typename TConstants, typename TState>
-	class TSpikeNeuron: public ISerialStream {
+	class TSpikeNeuron: public IProtoSerial<NDnnProto::TLayer> {
 	public:
 		TSpikeNeuron()
 		{}
@@ -54,10 +54,10 @@ namespace NDnn {
 			return InnerState.SpikeProbability;
 		}
 		
-		void SerialProcess(TSerialStream& serial) override final {
-			serial(c); 
-			serial(s);
-			serial(InnerState);
+		void SerialProcess(TProtoSerial& serial) override final {
+			serial(c, TConstants::ProtoFieldNumber); 
+			serial(s, TState::ProtoFieldNumber);
+			serial(InnerState, NDnnProto::TLayer::kSpikeNeuronInnerStateFieldNumber);
 		}
 
 	private:

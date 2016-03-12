@@ -14,7 +14,7 @@ namespace NDnn {
     public:
         TLog()
         {
-            Log = spdlog::stdout_logger_mt("console");
+            Log = spdlog::stderr_logger_mt("console");
             Log->set_pattern("LOG [%H:%M:%S %z] %v");
         }
         void SetColors() {
