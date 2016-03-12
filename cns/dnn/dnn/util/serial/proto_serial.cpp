@@ -54,7 +54,7 @@ namespace NDnn {
     }
 
     bool TProtoSerial::operator() (ui32& v, int protoField) {
-        if (!HasField(protoField)) return false;
+        CHECK_FIELD();
 
         switch (Mode) {
             case ESerialMode::IN:
