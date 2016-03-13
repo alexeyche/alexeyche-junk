@@ -69,10 +69,6 @@ namespace NDnn {
             request.Headers.push_back(MakePair(headersVals[0], headersVals[1]));
         }
         
-        // GetLine(bytes); // Empty line
-        for (const auto& b: bytes) {
-            printf("%d, ", b);
-        }
         while (bytes.size()>0) {
             request.Body += GetLine(bytes);
         }
