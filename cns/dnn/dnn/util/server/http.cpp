@@ -73,8 +73,6 @@ namespace NDnn {
             request.Body += GetLine(bytes);
         }
         
-        std::cout << request;
-
         TString path = NStr::LStrip(request.RawPath, "/");
         TVector<TString> pathSpl = NStr::Split(path, '?', 1);
         request.Path = NStr::Trim(pathSpl[0]);
