@@ -49,7 +49,9 @@ int main(int argc, const char** argv) {
     	sim.Deserialize(*config);
     }
 	
-	TConfig conf = sim.Serialize();
-	std::cout << conf.DebugString();
+    sim.Run();
+
+	// TConfig conf = sim.Serialize();
+	// std::cout << conf.DebugString();
     return 0;
 }

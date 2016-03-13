@@ -1,5 +1,6 @@
 package NDnnProto;
 
+
 message TSynapseInnerState {
     optional uint32 IdPre = 1;
     optional double DendriteDelay = 2;

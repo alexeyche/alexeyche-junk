@@ -158,6 +158,45 @@ namespace NDnn {
     }
 #endif
 
+    bool TProtoSerial::SerialRepeated(double& v, int idx, int protoField) {
+        CHECK_FIELD();
+
+        auto* fd = GetFieldDescr(protoField);
+        switch (Mode) {
+            case ESerialMode::IN:
+            {
+                v = Refl->GetRepeatedDouble(Message, fd, idx);
+            }
+            break;
+            case ESerialMode::OUT:
+            {
+                Refl->AddDouble(&Message, fd, v);
+            }
+            break;
+        }
+        return true;
+    }
+
+    bool TProtoSerial::SerialRepeated(NPb::Message& m, int idx, int protoField) {
+        CHECK_FIELD();
+
+        switch (Mode) {
+            case ESerialMode::IN:
+            {
+                const auto& messageField = Refl->GetRepeatedMessage(Message, GetFieldDescr(protoField), idx);
+                m.CopyFrom(messageField);
+            }
+            break;
+            case ESerialMode::OUT:
+            {
+                NPb::Message* messageField = Refl->AddMessage(&Message, GetFieldDescr(protoField));
+                messageField->CopyFrom(m);
+            }
+            break;
+        }
+        return true;
+    }
+
     bool TProtoSerial::operator() (NPb::Message& m, int protoField) {
         CHECK_FIELD();
 

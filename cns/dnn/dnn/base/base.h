@@ -5,9 +5,11 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <deque>
 #include <tuple>
 #include <thread>
 #include <mutex>
+#include <complex>
 
 namespace NDnn {
 
@@ -114,4 +116,8 @@ namespace NDnn {
 	    }
 	};
 
+	using TComplex = std::complex<double>;
+	
+	template <typename T>
+	using TDeque = std::deque<T>;
 } // namespace NDnn

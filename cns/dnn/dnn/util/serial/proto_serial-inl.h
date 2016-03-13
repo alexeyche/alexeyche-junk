@@ -12,6 +12,27 @@ namespace NDnn {
         } \
 
     template <typename T>
+    bool TProtoSerial::SerialRepeated(IProtoSerial<T>& v, int idx, int protoField) {
+        CHECK_FIELD();
+
+        typename IProtoSerial<T>::TProto mess;
+        L_DEBUG << "Proto " << (Mode == ESerialMode::IN ? "IN" : "OUT") << ": Serial process of repeated IProtoSerial with type " << mess.GetTypeName() << " as " << protoField << " field number in " << Message.GetTypeName();
+        
+        if (IsInput()) {
+            SerialRepeated(mess, idx, protoField);
+        }
+
+        TProtoSerial serial(mess, Mode);
+        v.SerialProcess(serial);
+    
+        if (IsOutput()) {
+            SerialRepeated(mess, idx, protoField);
+        }
+        L_DEBUG << "Proto " << (Mode == ESerialMode::IN ? "IN" : "OUT") << ": Serial process done";
+        return true;
+    }
+
+    template <typename T>
     bool TProtoSerial::operator() (IProtoSerial<T>& v, int protoField) {
         CHECK_FIELD();
 
@@ -35,8 +56,11 @@ namespace NDnn {
     template <typename T>
     bool TProtoSerial::operator() (TVector<T>& v, int protoField) {
         CHECK_FIELD();
-        for (auto& vecVal: v) {
-            (*this)(v, protoField);
+        if (IsInput()) {
+            v.resize(Refl->FieldSize(Message, GetFieldDescr(protoField)));
+        }
+        for (int idx=0; idx < v.size(); ++idx) {
+            SerialRepeated(v[idx], idx, protoField);
         }
         return true;
     }

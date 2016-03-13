@@ -5,6 +5,7 @@
 
 #include <dnn/util/act_vector.h>
 #include <dnn/util/random.h>
+#include <dnn/util/rand.h>
 #include <dnn/util/serial/meta_proto_serial.h>
 #include <dnn/protos/config.pb.h>
 
@@ -62,7 +63,7 @@ namespace NDnn {
 		    Neuron.CalculateDynamics(t, Iinput, Isyn);
 
 		    Neuron.MutSpikeProbability() = Activation.SpikeProbability(Neuron.Membrane());
-			if(Neuron.SpikeProbability() > GetUnif()) {
+			if(Neuron.SpikeProbability() > Rand->GetUnif()) {
 		        Neuron.MutFired() = true;
 		        Neuron.PostSpikeDynamics(t);
 		    }
@@ -80,7 +81,19 @@ namespace NDnn {
 			}
 		}
 
+		void SetRandEngine(TRandEngine& rand) {
+			Rand.Set(rand);
+		}
+
+		void Prepare() {
+			ENSURE(Rand, "Random engine is not set");
+
+			Neuron.Reset();
+		}
+
 	private:
+		TPtr<TRandEngine> Rand;
+
 		TNeuron Neuron;
 
 		typename TConf::TActivationFunction Activation;

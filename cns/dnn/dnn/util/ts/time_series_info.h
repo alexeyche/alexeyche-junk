@@ -9,6 +9,8 @@
 namespace NDnn {
 
     struct TLabelInfo: public IProtoSerial<NDnnProto::TLabelInfo> {
+        TLabelInfo() {}
+        
         TLabelInfo(TString name, ui32 duration)
             : Name(name)
             , Duration(duration)
@@ -28,6 +30,8 @@ namespace NDnn {
     };
 
     struct TLabelPos: public IProtoSerial<NDnnProto::TLabelPos> {
+        TLabelPos() {}
+
         TLabelPos(ui32 labelId, ui32 start)
             : LabelId(labelId)
             , Start(start)
@@ -53,6 +57,7 @@ namespace NDnn {
             serial(UniqueLabels);
             serial(LabelsStart);
             serial(Dt);
+            serial(DimSize);
         }
 
         void AddLabelAtPos(const string &lab, ui32 pos, ui32 dur) {
@@ -116,6 +121,7 @@ namespace NDnn {
         TVector<TLabelPos> LabelsStart;
 
         double Dt = 1.0;
+        ui32 DimSize = 0;
 
         ui32 __current_ahead_position = 1;
     };

@@ -8,6 +8,7 @@
 #include <dnn/util/log/log.h>
 #include <dnn/util/thread.h>
 #include <dnn/util/tuple.h>
+#include <dnn/util/rand.h>
 
 #include <dnn/neuron/integrate_and_fire.h>
 
@@ -29,6 +30,7 @@ namespace NDnn {
 		double Duration = 1000;
 		double Dt = 1.0;
 		ui32 Port = 9090;
+		int Seed = -1;
 	};
 
 
@@ -86,10 +88,13 @@ namespace NDnn {
 		template <typename L>
 		void RunWorkerRoutine(L& layer, ui32 idxFrom, ui32 idxTo, TSpinningBarrier& barrier) {
 			TTime t(Conf.Dt);
+			TRandEngine rand(Conf.Seed);
+
 			L_DEBUG << "Entering into simulation of layer " << layer.GetId() << " of neurons " << idxFrom << ":" << idxTo;
 			
 			for (ui32 neuronId=idxFrom; neuronId<idxTo; ++neuronId) {
-				layer[neuronId].GetNeuron().Reset();	
+				layer[neuronId].SetRandEngine(rand);
+				layer[neuronId].Prepare();
 			}
 
 			for (; t < Conf.Duration; ++t) {

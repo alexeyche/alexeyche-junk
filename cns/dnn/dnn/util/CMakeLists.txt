@@ -22,6 +22,8 @@ set(SOURCES
     json.cpp
     thread.cpp
     random.cpp
+    rand.cpp
+    ptr.cpp
 )
 
 set(DIR_SRCS)

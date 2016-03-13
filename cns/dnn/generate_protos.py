@@ -57,13 +57,28 @@ class TStruct(object):
         return "{}({})".format(self.name, ", ".join([ "{} {}".format(f[0], f[1]) for f in self.fields ]))
 
 def GenerateProtos(structures_to_file, package, dst, imports):
+    struct_name_to_file = {}
+    for dst_file, structures in structures_to_file.iteritems():
+        for sname, s in structures.iteritems():
+            struct_name_to_file[sname] = (dst_file, s)
+    
+    file_needed_imports = defaultdict(set)
+    for s, (f, struct) in struct_name_to_file.iteritems():
+        for fi in struct.fields:
+            t = struct_name_to_file.get(fi[0])
+            if t and t[0] != f:
+                file_needed_imports[f].add(t[0])
+            
     for dst_file, structures in structures_to_file.iteritems():
         with open(os.path.join(dst, dst_file), 'w') as f_ptr:
             f_ptr.write("package %s;\n" % package)
             f_ptr.write("\n")
             for imp in imports:
                 f_ptr.write("import \"{}\";\n".format(imp))
-                f_ptr.write("\n")
+            for imp in file_needed_imports.get(dst_file, []):
+                f_ptr.write("import \"{}\";\n".format(imp))
+            
+            f_ptr.write("\n")
             for structure in structures.values():
                 i = 1
                 f_ptr.write("message %s {\n" % structure.name)
@@ -114,7 +129,7 @@ def ParseStructures(src_dir):
                                 continue
                             
                             m = field_re.match(l.strip())
-                            if m:
+                            if m and open_brackets == 1:
                                 struct.fields.append( (m.group(1), m.group(2)) )
                                 continue
                 parse(known_types)

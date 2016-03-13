@@ -1,5 +1,6 @@
 package NDnnProto;
 
+
 message TDetermConst {
     optional double Threshold = 1;
 }

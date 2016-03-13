@@ -55,12 +55,12 @@ install(
     PATTERN "*.h"
     PATTERN "*.hpp"
 )
-#install(
-#    DIRECTORY
-#    ${CMAKE_BINARY_DIR}/lib/protos
-#    DESTINATION
-#    include/dnn/lib
-#    FILES_MATCHING
-#    PATTERN "*.h"
-#    PATTERN "*.hpp"
-#)
+install(
+    DIRECTORY
+    ${CMAKE_BINARY_DIR}/dnn/protos
+    DESTINATION
+    include/dnn
+    FILES_MATCHING
+    PATTERN "*.h"
+    PATTERN "*.hpp"
+)

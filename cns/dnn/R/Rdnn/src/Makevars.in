@@ -1,0 +1,20 @@
+PKG_CXXFLAGS = -std=c++14
+
+PKG_CPPFLAGS=-I"@DNN_INCLUDE@"
+
+PKG_LIBS = -L"@DNN_LIB@" -ldnn -ldnn_protos $(LIBS)
+
+
+OBJECTS.root= mod.o
+
+OBJECTS=  $(OBJECTS.root) RcppExports.o proto.o
+
+all: $(SHLIB) before  after
+
+clean:
+	rm -f $(OBJECTS)
+
+before: clean
+
+after:
+#	mv lossDev.so rjump.so

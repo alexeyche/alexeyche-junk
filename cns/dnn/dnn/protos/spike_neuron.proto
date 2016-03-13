@@ -1,5 +1,6 @@
 package NDnnProto;
 
+
 message TSpikeNeuronInnerState {
     optional double Membrane = 1;
     optional double SpikeProbability = 2;

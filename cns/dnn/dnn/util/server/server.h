@@ -71,11 +71,12 @@ namespace NDnn {
 	public:
 		TServer(ui32 port, ui32 max_connections = DefaultMaxConnections, bool debugMode = false)
 			: DebugMode(debugMode)
+			, Port(port)
 		{
-			Init(port, max_connections);
+			Init(max_connections);
 		}
 		
-		void Init(ui32 port, ui32 max_connections = DefaultMaxConnections) {
+		void Init(ui32 max_connections = DefaultMaxConnections) {
 			int status;
 			struct addrinfo hints;
 
@@ -85,7 +86,7 @@ namespace NDnn {
 			hints.ai_flags = AI_PASSIVE;     // fill in my IP for me
 
 			std::stringstream pss;
-			pss << port;
+			pss << Port;
 			std::string ps = pss.str();
 
 			struct addrinfo *servinfo;
@@ -122,6 +123,10 @@ namespace NDnn {
 				listen(SocketNum, max_connections) >= 0,
 				"Failed to listen"
 			);
+		}
+		
+		const ui32& GetPort() const {
+			return Port;
 		}
 
 		TServer& AddCallback(TString method, TString path, TRequestCallback cb) {
@@ -189,12 +194,12 @@ namespace NDnn {
 		}
 
 		void Receive(int socket) {
-			std::stringstream ss;
+			TDeque<char> bytes;
 			ui32 bytesReceived = 0;
 			while (true) {
-				char chunk[ReceiveChunkSize+1];
+				TVector<char> chunk(ReceiveChunkSize);
 
-				int chunkReceived = recv(socket, chunk, ReceiveChunkSize, 0);
+				int chunkReceived = recv(socket, &chunk[0], ReceiveChunkSize, 0);
 				if (chunkReceived < 0) {
 					perror("Some errors while reading recv socket");
 					exit(0);
@@ -205,23 +210,20 @@ namespace NDnn {
 				}
 
 				bytesReceived += chunkReceived;
-
+				
+				bytes.insert(bytes.end(), chunk.begin(), chunk.begin() + chunkReceived);
+				
 				if (chunkReceived < ReceiveChunkSize) {
-					chunk[chunkReceived] = '\0';
-					ss << std::string(chunk);
 					break;
-				} else {
-					chunk[chunkReceived+1] = '\0';
-					ss << std::string(chunk);
 				}
 			}
+
 			if (bytesReceived == 0) {
 				L_DEBUG << "Received zero bytes from socket. Ignoring";
 				return;
 			}
-
-
-			THttpRequest req = ParseHttpRequest(ss.str());
+			
+			THttpRequest req = ParseHttpRequest(std::move(bytes));
 
 			TOptional<TRequestCallback> cb;
 
@@ -318,6 +320,7 @@ namespace NDnn {
 
 	private:
 		bool DebugMode;
+		ui32 Port;
 
 		int SocketNum;
 		std::map<TString, TRequestCallback> DefaultCallbacks;

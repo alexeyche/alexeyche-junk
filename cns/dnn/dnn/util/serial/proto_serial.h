@@ -45,6 +45,13 @@ namespace NDnn {
 
         bool operator() (IMetaProtoSerial& v, int protoField, bool newMessage = false);
 
+        bool SerialRepeated(double& v, int idx, int protoField);
+
+        bool SerialRepeated(NPb::Message& m, int idx, int protoField);
+
+        template <typename T>
+        bool SerialRepeated(IProtoSerial<T>& v, int idx, int protoField);
+
         template <typename T>
         bool operator() (T& v) {
             return (*this)(v, CurrentFieldNumber++);

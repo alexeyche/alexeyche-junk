@@ -57,7 +57,7 @@ namespace NDnn {
 
     std::ostream& operator<< (std::ostream& stream, const THttpResponse& httpResp);
 
-    THttpRequest ParseHttpRequest(const TString&& requestString);
+    THttpRequest ParseHttpRequest(TDeque<char>&& bytes);
 
     TString GetDateAndTime();    
 

@@ -22,13 +22,31 @@ namespace NDnn {
         return stream;
     }
 
-    THttpRequest ParseHttpRequest(const TString&& requestString) {
-        std::istringstream inpStream(requestString);
+    namespace {
 
+        TString GetLine(TDeque<char>& bytes) {
+            TString s;
+            while (bytes.size() > 0) {
+                char b = bytes.front();
+                bytes.pop_front();
+                s.push_back(b);
+                
+                if (b == '\n') {
+                    return s;
+                }
+             }
+             if (s.empty()) {
+                throw TDnnException() << "Stream of bytes ended prematurely";   
+             }
+             return s;
+        }
+
+    } // namespace
+
+    THttpRequest ParseHttpRequest(TDeque<char>&& bytes) {
         THttpRequest request;
 
-        TString httpSpecString;
-        ENSURE(std::getline(inpStream, httpSpecString), "Premature end of http request: " << requestString);
+        TString httpSpecString = GetLine(bytes);
         httpSpecString = NStr::Trim(httpSpecString);
         TVector<TString> httpSpec = NStr::Split(httpSpecString, ' ');
 
@@ -39,9 +57,8 @@ namespace NDnn {
 
         TVector<TPair<TString, TString>> headers;
         while (true) {
-            TString headerString;
-            ENSURE(std::getline(inpStream, headerString), "Premature end of http headers: " << requestString);
-
+            TString headerString = GetLine(bytes);
+            
             if (NStr::Trim(headerString).empty()) {
                 break;
             }
@@ -51,11 +68,16 @@ namespace NDnn {
 
             request.Headers.push_back(MakePair(headersVals[0], headersVals[1]));
         }
-
-        TString line;
-        while (std::getline(inpStream, line)) {
-            request.Body += line;
+        
+        // GetLine(bytes); // Empty line
+        for (const auto& b: bytes) {
+            printf("%d, ", b);
         }
+        while (bytes.size()>0) {
+            request.Body += GetLine(bytes);
+        }
+        
+        std::cout << request;
 
         TString path = NStr::LStrip(request.RawPath, "/");
         TVector<TString> pathSpl = NStr::Split(path, '?', 1);

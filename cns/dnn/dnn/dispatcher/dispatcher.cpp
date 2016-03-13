@@ -8,8 +8,11 @@ namespace NDnn {
 	{
 		Server
 			.AddCallback(
-				"GET", "api/input",
+				"POST", "api/input",
 				[&](const THttpRequest& req, TResponseBuilder& resp) {
+					NDnnProto::TTimeSeries ts;
+					ENSURE(ts.ParseFromString(req.Body), "Failed to deserialize input TTimeSeries from http request");
+					InputData.Deserialize(ts);
 					resp.Good();
 				}
 			);
@@ -24,6 +27,7 @@ namespace NDnn {
 	}
 
 	void TDispatcher::MainLoop() {
+		L_DEBUG << "Entering dispatcher main loop on port " << Server.GetPort();
 		Server.MainLoop();
 	}
 

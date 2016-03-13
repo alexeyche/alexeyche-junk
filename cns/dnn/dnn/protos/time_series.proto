@@ -1,0 +1,13 @@
+package NDnnProto;
+
+import "time_series_info.proto";
+
+message TTimeSeries {
+    optional TTimeSeriesInfo Info = 1;
+    repeated TTimeSeriesData Data = 2;
+}
+
+message TTimeSeriesData {
+    repeated double Values = 1;
+}
+
