@@ -177,8 +177,6 @@ namespace NDnn {
             		GetInAddr((struct sockaddr *)&their_addr),
             		s, sizeof s);
 
-				// L_DEBUG << "Server: got connection from " << s;
-
 				if (DebugMode) {
 					Receive(new_fd);
         			close(new_fd);
