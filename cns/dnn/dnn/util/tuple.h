@@ -29,5 +29,6 @@ namespace NDnn {
 	    f(I, std::get<I>(t));
 	    ForEachEnumerate<I + 1, FuncT, Tp...>(t, f);
 	  }
+
 	
 } // namespace NDnn

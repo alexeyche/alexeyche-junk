@@ -6,11 +6,13 @@ import "spike_neuron.proto";
 import "basic_synapse.proto";
 import "sim.proto";
 import "synapse.proto";
-
+import "stochastic.proto";
+import "spike_neuron_impl.proto";
 
 message TConfig {
 	optional TSimConfiguration SimConfiguration = 1;	
 	repeated TLayer Layer = 2;
+	repeated TConnection Connection = 3;
 }
 
 
@@ -18,9 +20,18 @@ message TLayer {
     repeated TIntegrateAndFireConst IntegrateAndFireConst = 1;
     repeated TIntegrateAndFireState IntegrateAndFireState = 2;
     repeated TDetermConst DetermConst = 3;
-    repeated TSpikeNeuronInnerState SpikeNeuronInnerState = 4;
-    repeated TBasicSynapseConst BasicSynapseConst = 5;
-    repeated TBasicSynapseState BasicSynapseState = 6;
-    repeated TSynapseInnerState SynapseInnerState = 7;
+    repeated TSpikeNeuronImplInnerState SpikeNeuronImplInnerState = 4;
+    repeated TSpikeNeuronInnerState SpikeNeuronInnerState = 5;
+    repeated TBasicSynapseConst BasicSynapseConst = 6;
+    repeated TBasicSynapseState BasicSynapseState = 7;
+    repeated TSynapseInnerState SynapseInnerState = 8;
 }
 
+
+message TConnection {
+	optional uint32 From = 1;
+	optional uint32 To = 2;
+	optional double Weight = 3;
+	optional double DendriteDelay = 4;
+	optional TStochasticConst StochasticConst = 5;
+}

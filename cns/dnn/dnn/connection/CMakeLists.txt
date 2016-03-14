@@ -1,10 +1,9 @@
 cmake_minimum_required(VERSION 2.8)
 
 set(SOURCES
-    serial_base.cpp
-    proto_serial.cpp
-    meta_proto_serial.cpp
-    util.cpp
+	builder.cpp
+    connection.cpp
+    stochastic.cpp
 )
 
 set(DIR_SRCS)

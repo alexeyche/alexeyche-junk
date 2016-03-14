@@ -11,7 +11,7 @@ namespace NDnn {
             typename IProtoSerial<T>::TProto* mess;
 
             if (!createNewMessage) {
-                mess = GetMutMessage<typename IProtoSerial<T>::TProto>(protoField);
+                mess = GetEmbedMutMessage<typename IProtoSerial<T>::TProto>(protoField);
             } else {
                 mess = new typename IProtoSerial<T>::TProto();
             }

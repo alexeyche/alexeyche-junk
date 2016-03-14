@@ -1,0 +1,23 @@
+SimConfiguration {
+	Port: 9090
+	Seed: 1
+	Jobs: 8
+}
+Layer {
+	IntegrateAndFireConst {
+		TauMem: 100
+	}
+	DetermConst {
+		Threshold: 1.0
+	}
+    BasicSynapseConst {
+        PspDecay: 100.0
+    }
+}
+Connection {
+	From: 0 To: 1
+	StochasticConst {
+		Prob: 0.5
+	}
+	Weight: 1.0
+}

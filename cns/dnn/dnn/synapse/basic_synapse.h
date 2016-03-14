@@ -2,6 +2,11 @@
 
 #include "synapse.h"
 
+#include <dnn/util/serial/proto_serial.h>
+#include <dnn/protos/basic_synapse.pb.h>
+#include <dnn/protos/config.pb.h>
+
+
 namespace NDnn {
 
 

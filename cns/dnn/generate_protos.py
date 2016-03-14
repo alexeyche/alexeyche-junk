@@ -107,6 +107,7 @@ def ParseStructures(src_dir):
 
                 def parse(known_types):
                     open_brackets = 0
+                    all_open_brackets = 0
                     struct = None
                     line_num = 0
                     field_re = build_field_re(known_types)
@@ -116,20 +117,26 @@ def ParseStructures(src_dir):
                         struct_m = struct_re.match(l)
                         if struct_m:
                             struct = TStruct(struct_m.group(1))
-                            open_brackets = l.count("{")
+                            all_open_brackets = 0
+                            all_open_brackets += l.count("{")
+                            open_brackets += l.count("{")
                             continue
 
                         if struct:
                             open_brackets += l.count("{")
+                            all_open_brackets += l.count("{")
                             open_brackets -= l.count("}")
-                            if open_brackets == 0:
+                            if open_brackets == 0: 
+                                if all_open_brackets == 0:
+                                    struct = None
+                                    continue
                                 # if len(struct.fields)>0:
                                 structures_to_file[dst_file][struct.name] = struct
                                 struct = None
                                 continue
                             
                             m = field_re.match(l.strip())
-                            if m and open_brackets == 1:
+                            if m and open_brackets == 1 and all_open_brackets > 0:
                                 struct.fields.append( (m.group(1), m.group(2)) )
                                 continue
                 parse(known_types)

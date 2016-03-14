@@ -18,6 +18,7 @@ namespace NDnn {
 					InputData.Deserialize(ts);
 					InputDataIsReady.notify_all();
 					InputDataIsReadyVar = true;
+					InputDataIdx.resize(InputData.Dim());
 					resp.Good();
 				}
 			);
@@ -40,20 +41,24 @@ namespace NDnn {
 
 
 	void TDispatcher::SetPort(ui32 port) {
-		Server.Init(port);
+		Server.SetPort(port);
 	}
 	
 	const ui32& TDispatcher::GetPort() const {
 		return Server.GetPort();
 	}
 
-	const double& TDispatcher::GetNeuronInput(ui32 layerId, ui32 neuronId) {
+	double TDispatcher::GetNeuronInput(ui32 layerId, ui32 neuronId) {
 		while (!InputDataIsReadyVar) {
 			L_DEBUG << "Waiting for data";
 			TUniqueLock lock(InputDataMutex);
 			InputDataIsReady.wait(lock);
 		}
-		
+		if (layerId != 0) {
+			return 0.0;
+		}
+		ENSURE((neuronId < InputData.Data.size()) && (InputDataIdx[neuronId] < InputData.Data[neuronId].Values.size()), "Id out of range");
+		return InputData.Data[neuronId].Values[InputDataIdx[neuronId]++];
 	}
 
 	void TDispatcher::MainLoop() {

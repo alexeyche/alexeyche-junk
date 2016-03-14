@@ -1,0 +1,16 @@
+package NDnnProto;
+
+
+message TSpikeNeuronImplInnerState {
+    optional uint32 SynapsesSize = 1;
+}
+
+message TNeuronSpaceInfo {
+    optional uint32 LayerId = 1;
+    optional uint32 LocalId = 2;
+    optional uint32 GlobalId = 3;
+    optional uint32 ColumnSize = 4;
+    optional uint32 RowId = 5;
+    optional uint32 ColId = 6;
+}
+

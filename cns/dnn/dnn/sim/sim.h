@@ -1,3 +1,5 @@
+#pragma once
+
 #include "layer.h"
 
 #include <dnn/base/base.h>
@@ -44,8 +46,10 @@ namespace NDnn {
 		TSim(ui32 port)
 			: Dispatcher(port) 
 		{
+			ui32 accNeuronsSize = 0;
 			ForEachEnumerate(Layers, [&](ui32 layerId, auto& l) {
-				l.SetId(layerId);
+				l.SetupSpaceInfo(layerId, accNeuronsSize);
+				accNeuronsSize += l.Size();
 			});
 		}
 		
@@ -80,6 +84,8 @@ namespace NDnn {
 			});
 			if (serial.IsInput()) {
 				Dispatcher.SetPort(Conf.Port);
+				const NDnnProto::TConfig& inputConfig = serial.GetMessage<NDnnProto::TConfig>();
+				CreateConnections(inputConfig);
 			}
 		}
 
@@ -131,6 +137,24 @@ namespace NDnn {
 				barrier.Fail();
 			} catch (const TDnnInterrupt& e) {
 				// pass
+			}
+		}
+	
+		void CreateConnections(const NDnnProto::TConfig& config) {
+			TRandEngine rand(Conf.Seed);
+			for (const auto& connection: config.connection()) {
+				ForEach(Layers, [&](auto& leftLayer) {
+					if (leftLayer.GetId() != connection.from()) {
+						return;
+					}
+					ForEach(Layers, [&](auto& rightLayer) {
+						if (rightLayer.GetId() != connection.to()) {
+							return;
+						}
+						L_DEBUG << "Connecting layer " << leftLayer.GetId() << " to " << rightLayer.GetId();	
+						leftLayer.Connect(rightLayer, connection, rand);
+					});
+				});
 			}
 		}
 

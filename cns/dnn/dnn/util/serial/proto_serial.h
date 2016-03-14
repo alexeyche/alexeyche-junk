@@ -5,6 +5,7 @@
 #include <google/protobuf/message.h>
 #include <google/protobuf/repeated_field.h>
 
+#include <dnn/util/log/log.h>
 
 namespace NPb = google::protobuf;;
 
@@ -65,9 +66,20 @@ namespace NDnn {
 
         const NPb::FieldDescriptor* GetFieldDescr(int protoField);
 
+        template <typename T>
+        const T& GetMessage() const {
+            try {
+                return dynamic_cast<T&>(Message);
+            } catch (const std::bad_cast& error) {
+                T m;
+                L_INFO << "Failed to cast " << Message.GetTypeName() << " into " << m.GetTypeName();
+                throw; 
+            }
+        }
+
     private:
         template <typename T>
-        T* GetMutMessage(int protoField, bool newMessage = false) {
+        T* GetEmbedMutMessage(int protoField, bool newMessage = false) {
             auto* fd = GetFieldDescr(protoField);
             NPb::Message* message;
             if (fd->is_repeated()) {
@@ -85,9 +97,9 @@ namespace NDnn {
             ENSURE(m, "Failed to serialize field while casting " << protoField);
             return m;
         }
-
+        
         template <typename T>
-        const T* GetMessage(int protoField) {
+        const T* GetEmbedMessage(int protoField) {
             const NPb::Message* message = &Refl->GetMessage(Message, GetFieldDescr(protoField));
             const T *m = dynamic_cast<const T*>(message);
             ENSURE(m, "Failed to serialize field while casting " << protoField);
@@ -113,6 +125,8 @@ namespace NDnn {
         TProto Serialize();
 
         void Deserialize(TProto& proto);
+
+        void Deserialize(const TProto& proto);
 
         virtual void SerialProcess(TProtoSerial& serial) = 0;
     };

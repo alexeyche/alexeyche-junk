@@ -72,11 +72,11 @@ namespace NDnn {
 		TServer(ui32 port, ui32 max_connections = DefaultMaxConnections, bool debugMode = false)
 			: DebugMode(debugMode)
 			, Port(port)
+			, MaxConnections(max_connections)
 		{
-			Init(max_connections);
 		}
 		
-		void Init(ui32 max_connections = DefaultMaxConnections) {
+		void Listen() {
 			int status;
 			struct addrinfo hints;
 
@@ -120,13 +120,17 @@ namespace NDnn {
 			freeaddrinfo(servinfo);
 
 			ENSURE(
-				listen(SocketNum, max_connections) >= 0,
+				listen(SocketNum, MaxConnections) >= 0,
 				"Failed to listen"
 			);
 		}
 		
 		const ui32& GetPort() const {
 			return Port;
+		}
+
+		void SetPort(ui32 port) {
+			Port = port;
 		}
 
 		TServer& AddCallback(TString method, TString path, TRequestCallback cb) {
@@ -165,6 +169,7 @@ namespace NDnn {
 		}
 
 		void MainLoop() {
+			Listen();
 			while (true) {
 				struct sockaddr_storage their_addr;
 				socklen_t addr_size = sizeof(their_addr);
@@ -319,6 +324,7 @@ namespace NDnn {
 	private:
 		bool DebugMode;
 		ui32 Port;
+		ui32 MaxConnections;
 
 		int SocketNum;
 		std::map<TString, TRequestCallback> DefaultCallbacks;

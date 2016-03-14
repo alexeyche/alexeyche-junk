@@ -17,11 +17,15 @@ endforeach()
 set(DNN_SRCS ${DIR_SRCS})
 
 set(DIRS
+    activation
     base
+    connection
     contrib
     dispatcher
-    util
     protos
+    sim
+    synapse
+    util
 )
 
 foreach(dir ${DIRS})

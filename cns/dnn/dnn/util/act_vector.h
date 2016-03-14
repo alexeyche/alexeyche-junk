@@ -3,6 +3,7 @@
 #include <dnn/base/base.h>
 
 #include <unordered_set>
+#include <iostream>
 
 namespace NDnn {
 
@@ -10,11 +11,11 @@ namespace NDnn {
 	class TActVector : private TVector<T> {
 	public:
 		T& operator[] (const ui32 &i) {
-			MakeActive(i);
+			SetActive(i);
 			return TVector<T>::operator[](i);
 		}
 
-		void MakeActive(const ui32 &i) {
+		void SetActive(const ui32 &i) {
 			if(ActIndices.find(i) == ActIndices.end()) {
 				ActIndices.insert(i);
 			}
@@ -57,11 +58,15 @@ namespace NDnn {
 		void SetInactive(std::unordered_set<ui32>::iterator &i) {
 			i = ActIndices.erase(i);
 		}
+		
 		ui32 size() const {
 			return TVector<T>::size();
 		}
 		void resize(ui32 s) {
 			TVector<T>::resize(s);
+		}
+		void emplace_back(T&& v) {
+			TVector<T>::emplace_back(std::forward<T>(v));
 		}
 
 	    friend std::ostream& operator<<(std::ostream& str, const TActVector &self) {

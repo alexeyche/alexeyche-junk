@@ -1,0 +1,9 @@
+package NDnnProto;
+
+
+message TConnectionRecipe {
+    optional bool Inhibitory = 1;
+    optional double Amplitude = 2;
+    optional bool Exists = 3;
+}
+

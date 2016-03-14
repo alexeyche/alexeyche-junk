@@ -1,9 +1,9 @@
+#pragma once
 
 #include <dnn/base/base.h>
-
 #include <dnn/neuron/spike_neuron_impl.h>
-
 #include <dnn/neuron/default_config.h>
+#include <dnn/connection/builder.h>
 
 namespace NDnn {
 
@@ -27,8 +27,28 @@ namespace NDnn {
 			return Neurons[id];
 		}
 
-		void SetId(ui32 id) {
+		void SetupSpaceInfo(ui32 id, ui32 prevLayerNeuronsSize) {
 			Id = id;
+	        ui32 rowId = 0;
+        	ui32 colId = 0;
+        	ui32 colSize = ceil(sqrt(Size()));
+			for (ui32 nId=0; nId < Neurons.size(); ++nId) {
+				TNeuronSpaceInfo info;
+				info.LayerId = Id;
+				info.LocalId = nId;
+				info.GlobalId = prevLayerNeuronsSize + nId;
+				info.ColumnSize = colSize;
+				info.RowId = rowId;
+				info.ColId = colId;
+
+				Neurons[nId].SetSpaceInfo(info);
+				
+				rowId++;
+                if(rowId % colSize == 0) {
+                    colId++;
+                    rowId = 0;
+                }
+			}
 		}
 
 		const ui32& GetId() const {
@@ -46,6 +66,37 @@ namespace NDnn {
 			for (auto& n: Neurons) {
 				serial(n);
 			}
+		}
+		
+		void Connect(TLayer& dstLayer, const NDnnProto::TConnection& conn, TRandEngine& rand) {
+			auto connectionPtr = BuildConnection(conn);
+			connectionPtr->SetRandEngine(rand);
+
+			for (auto& npre : Neurons) {
+				for (auto& npost : dstLayer.Neurons) {
+					if (npre == npost) {
+						continue;
+					}
+					auto connRecipe = connectionPtr->GetConnectionRecipe(npre.GetSpaceInfo(), npost.GetSpaceInfo());
+					if (!connRecipe.Exists) {
+						continue;
+					}
+					
+					typename TConf::TSynapse syn;
+					auto synConst = npost.GetPredefinedSynapseConst();
+					if (synConst) {
+						TProtoSerial serial(*synConst, TSerialBase::ESerialMode::IN);
+						syn.MutConstants().SerialProcess(serial);
+					}
+
+					syn.MutWeight() = connRecipe.Amplitude * conn.weight();
+					syn.MutIdPre() = npre.GetGlobalId();
+					syn.MutDendriteDelay() = conn.dendritedelay();
+
+					npost.AddSynapse(std::move(syn));
+				}
+			}
+
 		}
 
 	private:

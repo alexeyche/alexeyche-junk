@@ -1,0 +1,7 @@
+package NDnnProto;
+
+
+message TStochasticConst {
+    optional double Prob = 1;
+}
+

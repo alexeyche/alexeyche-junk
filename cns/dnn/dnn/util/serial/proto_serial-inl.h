@@ -82,4 +82,9 @@ namespace NDnn {
         SerialProcess(serial);
     }
 
+    template <typename T>
+    void IProtoSerial<T>::Deserialize(const typename IProtoSerial<T>::TProto& proto) {
+        Deserialize(const_cast<typename IProtoSerial<T>::TProto&>(proto));
+    }
+
 } // namespace NDnn

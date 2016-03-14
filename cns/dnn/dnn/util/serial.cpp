@@ -109,7 +109,7 @@ namespace NDnn {
            break;
            case ESerialMode::OUT:
            {
-               NDnnProto::TVectorD* vecProto = GetMutMessage<NDnnProto::TVectorD>(protoField);
+               NDnnProto::TVectorD* vecProto = GetEmbedMutMessage<NDnnProto::TVectorD>(protoField);
                for (const auto& val: v) {
                    vecProto->add_x(val);
                }
@@ -134,7 +134,7 @@ namespace NDnn {
            break;
            case ESerialMode::OUT:
            {
-               NDnnProto::TMatrixD* mat = GetMutMessage<NDnnProto::TMatrixD>(protoField);
+               NDnnProto::TMatrixD* mat = GetEmbedMutMessage<NDnnProto::TMatrixD>(protoField);
                mat->set_n_rows(m.n_rows);
                mat->set_n_cols(m.n_cols);
                for (size_t rowIdx=0; rowIdx < m.n_rows; ++rowIdx) {

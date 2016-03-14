@@ -14,8 +14,15 @@ namespace NDnn {
         Descr = Message.GetDescriptor();
     }
 
+    #define CHECK_FIELD() \
+        if ((!HasField(protoField)) && IsInput()) { \
+            L_DEBUG << "Proto " << (Mode == ESerialMode::IN ? "IN" : "OUT") << ": Proto field " << protoField << " is empty " << Message.GetTypeName(); \
+            return false;  \
+        } \
 
-	void TMetaProtoSerial::operator() (NPb::Message& m, int protoField) {
+
+	bool TMetaProtoSerial::operator() (NPb::Message& m, int protoField) {
+        CHECK_FIELD();
         L_DEBUG << "Serial process of message " << m.GetTypeName() << " as " << protoField << " field number in " << Message.GetTypeName();
         auto* fd = GetFieldDescr(protoField);
         switch (Mode) {
@@ -43,13 +50,15 @@ namespace NDnn {
             }
             break;
         }
+        return true;
     }
-    void TMetaProtoSerial::operator() (IMetaProtoSerial& v) {
+    bool TMetaProtoSerial::operator() (IMetaProtoSerial& v) {
         L_DEBUG << "MetaProto " << (Mode == ESerialMode::IN ? "IN" : "OUT") << ": Serial process of meta entitty";
         
         v.SerialProcess(*this);
 
         L_DEBUG << "MetaProto " << (Mode == ESerialMode::IN ? "IN" : "OUT") << ": Serial process done";
+        return true;
     }   
 
     void TMetaProtoSerial::DuplicateSingleRepeated(ui32 duplicateFactor) {
@@ -70,4 +79,14 @@ namespace NDnn {
         return fd;
     }
 
+
+    bool TMetaProtoSerial::HasField(int protoField) {
+        auto *fd = GetFieldDescr(protoField);
+        if (fd->is_repeated()) {
+            return Refl->FieldSize(Message, fd) != 0;
+        }
+        return Refl->HasField(Message, fd);
+    }
+
+    #undef CHECK_FIELD
 } // namespace NDnn

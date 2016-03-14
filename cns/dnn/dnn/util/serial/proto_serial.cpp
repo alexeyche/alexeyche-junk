@@ -105,7 +105,7 @@ namespace NDnn {
         switch (Mode) {
             case ESerialMode::IN:
             {
-                const NDnnProto::TVectorD* vecProto = GetMessage<NDnnProto::TVectorD>(protoField);
+                const NDnnProto::TVectorD* vecProto = GetEmbedMessage<NDnnProto::TVectorD>(protoField);
                 v = TVectorD(vecProto->x_size());
                 for (size_t vecIdx=0; vecIdx < v.size(); ++vecIdx) {
                     v(vecIdx) = vecProto->x(vecIdx);
@@ -114,7 +114,7 @@ namespace NDnn {
             break;
             case ESerialMode::OUT:
             {
-                NDnnProto::TVectorD* vecProto = GetMutMessage<NDnnProto::TVectorD>(protoField);
+                NDnnProto::TVectorD* vecProto = GetEmbedMutMessage<NDnnProto::TVectorD>(protoField);
                 for (const auto& val: v) {
                     vecProto->add_x(val);
                 }
@@ -130,7 +130,7 @@ namespace NDnn {
         switch (Mode) {
             case ESerialMode::IN:
             {
-                const NDnnProto::TMatrixD* mat = GetMessage<NDnnProto::TMatrixD>(protoField);
+                const NDnnProto::TMatrixD* mat = GetEmbedMessage<NDnnProto::TMatrixD>(protoField);
                 m = TMatrixD(mat->n_rows(), mat->n_cols());
                 for (size_t rowIdx=0; rowIdx < m.n_rows; ++rowIdx) {
                     const NDnnProto::TVectorD& row = mat->row(rowIdx);
@@ -142,7 +142,7 @@ namespace NDnn {
             break;
             case ESerialMode::OUT:
             {
-                NDnnProto::TMatrixD* mat = GetMutMessage<NDnnProto::TMatrixD>(protoField);
+                NDnnProto::TMatrixD* mat = GetEmbedMutMessage<NDnnProto::TMatrixD>(protoField);
                 mat->set_n_rows(m.n_rows);
                 mat->set_n_cols(m.n_cols);
                 for (size_t rowIdx=0; rowIdx < m.n_rows; ++rowIdx) {
@@ -232,7 +232,7 @@ namespace NDnn {
     bool TProtoSerial::operator() (IMetaProtoSerial& v, int protoField, bool newMessage) {
         CHECK_FIELD();
 
-        NPb::Message* message = GetMutMessage<NPb::Message>(protoField, newMessage);
+        NPb::Message* message = GetEmbedMutMessage<NPb::Message>(protoField, newMessage);
         TMetaProtoSerial serial(*message, protoField, Mode);
         v.SerialProcess(serial);
         if (newMessage && IsInput()) {
@@ -268,7 +268,11 @@ namespace NDnn {
         if ((actual_size == 0) || (actual_size == size)) {
             return;
         }
-        ENSURE(actual_size == 1, "Size of repeated field must equal to " << size << " or be 1 so we can duplicate this message " << size << " times for you (now it's " << actual_size << ")");
+        if (actual_size != 1) {
+            L_DEBUG << "Size of repeated field must equal to " << size << " or be 1 so we can duplicate this message " << size << " times for you (now it's " << actual_size << "), so we skipping duplicating";
+            return;
+        }
+        
         L_DEBUG << "Duplicating " << fd->name() << " " << size << " times";
         auto* baseMessage = Refl->MutableRepeatedPtrField<NPb::Message>(&Message, fd)->Mutable(0);
         while (Refl->FieldSize(Message, fd) < size) {
@@ -279,4 +283,5 @@ namespace NDnn {
 
     #undef CHECK_FIELD
 
+    
 } // namespace NDnn

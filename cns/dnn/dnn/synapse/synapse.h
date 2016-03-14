@@ -1,9 +1,12 @@
 #pragma once
 
+#include <dnn/util/serial/proto_serial.h>
+#include <dnn/protos/synapse.pb.h>
+#include <dnn/protos/config.pb.h>
+
 namespace NDnn {
 
 	struct TSynapseInnerState: public IProtoSerial<NDnnProto::TSynapseInnerState> {
-		
 		void SerialProcess(TProtoSerial& serial) override {
 			serial(IdPre);
 			serial(DendriteDelay);
@@ -24,6 +27,7 @@ namespace NDnn {
 	template <typename TConstants, typename TState>
 	class TSynapse: public IProtoSerial<NDnnProto::TLayer> {
 	public:
+		using TConst = TConstants;
 		TSynapse()
 		{}
 
@@ -55,7 +59,22 @@ namespace NDnn {
 			serial(s, TState::ProtoFieldNumber);
 			serial(InnerState, NDnnProto::TLayer::kSynapseInnerStateFieldNumber);
 		}
+		
+		double& MutWeight() {
+			return InnerState.Weight;
+		}
 
+		ui32& MutIdPre() {
+			return InnerState.IdPre;
+		}
+
+		double& MutDendriteDelay() {
+			return InnerState.DendriteDelay;
+		}
+
+		TConstants& MutConstants() {
+			return c;
+		}
 	private:
 		TSynapseInnerState InnerState;
 

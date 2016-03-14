@@ -9,13 +9,12 @@ namespace NDnn {
 
 	template <typename TConstants>
 	class TActivation: public IProtoSerial<NDnnProto::TLayer> {
-	protected:
-		TActivation() {}
-		
+	public:
 		void SerialProcess(TProtoSerial& serial) override final {
 			serial(c, TConstants::ProtoFieldNumber); 
 		}
-
+		
+	protected:
 		TConstants c;
 	};
 

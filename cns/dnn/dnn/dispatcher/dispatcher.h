@@ -21,7 +21,7 @@ namespace NDnn {
 		
 		const ui32& GetPort() const;
 
-		const double& GetNeuronInput(ui32 layerId, ui32 neuronId);
+		double GetNeuronInput(ui32 layerId, ui32 neuronId);
 
 		void MainLoop();
 
@@ -33,6 +33,7 @@ namespace NDnn {
 		TTimeSeries InputData;
 
 		TServer Server;
+		TVector<ui32> InputDataIdx;
 	};
 
 

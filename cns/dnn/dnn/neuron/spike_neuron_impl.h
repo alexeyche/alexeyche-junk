@@ -6,16 +6,62 @@
 #include <dnn/util/act_vector.h>
 #include <dnn/util/random.h>
 #include <dnn/util/rand.h>
+#include <dnn/util/optional.h>
 #include <dnn/util/serial/meta_proto_serial.h>
+#include <dnn/util/serial/util.h>
 #include <dnn/protos/config.pb.h>
+#include <dnn/protos/spike_neuron_impl.pb.h>
 
 
 
 namespace NDnn {
 
+	struct TNeuronSpaceInfo {
+		ui32 LayerId;
+		ui32 LocalId;
+		ui32 GlobalId;
+		ui32 ColumnSize;
+		ui32 RowId;
+		ui32 ColId;
+
+		bool operator == (const TNeuronSpaceInfo& other) {
+			return GlobalId == other.GlobalId;
+		}
+	};
+
+	struct TSpikeNeuronImplInnerState: public IProtoSerial<NDnnProto::TSpikeNeuronImplInnerState> {
+		void SerialProcess(TProtoSerial& serial) {
+			serial(SynapsesSize);
+		}
+
+		ui32 SynapsesSize = 0;
+	};
+
+	class TSpikeNeuronImplInner: public IProtoSerial<NDnnProto::TLayer> {
+	public:
+		void SerialProcess(TProtoSerial& serial) {
+			serial(s, NDnnProto::TLayer::kSpikeNeuronImplInnerStateFieldNumber);
+		}
+
+		const ui32& SynapsesSize() const {
+			return s.SynapsesSize;
+		}
+	
+		ui32& MutSynapsesSize() {
+			return s.SynapsesSize;
+		}
+
+
+		TSpikeNeuronImplInnerState s;
+	};
+
+	
+
 	template <typename TNeuron, typename TConf>	
 	class TSpikeNeuronImpl: public IMetaProtoSerial {
 	public:
+		using TSelf = TSpikeNeuronImpl<TNeuron, TConf>;
+
 		TSpikeNeuronImpl()
 			: InputSpikesLock(ATOMIC_FLAG_INIT)
 		{}
@@ -55,9 +101,16 @@ namespace NDnn {
 			double Iinput = 0.0;
 
 			double Isyn = 0.0;
-		    for (const auto& synapse: Synapses) {
+			auto synIdIt = Synapses.abegin();
+		    while (synIdIt != Synapses.aend()) {
+		    	auto& synapse = Synapses[synIdIt];
 		    	double x = synapse.WeightedPotential();
-		    	Isyn += x;
+		    	if(fabs(x) < 0.0001) {
+		        	Synapses.SetInactive(synIdIt);
+		        } else {
+		        	Isyn += x;
+		        	++synIdIt;
+		        }
 		    }
 		    
 		    Neuron.CalculateDynamics(t, Iinput, Isyn);
@@ -73,13 +126,7 @@ namespace NDnn {
 			return Neuron;
 		}
 
-		void SerialProcess(TMetaProtoSerial& serial) override final {
-			serial(Neuron);
-			serial(Activation);
-			for (auto& synapse: Synapses) {
-				serial(synapse);
-			}
-		}
+		
 
 		void SetRandEngine(TRandEngine& rand) {
 			Rand.Set(rand);
@@ -90,7 +137,59 @@ namespace NDnn {
 
 			Neuron.Reset();
 		}
+		
+		void SetSpaceInfo(TNeuronSpaceInfo info) {
+			SpaceInfo = info;
+		}
 
+		bool operator == (const TSelf& other) {
+			return SpaceInfo == other.SpaceInfo;
+		}
+
+		const TNeuronSpaceInfo& GetSpaceInfo() const {
+			return SpaceInfo;
+		}
+
+		const ui32& GetGlobalId() const {
+			return SpaceInfo.GlobalId;
+		}
+		
+		const ui32& GetLocalId() const {
+			return SpaceInfo.LocalId;
+		}
+
+		void AddSynapse(typename TConf::TSynapse&& syn) {
+			Synapses.emplace_back(std::forward<typename TConf::TSynapse>(syn));
+			Inner.MutSynapsesSize()++;
+		}
+
+		void SerialProcess(TMetaProtoSerial& serial) override final {
+			serial(Neuron);
+			serial(Activation);
+			serial(Inner);
+			if (serial.IsInput()) {
+				Synapses.resize(Inner.SynapsesSize());
+				if (Inner.SynapsesSize() == 0) {
+					const NDnnProto::TLayer& layerSpec = serial.GetMessage<NDnnProto::TLayer>();
+					if (GetRepeatedFieldSizeFromMessage(layerSpec, TConf::TSynapse::TConst::ProtoFieldNumber) > GetLocalId()) {
+						L_DEBUG << "Got predefined synapse constants for neuron " << GetLocalId();
+						PredefineSynapseConst.emplace(
+							GetRepeatedFieldFromMessage<typename TConf::TSynapse::TConst::TProto>(
+								layerSpec, 
+								TConf::TSynapse::TConst::ProtoFieldNumber, 
+								GetLocalId()
+							)
+						);	
+					}
+				}
+			}
+			for (ui32 synId = 0; synId < Inner.SynapsesSize(); ++synId) {
+				serial(Synapses[synId]);
+			}
+		}
+		const TOptional<typename TConf::TSynapse::TConst::TProto>& GetPredefinedSynapseConst() const {
+			return PredefineSynapseConst;
+		}
 	private:
 		TPtr<TRandEngine> Rand;
 
@@ -101,6 +200,11 @@ namespace NDnn {
 
 		std::priority_queue<TSynSpike> InputSpikes;
 		std::atomic_flag InputSpikesLock;	
+
+		TSpikeNeuronImplInner Inner;
+		TNeuronSpaceInfo SpaceInfo;
+
+		TOptional<typename TConf::TSynapse::TConst::TProto> PredefineSynapseConst;
 	};
 
 } // namespace NDnn
