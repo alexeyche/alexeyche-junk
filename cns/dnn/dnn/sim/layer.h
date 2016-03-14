@@ -69,8 +69,7 @@ namespace NDnn {
 		}
 		
 		void Connect(TLayer& dstLayer, const NDnnProto::TConnection& conn, TRandEngine& rand) {
-			auto connectionPtr = BuildConnection(conn);
-			connectionPtr->SetRandEngine(rand);
+			auto connectionPtr = BuildConnection(conn, rand);
 
 			for (auto& npre : Neurons) {
 				for (auto& npost : dstLayer.Neurons) {
