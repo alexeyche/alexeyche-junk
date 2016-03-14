@@ -114,9 +114,9 @@ Rcpp::List TProto::ReadFromFile(TString protofile) {
 	std::fstream input(protofile, std::ios::in | std::ios::binary);
 
 	Rcpp::List l;
-	if (ReadEntity<TTimeSeries>(input, l)) {
-		return l;
-	}
+	// if (ReadEntity<TTimeSeries>(input, l)) {
+	// 	return l;
+	// }
     if (ReadEntity<TSpikesList>(input, l)) {
         return l;
     }

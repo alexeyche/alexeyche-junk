@@ -19,3 +19,10 @@ message TDnnOptions {
         (short_option) = "-c"
     ];
 }
+
+message TDumptoolOptions {
+    optional string Input = 1 [
+        (description) = "Input file",
+        (short_option) = "-i"
+    ];
+}

@@ -68,3 +68,7 @@ install(
     PATTERN "*.h"
     PATTERN "*.hpp"
 )
+
+install(CODE
+    "EXECUTE_PROCESS(COMMAND ln -sf ${PROJECT_SOURCE_DIR}/R/scripts ${CMAKE_INSTALL_PREFIX}/r_scripts)"
+)
