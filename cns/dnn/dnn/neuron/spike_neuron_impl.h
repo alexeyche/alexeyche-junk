@@ -24,7 +24,7 @@ namespace NDnn {
 		ui32 RowId;
 		ui32 ColId;
 
-		bool operator == (const TNeuronSpaceInfo& other) {
+		bool operator == (const TNeuronSpaceInfo& other) const {
 			return GlobalId == other.GlobalId;
 		}
 	};
@@ -37,27 +37,41 @@ namespace NDnn {
 		ui32 SynapsesSize = 0;
 	};
 
+	struct TSpikeNeuronConst: public IProtoSerial<NDnnProto::TSpikeNeuronConst> {
+		void SerialProcess(TProtoSerial& serial) {
+			serial(AxonDelay);
+		}
+
+		double AxonDelay = 0.0;
+	};
+
 	class TSpikeNeuronImplInner: public IProtoSerial<NDnnProto::TLayer> {
 	public:
 		void SerialProcess(TProtoSerial& serial) {
 			serial(s, NDnnProto::TLayer::kSpikeNeuronImplInnerStateFieldNumber);
+			serial(c, NDnnProto::TLayer::kSpikeNeuronConstFieldNumber);
 		}
 
 		const ui32& SynapsesSize() const {
 			return s.SynapsesSize;
 		}
-	
+
 		ui32& MutSynapsesSize() {
 			return s.SynapsesSize;
 		}
 
+		const double& GetAxonDelay() const {
+			return c.AxonDelay;
+		}
 
+	private:
 		TSpikeNeuronImplInnerState s;
+		TSpikeNeuronConst c;
 	};
 
-	
 
-	template <typename TNeuron, typename TConf>	
+
+	template <typename TNeuron, typename TConf>
 	class TSpikeNeuronImpl: public IMetaProtoSerial {
 	public:
 		using TSelf = TSpikeNeuronImpl<TNeuron, TConf>;
@@ -78,14 +92,14 @@ namespace NDnn {
 			}
 			return *this;
 		}
-		
+
 		void ReadInputSpikes(const TTime &t) {
 			while (InputSpikesLock.test_and_set(std::memory_order_acquire)) {}
 		    while(!InputSpikes.empty()) {
 		        const TSynSpike& sp = InputSpikes.top();
 		        if(sp.T >= t.T) break;
 		        auto& s = Synapses[sp.syn_id];
-		        
+
 		        s.MutFired() = true;
 		    	s.PropagateSpike();
 
@@ -96,7 +110,7 @@ namespace NDnn {
 
 		void CalculateDynamicsInternal(const TTime& t) {
 			ReadInputSpikes(t);
-			
+
 			// const double& Iinput = input.ifc().getValue(t);
 			double Iinput = 0.0;
 
@@ -112,7 +126,7 @@ namespace NDnn {
 		        	++synIdIt;
 		        }
 		    }
-		    
+
 		    Neuron.CalculateDynamics(t, Iinput, Isyn);
 
 		    Neuron.MutSpikeProbability() = Activation.SpikeProbability(Neuron.Membrane());
@@ -126,7 +140,7 @@ namespace NDnn {
 			return Neuron;
 		}
 
-		
+
 
 		void SetRandEngine(TRandEngine& rand) {
 			Rand.Set(rand);
@@ -137,13 +151,14 @@ namespace NDnn {
 
 			Neuron.Reset();
 		}
-		
+
 		void SetSpaceInfo(TNeuronSpaceInfo info) {
 			SpaceInfo = info;
 		}
 
-		bool operator == (const TSelf& other) {
-			return SpaceInfo == other.SpaceInfo;
+		template <typename TOtherNeuron>
+		bool operator == (const TOtherNeuron& other) const {
+			return SpaceInfo == other.GetSpaceInfo();
 		}
 
 		const TNeuronSpaceInfo& GetSpaceInfo() const {
@@ -153,7 +168,7 @@ namespace NDnn {
 		const ui32& GetGlobalId() const {
 			return SpaceInfo.GlobalId;
 		}
-		
+
 		const ui32& GetLocalId() const {
 			return SpaceInfo.LocalId;
 		}
@@ -175,11 +190,11 @@ namespace NDnn {
 						L_DEBUG << "Got predefined synapse constants for neuron " << GetLocalId();
 						PredefineSynapseConst.emplace(
 							GetRepeatedFieldFromMessage<typename TConf::TSynapse::TConst::TProto>(
-								layerSpec, 
-								TConf::TSynapse::TConst::ProtoFieldNumber, 
+								layerSpec,
+								TConf::TSynapse::TConst::ProtoFieldNumber,
 								GetLocalId()
 							)
-						);	
+						);
 					}
 				}
 			}
@@ -190,6 +205,15 @@ namespace NDnn {
 		const TOptional<typename TConf::TSynapse::TConst::TProto>& GetPredefinedSynapseConst() const {
 			return PredefineSynapseConst;
 		}
+
+		const TActVector<typename TConf::TSynapse>& GetSynapses() const {
+			return Synapses;
+		}
+
+		const double& GetAxonDelay() const {
+			return Inner.GetAxonDelay();
+		}
+
 	private:
 		TPtr<TRandEngine> Rand;
 
@@ -199,7 +223,7 @@ namespace NDnn {
 		TActVector<typename TConf::TSynapse> Synapses;
 
 		std::priority_queue<TSynSpike> InputSpikes;
-		std::atomic_flag InputSpikesLock;	
+		std::atomic_flag InputSpikesLock;
 
 		TSpikeNeuronImplInner Inner;
 		TNeuronSpaceInfo SpaceInfo;

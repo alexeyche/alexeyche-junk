@@ -8,9 +8,10 @@ import "sim.proto";
 import "synapse.proto";
 import "stochastic.proto";
 import "spike_neuron_impl.proto";
+import "spike_sequence_neuron.proto";
 
 message TConfig {
-	optional TSimConfiguration SimConfiguration = 1;	
+	optional TSimConfiguration SimConfiguration = 1;
 	repeated TLayer Layer = 2;
 	repeated TConnection Connection = 3;
 }
@@ -21,10 +22,13 @@ message TLayer {
     repeated TIntegrateAndFireState IntegrateAndFireState = 2;
     repeated TDetermConst DetermConst = 3;
     repeated TSpikeNeuronImplInnerState SpikeNeuronImplInnerState = 4;
-    repeated TSpikeNeuronInnerState SpikeNeuronInnerState = 5;
-    repeated TBasicSynapseConst BasicSynapseConst = 6;
-    repeated TBasicSynapseState BasicSynapseState = 7;
-    repeated TSynapseInnerState SynapseInnerState = 8;
+    repeated TSpikeNeuronConst SpikeNeuronConst = 5;
+    repeated TSpikeNeuronInnerState SpikeNeuronInnerState = 6;
+    repeated TBasicSynapseConst BasicSynapseConst = 7;
+    repeated TBasicSynapseState BasicSynapseState = 8;
+    repeated TSynapseInnerState SynapseInnerState = 9;
+    repeated TSpikeSequenceNeuronConst SpikeSequenceNeuronConst = 10;
+    repeated TSpikeSequenceNeuronState SpikeSequenceNeuronState = 11;
 }
 
 

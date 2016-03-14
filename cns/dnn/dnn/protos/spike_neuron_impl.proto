@@ -14,3 +14,7 @@ message TNeuronSpaceInfo {
     optional uint32 ColId = 6;
 }
 
+message TSpikeNeuronConst {
+    optional double AxonDelay = 1;
+}
+

@@ -1,5 +1,8 @@
 #include "proto.h"
 
+#include <dnn/util/ts/time_series.h>
+#include <dnn/util/ts/spikes_list.h>
+
 using namespace NDnn;
 
 template <>
@@ -37,6 +40,22 @@ Rcpp::List TProto::Translate<TTimeSeries>(const TTimeSeries& ent) {
 }
 
 template <>
+Rcpp::List TProto::Translate<TSpikesList>(const TSpikesList& ent) {
+    TVector<TVector<double>> sp;
+    for(auto &seq : ent.Data) {
+        sp.push_back(seq.Values);
+    }
+
+    Rcpp::List ret = Rcpp::List::create(
+          Rcpp::Named("values") = Rcpp::wrap(sp)
+        , Rcpp::Named("info") = Translate<TTimeSeriesInfo>(ent.Info)
+    );
+    ret.attr("class") = "SpikesList";
+    return ret;
+}
+
+
+template <>
 TTimeSeriesInfo TProto::TranslateBack<TTimeSeriesInfo>(const Rcpp::List& l) {
 	TTimeSeriesInfo ret;
     for(size_t li=0; li<l.size(); ++li) {
@@ -64,22 +83,43 @@ TTimeSeries TProto::TranslateBack<TTimeSeries>(const Rcpp::List& l) {
         ts.Data.resize(ts.Info.DimSize);
         ts.Data[0].Values = Rcpp::as<std::vector<double>>(values);
     }
-    Rcpp::List info;
     if(l.containsElementNamed("info")) {
         ui32 dimsize = ts.Info.DimSize;
-        ts.Info = TranslateBack<TTimeSeriesInfo>(info);
+        ts.Info = TranslateBack<TTimeSeriesInfo>(l["info"]);
         ts.Info.DimSize = dimsize;
     }
     return ts;
 }
 
+template <>
+TSpikesList TProto::TranslateBack<TSpikesList>(const Rcpp::List& l) {
+    TSpikesList sl;
+    Rcpp::List spikes = l["values"];
+    for(auto &sp_v: spikes) {
+        TSpikesListData sp_seq;
+        sp_seq.Values = Rcpp::as<TVector<double>>(sp_v);
+        sl.Data.push_back(sp_seq);
+    }
+
+    sl.Info.DimSize = sl.Data.size();
+
+    if(l.containsElementNamed("info")) {
+        sl.Info = TranslateBack<TTimeSeriesInfo>(l["info"]);
+    }
+    return sl;
+}
+
+
 Rcpp::List TProto::ReadFromFile(TString protofile) {
 	std::fstream input(protofile, std::ios::in | std::ios::binary);
-	
+
 	Rcpp::List l;
 	if (ReadEntity<TTimeSeries>(input, l)) {
 		return l;
 	}
+    if (ReadEntity<TSpikesList>(input, l)) {
+        return l;
+    }
 	ERR("Failed to find appropriate entity for data in file " << protofile);
 	return l; // For warning
 }
@@ -91,6 +131,9 @@ void TProto::WriteToFile(Rcpp::List l, TString protofile) {
     	WriteEntity(TranslateBack<TTimeSeries>(l), f);
     	return;
     }
-	    
+    if (name == "SpikesList") {
+        WriteEntity(TranslateBack<TSpikesList>(l), f);
+        return;
+    }
     ERR("Failed to find appropriate entity for data in R structure with class " << name);
 }

@@ -1,0 +1,13 @@
+package NDnnProto;
+
+import "time_series_info.proto";
+
+message TSpikesList {
+    optional TTimeSeriesInfo Info = 1;
+    repeated TSpikesListData Data = 2;
+}
+
+message TSpikesListData {
+    repeated double Values = 1;
+}
+

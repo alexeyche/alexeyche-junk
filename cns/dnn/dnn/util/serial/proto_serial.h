@@ -22,6 +22,8 @@ namespace NDnn {
 
         bool operator() (ui32& v, int protoField);
 
+        bool operator() (int& v, int protoField);
+
         bool operator() (double& v, int protoField);
 
         bool operator() (bool& v, int protoField);
@@ -61,7 +63,7 @@ namespace NDnn {
         bool operator() (IMetaProtoSerial& v) {
             return (*this)(v, CurrentFieldNumber);
         }
-        
+
         void DuplicateSingleRepeated(int protoField, ui32 size, bool allow_zero = true);
 
         const NPb::FieldDescriptor* GetFieldDescr(int protoField);
@@ -73,7 +75,7 @@ namespace NDnn {
             } catch (const std::bad_cast& error) {
                 T m;
                 L_INFO << "Failed to cast " << Message.GetTypeName() << " into " << m.GetTypeName();
-                throw; 
+                throw;
             }
         }
 
@@ -97,7 +99,7 @@ namespace NDnn {
             ENSURE(m, "Failed to serialize field while casting " << protoField);
             return m;
         }
-        
+
         template <typename T>
         const T* GetEmbedMessage(int protoField) {
             const NPb::Message* message = &Refl->GetMessage(Message, GetFieldDescr(protoField));

@@ -5,6 +5,8 @@
 #include <dnn/neuron/default_config.h>
 #include <dnn/connection/builder.h>
 
+#include <array>
+
 namespace NDnn {
 
 	template <typename N, ui32 size, typename TConf = TDefaultConfig>
@@ -14,6 +16,7 @@ namespace NDnn {
 
 	public:
 		using TNeuronType = N;
+		using TNeuronArr = std::array<TNeuronImplType, size>;
 
 		TLayer()
 			: Id(0)
@@ -22,7 +25,7 @@ namespace NDnn {
 		ui32 Size() const {
 			return size;
 		}
-		
+
 		TNeuronImplType& operator[](ui32 id) {
 			return Neurons[id];
 		}
@@ -42,7 +45,7 @@ namespace NDnn {
 				info.ColId = colId;
 
 				Neurons[nId].SetSpaceInfo(info);
-				
+
 				rowId++;
                 if(rowId % colSize == 0) {
                     colId++;
@@ -67,12 +70,12 @@ namespace NDnn {
 				serial(n);
 			}
 		}
-		
-		void Connect(TLayer& dstLayer, const NDnnProto::TConnection& conn, TRandEngine& rand) {
+		template <typename TDstLayer>
+		void Connect(TDstLayer& dstLayer, const NDnnProto::TConnection& conn, TRandEngine& rand) {
 			auto connectionPtr = BuildConnection(conn, rand);
 
-			for (auto& npre : Neurons) {
-				for (auto& npost : dstLayer.Neurons) {
+			for (auto& npre : GetNeurons()) {
+				for (auto& npost : dstLayer.GetMutNeurons()) {
 					if (npre == npost) {
 						continue;
 					}
@@ -80,7 +83,7 @@ namespace NDnn {
 					if (!connRecipe.Exists) {
 						continue;
 					}
-					
+
 					typename TConf::TSynapse syn;
 					auto synConst = npost.GetPredefinedSynapseConst();
 					if (synConst) {
@@ -97,10 +100,17 @@ namespace NDnn {
 			}
 
 		}
+		const TNeuronArr& GetNeurons() const {
+			return Neurons;
+		}
+
+		TNeuronArr& GetMutNeurons() {
+			return Neurons;
+		}
 
 	private:
 		ui32 Id;
-		std::array<TNeuronImplType, size> Neurons;
+		TNeuronArr Neurons;
 	};
 
 

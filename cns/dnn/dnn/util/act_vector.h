@@ -20,7 +20,7 @@ namespace NDnn {
 				ActIndices.insert(i);
 			}
 		}
-		
+
 		T& operator[](const std::unordered_set<ui32>::iterator &i) {
 			return TVector<T>::operator[](*i);
 		}
@@ -58,7 +58,7 @@ namespace NDnn {
 		void SetInactive(std::unordered_set<ui32>::iterator &i) {
 			i = ActIndices.erase(i);
 		}
-		
+
 		ui32 size() const {
 			return TVector<T>::size();
 		}
@@ -69,7 +69,7 @@ namespace NDnn {
 			TVector<T>::emplace_back(std::forward<T>(v));
 		}
 
-	    friend std::ostream& operator<<(std::ostream& str, const TActVector &self) {
+	    friend std::ostream& operator<<(std::ostream& str, const TActVector& self) {
 	        for(ui32 i=0; i<self.size(); ++i) {
 	        	std::cout << i << ":";
 	        	if(self.ActIndices.find(i) == self.ActIndices.end()) {

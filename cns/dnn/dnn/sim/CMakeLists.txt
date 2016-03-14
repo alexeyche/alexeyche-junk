@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 2.8)
 set(SOURCES
     sim.cpp
     layer.cpp
+    network.cpp
 )
 
 set(DIR_SRCS)

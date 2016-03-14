@@ -49,17 +49,17 @@ namespace NDnn {
 		const double& Potential() const {
 			return InnerState.Potential;
 		}
-		
+
 		double WeightedPotential() const {
 			return InnerState.Weight * InnerState.Potential;
 		}
 
 		void SerialProcess(TProtoSerial& serial) override final {
-			serial(c, TConstants::ProtoFieldNumber); 
+			serial(c, TConstants::ProtoFieldNumber);
 			serial(s, TState::ProtoFieldNumber);
 			serial(InnerState, NDnnProto::TLayer::kSynapseInnerStateFieldNumber);
 		}
-		
+
 		double& MutWeight() {
 			return InnerState.Weight;
 		}
@@ -68,7 +68,15 @@ namespace NDnn {
 			return InnerState.IdPre;
 		}
 
+		const ui32& IdPre() const {
+			return InnerState.IdPre;
+		}
+
 		double& MutDendriteDelay() {
+			return InnerState.DendriteDelay;
+		}
+
+		const double& DendriteDelay() const {
 			return InnerState.DendriteDelay;
 		}
 
@@ -79,7 +87,7 @@ namespace NDnn {
 		TSynapseInnerState InnerState;
 
 	protected:
-		
+
 		TConstants c;
 		TState s;
 	};

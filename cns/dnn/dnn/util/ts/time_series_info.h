@@ -10,7 +10,7 @@ namespace NDnn {
 
     struct TLabelInfo: public IProtoSerial<NDnnProto::TLabelInfo> {
         TLabelInfo() {}
-        
+
         TLabelInfo(TString name, ui32 duration)
             : Name(name)
             , Duration(duration)
@@ -41,7 +41,7 @@ namespace NDnn {
             serial(LabelId);
             serial(Start);
         }
-        
+
         bool operator == (const TLabelPos& other) const {
             return (LabelId == other.LabelId) && (Start == other.Start);
         }

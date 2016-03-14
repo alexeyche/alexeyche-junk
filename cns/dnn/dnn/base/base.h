@@ -87,9 +87,9 @@ namespace NDnn {
 	using TUniqueLock = std::unique_lock<TMutex>;
 
 	struct TTime {
-	    TTime(double dt) 
+	    TTime(double dt)
 	    	: T(0)
-	    	, Dt(dt) 
+	    	, Dt(dt)
 	    {
 	    }
 
@@ -119,7 +119,7 @@ namespace NDnn {
 	};
 
 	using TComplex = std::complex<double>;
-	
+
 	template <typename T>
 	using TDeque = std::deque<T>;
 } // namespace NDnn

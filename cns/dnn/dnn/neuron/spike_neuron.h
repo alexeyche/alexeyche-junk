@@ -7,21 +7,15 @@
 namespace NDnn {
 
 	struct TSpikeNeuronInnerState: public IProtoSerial<NDnnProto::TSpikeNeuronInnerState> {
-		TSpikeNeuronInnerState()
-			: Membrane(0.0)
-			, SpikeProbability(0.0)
-			, Fired(false)
-		{}
-
 		void SerialProcess(TProtoSerial& serial) override final {
             serial(Membrane);
             serial(SpikeProbability);
             serial(Fired);
         }
 
-		double Membrane;
-		double SpikeProbability;
-		bool Fired;
+		double Membrane = 0.0;
+		double SpikeProbability = 0.0;
+		bool Fired = false;
 	};
 
 	template <typename TConstants, typename TState>
@@ -33,7 +27,7 @@ namespace NDnn {
 		double& MutMembrane() {
 			return InnerState.Membrane;
 		}
-		
+
 		const double& Membrane() const {
 			return InnerState.Membrane;
 		}
@@ -41,7 +35,7 @@ namespace NDnn {
 		bool& MutFired() {
 			return InnerState.Fired;
 		}
-		
+
 		const bool& Fired() const {
 			return InnerState.Fired;
 		}
@@ -49,23 +43,23 @@ namespace NDnn {
 		double& MutSpikeProbability() {
 			return InnerState.SpikeProbability;
 		}
-		
+
 		const double& SpikeProbability() const {
 			return InnerState.SpikeProbability;
 		}
-		
+
 		void SerialProcess(TProtoSerial& serial) override final {
-			serial(c, TConstants::ProtoFieldNumber); 
+			serial(c, TConstants::ProtoFieldNumber);
 			serial(s, TState::ProtoFieldNumber);
 			serial(InnerState, NDnnProto::TLayer::kSpikeNeuronInnerStateFieldNumber);
 		}
 
 	private:
 		TSpikeNeuronInnerState InnerState;
-		
+
 	protected:
 		TState s;
 		TConstants c;
 	};
-	
+
 } // namespace NDnn

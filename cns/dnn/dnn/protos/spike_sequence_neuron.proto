@@ -1,0 +1,11 @@
+package NDnnProto;
+
+
+message TSpikeSequenceNeuronState {
+    optional uint32 Index = 1;
+}
+
+message TSpikeSequenceNeuronConst {
+    optional double Dt = 1;
+}
+

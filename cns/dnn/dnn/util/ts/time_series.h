@@ -9,6 +9,8 @@
 #include <dnn/util/maybe.h>
 #include <dnn/base/base.h>
 
+#include <numeric>
+
 namespace NDnn {
 
     struct TTimeSeriesData : public IProtoSerial<NDnnProto::TTimeSeriesData> {
@@ -44,7 +46,7 @@ namespace NDnn {
                 }
             }
         }
-        
+
         void AssertAnotherTs(const TTimeSeries& anotherTs) {
             ENSURE((Data.size() == anotherTs.Data.size()) && Length() == anotherTs.Length(), "Can't work with time series with different dimenstions");
         }

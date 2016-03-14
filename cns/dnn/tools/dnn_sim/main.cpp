@@ -7,6 +7,7 @@
 #include <dnn/synapse/basic_synapse.h>
 #include <dnn/activation/determ.h>
 #include <dnn/neuron/integrate_and_fire.h>
+#include <dnn/neuron/spike_sequence_neuron.h>
 #include <dnn/synapse/synapse.h>
 
 #include <dnn/protos/config.pb.h>
@@ -41,14 +42,14 @@ int main(int argc, const char** argv) {
     }
 
     auto sim = BuildSim<
-		TLayer<TIntegrateAndFire, 5, TNeuronConfig<TBasicSynapse, TDeterm>>,
-		TLayer<TIntegrateAndFire, 5>
+		TLayer<TSpikeSequenceNeuron, 5>,
+		TLayer<TIntegrateAndFire, 5, TNeuronConfig<TBasicSynapse, TDeterm>>
 	>(port);
 
     if (config) {
     	sim.Deserialize(*config);
     }
-	
+
     // sim.Run();
 
 	TConfig conf = sim.Serialize();

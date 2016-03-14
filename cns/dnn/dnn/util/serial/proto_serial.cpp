@@ -3,7 +3,7 @@
 
 namespace NDnn {
 
-    TProtoSerial::TProtoSerial(NPb::Message& message, ESerialMode mode) 
+    TProtoSerial::TProtoSerial(NPb::Message& message, ESerialMode mode)
         : Message(message)
         , TSerialBase(mode)
         , CurrentFieldNumber(1)
@@ -65,6 +65,24 @@ namespace NDnn {
             case ESerialMode::OUT:
             {
                 Refl->SetUInt32(&Message, GetFieldDescr(protoField), v);
+            }
+            break;
+        }
+        return true;
+    }
+
+    bool TProtoSerial::operator() (int& v, int protoField) {
+        CHECK_FIELD();
+
+        switch (Mode) {
+            case ESerialMode::IN:
+            {
+                v = Refl->GetInt32(Message, GetFieldDescr(protoField));
+            }
+            break;
+            case ESerialMode::OUT:
+            {
+                Refl->SetInt32(&Message, GetFieldDescr(protoField), v);
             }
             break;
         }
@@ -228,7 +246,7 @@ namespace NDnn {
         }
         return true;
     }
-    
+
     bool TProtoSerial::operator() (IMetaProtoSerial& v, int protoField, bool newMessage) {
         CHECK_FIELD();
 
@@ -272,7 +290,7 @@ namespace NDnn {
             L_DEBUG << "Size of repeated field must equal to " << size << " or be 1 so we can duplicate this message " << size << " times for you (now it's " << actual_size << "), so we skipping duplicating";
             return;
         }
-        
+
         L_DEBUG << "Duplicating " << fd->name() << " " << size << " times";
         auto* baseMessage = Refl->MutableRepeatedPtrField<NPb::Message>(&Message, fd)->Mutable(0);
         while (Refl->FieldSize(Message, fd) < size) {
@@ -283,5 +301,5 @@ namespace NDnn {
 
     #undef CHECK_FIELD
 
-    
+
 } // namespace NDnn

@@ -1,7 +1,7 @@
 #ifndef RPROTO_READ_H
 #define RPROTO_READ_H
 
-#include <dnn/util/ts/time_series.h>
+#include <dnn/base/base.h>
 
 #include <fstream>
 
