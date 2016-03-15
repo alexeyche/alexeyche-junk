@@ -52,13 +52,13 @@ namespace NDnn {
             );
 
             for(auto& conn : ConnMap[neuron.GetGlobalId()]) {
-                conn.neuron.enqueueSpike(
-                    TSynSpike(
-                          neuron.GetGlobalId() /* source of spike */
-                        , conn.SynId /* destination synapse */
-                        , t  + neuron.GetAxonDelay() + conn.DendriteDelay /* time of spike */
-                    )
-                );
+                // conn.neuron.enqueueSpike(
+                //     TSynSpike(
+                //           neuron.GetGlobalId() /* source of spike */
+                //         , conn.SynId /* destination synapse */
+                //         , t  + neuron.GetAxonDelay() + conn.DendriteDelay /* time of spike */
+                //     )
+                // );
             }
         }
 

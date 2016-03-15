@@ -18,7 +18,7 @@ namespace NDnn {
 
     class TStochastic : public TConnection<TStochasticConst> {
     public:
-        TConnectionRecipe GetConnectionRecipe(const TNeuronSpaceInfo &left, const TNeuronSpaceInfo &right) override final {
+        TConnectionRecipe GetConnectionRecipe(const TNeuronSpaceInfo& left, const TNeuronSpaceInfo& right) override final {
         	TConnectionRecipe recipe;
         	if(c.Prob > Rand->GetUnif()) {
         		recipe.Exists = true;

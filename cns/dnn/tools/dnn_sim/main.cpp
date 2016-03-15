@@ -10,49 +10,16 @@
 #include <dnn/neuron/spike_sequence_neuron.h>
 #include <dnn/synapse/synapse.h>
 
-#include <dnn/protos/config.pb.h>
-#include <dnn/protos/options.pb.h>
-#include <dnn/util/proto_options.h>
-#include <dnn/util/protobuf.h>
+#include <dnn/base/entry.h>
 
 using namespace NDnn;
-using namespace NDnnProto;
 
 int main(int argc, const char** argv) {
-	TProtoOptions<TDnnOptions> clOptions(argc, argv, "Dynamic neural network tool");
+    auto opts = InitOptions(argc, argv, "TestModel");
+    
+    auto sim = BuildModel<TLayer<TSpikeSequenceNeuron, 5>, TLayer<TIntegrateAndFire, 5, TNeuronConfig<TBasicSynapse, TDeterm>>>(opts);
 
-    TDnnOptions options;
-    if (!clOptions.Parse(options)) {
-        return 0;
-    }
-    if (options.verbose()) {
-        TLog::Instance().SetLogLevel(TLog::DEBUG_LEVEL);
-    }
-    ui32 port;
+    sim.Run();
 
-    TOptional<TConfig> config;
-    if (options.has_config()) {
-        config.emplace(TConfig());
-        ReadProtoTextFromFile(options.config(), *config);
-        port = config->simconfiguration().port();
-    }
-
-    if (options.has_port()) {
-        port = options.port();
-    }
-
-    auto sim = BuildSim<
-		TLayer<TSpikeSequenceNeuron, 5>,
-		TLayer<TIntegrateAndFire, 5, TNeuronConfig<TBasicSynapse, TDeterm>>
-	>(port);
-
-    if (config) {
-    	sim.Deserialize(*config);
-    }
-
-    // sim.Run();
-
-	TConfig conf = sim.Serialize();
-	std::cout << conf.DebugString();
     return 0;
 }
