@@ -8,8 +8,6 @@
 
  //    class TSerialStream: public TSerialBase {
  //    public:
- //        TSerialStream(std::ostream& ostr);
- //        TSerialStream(std::istream& istr);
 
  //        template <typename T>
  //        void operator() (IProtoSerial<T>& v) {

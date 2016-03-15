@@ -2,6 +2,7 @@
 
 #include <dnn/util/ts/time_series.h>
 #include <dnn/util/ts/spikes_list.h>
+#include <dnn/util/serial/bin_serial.h>
 
 using namespace NDnn;
 
@@ -111,28 +112,34 @@ TSpikesList TProto::TranslateBack<TSpikesList>(const Rcpp::List& l) {
 
 
 Rcpp::List TProto::ReadFromFile(TString protofile) {
-	std::fstream input(protofile, std::ios::in | std::ios::binary);
+	std::ifstream input(protofile, std::ios::binary);
+    TBinSerial serial(input);
 
 	Rcpp::List l;
-	if (ReadEntity<TTimeSeries>(input, l)) {
-		return l;
-	}
-    if (ReadEntity<TSpikesList>(input, l)) {
-        return l;
+    switch (serial.ReadProtobufType()) {
+        case EProto::TIME_SERIES:
+            l = Translate(serial.ReadObject<TTimeSeries>());
+            break;
+        case EProto::SPIKES_LIST:
+            l = Translate(serial.ReadObject<TSpikesList>());
+            break;
+        default:
+            ERR("Unknown protobuf type " << protofile);
     }
-	ERR("Failed to find appropriate entity for data in file " << protofile);
-	return l; // For warning
+	return l;
 }
 
 void TProto::WriteToFile(Rcpp::List l, TString protofile) {
-	std::fstream f(protofile, std::ios::out | std::ios::binary);
+	std::ofstream output(protofile, std::ios::binary);
+    TBinSerial serial(output);
+
     TString name = l.attr("class");
     if (name == "TimeSeries") {
-    	WriteEntity(TranslateBack<TTimeSeries>(l), f);
+        serial.WriteObject(TranslateBack<TTimeSeries>(l));
     	return;
     }
     if (name == "SpikesList") {
-        WriteEntity(TranslateBack<TSpikesList>(l), f);
+        serial.WriteObject(TranslateBack<TSpikesList>(l));
         return;
     }
     ERR("Failed to find appropriate entity for data in R structure with class " << name);

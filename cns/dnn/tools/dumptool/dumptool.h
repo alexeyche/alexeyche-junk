@@ -1,12 +1,7 @@
 
 template <typename T>
-bool DumpEntity(std::istream& istr) {
+void DumpEntity(TBinSerial& serial) {
 	typename T::TProto pb;
-	if (pb.ParseFromIstream(&istr)) {
-		T ent;
-		ent.Deserialize(pb);
-        std::cout << pb.DebugString();
-        return true;
-	}
-    return false;
+	serial.ReadProtobufMessage(pb);
+    std::cout << pb.DebugString();
 }

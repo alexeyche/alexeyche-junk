@@ -6,6 +6,8 @@
 #include <dnn/util/proto_options.h>
 #include <dnn/util/ts/time_series.h>
 #include <dnn/util/ts/spikes_list.h>
+#include <dnn/util/serial/bin_serial.h>
+#include <dnn/util/log/log.h>
 
 using namespace NDnn;
 
@@ -19,14 +21,20 @@ int main(int argc, const char** argv) {
     if (!clOptions.Parse(options)) {
         return 0;
     }
+    
+    TLog::Instance().SetLogLevel(TLog::DEBUG_LEVEL);
 
-    std::fstream input(options.input(), std::ios::in | std::ios::binary);
-    if (DumpEntity<TTimeSeries>(input)) {
-    	return 0;
+    std::ifstream input(options.input(), std::ios::binary);
+    TBinSerial serial(input);
+    switch (serial.ReadProtobufType()) {
+        case EProto::TIME_SERIES:
+            DumpEntity<TTimeSeries>(serial);
+            break;
+        case EProto::SPIKES_LIST:
+            DumpEntity<TSpikesList>(serial);
+            break;
+        default:
+            throw TDnnException() << "Failed to recognize protobuf type";
     }
-	if (DumpEntity<TSpikesList>(input)) {
-    	return 0;
-    }
-
-    return 1;
+    return 0;
 }

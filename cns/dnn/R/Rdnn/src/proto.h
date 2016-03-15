@@ -22,19 +22,6 @@ public:
 	template <typename T>
     T TranslateBack(const Rcpp::List& l);
 
-
-    template <typename T>
-    bool ReadEntity(std::istream& istr, Rcpp::List& l) {
-    	typename T::TProto pb;
-    	if (pb.ParseFromIstream(&istr)) {
-    		T ent;
-    		ent.Deserialize(pb);
-    		l = Translate<T>(ent);
-    		return true;
-    	}
-    	return false;
-    }
-
     template <typename T>
     void WriteEntity(T&& v, std::ostream& ostr) {
     	typename T::TProto pb = v.Serialize();

@@ -13,14 +13,5 @@ namespace NDnn {
 
 	TString ProtoTextToString(const google::protobuf::Message& message);
 
-	EProtobufType ReadProtobufType(std::istream& str);
-
-	void WriteProtobufType(std::ostream& str, EProtobufType type);
-
-	enum EProtobufType {
-		CONFIG_PROTO = 0,
-		TIME_SERIES_PROTO = 1,
-		SPIKES_LIST_PROTO = 2
-	};
 
 } // namespace NDnn
