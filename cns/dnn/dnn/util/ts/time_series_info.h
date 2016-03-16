@@ -117,6 +117,14 @@ namespace NDnn {
             return Nothing<ui32>();
         }
 
+        double GetDuration() const {
+            if (LabelsStart.size() == 0) {
+                return 0.0;
+            }
+            const TLabelPos& last = LabelsStart.back();
+            return last.Start + UniqueLabels.at(last.LabelId).Duration;
+        }
+
         TVector<TLabelInfo> UniqueLabels;
         TVector<TLabelPos> LabelsStart;
 

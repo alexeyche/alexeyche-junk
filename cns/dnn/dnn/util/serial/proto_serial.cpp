@@ -14,7 +14,6 @@ namespace NDnn {
 
     #define CHECK_FIELD() \
         if ((!HasField(protoField)) && IsInput()) { \
-            L_DEBUG << "Proto " << (Mode == ESerialMode::IN ? "IN" : "OUT") << ": Proto field " << protoField << " is empty " << Message.GetTypeName(); \
             return false;  \
         } \
 
@@ -218,7 +217,7 @@ namespace NDnn {
     bool TProtoSerial::operator() (NPb::Message& m, int protoField) {
         CHECK_FIELD();
 
-        L_DEBUG << "Serial process of message " << m.GetTypeName() << " as " << protoField << " field number in " << Message.GetTypeName();
+        // L_DEBUG << "Serial process of message " << m.GetTypeName() << " as " << protoField << " field number in " << Message.GetTypeName();
         auto* fd = GetFieldDescr(protoField);
         switch (Mode) {
             case ESerialMode::IN:

@@ -54,6 +54,10 @@ namespace NDnn {
 			serial(InnerState, NDnnProto::TLayer::kSpikeNeuronInnerStateFieldNumber);
 		}
 
+		void SetSpikeSequence(const TVector<double>&) {
+			throw TDnnException() << "Trying to set spike sequence on neuron without appropriate method";
+		}
+
 	private:
 		TSpikeNeuronInnerState InnerState;
 

@@ -39,25 +39,23 @@ namespace NDnn {
         void PostSpikeDynamics(const TTime&) {}
 
         void CalculateDynamics(const TTime& t, double Iinput, double Isyn) {
-            assert(Seq.IsSet());
-
-            if (s.Index >= Seq->size()) {
+            if (s.Index >= Seq.size()) {
                 return;
             }
 
-            const double& spike_time = Seq->at(s.Index);
+            const double& spike_time = Seq.at(s.Index);
             if ((spike_time>=t.T) && (spike_time<(t.T+t.Dt))) {
                 s.Index++;
                 MutFired() = true;
             }
         }
 
-        void SetAsInput(const TVector<double>& seq) {
-            Seq.Set(&seq);
+        void SetSpikeSequence(const TVector<double>& seq) {
+            Seq = seq;
         }
 
     private:
-        TPtr<const TVector<double>> Seq;
+        TVector<double> Seq;
     };
 
 } // namespace NDnn

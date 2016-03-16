@@ -47,19 +47,16 @@ namespace NDnn {
 
 		TSim(ui32 port)
 			: Dispatcher(port)
+			, PopulationSize(0)
 		{
-			ui32 accNeuronsSize = 0;
 			ForEachEnumerate(Layers, [&](ui32 layerId, auto& l) {
-				l.SetupSpaceInfo(layerId, accNeuronsSize);
-				accNeuronsSize += l.Size();
-			});
-			Network.Init(accNeuronsSize);
-			ForEach(Layers, [&](auto& l) {
-				Network.AddLayer(l);
+				l.SetupSpaceInfo(layerId, PopulationSize);
+				PopulationSize += l.Size();
 			});
 		}
 
 		void Run() {
+			std::cout << Network;
 			L_DEBUG << "Going to run simulation for " << Conf.Duration << " ms in " << Conf.Jobs << " jobs";
 			TVector<TIndexSlice> perLayerJobs = DispatchOnThreads(Conf.Jobs, LayersSize());
 
@@ -69,9 +66,9 @@ namespace NDnn {
 			ForEachEnumerate(Layers, [&](ui32 layerId, auto& layer) {
 				SimLayer(layer, perLayerJobs[layerId].Size, threads, barrier);
 			});
-			threads.emplace_back([&]() {
-				Dispatcher.MainLoop();
-			});
+			// threads.emplace_back([&]() {
+			// 	Dispatcher.MainLoop();
+			// });
 			for(auto& t: threads) {
 				t.join();
 			}
@@ -92,11 +89,28 @@ namespace NDnn {
 				Dispatcher.SetPort(Conf.Port);
 				const NDnnProto::TConfig& inputConfig = serial.GetMessage<NDnnProto::TConfig>();
 				CreateConnections(inputConfig);
+
+				Network.Init(PopulationSize);
+				ForEach(Layers, [&](auto& l) {
+					Network.AddLayer(l);
+				});
 			}
 		}
 
+		void SetInputSpikes(const TSpikesList&& ts) {
+			Network.GetMutSpikesList().Info = ts.Info;
+			auto& firstLayer = std::get<0>(Layers);
+			ENSURE(ts.Dim() == firstLayer.Size(), "Size of input spikes list doesn't equal to first layer size: " << ts.Dim() << " != " << firstLayer.Size());
 
-
+			for (auto& n: firstLayer) {
+				n.GetNeuron().SetSpikeSequence(ts[n.GetLocalId()]);
+			}
+			Conf.Duration = ts.Info.GetDuration();
+		}
+		
+		const TSpikesList& GetSpikes() const {
+			return Network.GetSpikesList();
+		}
 	private:
 
 		template <typename L>
@@ -120,7 +134,7 @@ namespace NDnn {
 
 			for (; t < Conf.Duration; ++t) {
 				for(ui32 neuronId=idxFrom; neuronId<idxTo; ++neuronId) {
-					Dispatcher.GetNeuronInput(layer.GetId(), neuronId);
+					// Dispatcher.GetNeuronInput(layer.GetId(), neuronId);
 
 					layer[neuronId].CalculateDynamicsInternal(t);
 					if (layer[neuronId].GetNeuron().Fired()) {
@@ -193,11 +207,13 @@ namespace NDnn {
 
 
 	private:
-		TSimConfiguration Conf;
-
 		std::tuple<T ...> Layers;
+		
+		TSimConfiguration Conf;
 		TDispatcher Dispatcher;
 		TNetwork Network;
+
+		ui32 PopulationSize;
 	};
 
 

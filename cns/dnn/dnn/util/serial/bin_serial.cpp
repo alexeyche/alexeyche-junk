@@ -8,6 +8,7 @@ namespace NDnn {
     TBinSerial::TBinSerial(std::ostream& ostr) 
         : TSerialBase(ESerialMode::OUT) 
         , OStr(&ostr)
+        , TypeWasRead(false)
     {
     	ENSURE(OStr->good(), "Output stream for TBinSerial is not good");
 
@@ -18,6 +19,7 @@ namespace NDnn {
     TBinSerial::TBinSerial(std::istream& istr)
         : TSerialBase(ESerialMode::IN) 
         , IStr(&istr)
+        , TypeWasRead(false)
     {
     	ENSURE(IStr->good(), "Input stream for TBinSerial is not good");
 
@@ -42,10 +44,16 @@ namespace NDnn {
 
         NPb::uint32 type;
         ENSURE(CodedIn->ReadVarint32(&type), "Failed to read protobuf type from stream");
+        TypeWasRead = true;
         return static_cast<EProto>(type); 
     }
 
     void TBinSerial::ReadProtobufMessage(NPb::Message& message) {
+        if (!TypeWasRead) {
+            ReadProtobufType();
+            TypeWasRead =  false;
+        }
+
         NPb::uint32 size;
         ENSURE(CodedIn->ReadVarint32(&size), "Stream prematurely ended while reading size of message");
 
@@ -58,13 +66,6 @@ namespace NDnn {
 		switch (Mode) {
             case ESerialMode::IN:
             {
-                NPb::uint32 type;
-                if (!CodedIn->ReadVarint32(&type)) {
-                    return false;
-                }
-                EProto readType = static_cast<EProto>(type);
-		        ENSURE(readType == protoType,
-                    "Got different type of message from input: " << static_cast<ui32>(readType) << ", expected " << static_cast<ui32>(protoType));
                 ReadProtobufMessage(message);
             }
             break;

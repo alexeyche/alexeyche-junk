@@ -16,14 +16,13 @@ namespace NDnn {
 
     #define CHECK_FIELD() \
         if ((!HasField(protoField)) && IsInput()) { \
-            L_DEBUG << "Proto " << (Mode == ESerialMode::IN ? "IN" : "OUT") << ": Proto field " << protoField << " is empty " << Message.GetTypeName(); \
             return false;  \
         } \
 
 
 	bool TMetaProtoSerial::operator() (NPb::Message& m, int protoField) {
         CHECK_FIELD();
-        L_DEBUG << "Serial process of message " << m.GetTypeName() << " as " << protoField << " field number in " << Message.GetTypeName();
+        // L_DEBUG << "Serial process of message " << m.GetTypeName() << " as " << protoField << " field number in " << Message.GetTypeName();
         auto* fd = GetFieldDescr(protoField);
         switch (Mode) {
             case ESerialMode::IN:
@@ -53,11 +52,11 @@ namespace NDnn {
         return true;
     }
     bool TMetaProtoSerial::operator() (IMetaProtoSerial& v) {
-        L_DEBUG << "MetaProto " << (Mode == ESerialMode::IN ? "IN" : "OUT") << ": Serial process of meta entitty";
+        // L_DEBUG << "MetaProto " << (Mode == ESerialMode::IN ? "IN" : "OUT") << ": Serial process of meta entitty";
         
         v.SerialProcess(*this);
 
-        L_DEBUG << "MetaProto " << (Mode == ESerialMode::IN ? "IN" : "OUT") << ": Serial process done";
+        // L_DEBUG << "MetaProto " << (Mode == ESerialMode::IN ? "IN" : "OUT") << ": Serial process done";
         return true;
     }   
 

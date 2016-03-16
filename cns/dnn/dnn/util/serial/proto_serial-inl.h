@@ -7,7 +7,6 @@ namespace NDnn {
 
     #define CHECK_FIELD() \
         if ((!HasField(protoField)) && IsInput()) { \
-            L_DEBUG << "Proto " << (Mode == ESerialMode::IN ? "IN" : "OUT") << ": Proto field " << protoField << " is empty " << Message.GetTypeName();  \
             return false; \
         } \
 
@@ -16,7 +15,7 @@ namespace NDnn {
         CHECK_FIELD();
 
         typename IProtoSerial<T>::TProto mess;
-        L_DEBUG << "Proto " << (Mode == ESerialMode::IN ? "IN" : "OUT") << ": Serial process of repeated IProtoSerial with type " << mess.GetTypeName() << " as " << protoField << " field number in " << Message.GetTypeName();
+        // L_DEBUG << "Proto " << (Mode == ESerialMode::IN ? "IN" : "OUT") << ": Serial process of repeated IProtoSerial with type " << mess.GetTypeName() << " as " << protoField << " field number in " << Message.GetTypeName();
         
         if (IsInput()) {
             SerialRepeated(mess, idx, protoField);
@@ -28,7 +27,7 @@ namespace NDnn {
         if (IsOutput()) {
             SerialRepeated(mess, idx, protoField);
         }
-        L_DEBUG << "Proto " << (Mode == ESerialMode::IN ? "IN" : "OUT") << ": Serial process done";
+        // L_DEBUG << "Proto " << (Mode == ESerialMode::IN ? "IN" : "OUT") << ": Serial process done";
         return true;
     }
 
@@ -37,7 +36,7 @@ namespace NDnn {
         CHECK_FIELD();
 
         typename IProtoSerial<T>::TProto mess;
-        L_DEBUG << "Proto " << (Mode == ESerialMode::IN ? "IN" : "OUT") << ": Serial process of IProtoSerial with type " << mess.GetTypeName() << " as " << protoField << " field number in " << Message.GetTypeName();
+        // L_DEBUG << "Proto " << (Mode == ESerialMode::IN ? "IN" : "OUT") << ": Serial process of IProtoSerial with type " << mess.GetTypeName() << " as " << protoField << " field number in " << Message.GetTypeName();
         
         if (IsInput()) {
             (*this)(mess, protoField);    
@@ -49,7 +48,7 @@ namespace NDnn {
         if (IsOutput()) {
             (*this)(mess, protoField);
         }
-        L_DEBUG << "Proto " << (Mode == ESerialMode::IN ? "IN" : "OUT") << ": Serial process done";
+        // L_DEBUG << "Proto " << (Mode == ESerialMode::IN ? "IN" : "OUT") << ": Serial process done";
         return true;
     }
 

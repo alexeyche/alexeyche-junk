@@ -18,6 +18,16 @@ message TDnnOptions {
         (description) = "Read prototext config from file",
         (short_option) = "-c"
     ];
+
+    optional string InputSpikes = 4 [
+        (description) = "Read input spikes and put it on SpikeSequenceNeuron layer",
+        (short_option) = "-is"
+    ];
+
+    optional string OutputSpikes = 5 [
+        (description) = "Output spikes from simulation",
+        (short_option) = "-o"
+    ];
 }
 
 message TDumptoolOptions {

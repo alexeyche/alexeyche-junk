@@ -46,12 +46,22 @@ namespace NDnn {
 			return true;
 		}
 
+		template <typename T>
+		bool WriteObject(const T& obj) {
+			typename T::TProto proto = const_cast<T&>(obj).Serialize();
+			ENSURE((*this)(const_cast<typename T::TProto&>(proto), DeduceType<T>()), "Failed to write object into stream");
+			return true;
+		}
+
+
 		bool operator ()(NPb::Message& message, EProto protoType);
 
 		template <typename T>
 		EProto DeduceType();
 
 	private:
+		bool TypeWasRead;
+		
         std::ostream* OStr;
         std::istream* IStr;
 

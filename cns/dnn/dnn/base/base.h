@@ -104,14 +104,14 @@ namespace NDnn {
 	};
 
 	struct TSynSpike {
-	    TSynSpike(const size_t &_n_id, const size_t &_syn_id, const double &_t)
-	    : n_id(_n_id)
-	    , syn_id(_syn_id)
-	    , T(_t) {}
+	    TSynSpike(size_t neuronId, size_t synapseId, double t)
+	    : NeuronId(neuronId)
+	    , SynapseId(synapseId)
+	    , T(t) {}
 
 	    double T;
-	    size_t n_id;
-	    size_t syn_id;
+	    ui32 NeuronId;
+	    ui32 SynapseId;
 
 	    bool operator<(const TSynSpike& rhs) const {
 	        return T > rhs.T;

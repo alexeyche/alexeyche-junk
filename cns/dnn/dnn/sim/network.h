@@ -3,18 +3,22 @@
 #include <dnn/util/pretty_print.h>
 #include <dnn/util/ts/spikes_list.h>
 #include <dnn/util/act_vector.h>
+#include <dnn/neuron/spike_neuron_impl.h>
 
 namespace NDnn {
 
     class TConn {
     public:
-        TConn(ui32 synId, double dendriteDelay)
-            : SynId(synId)
+        TConn(TAsyncSpikeQueue& dstQueue, ui32 synId, double dendriteDelay)
+            : DstQueue(dstQueue)
+            , SynId(synId)
             , DendriteDelay(dendriteDelay)
         {}
 
-        double DendriteDelay;
+        TAsyncSpikeQueue& DstQueue;
         ui32 SynId;
+
+        double DendriteDelay;
 
         friend std::ostream& operator<<(std::ostream& str, const TConn& self) {
             str << "(" << self.SynId << ", Delay: " << self.DendriteDelay << ")";
@@ -27,7 +31,9 @@ namespace NDnn {
         TNetwork() {}
 
         void Init(ui32 popSize) {
+            ConnMap.clear();
             ConnMap.resize(popSize);
+            SpikesList.Data.clear();
             SpikesList.Data.resize(popSize);
         }
 
@@ -36,9 +42,9 @@ namespace NDnn {
             for(auto& n: layer) {
                 const auto& syns = n.GetSynapses();
                 for (ui32 con_i = 0; con_i < syns.size(); ++con_i) {
-                    const auto& syn = syns.Get(con_i);
-
-                    ConnMap[ syn.IdPre() ].emplace_back(con_i, syn.DendriteDelay());
+                    // const auto& syn = syns.Get(con_i);
+                    const auto& syn = syns[con_i];
+                    ConnMap[ syn.IdPre() ].emplace_back(n.GetMutAsyncSpikeQueue(), con_i, syn.DendriteDelay());
                 }
             }
         }
@@ -52,13 +58,13 @@ namespace NDnn {
             );
 
             for(auto& conn : ConnMap[neuron.GetGlobalId()]) {
-                // conn.neuron.enqueueSpike(
-                //     TSynSpike(
-                //           neuron.GetGlobalId() /* source of spike */
-                //         , conn.SynId /* destination synapse */
-                //         , t  + neuron.GetAxonDelay() + conn.DendriteDelay /* time of spike */
-                //     )
-                // );
+                conn.DstQueue.EnqueueSpike(
+                    TSynSpike(
+                          neuron.GetGlobalId() /* source of spike */
+                        , conn.SynId /* destination synapse */
+                        , t  + neuron.GetAxonDelay() + conn.DendriteDelay /* time of spike */
+                    )
+                );
             }
         }
 
@@ -73,9 +79,14 @@ namespace NDnn {
             return str;
         }
 
-        TSpikesList& GetSpikesList() {
+        TSpikesList& GetMutSpikesList() {
             return SpikesList;
         }
+
+        const TSpikesList& GetSpikesList() const {
+            return SpikesList;
+        }
+
 
         TMaybe<ui32> GetClassId(const TTime& t) {
             return SpikesList.Info.GetClassId(t.T);

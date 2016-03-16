@@ -40,7 +40,7 @@ namespace NDnn {
         }
 
     	void PropagateSpike() {
-    	    MutPotential() += Amplitude();
+    	    MutPotential() += Amplitude(); 
     	}
 
     };

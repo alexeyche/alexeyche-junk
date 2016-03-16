@@ -22,7 +22,7 @@ namespace NDnn {
     struct TSpikesList : public IProtoSerial<NDnnProto::TSpikesList> {
         void ChangeTimeDelta(const double &dt) {
             Info.ChangeTimeDelta(dt);
-            for(auto &s: Data) {
+            for(auto& s: Data) {
                 for(auto &t: s.Values) {
                     t = ceil(t/dt);
                 }
@@ -34,6 +34,10 @@ namespace NDnn {
         }
 
         TVector<double>& operator [](const ui32 &i) {
+            return Data[i].Values;
+        }
+
+        const TVector<double>& operator [](const ui32 &i) const {
             return Data[i].Values;
         }
 
@@ -53,7 +57,7 @@ namespace NDnn {
             Data[ni].Values.push_back(t);
         }
 
-        TVector<TSpikesList> chop()  {
+        TVector<TSpikesList> Chop()  {
             TVector<TSpikesList> sl_chopped;
 
             TVector<ui32> indices(Dim(), 0);

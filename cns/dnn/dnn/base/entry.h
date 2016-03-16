@@ -3,13 +3,16 @@
 #include <dnn/protos/config.pb.h>
 #include <dnn/util/optional.h>
 #include <dnn/sim/sim.h>
-
+#include <dnn/util/protobuf.h>
+#include <dnn/util/serial/bin_serial.h>
 
 namespace NDnn {
 
 	struct TModelOptions {
 		ui32 Port;
-		TOptional<NDnnProto::TConfig> Config;
+		TOptional<TString> ConfigFile;
+		TOptional<TString> InputSpikesFile;
+		TOptional<TString> OutputSpikesFile;
 		TString Name;
 	};
 
@@ -20,9 +23,18 @@ namespace NDnn {
 		
 		auto sim = BuildSim<T...>(options.Port);
 
-	    if (options.Config) {
-	    	sim.Deserialize(*options.Config);
+		if (options.ConfigFile) {
+	    	NDnnProto::TConfig config;
+	    	ReadProtoTextFromFile(*options.ConfigFile, config);
+	    	sim.Deserialize(config);
 	    }
+
+	    if (options.InputSpikesFile) {
+    		std::ifstream input(*options.InputSpikesFile, std::ios::binary);
+		    TBinSerial serial(input);
+	    	sim.SetInputSpikes(serial.ReadObject<TSpikesList>());
+	    }
+
 	    return sim;
 	}
 

@@ -17,9 +17,18 @@ using namespace NDnn;
 int main(int argc, const char** argv) {
     auto opts = InitOptions(argc, argv, "TestModel");
     
-    auto sim = BuildModel<TLayer<TSpikeSequenceNeuron, 5>, TLayer<TIntegrateAndFire, 5, TNeuronConfig<TBasicSynapse, TDeterm>>>(opts);
+    auto sim = BuildModel<
+        TLayer<TSpikeSequenceNeuron, 100>, 
+        TLayer<TIntegrateAndFire, 100, TNeuronConfig<TBasicSynapse, TDeterm>>
+    >(opts);
 
     sim.Run();
+
+    if (opts.OutputSpikesFile) {
+		std::ofstream output(*opts.OutputSpikesFile, std::ios::binary);
+	    TBinSerial serial(output);
+		serial.WriteObject<TSpikesList>(sim.GetSpikes());
+    }
 
     return 0;
 }

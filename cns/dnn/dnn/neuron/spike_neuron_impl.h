@@ -70,63 +70,76 @@ namespace NDnn {
 	};
 
 
+	struct TAsyncSpikeQueue {
+		TAsyncSpikeQueue()
+			: InputSpikesLock(ATOMIC_FLAG_INIT)
+		{}
+		
+		TAsyncSpikeQueue(const TAsyncSpikeQueue& other)
+			: InputSpikesLock(ATOMIC_FLAG_INIT) 
+		{
+			(*this) = other;
+		}
+		
+		TAsyncSpikeQueue& operator = (const TAsyncSpikeQueue& other) {
+			if (this != &other) {
+				InputSpikes = other.InputSpikes;
+			}
+			return *this;
+		}
+		
+		void EnqueueSpike(const TSynSpike&& sp) {
+			while (InputSpikesLock.test_and_set(std::memory_order_acquire));
+			InputSpikes.push(sp);
+			InputSpikesLock.clear(std::memory_order_release);
+		}
+
+		std::priority_queue<TSynSpike> InputSpikes;
+		std::atomic_flag InputSpikesLock;
+	};
 
 	template <typename TNeuron, typename TConf>
 	class TSpikeNeuronImpl: public IMetaProtoSerial {
 	public:
+		using TNeuronType = TNeuron; 
 		using TSelf = TSpikeNeuronImpl<TNeuron, TConf>;
-
-		TSpikeNeuronImpl()
-			: InputSpikesLock(ATOMIC_FLAG_INIT)
-		{}
-
-		TSpikeNeuronImpl(const TSpikeNeuronImpl& other) {
-			(*this) = other;
-		}
-
-		TSpikeNeuronImpl& operator = (const TSpikeNeuronImpl& other) {
-			if (this != &other) {
-				Neuron = other.Neuron;
-				Activation = other.Activation;
-				Synapses = other.Synapses;
-			}
-			return *this;
-		}
-
+		
 		void ReadInputSpikes(const TTime &t) {
-			while (InputSpikesLock.test_and_set(std::memory_order_acquire)) {}
-		    while(!InputSpikes.empty()) {
-		        const TSynSpike& sp = InputSpikes.top();
+			while (Queue.InputSpikesLock.test_and_set(std::memory_order_acquire)) {}
+			while (!Queue.InputSpikes.empty()) {
+		        const TSynSpike& sp = Queue.InputSpikes.top();
 		        if(sp.T >= t.T) break;
-		        auto& s = Synapses[sp.syn_id];
-
+		        auto& s = Synapses[sp.SynapseId];
 		        s.MutFired() = true;
 		    	s.PropagateSpike();
 
-		        InputSpikes.pop();
+		        Queue.InputSpikes.pop();
 		    }
-		    InputSpikesLock.clear(std::memory_order_release);
+		    Queue.InputSpikesLock.clear(std::memory_order_release);
 		}
 
 		void CalculateDynamicsInternal(const TTime& t) {
 			ReadInputSpikes(t);
 
-			// const double& Iinput = input.ifc().getValue(t);
 			double Iinput = 0.0;
 
 			double Isyn = 0.0;
-			auto synIdIt = Synapses.abegin();
-		    while (synIdIt != Synapses.aend()) {
-		    	auto& synapse = Synapses[synIdIt];
-		    	double x = synapse.WeightedPotential();
-		    	if(fabs(x) < 0.0001) {
-		        	Synapses.SetInactive(synIdIt);
-		        } else {
-		        	Isyn += x;
-		        	++synIdIt;
-		        }
-		    }
+			// auto synIdIt = Synapses.abegin();
+		 //    while (synIdIt != Synapses.aend()) {
+		 //    	auto& synapse = Synapses[synIdIt];
+		 //    	double x = synapse.WeightedPotential();
+		 //    	if(fabs(x) < 0.0001) {
+		 //        	Synapses.SetInactive(synIdIt);
+		 //        } else {
+		 //        	Isyn += x;
+		 //        	++synIdIt;
+		 //        }
+		 //    }
 
+			for (auto& s: Synapses) {
+				double x = s.WeightedPotential();
+				Isyn += x;
+			}
 		    Neuron.CalculateDynamics(t, Iinput, Isyn);
 
 		    Neuron.MutSpikeProbability() = Activation.SpikeProbability(Neuron.Membrane());
@@ -134,13 +147,22 @@ namespace NDnn {
 		        Neuron.MutFired() = true;
 		        Neuron.PostSpikeDynamics(t);
 		    }
+
+		    for (auto &s: Synapses) {
+	   			s.CalculateDynamics(t);
+	        	s.MutFired() = false;
+	   		}
+
+	   		// for(auto syn_id_it = syns.abegin(); syn_id_it != syns.aend(); ++syn_id_it) {
+	     //    	auto& s = Synapses[syn_id_it];
+	     //    	s.CalculateDynamics(t);
+	     //    	s.MutFired() = false;
+	     //    }
 		}
 
 		TNeuron& GetNeuron() {
 			return Neuron;
 		}
-
-
 
 		void SetRandEngine(TRandEngine& rand) {
 			Rand.Set(rand);
@@ -163,6 +185,10 @@ namespace NDnn {
 
 		const TNeuronSpaceInfo& GetSpaceInfo() const {
 			return SpaceInfo;
+		}
+
+		TAsyncSpikeQueue& GetMutAsyncSpikeQueue() {
+			return Queue;
 		}
 
 		const ui32& GetGlobalId() const {
@@ -206,7 +232,8 @@ namespace NDnn {
 			return PredefineSynapseConst;
 		}
 
-		const TActVector<typename TConf::TSynapse>& GetSynapses() const {
+		// const TActVector<typename TConf::TSynapse>& GetSynapses() const {
+		const TVector<typename TConf::TSynapse>& GetSynapses() const {
 			return Synapses;
 		}
 
@@ -216,14 +243,14 @@ namespace NDnn {
 
 	private:
 		TPtr<TRandEngine> Rand;
+		
+		TAsyncSpikeQueue Queue;
 
 		TNeuron Neuron;
 
 		typename TConf::TActivationFunction Activation;
-		TActVector<typename TConf::TSynapse> Synapses;
-
-		std::priority_queue<TSynSpike> InputSpikes;
-		std::atomic_flag InputSpikesLock;
+		// TActVector<typename TConf::TSynapse> Synapses;
+		TVector<typename TConf::TSynapse> Synapses;
 
 		TSpikeNeuronImplInner Inner;
 		TNeuronSpaceInfo SpaceInfo;

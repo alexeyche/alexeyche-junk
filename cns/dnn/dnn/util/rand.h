@@ -15,7 +15,7 @@ namespace NDnn {
 		{
 			ui32 seedNum = seed >= 0 ? seed : std::chrono::system_clock::now().time_since_epoch().count();
 			Generator = std::mt19937(seedNum);
-			L_DEBUG << "Initalize rand engine with seed " << seedNum;
+			L_DEBUG << "Initialize rand engine with seed " << seedNum;
 		}
 
 		double GetUnif() {

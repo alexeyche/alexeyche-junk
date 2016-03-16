@@ -5,7 +5,7 @@ SimConfiguration {
 }
 Layer {
 	IntegrateAndFireConst {
-		TauMem: 100
+		TauMem: 10
 	}
 	DetermConst {
 		Threshold: 1.0

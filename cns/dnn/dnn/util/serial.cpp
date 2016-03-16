@@ -150,7 +150,7 @@ namespace NDnn {
 #endif
 
     void TProtoSerial::operator() (NPb::Message& m, int protoField) {
-        L_DEBUG << "Serial process of message " << m.GetTypeName() << " as " << protoField << " field number in " << Message.GetTypeName();
+        // L_DEBUG << "Serial process of message " << m.GetTypeName() << " as " << protoField << " field number in " << Message.GetTypeName();
         auto* fd = GetFieldDescr(protoField);
         switch (Mode) {
             case ESerialMode::IN:
