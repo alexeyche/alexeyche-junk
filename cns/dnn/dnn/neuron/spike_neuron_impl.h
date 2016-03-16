@@ -27,6 +27,11 @@ namespace NDnn {
 		bool operator == (const TNeuronSpaceInfo& other) const {
 			return GlobalId == other.GlobalId;
 		}
+
+		friend std::ostream& operator<<(std::ostream& str, const TNeuronSpaceInfo& self) {
+            str << "Neuron(g-" << self.GlobalId << ":layer-" << self.LayerId << ":local-" << self.LocalId << ")";
+            return str;
+        }
 	};
 
 	struct TSpikeNeuronImplInnerState: public IProtoSerial<NDnnProto::TSpikeNeuronImplInnerState> {
@@ -84,6 +89,7 @@ namespace NDnn {
 		TAsyncSpikeQueue& operator = (const TAsyncSpikeQueue& other) {
 			if (this != &other) {
 				InputSpikes = other.InputSpikes;
+				Info = other.Info;
 			}
 			return *this;
 		}
@@ -93,6 +99,8 @@ namespace NDnn {
 			InputSpikes.push(sp);
 			InputSpikesLock.clear(std::memory_order_release);
 		}
+		
+		TNeuronSpaceInfo Info;
 
 		std::priority_queue<TSynSpike> InputSpikes;
 		std::atomic_flag InputSpikesLock;
@@ -140,7 +148,8 @@ namespace NDnn {
 				double x = s.WeightedPotential();
 				Isyn += x;
 			}
-		    Neuron.CalculateDynamics(t, Iinput, Isyn);
+			
+			Neuron.CalculateDynamics(t, Iinput, Isyn);
 
 		    Neuron.MutSpikeProbability() = Activation.SpikeProbability(Neuron.Membrane());
 			if(Neuron.SpikeProbability() > Rand->GetUnif()) {
@@ -176,6 +185,7 @@ namespace NDnn {
 
 		void SetSpaceInfo(TNeuronSpaceInfo info) {
 			SpaceInfo = info;
+			Queue.Info = SpaceInfo;
 		}
 
 		template <typename TOtherNeuron>
@@ -213,7 +223,6 @@ namespace NDnn {
 				if (Inner.SynapsesSize() == 0) {
 					const NDnnProto::TLayer& layerSpec = serial.GetMessage<NDnnProto::TLayer>();
 					if (GetRepeatedFieldSizeFromMessage(layerSpec, TConf::TSynapse::TConst::ProtoFieldNumber) > GetLocalId()) {
-						L_DEBUG << "Got predefined synapse constants for neuron " << GetLocalId();
 						PredefineSynapseConst.emplace(
 							GetRepeatedFieldFromMessage<typename TConf::TSynapse::TConst::TProto>(
 								layerSpec,

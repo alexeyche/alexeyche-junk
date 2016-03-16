@@ -41,6 +41,10 @@ namespace NDnn {
 	    if (options.has_outputspikes()) {
 	    	opts.OutputSpikesFile = options.outputspikes();
 	    }
+
+	    if (options.has_stat()) {
+	    	opts.StatFile = options.stat();
+	    }
 	    return opts;
 	}
 

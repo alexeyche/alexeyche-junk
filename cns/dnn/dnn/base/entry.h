@@ -13,6 +13,7 @@ namespace NDnn {
 		TOptional<TString> ConfigFile;
 		TOptional<TString> InputSpikesFile;
 		TOptional<TString> OutputSpikesFile;
+		TOptional<TString> StatFile;
 		TString Name;
 	};
 
@@ -20,7 +21,6 @@ namespace NDnn {
 
 	template <typename ... T>
 	auto BuildModel(TModelOptions options) {
-		
 		auto sim = BuildSim<T...>(options.Port);
 
 		if (options.ConfigFile) {

@@ -94,7 +94,7 @@ namespace NDnn {
 	    }
 
 	    void operator ++() {
-	        T+=Dt;
+	        T += Dt;
 	    }
 	    bool operator<(const double &dur) const {
 	        return T < dur;

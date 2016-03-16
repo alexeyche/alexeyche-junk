@@ -21,7 +21,7 @@ namespace NDnn {
         double DendriteDelay;
 
         friend std::ostream& operator<<(std::ostream& str, const TConn& self) {
-            str << "(" << self.SynId << ", Delay: " << self.DendriteDelay << ")";
+            str << "(" << self.DstQueue.Info << ", " << self.SynId << ", Delay: " << self.DendriteDelay << ")";
             return str;
         }
     };
@@ -29,6 +29,17 @@ namespace NDnn {
     class TNetwork {
     public:
         TNetwork() {}
+
+        TNetwork(const TNetwork& other) {
+            (*this) = other;
+        }
+
+        TNetwork& operator=(const TNetwork& other) {
+            if (this != &other) {
+                SpikesList = other.SpikesList;
+            }
+            return *this;
+        }
 
         void Init(ui32 popSize) {
             ConnMap.clear();

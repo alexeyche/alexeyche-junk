@@ -7,11 +7,12 @@
 
 #include <dnn/dispatcher/dispatcher.h>
 
-#include <dnn/util/spinning_barrier.h>
 #include <dnn/util/log/log.h>
+#include <dnn/util/rand.h>
+#include <dnn/util/serial/bin_serial.h>
+#include <dnn/util/spinning_barrier.h>
 #include <dnn/util/thread.h>
 #include <dnn/util/tuple.h>
-#include <dnn/util/rand.h>
 
 #include <dnn/neuron/integrate_and_fire.h>
 
@@ -38,7 +39,6 @@ namespace NDnn {
 	};
 
 
-
 	template <typename ... T>
 	class TSim: public IProtoSerial<NDnnProto::TConfig> {
 	public:
@@ -55,8 +55,41 @@ namespace NDnn {
 			});
 		}
 
+		TSim(const TSim& other)
+			: Dispatcher(other.Dispatcher.GetPort()) 
+		{
+			(*this) = other;
+		}
+
+		TSim& operator = (const TSim& other) {
+			if (this != &other) {
+				Layers = other.Layers;
+				PopulationSize = other.PopulationSize;
+				Conf = other.Conf;
+				Dispatcher = other.Dispatcher;
+				Network = other.Network;
+				Network.Init(PopulationSize);
+				ForEach(Layers, [&](auto& l) {
+					Network.AddLayer(l);
+				});
+			}
+			return *this;
+		}
+
+		template <size_t layerId, size_t neuronId>
+		auto GetNeuron() {
+			return std::get<layerId>(Layers)[neuronId].GetNeuron();
+		} 
+
+		void ListenStat(const TString& name, const double& v, ui32 from, ui32 to) {
+
+		}
+
+		void SaveStat(const TString& fname) {
+			
+		}
+
 		void Run() {
-			std::cout << Network;
 			L_DEBUG << "Going to run simulation for " << Conf.Duration << " ms in " << Conf.Jobs << " jobs";
 			TVector<TIndexSlice> perLayerJobs = DispatchOnThreads(Conf.Jobs, LayersSize());
 
@@ -110,6 +143,12 @@ namespace NDnn {
 		
 		const TSpikesList& GetSpikes() const {
 			return Network.GetSpikesList();
+		}
+
+		void SaveSpikes(const TString& fname) const {
+			std::ofstream output(fname, std::ios::binary);
+	    	TBinSerial serial(output);
+			serial.WriteObject<TSpikesList>(Network.GetSpikesList());
 		}
 	private:
 

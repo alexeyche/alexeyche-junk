@@ -57,7 +57,9 @@ namespace NDnn {
 		void SetSpikeSequence(const TVector<double>&) {
 			throw TDnnException() << "Trying to set spike sequence on neuron without appropriate method";
 		}
-
+		const TState& State() const {
+			return s;
+		}
 	private:
 		TSpikeNeuronInnerState InnerState;
 

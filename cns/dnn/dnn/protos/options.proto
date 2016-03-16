@@ -28,6 +28,11 @@ message TDnnOptions {
         (description) = "Output spikes from simulation",
         (short_option) = "-o"
     ];
+    
+    optional string Stat = 6 [
+        (description) = "Gather statistics and save in file",
+        (short_option) = "-s"
+    ];
 }
 
 message TDumptoolOptions {
