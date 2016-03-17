@@ -28,6 +28,8 @@ namespace NDnn {
  		~TBinSerial();
 
 		EProto ReadProtobufType();
+
+		bool ReadProtobufType(EProto &dst);
 		
 		template <typename T>
 		T ReadObject() {
@@ -37,8 +39,19 @@ namespace NDnn {
 	        obj.Deserialize(pb);
 	        return obj;
 		}
+
+		template <typename T>
+		bool ReadObject(T& obj) {
+			typename T::TProto pb;
+	        if (!ReadProtobufMessage(pb)) {
+	        	return false;
+	        }
+	        obj.Deserialize(pb);
+	        return true;
+		}
+
 		
-		void ReadProtobufMessage(NPb::Message& message);
+		bool ReadProtobufMessage(NPb::Message& message);
 
 		template <typename T>
 		bool WriteObject(T&& obj) {

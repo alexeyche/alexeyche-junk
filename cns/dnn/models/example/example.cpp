@@ -17,7 +17,7 @@ int main(int argc, const char** argv) {
         TLayer<TIntegrateAndFire, 100, TNeuronConfig<TBasicSynapse, TDeterm>>
     >(opts);
 
-    sim.ListenStat("Membrane", sim.GetNeuron<1, 55>().Membrane(), 0, 1000);
+    sim.ListenBasicStats<1, 55>(0, 1000);
     
     sim.Run();
 

@@ -64,6 +64,7 @@ namespace NDnn {
 
 		TSim& operator = (const TSim& other) {
 			if (this != &other) {
+				ENSURE(other.StatGatherer.Size() == 0, "Can't copy simulation with pointed variables to listen in statistics gatherer");
 				Layers = other.Layers;
 				PopulationSize = other.PopulationSize;
 				Conf = other.Conf;
@@ -82,8 +83,14 @@ namespace NDnn {
 			return std::get<layerId>(Layers)[neuronId].GetNeuron();
 		} 
 
-		void ListenStat(const TString& name, const double& v, ui32 from, ui32 to) {
-			StatGatherer.ListenStat(name, v, from, to);
+		void ListenStat(const TString& name, std::function<double()> cb, ui32 from, ui32 to) {
+			StatGatherer.ListenStat(name, cb, from, to);
+		}
+
+		template <size_t layerId, size_t neuronId>
+		void ListenBasicStats(ui32 from, ui32 to) {
+			StatGatherer.ListenStat("Membrane", [&]() { return GetNeuron<layerId, neuronId>().Membrane(); }, from, to);
+			StatGatherer.ListenStat("SpikeProbability", [&]() { return GetNeuron<layerId, neuronId>().SpikeProbability(); }, from, to);
 		}
 
 		void SaveStat(const TString& fname) {
@@ -98,7 +105,7 @@ namespace NDnn {
 			TVector<std::thread> threads;
 
 			ForEachEnumerate(Layers, [&](ui32 layerId, auto& layer) {
-				SimLayer(layer, perLayerJobs[layerId].Size, threads, barrier);
+				SimLayer(layer, perLayerJobs[layerId].Size, threads, barrier, layerId == 0 ? true : false);
 			});
 			// threads.emplace_back([&]() {
 			// 	Dispatcher.MainLoop();
@@ -154,9 +161,10 @@ namespace NDnn {
 	private:
 
 		template <typename L>
-		void RunWorkerRoutine(L& layer, ui32 idxFrom, ui32 idxTo, TSpinningBarrier& barrier) {
+		void RunWorkerRoutine(L& layer, ui32 idxFrom, ui32 idxTo, TSpinningBarrier& barrier, bool masterThread) {
 			TTime t(Conf.Dt);
 			TRandEngine rand(Conf.Seed);
+			if (masterThread) StatGatherer.Init();
 
 			L_DEBUG << "Entering into simulation of layer " << layer.GetId() << " of neurons " << idxFrom << ":" << idxTo;
 
@@ -164,6 +172,7 @@ namespace NDnn {
 				layer[neuronId].SetRandEngine(rand);
 				layer[neuronId].Prepare();
 			}
+
 
 //======= PERFOMANCE MEASURE ======================================================================
 		#ifdef PERF
@@ -182,10 +191,10 @@ namespace NDnn {
 						layer[neuronId].GetNeuron().MutFired() = false;
 					}
 				}
-				L_DEBUG << "Simulation step " << t.T;
-				StatGatherer.Collect(t);
+				
 				barrier.Wait();
-
+				if (masterThread) StatGatherer.Collect(t);
+				barrier.Wait();
 //======= PERFOMANCE MEASURE ======================================================================
 		#ifdef PERF
 				size_t cur_time = std::time(nullptr);
@@ -203,24 +212,26 @@ namespace NDnn {
 		}
 
 		template <typename L>
-		void SimLayer(L& layer, ui32 jobs, TVector<std::thread>& threads, TSpinningBarrier& barrier) {
+		void SimLayer(L& layer, ui32 jobs, TVector<std::thread>& threads, TSpinningBarrier& barrier, bool masterThread) {
 			TVector<TIndexSlice> layerJobSlices = DispatchOnThreads(layer.Size(), jobs);
-			for (const auto& slice: layerJobSlices) {
+			for (ui32 sliceId = 0; sliceId < layerJobSlices.size(); ++sliceId) {
+				const TIndexSlice& slice = layerJobSlices[sliceId];
 				threads.emplace_back(
 					TSelf::RunWorker<L>,
 					std::ref(*this),
 					std::ref(layer),
 					slice.From,
 					slice.To,
-					std::ref(barrier)
+					std::ref(barrier),
+					(masterThread && (sliceId == 0)) ? true : false
 				);
 			}
 		}
 
 		template <typename L>
-		static void RunWorker(TSelf& self, L& layer, ui32 idxFrom, ui32 idxTo, TSpinningBarrier& barrier) {
+		static void RunWorker(TSelf& self, L& layer, ui32 idxFrom, ui32 idxTo, TSpinningBarrier& barrier, bool masterThread) {
 			try {
-				self.RunWorkerRoutine(layer, idxFrom, idxTo, barrier);
+				self.RunWorkerRoutine(layer, idxFrom, idxTo, barrier, masterThread);
 			} catch (const TDnnException& e) {
 				L_DEBUG << "Got error in layer " << layer.GetId() << ", neurons " << idxFrom << ":" << idxTo << ", thread: " << e.what();
 				barrier.Fail();

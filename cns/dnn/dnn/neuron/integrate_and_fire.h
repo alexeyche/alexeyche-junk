@@ -51,7 +51,7 @@ namespace NDnn {
 
 	    void CalculateDynamics(const TTime& t, double Iinput, double Isyn) {
 	        if(s.RefTime < 0.001) {
-	            MutMembrane() += t.Dt * ( - Membrane()  + c.NoiseAmp*0.0 + Iinput + Isyn) / c.TauMem;
+	            MutMembrane() += t.Dt * ( - Membrane()  + c.NoiseAmp * Rand->GetNorm() + Iinput + Isyn) / c.TauMem;
 	        } else {
 	            s.RefTime -= t.Dt;
 	        }

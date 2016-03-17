@@ -12,6 +12,7 @@ namespace NDnn {
 	public:
 		TRandEngine(int seed)
 			: Unif(0.0,1.0)
+			, Norm(0.0, 1.0)
 		{
 			ui32 seedNum = seed >= 0 ? seed : std::chrono::system_clock::now().time_since_epoch().count();
 			Generator = std::mt19937(seedNum);
@@ -22,8 +23,14 @@ namespace NDnn {
 			return Unif(Generator);
 		}
 
-	private:
+		double GetNorm() {
+			return Norm(Generator);
+		}
+		
+ 	private:
 		std::uniform_real_distribution<double> Unif;
+		std::normal_distribution<double> Norm;
+
 		std::mt19937 Generator;
 	};
 

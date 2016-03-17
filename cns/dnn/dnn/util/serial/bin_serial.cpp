@@ -40,27 +40,43 @@ namespace NDnn {
     	}
     }
 
-    EProto TBinSerial::ReadProtobufType() {
+    bool TBinSerial::ReadProtobufType(EProto &dst) {
         ENSURE(Mode == ESerialMode::IN, "Can't get protobuf type from non input stream");
 
         NPb::uint32 type;
-        ENSURE(CodedIn->ReadVarint32(&type), "Failed to read protobuf type from stream");
+        if (!CodedIn->ReadVarint32(&type)) {
+            return false;
+        }
+        
         TypeWasRead = true;
-        return static_cast<EProto>(type); 
+        dst = static_cast<EProto>(type); 
+        return true;
     }
 
-    void TBinSerial::ReadProtobufMessage(NPb::Message& message) {
+    EProto TBinSerial::ReadProtobufType() {
+        EProto dst;
+        ENSURE(ReadProtobufType(dst), "Failed to read protobuf type from stream");
+        return dst;
+    }
+
+    bool TBinSerial::ReadProtobufMessage(NPb::Message& message) {
         if (!TypeWasRead) {
-            ReadProtobufType();
-            TypeWasRead =  false;
+            EProto dst;
+            if (!ReadProtobufType(dst)) {
+                return false;
+            }
         }
 
         NPb::uint32 size;
-        ENSURE(CodedIn->ReadVarint32(&size), "Stream prematurely ended while reading size of message");
-
+        if (!CodedIn->ReadVarint32(&size)) {
+            return false;
+        }
+        
         NPbIO::CodedInputStream::Limit limit = CodedIn->PushLimit(size);
         ENSURE(message.ParseFromCodedStream(CodedIn), "Can't parse message with size " << size);
         CodedIn->PopLimit(limit);
+        TypeWasRead =  false;
+        return true;
     }
 
 	bool TBinSerial::operator ()(NPb::Message& message, EProto protoType) {
@@ -73,8 +89,8 @@ namespace NDnn {
             case ESerialMode::OUT:
             {
             	CodedOut->WriteVarint32(static_cast<ui32>(protoType));
-            	CodedOut->WriteVarint32(message.ByteSize());
-            	message.SerializeToCodedStream(CodedOut);
+                CodedOut->WriteVarint32(message.ByteSize());
+                message.SerializeToCodedStream(CodedOut);
             }
             break;
         }

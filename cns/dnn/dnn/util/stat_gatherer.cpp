@@ -24,23 +24,27 @@ namespace NDnn {
 		return *this;
 	}
 
-	void TStatGatherer::ListenStat(const TString& name, const double& v, ui32 from, ui32 to) {
-		Stats.emplace_back(name, v, from, to);
-		ActiveStats.push_back(&Stats.back());
+	void TStatGatherer::Init() {
+		ActiveStats.clear();
+		for (auto& stat: Stats) {
+			ActiveStats.push_back(&stat);
+		}
+	}
+
+	void TStatGatherer::ListenStat(const TString& name, std::function<double()> cb, ui32 from, ui32 to) {
+		Stats.emplace_back(name, cb, from, to);
 	}
 
 	void TStatGatherer::Collect(const TTime& t) {
 		auto statIt = ActiveStats.begin();
 		while (statIt != ActiveStats.end()) {
-			L_DEBUG << t.T << " ? " << statIt->Get()->GetTo();
-			
 			if (t.T > statIt->Get()->GetTo()) {
-
-				ActiveStats.erase(statIt);
-				continue;
-			}
-			if (t.T >= statIt->Get()->GetFrom()) {
-				statIt->Get()->Collect();
+				statIt = ActiveStats.erase(statIt);
+			} else {
+				if (t.T >= statIt->Get()->GetFrom()) {
+					statIt->Get()->Collect();
+				}
+				++statIt;	
 			}
 		}
 	}
@@ -53,5 +57,8 @@ namespace NDnn {
 	    }
 	}
 
+	ui32 TStatGatherer::Size() const {
+		return Stats.size();
+	}
 
 } // namespace NDnn

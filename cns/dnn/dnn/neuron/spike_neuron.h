@@ -60,10 +60,16 @@ namespace NDnn {
 		const TState& State() const {
 			return s;
 		}
+
+		void SetRandEngine(TRandEngine& rand) {
+			Rand.Set(rand);
+		}
 	private:
 		TSpikeNeuronInnerState InnerState;
 
 	protected:
+		TPtr<TRandEngine> Rand;
+
 		TState s;
 		TConstants c;
 	};

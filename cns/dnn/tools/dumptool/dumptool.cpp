@@ -8,6 +8,7 @@
 #include <dnn/util/ts/spikes_list.h>
 #include <dnn/util/serial/bin_serial.h>
 #include <dnn/util/log/log.h>
+#include <dnn/util/stat_gatherer.h>
 
 using namespace NDnn;
 
@@ -32,6 +33,9 @@ int main(int argc, const char** argv) {
             break;
         case EProto::SPIKES_LIST:
             DumpEntity<TSpikesList>(serial);
+            break;
+        case EProto::STATISTICS:
+            DumpEntities<TStatistics>(serial);
             break;
         default:
             throw TDnnException() << "Failed to recognize protobuf type";

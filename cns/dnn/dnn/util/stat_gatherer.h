@@ -31,8 +31,8 @@ namespace NDnn {
 
 	class TStatCollector {
 	public:
-		TStatCollector(const TString& name, const double& v, ui32 from, ui32 to)
-			: Src(&v)
+		TStatCollector(const TString& name, std::function<double()> cb, ui32 from, ui32 to)
+			: Callback(cb)
 			, Result(name, from, to) 
 		{}
 		
@@ -43,14 +43,13 @@ namespace NDnn {
 		TStatCollector& operator=(const TStatCollector& other) {
 			if (this != &other) {
 				Result = other.Result;
-				throw TDnnException() << "Can't gather statistics from destroyed objects. Please do not copy after you've pointed variables to listen to";
-				Src = other.Src;
+				Callback = other.Callback;
 			}
 			return *this;
 		}
 
 		void Collect() {
-			Result.Values.push_back(Src.Ref());
+			Result.Values.push_back(Callback());
 		}
 		
 		const ui32& GetFrom() const {
@@ -67,7 +66,7 @@ namespace NDnn {
 
 	private:
 		TStatistics Result;
-		TPtr<const double> Src;
+		std::function<double()> Callback;
 	};
 
 	class TStatGatherer {
@@ -78,12 +77,15 @@ namespace NDnn {
 
 		TStatGatherer& operator=(const TStatGatherer& other);
 
-		void ListenStat(const TString& name, const double& v, ui32 from, ui32 to);
+		void ListenStat(const TString& name, std::function<double()> cb, ui32 from, ui32 to);
 
 		void Collect(const TTime& t);
 
 		void SaveStat(const TString& fname);
 
+		void Init();
+
+		ui32 Size() const;
 	private:
 		TVector<TPtr<TStatCollector>> ActiveStats;
 		TVector<TStatCollector> Stats;

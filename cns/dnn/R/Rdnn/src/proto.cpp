@@ -2,6 +2,7 @@
 
 #include <dnn/util/ts/time_series.h>
 #include <dnn/util/ts/spikes_list.h>
+#include <dnn/util/stat_gatherer.h>
 #include <dnn/util/serial/bin_serial.h>
 
 using namespace NDnn;
@@ -52,6 +53,19 @@ Rcpp::List TProto::Translate<TSpikesList>(const TSpikesList& ent) {
         , Rcpp::Named("info") = Translate<TTimeSeriesInfo>(ent.Info)
     );
     ret.attr("class") = "SpikesList";
+    return ret;
+}
+
+
+template <>
+Rcpp::List TProto::Translate<TStatistics>(const TStatistics& ent) {
+    Rcpp::List ret = Rcpp::List::create(
+          Rcpp::Named("Values") = Rcpp::wrap(ent.Values)
+        , Rcpp::Named("Name") = ent.Name
+        , Rcpp::Named("From") = ent.From
+        , Rcpp::Named("To") = ent.To
+    );
+    ret.attr("class") = "Statistics";
     return ret;
 }
 
@@ -122,6 +136,16 @@ Rcpp::List TProto::ReadFromFile(TString protofile) {
             break;
         case EProto::SPIKES_LIST:
             l = Translate(serial.ReadObject<TSpikesList>());
+            break;
+        case EProto::STATISTICS:
+            {
+                TStatistics stat;
+                while (serial.ReadObject<TStatistics>(stat)) {
+                    Rcpp::List subList;
+                    subList = Translate(stat);
+                    l.push_back(subList);
+                }
+            }
             break;
         default:
             ERR("Unknown protobuf type " << protofile);

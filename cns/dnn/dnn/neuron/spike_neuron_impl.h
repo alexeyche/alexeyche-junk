@@ -175,6 +175,7 @@ namespace NDnn {
 
 		void SetRandEngine(TRandEngine& rand) {
 			Rand.Set(rand);
+			Neuron.SetRandEngine(rand);
 		}
 
 		void Prepare() {

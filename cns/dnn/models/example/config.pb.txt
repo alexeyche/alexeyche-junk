@@ -17,7 +17,7 @@ Layer {
 Connection {
 	From: 0 To: 1
 	StochasticConst {
-		Prob: 0.1
+		Prob: 0.5
 	}
-	Weight: 1.0
+	Weight: 0.1
 }
