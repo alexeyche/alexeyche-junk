@@ -57,7 +57,7 @@ namespace NDnn {
 		}
 
 		TSim(const TSim& other)
-			: Dispatcher(other.Dispatcher.GetPort()) 
+			: Dispatcher(other.Dispatcher.GetPort())
 		{
 			(*this) = other;
 		}
@@ -81,7 +81,7 @@ namespace NDnn {
 		template <size_t layerId, size_t neuronId>
 		auto GetNeuron() {
 			return std::get<layerId>(Layers)[neuronId].GetNeuron();
-		} 
+		}
 
 		void ListenStat(const TString& name, std::function<double()> cb, ui32 from, ui32 to) {
 			StatGatherer.ListenStat(name, cb, from, to);
@@ -148,7 +148,7 @@ namespace NDnn {
 			}
 			Conf.Duration = ts.Info.GetDuration();
 		}
-		
+
 		const TSpikesList& GetSpikes() const {
 			return Network.GetSpikesList();
 		}
@@ -191,7 +191,7 @@ namespace NDnn {
 						layer[neuronId].GetNeuron().MutFired() = false;
 					}
 				}
-				
+
 				barrier.Wait();
 				if (masterThread) StatGatherer.Collect(t);
 				barrier.Wait();
@@ -261,7 +261,7 @@ namespace NDnn {
 
 	private:
 		std::tuple<T ...> Layers;
-		
+
 		TSimConfiguration Conf;
 		TDispatcher Dispatcher;
 		TNetwork Network;

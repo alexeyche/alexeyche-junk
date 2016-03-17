@@ -16,7 +16,7 @@ namespace NDnn {
     template <typename Proto>
     class TProtoOptions {
     public:
-        TProtoOptions(int argc, const char** argv, TString description) : Description(description) {
+        TProtoOptions(int argc, const char** argv, TString description, std::set<int> fields = {}) : Description(description) {
             for(size_t i=1; i<argc; ++i) {
                 Opts.push_back(argv[i]);
             }
@@ -25,6 +25,9 @@ namespace NDnn {
             int count = descriptor->field_count();
             for (int i = 0; i < count; ++i) {
                 const google::protobuf::FieldDescriptor* fieldDesc = descriptor->field(i);
+                if ((fields.size() > 0) && (fields.find(fieldDesc->number()) == fields.end())) {
+                    continue;
+                }
                 TString long_option = NStr::CamelCaseToOption(fieldDesc->name());
 
                 NamedFields.insert(std::make_pair(long_option, fieldDesc));
@@ -37,6 +40,7 @@ namespace NDnn {
                 if(!default_value.empty()) {
                     Defaults.push_back(std::make_pair(fieldDesc, default_value));
                 }
+                Fields.push_back(fieldDesc);
             }
         }
 
@@ -125,8 +129,7 @@ namespace NDnn {
             std::cout << Description << "\n\n";
             const google::protobuf::Descriptor* descriptor = Proto::descriptor();
             int count = descriptor->field_count();
-            for (int i = 0; i < count; ++i) {
-                auto* fieldDesc = descriptor->field(i);
+            for (const auto* fieldDesc: Fields) {
                 std::cout << "\t" << NStr::CamelCaseToOption(fieldDesc->name());
 
                 TString short_option = fieldDesc->options().GetExtension(NDnnProto::short_option);
@@ -148,6 +151,8 @@ namespace NDnn {
 
     private:
         std::vector<TString> Opts;
+
+        std::vector<const google::protobuf::FieldDescriptor*> Fields;
 
         std::map<TString, const google::protobuf::FieldDescriptor*> NamedFields;
         std::map<TString, const google::protobuf::FieldDescriptor*> ShortNamedFields;

@@ -1,7 +1,7 @@
 SimConfiguration {
 	Port: 9090
 	Seed: 2
-	Jobs: 8
+	Jobs: 4
 }
 Layer {
 	IntegrateAndFireConst {
