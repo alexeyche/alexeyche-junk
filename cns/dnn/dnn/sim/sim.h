@@ -13,6 +13,7 @@
 #include <dnn/util/spinning_barrier.h>
 #include <dnn/util/thread.h>
 #include <dnn/util/tuple.h>
+#include <dnn/util/stat_gatherer.h>
 
 #include <dnn/neuron/integrate_and_fire.h>
 
@@ -82,11 +83,11 @@ namespace NDnn {
 		} 
 
 		void ListenStat(const TString& name, const double& v, ui32 from, ui32 to) {
-
+			StatGatherer.ListenStat(name, v, from, to);
 		}
 
 		void SaveStat(const TString& fname) {
-			
+			StatGatherer.SaveStat(fname);
 		}
 
 		void Run() {
@@ -181,6 +182,8 @@ namespace NDnn {
 						layer[neuronId].GetNeuron().MutFired() = false;
 					}
 				}
+				L_DEBUG << "Simulation step " << t.T;
+				StatGatherer.Collect(t);
 				barrier.Wait();
 
 //======= PERFOMANCE MEASURE ======================================================================
@@ -253,6 +256,7 @@ namespace NDnn {
 		TNetwork Network;
 
 		ui32 PopulationSize;
+		TStatGatherer StatGatherer;
 	};
 
 

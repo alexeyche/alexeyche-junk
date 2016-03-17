@@ -1,0 +1,10 @@
+package NDnnProto;
+
+
+message TStatistics {
+    repeated double Values = 1;
+    optional uint32 From = 2;
+    optional uint32 To = 3;
+    optional string Name = 4;
+}
+

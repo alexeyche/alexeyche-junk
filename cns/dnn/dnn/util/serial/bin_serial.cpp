@@ -2,6 +2,7 @@
 
 #include <dnn/util/ts/time_series.h>
 #include <dnn/util/ts/spikes_list.h>
+#include <dnn/util/stat_gatherer.h>
 
 namespace NDnn {
 
@@ -89,5 +90,12 @@ namespace NDnn {
     EProto TBinSerial::DeduceType<TSpikesList>() {
         return EProto::SPIKES_LIST;
     }
+
+    template <>
+    EProto TBinSerial::DeduceType<TStatistics>() {
+        return EProto::STATISTICS;
+    }
+
+
 
 } // namespace NDnn

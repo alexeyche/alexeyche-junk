@@ -14,6 +14,10 @@ message TNeuronSpaceInfo {
     optional uint32 ColId = 6;
 }
 
+message TAsyncSpikeQueue {
+    optional TNeuronSpaceInfo Info = 1;
+}
+
 message TSpikeNeuronConst {
     optional double AxonDelay = 1;
 }

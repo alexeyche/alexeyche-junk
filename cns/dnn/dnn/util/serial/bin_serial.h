@@ -17,7 +17,8 @@ namespace NDnn {
 	enum class EProto {
 		CONFIG = 0,
 		TIME_SERIES = 1,
-		SPIKES_LIST = 2
+		SPIKES_LIST = 2,
+		STATISTICS = 3
 	};
 
 	class TBinSerial: public TSerialBase {
