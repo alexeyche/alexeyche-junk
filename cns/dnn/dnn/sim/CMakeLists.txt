@@ -4,6 +4,8 @@ set(SOURCES
     sim.cpp
     layer.cpp
     network.cpp
+    global_ctx.cpp
+    reward_control.cpp
 )
 
 set(DIR_SRCS)

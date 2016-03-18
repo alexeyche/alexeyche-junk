@@ -2,6 +2,8 @@
 
 #include "layer.h"
 #include "network.h"
+#include "global_ctx.h"
+#include "reward_control.h"
 
 #include <dnn/base/base.h>
 
@@ -54,6 +56,8 @@ namespace NDnn {
 				l.SetupSpaceInfo(layerId, PopulationSize);
 				PopulationSize += l.Size();
 			});
+
+			TGlobalCtx::Inst().Init(RewardControl);
 		}
 
 		TSim(const TSim& other)
@@ -69,6 +73,8 @@ namespace NDnn {
 				PopulationSize = other.PopulationSize;
 				Conf = other.Conf;
 				Dispatcher = other.Dispatcher;
+				RewardControl = other.RewardControl;
+				TGlobalCtx::Inst().Init(RewardControl);
 				Network = other.Network;
 				Network.Init(PopulationSize);
 				ForEach(Layers, [&](auto& l) {
@@ -87,6 +93,11 @@ namespace NDnn {
 			StatGatherer.ListenStat(name, cb, from, to);
 		}
 
+		void CollectReward() {
+			StatGatherer.ListenStat("Reward", [&]() { return TGlobalCtx::Inst().GetReward(); });	
+			StatGatherer.ListenStat("RewardDelta", [&]() { return TGlobalCtx::Inst().GetRewardDelta(); });
+		}
+ 
 		template <size_t layerId, size_t neuronId>
 		void ListenBasicStats(ui32 from, ui32 to) {
 			StatGatherer.ListenStat("Membrane", [&]() { return GetNeuron<layerId, neuronId>().Membrane(); }, from, to);
@@ -268,6 +279,8 @@ namespace NDnn {
 
 		ui32 PopulationSize;
 		TStatGatherer StatGatherer;
+
+		TRewardControl RewardControl;
 	};
 
 

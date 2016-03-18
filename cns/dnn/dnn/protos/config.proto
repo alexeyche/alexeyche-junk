@@ -9,11 +9,18 @@ import "synapse.proto";
 import "stochastic.proto";
 import "spike_neuron_impl.proto";
 import "spike_sequence_neuron.proto";
+import "reward_control.proto";
+
+message TRewardControl {
+    optional TRewardControlConst RewardControlConst = 1;
+    optional TRewardControlState RewardControlState = 2;
+}
 
 message TConfig {
 	optional TSimConfiguration SimConfiguration = 1;
 	repeated TLayer Layer = 2;
 	repeated TConnection Connection = 3;
+    optional TRewardControl RewardControl = 4;
 }
 
 

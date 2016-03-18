@@ -5,6 +5,8 @@
 #include <dnn/util/ptr.h>
 #include <dnn/protos/stat_gatherer.pb.h>
 
+#include <limits>
+
 namespace NDnn {
 
 	struct TStatistics: public IProtoSerial<NDnnProto::TStatistics> { 
@@ -31,7 +33,7 @@ namespace NDnn {
 
 	class TStatCollector {
 	public:
-		TStatCollector(const TString& name, std::function<double()> cb, ui32 from, ui32 to)
+		TStatCollector(const TString& name, std::function<double()> cb, ui32 from = 0, ui32 to = std::numeric_limits<ui32>::max())
 			: Callback(cb)
 			, Result(name, from, to) 
 		{}

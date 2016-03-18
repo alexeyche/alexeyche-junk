@@ -60,10 +60,10 @@ Rcpp::List TProto::Translate<TSpikesList>(const TSpikesList& ent) {
 template <>
 Rcpp::List TProto::Translate<TStatistics>(const TStatistics& ent) {
     Rcpp::List ret = Rcpp::List::create(
-          Rcpp::Named("Values") = Rcpp::wrap(ent.Values)
-        , Rcpp::Named("Name") = ent.Name
-        , Rcpp::Named("From") = ent.From
-        , Rcpp::Named("To") = ent.To
+          Rcpp::Named("values") = Rcpp::wrap(ent.Values)
+        , Rcpp::Named("name") = ent.Name
+        , Rcpp::Named("from") = ent.From
+        , Rcpp::Named("to") = ent.To
     );
     ret.attr("class") = "Statistics";
     return ret;
@@ -143,7 +143,7 @@ Rcpp::List TProto::ReadFromFile(TString protofile) {
                 while (serial.ReadObject<TStatistics>(stat)) {
                     Rcpp::List subList;
                     subList = Translate(stat);
-                    l.push_back(subList);
+                    l[stat.Name] = subList;
                 }
             }
             break;

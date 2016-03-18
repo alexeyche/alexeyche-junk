@@ -1,0 +1,13 @@
+package NDnnProto;
+
+
+message TRewardControlState {
+    optional double R = 1;
+    optional double MeanR = 2;
+}
+
+message TRewardControlConst {
+    optional double TauTrace = 1;
+    optional double TauMeanTrace = 2;
+}
+
