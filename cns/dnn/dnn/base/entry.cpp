@@ -8,13 +8,13 @@
 
 namespace NDnn {
 
-	TModelOptions InitOptions(const int argc, const char** argv, TString name) {
-		TProtoOptions<NDnnProto::TDnnOptions> clOptions(argc, argv, NStr::TStringBuilder() << "Dynamic neural network model, " << name);
+	TModelOptions InitOptions(const int argc, const char** argv, TString name, std::set<int> fields) {
+		TProtoOptions<NDnnProto::TDnnOptions> clOptions(argc, argv, NStr::TStringBuilder() << "Dynamic neural network model, " << name, fields);
 		NDnnProto::TDnnOptions options;
 		if (!clOptions.Parse(options)) {
 			exit(1);
 		}
-	    
+
 	    if (options.verbose()) {
 	        TLog::Instance().SetLogLevel(TLog::DEBUG_LEVEL);
 	    }
@@ -24,7 +24,7 @@ namespace NDnn {
 
 	    if (options.has_config()) {
 	    	opts.ConfigFile = options.config();
-	    	
+
 	    	NDnnProto::TConfig config;
 	        ReadProtoTextFromFile(*opts.ConfigFile, config);
 	        opts.Port = config.simconfiguration().port();

@@ -17,7 +17,7 @@ namespace NDnn {
 		TString Name;
 	};
 
-	TModelOptions InitOptions(const int argc, const char** argv, TString name);
+	TModelOptions InitOptions(const int argc, const char** argv, TString name, std::set<int> fields = {});
 
 	template <typename ... T>
 	auto BuildModel(TModelOptions options) {
