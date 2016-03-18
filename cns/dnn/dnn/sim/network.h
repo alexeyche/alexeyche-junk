@@ -53,8 +53,8 @@ namespace NDnn {
             for(auto& n: layer) {
                 const auto& syns = n.GetSynapses();
                 for (ui32 con_i = 0; con_i < syns.size(); ++con_i) {
-                    // const auto& syn = syns.Get(con_i);
-                    const auto& syn = syns[con_i];
+                    const auto& syn = syns.Get(con_i);
+                    // const auto& syn = syns[con_i];
                     ConnMap[ syn.IdPre() ].emplace_back(n.GetMutAsyncSpikeQueue(), con_i, syn.DendriteDelay());
                 }
             }

@@ -132,22 +132,17 @@ namespace NDnn {
 			double Iinput = 0.0;
 
 			double Isyn = 0.0;
-			// auto synIdIt = Synapses.abegin();
-		 //    while (synIdIt != Synapses.aend()) {
-		 //    	auto& synapse = Synapses[synIdIt];
-		 //    	double x = synapse.WeightedPotential();
-		 //    	if(fabs(x) < 0.0001) {
-		 //        	Synapses.SetInactive(synIdIt);
-		 //        } else {
-		 //        	Isyn += x;
-		 //        	++synIdIt;
-		 //        }
-		 //    }
-
-			for (auto& s: Synapses) {
-				double x = s.WeightedPotential();
-				Isyn += x;
-			}
+			auto synIdIt = Synapses.abegin();
+		    while (synIdIt != Synapses.aend()) {
+		    	auto& synapse = Synapses[synIdIt];
+		    	double x = synapse.WeightedPotential();
+		    	if(fabs(x) < 0.0001) {
+		        	Synapses.SetInactive(synIdIt);
+		        } else {
+		        	Isyn += x;
+		        	++synIdIt;
+		        }
+		    }
 			
 			Neuron.CalculateDynamics(t, Iinput, Isyn);
 
@@ -157,16 +152,11 @@ namespace NDnn {
 		        Neuron.PostSpikeDynamics(t);
 		    }
 
-		    for (auto &s: Synapses) {
-	   			s.CalculateDynamics(t);
+	   		for(auto syn_id_it = Synapses.abegin(); syn_id_it != Synapses.aend(); ++syn_id_it) {
+	        	auto& s = Synapses[syn_id_it];
+	        	s.CalculateDynamics(t);
 	        	s.MutFired() = false;
-	   		}
-
-	   		// for(auto syn_id_it = syns.abegin(); syn_id_it != syns.aend(); ++syn_id_it) {
-	     //    	auto& s = Synapses[syn_id_it];
-	     //    	s.CalculateDynamics(t);
-	     //    	s.MutFired() = false;
-	     //    }
+	        }
 		}
 
 		TNeuron& GetNeuron() {
@@ -242,8 +232,8 @@ namespace NDnn {
 			return PredefineSynapseConst;
 		}
 
-		// const TActVector<typename TConf::TSynapse>& GetSynapses() const {
-		const TVector<typename TConf::TSynapse>& GetSynapses() const {
+		const TActVector<typename TConf::TSynapse>& GetSynapses() const {
+		// const TVector<typename TConf::TSynapse>& GetSynapses() const {
 			return Synapses;
 		}
 
@@ -259,8 +249,8 @@ namespace NDnn {
 		TNeuron Neuron;
 
 		typename TConf::TActivationFunction Activation;
-		// TActVector<typename TConf::TSynapse> Synapses;
-		TVector<typename TConf::TSynapse> Synapses;
+		TActVector<typename TConf::TSynapse> Synapses;
+		// TVector<typename TConf::TSynapse> Synapses;
 
 		TSpikeNeuronImplInner Inner;
 		TNeuronSpaceInfo SpaceInfo;

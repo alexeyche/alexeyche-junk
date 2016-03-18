@@ -20,11 +20,11 @@ int main(int argc, const char** argv) {
     });
 
     auto sim = BuildModel<
-        TLayer<TSpikeSequenceNeuron, 100>,
-        TLayer<TIntegrateAndFire, 100, TNeuronConfig<TBasicSynapse, TDeterm>>
+        TLayer<TSpikeSequenceNeuron, 1000>,
+        TLayer<TIntegrateAndFire, 1000, TNeuronConfig<TBasicSynapse, TDeterm>>
     >(opts);
 
-    sim.ListenBasicStats<1, 55>(0, 1000);
+    // sim.ListenBasicStats<1, 55>(0, 1000);
 
     sim.Run();
 

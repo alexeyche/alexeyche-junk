@@ -210,7 +210,7 @@ namespace NDnn {
 		#ifdef PERF
 				size_t cur_time = std::time(nullptr);
 				if(cur_time - start_time>5) {
-					L_DEBUG << "Sim, perf start: " << ((double)(t.t-sim_time)/1000.0)/((double)(cur_time - start_time));
+								L_DEBUG << "Sim, perf start: " << ((double)(t.T-sim_time)/1000.0)/((double)(cur_time - start_time)) << " " << (double)(t.T-sim_time)/1000.0 << " / " << (double)(cur_time - start_time);
 					start_time = cur_time;
 					sim_time = t.T;
 				}
