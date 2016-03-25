@@ -7,6 +7,8 @@ PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS ${ProtoFiles})
 set(ProtobufIncludePath ${PROTOBUF_INCLUDE_DIRS}
         CACHE INTERNAL "Path to generated protobuf files.")
 
+include_directories(${PROTOBUF_INCLUDE_DIRS})
+
 add_library(dnn_protos SHARED ${ProtoFiles} ${PROTO_SRCS} ${PROTO_HDRS})
 
 SET_TARGET_PROPERTIES(dnn_protos PROPERTIES COMPILE_FLAGS "-fPIC")
