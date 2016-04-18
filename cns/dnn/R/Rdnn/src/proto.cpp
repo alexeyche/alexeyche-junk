@@ -124,6 +124,33 @@ TSpikesList TProto::TranslateBack<TSpikesList>(const Rcpp::List& l) {
     return sl;
 }
 
+Rcpp::List TProto::TranslateModel(const NDnnProto::TConfig& config) {
+    Rcpp::List res;
+    
+    for (const auto& layer: config.layer()) {
+        ui32 layerSynapseCounter = 0;
+        for (const auto& neuronInner: layer.spikeneuronimplinnerstate()) {
+            Rcpp::List neuronInfo;
+            Rcpp::NumericVector weights;
+            Rcpp::IntegerVector ids_pre;
+            
+            for (ui32 synId=0; synId < neuronInner.synapsessize(); ++synId, ++layerSynapseCounter) {
+                auto synInner = layer.synapseinnerstate(layerSynapseCounter);
+                weights.push_back(synInner.weight());
+                ids_pre.push_back(synInner.idpre());
+            }
+            res.push_back(
+                Rcpp::List::create(
+                    Rcpp::Named("weights") = weights,
+                    Rcpp::Named("ids_pre") = ids_pre
+                )
+            );
+        }    
+    }
+    
+    return res;
+}
+
 
 Rcpp::List TProto::ReadFromFile(TString protofile) {
 	std::ifstream input(protofile, std::ios::binary);
@@ -145,6 +172,15 @@ Rcpp::List TProto::ReadFromFile(TString protofile) {
                     subList = Translate(stat);
                     l[stat.Name] = subList;
                 }
+            }
+            break;
+        case EProto::CONFIG:
+            {
+                NDnnProto::TConfig config;
+                if (!serial.ReadProtobufMessage(config)) {
+                    ERR("Failed to read config protobuf: " << protofile);
+                }
+                l = TranslateModel(config);
             }
             break;
         default:

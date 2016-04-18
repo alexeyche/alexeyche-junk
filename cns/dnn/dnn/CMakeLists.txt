@@ -73,7 +73,7 @@ install(CODE
     "EXECUTE_PROCESS(COMMAND ln -sf ${PROJECT_SOURCE_DIR}/R/scripts ${CMAKE_INSTALL_PREFIX}/r_scripts)"
 )
 install(CODE
-    "EXECUTE_PROCESS(COMMAND mkdir ${CMAKE_INSTALL_PREFIX}/spikes)"
+    "EXECUTE_PROCESS(COMMAND mkdir -p ${CMAKE_INSTALL_PREFIX}/spikes)"
 )
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")

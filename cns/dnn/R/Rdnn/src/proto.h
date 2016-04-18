@@ -2,6 +2,7 @@
 #define RPROTO_READ_H
 
 #include <dnn/base/base.h>
+#include <dnn/protos/config.pb.h>
 
 #include <fstream>
 
@@ -17,10 +18,13 @@ class TProto {
 public:
 
     template <typename T>
-    Rcpp::List Translate(const T& ent);
+    static Rcpp::List Translate(const T& ent);
+
+    static Rcpp::List TranslateModel(const NDnnProto::TConfig& config);
+
 
 	template <typename T>
-    T TranslateBack(const Rcpp::List& l);
+    static T TranslateBack(const Rcpp::List& l);
 
     template <typename T>
     void WriteEntity(T&& v, std::ostream& ostr) {

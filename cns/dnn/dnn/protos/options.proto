@@ -23,15 +23,39 @@ message TDnnOptions {
         (description) = "Read input spikes and put it on SpikeSequenceNeuron layer",
         (short_option) = "-is"
     ];
-
-    optional string OutputSpikes = 5 [
+    
+    optional string InputTimeSeries = 5 [
+        (description) = "Read input time series",
+        (short_option) = "-it"
+    ];
+    
+    optional string Output = 6 [
         (description) = "Output spikes from simulation",
         (short_option) = "-o"
     ];
 
-    optional string Stat = 6 [
+    optional string Stat = 7 [
         (description) = "Gather statistics and save in file",
+        (short_option) = "-st"
+    ];
+
+    optional string Load = 8 [
+        (description) = "Load model from file",
+        (short_option) = "-l"
+    ];
+    optional string Save = 9 [
+        (description) = "Save model to file",
         (short_option) = "-s"
+    ];
+    optional string NoLearning = 10 [
+        (description) = "Turn off any learning (not working for now)",
+        (short_option) = "-nl"
+    ];
+
+    optional uint32 Jobs = 11 [
+        (description) = "Parallel jobs to run simulation ",
+        (default_value) = "8",
+        (short_option) = "-j"
     ];
 }
 

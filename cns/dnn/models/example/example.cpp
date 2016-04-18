@@ -11,17 +11,11 @@
 using namespace NDnn;
 
 int main(int argc, const char** argv) {
-    auto opts = InitOptions(argc, argv, "TestModel", {
-        NDnnProto::TDnnOptions::kConfigFieldNumber,
-        NDnnProto::TDnnOptions::kInputSpikesFieldNumber,
-        NDnnProto::TDnnOptions::kOutputSpikesFieldNumber,
-        NDnnProto::TDnnOptions::kStatFieldNumber,
-        NDnnProto::TDnnOptions::kVerboseFieldNumber
-    });
+    auto opts = InitOptions(argc, argv, "TestModel");
 
     auto sim = BuildModel<
-        TLayer<TSpikeSequenceNeuron, 1000>,
-        TLayer<TIntegrateAndFire, 1000, TNeuronConfig<TBasicSynapse, TDeterm>>
+        TLayer<TSpikeSequenceNeuron, 100>,
+        TLayer<TIntegrateAndFire, 100, TNeuronConfig<TBasicSynapse, TDeterm>>
     >(opts);
 
     // sim.ListenBasicStats<1, 55>(0, 1000);
@@ -34,6 +28,10 @@ int main(int argc, const char** argv) {
 
     if (opts.StatFile) {
         sim.SaveStat(*opts.StatFile);
+    }
+
+    if (opts.ModelSave) {
+        sim.SaveModel(*opts.ModelSave);
     }
     return 0;
 }

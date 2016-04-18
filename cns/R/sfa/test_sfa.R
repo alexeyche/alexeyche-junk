@@ -4,18 +4,6 @@ require(rSFA)
 require(Rdnn)
 
 
-# type = c("Normal", "Aggressive")
-# norm_actions = c("Bowing","Clapping","Handshaking","Hugging","Jumping","Running","Seating","Standing","Walking","Waving")
-# aggr_actions = c("Elbowing","Frontkicking","Hamering","Headering","Kneeing","Pulling","Punching","Pushing","Sidekicking","Slapping")
-# subs = c("sub1", "sub2", "sub3", "sub4")
-# 
-# f = ds.path("emg_active", subs[1], type[1], "txt", paste(norm_actions[1], ".txt", sep=""))
-# 
-# rdata = as.matrix(read.table(f))
-# 
-# dm = colMeans(rdata)
-# data = (dm - rdata)/sqrt(colMeans((rdata-dm)^2))
-
 
 norm = function(x) {
     xm = colMeans(x)
@@ -57,9 +45,13 @@ x2 = cos(11*t)
 
 xr = matrix(c(x1, x2), ncol=2, nrow=1000)
 
-
+sp = spikes
+sp$values = spikes$values[101:200]
+spikes.pr = preprocess.run(Epsp(TauDecay=50, Length=200), binarize.spikes(spikes), 4)
+xr = t(spikes.pr$values)
 xn = norm(xr)
-h = expansion(xn)
+#h = expansion(xn)
+h = xn
 hc = centering(h)
 z = whitening(hc)
 
@@ -71,9 +63,25 @@ for(i in 1:ncol(z)) {
 prc = eigen(t(dz) %*% dz)
 lambda_i = order(prc$values, decreasing=FALSE)
 
+lambda_i = lambda_i[1:2]
+
 g = NULL
 for(i in lambda_i) {
     g = cbind(g, t(t(prc$vectors[,i]) %*% t(z)))
 }
 
+K = kernel.run(Dot(), time.series(t(g), spikes.pr$info), 8)
 
+c(y, M, N, A) := KFD(K)
+c(metric, K, y, M, N, A) := list(-tr(M)/tr(N), K, y, M, N, A)
+
+ans = K %*% y[, 1:2]
+
+par(mfrow=c(1,2))
+
+metrics_str = sprintf("%f", metric)
+plot(Re(ans[,1]), col=as.integer(rownames(K)), main=metrics_str) 
+plot(Re(ans), col=as.integer(rownames(K)))        
+
+
+ts.sfa = chop.time.series(time.series(t(g[,1:2]), spikes.pr$info))

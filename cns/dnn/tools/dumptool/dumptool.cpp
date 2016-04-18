@@ -3,6 +3,7 @@
 #include <fstream>
 
 #include <dnn/protos/options.pb.h>
+#include <dnn/protos/config.pb.h>
 #include <dnn/util/proto_options.h>
 #include <dnn/util/ts/time_series.h>
 #include <dnn/util/ts/spikes_list.h>
@@ -36,6 +37,13 @@ int main(int argc, const char** argv) {
             break;
         case EProto::STATISTICS:
             DumpEntities<TStatistics>(serial);
+            break;
+        case EProto::CONFIG:
+            {
+                NDnnProto::TConfig config;
+                serial.ReadProtobufMessage(config);
+                std::cout << config.DebugString();
+            }
             break;
         default:
             throw TDnnException() << "Failed to recognize protobuf type";

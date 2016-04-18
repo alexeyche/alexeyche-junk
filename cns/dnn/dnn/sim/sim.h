@@ -108,6 +108,17 @@ namespace NDnn {
 			StatGatherer.SaveStat(fname);
 		}
 
+ 		void SaveModel(const TString& fname) {
+			std::ofstream output(fname, std::ios::binary);
+		    TBinSerial serial(output);
+		    NDnnProto::TConfig config = Serialize();
+		    serial(config, EProto::CONFIG);
+		}
+
+		void SetJobs(ui32 jobs) {
+			Conf.Jobs = jobs;
+		}
+
 		void Run() {
 			L_DEBUG << "Going to run simulation for " << Conf.Duration << " ms in " << Conf.Jobs << " jobs";
 			TVector<TIndexSlice> perLayerJobs = DispatchOnThreads(Conf.Jobs, LayersSize());
