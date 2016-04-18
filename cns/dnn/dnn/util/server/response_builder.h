@@ -25,7 +25,7 @@ namespace NDnn {
         TResponseBuilder& BadRequest();
 
         TResponseBuilder& InternalError();
-        
+
         TResponseBuilder& ServiceUnavailable();
 
         TString& Body();

@@ -87,7 +87,7 @@ namespace NDnn {
         Response.Status = "Internal Server Error";
         return *this;
     }
-    
+
     TResponseBuilder& TResponseBuilder::ServiceUnavailable() {
         Response.Code = 503;
         Response.Status = "Service Unavailable";

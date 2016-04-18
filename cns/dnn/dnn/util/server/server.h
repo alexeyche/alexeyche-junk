@@ -75,7 +75,7 @@ namespace NDnn {
 			, MaxConnections(max_connections)
 		{
 		}
-		
+
 		void Listen() {
 			int status;
 			struct addrinfo hints;
@@ -124,7 +124,7 @@ namespace NDnn {
 				"Failed to listen"
 			);
 		}
-		
+
 		const ui32& GetPort() const {
 			return Port;
 		}
@@ -213,9 +213,9 @@ namespace NDnn {
 				}
 
 				bytesReceived += chunkReceived;
-				
+
 				bytes.insert(bytes.end(), chunk.begin(), chunk.begin() + chunkReceived);
-				
+
 				if (chunkReceived < ReceiveChunkSize) {
 					break;
 				}
@@ -225,7 +225,7 @@ namespace NDnn {
 				L_DEBUG << "Received zero bytes from socket. Ignoring";
 				return;
 			}
-			
+
 			THttpRequest req = ParseHttpRequest(std::move(bytes));
 
 			TOptional<TRequestCallback> cb;
