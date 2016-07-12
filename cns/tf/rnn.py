@@ -28,8 +28,8 @@ class ThetaRNNCell(RNNCell):
         self,
         num_units,
         dt = dt,
-        input_weights_init=tf.uniform_unit_scaling_initializer(),
-        recc_weights_init=tf.uniform_unit_scaling_initializer(),
+        input_weights_init=tf.random_uniform_initializer(minval=2.0, maxval=3.0),
+        recc_weights_init=tf.random_uniform_initializer(minval=2.0, maxval=3.0), 
         activation=gauss_act
     ):
         self._num_units = num_units
@@ -61,6 +61,7 @@ class ThetaRNNCell(RNNCell):
             self.bias = vs.get_variable("Bias", [self._num_units], initializer=init_ops.constant_initializer(0.0))
 
             state_cos = tf.cos(state)
+            #weighted_input =  math_ops.matmul(inputs, tf.exp(self.W)) + math_ops.matmul(state_cos, tf.exp(self.U)) + self.bias
             weighted_input =  math_ops.matmul(inputs, self.W) + math_ops.matmul(state_cos, self.U) + self.bias
 
             new_state = state + self._dt * (1.0 - state_cos + (1.0 + state_cos) * weighted_input)
@@ -76,6 +77,7 @@ def gen_poisson(rates, T, dt):
 
 
 def get_form():
+    #thetaNeuron = ThetaRNNCell(1, input_weights_init = tf.constant_initializer(np.log(1.0/dt)), recc_weights_init = tf.constant_initializer(0))
     thetaNeuron = ThetaRNNCell(1, input_weights_init = tf.constant_initializer(1.0/dt), recc_weights_init = tf.constant_initializer(0))
 
     inputs  = [ tf.placeholder(tf.float32, shape=(1, 1), name="Input_{}".format(idx)) for idx in xrange(12) ]
@@ -91,16 +93,17 @@ def get_form():
         sess.run(init)
         feed_dict = {k: v for k, v in zip(inputs, data)}
         outputs_v, _ = sess.run([outputs, state], feed_dict)
-    return np.asarray(outputs_v)[:,0,0]
+    signal_form = np.asarray(outputs_v)[:,0,0]
+    return signal_form[np.where(signal_form > 1e-08)]
 
 
-#signal_form = get_form()
+signal_form = get_form()
 
-input_size = 5
+input_size = 10
 batch_size = 1
-net_size = 1
-
-seq_size = 20
+net_size = 10
+epochs = 100
+seq_size = 200
 
 thetaNeuron = ThetaRNNCell(net_size, dt)
 inputs  = [ tf.placeholder(tf.float32, shape=(batch_size, input_size), name="Input_{}".format(idx)) for idx in xrange(seq_size) ]
@@ -109,36 +112,50 @@ init_state = tf.placeholder(tf.float32, shape=(batch_size, net_size), name="Stat
 
 outputs, state = rnn.rnn(thetaNeuron, inputs, init_state)
 
-init = tf.initialize_all_variables()
 
 sess = tf.Session()
 
-data = [ 1.0*np.random.randn(batch_size, input_size) for _ in xrange(seq_size) ]
 
-#target_data = gen_poisson(np.asarray([10]*N), seq_size, 0.01)
+data = [ np.zeros((batch_size, input_size)) for _ in xrange(seq_size) ]
 
-with tf.device("/cpu:0"):
+for seq_i in xrange(seq_size):
+    ni = seq_i % input_size
+    data[seq_i][0, ni] = 1.0 
+    data[seq_i][0, :] = np.convolve(signal_form, data[seq_i][0, :], mode="same")
+
+
+target_seq = gen_poisson(np.asarray([4.0]*net_size), seq_size, 0.01)
+
+for ni in xrange(net_size):
+    target_seq[:, ni] = np.convolve(signal_form, target_seq[:, ni], mode="same")    
+
+target_data = [ np.asarray([ target_seq[si, :] for _ in xrange(batch_size) ]) for si in xrange(seq_size) ]
+
+
+targets = [ tf.placeholder(tf.float32, shape=(batch_size, net_size), name="Target") for si in xrange(seq_size) ]
+loss = tf.add_n([ tf.nn.l2_loss(target - outputs) for output, target in zip(outputs, targets) ])
+train_step = tf.train.AdamOptimizer(0.5).minimize(loss)
+
+init = tf.initialize_all_variables()
+
+weights = []
+with tf.device("/gpu:0"):
     sess.run(init)
-    feed_dict = {k: v for k, v in zip(inputs, data)}
-    feed_dict[init_state] = np.zeros((batch_size, net_size))
-    fetch = [outputs, state]
-    for state_var, weighted_input_var in thetaNeuron.debug_data:
-        fetch.append(state_var)
-        fetch.append(weighted_input_var)
+    for e in xrange(epochs):
+        feed_dict = {k: v for k, v in zip(inputs, data)}
+        feed_dict[init_state] = np.zeros((batch_size, net_size))
+        feed_dict.update({k: v for k, v in zip(targets, target_data)})
 
-    out = sess.run(fetch, feed_dict)
-
-
-outputs_v, state_v = np.asarray(out[0]), out[1]
-out = out[2:]
-states_v, winputs_v = [], []
-for _ in xrange(len(inputs)):
-    states_v.append(out.pop(0))
-    winputs_v.append(out.pop(0))
-
-states_v = np.asarray(states_v)[:,0,0]
-winputs_v = np.asarray(winputs_v)[:,0,0]
-
+        fetch = [outputs, state]
+        fetch += [thetaNeuron.W]
+        fetch += [loss, train_step]
+        
+        out = sess.run(fetch, feed_dict)
+        outputs_v, state_v = np.asarray(out[0]), out[1]
+        W = out[2]
+        loss_v, train_step_v = out[3], out[4]
+        print "Epoch {}, train loss {}".format(e, loss_v)
+        weights.append(W)
 
 
 out_one = outputs_v[:,0,0]
@@ -146,7 +163,7 @@ out = outputs_v[:,0, :]
 
 plt.figure(1)
 plt.subplot(2,1,1)
-plt.plot(out_one)
+plt.imshow(target_seq)
 plt.subplot(2,1,2)
 plt.imshow(out.T)
 plt.show()
