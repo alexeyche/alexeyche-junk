@@ -15,6 +15,12 @@ from matplotlib import pyplot as plt
 def gauss_act(x, sigma):
     return tf.exp( - tf.square(-1.0 - tf.cos(x) )/( 2.0 * sigma ** 2))
 
+def laplace_act(x, sigma):
+    return tf.exp( - tf.abs(tf.cos(x) + 1.0)/sigma)
+
+
+seed = 1
+
 class ThetaRNNCell(RNNCell):
     """Theta neuron RNN cell."""
 
@@ -23,9 +29,9 @@ class ThetaRNNCell(RNNCell):
         num_units,
         dt,
         sigma,
-        input_weights_init=tf.uniform_unit_scaling_initializer(factor=10.0),
-        recc_weights_init=tf.uniform_unit_scaling_initializer(factor=10.0),
-        activation=gauss_act
+        input_weights_init=tf.uniform_unit_scaling_initializer(factor=5.0, seed=seed),
+        recc_weights_init=tf.uniform_unit_scaling_initializer(factor=5.0, seed=seed),
+        activation=laplace_act
     ):
         self._num_units = num_units
         self._activation = activation
@@ -61,13 +67,15 @@ class ThetaRNNCell(RNNCell):
             weighted_input =  math_ops.matmul(inputs, self.W) + math_ops.matmul(state_cos, self.U) + self.bias
 
             new_state = state + self._dt * (1.0 - state_cos + (1.0 + state_cos) * weighted_input)
-            output = self._activation(new_state, self._sigma)
+            # output = self._activation(new_state, self._sigma)
+            output = -tf.cos(new_state)/2.0 + 0.5
             self.debug_data.append((new_state, weighted_input))
         return output, new_state
 
 
 
 def gen_poisson(rates, T, dt):
+    np.random.seed(1)
     res = dt * rates >  np.random.random((T, rates.shape[0]))
     return res.astype(np.float32)
 
@@ -93,7 +101,7 @@ def get_form(dt, sigma):
     return signal_form[np.where(signal_form > 1e-08)]
 
 
-sigma = 0.01
+sigma = 0.5
 dt = 0.1
 
 
@@ -101,11 +109,11 @@ signal_form = get_form(dt, sigma)
 
 input_size = 10
 batch_size = 1
-net_size = 10
-epochs = 1000
-seq_size = 50
+net_size = 1
+epochs = 400
+seq_size = 10
 lrate = 0.1
-decay_rate = 0.99
+decay_rate=1
 
 thetaNeuron = ThetaRNNCell(net_size, dt, sigma)
 inputs  = [ tf.placeholder(tf.float32, shape=(batch_size, input_size), name="Input_{}".format(idx)) for idx in xrange(seq_size) ]
@@ -116,33 +124,36 @@ outputs, state = rnn.rnn(thetaNeuron, inputs, init_state)
 
 
 sess = tf.Session()
-
+writer = tf.train.SummaryWriter("{}/tf".format(os.environ["HOME"]), sess.graph)
 
 data = [ np.zeros((batch_size, input_size)) for _ in xrange(seq_size) ]
 
 for seq_i in xrange(seq_size):
-    ni = seq_i % input_size
-    data[seq_i][0, ni] = 1.0
-    data[seq_i][0, :] = np.convolve(signal_form, data[seq_i][0, :], mode="same")
+   ni = seq_i % input_size
+   data[seq_i][0, ni] = 1.0
+   # data[seq_i][0, :] = np.convolve(signal_form, data[seq_i][0, :], mode="same")
 
+#data[0] = 1.0 * np.ones((batch_size, input_size))
 
-target_seq = gen_poisson(np.asarray([4.0]*net_size), seq_size, 0.01)
+#target_seq = gen_poisson(np.asarray([4.0]*net_size), seq_size, 0.01)
 
-for ni in xrange(net_size):
-    target_seq[:, ni] = np.convolve(signal_form, target_seq[:, ni], mode="same")
+# for ni in xrange(net_size):
+#   target_seq[:, ni] = np.convolve(signal_form, target_seq[:, ni], mode="same")
 
+target_seq = np.zeros((seq_size, net_size))
+target_seq[5,:] = 1.0
 target_data = [ np.asarray([ target_seq[si, :] for _ in xrange(batch_size) ]) for si in xrange(seq_size) ]
-
 
 targets = [ tf.placeholder(tf.float32, shape=(batch_size, net_size), name="Target") for si in xrange(seq_size) ]
 loss = tf.add_n([ tf.nn.l2_loss(target - outputs) for output, target in zip(outputs, targets) ]) / seq_size / batch_size / net_size
 
 lr = tf.Variable(0.0, trainable=False)
 tvars = tf.trainable_variables()
-grads, _ = tf.clip_by_global_norm(tf.gradients(loss, tvars), 5.0)
+grads_raw = tf.gradients(loss, tvars)
+# grads, _ = tf.clip_by_global_norm(tf.gradients(loss, tvars), 5.0)
 
 optimizer = tf.train.GradientDescentOptimizer(lr)
-train_step = optimizer.apply_gradients(zip(grads, tvars))
+train_step = optimizer.apply_gradients(zip(grads_raw, tvars))
 
 init = tf.initialize_all_variables()
 
@@ -162,6 +173,7 @@ with tf.device("/cpu:0"):
         fetch += [thetaNeuron.W]
         fetch += [thetaNeuron.U]
         fetch += [loss, train_step]
+        fetch += grads_raw[-3:]
 
         out = sess.run(fetch, feed_dict)
         outputs_v, state_v = np.asarray(out[0]), out[1]
@@ -169,15 +181,17 @@ with tf.device("/cpu:0"):
         recc_weights.append(out[3])
 
         loss_v, train_step_v = out[4], out[5]
+        gW, gU, gB = out[6], out[7], out[8]
         print ", train loss {}".format(loss_v)
+        if e % 50 == 0 or e == epochs-1:
+            plt.plot(outputs_v[:,0,0]); plt.show()
+            # out_one = outputs_v[:,0,0]
+            # out = outputs_v[:,0, :]
 
-        out_one = outputs_v[:,0,0]
-        out = outputs_v[:,0, :]
-
-        plt.figure(1)
-        plt.subplot(2,1,1)
-        plt.imshow(target_seq.T)
-        plt.subplot(2,1,2)
-        plt.imshow(out.T)
-        plt.show()
+            # plt.figure(1)
+            # plt.subplot(2,1,1)
+            # plt.imshow(target_seq.T)
+            # plt.subplot(2,1,2)
+            # plt.imshow(out.T)
+            # plt.show()
 
