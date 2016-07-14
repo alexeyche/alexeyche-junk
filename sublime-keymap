@@ -1,0 +1,25 @@
+[
+	{ "keys": ["ctrl+o"], "command": "switch_file", "args": {"extensions": ["cpp", "cxx", "cc", "c", "hpp", "hxx", "hh", "h", "ipp", "inl", "m", "mm"]} },
+	{ "keys": ["alt+o"], "command": "prompt_open_file" },
+	{ "keys": ["ctrl+,", "r"], "command": "run_existing_window_command", "args":
+	{
+	    "id": "repl_python",
+	    "file": "config/Python/Main.sublime-menu"
+	}},
+	{
+		"keys" : ["ctrl+,", "d"], "command" : "chain",
+			"args" : {
+				"commands" : [
+					["focus_group", { "group": 1 }],
+					["close"],
+					["run_existing_window_command", {
+					    "id": "repl_python",
+					    "file": "config/Python/Main.sublime-menu"
+					}],
+					["focus_group", { "group": 0 }],
+					["repl_transfer_current", {"scope": "file"}]
+				],
+
+			}
+	}
+]
