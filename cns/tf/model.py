@@ -20,7 +20,7 @@ def epsp_act(x, sigma):
 
 
 SEED=3
-INIT_FACTOR = 10.0
+INIT_FACTOR = 1.0
 
 class ThetaRNNCell(RNNCell):
     """Theta neuron RNN cell."""
@@ -30,8 +30,8 @@ class ThetaRNNCell(RNNCell):
         num_units,
         dt,
         sigma,
-        input_weights_init=init_ops.constant_initializer(INIT_FACTOR), #tf.uniform_unit_scaling_initializer(factor=INIT_FACTOR, seed=SEED),
-        recc_weights_init=init_ops.constant_initializer(INIT_FACTOR),
+        input_weights_init=tf.uniform_unit_scaling_initializer(factor=0.01),
+        recc_weights_init=tf.uniform_unit_scaling_initializer(factor=0.01),
         activation=laplace_act
     ):
         self._num_units = num_units
@@ -61,15 +61,16 @@ class ThetaRNNCell(RNNCell):
             input_size = inputs.get_shape().with_rank(2)[1]
 
             self.W = vs.get_variable("W", [input_size, self._num_units], initializer=self.input_weights_init)
-            #self.U = vs.get_variable("U", [self._num_units, self._num_units], initializer=self.recc_weights_init)
+            self.U = vs.get_variable("U", [self._num_units, self._num_units], initializer=self.recc_weights_init)
             self.bias = vs.get_variable("Bias", [self._num_units], initializer=init_ops.constant_initializer(0.0))
 
             state_cos = tf.cos(state)
-            #weighted_input =  math_ops.matmul(inputs, tf.exp(self.W)) + math_ops.matmul(state_cos, tf.exp(self.U)) + self.bias
-            weighted_input =  math_ops.matmul(inputs, self.W) + self.bias # + math_ops.matmul(state_cos, self.U)
+            weighted_input =  math_ops.matmul(inputs, tf.exp(self.W)) + math_ops.matmul(state_cos, tf.exp(self.U)) + self.bias
 
-            new_state = state + self._dt * (1.0 - state_cos + (1.0 + state_cos) * weighted_input)
+            new_state = 1.0 - state_cos + (1.0 + state_cos) * weighted_input
+
             output = self._activation(new_state, self._sigma)
+
             # output = -tf.cos(new_state)/2.0 + 0.5
             self.states_info.append(new_state)
             self.weighted_input_info.append(weighted_input)
@@ -80,11 +81,11 @@ class ThetaRNNCell(RNNCell):
 			sess = tf.Session()
 			state = tf.placeholder(tf.float32, shape=(len,), name="State")
 			act = self._activation(state, sigma_bias * self._sigma)
-			
+
 			sess.run(tf.initialize_all_variables())
 			act_v = sess.run(act, {state: np.linspace(3.14/2.0, 3.14*3.0/2.0, len)})
 			return act_v
-			   
+
 
 def gen_poisson(rates, T, dt, seed):
     np.random.seed(seed)
@@ -104,7 +105,8 @@ def generate_data(input_size, net_size, seq_size, batch_size, signal_form):
     #target_seq = gen_poisson(np.asarray([4.0]*net_size), seq_size, 0.01)
 
     target_seq = np.zeros((seq_size, net_size))
-    target_seq[seq_size/2, 0] = 1.0
+    for ni in xrange(net_size):
+        target_seq[seq_size/2, ni] = 1.0
 
     for ni in xrange(net_size):
       target_seq[:, ni] = np.convolve(signal_form, target_seq[:, ni], mode="same")

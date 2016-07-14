@@ -21,5 +21,11 @@
 				],
 
 			}
-	}
+	},
+	{
+        "keys": ["ctrl+left"], "command": "focus_group", "args":{ "group": 0 }
+    },
+    {
+        "keys": ["ctrl+right"], "command": "focus_group", "args":{ "group": 1 }
+    }
 ]

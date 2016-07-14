@@ -13,13 +13,13 @@ sigma = 0.05
 dt = 0.1
 #alpha=0.25
 
-input_size = 10
+input_size = 100
 batch_size = 1
-net_size = 1
-epochs = 300
-seq_size = 10
+net_size = 10
+epochs = 1
+seq_size = 100
 
-lrate = 10.0
+lrate = 0.0001
 decay_rate=1
 
 
@@ -43,10 +43,10 @@ lr = tf.Variable(0.0, trainable=False)
 
 tvars = tf.trainable_variables()
 grads_raw = tf.gradients(loss, tvars)
-#grads, _ = tf.clip_by_global_norm(tf.gradients(loss, tvars), 5.0)
+grads, _ = tf.clip_by_global_norm(tf.gradients(loss, tvars), 5.0)
 
-optimizer = tf.train.GradientDescentOptimizer(lr)
-train_step = optimizer.apply_gradients(zip(grads_raw, tvars))
+optimizer = tf.train.AdamOptimizer(lr)
+train_step = optimizer.apply_gradients(zip(grads, tvars))
 
 
 
@@ -81,16 +81,16 @@ with tf.device("/cpu:0"):
 
         outputs_v, state_v = np.asarray(out[0]), out[1]
         loss_v, train_step_v = out[2], out[3]
-        
+
         weights.append((out[4], out[6]))
         bias.append((out[5], out[7]))
-        
+
         print ", train loss {}".format(loss_v)
         states_info.append(out[8])
         winput_info.append(out[9])
         outputs_info.append(outputs_v)
         # if e % 10 == 0 or e == epochs-1:
-            
+
             # plt.figure(1)
             # plt.subplot(2,1,1)
             # plt.plot(outputs_v[:,0,0])
@@ -101,16 +101,16 @@ with tf.device("/cpu:0"):
 
 
 plt.figure(1)
-plt.subplot(2,1,1)
-plt.plot(np.cos(np.asarray(states_info[0])[:,0,0]))
-plt.subplot(2,1,2)
+# plt.subplot(2,1,1)
+# plt.plot(np.cos(np.asarray(states_info[0])[:,0]))
+# plt.subplot(2,1,2)
 plt.plot(outputs_info[0][:,0,0])
 plt.show()
 
 plt.figure(1)
-plt.subplot(2,1,1)
-plt.plot(np.cos(np.asarray(states_info[-1])[:,0,0]))
-plt.subplot(2,1,2)
+# plt.subplot(2,1,1)
+# plt.plot(np.cos(np.asarray(states_info[-1])[:,0]))
+# plt.subplot(2,1,2)
 plt.plot(outputs_info[-1][:,0,0])
 plt.show()
 
@@ -120,9 +120,9 @@ b = np.asarray(bias)
 
 plt.figure(1)
 plt.subplot(2,1,1)
-plt.imshow(w[:,0,:,0].T); 
+plt.imshow(w[:,0,:,0].T);
 plt.subplot(2,1,2)
-plt.imshow(w[:,1,:,0].T); 
+plt.imshow(w[:,1,:,0].T);
 plt.show()
 
 
