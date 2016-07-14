@@ -9,23 +9,25 @@ import os
 from matplotlib import pyplot as plt
 
 
-sigma = 0.25
-dt = 0.05
-
+sigma = 0.05
+dt = 0.1
+#alpha=0.25
 
 input_size = 10
 batch_size = 1
 net_size = 1
-epochs = 500
+epochs = 300
 seq_size = 10
 
-lrate = 0.5
+lrate = 10.0
 decay_rate=1
 
 
 
 
 thetaNeuron = ThetaRNNCell(net_size, dt, sigma, activation = epsp_act)
+
+signal_form = thetaNeuron.get_signal_form(9)
 
 inputs  = [ tf.placeholder(tf.float32, shape=(batch_size, input_size), name="Input_{}".format(idx)) for idx in xrange(seq_size) ]
 targets = [ tf.placeholder(tf.float32, shape=(batch_size, net_size), name="Target") for si in xrange(seq_size) ]
@@ -49,7 +51,7 @@ train_step = optimizer.apply_gradients(zip(grads_raw, tvars))
 
 
 
-inputs_v, targets_v = generate_data(input_size, net_size, seq_size, batch_size)
+inputs_v, targets_v = generate_data(input_size, net_size, seq_size, batch_size, signal_form)
 init_state_v = np.zeros((batch_size, net_size))
 
 
@@ -57,7 +59,7 @@ sess = tf.Session()
 writer = tf.train.SummaryWriter("{}/tf".format(os.environ["HOME"]), sess.graph)
 
 weights, recc_weights, bias = [], [], []
-states_info, winput_info = [], []
+outputs_info, states_info, winput_info = [], [], []
 with tf.device("/cpu:0"):
     sess.run(tf.initialize_all_variables())
     for e in xrange(epochs):
@@ -86,28 +88,41 @@ with tf.device("/cpu:0"):
         print ", train loss {}".format(loss_v)
         states_info.append(out[8])
         winput_info.append(out[9])
+        outputs_info.append(outputs_v)
         # if e % 10 == 0 or e == epochs-1:
             
-        #     plt.figure(1)
-        #     plt.subplot(2,1,1)
-        #     plt.plot(outputs_v[:,0,0])
-        #     plt.subplot(2,1,2)
-        #     plt.plot(np.cos(np.asarray(states_info[0])[:,0,0]))
-        #     plt.show()
+            # plt.figure(1)
+            # plt.subplot(2,1,1)
+            # plt.plot(outputs_v[:,0,0])
+            # plt.subplot(2,1,2)
+            # plt.plot(np.cos(np.asarray(states_info[0])[:,0,0]))
+            # plt.show()
 
 
 
 plt.figure(1)
 plt.subplot(2,1,1)
-plt.plot(outputs_v[:,0,0])
-plt.subplot(2,1,2)
 plt.plot(np.cos(np.asarray(states_info[0])[:,0,0]))
+plt.subplot(2,1,2)
+plt.plot(outputs_info[0][:,0,0])
 plt.show()
 
-w = np.asarray(weights)
-plt.plot(w[:,1,0,0]); plt.show()
-b = np.asarray(bias)
-plt.plot(b[:,1,0]); plt.show()
+plt.figure(1)
+plt.subplot(2,1,1)
+plt.plot(np.cos(np.asarray(states_info[-1])[:,0,0]))
+plt.subplot(2,1,2)
+plt.plot(outputs_info[-1][:,0,0])
+plt.show()
 
+
+w = np.asarray(weights)
+b = np.asarray(bias)
+
+plt.figure(1)
+plt.subplot(2,1,1)
+plt.imshow(w[:,0,:,0].T); 
+plt.subplot(2,1,2)
+plt.imshow(w[:,1,:,0].T); 
+plt.show()
 
 

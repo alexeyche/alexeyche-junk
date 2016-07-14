@@ -19,8 +19,8 @@ def epsp_act(x, sigma):
     return tf.exp( - (tf.cos(x) + 1.0)/sigma)
 
 
-SEED=2
-INIT_FACTOR = 50.0
+SEED=3
+INIT_FACTOR = 10.0
 
 class ThetaRNNCell(RNNCell):
     """Theta neuron RNN cell."""
@@ -30,8 +30,8 @@ class ThetaRNNCell(RNNCell):
         num_units,
         dt,
         sigma,
-        input_weights_init=tf.uniform_unit_scaling_initializer(factor=INIT_FACTOR, seed=SEED),
-        recc_weights_init=tf.uniform_unit_scaling_initializer(factor=INIT_FACTOR, seed=SEED),
+        input_weights_init=init_ops.constant_initializer(INIT_FACTOR), #tf.uniform_unit_scaling_initializer(factor=INIT_FACTOR, seed=SEED),
+        recc_weights_init=init_ops.constant_initializer(INIT_FACTOR),
         activation=laplace_act
     ):
         self._num_units = num_units
@@ -75,7 +75,16 @@ class ThetaRNNCell(RNNCell):
             self.weighted_input_info.append(weighted_input)
         return output, new_state
 
-
+    def get_signal_form(self, len=10, sigma_bias = 0.2, scope=None):
+        with vs.variable_scope(scope or type(self).__name__ + "_SignalForm"):
+			sess = tf.Session()
+			state = tf.placeholder(tf.float32, shape=(len,), name="State")
+			act = self._activation(state, sigma_bias * self._sigma)
+			
+			sess.run(tf.initialize_all_variables())
+			act_v = sess.run(act, {state: np.linspace(3.14/2.0, 3.14*3.0/2.0, len)})
+			return act_v
+			   
 
 def gen_poisson(rates, T, dt, seed):
     np.random.seed(seed)
@@ -83,13 +92,13 @@ def gen_poisson(rates, T, dt, seed):
     return res.astype(np.float32)
 
 
-def generate_data(input_size, net_size, seq_size, batch_size):
+def generate_data(input_size, net_size, seq_size, batch_size, signal_form):
     data = [ np.zeros((batch_size, input_size)) for _ in xrange(seq_size) ]
     assert input_size == seq_size
 
     for seq_i in xrange(seq_size):
        data[seq_i][0, seq_i] = 1.0
-       # data[seq_i][0, :] = np.convolve(signal_form, data[seq_i][0, :], mode="same")
+       #data[seq_i][0, :] = np.convolve(signal_form, data[seq_i][0, :], mode="same")
 
 
     #target_seq = gen_poisson(np.asarray([4.0]*net_size), seq_size, 0.01)
@@ -97,8 +106,8 @@ def generate_data(input_size, net_size, seq_size, batch_size):
     target_seq = np.zeros((seq_size, net_size))
     target_seq[seq_size/2, 0] = 1.0
 
-    # for ni in xrange(net_size):
-    #   target_seq[:, ni] = np.convolve(signal_form, target_seq[:, ni], mode="same")
+    for ni in xrange(net_size):
+      target_seq[:, ni] = np.convolve(signal_form, target_seq[:, ni], mode="same")
 
 
     target_v = [ np.asarray([ target_seq[si, :] for _ in xrange(batch_size) ]) for si in xrange(seq_size) ]
