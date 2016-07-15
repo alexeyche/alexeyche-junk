@@ -7,7 +7,8 @@ from tensorflow.python.ops.rnn_cell import RNNCell
 from tensorflow.python.ops import variable_scope as vs
 from tensorflow.python.ops import math_ops
 from tensorflow.python.ops import init_ops
-
+from tensorflow.python.ops.math_ops import tanh
+from tensorflow.python.ops.math_ops import sigmoid
 
 def gauss_act(x, sigma):
     return tf.exp( - tf.square(-1.0 - tf.cos(x) )/( 2.0 * sigma ** 2))
@@ -30,8 +31,8 @@ class ThetaRNNCell(RNNCell):
         num_units,
         dt,
         sigma,
-        input_weights_init=tf.uniform_unit_scaling_initializer(factor=0.01),
-        recc_weights_init=tf.uniform_unit_scaling_initializer(factor=0.01),
+        input_weights_init=tf.uniform_unit_scaling_initializer(factor=1.0),
+        recc_weights_init=tf.uniform_unit_scaling_initializer(factor=1.0),
         activation=laplace_act
     ):
         self._num_units = num_units
@@ -65,18 +66,19 @@ class ThetaRNNCell(RNNCell):
             self.bias = vs.get_variable("Bias", [self._num_units], initializer=init_ops.constant_initializer(0.0))
 
             state_cos = tf.cos(state)
-            weighted_input =  math_ops.matmul(inputs, tf.exp(self.W)) + math_ops.matmul(state_cos, tf.exp(self.U)) + self.bias
+            weighted_input =  math_ops.matmul(inputs, self.W) + math_ops.matmul(state, self.U) + self.bias
 
             new_state = 1.0 - state_cos + (1.0 + state_cos) * weighted_input
 
-            output = self._activation(new_state, self._sigma)
-
+            output = sigmoid(-tf.cos(new_state))
+            # output = self._activation(new_state, self._sigma)
             # output = -tf.cos(new_state)/2.0 + 0.5
             self.states_info.append(new_state)
             self.weighted_input_info.append(weighted_input)
+        #return output, new_state
         return output, new_state
 
-    def get_signal_form(self, len=10, sigma_bias = 0.2, scope=None):
+    def get_signal_form(self, len=10, sigma_bias = 1.0, scope=None):
         with vs.variable_scope(scope or type(self).__name__ + "_SignalForm"):
 			sess = tf.Session()
 			state = tf.placeholder(tf.float32, shape=(len,), name="State")
@@ -95,7 +97,6 @@ def gen_poisson(rates, T, dt, seed):
 
 def generate_data(input_size, net_size, seq_size, batch_size, signal_form):
     data = [ np.zeros((batch_size, input_size)) for _ in xrange(seq_size) ]
-    assert input_size == seq_size
 
     for seq_i in xrange(seq_size):
        data[seq_i][0, seq_i] = 1.0
@@ -105,8 +106,10 @@ def generate_data(input_size, net_size, seq_size, batch_size, signal_form):
     #target_seq = gen_poisson(np.asarray([4.0]*net_size), seq_size, 0.01)
 
     target_seq = np.zeros((seq_size, net_size))
-    for ni in xrange(net_size):
-        target_seq[seq_size/2, ni] = 1.0
+    for seq_i in xrange(seq_size):
+    	target_seq[seq_i, seq_i] = 1.0
+    # for ni in xrange(net_size):
+    #     target_seq[seq_size/2, ni] = 1.0
 
     for ni in xrange(net_size):
       target_seq[:, ni] = np.convolve(signal_form, target_seq[:, ni], mode="same")
