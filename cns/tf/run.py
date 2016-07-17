@@ -1,7 +1,13 @@
 
 from model import ThetaRNNCell, generate_data
-from model import laplace_act, gauss_act, epsp_act
+from model import gauss_act, epsp_act, simple_act
+from model import gen_poisson
+
 from tensorflow.python.ops import rnn
+from tensorflow.python.ops import rnn_cell
+from tensorflow.python.ops import seq2seq as ss
+from tensorflow.python.ops.math_ops import sigmoid
+
 
 import tensorflow as tf
 import numpy as np
@@ -9,49 +15,53 @@ import os
 from matplotlib import pyplot as plt
 
 
-sigma = 0.05
-dt = 0.1
+sigma = 0.5
+dt = 0.01
+seed = 4
 #alpha=0.25
 
-input_size = 5
+input_size = 100
 batch_size = 1
-net_size = 5
-epochs = 1000
-seq_size = 5
+net_size = 10
+epochs = 300
+seq_size = 25
 
-lrate = 0.01
+lrate = 0.1
 decay_rate=1
 
 
 
+neuron = ThetaRNNCell(net_size, dt, activation = simple_act, sigma = sigma)
 
-thetaNeuron = ThetaRNNCell(net_size, dt, sigma, activation = gauss_act)
-
-signal_form = thetaNeuron.get_signal_form(4, sigma_bias=5.0)
+# neuron = rnn_cell.BasicRNNCell(net_size, activation = sigmoid)
+# neuron = rnn_cell.GRUCell(net_size, activation = sigmoid)
 
 inputs  = [ tf.placeholder(tf.float32, shape=(batch_size, input_size), name="Input_{}".format(idx)) for idx in xrange(seq_size) ]
 targets = [ tf.placeholder(tf.float32, shape=(batch_size, net_size), name="Target") for si in xrange(seq_size) ]
 
 init_state = state = tf.placeholder(tf.float32, shape=(batch_size, net_size), name="State")
 
-outputs, finstate = rnn.rnn(thetaNeuron, inputs, init_state)
+outputs, finstate = rnn.rnn(neuron, inputs, init_state)
 
 
-loss = tf.add_n([ tf.nn.l2_loss(target - outputs) for output, target in zip(outputs, targets) ]) / seq_size / batch_size / net_size
+loss = tf.add_n([ tf.nn.l2_loss(target - output) for output, target in zip(outputs, targets) ]) / seq_size / batch_size / net_size
 
 lr = tf.Variable(0.0, trainable=False)
 
 tvars = tf.trainable_variables()
 grads_raw = tf.gradients(loss, tvars)
-grads, _ = tf.clip_by_global_norm(tf.gradients(loss, tvars), 5.0)
+grads, _ = tf.clip_by_global_norm(grads_raw, 5.0)
 
-optimizer = tf.train.GradientDescentOptimizer(lr)
+#optimizer = tf.train.GradientDescentOptimizer(lr)
+optimizer = tf.train.AdagradOptimizer(lr)
 train_step = optimizer.apply_gradients(zip(grads, tvars))
 
+sfn=9
+sf_sigma = 0.1
+sf = np.exp(-np.square(0.5-np.linspace(0.0, 1.0, sfn))/sf_sigma)
+inputs_v = [ np.asarray([s]) for s in gen_poisson(np.asarray(input_size*[1.0/seq_size]), seq_size, 1.0, sf, seed) ] 
+targets_v = [ np.asarray([s]) for s in gen_poisson(np.asarray(net_size*[1.0/seq_size]), seq_size, 1.0, sf, seed) ]
 
-
-
-inputs_v, targets_v = generate_data(input_size, net_size, seq_size, batch_size, signal_form)
 init_state_v = np.zeros((batch_size, net_size))
 
 
@@ -61,6 +71,7 @@ writer = tf.train.SummaryWriter("{}/tf".format(os.environ["HOME"]), sess.graph)
 
 weights, recc_weights, bias = [], [], []
 outputs_info, states_info, winput_info = [], [], []
+grads_info = []
 with tf.device("/cpu:0"):
     sess.run(tf.initialize_all_variables())
     for e in xrange(epochs):
@@ -74,60 +85,26 @@ with tf.device("/cpu:0"):
 
         fetch = [outputs, finstate]
         fetch += [loss, train_step]
-        fetch += [thetaNeuron.W, thetaNeuron.U, thetaNeuron.bias]
         fetch += grads
-        fetch += [thetaNeuron.states_info, thetaNeuron.weighted_input_info]
 
         out = sess.run(fetch, feed_dict)
 
         outputs_v, state_v = np.asarray(out[0]), out[1]
-        loss_v, train_step_v = out[2], out[3]
-
-        weights.append((out[4], out[7]))
-        bias.append((out[5], out[8]))
-        recc_weights.append((out[6], out[9]))
+        loss_v, _ = out[2], out[3]
 
         print ", train loss {}".format(loss_v)
-        states_info.append(out[10])
-        winput_info.append(out[11])
         outputs_info.append(outputs_v)
-        # if e % 10 == 0 or e == epochs-1:
-
-            # plt.figure(1)
-            # plt.subplot(2,1,1)
-            # plt.plot(outputs_v[:,0,0])
-            # plt.subplot(2,1,2)
-            # plt.plot(np.cos(np.asarray(states_info[0])[:,0,0]))
-            # plt.show()
+        grads_info.append(out[4:])
 
 
 
 plt.figure(1)
-plt.subplot(3,1,1)
+plt.subplot(4,1,1)
+plt.imshow(np.asarray(inputs_v)[:,0,:].T)
+plt.subplot(4,1,2)
 plt.imshow(np.asarray(outputs_info)[0,:,0,:].T)
-plt.subplot(3,1,2)
+plt.subplot(4,1,3)
 plt.imshow(np.asarray(outputs_info)[-1,:,0,:].T)
-plt.subplot(3,1,3)
+plt.subplot(4,1,4)
 plt.imshow(np.asarray(targets_v)[:,0,:].T)
 plt.show()
-
-# plt.figure(1)
-# # plt.subplot(2,1,1)
-# # plt.plot(np.cos(np.asarray(states_info[-1])[:,0]))
-# # plt.subplot(2,1,2)
-# plt.show()
-
-
-w = np.asarray(weights)
-b = np.asarray(bias)
-u = np.asarray(recc_weights)
-
-plt.figure(1)
-plt.subplot(2,1,1)
-plt.imshow(w[:,0,:,0].T);
-plt.subplot(2,1,2)
-plt.imshow(w[:,1,:,0].T);
-plt.show()
-
-
-plt.imshow(np.cos(np.asarray(states_info)[0,:,0,:].T)); plt.show()
