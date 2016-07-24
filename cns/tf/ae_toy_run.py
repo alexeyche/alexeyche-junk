@@ -1,7 +1,7 @@
 
 from model import ThetaRNNCell
 from model import gauss_act, epsp_act, simple_act
-from model import gen_poisson, dispatch_array, recollect_array, dispatch_data, recollect_data
+from model import gen_poisson, dispatch_array, recollect_array
 
 from tensorflow.python.ops import rnn
 from tensorflow.python.ops import rnn_cell
@@ -14,11 +14,6 @@ import tensorflow as tf
 import numpy as np
 import os
 from matplotlib import pyplot as plt
-from os.path import join as pj
-import sys
-import cPickle as pkl
-
-from mp_lib import SpikeRecords
 
 device = "gpu"
 
@@ -26,52 +21,17 @@ dt = 0.25
 seed = 4
 #alpha=0.25
 
-net_size = 100
-epochs = 2500
+input_size = 25
+batch_size = 5
+net_size = 10
+epochs = 1000
 bptt_steps = 50
-le_size = 10
-lrate = 0.00001
-decay_rate = 0.999
+seq_size = 1000
+le_size = 2
+lrate = 0.005
+decay_rate = 1.0
 
-ds_dir = pj(os.environ["HOME"], "Music", "ml", "impro")
-run_dir = pj(os.environ["HOME"], "Music", "ml", "impro_run")
-if not os.path.exists(run_dir):
-    os.makedirs(run_dir)
-
-data_list = []
-for f in sorted(os.listdir(ds_dir)):
-    if f.endswith("spikes.pkl"):
-        if not f[0] in frozenset(["0", "1", "2", "3"]):
-            continue
-        print "Loading {}".format(f)
-        
-        spike_object = pkl.load(open(pj(ds_dir, f), "rb"))
-
-        tmax = max(spike_object.spike_times)
-        neurons_num = spike_object.neurons_num
-        data = np.zeros((neurons_num, tmax+1))
-        for ni, fired_time in zip(spike_object.fired_neurons, spike_object.spike_times):
-            data[ni, fired_time] = 1.0
-                
-        sfn=9
-        sf_sigma = 0.1
-        sf = np.exp(-np.square(0.5-np.linspace(0.0, 1.0, sfn))/sf_sigma)
-        for ni in xrange(data.shape[0]):
-            data[ni, :] = np.convolve(sf, data[ni, :], mode="same") 
-            data[ni, :] = np.clip(data[ni, :], 0.0, 1.0)
-        data_list.append(data)
-
-
-
-
-input_size = data_list[0].shape[0]
-data_list_len = len(data_list)
-batch_size = len(data_list)*10
-
-corpus, seq_lengths = dispatch_data(data_list, bptt_steps, batch_size)
-del data_list
-
-neuron_in = ThetaRNNCell(net_size, dt, activation = simple_act, update_gate=True)
+neuron_in = ThetaRNNCell(input_size, dt, activation = simple_act, update_gate=True)
 neuron_le = ThetaRNNCell(le_size, dt, activation = simple_act, update_gate=True)
 neuron_out = ThetaRNNCell(input_size, dt, activation = simple_act, update_gate=True)
 
@@ -127,6 +87,22 @@ optimizer = tf.train.AdamOptimizer(lr)
 train_step = optimizer.apply_gradients(zip(grads, tvars))
 
 
+train_data = np.load(pj(os.environ["HOME"], "Music", "ml", "test_licks.data.npy"))
+input_size = train_data.shape[0]
+corpus = dispatch_array(train_data, bptt_steps, batch_size)
+
+sfn=9
+sf_sigma = 0.1
+sf = np.exp(-np.square(0.5-np.linspace(0.0, 1.0, sfn))/sf_sigma)
+data = gen_poisson(np.asarray(input_size*[1.0/seq_size]), seq_size, 1.0, sf, seed)
+corpus = dispatch_array(data.T, bptt_steps, batch_size)
+# corpus = [[]]
+# for seq_i in xrange(data.shape[0]):
+#     corpus[-1].append(np.asarray([data[seq_i, :]]))
+#     if len(corpus[-1]) % bptt_steps == 0:
+#         corpus.append([])
+# if len(corpus[-1]) == 0:
+#     corpus = corpus[:-1]
 
 
 weights, recc_weights, bias = [], [], []
@@ -143,7 +119,6 @@ with tf.device("/{}:0".format(device)):
         ep_lrate = lrate * (decay_rate ** e)
         sess.run(tf.assign(lr, ep_lrate))
         loss_sum = 0
-        corpus_out = []
         for corp_i, corp_data in enumerate(corpus):
             feed_dict = {k: v for k, v in zip(inputs, corp_data)}
             feed_dict[init_state] = state_v
@@ -159,41 +134,33 @@ with tf.device("/{}:0".format(device)):
 
             # outputs_info.append(outputs_v)
             # grads_info.append(out[4:])
-            corpus_out.append(outputs_v)
-
-        if e % 5 == 0:
-            plt.figure(1)
-            plt.subplot(2,1,1)
-            plt.imshow(recollect_data(corpus[:100], seq_lengths, data_list_len)[0][:, :5000])
-            plt.subplot(2,1,2)
-            plt.imshow(recollect_data(corpus_out[:100], seq_lengths, data_list_len)[0][:, :5000])
-            plt.savefig(pj(run_dir, "{}_result.png".format(e)))
-        
-        
         print "Epoch {}, learning rate {}".format(e, ep_lrate), "train loss {}".format(loss_sum/len(corpus))
 
 
 
-    # corpus_out, states = [], []
-    # for corp_i, corp_data in enumerate(corpus):
-    #     feed_dict = {k: v for k, v in zip(inputs, corp_data)}
-    #     feed_dict[init_state] = np.zeros((batch_size, state_size))
-    #     feed_dict.update({k: v for k, v in zip(targets, corp_data)})
+    corpus_out, states = [], []
+    for corp_i, corp_data in enumerate(corpus):
+        feed_dict = {k: v for k, v in zip(inputs, corp_data)}
+        feed_dict[init_state] = np.zeros((batch_size, state_size))
+        feed_dict.update({k: v for k, v in zip(targets, corp_data)})
 
-    #     fetch = [outputs, finstate]
-    #     fetch += [neuron_le.states_info]
-    #     fetch += [neuron_in.W, neuron_in.U, neuron_in.W_u, neuron_in.U_u] 
-    #     fetch += [neuron_le.W, neuron_le.U, neuron_le.W_u, neuron_le.U_u] 
-    #     fetch += [neuron_out.W, neuron_out.U, neuron_out.W_u, neuron_out.U_u] 
+        fetch = [outputs, finstate]
+        fetch += [neuron_in.W, neuron_in.U, neuron_in.W_u, neuron_in.U_u] 
+        fetch += [neuron_le.W, neuron_le.U, neuron_le.W_u, neuron_le.U_u] 
+        fetch += [neuron_out.W, neuron_out.U, neuron_out.W_u, neuron_out.U_u] 
         
-    #     out = sess.run(fetch, feed_dict)
-    #     outputs_v, state_v, states_v = out[0], out[1], out[2]
-    #     params = out[3:]
-        
-    #     corpus_out.append(outputs_v)
-    #     states.append(states_v)
+        out = sess.run(fetch, feed_dict)
+        outputs_v, state_v = out[0], out[1]
+        params = out[2:]
+        corpus_out.append(outputs_v)
 
     
+plt.figure(1)
+plt.subplot(2,1,1)
+plt.imshow(recollect_array(corpus_out))
+plt.subplot(2,1,2)
+plt.imshow(recollect_array(corpus))
+plt.show()
 
 
 
