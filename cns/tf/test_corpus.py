@@ -27,7 +27,7 @@ for f in sorted(os.listdir(ds_dir)):
         print "Considering {} as input".format(f)
         data_file_list.append(pj(ds_dir, f))
 
-data_file_list = data_file_list[:3]
+# data_file_list = data_file_list[:3]
 
 max_t, input_dims = 0, None
 
@@ -68,4 +68,7 @@ for inp_file in data_file_list:
     corpus.enrich_with_source(data)
     data_list.append(data)
 
-d = recollect_data(corpus.data, corpus.seq_lengths, corpus.number_of_sources)
+
+for di in xrange(len(data_list)):
+
+    print di, np.sum(data_list[di] - corpus.recollect(di))

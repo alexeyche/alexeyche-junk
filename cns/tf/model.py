@@ -150,7 +150,7 @@ def recollect_array(corpus):
 
 
 class Corpus(object):
-    def __init__(self, input_dimension, number_of_sources, batch_size, max_t, seq_size):
+    def __init__(self, input_dimension, number_of_sources, batch_size, max_t, seq_size, data_end=None):
         self.batch_size = batch_size
         self.max_t = max_t
         self.seq_size = seq_size
@@ -160,27 +160,46 @@ class Corpus(object):
         self.input_dimension = input_dimension
         
         assert self.batch_size % self.number_of_sources == 0, "Need batch size be denominator of number of sources"
-
+        self.sub_batch_num = self.batch_size/self.sub_batch_size
+        
         per_seq = self.max_t / self.seq_size + self.max_t % self.seq_size
         per_batch = per_seq / self.sub_batch_size + per_seq % self.sub_batch_size
         
         self.data = np.zeros((per_batch, self.seq_size, self.batch_size, self.input_dimension))
         
-        self.seq_data = []
+        self.data_end = data_end if not data_end is None else np.zeros(self.batch_size, dtype=np.int32)
+    
+    @staticmethod
+    def construct_from(other_corpus):
+        return Corpus(
+            other_corpus.input_dimension, 
+            other_corpus.number_of_sources, 
+            other_corpus.batch_size, 
+            other_corpus.max_t, 
+            other_corpus.seq_size,
+            other_corpus.data_end
+        )
+
+    def feed_corpus(self, corpus_id, corpus):
+        assert corpus_id < self.data.shape[0], "Out of corpus index"
+        for seq_id, seq_data in enumerate(corpus):
+            self.data[corpus_id, seq_id, :, :] = seq_data
 
     def enrich_with_source(self, data):
+        assert self._source_id < self.number_of_sources, "Got too many data sources"
+        
         batch_ids = np.zeros(self.sub_batch_size, dtype=np.int32)
         batch_ends_ids = np.zeros(self.sub_batch_size, dtype=np.int32)
         data_len = data.shape[1]
 
         batch_ends_ids[0] = data_len % self.sub_batch_size
         batch_ends_ids[0] += data_len / self.sub_batch_size
+        self.data_end[self._source_id * self.sub_batch_size] = batch_ends_ids[0]
         for b_idx in xrange(1, self.sub_batch_size):
             batch_ids[b_idx] = batch_ends_ids[b_idx-1]
             sl = data_len / self.sub_batch_size
             batch_ends_ids[b_idx] = batch_ids[b_idx] + sl 
-        
-        self.seq_data.append((batch_ids, batch_ends_ids))
+            self.data_end[self._source_id * self.sub_batch_size + b_idx] = sl
 
         full_set = frozenset(range(0, self.sub_batch_size))
         dst_batch = np.zeros(self.batch_size, dtype=np.bool)
@@ -192,23 +211,74 @@ class Corpus(object):
             for si in xrange(self.data.shape[1]):
                 data_presence = np.where(batch_ids < batch_ends_ids)[0]
                 if len(data_presence) == 0:
+                    self._source_id += 1
                     return
                 for dp_i in full_set - set(data_presence):
                     dst_batch[self._source_id * self.sub_batch_size + dp_i] = False
                 
                 self.data[ci, si, dst_batch, :] = data[:, batch_ids[data_presence]].T 
                 batch_ids += 1
+        self._source_id += 1
+    
+    def _get_source_batch_ids(self, source_id, dst_batch_ids):
+        assert source_id < self.sub_batch_num, "Trying to recollect something that not present in corpus"
         
-    def recollect(self, id):
-        assert id < len(self.seq_data), "Need filled sequence data" 
-        batch_ids = self.seq_data[id][0].copy()
-        batch_end_ids = self.seq_data[id][1].copy()
-        
-        
-        for ci in xrange(self.data.shape[0])
-            for si in xrange(self.data.shape[1])
-                
+        source_b_ids = np.zeros(self.sub_batch_size, dtype=np.int32)
+        source_b_ids[0] = dst_batch_ids[0]
+        cumul_end = self.data_end[source_id * self.sub_batch_size]
+        for di in xrange(1, self.sub_batch_size): 
+            source_b_ids[di] = dst_batch_ids[di] + cumul_end
+            cumul_end += self.data_end[source_id * self.sub_batch_size + di]
+        return source_b_ids
 
+    def recollect(self, id, head=None):
+        assert id < self.sub_batch_num, "Trying to recollect something that not present in corpus"
+        
+        batch_masks =[]
+        for source_id in xrange(self.sub_batch_num):
+            dst_batch = np.zeros(self.batch_size, dtype=np.bool)
+            for bi in xrange(self.batch_size):
+                if bi >= source_id * self.sub_batch_size and bi < (source_id+1) * self.sub_batch_size:
+                    dst_batch[bi] = True
+            batch_masks.append(dst_batch)
+
+        full_set = frozenset(range(0, self.sub_batch_size))
+        batch_ids = np.zeros(self.sub_batch_size, dtype=np.int32)
+        batch_ends_ids = self._get_source_batch_ids(
+            id, 
+            self.data_end[(id * self.sub_batch_size):(id * self.sub_batch_size + self.sub_batch_size)]
+        )
+
+        dst = np.zeros((self.input_dimension, head if head else sum(self.data_end[batch_masks[id]])))
+        for ci in xrange(self.data.shape[0]):
+            for si in xrange(self.data.shape[1]):
+                source_ids = self._get_source_batch_ids(id, batch_ids)
+                
+                for b_id, (current_id, end_id) in enumerate(zip(source_ids.copy(), batch_ends_ids)):
+                    if current_id >= end_id or (head and current_id >= head):
+                        batch_masks[id][id * self.sub_batch_size + b_id] = False
+                 
+                bm = batch_masks[id][(id*self.sub_batch_size):(id+1)*self.sub_batch_size]
+                if not np.any(bm):
+                    return dst
+
+                source_ids_left = source_ids[bm]
+                
+                dst[:, source_ids_left] = self.data[ci, si, batch_masks[id], :].T
+                batch_ids += 1
+        return dst 
+                
+    def prepare_sequence(self, corpus_id, allow_zeros=False):
+        if corpus_id >= self.data.shape[0]:
+            assert allow_zeros, "Can't get corpus data for id {}".format(corpus_id)
+            return [ np.zeros((self.batch_size, self.input_dimension)) for _ in xrange(self.seq_size) ]
+
+        return [ self.data[corpus_id, seq_id, :, :] for seq_id in xrange(self.seq_size) ]
+
+    @property
+    def shape(self):
+        return self.data.shape
+    
 
 def dispatch_data(data_list, seq_size, batch_size=None):
     if batch_size is None:
@@ -315,10 +385,9 @@ def dispatch_data(data_list, seq_size, batch_size=None):
 
 
 def recollect_data(corpus, seq_lengths, source_len):
-    assert corpus.shape[0] > 0, "Got empty corpus"
-    batch_size = corpus.shape[2]
+    batch_size = corpus[0][0].shape[0]
     assert batch_size % source_len == 0, "Batch size is not denominator of given data list length"
-    dim_size = corpus.shape[3]
+    dim_size = corpus[0][0].shape[1]
     sub_batch_size = batch_size/source_len
     
     data_list = []
@@ -335,19 +404,18 @@ def recollect_data(corpus, seq_lengths, source_len):
     
     batch_ids = np.zeros(batch_size, dtype = np.int32) 
     
-    for c_id in xrange(corpus.shape[0]):
-        for seq_id in xrange(corpus.shape[1]):
+    for c in corpus:
+        for seq_id, seq in enumerate(c):
             sub_batch_id = 0
             cuml_id = 0
             for b_num, b_id in enumerate(batch_ids):
                 source_id = b_num / sub_batch_size
                 dst_id = cuml_id + b_id
-                print b_num, source_id, dst_id
                 # data_list[source_id][]
                 # print c_id, seq_id, b_num, b_id
                 if b_id < seq_lengths[b_num]: # source_ends_ids[source_id]:
                     # print source_id, cuml_id, b_id, " -> ", dst_id, " ends in ", source_ends_ids[source_id] 
-                    data_list[source_id][:, dst_id] = corpus[c_id, seq_id, b_num, :]
+                    data_list[source_id][:, dst_id] = seq[b_num, :]
                 # else:
                 #     print "Source ", source_id, " ended with ", dst_id
                 
