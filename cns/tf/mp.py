@@ -38,16 +38,16 @@ if not os.path.exists(res_dir):
 
 
 filters_num = 100
-filter_size = 100
+filter_size = 200
 jobs = 1
 batch_size = 100000
 threshold = 0.2
-match_iterations = 10
+match_iterations = 5
 learning_rate = 0.001
 momentum = 0.0
 epochs = 1
 learning = False
-target_sr = 2000
+target_sr = 3000
 
 
 filters = np.zeros((filters_num, filter_size))
@@ -190,7 +190,7 @@ for source_id, source_filename in enumerate(data_source):
 
     pkl.dump(spike_records, open(spikes_file, "wb"), protocol=2)
     print "Done"
-    
+
 filters_file = pj(ds_dir, "filters.pkl") 
 print "Saving filters in {}".format(filters_file)
 np.save(open(filters_file, "w"), filters)
