@@ -65,10 +65,10 @@ filters = gammatone_filters
 
 # dct_filters = generate_dct_dictionary(filters_num/2, filter_size)
 
-# filters[0:100,:300] = generate_dct_dictionary(100, 300) 
-# filters[100:200,:200] = generate_dct_dictionary(100, 200) 
-# filters[200:300,:100] = generate_dct_dictionary(100, 100) 
-# filters[300:400,:50] = generate_dct_dictionary(100, 50) 
+# filters[0:100,:300] = generate_dct_dictionary(100, 300)
+# filters[100:200,:200] = generate_dct_dictionary(100, 200)
+# filters[200:300,:100] = generate_dct_dictionary(100, 100)
+# filters[300:400,:50] = generate_dct_dictionary(100, 50)
 
 # filters = np.concatenate([gammatone_filters, dct_filters])
 
@@ -82,7 +82,7 @@ use_gpu = True
 filters_gpu = tf.placeholder(tf.float32, shape=filters.shape, name="Filters")
 Rn_gpu = tf.placeholder(tf.float32, shape=(batch_size, filter_size), name="Rn")
 prods_gpu = math_ops.matmul(filters_gpu, tf.transpose(Rn_gpu))
-gpu_session = tf.Session()    
+gpu_session = tf.Session()
 
 assert not use_gpu or jobs == 1, "Can't use gpu with multiple processes"
 
@@ -98,7 +98,7 @@ for source_id, source_filename in enumerate(data_source):
 
     data_denom = np.sqrt(np.sum(data ** 2))
     data = data/data_denom
-    data = np.concatenate([data, np.zeros(filter_size)]) 
+    data = np.concatenate([data, np.zeros(filter_size)])
 
     print "Source with id {} and file {}".format(source_id, source_filename)
     processes = []
@@ -115,13 +115,13 @@ for source_id, source_filename in enumerate(data_source):
                         p.terminate()
                         p.join()
                     ids_to_delete.add(pi)
-                    
+
                     if len(batch_records)>0:
                         if learning:
                             dfilters = dfilters * momentum + dfilters_from_batch
                             filters += dfilters * learning_rate
                         records += batch_records
-                    
+
                     if not wait_all:
                         processes = [ p for pi, p in enumerate(processes) if not pi in ids_to_delete ]
                         return
@@ -129,7 +129,7 @@ for source_id, source_filename in enumerate(data_source):
                 except Empty:
                     pass
             processes = [ p for pi, p in enumerate(processes) if not pi in ids_to_delete ]
-                                                        
+
 
 
     data_iter = 0
@@ -141,25 +141,25 @@ for source_id, source_filename in enumerate(data_source):
         Rn = np.zeros((batch_size, filter_size))
         scales = np.ones(batch_size)
         for bi in xrange(batch_size):
-            Rn[bi, :] = data[data_iter:(data_iter + filter_size)]     
+            Rn[bi, :] = data[data_iter:(data_iter + filter_size)]
             Rn_sum = np.sum(Rn[bi, :] ** 2)
             if Rn_sum > 1e-05:
                 scales[bi] = np.sqrt(Rn_sum)
                 Rn[bi, :] = Rn[bi, :] / scales[bi]
 
             data_iter += 1
-            if data_iter + filter_size >= data.shape[0]: 
+            if data_iter + filter_size >= data.shape[0]:
                 break
 
         queue = Queue()
         if use_gpu:
             run_on_batch(
-                data_iter_start, 
-                Rn, 
-                data[data_iter_start:(data_iter_start+batch_size)], 
-                filters, 
+                data_iter_start,
+                Rn,
+                data[data_iter_start:(data_iter_start+batch_size)],
+                filters,
                 scales,
-                match_iterations, 
+                match_iterations,
                 threshold,
                 learning,
                 lambda filters, Rn: gpu_session.run([prods_gpu], {filters_gpu: filters, Rn_gpu: Rn})[0],
@@ -169,14 +169,14 @@ for source_id, source_filename in enumerate(data_source):
             sync(wait_all=False)
         else:
             process = Process(
-                target = run_on_batch, 
+                target = run_on_batch,
                 args = (
-                    data_iter_start, 
-                    Rn, 
-                    data[data_iter_start:(data_iter_start+batch_size)], 
+                    data_iter_start,
+                    Rn,
+                    data[data_iter_start:(data_iter_start+batch_size)],
                     filters,
-                    scales, 
-                    match_iterations, 
+                    scales,
+                    match_iterations,
                     threshold,
                     learning,
                     None,
@@ -188,7 +188,7 @@ for source_id, source_filename in enumerate(data_source):
             if len(processes) == jobs:
                 sync(wait_all=False)
     sync(wait_all=True)
-    
+
     spike_records = SpikeRecords(records, filters_num, threshold, data_denom, target_sr)
     data_restored, sr = spike_records.get_waveform(filters)
     # data_restored, sr = restore(records, filters), target_sr
@@ -196,7 +196,7 @@ for source_id, source_filename in enumerate(data_source):
     print "Mean error: {}".format(
         np.mean( (data_restored - data[:len(data_restored)]*data_denom) ** 2.0)
     )
-    
+
     restored_file = pj(res_dir, "{}_input_restored.wav".format(source_id))
     print "Saving restored file in {}".format(restored_file)
     data_resampled = lr.resample(data_restored, sr, source_sr, scale=True)
@@ -208,7 +208,7 @@ for source_id, source_filename in enumerate(data_source):
     pkl.dump(spike_records, open(spikes_file, "wb"), protocol=2)
     print "Done"
 
-filters_file = pj(ds_dir, "filters.pkl") 
+filters_file = pj(ds_dir, "filters.pkl")
 print "Saving filters in {}".format(filters_file)
 np.save(open(filters_file, "w"), filters)
 
@@ -244,9 +244,9 @@ data = data*data_denom
 #     np.mean( (filtered_data - data[:len(filtered_data)]) ** 2.0)
 # )
 # lr.output.write_wav(
-#     pj(res_dir, "{}_input_restored_f.wav".format(source_id)), 
+#     pj(res_dir, "{}_input_restored_f.wav".format(source_id)),
 #     filtered_data,
-#     # lr.resample(filtered_data, sr, source_sr, scale=True), 
+#     # lr.resample(filtered_data, sr, source_sr, scale=True),
 #     source_sr
 # )
 
