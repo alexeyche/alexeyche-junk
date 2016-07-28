@@ -24,7 +24,6 @@ from mp_lib import gammatone
 from mp_lib import generate_dct_dictionary
 
 
-
 ds_dir = pj(os.environ["HOME"], "Music", "ml", "impro")
 data_source = []
 for f in sorted(os.listdir(ds_dir)):
@@ -37,12 +36,12 @@ if not os.path.exists(res_dir):
 
 
 
-filters_num = 100
-filter_size = 200
+filters_num = 500
+filter_size = 100
 jobs = 1
 batch_size = 100000
 threshold = 0.2
-match_iterations = 5
+match_iterations = 10
 learning_rate = 0.001
 momentum = 0.0
 epochs = 1
@@ -50,25 +49,31 @@ learning = False
 target_sr = 3000
 
 
-filters = np.zeros((filters_num, filter_size))
 dfilters = np.zeros((filters_num, filter_size))
+filters = np.zeros((filters_num, filter_size))
 
-# t = np.linspace(0, 0.05, filter_size)
-# freqs = np.linspace(10, 1000, filters_num)
 
-# for fi, freq in enumerate(freqs):
-#     filters[fi, :] = gammatone(t, freq, 0.0, 1.0, 2.0, 20.0)
+gammatone_filters = np.zeros((filters_num, filter_size))
 
-# subf = 10
-# subfilters = generate_dct_dictionary(filters_num/subf, filter_size)
-# filters_list = []
-# for factor in np.linspace(0.1, 2.0, subf):
-#     print factor
-#     filters_list.append(subfilters * factor)
+t = np.linspace(0, 0.05, filter_size)
+freqs = np.linspace(10, 1000, filters_num)
 
-# filters = np.concatenate(filters_list)
+for fi, freq in enumerate(freqs):
+    gammatone_filters[fi, :] = gammatone(t, freq, 0.0, 1.0, 2.0, 20.0)
 
-filters = generate_dct_dictionary(filters_num, filter_size)
+filters = gammatone_filters
+
+# dct_filters = generate_dct_dictionary(filters_num/2, filter_size)
+
+# filters[0:100,:300] = generate_dct_dictionary(100, 300) 
+# filters[100:200,:200] = generate_dct_dictionary(100, 200) 
+# filters[200:300,:100] = generate_dct_dictionary(100, 100) 
+# filters[300:400,:50] = generate_dct_dictionary(100, 50) 
+
+# filters = np.concatenate([gammatone_filters, dct_filters])
+
+# filters = generate_dct_dictionary(filters_num, filter_size)
+
 
 filters = (filters.T/np.sqrt(np.sum(filters ** 2, 1))).T
 filters_init = filters.copy()
@@ -81,12 +86,15 @@ gpu_session = tf.Session()
 
 assert not use_gpu or jobs == 1, "Can't use gpu with multiple processes"
 
+data_source = [data_source[1]]
+
 for source_id, source_filename in enumerate(data_source):
     data, source_sr = lr.load(source_filename)
+    data = data[:500000]
     data = lr.resample(data, source_sr, target_sr, scale=True)
 
-    # data_test = lr.resample(data, target_sr, source_sr, scale=True)
-    # lr.output.write_wav("/home/alexeyche/Music/ml/test.wav", data_test, source_sr)
+    data_test = lr.resample(data, target_sr, source_sr, scale=True)
+    lr.output.write_wav("/home/alexeyche/Music/ml/test.wav", data_test, source_sr)
 
     data_denom = np.sqrt(np.sum(data ** 2))
     data = data/data_denom
@@ -131,12 +139,14 @@ for source_id, source_filename in enumerate(data_source):
         data_iter_start = data_iter
 
         Rn = np.zeros((batch_size, filter_size))
+        scales = np.ones(batch_size)
         for bi in xrange(batch_size):
             Rn[bi, :] = data[data_iter:(data_iter + filter_size)]     
             Rn_sum = np.sum(Rn[bi, :] ** 2)
             if Rn_sum > 1e-05:
-                Rn[bi, :] = Rn[bi, :] / np.sqrt(Rn_sum)
-            
+                scales[bi] = np.sqrt(Rn_sum)
+                Rn[bi, :] = Rn[bi, :] / scales[bi]
+
             data_iter += 1
             if data_iter + filter_size >= data.shape[0]: 
                 break
@@ -148,6 +158,7 @@ for source_id, source_filename in enumerate(data_source):
                 Rn, 
                 data[data_iter_start:(data_iter_start+batch_size)], 
                 filters, 
+                scales,
                 match_iterations, 
                 threshold,
                 learning,
@@ -163,7 +174,8 @@ for source_id, source_filename in enumerate(data_source):
                     data_iter_start, 
                     Rn, 
                     data[data_iter_start:(data_iter_start+batch_size)], 
-                    filters, 
+                    filters,
+                    scales, 
                     match_iterations, 
                     threshold,
                     learning,
@@ -179,12 +191,17 @@ for source_id, source_filename in enumerate(data_source):
     
     spike_records = SpikeRecords(records, filters_num, threshold, data_denom, target_sr)
     data_restored, sr = spike_records.get_waveform(filters)
+    # data_restored, sr = restore(records, filters), target_sr
+    # data_restored *= data_denom
+    print "Mean error: {}".format(
+        np.mean( (data_restored - data[:len(data_restored)]*data_denom) ** 2.0)
+    )
     
     restored_file = pj(res_dir, "{}_input_restored.wav".format(source_id))
     print "Saving restored file in {}".format(restored_file)
     data_resampled = lr.resample(data_restored, sr, source_sr, scale=True)
     lr.output.write_wav(restored_file, data_resampled, source_sr)
-    
+
     spikes_file = pj(ds_dir, "{}_spikes.pkl".format(source_id))
     print "Saving spikes in {}".format(spikes_file)
 
@@ -197,11 +214,48 @@ np.save(open(filters_file, "w"), filters)
 
 recs = np.asarray(records)
 
+
+data = data*data_denom
+
+
+# import adaptfilt as adf
+# data = data_test
+# data_restored = lr.resample(data_restored, sr, source_sr, scale=True)
+# data_restored = data_restored[:len(data)]
+
+# # Apply adaptive filter
+# M = 5000  # Number of filter taps in adaptive filter
+# step = 0.0002  # Step size
+# K = 3
+# y, e, w = adf.lms(data_restored, data, M, step)
+
+# N = len(data_restored)-M+1
+
+# filtered_data = np.zeros(N)
+
+# for n in xrange(N):
+#     x = np.flipud(data_restored[n:n+M])
+#     filtered_data[n] = np.dot(x, w)
+
+# print "Mean error before filtering: {}".format(
+#     np.mean( (data_restored - data[:len(data_restored)]) ** 2.0)
+# )
+# print "Mean error after filtering: {}".format(
+#     np.mean( (filtered_data - data[:len(filtered_data)]) ** 2.0)
+# )
+# lr.output.write_wav(
+#     pj(res_dir, "{}_input_restored_f.wav".format(source_id)), 
+#     filtered_data,
+#     # lr.resample(filtered_data, sr, source_sr, scale=True), 
+#     source_sr
+# )
+
+
 plt.figure(1)
 plt.subplot(2,1,1)
 plt.scatter(recs[:, 0], recs[:, 1])
 plt.subplot(2,1,2)
-plt.plot(data*data_denom)
+plt.plot(data)
 plt.plot(data_restored)
 plt.show()
 

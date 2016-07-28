@@ -166,7 +166,7 @@ np.random.seed(42)
 n_features, n_components = 512, 1024
 print "generating dictionary..."
 D = generate_dict(n_features, n_components)
-sparsities = np.arange(50, 200, 15)
+sparsities = [50] #  np.arange(50, 200, 15)
 print "generating signals..."
 Y = np.zeros((n_components, len(sparsities)))
 X = np.zeros((n_features, len(sparsities)))    

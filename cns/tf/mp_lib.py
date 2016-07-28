@@ -34,6 +34,7 @@ def run_on_batch(
     Rn, 
     true_signal, 
     filters, 
+    scales,
     match_iterations, 
     threshold, 
     learning,
@@ -53,7 +54,7 @@ def run_on_batch(
         for bi, fi in enumerate(filter_maxs):
             if prods[fi, bi] >= threshold:
                 Rn[bi, :] -= prods[fi, bi] * filters[fi,:]
-                batch_records.append((data_iter_start + bi, fi, prods[fi, bi]))
+                batch_records.append((data_iter_start + bi, fi, prods[fi, bi] * scales[bi]))
                 got_anybody = True
                 
         if not got_anybody:
