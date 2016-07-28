@@ -1,0 +1,19 @@
+filters_num = 200
+filter_size = 200
+
+Mean error: 0.0119387251378
+
+==
+
+filters_num = 200
+filter_size = 100
+
+Mean error: 0.00815773019004
+
+==
+
+filters_num = 200
+filter_size = 50
+
+
+Mean error: 0.00500383435538
