@@ -11,6 +11,8 @@ from tensorflow.python.ops.math_ops import tanh
 from tensorflow.python.ops.math_ops import sigmoid
 
 import math
+import scipy
+import scipy.sparse
 
 def gauss_act(x, sigma):
     return tf.exp( - tf.square(-1.0 - tf.cos(x) )/( 2.0 * sigma ** 2))
@@ -164,15 +166,19 @@ class Corpus(object):
         
         per_seq = self.max_t / self.seq_size + self.max_t % self.seq_size
         per_batch = per_seq / self.sub_batch_size + per_seq % self.sub_batch_size
-        
-        self.data = np.zeros((per_batch, self.seq_size, self.batch_size, self.input_dimension))
-        
+        self.data = list( 
+            list(
+                scipy.sparse.csr_matrix((self.batch_size, self.input_dimension), dtype=np.float32) 
+                for si in xrange(self.seq_size)
+            ) 
+            for ci in xrange(per_batch) 
+        )
         self.data_end = data_end if not data_end is None else np.zeros(self.batch_size, dtype=np.int32)
     
     @staticmethod
-    def construct_from(other_corpus):
+    def construct_from(other_corpus, dim=None):
         return Corpus(
-            other_corpus.input_dimension, 
+            other_corpus.input_dimension if dim is None else dim, 
             other_corpus.number_of_sources, 
             other_corpus.batch_size, 
             other_corpus.max_t, 
@@ -181,16 +187,16 @@ class Corpus(object):
         )
 
     def feed_corpus(self, corpus_id, corpus):
-        assert corpus_id < self.data.shape[0], "Out of corpus index"
+        assert corpus_id < len(self.data), "Out of corpus index"
         for seq_id, seq_data in enumerate(corpus):
-            self.data[corpus_id, seq_id, :, :] = seq_data
+            self.data[corpus_id][seq_id] = scipy.sparse.csc_matrix(seq_data)
 
     def enrich_with_source(self, data):
         assert self._source_id < self.number_of_sources, "Got too many data sources"
         
         batch_ids = np.zeros(self.sub_batch_size, dtype=np.int32)
         batch_ends_ids = np.zeros(self.sub_batch_size, dtype=np.int32)
-        data_len = data.shape[1]
+        data_len = data.shape[0]
 
         batch_ends_ids[0] = data_len % self.sub_batch_size
         batch_ends_ids[0] += data_len / self.sub_batch_size
@@ -207,8 +213,8 @@ class Corpus(object):
             if bi >= self._source_id * self.sub_batch_size and bi < (self._source_id+1) * self.sub_batch_size:
                 dst_batch[bi] = True
 
-        for ci in xrange(self.data.shape[0]):
-            for si in xrange(self.data.shape[1]):
+        for ci in xrange(len(self.data)):
+            for si in xrange(self.seq_size):
                 data_presence = np.where(batch_ids < batch_ends_ids)[0]
                 if len(data_presence) == 0:
                     self._source_id += 1
@@ -216,7 +222,7 @@ class Corpus(object):
                 for dp_i in full_set - set(data_presence):
                     dst_batch[self._source_id * self.sub_batch_size + dp_i] = False
                 
-                self.data[ci, si, dst_batch, :] = data[:, batch_ids[data_presence]].T 
+                self.data[ci][si][dst_batch, :] = data[batch_ids[data_presence], :]
                 batch_ids += 1
         self._source_id += 1
     
@@ -249,9 +255,9 @@ class Corpus(object):
             self.data_end[(id * self.sub_batch_size):(id * self.sub_batch_size + self.sub_batch_size)]
         )
 
-        dst = np.zeros((self.input_dimension, head if head else sum(self.data_end[batch_masks[id]])))
-        for ci in xrange(self.data.shape[0]):
-            for si in xrange(self.data.shape[1]):
+        dst = np.zeros((head if head else sum(self.data_end[batch_masks[id]]), self.input_dimension))
+        for ci in xrange(len(self.data)):
+            for si in xrange(self.seq_size):
                 source_ids = self._get_source_batch_ids(id, batch_ids)
                 
                 for b_id, (current_id, end_id) in enumerate(zip(source_ids.copy(), batch_ends_ids)):
@@ -264,20 +270,20 @@ class Corpus(object):
 
                 source_ids_left = source_ids[bm]
                 
-                dst[:, source_ids_left] = self.data[ci, si, batch_masks[id], :].T
+                dst[source_ids_left, :] = self.data[ci][si][batch_masks[id], :].todense()
                 batch_ids += 1
         return dst 
                 
     def prepare_sequence(self, corpus_id, allow_zeros=False):
-        if corpus_id >= self.data.shape[0]:
+        if corpus_id >= len(self.data):
             assert allow_zeros, "Can't get corpus data for id {}".format(corpus_id)
             return [ np.zeros((self.batch_size, self.input_dimension)) for _ in xrange(self.seq_size) ]
 
-        return [ self.data[corpus_id, seq_id, :, :] for seq_id in xrange(self.seq_size) ]
+        return [ self.data[corpus_id][seq_id].todense() for seq_id in xrange(self.seq_size) ]
 
     @property
     def shape(self):
-        return self.data.shape
+        return (len(self.data), self.seq_size, self.batch_size, self.input_dimension)
     
 
 def dispatch_data(data_list, seq_size, batch_size=None):

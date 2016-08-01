@@ -18,8 +18,12 @@ from os.path import join as pj
 import sys
 import cPickle as pkl
 import gc
+import scipy
+import scipy.sparse
 
-from mp_lib import SpikeRecords
+from env import Env
+
+from conv_lib import SparseAcoustic
 
 device = "gpu"
 
@@ -27,42 +31,40 @@ dt = 0.25
 seed = 4
 #alpha=0.25
 
-net_size = 100
-epochs = 200
+net_size = 50
+epochs = 1000
 bptt_steps = 50
 le_size = 10
-lrate = 0.00001
-decay_rate = 0.999
+lrate = 0.0001
+decay_rate = 1.0 #0.999
 
 forecast_corpus_gap = 0
 
-ds_dir = pj(os.environ["HOME"], "Music", "ml", "impro")
-run_dir = pj(os.environ["HOME"], "Music", "ml", "impro_run")
-if not os.path.exists(run_dir):
-    os.makedirs(run_dir)
+env = Env("piano")
 
 
 
-data_file_list = []
+source_data_file_list = []
 
-for f in sorted(os.listdir(ds_dir)):
-    if f.endswith("spikes.pkl"):
+for f in sorted(os.listdir(env.dataset())):
+    if f.endswith("sparse_acoustic_data.dump"):
         print "Considering {} as input".format(f)
-        data_file_list.append(pj(ds_dir, f))
+        source_data_file_list.append(env.dataset(f))
 
+
+data_file_list = source_data_file_list[:]
 
 max_t, input_size = 0, None
 
-for inp_file in data_file_list:
+for source_id, inp_file in enumerate(data_file_list):
     print "Reading {}".format(inp_file)
-    spike_object = pkl.load(open(inp_file, "rb"))
-    max_t = max(max_t, max(spike_object.spike_times))
-    assert input_size is None or input_size == spike_object.neurons_num, "Got spikes with another neurons number"
-    input_size = spike_object.neurons_num
+    d = SparseAcoustic.deserialize(inp_file)
+    max_t = max(d.data.shape[0], max_t)
+    assert input_size is None or input_size == d.data.shape[1], "Got spikes with another neurons number"
+    input_size = d.data.shape[1]
 
 
 batch_size = len(data_file_list)*10
-
 
 corpus = Corpus(input_size, len(data_file_list), batch_size, max_t, bptt_steps)
 
@@ -71,20 +73,17 @@ sf_sigma = 0.1
 sf = np.exp(-np.square(0.5-np.linspace(0.0, 1.0, sfn))/sf_sigma)
 
 for inp_file in data_file_list:
-    spike_object = pkl.load(open(inp_file, "rb"))
-    tmax = max(spike_object.spike_times)
-    neurons_num = spike_object.neurons_num
-    
-    data = np.zeros((neurons_num, tmax+1))
-    for ni, fired_time in zip(spike_object.fired_neurons, spike_object.spike_times):
-        data[ni, fired_time] = 1.0
-            
-    for ni in xrange(data.shape[0]):
-        data[ni, :] = np.convolve(sf, data[ni, :], mode="same") 
-        data[ni, :] = np.clip(data[ni, :], 0.0, 1.0)
-
-    corpus.enrich_with_source(data)
-
+    print "Feeding {}".format(inp_file)
+    d = SparseAcoustic.deserialize(inp_file)
+    # print "Convolving ..."
+    # dd = np.zeros(d.data.shape)
+    # for ni in xrange(d.data.shape[1]):
+    #     row = np.asarray(d.data[:, ni].todense()).reshape((d.data.shape[0],))
+    #     row = np.convolve(sf, row, mode="same")
+    #     row = np.clip(row, 0.0, 1.0)
+    #     dd[:, ni] = row
+    print "Feeding corpus ..."
+    corpus.enrich_with_source(d.data)
 
 gc.collect()
 
@@ -144,77 +143,96 @@ optimizer = tf.train.AdamOptimizer(lr)
 train_step = optimizer.apply_gradients(zip(grads, tvars))
 
 
-
-
 weights, recc_weights, bias = [], [], []
 outputs_info, states_info, winput_info = [], [], []
 grads_info = []
-with tf.device("/{}:0".format(device)):
-    sess = tf.Session()
-    writer = tf.train.SummaryWriter("{}/tf".format(os.environ["HOME"]), sess.graph)
 
+sess = tf.Session()
+saver = tf.train.Saver()
+
+writer = tf.train.SummaryWriter("{}/tf".format(os.environ["HOME"]), sess.graph)
+
+model_fname = env.run("nn_model.ckpt")
+if os.path.exists(model_fname):
+    print "Restoring from {}".format(model_fname)
+    saver.restore(sess, model_fname)
+else:
     sess.run(tf.initialize_all_variables())
-    for e in xrange(epochs):
-        state_v = np.zeros((batch_size, state_size))
 
-        ep_lrate = lrate * (decay_rate ** e)
-        sess.run(tf.assign(lr, ep_lrate))
-        loss_sum = 0
-        corpus_out = Corpus.construct_from(corpus)
-        for corp_i in xrange(corpus.shape[0]):
-            feed_dict = {k: v for k, v in zip(inputs, corpus.prepare_sequence(corp_i)) }
-            feed_dict[init_state] = state_v
-            feed_dict.update({k: v for k, v in zip(
-                targets, 
-                corpus.prepare_sequence(corp_i + forecast_corpus_gap, allow_zeros=True)
-            )})
+for e in xrange(epochs):
+    state_v = np.zeros((batch_size, state_size))
+ 
+    ep_lrate = lrate * (decay_rate ** e)
+    sess.run(tf.assign(lr, ep_lrate))
+    loss_sum = 0
+    corpus_out = Corpus.construct_from(corpus)
+    for corp_i in xrange(corpus.shape[0]):
+        feed_dict = {k: v for k, v in zip(inputs, corpus.prepare_sequence(corp_i)) }
+        feed_dict[init_state] = state_v
+        feed_dict.update({k: v for k, v in zip(
+            targets, 
+            corpus.prepare_sequence(corp_i + forecast_corpus_gap, allow_zeros=True)
+        )})
 
-            fetch = [outputs, finstate, loss, train_step]
-            out = sess.run(fetch, feed_dict)
+        fetch = [outputs, finstate, loss, train_step]
+        out = sess.run(fetch, feed_dict)
 
-            outputs_v, state_v = out[0], out[1]
-            loss_v, _ = out[2], out[3]
-            loss_sum += loss_v
-            # states_info.append(out[4:])
+        outputs_v, state_v = out[0], out[1]
+        loss_v, _ = out[2], out[3]
+        loss_sum += loss_v
+        # states_info.append(out[4:])
 
-            # outputs_info.append(outputs_v)
-            # grads_info.append(out[4:])
-            corpus_out.feed_corpus(corp_i, outputs_v)
+        # outputs_info.append(outputs_v)
+        # grads_info.append(out[4:])
+        corpus_out.feed_corpus(corp_i, outputs_v)
 
-        if e % 5 == 0:
-            plt.figure(1)
-            plt.subplot(2,1,1)
+    if e % 5 == 0:
+        plt.figure(1)
+        plt.subplot(2,1,1)
 
-            plt.imshow(corpus.recollect(0, head=2500))
-            plt.subplot(2,1,2)
-            plt.imshow(corpus_out.recollect(0, head=2500))
-            plt.savefig(pj(run_dir, "{}_result.png".format(e)))
+        plt.imshow(corpus.recollect(0, head=15000)[10000:15000, :].T)
+        plt.subplot(2,1,2)
+        plt.imshow(corpus_out.recollect(0, head=15000)[10000:15000, :].T)
+        plt.savefig(env.run("{}_result.png".format(e)))
+    
+    gc.collect()
+    
+    print "Epoch {}, learning rate {}".format(e, ep_lrate), "train loss {}".format(loss_sum/corpus.shape[0])
+
+
+for source_id, f in enumerate(source_data_file_list):
+    try:
+        id = data_file_list.index(f)
+    except ValueError:
+        continue
+    print "Recovering {}".format(source_id)
+    d = SparseAcoustic.deserialize(f)
+    d.data = scipy.sparse.csr_matrix(corpus_out.recollect(id))
+    d.serialize(env.run("{}_nn_recovery.dump".format(source_id)))
         
-        gc.collect()
-        
-        print "Epoch {}, learning rate {}".format(e, ep_lrate), "train loss {}".format(loss_sum/corpus.shape[0])
+print "Saving model {}".format(saver.save(sess, model_fname))
+
+le_corpus_out = Corpus.construct_from(corpus, dim = le_size)
+for corp_i in xrange(corpus.shape[0]):
+    feed_dict = {k: v for k, v in zip(inputs, corpus.prepare_sequence(corp_i)) }
+    feed_dict[init_state] = np.zeros((batch_size, state_size))
+    feed_dict.update({k: v for k, v in zip(
+        targets, 
+        corpus.prepare_sequence(corp_i + forecast_corpus_gap, allow_zeros=True)
+    )})
 
 
-
-    # corpus_out, states = [], []
-    # for corp_i, corp_data in enumerate(corpus):
-    #     feed_dict = {k: v for k, v in zip(inputs, corp_data)}
-    #     feed_dict[init_state] = np.zeros((batch_size, state_size))
-    #     feed_dict.update({k: v for k, v in zip(targets, corp_data)})
-
-    #     fetch = [outputs, finstate]
-    #     fetch += [neuron_le.states_info]
-    #     fetch += [neuron_in.W, neuron_in.U, neuron_in.W_u, neuron_in.U_u] 
-    #     fetch += [neuron_le.W, neuron_le.U, neuron_le.W_u, neuron_le.U_u] 
-    #     fetch += [neuron_out.W, neuron_out.U, neuron_out.W_u, neuron_out.U_u] 
-        
-    #     out = sess.run(fetch, feed_dict)
-    #     outputs_v, state_v, states_v = out[0], out[1], out[2]
-    #     params = out[3:]
-        
-    #     corpus_out.append(outputs_v)
-    #     states.append(states_v)
-
+    fetch = [outputs, finstate]
+    fetch += [neuron_le.states_info]
+    fetch += [neuron_in.W, neuron_in.U, neuron_in.W_u, neuron_in.U_u] 
+    fetch += [neuron_le.W, neuron_le.U, neuron_le.W_u, neuron_le.U_u] 
+    fetch += [neuron_out.W, neuron_out.U, neuron_out.W_u, neuron_out.U_u] 
+    
+    out = sess.run(fetch, feed_dict)
+    outputs_v, state_v, states_v = out[0], out[1], out[2]
+    params = out[3:]
+    
+    le_corpus_out.feed_corpus(corp_i, states_v)
     
 
 
