@@ -32,13 +32,13 @@ seed = 4
 #alpha=0.25
 
 net_size = 50
-epochs = 1000
+epochs = 200
 bptt_steps = 50
 le_size = 10
 lrate = 0.0001
 decay_rate = 1.0 #0.999
 
-forecast_corpus_gap = 0
+forecast_step = 1
 
 env = Env("piano")
 
@@ -75,20 +75,13 @@ sf = np.exp(-np.square(0.5-np.linspace(0.0, 1.0, sfn))/sf_sigma)
 for inp_file in data_file_list:
     print "Feeding {}".format(inp_file)
     d = SparseAcoustic.deserialize(inp_file)
-    # print "Convolving ..."
-    # dd = np.zeros(d.data.shape)
-    # for ni in xrange(d.data.shape[1]):
-    #     row = np.asarray(d.data[:, ni].todense()).reshape((d.data.shape[0],))
-    #     row = np.convolve(sf, row, mode="same")
-    #     row = np.clip(row, 0.0, 1.0)
-    #     dd[:, ni] = row
     print "Feeding corpus ..."
     corpus.enrich_with_source(d.data)
 
 gc.collect()
 
 neuron_in = ThetaRNNCell(net_size, dt, activation = simple_act, update_gate=True)
-neuron_le = ThetaRNNCell(le_size, dt, activation = simple_act, update_gate=True)
+# neuron_le = ThetaRNNCell(le_size, dt, activation = simple_act, update_gate=True)
 neuron_out = ThetaRNNCell(input_size, dt, activation = simple_act, update_gate=True)
 
 # neuron_in = ThetaRNNCell(input_size, dt, activation = simple_act, sigma = sigma)
@@ -98,7 +91,7 @@ neuron_out = ThetaRNNCell(input_size, dt, activation = simple_act, update_gate=T
 # neuron_le = test_cell(le_size)
 # neuron_out = test_cell(input_size, activation = sigmoid)
 
-neurons = rnn_cell.MultiRNNCell([neuron_in, neuron_le, neuron_out])
+neurons = rnn_cell.MultiRNNCell([neuron_in, neuron_out])
 
 
 # neurons = rnn_cell.MultiRNNCell([neuron_in, neuron_le])
@@ -112,6 +105,12 @@ targets = [ tf.placeholder(tf.float32, shape=(batch_size, input_size), name="Tar
 init_state = state = tf.placeholder(tf.float32, shape=(batch_size, state_size), name="State")
 
 outputs, finstate = rnn.rnn(neurons, inputs, init_state)
+
+test_input = tf.placeholder(tf.float32, shape=(batch_size, input_size), name="TestInput")
+test_target = tf.placeholder(tf.float32, shape=(batch_size, input_size), name="TestTarget")
+
+test_output, test_finstate = neurons(test_input, state)
+test_loss = tf.nn.l2_loss(test_target - test_output) / batch_size / net_size
 
 # hand made seq2seq
 
@@ -156,6 +155,7 @@ model_fname = env.run("nn_model.ckpt")
 if os.path.exists(model_fname):
     print "Restoring from {}".format(model_fname)
     saver.restore(sess, model_fname)
+    epochs = 0
 else:
     sess.run(tf.initialize_all_variables())
 
@@ -171,7 +171,7 @@ for e in xrange(epochs):
         feed_dict[init_state] = state_v
         feed_dict.update({k: v for k, v in zip(
             targets, 
-            corpus.prepare_sequence(corp_i + forecast_corpus_gap, allow_zeros=True)
+            corpus.prepare_sequence(corp_i, shift = forecast_step)
         )})
 
         fetch = [outputs, finstate, loss, train_step]
@@ -199,42 +199,114 @@ for e in xrange(epochs):
     
     print "Epoch {}, learning rate {}".format(e, ep_lrate), "train loss {}".format(loss_sum/corpus.shape[0])
 
+if epochs>0:
+    for source_id, f in enumerate(source_data_file_list):
+        try:
+            id = data_file_list.index(f)
+        except ValueError:
+            continue
+        print "Recovering {}".format(source_id)
+        d = SparseAcoustic.deserialize(f)
+        d.data = scipy.sparse.csr_matrix(corpus_out.recollect(id))
+        d.serialize(env.run("{}_nn_recovery.dump".format(source_id)))
+            
+    print "Saving model {}".format(saver.save(sess, model_fname))
 
-for source_id, f in enumerate(source_data_file_list):
-    try:
-        id = data_file_list.index(f)
-    except ValueError:
-        continue
-    print "Recovering {}".format(source_id)
-    d = SparseAcoustic.deserialize(f)
-    d.data = scipy.sparse.csr_matrix(corpus_out.recollect(id))
-    d.serialize(env.run("{}_nn_recovery.dump".format(source_id)))
-        
-print "Saving model {}".format(saver.save(sess, model_fname))
-
-le_corpus_out = Corpus.construct_from(corpus, dim = le_size)
+state_v = np.zeros((batch_size, state_size))
+corpus_out = Corpus.construct_from(corpus)
+loss_sum = 0
 for corp_i in xrange(corpus.shape[0]):
     feed_dict = {k: v for k, v in zip(inputs, corpus.prepare_sequence(corp_i)) }
-    feed_dict[init_state] = np.zeros((batch_size, state_size))
+    feed_dict[init_state] = state_v
     feed_dict.update({k: v for k, v in zip(
         targets, 
-        corpus.prepare_sequence(corp_i + forecast_corpus_gap, allow_zeros=True)
+        corpus.prepare_sequence(corp_i, shift = forecast_step)
     )})
 
 
-    fetch = [outputs, finstate]
-    fetch += [neuron_le.states_info]
+    fetch = [outputs, finstate, loss]
     fetch += [neuron_in.W, neuron_in.U, neuron_in.W_u, neuron_in.U_u] 
-    fetch += [neuron_le.W, neuron_le.U, neuron_le.W_u, neuron_le.U_u] 
+    # fetch += [neuron_le.W, neuron_le.U, neuron_le.W_u, neuron_le.U_u] 
     fetch += [neuron_out.W, neuron_out.U, neuron_out.W_u, neuron_out.U_u] 
     
     out = sess.run(fetch, feed_dict)
-    outputs_v, state_v, states_v = out[0], out[1], out[2]
+    outputs_v, state_v, loss_v = out[0], out[1], out[2]
     params = out[3:]
     
-    le_corpus_out.feed_corpus(corp_i, states_v)
-    
+    loss_sum += loss_v
 
+    corpus_out.feed_corpus(corp_i, outputs_v)
+
+loss_sum = loss_sum/corpus.shape[0]
+
+    # le_corpus_out.feed_corpus(corp_i, states_v)
+
+
+state_v = np.zeros((batch_size, state_size))
+corpus_out = Corpus.construct_from(corpus)
+
+corpus_id = 0
+seq_id = 0
+test_seq = corpus.prepare_sequence(corpus_id)
+test_target_seq = corpus.prepare_sequence(corpus_id, shift = forecast_step)
+
+
+test_input_v = test_seq.pop(0)
+test_target_v = test_target_seq.pop(0)
+
+warming_up_steps = 1000
+
+for step_i in xrange(0, corpus.shape[0]*corpus.shape[1]):
+    feed_dict = {
+        test_input: test_input_v,
+        state: state_v,
+        test_target: test_target_v
+    }
+    test_output_v, state_v, test_loss_v = sess.run([test_output, test_finstate, test_loss], feed_dict)
+
+    corpus_out.feed_batch(corpus_id, seq_id, test_output_v)
+
+    # if step_i < warming_up_steps:
+    test_input_v = test_seq.pop(0)
+    if len(test_seq) == 0:
+        corpus_id += 1
+        if corpus_id >= corpus.shape[0]:
+            break
+        test_seq = corpus.prepare_sequence(corpus_id)
+    # else:
+    #     test_input_v = test_output_v
+
+
+    test_target_v = test_target_seq.pop(0)
+    if len(test_target_seq) == 0:
+        corpus_id += 1
+        if corpus_id >= corpus.shape[0]:
+            break
+        test_target_seq = corpus.prepare_sequence(corpus_id, shift = forecast_step)
+    
+    print corpus_id, seq_id
+    
+    seq_id += 1
+    if seq_id >= bptt_steps:
+        seq_id = 0
+    print "Testing step {}, loss {}".format(step_i, test_loss_v)
+
+plt.figure(1)
+plt.subplot(2,1,1)
+
+plt.imshow(corpus.recollect(0, head=15000)[10000:15000, :].T)
+plt.subplot(2,1,2)
+plt.imshow(corpus_out.recollect(0, head=15000)[10000:15000, :].T)
+plt.show()
+
+#     plt.figure(1)
+#     plt.subplot(3,1,1)
+#     plt.imshow(test_input_v)
+#     plt.subplot(3,1,2)
+#     plt.imshow(test_target_v)
+#     plt.subplot(3,1,3)
+#     plt.imshow(test_seq[0])
+#     plt.show()
 
 
 # plt.figure(1)

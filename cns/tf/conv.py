@@ -234,18 +234,17 @@ else:
             continue
         
         _, source_sr, _ = read_song(source_id)
-        for name in ["nn_given", "nn_recovery"]:
-            src = env.run("{}_{}.dump".format(source_id, name))
-            dst = env.result("{}_{}.wav".format(source_id, name))
-            if os.path.exists(src):
-                print "Recovering {}".format(src)
-                sa = SparseAcoustic.deserialize(src)
+        src = env.run("{}_nn_recovery.dump".format(source_id))
+        dst = env.result("{}_nn_recovery.wav".format(source_id))
+        if os.path.exists(src):
+            print "Recovering {}".format(src)
+            sa = SparseAcoustic.deserialize(src)
 
-                out_final = restore_hidden(rfilter_v.reshape(L, filters_num), np.asarray(sa.data.todense()))
+            out_final = restore_hidden(rfilter_v.reshape(L, filters_num), np.asarray(sa.data.todense()))
 
-                out_final *= sa.data_denom
-                data_recov = lr.resample(out_final, target_sr, source_sr, scale=True)
-                lr.output.write_wav(dst, data_recov, source_sr)
+            out_final *= sa.data_denom
+            data_recov = lr.resample(out_final, target_sr, source_sr, scale=True)
+            lr.output.write_wav(dst, data_recov, source_sr)
 
 
 # 

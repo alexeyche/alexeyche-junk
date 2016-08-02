@@ -191,6 +191,12 @@ class Corpus(object):
         for seq_id, seq_data in enumerate(corpus):
             self.data[corpus_id][seq_id] = scipy.sparse.csc_matrix(seq_data)
 
+
+    def feed_batch(self, corpus_id, seq_id, batch):
+        assert corpus_id < len(self.data), "Out of corpus index"
+        assert seq_id < self.seq_size, "Out of seq size"
+        self.data[corpus_id][seq_id] = scipy.sparse.csc_matrix(batch)
+        
     def enrich_with_source(self, data):
         assert self._source_id < self.number_of_sources, "Got too many data sources"
         
@@ -274,12 +280,18 @@ class Corpus(object):
                 batch_ids += 1
         return dst 
                 
-    def prepare_sequence(self, corpus_id, allow_zeros=False):
-        if corpus_id >= len(self.data):
-            assert allow_zeros, "Can't get corpus data for id {}".format(corpus_id)
-            return [ np.zeros((self.batch_size, self.input_dimension)) for _ in xrange(self.seq_size) ]
-
-        return [ self.data[corpus_id][seq_id].todense() for seq_id in xrange(self.seq_size) ]
+    def prepare_sequence(self, corpus_id, shift=0):
+        assert corpus_id < len(self.data), "Corpus id out of length"
+        res = []
+        for seq_id in xrange(shift, self.seq_size+shift):
+            shifted_seq_id = seq_id % self.seq_size
+            if seq_id == self.seq_size:
+                corpus_id += 1
+                if corpus_id >= len(self.data):
+                    corpus_id = 0
+            res.append(self.data[corpus_id][shifted_seq_id].todense())
+        return res            
+    
 
     @property
     def shape(self):
