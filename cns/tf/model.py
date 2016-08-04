@@ -70,10 +70,12 @@ class ThetaRNNCell(RNNCell):
         with vs.variable_scope(scope or type(self).__name__):
             batch_size = inputs.get_shape().with_rank(2)[0]
             input_size = inputs.get_shape().with_rank(2)[1]
-
-            self.W = vs.get_variable("W", [input_size, self._num_units], initializer=self.input_weights_init)
-            self.U = vs.get_variable("U", [self._num_units, self._num_units], initializer=self.recc_weights_init)
-            self.bias = vs.get_variable("Bias", [self._num_units], initializer=init_ops.constant_initializer(0.0))
+            if self.W is None:
+                self.W = vs.get_variable("W", [input_size, self._num_units], initializer=self.input_weights_init)
+            if self.U is None:
+                self.U = vs.get_variable("U", [self._num_units, self._num_units], initializer=self.recc_weights_init)
+            if self.bias is None:
+                self.bias = vs.get_variable("Bias", [self._num_units], initializer=init_ops.constant_initializer(0.0))
 
             state_cos = tf.cos(state)
             weighted_input =  math_ops.matmul(inputs, self.W) + math_ops.matmul(state, self.U) + self.bias
@@ -82,9 +84,12 @@ class ThetaRNNCell(RNNCell):
             if not self._update_gate:
                 state = state + self._dt * new_state
             else:
-                self.W_u = vs.get_variable("W_u", [input_size, self._num_units], initializer=self.input_weights_init)
-                self.U_u = vs.get_variable("U_u", [self._num_units, self._num_units], initializer=self.recc_weights_init)
-                self.bias_u = vs.get_variable("Bias_u", [self._num_units], initializer=init_ops.constant_initializer(0.0))
+                if self.W_u is None: 
+                    self.W_u = vs.get_variable("W_u", [input_size, self._num_units], initializer=self.input_weights_init)
+                if self.U_u is None:
+                    self.U_u = vs.get_variable("U_u", [self._num_units, self._num_units], initializer=self.recc_weights_init)
+                if self.bias_u is None:
+                    self.bias_u = vs.get_variable("Bias_u", [self._num_units], initializer=init_ops.constant_initializer(0.0))
                 u = sigmoid(math_ops.matmul(inputs, self.W_u) + math_ops.matmul(state, self.U_u) + self.bias_u)
                 state = u * state + (1.0-u) * self._dt * new_state
 

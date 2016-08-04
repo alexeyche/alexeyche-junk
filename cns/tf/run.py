@@ -64,7 +64,7 @@ for source_id, inp_file in enumerate(data_file_list):
     input_size = d.data.shape[1]
 
 
-batch_size = len(data_file_list)*10
+batch_size = len(data_file_list)*5
 
 corpus = Corpus(input_size, len(data_file_list), batch_size, max_t, bptt_steps)
 
@@ -104,13 +104,11 @@ targets = [ tf.placeholder(tf.float32, shape=(batch_size, input_size), name="Tar
 
 init_state = state = tf.placeholder(tf.float32, shape=(batch_size, state_size), name="State")
 
-outputs, finstate = rnn.rnn(neurons, inputs, init_state)
+####################
 
-test_input = tf.placeholder(tf.float32, shape=(batch_size, input_size), name="TestInput")
-test_target = tf.placeholder(tf.float32, shape=(batch_size, input_size), name="TestTarget")
+# outputs, finstate = rnn.rnn(neurons, inputs, init_state)
 
-test_output, test_finstate = neurons(test_input, state)
-test_loss = tf.nn.l2_loss(test_target - test_output) / batch_size / net_size
+####################
 
 # hand made seq2seq
 
@@ -120,9 +118,11 @@ test_loss = tf.nn.l2_loss(test_target - test_output) / batch_size / net_size
 # finstate = array_ops.concat(1, [le_state, inp_state])
 # outputs, finstate = rnn.rnn(neurons_out, outputs_le, finstate, scope="out")
 
+####################
+
 # official seq2seq (perfect regression)
 
-# outputs, finstate = ss.basic_rnn_seq2seq(inputs, targets, neurons)
+outputs, finstate = ss.basic_rnn_seq2seq(inputs, targets, neurons)
 
 loss = tf.add_n([ tf.nn.l2_loss(target - output) for output, target in zip(outputs, targets) ]) / bptt_steps / batch_size / net_size
 
@@ -212,93 +212,103 @@ if epochs>0:
             
     print "Saving model {}".format(saver.save(sess, model_fname))
 
-state_v = np.zeros((batch_size, state_size))
-corpus_out = Corpus.construct_from(corpus)
-loss_sum = 0
-for corp_i in xrange(corpus.shape[0]):
-    feed_dict = {k: v for k, v in zip(inputs, corpus.prepare_sequence(corp_i)) }
-    feed_dict[init_state] = state_v
-    feed_dict.update({k: v for k, v in zip(
-        targets, 
-        corpus.prepare_sequence(corp_i, shift = forecast_step)
-    )})
+# state_v = np.zeros((batch_size, state_size))
+# corpus_out = Corpus.construct_from(corpus)
+# loss_sum = 0
+# for corp_i in xrange(corpus.shape[0]):
+#     feed_dict = {k: v for k, v in zip(inputs, corpus.prepare_sequence(corp_i)) }
+#     feed_dict[init_state] = state_v
+#     feed_dict.update({k: v for k, v in zip(
+#         targets, 
+#         corpus.prepare_sequence(corp_i, shift = forecast_step)
+#     )})
 
 
-    fetch = [outputs, finstate, loss]
-    fetch += [neuron_in.W, neuron_in.U, neuron_in.W_u, neuron_in.U_u] 
-    # fetch += [neuron_le.W, neuron_le.U, neuron_le.W_u, neuron_le.U_u] 
-    fetch += [neuron_out.W, neuron_out.U, neuron_out.W_u, neuron_out.U_u] 
+#     fetch = [outputs, finstate, loss]
+#     fetch += [neuron_in.W, neuron_in.U, neuron_in.W_u, neuron_in.U_u] 
+#     # fetch += [neuron_le.W, neuron_le.U, neuron_le.W_u, neuron_le.U_u] 
+#     fetch += [neuron_out.W, neuron_out.U, neuron_out.W_u, neuron_out.U_u] 
     
-    out = sess.run(fetch, feed_dict)
-    outputs_v, state_v, loss_v = out[0], out[1], out[2]
-    params = out[3:]
+#     out = sess.run(fetch, feed_dict)
+#     outputs_v, state_v, loss_v = out[0], out[1], out[2]
+#     params = out[3:]
     
-    loss_sum += loss_v
+#     loss_sum += loss_v
 
-    corpus_out.feed_corpus(corp_i, outputs_v)
+#     corpus_out.feed_corpus(corp_i, outputs_v)
 
-loss_sum = loss_sum/corpus.shape[0]
+# loss_sum = loss_sum/corpus.shape[0]
 
-    # le_corpus_out.feed_corpus(corp_i, states_v)
-
-
-state_v = np.zeros((batch_size, state_size))
-corpus_out = Corpus.construct_from(corpus)
-
-corpus_id = 0
-seq_id = 0
-test_seq = corpus.prepare_sequence(corpus_id)
-test_target_seq = corpus.prepare_sequence(corpus_id, shift = forecast_step)
+#     # le_corpus_out.feed_corpus(corp_i, states_v)
 
 
-test_input_v = test_seq.pop(0)
-test_target_v = test_target_seq.pop(0)
+# state_v = np.zeros((batch_size, state_size))
+# corpus_out = Corpus.construct_from(corpus)
 
-warming_up_steps = 1000
+# corpus_id = target_corpus_id = 0
 
-for step_i in xrange(0, corpus.shape[0]*corpus.shape[1]):
-    feed_dict = {
-        test_input: test_input_v,
-        state: state_v,
-        test_target: test_target_v
-    }
-    test_output_v, state_v, test_loss_v = sess.run([test_output, test_finstate, test_loss], feed_dict)
+# seq_id = 0
+# test_seq = corpus.prepare_sequence(corpus_id)
+# test_target_seq = corpus.prepare_sequence(target_corpus_id, shift = forecast_step)
 
-    corpus_out.feed_batch(corpus_id, seq_id, test_output_v)
+# test_input_v = test_seq.pop(0)
+# test_target_v = test_target_seq.pop(0)
 
-    # if step_i < warming_up_steps:
-    test_input_v = test_seq.pop(0)
-    if len(test_seq) == 0:
-        corpus_id += 1
-        if corpus_id >= corpus.shape[0]:
-            break
-        test_seq = corpus.prepare_sequence(corpus_id)
-    # else:
-    #     test_input_v = test_output_v
+# warming_up_steps = 125 # corpus.shape[0]*corpus.shape[1]
 
 
-    test_target_v = test_target_seq.pop(0)
-    if len(test_target_seq) == 0:
-        corpus_id += 1
-        if corpus_id >= corpus.shape[0]:
-            break
-        test_target_seq = corpus.prepare_sequence(corpus_id, shift = forecast_step)
+# for step_i in xrange(corpus.shape[0]*corpus.shape[1]):
+#     feed_dict = {
+#         test_input: test_input_v,
+#         state: state_v,
+#         test_target: test_target_v
+#     }
+#     test_output_v, state_v, test_loss_v = sess.run([test_output, test_finstate, test_loss], feed_dict)
+#     print "Feeding {} {} {}".format(step_i / bptt_steps, seq_id, np.linalg.norm(test_output_v))
+#     corpus_out.feed_batch(step_i / bptt_steps, seq_id, test_output_v)
     
-    print corpus_id, seq_id
+#     if step_i < warming_up_steps:
+#         test_input_v = test_seq.pop(0)
+#         if len(test_seq) == 0:
+#             corpus_id += 1
+#             if corpus_id >= corpus.shape[0]:
+#                 break
+#             test_seq = corpus.prepare_sequence(corpus_id)
+#     else:
+#         test_input_v = test_output_v
+
+
+#     test_target_v = test_target_seq.pop(0)
+#     if len(test_target_seq) == 0:
+#         target_corpus_id += 1
+#         if target_corpus_id >= corpus.shape[0]:
+#             break
+#         test_target_seq = corpus.prepare_sequence(target_corpus_id, shift = forecast_step)
     
-    seq_id += 1
-    if seq_id >= bptt_steps:
-        seq_id = 0
-    print "Testing step {}, loss {}".format(step_i, test_loss_v)
+#     seq_id += 1
+#     if seq_id >= bptt_steps:
+#         seq_id = 0
+#     print "Testing step {}, loss {}".format(step_i, test_loss_v)
 
-plt.figure(1)
-plt.subplot(2,1,1)
-
-plt.imshow(corpus.recollect(0, head=15000)[10000:15000, :].T)
-plt.subplot(2,1,2)
-plt.imshow(corpus_out.recollect(0, head=15000)[10000:15000, :].T)
-plt.show()
-
+# plt.figure(1)
+# plt.subplot(2,1,1)
+# # plt.imshow(corpus.data[0][49].todense())
+# plt.imshow(corpus.recollect(0, head=25000)[10000:25000, :].T)
+# plt.subplot(2,1,2)
+# # plt.imshow(corpus_out.data[0][49].todense())
+# plt.imshow(corpus_out.recollect(0, head=25000)[10000:25000, :].T)
+# plt.show()
+# for source_id, f in enumerate(source_data_file_list):
+#     try:
+#         id = data_file_list.index(f)
+#     except ValueError:
+#         continue
+#     print "Saving dream {}".format(source_id)
+#     d = SparseAcoustic.deserialize(f)
+#     d.data = scipy.sparse.csr_matrix(corpus_out.recollect(id))
+#     d.serialize(env.run("{}_nn_dream.dump".format(source_id)))
+        
+    
 #     plt.figure(1)
 #     plt.subplot(3,1,1)
 #     plt.imshow(test_input_v)
