@@ -31,8 +31,3 @@ class Env(object):
 		if len(args)>0:
 			return pj(self._run_dir, *args)
 		return self._run_dir
-
-
-
-
-current = Env("piano")

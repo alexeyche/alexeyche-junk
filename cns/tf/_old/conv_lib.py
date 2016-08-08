@@ -23,3 +23,9 @@ class SparseAcoustic(object):
             res = scipy.sparse.csr_matrix((loader['data'], loader['indices'], loader['indptr']), shape = loader['shape'])
         return SparseAcoustic(res, data_denom)
 
+
+
+def norm(data):
+    data_denom = np.sqrt(np.sum(data ** 2))
+    data = data/data_denom
+    return data, data_denom
