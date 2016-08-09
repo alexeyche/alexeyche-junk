@@ -59,8 +59,8 @@ device = "gpu"
 seed = 4
 #alpha=0.25
 
-net_size = 256
-layers_size = 4
+net_size = 50
+layers_size = 1
 
 # le_size = 10
 
@@ -73,8 +73,8 @@ lrate = 0.0001
 decay_rate = 1.0 #0.999
 
 
-forecast_step = 10
-continuous_steps = 10
+forecast_step = 0
+continuous_steps = 1
 
 source_data_file_list = []
 
@@ -212,10 +212,10 @@ def generate():
 
     generated = []
     generated += inputs_v
-
-    for gen_idx in xrange(5000/forecast_step):
-        inputs_v, state_v = run(inputs_v, state_v)
-        generated += inputs_v[-forecast_step:]
+    if forecast_step > 0:
+        for gen_idx in xrange(5000/forecast_step):
+            inputs_v, state_v = run(inputs_v, state_v)
+            generated += inputs_v[-forecast_step:]
 
     return generated
 
