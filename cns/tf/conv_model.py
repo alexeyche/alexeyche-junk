@@ -82,7 +82,7 @@ class ConvModel(object):
             self.cfg = ConvConfig(**kwargs)
             self.ds_info = ConvDatasetInfo()
 
-        self.build()
+            self.build()
         
     def _read_song(self, fname, proportion=None):
         logging.info("Reading {}".format(fname))    
@@ -228,26 +228,27 @@ class ConvModel(object):
             save_as_sparse(hidden_final, open(dump_fname, "w"))
             
             out_final = self.restore_hidden(hidden_final, rfilter_v.reshape(self.cfg.filter_len, self.cfg.filters_num))
+            self.save_waveform_as(out_final, data_id, env.result("{}_recovery.wav".format(data_id)))
             
-            source_sr, data_denom = self.get_data_info(data_id)
-
-            out_final *= data_denom
-            data_recov = lr.resample(out_final, self.cfg.target_sr, source_sr, scale=True)
             
-            recov_fname = env.result("{}_recovery.wav".format(data_id))
-            logging.info("Saving recovery as {}".format(recov_fname))
-            lr.output.write_wav(recov_fname, data_recov, source_sr)
+    def save_waveform_as(self, waveform, data_id, dst):
+        source_sr, data_denom = self.get_data_info(data_id)
+
+        waveform *= data_denom
+        waveform_resampled = lr.resample(waveform, self.cfg.target_sr, source_sr, scale=True)
+        
+        logging.info("Saving waveform as {}".format(dst))
+        lr.output.write_wav(dst, waveform_resampled, source_sr)
 
 
-
-    def restore_hidden(self, hidden_data, recov_filter=None):
+    def restore_hidden(self, hidden_data, recov_filter=None, sess=None):
         if recov_filter is None:
             recov_filter_fname = env.run(ConvModel.RECOV_FILTER_FNAME)
             assert os.path.exists(recov_filter_fname), "Need recovery filter filename {} to recover".format(recov_filter_fname)
             recov_filter = np.load(open(recov_filter_fname))
             recov_filter = recov_filter.reshape(150, 100) # HACK TODO
 
-        sess = tf.Session()
+        sess = sess if sess else tf.Session()
 
         output_data = []
         for id_start in xrange(0, hidden_data.shape[0], self.cfg.batch_size):
@@ -299,6 +300,7 @@ class ConvModel(object):
         ds_info = pkl.load(src)
         cm = ConvModel(cfg, ds_info)
         if sess:
+            cm.build()
             saver = tf.train.Saver()
             modelf = env.run(ConvModel.MODEL_FNAME)
             if os.path.exists(modelf):
