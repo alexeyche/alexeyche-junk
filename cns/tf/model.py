@@ -56,9 +56,16 @@ class ThetaRNNCell(RNNCell):
         self.W_u = None
         self.U_u = None
         self.bias_u = None
+        self.W_s = None
+        self.U_s = None
+        self.bias_s = None
         
         self.input_weights_init = input_weights_init
         self.recc_weights_init = recc_weights_init
+        
+        self._sensitivity = False
+        
+        self.states_info = []
 
     @property
     def state_size(self):
@@ -79,10 +86,22 @@ class ThetaRNNCell(RNNCell):
             if self.bias is None:
                 self.bias = vs.get_variable("Bias", [self._num_units], initializer=init_ops.constant_initializer(0.0))
 
-            state_cos = tf.cos(state)
+            if self._sensitivity:
+                if self.W_s is None: 
+                    self.W_s = vs.get_variable("W_s", [input_size, self._num_units], initializer=self.input_weights_init)
+                if self.U_s is None:
+                    self.U_s = vs.get_variable("U_s", [self._num_units, self._num_units], initializer=self.recc_weights_init)
+                if self.bias_s is None:
+                    self.bias_s = vs.get_variable("Bias_s", [self._num_units], initializer=init_ops.constant_initializer(0.0))
+                s = sigmoid(math_ops.matmul(inputs, self.W_s) + math_ops.matmul(state, self.U_s) + self.bias_s)
+                s *= 3.0
+            else:
+                s = 1.0
+
+            state_cos = s * tf.cos(state)
             weighted_input =  math_ops.matmul(inputs, self.W) + math_ops.matmul(state, self.U) + self.bias
 
-            new_state = 1.0 - state_cos + (1.0 + state_cos) * weighted_input
+            new_state = s - state_cos + (s + state_cos) * weighted_input
             if not self._update_gate:
                 state = state + self._dt * new_state
             else:
@@ -96,8 +115,9 @@ class ThetaRNNCell(RNNCell):
                 state = u * state + (1.0-u) * self._dt * new_state
 
             output = self._activation(new_state, self._sigma)
+            
+            self.states_info.append(state)
 
-            # self.states_info.append(new_state)
         return output, state
 
 
