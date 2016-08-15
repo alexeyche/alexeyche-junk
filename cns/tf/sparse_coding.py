@@ -81,7 +81,7 @@ x_mean, x_var = calc_mean_and_var(data, batch_size, filter_size)
 dd = form_batch(0, data, data.shape[0], filter_size)[0]
 
 
-dd = (dd - x_mean)/np.sqrt(x_var)
+dd = (dd - x_mean)/np.sqrt(x_var + 1e-05)
 x_cov = np.cov(dd.T)
 w, V = np.linalg.eig(x_cov)
 D = np.diag(w)
