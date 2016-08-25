@@ -18,7 +18,7 @@ filters_num = 500
 filter_size = 100
 batch_size = 100000
 target_sr = 3000
-sigma_zca = 1e-05
+sigma_zca = 0.1 #1e-05
 
 def colnorm(f):
 	return f.T/np.sqrt(np.sum(f ** 2, 1)).T
@@ -81,20 +81,18 @@ x_mean, x_var = calc_mean_and_var(data, batch_size, filter_size)
 dd = form_batch(0, data, data.shape[0], filter_size)[0]
 
 
-dd = (dd - x_mean)/np.sqrt(x_var + 1e-05)
+dd = (dd - x_mean)/np.sqrt(x_var + 0.1)
 x_cov = np.cov(dd.T)
 w, V = np.linalg.eig(x_cov)
 D = np.diag(w)
 
 
-zcaM = np.dot(np.dot(V, 1.0/np.sqrt(D + sigma_zca)), V.T)
+zcaM = np.dot(np.dot(V, 1.0/np.sqrt(D + 1.0)), V.T)
 
 
 
-
-
-#dd = np.dot(zcaM, )
-
+dd = np.dot(zcaM, dd.T).T
+plt.imshow(dd[1000:2000, :].T); plt.show()
 
 
 
@@ -103,10 +101,5 @@ filters = tf.placeholder(tf.float32, shape=(filters_num, filter_size), name="Fil
 Rn = tf.placeholder(tf.float32, shape=(batch_size, filter_size), name="Rn")
 
 prods = math_ops.matmul(filters, tf.transpose(Rn))
-
-
-
-
-
 
 filters_v = colnorm(np.random.randn(filters_num, filter_size))

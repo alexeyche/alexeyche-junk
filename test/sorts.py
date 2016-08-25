@@ -2,7 +2,7 @@
 
 import numpy as np
 import time
-
+import random
 
 def split(arr):
 	spl_point = len(arr)/2
@@ -67,6 +67,37 @@ def insertion_sort(arr):
 	return arr
 
 
+def swap(arr, i, j):
+	tmp = arr[j]
+	arr[j] = arr[i]
+	arr[i] = tmp
+
+def qpartition(arr, lo, hi):
+	pivot = arr[hi-1]
+	# print "lo {} hi {}, pivot {}".format(lo, hi, pivot)
+	# print "Beofore {}".format(arr[lo:hi])
+	i = lo
+	for j in xrange(lo, hi-1):
+		# print "{}, {}: {} <= {} ? ".format(i, j, arr[j], pivot) 
+		if arr[j] <= pivot:
+			if i != j:
+				swap(arr, i, j)
+			i += 1		
+	swap(arr, i, hi-1)
+	# print "After {}".format(arr[lo:hi])
+	return i
+
+def qsort(arr, lo=None, hi=None):
+	if lo is None:
+		lo = 0
+	if hi is None:
+		hi = len(arr)
+	if lo < hi:
+		p = qpartition(arr, lo, hi)
+		qsort(arr, lo, p)
+		qsort(arr, p+1, hi)
+	return arr
+
 
 def test_sort(fun):
 	start = time.time()
@@ -76,6 +107,31 @@ def test_sort(fun):
 	print "Done {} in {} seconds".format(fun.__name__, time.time() - start)
 
 
+
+def randomized_partition(A, p, r):
+	if len(A) == 1:
+		return 0
+	pivot_idx = random.randint(p, r-1)
+	swap(A, r-1, pivot_idx)
+	return qpartition(A, p, r)
+
+def randomized_select(A, p, r, i):
+	if p == r:
+		return A[p]
+	q = randomized_partition(A, p, r)
+	# print A
+	# print q, p, r, i # 1, 0, 7, 1, 1-0
+	k = q - p + 1
+	print k
+	if i == k:
+		return A[q]
+	elif i < k:
+		return randomized_select(A, p, q, i)
+	else:
+		return randomized_select(A, q+1, r, i-k)
+
+A = [4,1,5,10,0,20,21]
+print randomized_select(A, 0, len(A), 1)
 
 
 # test_sort(merge_sort)
@@ -88,4 +144,8 @@ def test_sort(fun):
 
 # test_sort(merge_sort)
 
+# test_sort(qsort)
 
+# print qsort([0, 5, 1, 3, 10])
+# test_sort(qsort)
+# test_sort(merge_sort)
