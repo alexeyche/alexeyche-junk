@@ -14,7 +14,7 @@ import librosa as lr
 import os
 import scipy
 
-from env import current as env
+from env import Env
 from util import norm
 from model import ThetaRNNCell
 
@@ -40,14 +40,17 @@ class Config(object):
         self.filters_num = kwargs.get("filters_num", 50)
         self.target_sr = kwargs.get("target_sr", 3000)
         self.strides = kwargs.get("strides", 1)
-        self.lrate = kwargs.get("lrate", 1e-03)
+        self.lrate = kwargs.get("lrate", 1e-04)
         self.net_size = kwargs.get("net_size", 100)
-        self.le_size = kwargs.get("le_size", 10)
+        self.le_size = kwargs.get("le_size", 2)
         self.num_of_layers = kwargs.get("num_of_layers", 1)
         self.forecast_ms = kwargs.get("forecast_ms", 0)
 
+
+env = Env("piano")
+
 c = Config()
-epochs = 100
+epochs = 1000
 
 # cell_type = rc.GRUCell
 # cell_type = rc.BasicRNNCell
@@ -286,7 +289,6 @@ for epoch in xrange(epochs):
         
         out_v.append(curr_out_v.reshape(c.seq_size))
         tout_v.append(ret[-2].reshape(c.seq_size))
-        # plt.figure(1)
         
         losses.append(cost_v)
     

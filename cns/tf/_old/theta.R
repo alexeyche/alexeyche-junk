@@ -13,16 +13,16 @@ cos.m = function(x) {
     1*cos(x)    
 }
 
-alpha = 0.1
-dt = 0.25
+dt = 0.5
+sens = 1.0
+b = 0.0
 
 w = rnorm(N)
 ss = NULL
 s = 0.0
 for (istep in 1:sample_duration) {
-    delta = (1.0 - cos.m(s) + (1.0 + cos.m(s)) * inp_spikes[istep,] %*% w)     
+    delta = (1.0 - cos.m(s) + (1.0 + cos.m(s)) * (b + inp_spikes[istep,] %*% w))
     
-    #new_s = (1.0 - alpha) * s + alpha * delta
     new_s = s + dt * delta     
     
     ss = c(ss, new_s)

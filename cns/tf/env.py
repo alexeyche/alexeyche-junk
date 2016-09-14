@@ -34,5 +34,3 @@ class Env(object):
 
 
 
-
-current = Env("piano")

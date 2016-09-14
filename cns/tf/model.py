@@ -30,7 +30,6 @@ def simple_act(x, sigma):
 
 
 
-
 class ThetaRNNCell(RNNCell):
     """Theta neuron RNN cell."""
 
@@ -39,10 +38,10 @@ class ThetaRNNCell(RNNCell):
         num_units,
         activation = simple_act,
         input_weights_init = tf.uniform_unit_scaling_initializer(factor=1.0),
-        recc_weights_init = tf.uniform_unit_scaling_initializer(factor=1.0),
-        sigma = None,
+        recc_weights_init = tf.uniform_unit_scaling_initializer(factor=0.1),
+        sigma = 1.0,
         update_gate = True,
-        dt = 0.25
+        dt = 1.0
     ):
         self._num_units = num_units
         self._activation = activation
@@ -59,13 +58,15 @@ class ThetaRNNCell(RNNCell):
         self.W_s = None
         self.U_s = None
         self.bias_s = None
-        
+        self.sigma = None
+
         self.input_weights_init = input_weights_init
         self.recc_weights_init = recc_weights_init
         
         self._sensitivity = False
         
         self.states_info = []
+        self.update_info = []
 
     @property
     def state_size(self):
@@ -94,11 +95,11 @@ class ThetaRNNCell(RNNCell):
                 if self.bias_s is None:
                     self.bias_s = vs.get_variable("Bias_s", [self._num_units], initializer=init_ops.constant_initializer(0.0))
                 s = sigmoid(math_ops.matmul(inputs, self.W_s) + math_ops.matmul(state, self.U_s) + self.bias_s)
-                s *= 3.0
+                # s *= 3.0
             else:
                 s = 1.0
-
-            state_cos = s * tf.cos(state)
+            s = 1.0
+            state_cos = s*tf.cos(state)
             weighted_input =  math_ops.matmul(inputs, self.W) + math_ops.matmul(state, self.U) + self.bias
 
             new_state = s - state_cos + (s + state_cos) * weighted_input
@@ -113,8 +114,10 @@ class ThetaRNNCell(RNNCell):
                     self.bias_u = vs.get_variable("Bias_u", [self._num_units], initializer=init_ops.constant_initializer(0.0))
                 u = sigmoid(math_ops.matmul(inputs, self.W_u) + math_ops.matmul(state, self.U_u) + self.bias_u)
                 state = u * state + (1.0-u) * self._dt * new_state
-
-            output = self._activation(new_state, self._sigma)
+                self.update_info.append(u)
+            
+            # self.sigma = vs.get_variable("sigma", [self._num_units], initializer=init_ops.constant_initializer(1.0))
+            output = self._activation(state, self._sigma)
             
             self.states_info.append(state)
 
