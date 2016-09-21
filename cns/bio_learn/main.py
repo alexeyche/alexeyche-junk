@@ -2,49 +2,7 @@
 
 from matplotlib import pyplot as plt
 import numpy as np
-
-
-class Act(object):
-	def __call__(self, x):
-		raise NotImplementedError()
-
-	def deriv(self, x):
-		raise NotImplementedError()
-
-class Linear(Act):
-	def __call__(self, x):
-		return x
-
-	def deriv(self, x):
-		return np.ones(x.shape)
-
-class Sigmoid(Act):
-	def __call__(self, x):
-		return 1.0/(1.0 + np.exp(-x))
-
-	def deriv(self, x):
-		v = self(x)
-		return v * (1.0 - v)
-
-def get_oja_deriv(x, y, W, dy):
-	assert W.shape[0] == len(x), "x, {} != {}".format(W.shape[0], len(x))
-	assert W.shape[1] == len(y), "y, {} != {}".format(W.shape[1], len(y))
-
-	dW = np.zeros(W.shape)
-	for ni in xrange(len(y)):
-		dW[:, ni] = y[ni] * (x - y[ni] * W[:, ni]) * dy[ni]
-	return dW
-
-def norm(f):
-	# return np.asarray([ f[ri, :] * n for ri, n in enumerate(np.sqrt(np.sum(f ** 2, 1))) ])
-	# return np.asarray([ f[:, ci] * n for ci, n in enumerate(np.sqrt(np.sum(f ** 2, 0))) ]).T
-	return f
-
-class Learning(object):
-	BP = 0
-	FA = 1
-	OJA = 2
-	OJA_FEED = 3
+from common import Sigmoid, Linear, get_oja_deriv, norm, Learning
 
 lrate = 1e-02
 
@@ -87,7 +45,7 @@ for lrule in (Learning.BP, Learning.FA, Learning.OJA, Learning.OJA_FEED):
 		for ti in xrange(T):
 			x = x_s[ti, :]
 			y_t = y_t_s[ti, :]
-			
+
 			a0 = np.dot(x, W0); h0 = act(a0)
 			a1 = np.dot(h0, W1); h1 = act(a1)
 			a2 = np.dot(h1, W2); y = act(a2)
@@ -97,7 +55,7 @@ for lrule in (Learning.BP, Learning.FA, Learning.OJA, Learning.OJA_FEED):
 
 			x1 = np.dot(e, B1); yf1 = act(x1)
 			x0 = np.dot(e, B0); yf0 = act(x0)
-			
+
 			if lrule == Learning.BP or lrule == Learning.FA:
 				if lrule == Learning.BP:
 					dh1 = np.dot(W2, e) * act.deriv(a1).T
