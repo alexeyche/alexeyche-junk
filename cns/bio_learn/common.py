@@ -44,3 +44,37 @@ class Learning(object):
     FA = 1
     OJA = 2
     OJA_FEED = 3
+
+
+
+class BioLearning(object):
+    STDP = 0
+
+
+
+
+class BioAct(object):
+    def __call__(self, x):
+        raise NotImplementedError()
+
+    def deriv(self, x):
+        raise NotImplementedError()
+
+class Determ(BioAct):
+    def __init__(self, threshold):
+        self.threshold = threshold
+
+    def __call__(self, x):
+        if x >= self.threshold:
+            return 1.0
+        return 0.0
+
+    def deriv(self, x):
+        if hasattr(x, "shape"):
+            return np.ones(x.shape)
+        return 1.0
+
+
+
+
+
