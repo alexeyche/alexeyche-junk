@@ -49,6 +49,8 @@ class Learning(object):
 
 class BioLearning(object):
     NEAREST_STDP = 0
+    RESUME = 1
+    SPAN = 2
 
 
 
