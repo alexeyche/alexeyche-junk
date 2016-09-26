@@ -6,26 +6,25 @@ from functools import partial
 
 from common import Determ, BioLearning
 
-np.random.seed(1)
+np.random.seed(10)
 
-lrate = 1e-01
+lrate = 1.0
 
 syn_size = 100
 sim_time = 100
 
-inp_spikes0 = [[25.0]] + [ [sim_time * np.random.random()] for _ in xrange(syn_size-1) ]
-inp_spikes1 = [[]] + [ [sim_time * np.random.random()] for _ in xrange(syn_size-1) ]
+inp_spikes0 = [ [sim_time * np.random.random()] for _ in xrange(syn_size-1) ]
+inp_spikes1 = [ [sim_time * np.random.random()] for _ in xrange(syn_size-1) ]
 
 T = 1
 lrule = BioLearning.SPAN
 
 
-epochs = 1
 dt = 1.0
 target_spikes = [75.0]
 
-W0 = 0.1*np.asarray([5.0] +  [ np.random.random() for _ in xrange(syn_size-1) ])
-W1 = 0.1*np.asarray([5.0] +  [ np.random.random() for _ in xrange(syn_size-1) ])
+W0 = np.asarray([ np.random.random() for _ in xrange(syn_size) ])
+W1 = np.asarray([ np.random.random() for _ in xrange(syn_size) ])
 B0 = 1.0
 
 slice_size = 25
@@ -42,8 +41,8 @@ error_res = np.zeros((slice_size, slice_size))
 
 tau_syn = 10.0
 tau_ref = 2.0
-tau_plus = 10
-tau_minus = 10
+tau_plus = 5.0
+tau_minus = 10.0
 a_plus = 1.0
 a_minus = 1.0
 epochs = 100
@@ -53,7 +52,9 @@ threshold = 0.5
 act = Determ(threshold)
 
 def alpha(x, tau):
-    return np.exp(-x/tau)
+    if x < 0:
+        return 0.0
+    return np.exp(-float(x)/tau)
 
 def stdp_window(s):
     if s >= 0:
@@ -71,22 +72,24 @@ def conv(t, spikes, kernel):
         v += kernel(t-t_sp)
     return v
 
-def srm(t, W, all_inp_spikes, out_spikes):
-    x_syn = 0
-    syn_fired = np.zeros(len(all_inp_spikes))
-    for syn_id, inp_spikes in enumerate(all_inp_spikes):
-        syn_fired[syn_id] = 0.0
-        for t_sp in inp_spikes[:]:
-            if t_sp > t:
-                break
-            t_sp += 1.0 # dendrite time
-            s_sp = t - t_sp
-            if abs(s_sp) < dt:
-                syn_fired[syn_id] = 1.0
-            if s_sp < tau_syn*10:
-                x_syn += W[syn_id] * alpha(s_sp, tau_syn)
-            else:
-                inp_spikes.pop(0)
+def srm(t, out_spikes, W=None, all_inp_spikes=[], x_syn=None):
+    syn_fired = None
+    if x_syn is None:
+        x_syn = 0
+        syn_fired = np.zeros(len(all_inp_spikes))
+        for syn_id, inp_spikes in enumerate(all_inp_spikes):
+            syn_fired[syn_id] = 0.0
+            for t_sp in inp_spikes[:]:
+                if t_sp > t:
+                    break
+                t_sp += 1.0 # dendrite time
+                s_sp = t - t_sp
+                if abs(s_sp) < dt:
+                    syn_fired[syn_id] = 1.0
+                if s_sp < tau_syn*10:
+                    x_syn += W[syn_id] * alpha(s_sp, tau_syn)
+                else:
+                    inp_spikes.pop(0)
 
     y = x_syn
     if len(out_spikes) > 0:
@@ -100,16 +103,15 @@ def srm(t, W, all_inp_spikes, out_spikes):
 
 ri=0
 ci=0
-epochs=1
+epochs=1000
 for epoch in xrange(epochs):
     target_id = 0
     acc0, acc1 = [], []
-    spikes0, spikes1 = [], []
+    spikes0, spikes1, spikes_e_plus, spikes_e_minus = [], [], [], []
     inp_spikes1[0] = spikes0
 
     dW0, dW1 = np.zeros(syn_size), np.zeros(syn_size)
-    mean_y_all = np.zeros((sim_time,))
-    error_all = np.zeros((sim_time,))
+
     cum_error = 0
     for t in xrange(sim_time):
         target_fired = 0.0
@@ -117,24 +119,27 @@ for epoch in xrange(epochs):
             target_id += 1
             target_fired = 1.0
 
-        y0, p_act0, fired0, syn_fired0 = srm(t, W0, inp_spikes0, spikes0)
-        y1, p_act1, fired1, syn_fired1 = srm(t, W1, inp_spikes1, spikes1)
+        y0, p_act0, fired0, syn_fired0 = srm(t, spikes0, W0, inp_spikes0)
+        y1, p_act1, fired1, syn_fired1 = srm(t, spikes1, W1, inp_spikes1)
+
+        mean_y = conv(t, spikes1, partial(alpha, tau=tau_plus))
+        mean_y_t = conv(t, target_spikes, partial(alpha, tau=tau_plus))
+        e = mean_y_t - mean_y
+
+        y_e_plus, _, fired_e_plus, syn_fired_e_plus = srm(t, spikes_e_plus, x_syn=e)
+
+        
+        cum_error += e 
 
         if lrule == BioLearning.RESUME:
-            cum_error += target_fired - fired1
             for syn_id, syn_spikes in enumerate(inp_spikes1):
                 dW1[syn_id] += (target_fired - fired1)  * conv(t, syn_spikes, partial(alpha, tau=tau_plus))
-        elif lrule == BioLearning.SPAN:
-            mean_y = conv(t, spikes1, partial(alpha, tau=tau_plus))
-            mean_y_t = conv(t, target_spikes, partial(alpha, tau=tau_plus))
-
-            cum_error += mean_y_t - mean_y
-            error_all[t] = mean_y_t - mean_y
-            mean_y_all[t] = mean_y_t - mean_y
-
+        elif lrule == BioLearning.SPAN:    
             for syn_id, syn_spikes in enumerate(inp_spikes1):
                 mean_x = conv(t, syn_spikes, partial(alpha, tau=tau_plus))
                 dW1[syn_id] += (mean_y_t - mean_y)  * mean_x
+
+            # B0
 
         acc0.append(y0)
         acc1.append(y1)
@@ -152,7 +157,6 @@ for epoch in xrange(epochs):
     # dW0res[ri, ci] = dW0
     # dW1res[ri, ci] = dW1
 
-ss=[ conv(t, spikes1, partial(alpha, tau=tau_plus)) for t  in xrange(sim_time) ]
 
     if len(spikes1) == 0:
         print "Epoch {}, no spikes, cum_error {}".format(epoch, cum_error)
