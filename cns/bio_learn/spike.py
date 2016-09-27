@@ -15,7 +15,7 @@ def get_idx_of_refractory(ti, spikes, tau_ref):
 
 np.random.seed(10)
 
-lrate = 1e-02
+lrate = 1e-01
 epochs = 1000
 
 in_size = 30
@@ -43,7 +43,7 @@ lrule = Learning.BP
 
 F = -0.1 + 0.2*np.random.rand(in_size, out_size)
 
-T = 100
+T = 200
 dt = 1.0
 Tsize = int(T/dt)
 x_s = np.random.randn(T, in_size)
