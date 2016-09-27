@@ -74,9 +74,10 @@ class Determ(BioAct):
         return p
 
     def deriv(self, x):
-        if hasattr(x, "shape"):
-            return np.ones(x.shape)
-        return 1.0
+        return self(x)
+        # if hasattr(x, "shape"):
+        #     return np.ones(x.shape)
+        # return 1.0
 
 
 
