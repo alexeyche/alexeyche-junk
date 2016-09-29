@@ -20,7 +20,7 @@ act = Sigmoid()
 
 F = -1.0 + 2.0*np.random.rand(in_size, out_size)
 
-T = 1
+T = 100
 
 x_s = np.random.randn(T, in_size)
 y_t_s = act(np.dot(x_s, F))
