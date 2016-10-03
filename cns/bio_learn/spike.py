@@ -2,6 +2,8 @@ from matplotlib import pyplot as plt
 from matplotlib.pyplot import cm
 import numpy as np
 from functools import partial
+import os
+from os.path import join as pj
 
 from common import Determ, Learning
 import scipy.sparse as sp
@@ -13,22 +15,21 @@ def get_idx_of_refractory(ti, spikes, tau_ref):
    	return np.asarray([], dtype=np.uint32)
     
 
+
+pic_dir = "/home/alexeyche/prog/tmp"
 np.random.seed(10)
 
 lrate = 1.0
-epochs = 1000
+epochs = 100
 
 in_size = 10
 hidden_size0 = 10
 out_size = 1
 
 
-W0 = np.random.rand(in_size, hidden_size0)
-W1 = np.random.rand(hidden_size0, out_size)
+W0 = 0.1*np.random.rand(in_size, hidden_size0)
+W1 = 0.1*np.random.rand(hidden_size0, out_size)
 B0 = np.random.rand(out_size, hidden_size0)
-
-W0 *= 4.0
-W1 *= 4.0
 
 # W2 = -0.1 + 0.2*np.random.rand(hidden_size1, out_size)
 
@@ -36,13 +37,13 @@ tau_syn = 10.0
 tau_ref = 2.0
 tau_learn = 5.0
 tau_mem = 2.0
-threshold = 1.0
+threshold = 0.1
 
 act = Determ(threshold)
 
 lrule = Learning.BP
 
-
+[ os.remove(pj(pic_dir, f)) for f in os.listdir(pic_dir) if f.endswith(".png") ]
 
 F = -0.1 + 0.2*np.random.rand(in_size, out_size)
 
@@ -53,32 +54,33 @@ Tsize = int(T/dt)
 x_s = np.zeros((Tsize, in_size))
 # tt = 0
 # while tt < T:
-# for ni in xrange(in_size):
-#     x_s[tt, ni] = in_size
-    # tt += 2.0
-x_s[0,1] = 1.0
-x_s[10,0] = 1.0
-x_s[20,2] = 1.0
-x_s[21,0] = 1.0
-x_s[30,0] = 1.0
-x_s[35,1] = 1.0
-x_s[1,3] = 1.0
-x_s[15,4] = 1.0
-x_s[25,5] = 1.0
-x_s[30,3] = 1.0
-x_s[37,4] = 1.0
-x_s[50,5] = 1.0
-x_s[5,6] = 1.0
-x_s[12,7] = 1.0
-x_s[18,8] = 1.0
-x_s[23,9] = 1.0
-x_s[30,7] = 1.0
-x_s[40,6] = 1.0
+#     for ni in xrange(in_size):
+#         x_s[tt, ni] = in_size
+        # tt += 2.0
 
-y_t_s = np.zeros((Tsize, out_size)) #Determ(0.75)(np.dot(x_s, F))
-y_t_s[0,0] = 1.0
-y_t_s[25,0] = 1.0
-y_t_s[50,0] = 1.0
+# x_s[0,1] = 1.0
+# x_s[10,0] = 1.0
+# x_s[20,2] = 1.0
+# x_s[21,0] = 1.0
+# x_s[30,0] = 1.0
+# x_s[35,1] = 1.0
+# x_s[1,3] = 1.0
+# x_s[15,4] = 1.0
+# x_s[25,5] = 1.0
+# x_s[30,3] = 1.0
+# x_s[37,4] = 1.0
+# x_s[47,5] = 1.0
+# x_s[5,6] = 1.0
+# x_s[12,7] = 1.0
+# x_s[18,8] = 1.0
+# x_s[23,9] = 1.0
+# x_s[30,7] = 1.0
+# x_s[46,6] = 1.0
+
+# y_t_s = np.zeros((Tsize, out_size)) #Determ(0.75)(np.dot(x_s, F))
+# y_t_s[0,0] = 1.0
+# y_t_s[25,0] = 1.0
+# y_t_s[50,0] = 1.0
 
 stats = []
 error_acc = []
@@ -117,6 +119,7 @@ for epoch in xrange(epochs):
     	u0[get_idx_of_refractory(ti, spikes0, tau_ref)] = -5.0
         a0 = act(u0)
         s0 += dt * (- s0/tau_syn + a0)
+        x_mean[np.where(a0 == 1.0)] = 0.0
         spikes0[ti, np.where(a0 == 1.0)] = 1.0
         u0m += dt * (- u0m/tau_learn + a0)
 
@@ -126,6 +129,7 @@ for epoch in xrange(epochs):
     	u1[get_idx_of_refractory(ti, spikes1, tau_ref)] = -5.0
         a1 = act(u1)
         spikes1[ti, np.where(a1 == 1.0)] = 1.0
+        s0[np.where(a1 == 1.0)] = 0.0
 
         ym += dt * (- ym/tau_learn + a1)
         ym_t += dt * (- ym_t/tau_learn + target_fired)
@@ -199,7 +203,7 @@ for epoch in xrange(epochs):
     plt.plot(x_s[:,8])
     plt.plot(x_s[:,9])
     plt.subplot(8,1,6)
-    hni = 0
+    hni = 1
     plt.title("Derivative {}".format(hni))
     plt.plot(dW0_stat[:,0,hni])
     plt.plot(dW0_stat[:,1,hni])
@@ -276,7 +280,7 @@ for epoch in xrange(epochs):
     plt.plot(s0_stat[:,8])
     plt.plot(s0_stat[:,9])
     plt.subplot(8,1,8)
-    plt.title("Derivative 1")
+    plt.title("Derivative output neuron")
     plt.plot(dW1_stat[:,0,0], linewidth=5.0)
     plt.plot(dW1_stat[:,1,0])
     plt.plot(dW1_stat[:,2,0])
@@ -288,8 +292,18 @@ for epoch in xrange(epochs):
     plt.plot(dW1_stat[:,8,0])
     plt.plot(dW1_stat[:,9,0])
 
-    plt.savefig("/home/alexeyche/prog/tmp/{}_spike_plot.png".format(epoch), dpi=100)
+    plt.savefig("{}/spike_plot_{}.png".format(pic_dir, epoch), dpi=100)
     plt.clf()
+
+    plt.subplot(2,1,1)
+    plt.imshow(np.mean(dW0_stat, 0))
+    plt.colorbar()
+    plt.subplot(2,1,2)
+    plt.imshow(np.mean(dW1_stat, 0))
+    plt.colorbar()
+    plt.savefig("{}/dW_{}.png".format(pic_dir, epoch), dpi=100)
+    plt.clf()
+
 
 stats.append(error_acc)
 
