@@ -66,15 +66,18 @@ class Determ(BioAct):
     def __init__(self, threshold):
         self.threshold = threshold
 
-    def __call__(self, x):
-        if x >= self.threshold:
-            return 1.0
-        return 0.0
+    def __call__(self, x, **kwargs):
+        threshold = kwargs.get("threshold", self.threshold)
+        
+        p = np.zeros(x.shape)
+        p[np.where(x >= self.threshold)] = 1.0
+        return p
 
     def deriv(self, x):
-        if hasattr(x, "shape"):
-            return np.ones(x.shape)
-        return 1.0
+        return self(x)
+        # if hasattr(x, "shape"):
+        #     return np.ones(x.shape)
+        # return 1.0
 
 
 

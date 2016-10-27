@@ -1,161 +1,183 @@
-
 from matplotlib import pyplot as plt
 from matplotlib.pyplot import cm
 import numpy as np
 from functools import partial
 
-from common import Determ, BioLearning
+from common import Determ, Learning
+import scipy.sparse as sp
 
-np.random.seed(1)
+def get_idx_of_refractory(ti, spikes, tau_ref):
+    sp_idx = spikes[max(0, ti-int(tau_ref/dt)):ti].rows
+    if len(sp_idx) > 0:
+        return [ int(v) for v in np.hstack(sp_idx) ]
+    return np.asarray([], dtype=np.uint32)
+    
 
-lrate = 1e-01
+np.random.seed(10)
 
-syn_size = 100
-sim_time = 100
-
-inp_spikes0 = [[25.0]] + [ [sim_time * np.random.random()] for _ in xrange(syn_size-1) ]
-inp_spikes1 = [[]] + [ [sim_time * np.random.random()] for _ in xrange(syn_size-1) ]
-
-T = 1
-lrule = BioLearning.SPAN
-
-
+lrate = 1.0
 epochs = 1
-dt = 1.0
-target_spikes = [75.0]
 
-W0 = 0.1*np.asarray([5.0] +  [ np.random.random() for _ in xrange(syn_size-1) ])
-W1 = 0.1*np.asarray([5.0] +  [ np.random.random() for _ in xrange(syn_size-1) ])
-B0 = 1.0
+in_size = 1
+hidden_size0 = 1
+out_size = 1
+
+
+W0 = np.random.rand(in_size, hidden_size0)
+W1 = np.random.rand(hidden_size0, out_size)
+B0 = np.random.rand(out_size, hidden_size0)
+
+
+# W2 = -0.1 + 0.2*np.random.rand(hidden_size1, out_size)
+
+tau_syn = 10.0
+tau_ref = 5.0
+tau_learn = 5.0
+tau_mem = 5.0
+threshold = 1.0
+
+act = Determ(threshold)
+
+lrule = Learning.FA
+
+
+T = 40
+dt = 1.0
+Tsize = int(T/dt)
+
+x_s = np.zeros((Tsize, in_size))
+x_s[10,0] = 1.0
+
+y_t_s = np.zeros((Tsize, out_size))
+y_t_s[15,0] = 1.0
 
 slice_size = 25
 
-W0a = np.linspace(0, 1.0, slice_size)
-W1a = np.linspace(0, 1.0, slice_size)
+W0a = np.linspace(0.0, 5.0, slice_size)
+W1a = np.linspace(0.0, 5.0, slice_size)
+
 
 W0res = np.zeros((slice_size, slice_size))
 W1res = np.zeros((slice_size, slice_size))
 dW0res = np.zeros((slice_size, slice_size))
 dW1res = np.zeros((slice_size, slice_size))
 error_res = np.zeros((slice_size, slice_size))
+spike_count0 = np.zeros((slice_size, slice_size))
+spike_count1 = np.zeros((slice_size, slice_size))
+
+for ri, W0v in enumerate(W0a):
+    for ci, W1v in enumerate(W1a):
+        W0 = W0v
+        W1 = W1v
+
+        for epoch in xrange(epochs):
+            x_mean = np.zeros(in_size)
+            u0 = np.zeros(hidden_size0)
+            s0 = np.zeros(hidden_size0)
+            u0m = np.zeros(hidden_size0)
+
+            u1 = np.zeros(out_size)
+
+            ym = np.zeros(out_size)
+            ym_t = np.zeros(out_size)
 
 
-tau_syn = 10.0
-tau_ref = 2.0
-tau_plus = 10
-tau_minus = 10
-a_plus = 1.0
-a_minus = 1.0
-epochs = 100
+            u0_stat = np.zeros((Tsize, hidden_size0))
+            u0m_stat = np.zeros((Tsize, hidden_size0))
+            u1_stat = np.zeros((Tsize, out_size))
+            e_stat = np.zeros((Tsize, out_size))
+            s0_stat = np.zeros((Tsize, hidden_size0))
+            
+            spikes0 = sp.lil_matrix((Tsize, hidden_size0), dtype=np.float32)
+            spikes1 = sp.lil_matrix((Tsize, out_size), dtype=np.float32)
 
-threshold = 0.5
+            dW0, dW1 = 0, 0
 
-act = Determ(threshold)
+            int_error = 0.0
+            for ti, t in enumerate(np.linspace(0, T, Tsize)):
+                target_fired = y_t_s[ti,:]
+                x = x_s[ti, :]
+                
+                x_mean += dt * ( - x_mean/tau_syn + x )
 
-def alpha(x, tau):
-    return np.exp(-x/tau)
+                u0 += dt * (- u0 + np.dot(x_mean, W0))/tau_mem
+                u0[get_idx_of_refractory(ti, spikes0, tau_ref)] = -5.0
+                a0 = act(u0)
+                s0 += dt * (- s0/tau_syn + a0)
+                spikes0[ti, np.where(a0 == 1.0)] = 1.0
+                # x_mean[np.where(a0 == 1.0)] = 0.0
+        
+                u0m += dt * (- u0m/tau_learn + a0)
 
-def stdp_window(s):
-    if s >= 0:
-        return a_plus * alpha(s, tau_plus)
-    else:
-        return - a_minus * alpha(-s, tau_minus)
+                s0_stat[ti, :] = s0
+
+                u1 += dt * (- u1 + np.dot(s0, W1))/tau_mem
+                u1[get_idx_of_refractory(ti, spikes1, tau_ref)] = -5.0
+                a1 = act(u1)
+                spikes1[ti, np.where(a1 == 1.0)] = 1.0
+                # s0[np.where(a1 == 1.0)] = 0.0
+
+                ym += dt * (- ym/tau_learn + a1)
+                ym_t += dt * (- ym_t/tau_learn + target_fired)
+
+                u0_stat[ti, :] = u0
+                u0m_stat[ti, :] = u0m
+                u1_stat[ti, :] = u1
+                
+                e = ym - ym_t
+                e_stat[ti, :] = e
+
+                error = 0.5 * np.inner(e, e)
+
+                int_error += error/Tsize
+
+                if lrule == Learning.BP or lrule == Learning.FA:
+                    if lrule == Learning.BP:
+                        du0 = np.dot(W1, e) #* act.deriv(u0)
+                    else:
+                        du0 = np.dot(e, B0) #* act.deriv(u0)
+                    
+                    dW0_cur = - np.outer(x_mean, du0)/Tsize
+                    dW1_cur = - np.outer(s0, e)/Tsize
+                    
+                    dW0 += dW0_cur #- 0.0001 * W0
+                    dW1 += dW1_cur #- 0.0001 * W1
+
+            spike_count0[ri, ci] = len(np.where(spikes0.todense() > 0)[0])
+            spike_count1[ri, ci] = len(np.where(spikes1.todense() > 0)[0])
+            
+            W0res[ri, ci] = W0
+            W1res[ri, ci] = W1
+            dW0res[ri, ci] = dW0
+            dW1res[ri, ci] = dW1
+            error_res[ri, ci] = int_error
 
 
+# plt.subplot(3,1,1)
+plt.figure(1)
+plt.quiver(
+    W0res, W1res, dW0res, dW0res,
+    error_res,
+    cmap=cm.seismic,     # colour map
+    headlength=7, headwidth=5.0)        # length of the arrows
 
-def conv(t, spikes, kernel):
-    v = 0.0
-    for t_sp in spikes:
-        if t_sp > t:
-            break
-        v += kernel(t-t_sp)
-    return v
+plt.colorbar()                      # add colour bar on the right
 
-def srm(t, W, all_inp_spikes, out_spikes):
-    x_syn = 0
-    syn_fired = np.zeros(len(all_inp_spikes))
-    for syn_id, inp_spikes in enumerate(all_inp_spikes):
-        syn_fired[syn_id] = 0.0
-        for t_sp in inp_spikes[:]:
-            if t_sp > t:
-                break
-            t_sp += 1.0 # dendrite time
-            s_sp = t - t_sp
-            if abs(s_sp) < dt:
-                syn_fired[syn_id] = 1.0
-            if s_sp < tau_syn*10:
-                x_syn += W[syn_id] * alpha(s_sp, tau_syn)
-            else:
-                inp_spikes.pop(0)
+# plt.subplot(3,1,2)
+plt.figure(2)
+plt.subplot(2,1,1)
+plt.imshow(spike_count0, origin='lower')
+plt.colorbar()
+plt.subplot(2,1,2)
+plt.imshow(spike_count1, origin='lower')
+plt.colorbar()                      
 
-    y = x_syn
-    if len(out_spikes) > 0:
-        y += -100.0 * alpha(t-out_spikes[-1], tau_ref)
-    p_act = act(y)
-    fired = 0.0
-    if p_act > np.random.random():
-        out_spikes.append(t)
-        fired = 1.0
-    return y, p_act, fired, syn_fired
+plt.figure(3)
+plt.subplot(2,1,1)
+plt.imshow(dW0res, origin='lower')
+plt.colorbar()
+plt.subplot(2,1,2)
+plt.imshow(dW1res, origin='lower')
+plt.colorbar()
 
-ri=0
-ci=0
-epochs=1
-for epoch in xrange(epochs):
-    target_id = 0
-    acc0, acc1 = [], []
-    spikes0, spikes1 = [], []
-    inp_spikes1[0] = spikes0
-
-    dW0, dW1 = np.zeros(syn_size), np.zeros(syn_size)
-    mean_y_all = np.zeros((sim_time,))
-    error_all = np.zeros((sim_time,))
-    cum_error = 0
-    for t in xrange(sim_time):
-        target_fired = 0.0
-        if target_id < len(target_spikes) and t == target_spikes[target_id]:
-            target_id += 1
-            target_fired = 1.0
-
-        y0, p_act0, fired0, syn_fired0 = srm(t, W0, inp_spikes0, spikes0)
-        y1, p_act1, fired1, syn_fired1 = srm(t, W1, inp_spikes1, spikes1)
-
-        if lrule == BioLearning.RESUME:
-            cum_error += target_fired - fired1
-            for syn_id, syn_spikes in enumerate(inp_spikes1):
-                dW1[syn_id] += (target_fired - fired1)  * conv(t, syn_spikes, partial(alpha, tau=tau_plus))
-        elif lrule == BioLearning.SPAN:
-            mean_y = conv(t, spikes1, partial(alpha, tau=tau_plus))
-            mean_y_t = conv(t, target_spikes, partial(alpha, tau=tau_plus))
-
-            cum_error += mean_y_t - mean_y
-            error_all[t] = mean_y_t - mean_y
-            mean_y_all[t] = mean_y_t - mean_y
-
-            for syn_id, syn_spikes in enumerate(inp_spikes1):
-                mean_x = conv(t, syn_spikes, partial(alpha, tau=tau_plus))
-                dW1[syn_id] += (mean_y_t - mean_y)  * mean_x
-
-        acc0.append(y0)
-        acc1.append(y1)
-
-    cum_error = cum_error/sim_time
-
-    dW0 = dW0/sim_time
-    dW1 = dW1/sim_time
-
-    W0 += lrate * dW0
-    W1 += lrate * dW1
-
-    # W0res[ri, ci] = W0
-    # W1res[ri, ci] = W1
-    # dW0res[ri, ci] = dW0
-    # dW1res[ri, ci] = dW1
-
-ss=[ conv(t, spikes1, partial(alpha, tau=tau_plus)) for t  in xrange(sim_time) ]
-
-    if len(spikes1) == 0:
-        print "Epoch {}, no spikes, cum_error {}".format(epoch, cum_error)
-    else:
-        print "Epoch {}, error {}, cum_error {}".format(epoch, target_spikes[0] - spikes1[0], cum_error)
-
+plt.show()
