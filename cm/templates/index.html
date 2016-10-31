@@ -1,0 +1,105 @@
+<!doctype html>
+<html>
+<head>
+  <title>Network | Basic usage</title>
+   <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+  <link href="/js/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/js/vis/vis.css" rel="stylesheet" type="text/css" />
+
+  <script type="text/javascript" src="/js/vis/vis.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="js/bootstrap/js/bootstrap.min.js"></script>
+
+  <style type="text/css">
+    #network {
+      padding-top: 200px;
+      width: 1200px;
+      height: 600px;
+      border: 1px solid lightgray;
+    }
+  </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">CM</a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="#">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+     <div class="container">
+        <div id="network"></div>
+    </div>
+
+<script type="text/javascript">
+  var nodeData = {{ node_data|tojson }};
+
+  var nodes = new vis.DataSet(nodeData);
+    // {id: 1, label: 'Node 1'},
+
+  // create an array with edges
+  var edgeData = {{ edge_data|tojson }};
+  var edges = new vis.DataSet(edgeData);
+    // {from: 1, to: 3},
+
+  // create a network
+  var container = document.getElementById('network');
+  var data = {
+    nodes: nodes,
+    edges: edges
+  };
+  var options = {
+      layout: {
+          hierarchical: {
+              direction: "UD",
+              sortMethod: "directed"
+          }
+      },
+      nodes: {
+        borderWidth: 2
+        // fixed: true
+      },
+      edges: {
+        smooth: true,
+        arrows: {to : true },
+        width: 1,
+        color: 'rgb(0,0,0'
+      },
+      groups: {
+        failed: {color: { background: 'rgb(230, 0, 0)', border: 'rgb(0,0,0)' }},  
+        running: {color: { background: 'rgb(102, 204, 255)', border: 'rgb(0,0,0)' }},  
+        finished: {color: { background: 'rgb(51, 204, 51)', border: 'rgb(0,0,0)' }},  
+        idle: {color: { background: 'rgb(242, 242, 242)', border: 'rgb(0,0,0)' }},  
+      }
+      
+  };
+  var network = new vis.Network(container, data, options);
+
+  network.on('select', function (params) {
+      document.getElementById('selection').innerHTML = 'Selection: ' + params.nodes;
+  });
+</script>
+
+<p id="selection"></p>
+
+</body>
+</html>

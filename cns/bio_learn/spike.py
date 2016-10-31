@@ -19,21 +19,21 @@ def get_idx_of_refractory(ti, spikes, tau_ref):
 pic_dir = "/home/alexeyche/prog/tmp"
 np.random.seed(10)
 
-lrate = 1.0
+lrate = 1e-02
 epochs = 100
 
-in_size = 10
-hidden_size0 = 10
+in_size = 50
+hidden_size0 = 25
 out_size = 1
 
 
-W0 = 0.1*np.random.rand(in_size, hidden_size0)
-W1 = 0.1*np.random.rand(hidden_size0, out_size)
+W0 = -0.1 + 0.2*np.random.rand(in_size, hidden_size0)
+W1 = -0.1 + 0.2*np.random.rand(hidden_size0, out_size)
 B0 = np.random.rand(out_size, hidden_size0)
 
 # W2 = -0.1 + 0.2*np.random.rand(hidden_size1, out_size)
 
-tau_syn = 10.0
+tau_syn = 15.0
 tau_ref = 2.0
 tau_learn = 5.0
 tau_mem = 2.0
@@ -41,7 +41,7 @@ threshold = 0.1
 
 act = Determ(threshold)
 
-lrule = Learning.BP
+lrule = Learning.FA
 
 [ os.remove(pj(pic_dir, f)) for f in os.listdir(pic_dir) if f.endswith(".png") ]
 
@@ -52,35 +52,19 @@ dt = 1.0
 Tsize = int(T/dt)
 #x_s = np.random.randn(Tsize, in_size)
 x_s = np.zeros((Tsize, in_size))
-# tt = 0
-# while tt < T:
-#     for ni in xrange(in_size):
-#         x_s[tt, ni] = in_size
-        # tt += 2.0
+x_rate = 2.0
+for tt in xrange(Tsize):
+    for ni in xrange(in_size):
+        if np.random.random() <= x_rate/Tsize:        
+            x_s[tt, ni] = 1.0
 
-# x_s[0,1] = 1.0
-# x_s[10,0] = 1.0
-# x_s[20,2] = 1.0
-# x_s[21,0] = 1.0
-# x_s[30,0] = 1.0
-# x_s[35,1] = 1.0
-# x_s[1,3] = 1.0
-# x_s[15,4] = 1.0
-# x_s[25,5] = 1.0
-# x_s[30,3] = 1.0
-# x_s[37,4] = 1.0
-# x_s[47,5] = 1.0
-# x_s[5,6] = 1.0
-# x_s[12,7] = 1.0
-# x_s[18,8] = 1.0
-# x_s[23,9] = 1.0
-# x_s[30,7] = 1.0
-# x_s[46,6] = 1.0
 
-# y_t_s = np.zeros((Tsize, out_size)) #Determ(0.75)(np.dot(x_s, F))
-# y_t_s[0,0] = 1.0
-# y_t_s[25,0] = 1.0
-# y_t_s[50,0] = 1.0
+
+y_t_s = np.zeros((Tsize, out_size)) #Determ(0.75)(np.dot(x_s, F))
+y_t_s[0,0] = 1.0
+y_t_s[25,0] = 1.0
+y_t_s[50,0] = 1.0
+y_t_s[75,0] = 1.0
 
 stats = []
 error_acc = []
@@ -114,23 +98,22 @@ for epoch in xrange(epochs):
         x = x_s[ti, :]
         
         x_mean += dt * ( - x_mean/tau_syn + x )
-
         u0 += dt * (- u0 + np.dot(x_mean, W0))/tau_mem
-    	u0[get_idx_of_refractory(ti, spikes0, tau_ref)] = -5.0
+    	refr_ids0 = get_idx_of_refractory(ti, spikes0, tau_ref)
+        u0[refr_ids0] = -5.0
         a0 = act(u0)
         s0 += dt * (- s0/tau_syn + a0)
-        x_mean[np.where(a0 == 1.0)] = 0.0
         spikes0[ti, np.where(a0 == 1.0)] = 1.0
         u0m += dt * (- u0m/tau_learn + a0)
 
         s0_stat[ti, :] = s0
 
         u1 += dt * (- u1 + np.dot(s0, W1))/tau_mem
-    	u1[get_idx_of_refractory(ti, spikes1, tau_ref)] = -5.0
+    	refr_ids1 = get_idx_of_refractory(ti, spikes1, tau_ref)
+        u1[refr_ids1] = -5.0
         a1 = act(u1)
         spikes1[ti, np.where(a1 == 1.0)] = 1.0
-        s0[np.where(a1 == 1.0)] = 0.0
-
+        
         ym += dt * (- ym/tau_learn + a1)
         ym_t += dt * (- ym_t/tau_learn + target_fired)
 
@@ -151,6 +134,7 @@ for epoch in xrange(epochs):
             else:
                 du0 = np.dot(e, B0) #* act.deriv(u0)
             
+            # du0[refr_ids0] = 0.0
             dW0_cur = - np.outer(x_mean, du0)/Tsize
             dW1_cur = - np.outer(s0, e)/Tsize
             
@@ -295,13 +279,19 @@ for epoch in xrange(epochs):
     plt.savefig("{}/spike_plot_{}.png".format(pic_dir, epoch), dpi=100)
     plt.clf()
 
-    plt.subplot(2,1,1)
+    plt.subplot(2,2,1)
     plt.imshow(np.mean(dW0_stat, 0))
     plt.colorbar()
-    plt.subplot(2,1,2)
+    plt.subplot(2,2,2)
     plt.imshow(np.mean(dW1_stat, 0))
     plt.colorbar()
-    plt.savefig("{}/dW_{}.png".format(pic_dir, epoch), dpi=100)
+    plt.subplot(2,2,3)
+    plt.imshow(W0)
+    plt.colorbar()
+    plt.subplot(2,2,4)
+    plt.imshow(W1)
+    plt.colorbar()
+    plt.savefig("{}/W_{}.png".format(pic_dir, epoch), dpi=100)
     plt.clf()
 
 
