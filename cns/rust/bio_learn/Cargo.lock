@@ -1,0 +1,56 @@
+[root]
+name = "bio_learn"
+version = "0.1.0"
+dependencies = [
+ "ndarray 0.6.9 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "either"
+version = "1.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
+name = "itertools"
+version = "0.5.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+dependencies = [
+ "either 1.0.2 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "matrixmultiply"
+version = "0.1.12"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
+name = "ndarray"
+version = "0.6.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+dependencies = [
+ "itertools 0.5.6 (registry+https://github.com/rust-lang/crates.io-index)",
+ "matrixmultiply 0.1.12 (registry+https://github.com/rust-lang/crates.io-index)",
+ "num-complex 0.1.35 (registry+https://github.com/rust-lang/crates.io-index)",
+ "num-traits 0.1.36 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "num-complex"
+version = "0.1.35"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+dependencies = [
+ "num-traits 0.1.36 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "num-traits"
+version = "0.1.36"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[metadata]
+"checksum either 1.0.2 (registry+https://github.com/rust-lang/crates.io-index)" = "3d2b503c86dad62aaf414ecf2b8c527439abedb3f8d812537f0b12bfd6f32a91"
+"checksum itertools 0.5.6 (registry+https://github.com/rust-lang/crates.io-index)" = "4e80479061d4444bfb160054b66fa92cf45e5a6490aadec415ea214004198194"
+"checksum matrixmultiply 0.1.12 (registry+https://github.com/rust-lang/crates.io-index)" = "38a17dc95fa4f06de342594b225b0822762506c43ca7b58486d778204bd76228"
+"checksum ndarray 0.6.9 (registry+https://github.com/rust-lang/crates.io-index)" = "a50c19ec8e2be7aaf9f2dde556d7fcba2be2fd894cfaac41fd4a3da6ba6f8466"
+"checksum num-complex 0.1.35 (registry+https://github.com/rust-lang/crates.io-index)" = "f0c78e054dd19c3fd03419ade63fa661e9c49bb890ce3beb4eee5b7baf93f92f"
+"checksum num-traits 0.1.36 (registry+https://github.com/rust-lang/crates.io-index)" = "a16a42856a256b39c6d3484f097f6713e14feacd9bfb02290917904fae46c81c"

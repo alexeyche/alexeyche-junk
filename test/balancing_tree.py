@@ -119,17 +119,17 @@ def _prepare_data():
     return (0, 1, 2, 3, 4, 5, 6, 7)
 
 
-if __name__ == "__main__":
-    import os
-    os.chdir("/home/alexeyche")
-    d = _prepare_data()
-    tree = BalancedTree(lambda x: x)
-    for data in d:
-        tree.insert(data)
+# if __name__ == "__main__":
+import os
+os.chdir("/home/alexeyche")
+d = _prepare_data()
+tree = BalancedTree(lambda x: x)
+for data in d:
+    tree.insert(data)
 
-    tree.balance()
+tree.balance()
 
-    d = tree.get_dot()
+d = tree.get_dot()
 
-    t = subprocess.Popen(["dot", "-Tpng"], stdin=subprocess.PIPE, stdout=open("bst.png", "w"))
-    t.communicate(d)
+t = subprocess.Popen(["dot", "-Tpng"], stdin=subprocess.PIPE, stdout=open("bst.png", "w"))
+t.communicate(d)
