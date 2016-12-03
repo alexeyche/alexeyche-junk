@@ -20,10 +20,10 @@ def max_profit(stocks, lo, hi):
 
     mp = (hi + lo)/2
     # print "[{} - {} - {}]".format(lo, mp, hi)
-    
+
     left_best = max_profit(stocks, lo, mp)
     right_best = max_profit(stocks, mp, hi)
-    
+
     # print "Left best {} [{}], right best {} [{}]".format(left_best, stocks[lo:mp], right_best, stocks[mp:hi])
 
     min_left = min(stocks[lo:mp])

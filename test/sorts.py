@@ -10,7 +10,7 @@ def split(arr):
 
 def merge_seqs(larr, rarr):
 	ans = []
-	
+
 	l_it, r_it = 0, 0
 	while l_it < len(larr) and r_it < len(rarr):
 		if larr[l_it] < rarr[r_it]:
@@ -78,11 +78,11 @@ def qpartition(arr, lo, hi):
 	# print "Beofore {}".format(arr[lo:hi])
 	i = lo
 	for j in xrange(lo, hi-1):
-		# print "{}, {}: {} <= {} ? ".format(i, j, arr[j], pivot) 
+		# print "{}, {}: {} <= {} ? ".format(i, j, arr[j], pivot)
 		if arr[j] <= pivot:
 			if i != j:
 				swap(arr, i, j)
-			i += 1		
+			i += 1
 	swap(arr, i, hi-1)
 	# print "After {}".format(arr[lo:hi])
 	return i

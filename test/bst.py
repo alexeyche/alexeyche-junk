@@ -11,23 +11,23 @@ Has a left child, right child, and key value, and stores its subtree size.
         self.left = None
         self.right = None
         self.size = 1
-        
+
     def update_stats(self):
         """Updates this node's size based on its children's sizes."""
-        self.size = (0 if self.left is None else self.left.size) + (0 if self.right is None else self.right.size) 
+        self.size = (0 if self.left is None else self.left.size) + (0 if self.right is None else self.right.size)
 
     def insert(self, t, NodeType):
         """Insert key t into the subtree rooted at this node (updating subtree size)."""
         self.size += 1
         if t < self.key:
             if self.left is None:
-                self.left = NodeType(self, t)                
+                self.left = NodeType(self, t)
                 return self.left
             else:
                 return self.left.insert(t, NodeType)
         else:
             if self.right is None:
-                self.right = NodeType(self, t)   
+                self.right = NodeType(self, t)
                 return self.right
             else:
                 return self.right.insert(t, NodeType)
@@ -49,7 +49,7 @@ Has a left child, right child, and key value, and stores its subtree size.
 
     def rank(self, t):
         """Return the number of keys <= t in the subtree rooted at this node."""
-        left_size = 0 if self.left is None else self.left.size 
+        left_size = 0 if self.left is None else self.left.size
         if t == self.key:
             return left_size + 1
         elif t < self.key:
@@ -61,15 +61,15 @@ Has a left child, right child, and key value, and stores its subtree size.
             if self.right is None:
                 return left_size + 1
             else:
-                return self.right.rank(t) + left_size + 1 
-            
+                return self.right.rank(t) + left_size + 1
+
     def minimum(self):
         """Returns the node with the smallest key in the subtree rooted by this node."""
         current = self
         while current.left is not None:
             current = current.left
         return current
-        
+
 
     def successor(self):
         """Returns the node with the smallest key larger than this node's key, or None if this has the largest key in the tree."""
@@ -90,7 +90,7 @@ Has a left child, right child, and key value, and stores its subtree size.
             else:
                 self.parent.right = self.left or self.right
                 if self.parent.right is not None:
-                    self.parent.right.parent = self.parent 
+                    self.parent.right.parent = self.parent
             current = self.parent
             while current.key is not None:
                 current.update_stats()
@@ -99,8 +99,8 @@ Has a left child, right child, and key value, and stores its subtree size.
         else:
             s = self.successor()
             self.key, s.key = s.key, self.key
-            return s.delete()        
-        
+            return s.delete()
+
     def check(self, lokey, hikey):
         """Checks that the subtree rooted at t is a valid BST and all keys are between (lokey, hikey)."""
         if lokey is not None and self.key <= lokey:
@@ -117,7 +117,7 @@ Has a left child, right child, and key value, and stores its subtree size.
             self.right.check(self.key, hikey)
         if self.size != 1 + (0 if self.left is None else self.left.size) + (0 if self.right is None else self.right.size):
             raise "BST RI violation"
-            
+
     def __repr__(self):
         return "<BST Node, key:" + str(self.key) + ">"
 
@@ -133,7 +133,7 @@ and a pointer to the root.
         self.root = None
         self.NodeType = NodeType
         self.psroot = self.NodeType(None, None)
-    
+
     def reroot(self):
         self.root = self.psroot.left
 
@@ -145,21 +145,21 @@ and a pointer to the root.
             return self.root
         else:
             return self.root.insert(t, self.NodeType)
-        
+
     def find(self, t):
         """Return the node for key t if is in the tree, or None otherwise."""
         if self.root is None:
             return None
         else:
             return self.root.find(t)
-        
+
     def rank(self, t):
         """The number of keys <= t in the tree."""
         if self.root is None:
             return 0
         else:
-            return self.root.rank(t)        
-        
+            return self.root.rank(t)
+
     def delete(self, t):
         """Delete the node for key t if it is in the tree."""
         node = self.find(t)
@@ -170,7 +170,7 @@ and a pointer to the root.
     def check(self):
         if self.root is not None:
             self.root.check(None, None)
-            
+
     def __str__(self):
         if self.root is None: return '<empty tree>'
         def recurse(node):
@@ -230,5 +230,5 @@ def test(args=None, BSTtype=BST):
         print
         print tree
 
-if __name__ == '__main__': 
+if __name__ == '__main__':
     test([10])

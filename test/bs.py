@@ -34,7 +34,7 @@ def test_bs():
 		v = np.random.randint(0, arr_size)
 
 		ans = binary_search(v, arr)
-		
+
 		assert ans == arr.index(v), "Test failed: {} {}".format(arr, v)
 		print "Done {} with array size {}".format(i, arr_size)
 
