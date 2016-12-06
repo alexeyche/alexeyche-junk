@@ -33,11 +33,11 @@ class State(object):
 
 np.random.seed(25)
 
-v_size = 100
-h_size = 100
+v_size = 25
+h_size = 25
 pop_size = v_size + h_size
 u_rest = -5.0
-beta = 1.0
+beta = 0.75
 tau_decay = 10.0
 tau_rise = 2.0
 tau_refr = 5.0
@@ -48,18 +48,18 @@ tau_look_around = 20*tau_decay
 # tau_mean_trace = 100.0
 
 
-T = 200.0
+T = 50.0
 dt = 1.0
 dt_sec = dt/1000.0
 Tsize = int(T/dt)
 weight_factor = 0.0
 W = - weight_factor +  2.0 * weight_factor*np.random.rand(pop_size, pop_size)
 
-lambda_first = 1.0/50.0 #1.0/T
-lambda_second = 1.0/100.0 #lambda_first/10.0
+lambda_first = 1.0/T
+lambda_second = lambda_first/10.0
 
 lrate = 1.0
-epochs = 100
+epochs = 10000
 
 act = lambda u: 1.0/(1.0 + np.exp(-beta * u))
 epsp = lambda x: (1.0/(tau_decay - tau_rise)) * (np.exp(-x/tau_decay) - np.exp(-x/tau_rise))
@@ -168,6 +168,7 @@ for ep in xrange(epochs):
         step(ti, t, spikes, state, stats, simulate_visible=False, learn=True)
 
     W += state.dW
+    W = W.clip(-100.0, 100.0)
     r, mean_r = state.r, state.mean_r
     print "Epoch {} finished, likelihood: {}".format(ep, np.mean(stats.ll))
 
@@ -177,7 +178,7 @@ stats_eval = Stats(epochs, Tsize, pop_size)
 state_eval = State(pop_size)
 
 spikes_eval = sp.lil_matrix((Tsize, pop_size), dtype=np.float32)
-spikes_eval[:10,:] = given_spikes[:10,:]
+spikes_eval[:3,:] = given_spikes[:3,:]
 for ti, t in enumerate(np.linspace(0, T, Tsize)):
     step(ti, t, spikes_eval, state_eval, stats_eval, simulate_visible=True, learn=False)
 
