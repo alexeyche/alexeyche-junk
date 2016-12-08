@@ -51,14 +51,10 @@ tau_refr = dt_ms/2.0
 amp_refr = 50.0
 
 env = Env("simple_test")
-_GLMStateTuple = collections.namedtuple("GLMStateTuple", ("u", "s", "r", "dW"))
-_GLMInputTuple = collections.namedtuple("GLMInputTuple", ("input", "target"))
-_GLMOutputTuple = collections.namedtuple("GLMOutputTuple", ("a", "spikes"))
+_GLMStateTuple = collections.namedtuple("GLMStateTuple", ("u", "s", "r", "spikes", "dW"))
+_GLMOutputTuple = collections.namedtuple("GLMOutputTuple", ("input", "target", "a"))
 
 class GLMStateTuple(_GLMStateTuple):
-    __slots__ = ()
-
-class GLMInputTuple(_GLMInputTuple):
     __slots__ = ()
 
 class GLMOutputTuple(_GLMOutputTuple):
@@ -90,11 +86,11 @@ class GLMCell(rc.RNNCell):
 
     @property
     def state_size(self):
-        return GLMStateTuple(self._num_units, input_size, self._num_units, (input_size, self._num_units))
+        return GLMStateTuple(self._num_units, input_size, self._num_units, self._num_units, (input_size, self._num_units))
 
     @property
     def output_size(self):
-        return GLMOutputTuple(self._num_units, self._num_units)
+        return GLMOutputTuple(self._num_units, self._num_units, self._num_units)
 
 
     def _init_parameters(self):
@@ -105,34 +101,32 @@ class GLMCell(rc.RNNCell):
         with vs.variable_scope(scope or type(self).__name__):
             self._init_parameters()
 
-            _input, target = input_tuple
-            u, s, r, dW = state
+            _input, target, _ = input_tuple
+            u, s, r, inner_spikes, dW = state
 
-            s = (1.0 - tau_syn) * s + _input            
+            s = (1.0 - tau_syn) * s + _input
             u = (1.0 - tau_mem) * u + mo.matmul(s, self.W)
             r = (1.0 - tau_refr) * r
 
-            a_raw = self._activation(u) 
+            a_raw = self._activation(u)
             a = a_raw * tf.exp(-r)
 
             spikes = tf.select(
-                a > tf.random_uniform([batch_size, self._num_units]), 
+                a > tf.random_uniform([batch_size, self._num_units]),
                 tf.ones([batch_size, self._num_units]),
                 tf.zeros([batch_size, self._num_units])
             )
-            
+
             r += spikes * amp_refr
-            
+
             a_grad = tf.gradients([a], [u])[0]
 
             dW += lrate * outer(
-                tf.reduce_sum(s, 0),  
+                tf.reduce_sum(s, 0),
                 tf.reduce_sum( (a_grad/a_raw) * (target - a), 0)
             )
 
-            return GLMOutputTuple(a, spikes), GLMStateTuple(u, s, r, dW)
-
-
+            return GLMOutputTuple(spikes, target, a), GLMStateTuple(u, s, r, spikes, dW)
 
 
 
@@ -140,15 +134,17 @@ cell_type = GLMCell
 
 cells = rc.MultiRNNCell([cell_type(net_size) for _ in xrange(num_of_layers)], state_is_tuple=True)
 
-input = GLMInputTuple(
+input = GLMOutputTuple(
     tf.placeholder(tf.float32, shape=(seq_size, batch_size, input_size), name="Input"),
-    tf.placeholder(tf.float32, shape=(seq_size, batch_size, net_size), name="Target")
+    tf.placeholder(tf.float32, shape=(seq_size, batch_size, net_size), name="Target"),
+    tf.placeholder(tf.float32, shape=(seq_size, batch_size, net_size), name="Activation"),
 )
 
 state = tuple([ GLMStateTuple(
     tf.placeholder(tf.float32, [batch_size, net_size], name="u{}".format(li)),
     tf.placeholder(tf.float32, [batch_size, input_size], name="s{}".format(li)),
     tf.placeholder(tf.float32, [batch_size, net_size], name="r{}".format(li)),
+    tf.placeholder(tf.float32, [batch_size, net_size], name="spikes{}".format(li)),
     tf.placeholder(tf.float32, [input_size, net_size], name="dW{}".format(li))
 ) for li in xrange(num_of_layers) ])
 
@@ -164,6 +160,7 @@ state_v = tuple([ GLMStateTuple(
     np.zeros((batch_size, net_size)),
     np.zeros((batch_size, input_size)),
     np.zeros((batch_size, net_size)),
+    np.zeros((batch_size, net_size)),
     np.zeros((input_size, net_size)),
 ) for li in xrange(num_of_layers) ])
 
@@ -173,7 +170,7 @@ x_rate = 2.0
 for bi in xrange(batch_size):
     for tt in xrange(seq_size):
         for ni in xrange(input_size):
-            if np.random.random() <= x_rate/seq_size:        
+            if np.random.random() <= x_rate/seq_size:
                 inputs_v[tt, bi, ni] = 1.0
 
 
@@ -215,7 +212,7 @@ for e in xrange(epochs):
             spikes,
             finstate,
             log_ll
-        ], 
+        ],
         {
             input: GLMInputTuple(inputs_v, targets_v),
             state: state_v,
@@ -230,9 +227,9 @@ for e in xrange(epochs):
     for cell, st in zip(cells._cells, finstate_v):
         dW = st.dW
         assert not np.any(np.isnan(dW)), "Found nan"
-        
+
         old_W = sess.run(cell.W)
         sess.run(cell.W.assign(cell.W + dW))
         new_W = sess.run(cell.W)
-        
+
     print "Epoch {}, log ll {}, loss {}".format(e, log_ll_v, loss)
