@@ -35,6 +35,8 @@ seq_size = 100
 
 factor = 0.1
 dt = 1.0/1000.0
+dt_ms = dt * 1000.0
+
 N = 1
 lrate = 1e-02
 
@@ -43,13 +45,13 @@ batch_size = 1
 input_size = 100
 net_size = 10
 
-tau_syn = 1.0/10.0
-tau_mem = 1.0/10.0
-
+tau_syn = dt_ms/10.0
+tau_mem = dt_ms/10.0
+tau_refr = dt_ms/2.0
+amp_refr = 50.0
 
 env = Env("simple_test")
-
-_GLMStateTuple = collections.namedtuple("GLMStateTuple", ("u", "s", "dW"))
+_GLMStateTuple = collections.namedtuple("GLMStateTuple", ("u", "s", "r", "dW"))
 _GLMInputTuple = collections.namedtuple("GLMInputTuple", ("input", "target"))
 _GLMOutputTuple = collections.namedtuple("GLMOutputTuple", ("a", "spikes"))
 
@@ -63,11 +65,23 @@ class GLMOutputTuple(_GLMOutputTuple):
     __slots__ = ()
 
 
+def safe_log(v):
+    return tf.log(tf.maximum(v, 1e-08))
+
+def exp_act(u):
+    return tf.exp(u) * dt
+
+def sigmoid_act(u):
+    return tf.sigmoid(u) * dt
+
+def log_exp(u, threshold=2.0, slope=1.0):
+    return tf.log(1.0 + tf.exp((u-threshold)/slope))
+
 def outer(left_v, right_v):
     return mo.matmul(tf.expand_dims(left_v, 1), tf.expand_dims(right_v, 0))
 
 class GLMCell(rc.RNNCell):
-    def __init__(self, num_units, activation = mo.exp):
+    def __init__(self, num_units, activation = exp_act):
         self._num_units = num_units
         self._activation = activation
 
@@ -76,7 +90,7 @@ class GLMCell(rc.RNNCell):
 
     @property
     def state_size(self):
-        return GLMStateTuple(self._num_units, input_size, (input_size, self._num_units))
+        return GLMStateTuple(self._num_units, input_size, self._num_units, (input_size, self._num_units))
 
     @property
     def output_size(self):
@@ -92,27 +106,31 @@ class GLMCell(rc.RNNCell):
             self._init_parameters()
 
             _input, target = input_tuple
-            u, s, dW = state
+            u, s, r, dW = state
 
             s = (1.0 - tau_syn) * s + _input            
             u = (1.0 - tau_mem) * u + mo.matmul(s, self.W)
+            r = (1.0 - tau_refr) * r
 
-            a = self._activation(u)
+            a_raw = self._activation(u) 
+            a = a_raw * tf.exp(-r)
 
             spikes = tf.select(
-                a * dt > tf.random_uniform([batch_size, self._num_units]), 
+                a > tf.random_uniform([batch_size, self._num_units]), 
                 tf.ones([batch_size, self._num_units]),
                 tf.zeros([batch_size, self._num_units])
             )
-
+            
+            r += spikes * amp_refr
+            
             a_grad = tf.gradients([a], [u])[0]
 
             dW += lrate * outer(
                 tf.reduce_sum(s, 0),  
-                tf.reduce_sum( (a_grad/a) * (target - dt*a), 0)
+                tf.reduce_sum( (a_grad/a_raw) * (target - a), 0)
             )
 
-            return GLMOutputTuple(a, spikes), GLMStateTuple(u, s, dW)
+            return GLMOutputTuple(a, spikes), GLMStateTuple(u, s, r, dW)
 
 
 
@@ -130,21 +148,23 @@ input = GLMInputTuple(
 state = tuple([ GLMStateTuple(
     tf.placeholder(tf.float32, [batch_size, net_size], name="u{}".format(li)),
     tf.placeholder(tf.float32, [batch_size, input_size], name="s{}".format(li)),
-    tf.placeholder(tf.float32, [input_size, net_size], name="dW{}".format(li)),
+    tf.placeholder(tf.float32, [batch_size, net_size], name="r{}".format(li)),
+    tf.placeholder(tf.float32, [input_size, net_size], name="dW{}".format(li))
 ) for li in xrange(num_of_layers) ])
 
 
 net_out, finstate = rnn.dynamic_rnn(cells, input, initial_state=state, time_major=True)
 a, spikes = net_out
 
-log_ll = tf.reduce_mean(input.target * tf.log(a*dt) + (1.0 - input.target) * tf.log(1.0 - a*dt))
+log_ll = tf.reduce_mean(input.target * safe_log(a*dt) + (1.0 - input.target) * safe_log(1.0 - a*dt))
 
 ## RUNNING
 
 state_v = tuple([ GLMStateTuple(
     np.zeros((batch_size, net_size)),
     np.zeros((batch_size, input_size)),
-    np.zeros((input_size, net_size))
+    np.zeros((batch_size, net_size)),
+    np.zeros((input_size, net_size)),
 ) for li in xrange(num_of_layers) ])
 
 inputs_v = np.zeros((seq_size, batch_size, input_size))
@@ -187,11 +207,12 @@ else:
 
 target_smooth = smooth_matrix(np.squeeze(targets_v))
 
-epochs = 500
+epochs = 200
 for e in xrange(epochs):
     sess_out = sess.run(
         [
-            net_out,
+            a,
+            spikes,
             finstate,
             log_ll
         ], 
@@ -201,18 +222,17 @@ for e in xrange(epochs):
         }
     )
 
-    net_out_v, finstate_v, log_ll_v = sess_out
+    a_v, spikes_v, finstate_v, log_ll_v = sess_out
 
-    # output_smooth = smooth_matrix(np.squeeze(net_out_v))
-    # loss = np.mean(np.square(output_smooth - target_smooth))
+    output_smooth = smooth_matrix(np.squeeze(spikes_v))
+    loss = np.mean(np.square(output_smooth - target_smooth))
 
-    for cell_id, cell in enumerate(cells._cells):
-        dW = finstate_v[cell_id].dW
+    for cell, st in zip(cells._cells, finstate_v):
+        dW = st.dW
         assert not np.any(np.isnan(dW)), "Found nan"
-
-        W = sess.run(cell.W)
-        assign_op = cell.W.assign(W + dW)
-        sess.run(assign_op)
+        
+        old_W = sess.run(cell.W)
+        sess.run(cell.W.assign(cell.W + dW))
         new_W = sess.run(cell.W)
         
-    print "Epoch {}, log ll {}".format(e, log_ll_v)
+    print "Epoch {}, log ll {}, loss {}".format(e, log_ll_v, loss)
