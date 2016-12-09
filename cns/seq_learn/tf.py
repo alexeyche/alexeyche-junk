@@ -64,14 +64,14 @@ class GLMOutputTuple(_GLMOutputTuple):
 def safe_log(v):
     return tf.log(tf.maximum(v, 1e-08))
 
-def exp_act(u):
-    return tf.exp(u) * dt
+def exp_act(u, gain=1.0):
+    return tf.exp(u) * gain
 
 def sigmoid_act(u):
-    return tf.sigmoid(u) * dt
+    return tf.sigmoid(u)
 
-def log_exp(u, threshold=2.0, slope=1.0):
-    return tf.log(1.0 + tf.exp((u-threshold)/slope))
+def log_exp(u, threshold=0.0, slope=1.0):
+    return dt *(tf.log(1.0 + tf.exp((u-threshold)/slope)) - tf.log(1.0 + tf.exp(-threshold/slope)))
 
 def outer(left_v, right_v):
     return mo.matmul(tf.expand_dims(left_v, 1), tf.expand_dims(right_v, 0))
@@ -86,7 +86,7 @@ class GLMCell(rc.RNNCell):
 
     @property
     def state_size(self):
-        return GLMStateTuple(self._num_units, input_size, self._num_units, self._num_units, (input_size, self._num_units))
+        return GLMStateTuple(self._num_units, input_size + self._num_units, self._num_units, self._num_units, (input_size, self._num_units))
 
     @property
     def output_size(self):
@@ -95,7 +95,7 @@ class GLMCell(rc.RNNCell):
 
     def _init_parameters(self):
         if self.W is None:
-            self.W = vs.get_variable("W", [input_size, self._num_units], initializer=tf.uniform_unit_scaling_initializer(factor=1.0))
+            self.W = vs.get_variable("W", [input_size + self._num_units, self._num_units], initializer=tf.uniform_unit_scaling_initializer(factor=1.0))
 
     def __call__(self, input_tuple, state, scope=None):
         with vs.variable_scope(scope or type(self).__name__):
@@ -104,7 +104,7 @@ class GLMCell(rc.RNNCell):
             _input, target, _ = input_tuple
             u, s, r, inner_spikes, dW = state
 
-            s = (1.0 - tau_syn) * s + _input
+            s = (1.0 - tau_syn) * s + tf.concat(1, [_input, inner_spikes])
             u = (1.0 - tau_mem) * u + mo.matmul(s, self.W)
             r = (1.0 - tau_refr) * r
 
@@ -142,15 +142,15 @@ input = GLMOutputTuple(
 
 state = tuple([ GLMStateTuple(
     tf.placeholder(tf.float32, [batch_size, net_size], name="u{}".format(li)),
-    tf.placeholder(tf.float32, [batch_size, input_size], name="s{}".format(li)),
+    tf.placeholder(tf.float32, [batch_size, input_size + net_size], name="s{}".format(li)),
     tf.placeholder(tf.float32, [batch_size, net_size], name="r{}".format(li)),
     tf.placeholder(tf.float32, [batch_size, net_size], name="spikes{}".format(li)),
-    tf.placeholder(tf.float32, [input_size, net_size], name="dW{}".format(li))
+    tf.placeholder(tf.float32, [input_size + net_size, net_size], name="dW{}".format(li))
 ) for li in xrange(num_of_layers) ])
 
 
 net_out, finstate = rnn.dynamic_rnn(cells, input, initial_state=state, time_major=True)
-a, spikes = net_out
+spikes, target, a = net_out
 
 log_ll = tf.reduce_mean(input.target * safe_log(a*dt) + (1.0 - input.target) * safe_log(1.0 - a*dt))
 
@@ -158,10 +158,10 @@ log_ll = tf.reduce_mean(input.target * safe_log(a*dt) + (1.0 - input.target) * s
 
 state_v = tuple([ GLMStateTuple(
     np.zeros((batch_size, net_size)),
-    np.zeros((batch_size, input_size)),
+    np.zeros((batch_size, input_size + net_size)),
     np.zeros((batch_size, net_size)),
     np.zeros((batch_size, net_size)),
-    np.zeros((input_size, net_size)),
+    np.zeros((input_size + net_size, net_size)),
 ) for li in xrange(num_of_layers) ])
 
 inputs_v = np.zeros((seq_size, batch_size, input_size))
@@ -189,6 +189,7 @@ for bi in xrange(batch_size):
 
 # targets_v[seq_size/2, 0, 2] = 1.0
 
+a_v_blank = np.zeros((seq_size, batch_size, net_size))
 
 sess = tf.Session()
 saver = tf.train.Saver()
@@ -204,7 +205,7 @@ else:
 
 target_smooth = smooth_matrix(np.squeeze(targets_v))
 
-epochs = 200
+epochs = 500
 for e in xrange(epochs):
     sess_out = sess.run(
         [
@@ -214,7 +215,7 @@ for e in xrange(epochs):
             log_ll
         ],
         {
-            input: GLMInputTuple(inputs_v, targets_v),
+            input: GLMOutputTuple(inputs_v, targets_v, a_v_blank),
             state: state_v,
         }
     )
