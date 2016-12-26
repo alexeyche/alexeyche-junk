@@ -264,7 +264,7 @@ target_smooth = smooth_matrix(np.squeeze(targets_v))
 
 writer = tf.train.SummaryWriter(env.run("summary"), sess.graph)
 
-epochs = 2
+epochs = 20
 for e in xrange(epochs):
     sess_out = sess.run(
         [

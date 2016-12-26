@@ -39,7 +39,7 @@ filters_num = 100
 batch_size = 1
 target_sr = 5000 
 avg_size = 5
-gamma = 1.0
+gamma = 1.0 
 lrate = 1e-04
 epochs = 300
 collect_output = True    
@@ -57,7 +57,7 @@ recov_filter = vs.get_variable("Wr", [L, 1, 1, filters_num], initializer=init)
 
 hidden = tf.nn.conv2d(input, filter, strides=[1, strides, 1, 1], padding='VALID')
 # hidden_t = hidden
-hidden_t = tf.pow(tf.nn.relu(hidden), 2.0)
+hidden_t = tf.pow(tf.nn.relu(hidden), 4.0)
 # hidden_t = tf.pow(tf.nn.relu(tf.nn.bias_add(hidden, bias)), 2.0)
 
 # hidden_p = tf.nn.avg_pool(hidden_t, [1, avg_size, 1, 1], strides = [1,1,1,1], padding='SAME')
@@ -65,17 +65,17 @@ hidden_p = hidden_t
 # hidden_t = tf.pow(hidden, 2.0)
 
 # hidden_t = tf.abs(hidden)
-hidden_p = hidden_p/tf.maximum(tf.reduce_max(hidden_p, [1]), tf.constant(1e-10))
-# hidden_p = tf.nn.l2_normalize(hidden_p, dim=1)
+# hidden_p = hidden_p/tf.maximum(tf.reduce_max(hidden_p, [1]), tf.constant(1e-10))
+hidden_p = tf.nn.l2_normalize(hidden_p, dim=1)
 
 output = tf.nn.conv2d_transpose(hidden_p, recov_filter, output_shape = (1, seq_size, 1, 1), strides=[1, strides, 1, 1], padding='VALID')
-# output = tf.nn.l2_normalize(output, dim=1)
 
+output_n = tf.nn.l2_normalize(output, dim=1)
+input_n = tf.nn.l2_normalize(input, dim=1)
+cost = tf.nn.l2_loss(output_n - input_n) + gamma * tf.reduce_mean(hidden_t)  #+ 0.01 * gamma * tf.reduce_sum(hidden_t)
 
-cost = tf.nn.l2_loss(output - input) + gamma * tf.reduce_mean(hidden_t)  #+ 0.01 * gamma * tf.reduce_sum(hidden_t)
-
-# optimizer = tf.train.AdamOptimizer(lrate)
-optimizer = tf.train.RMSPropOptimizer(lrate)
+optimizer = tf.train.AdamOptimizer(lrate)
+# optimizer = tf.train.RMSPropOptimizer(lrate)
 tvars = tf.trainable_variables()
 grads = tf.gradients(cost, tvars)
 train_step = optimizer.apply_gradients(zip(grads, tvars))
@@ -116,7 +116,6 @@ else:
 for e in xrange(epochs):
     mc = []
 
-
     output_data = []
     hidden_data = []
     zero_hidden = set(xrange(filters_num))
@@ -126,14 +125,13 @@ for e in xrange(epochs):
         batch_data = np.zeros(seq_size)
         batch_data[:len(data_slice)] = data_slice
         
-        out_v, h_v_raw, h_v, filter_v, rfilter_v, bias_v, cost_v, _ = sess.run(
-            [output, hidden_t, hidden_p, filter, recov_filter, bias, cost, train_step], {
+        out_v, in_v, h_v_raw, h_v, filter_v, rfilter_v, bias_v, cost_v, _ = sess.run(
+            [output_n, input_n, hidden_t, hidden_p, filter, recov_filter, bias, cost, train_step], {
                 input: batch_data.reshape(1, seq_size, 1, 1)
             }
         )
         h_v_raw = h_v_raw.reshape(h_v_raw.shape[1], h_v_raw.shape[3])
         h_v = h_v.reshape(h_v.shape[1], h_v.shape[3])
-
         
         # plt.figure(1)
         # plt.subplot(2,1,1)
