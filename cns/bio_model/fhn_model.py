@@ -114,8 +114,8 @@ class FHNCell(rc.RNNCell):
             
             input_transf = tf.matmul(input, self.W) 
 
-            dV = self._f(V) - W + input_transf + tf.matmul(V, self.Wr) + tf.random_normal((self._num_units,)) * 1.0
-            dW = self._a * (self._b * V - W)
+            dV = self._f(V) - W + input_transf + tf.matmul(V, self.Wr) + tf.random_normal((self._num_units,)) * 0.1
+            dW = self._a * (self._b * V - self._c * W)
 
             # dV2 = self._f(V + 0.6666 * dV * dt) - W + input_transf + tf.matmul(V + 0.6666 * dV * dt, self.Wr)     
             # dW2 = self._a * (self._b * V - (W + 0.6666 * dW * dt))            
@@ -158,7 +158,7 @@ loss = tf.nn.l2_loss(output_n - input_n)
 
 # train_step = tf.train.AdamOptimizer(0.00001).minimize(loss)
 # train_step = tf.train.GradientDescentOptimizer(0.0001).minimize(loss)
-train_step = tf.train.FtrlOptimizer(0.001).minimize(loss) # not bad
+train_step = tf.train.FtrlOptimizer(0.0001).minimize(loss) # not bad
 # train_step = tf.train.RMSPropOptimizer(0.000001).minimize(loss)
 # train_step = tf.train.ProximalAdagradOptimizer(0.000001).minimize(loss)
 
@@ -193,7 +193,6 @@ for e in xrange(epochs):
         np.zeros((batch_size, net_size)),
         np.zeros((batch_size, net_size)),
     )
-
 
     sess_out = sess.run(
         [
