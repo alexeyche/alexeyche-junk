@@ -25,7 +25,7 @@ def smooth_matrix(m, sigma=0.01, filter_size=50):
 def sl(*vector, **kwargs):
     for id, v in enumerate(vector):
         plt.plot(np.squeeze(v))
-    
+
     if kwargs.get("file"):
         plt.savefig(kwargs["file"])
         plt.clf()
@@ -54,5 +54,5 @@ def generate_dct_dictionary(l, size):
     for fi in xrange(size):
         filters[:, fi] = np.cos((np.pi * (2 * fi + 1) * p)/(2*l))
         filters[0, fi] *= 1.0/np.sqrt(2.0)
-        # filters[fi, 1:] *= np.sqrt(2/l) 
+        # filters[fi, 1:] *= np.sqrt(2/l)
     return filters * np.sqrt(2.0/l)

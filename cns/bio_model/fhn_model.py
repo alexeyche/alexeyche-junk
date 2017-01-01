@@ -70,7 +70,7 @@ class FHNCell(rc.RNNCell):
     def __init__(self, num_units, f):
         self._num_units = num_units
         self._f = f
-        
+
         self._a = None
         self._b = None
         self._c = None
@@ -89,17 +89,17 @@ class FHNCell(rc.RNNCell):
     @property
     def output_size(self):
         return FHNOutputTuple(
-            self._num_units, 
+            self._num_units,
             self._num_units
         )
 
     def _init_parameters(self, input):
         if self._a is None:
-            self._a = vs.get_variable("a", [self._num_units], initializer=tf.constant_initializer(value=a))
+            self._a = vs.get_variable("a", [self._num_units], initializer=tf.constant_initializer(value=a), trainable=False)
         if self._b is None:
-            self._b = vs.get_variable("b", [self._num_units], initializer=tf.constant_initializer(value=b))
+            self._b = vs.get_variable("b", [self._num_units], initializer=tf.constant_initializer(value=b), trainable=False)
         if self._c is None:
-            self._c = vs.get_variable("c", [self._num_units], initializer=tf.constant_initializer(value=c))
+            self._c = vs.get_variable("c", [self._num_units], initializer=tf.constant_initializer(value=c), trainable=False)
         if self.W is None:
             dim = input.get_shape()[1]
             self.W = vs.get_variable("W", [dim, self._num_units], initializer=tf.uniform_unit_scaling_initializer(factor=weight_init_factor))
@@ -109,17 +109,17 @@ class FHNCell(rc.RNNCell):
     def __call__(self, input, state, scope=None):
         with vs.variable_scope(scope or type(self).__name__):
             self._init_parameters(input)
-            
-            V, W = state
-            
-            input_transf = tf.matmul(input, self.W) 
 
-            dV = self._f(V) - W + input_transf + tf.matmul(V, self.Wr) + tf.random_normal((self._num_units,)) * 0.1
+            V, W = state
+
+            input_transf = tf.matmul(input, self.W)
+
+            dV = self._f(V) - W + input_transf + tf.matmul(V, self.Wr) # + tf.random_normal((self._num_units,)) * 0.1
             dW = self._a * (self._b * V - self._c * W)
 
-            # dV2 = self._f(V + 0.6666 * dV * dt) - W + input_transf + tf.matmul(V + 0.6666 * dV * dt, self.Wr)     
-            # dW2 = self._a * (self._b * V - (W + 0.6666 * dW * dt))            
-            
+            # dV2 = self._f(V + 0.6666 * dV * dt) - W + input_transf + tf.matmul(V + 0.6666 * dV * dt, self.Wr)
+            # dW2 = self._a * (self._b * V - (W + 0.6666 * dW * dt))
+
             # V += dt * (0.25 * dV + 0.75 * dV2)
             # W += dt * (0.25 * dW + 0.75 * dW2)
 
@@ -129,38 +129,55 @@ class FHNCell(rc.RNNCell):
             return FHNOutputTuple(V, W), FHNStateTuple(V, W)
 
 
-input = tf.placeholder(tf.float32, shape=(seq_size, batch_size, 1), name="Input")
-target = tf.placeholder(tf.float32, shape=(seq_size, batch_size, net_size), name="Target")
-
 state = FHNStateTuple(
     tf.placeholder(tf.float32, [batch_size, net_size], name="V"),
     tf.placeholder(tf.float32, [batch_size, net_size], name="W"),
 )
 
 
-cell = FHNCell(net_size, basic_v_relation) 
+cell = FHNCell(net_size, basic_v_relation)
 
-net_out, finstate = rnn.dynamic_rnn(cell, input, initial_state=state, time_major=True)
+input = tf.placeholder(tf.float32, shape=(batch_size, seq_size, 1, 1), name="Input")
+filter = vs.get_variable("E", [L, 1, 1, filters_num], initializer=tf.uniform_unit_scaling_initializer(factor=weight_init_factor))
+
+conv_out = tf.nn.conv2d(input, filter, strides=[1, strides, 1, 1], padding='SAME')
+conv_out = tf.transpose(conv_out, [1,0,2,3])
+conv_out = tf.squeeze(conv_out, squeeze_dims=[2])
+
+net_out, finstate = rnn.dynamic_rnn(cell, conv_out, initial_state=state, time_major=True)
 
 V = tf.expand_dims(net_out.V, 3)
 V = tf.transpose(V, [1, 0, 3, 2])
 
 
-recov_filter = vs.get_variable("R", [L, 1, net_size, 1], initializer=tf.uniform_unit_scaling_initializer(factor=weight_init_factor))            
+recov_filter = vs.get_variable("R", [L, 1, net_size, 1], initializer=tf.uniform_unit_scaling_initializer(factor=weight_init_factor))
 output = tf.nn.conv2d(V, recov_filter, strides=[1, strides, 1, 1], padding='SAME')
-output = tf.transpose(output, [1, 0, 2, 3])
-output = tf.squeeze(output, 3)
 
-input_n = tf.nn.l2_normalize(input, 0)
-output_n = tf.nn.l2_normalize(output, 0)
+# output = tf.transpose(output, [1, 0, 2, 3])
+# output = tf.squeeze(output, squeeze_dims=[2])
+
+input_n = tf.nn.l2_normalize(input, 1)
+output_n = tf.nn.l2_normalize(output, 1)
 
 loss = tf.nn.l2_loss(output_n - input_n)
 
-# train_step = tf.train.AdamOptimizer(0.00001).minimize(loss)
-# train_step = tf.train.GradientDescentOptimizer(0.0001).minimize(loss)
-train_step = tf.train.FtrlOptimizer(0.0001).minimize(loss) # not bad
-# train_step = tf.train.RMSPropOptimizer(0.000001).minimize(loss)
-# train_step = tf.train.ProximalAdagradOptimizer(0.000001).minimize(loss)
+# optimizer = tf.train.AdamOptimizer(0.001)
+# optimizer = tf.train.GradientDescentOptimizer(0.01)
+# optimizer = tf.train.MomentumOptimizer(0.0001, 0.9, use_nesterov=True)
+# optimizer = tf.train.FtrlOptimizer(0.00001) # not bad
+optimizer = tf.train.RMSPropOptimizer(0.000001)
+# optimizer = tf.train.AdagradOptimizer(0.0001)
+# optimizer = tf.train.AdadeltaOptimizer(0.0001)
+# optimizer = tf.train.ProximalAdagradOptimizer(0.0001)
+
+tvars = tf.trainable_variables()
+grads_raw = tf.gradients(loss, tvars)
+# grads = grads_raw
+
+grads, _ = tf.clip_by_global_norm(grads_raw, 5.0)
+
+apply_grads = optimizer.apply_gradients(zip(grads, tvars))
+
 
 sess = tf.Session()
 saver = tf.train.Saver()
@@ -173,18 +190,11 @@ if os.path.exists(model_fname):
 else:
     sess.run(tf.global_variables_initializer())
 
-tmp_dir = pj(os.environ["HOME"], "tmp")
+tmp_dir = pj(os.environ["HOME"], "tmp", "tf_pics")
 [ os.remove(pj(tmp_dir, f)) for f in os.listdir(tmp_dir) if f[-4:] == ".png" ]
 
 
-targets_v = np.zeros((seq_size, net_size))
-
-for si in xrange(seq_size):
-    if si % net_size == 0:
-        targets_v[si, int((float(si)/seq_size) * net_size)] = 1.0
-
-targets_v = smooth_matrix(targets_v)
-inputs_v =  moving_average(np.random.randn(seq_size), 10).reshape(seq_size, batch_size, 1)
+inputs_v =  moving_average(np.random.randn(seq_size), 10).reshape(batch_size, seq_size, 1, 1)
 
 
 epochs = 1000
@@ -198,24 +208,37 @@ for e in xrange(epochs):
         [
             net_out,
             finstate,
-            train_step,
+            apply_grads,
             loss,
             input_n,
-            output_n
+            output_n,
+            grads,
+            grads_raw
         ],
         {
             input: inputs_v,
             state: state_v,
-            target: targets_v.reshape(seq_size, batch_size, net_size)
         }
     )
 
-    net_out_v, finstate_v, _, loss_v, input_n_v, output_n_v = sess_out
+    net_out_v, finstate_v, _, loss_v, input_n_v, output_n_v, grads_v, grads_raw_v = sess_out
+
+    for g, gr, tv in zip(grads_v, grads_raw_v, tvars):
+        vname = tv.name.split("/")[-1].replace(":","_")
+
+        f = pj(tmp_dir, "{}_{}.png".format(vname, e))
+        fr = pj(tmp_dir, "{}_raw_{}.png".format(vname, e))
+
+        if len(g.shape) == 1:
+            sl(g, file=f)
+            sl(gr, file=fr)
+        else:
+            sm(g, file=f)
+            sm(gr, file=fr)
 
     Vv, Wv = net_out_v
-
-    sm(Vv, file=pj(tmp_dir, "V_{}.png".format(e)))
-    sm(Wv, file=pj(tmp_dir, "W_{}.png".format(e)))
+    sm(Vv, file=pj(tmp_dir, "out_V_{}.png".format(e)))
+    sm(Wv, file=pj(tmp_dir, "state_W_{}.png".format(e)))
     sl(output_n_v, input_n_v, (output_n_v-input_n_v) ** 2, file=pj(tmp_dir, "rec_{}.png".format(e)))
 
     print "Epoch {}, loss {}".format(e, loss_v)
