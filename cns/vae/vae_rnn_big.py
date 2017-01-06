@@ -19,7 +19,8 @@ from tensorflow.python.ops import math_ops as mo
 from tensorflow.python.ops import array_ops
 from tensorflow.python.framework import dtypes
 
-from util import sm, sl, smooth_matrix, smooth, moving_average, norm, outer, generate_dct_dictionary, fun
+from util import sm, sl, smooth_matrix, smooth
+from util import moving_average, norm, fun, KLDivergenceGauss
 
 def xavier_init(fan_in, fan_out, constant=1):
     low = -constant*np.sqrt(6.0/(fan_in + fan_out))
@@ -147,9 +148,15 @@ with tf.variable_scope("rnn") as scope:
 
 z_prior_mu, z_prior_sigma, z_mu, z_sigma, z, z_t, post_mu = out
 
+# kl_loss = tf.reduce_sum(
+#     - 0.5 + z_sigma - z_prior_sigma +
+#     0.5 * (tf.exp(2.0 * z_prior_sigma) + tf.square(z_mu - z_prior_mu)) / tf.exp(2.0 * z_sigma),
+#     [1, 2]
+# )
+
+# minimize Reverse-KL
 kl_loss = tf.reduce_sum(
-    - 0.5 + tf.log(z_sigma) - tf.log(z_prior_sigma) +
-    0.5 * (tf.exp(2.0 * z_prior_sigma) + tf.square(z_mu - z_prior_mu)) / tf.exp(2.0 * z_sigma),
+    KLDivergenceGauss(z_prior_mu, z_prior_sigma, z_mu, z_sigma),
     [1, 2]
 )
 

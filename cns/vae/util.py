@@ -134,3 +134,13 @@ def fun(*args, **kwargs):
 
     return inputs[0]
 
+
+def KLDivergenceGauss(p_mu, log_p_sigma, q_mu, log_q_sigma):
+    return \
+        - 0.5 + log_q_sigma - log_p_sigma +
+        0.5 * (
+            tf.exp(2.0 * log_p_sigma) +
+            tf.square(p_mu - q_mu)
+        ) / tf.exp(2.0 * log_q_sigma)
+
+
