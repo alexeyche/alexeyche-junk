@@ -1,4 +1,5 @@
 
+import tensorflow as tf
 from matplotlib import pyplot as plt
 import numpy as np
 
@@ -38,10 +39,12 @@ def moving_average(a, n=3) :
     v = ret[n - 1:] / n
     return np.pad(v, [0, n-1], 'constant')
 
-def norm(data):
+def norm(data, return_denom=False):
     data_denom = np.sqrt(np.sum(data ** 2))
     data = data/data_denom
-    return data
+    if not return_denom:
+        return data
+    return data, data_denom
 
 
 def outer(left_v, right_v):
@@ -56,3 +59,70 @@ def generate_dct_dictionary(l, size):
         filters[0, fi] *= 1.0/np.sqrt(2.0)
         # filters[fi, 1:] *= np.sqrt(2/l)
     return filters * np.sqrt(2.0/l)
+
+def xavier_init(fan_in, fan_out, const=0.5):
+    """Xavier initialization of network weights.
+
+    https://stackoverflow.com/questions/33640581/how-to-do-xavier-initialization-on-tensorflow
+
+    :param fan_in: fan in of the network (n_features)
+    :param fan_out: fan out of the network (n_components)
+    :param const: multiplicative constant
+    """
+    low = -const * np.sqrt(6.0 / (fan_in + fan_out))
+    high = const * np.sqrt(6.0 / (fan_in + fan_out))
+    return tf.random_uniform((fan_in, fan_out), minval=low, maxval=high)
+
+def xavier_vec_init(fan_in, const=1.0):
+    low = -const * np.sqrt(6.0 / fan_in)
+    high = const * np.sqrt(6.0 / fan_in)
+    return tf.random_uniform((fan_in,), minval=low, maxval=high)
+
+def fun(*args, **kwargs): 
+    assert 'nout' in kwargs, "Need output size"
+    assert 'name' in kwargs, "Need name for output"
+    
+    assert len(args) > 0, "Empty args"
+
+    nout = kwargs["nout"]
+    name = kwargs["name"]
+
+    act = kwargs.get("act", tf.nn.tanh)
+    use_bias = kwargs.get("use_bias", True)
+    weight_factor = kwargs.get("weight_factor", 1.0)
+    use_weight_norm = kwargs.get("use_weight_norm", False)
+    layers_num = kwargs.get("layers_num", 1)
+    
+    inputs = args 
+    
+    for l_id in xrange(layers_num):
+        s = tf.zeros(inputs[0].get_shape().as_list()[:-1] + [nout], dtype=tf.float32)
+
+        for idx, a in enumerate(inputs):
+            a_shape = a.get_shape().as_list()
+            
+
+            nin = a_shape[-1]
+
+            init = lambda shape, dtype, partition_info: xavier_init(nin, nout, const = weight_factor)
+            vec_init = lambda shape, dtype, partition_info: xavier_vec_init(nout, const = weight_factor)
+
+            if not use_weight_norm:
+                w = tf.get_variable("W{}-{}-{}".format(l_id, idx, name), [nin, nout], dtype=tf.float32, initializer = init)
+                a_w = tf.matmul(a, w)
+            else:
+                V = tf.get_variable("V{}-{}-{}".format(l_id, idx, name), [nin, nout], dtype=tf.float32, initializer = init) #tf.uniform_unit_scaling_initializer(factor=weight_factor))
+                g = tf.get_variable("g{}-{}-{}".format(l_id, idx, name), [nout], dtype=tf.float32, initializer = vec_init)
+                
+                a_w = tf.matmul(a, V)
+                a_w = a_w * g/tf.sqrt(tf.reduce_sum(tf.square(V),[0]))
+
+            if use_bias:
+                b = tf.get_variable("b{}-{}-{}".format(l_id, idx, name), [nout], initializer = tf.zeros_initializer(tf.float32))
+                a_w += a_w + b
+            
+            s += a_w
+        inputs = (act(s),)
+
+    return inputs[0]
+

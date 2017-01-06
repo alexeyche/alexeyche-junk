@@ -9,7 +9,7 @@ def make_dir(*args):
 
 
 class Env(object):
-	ROOT_PATH = pj(os.environ["HOME"], "Music", "glm")
+	ROOT_PATH = pj(os.environ["HOME"], "Music", "vae")
 
 	def __init__(self, dataset):
 		self._res_dir = make_dir(self.ROOT_PATH, dataset, "result")
