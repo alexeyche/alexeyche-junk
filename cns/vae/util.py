@@ -24,8 +24,15 @@ def smooth_matrix(m, sigma=0.01, filter_size=50):
     return res
 
 def sl(*vector, **kwargs):
+    labels = kwargs.get("labels", [])
     for id, v in enumerate(vector):
-        plt.plot(np.squeeze(v))
+        if len(labels) > 0:
+            plt.plot(np.squeeze(v), label=labels[id])
+        else:
+            plt.plot(np.squeeze(v))
+
+    if len(labels) > 0:
+        plt.legend()
 
     if kwargs.get("file"):
         plt.savefig(kwargs["file"])
@@ -78,10 +85,10 @@ def xavier_vec_init(fan_in, const=1.0):
     high = const * np.sqrt(6.0 / fan_in)
     return tf.random_uniform((fan_in,), minval=low, maxval=high)
 
-def fun(*args, **kwargs): 
+def fun(*args, **kwargs):
     assert 'nout' in kwargs, "Need output size"
     assert 'name' in kwargs, "Need name for output"
-    
+
     assert len(args) > 0, "Empty args"
 
     nout = kwargs["nout"]
@@ -92,37 +99,38 @@ def fun(*args, **kwargs):
     weight_factor = kwargs.get("weight_factor", 1.0)
     use_weight_norm = kwargs.get("use_weight_norm", False)
     layers_num = kwargs.get("layers_num", 1)
-    
-    inputs = args 
-    
-    for l_id in xrange(layers_num):
-        s = tf.zeros(inputs[0].get_shape().as_list()[:-1] + [nout], dtype=tf.float32)
+    reuse = kwargs.get("reuse", False)
 
-        for idx, a in enumerate(inputs):
-            a_shape = a.get_shape().as_list()
-            
+    with tf.variable_scope(name, reuse=reuse) as scope:
+        inputs = args
 
-            nin = a_shape[-1]
+        for l_id in xrange(layers_num):
+            layer_out = tf.zeros(inputs[0].get_shape().as_list()[:-1] + [nout], dtype=tf.float32)
 
-            init = lambda shape, dtype, partition_info: xavier_init(nin, nout, const = weight_factor)
-            vec_init = lambda shape, dtype, partition_info: xavier_vec_init(nout, const = weight_factor)
+            for idx, a in enumerate(inputs):
+                a_shape = a.get_shape().as_list()
 
-            if not use_weight_norm:
-                w = tf.get_variable("W{}-{}-{}".format(l_id, idx, name), [nin, nout], dtype=tf.float32, initializer = init)
-                a_w = tf.matmul(a, w)
-            else:
-                V = tf.get_variable("V{}-{}-{}".format(l_id, idx, name), [nin, nout], dtype=tf.float32, initializer = init) #tf.uniform_unit_scaling_initializer(factor=weight_factor))
-                g = tf.get_variable("g{}-{}-{}".format(l_id, idx, name), [nout], dtype=tf.float32, initializer = vec_init)
-                
-                a_w = tf.matmul(a, V)
-                a_w = a_w * g/tf.sqrt(tf.reduce_sum(tf.square(V),[0]))
+                nin = a_shape[-1]
 
-            if use_bias:
-                b = tf.get_variable("b{}-{}-{}".format(l_id, idx, name), [nout], initializer = tf.zeros_initializer(tf.float32))
-                a_w += a_w + b
-            
-            s += a_w
-        inputs = (act(s),)
+                init = lambda shape, dtype, partition_info: xavier_init(nin, nout, const = weight_factor)
+                vec_init = lambda shape, dtype, partition_info: xavier_vec_init(nout, const = weight_factor)
+                bias_init = lambda shape, dtype, partition_info: np.zeros((nout,))
+                if not use_weight_norm:
+                    w = tf.get_variable("W{}-{}".format(l_id, idx), [nin, nout], dtype = tf.float32, initializer = init)
+                    a_w = tf.matmul(a, w)
+                else:
+                    V = tf.get_variable("V{}-{}".format(l_id, idx), [nin, nout], dtype = tf.float32, initializer = init) #tf.uniform_unit_scaling_initializer(factor=weight_factor))
+                    g = tf.get_variable("g{}-{}".format(l_id, idx), [nout], dtype = tf.float32, initializer = vec_init)
+
+                    a_w = tf.matmul(a, V)
+                    a_w = a_w * g/tf.sqrt(tf.reduce_sum(tf.square(V),[0]))
+
+                if use_bias:
+                    b = tf.get_variable("b{}-{}".format(l_id, idx), [nout], tf.float32, initializer = bias_init)
+                    a_w = a_w + b
+
+                layer_out = layer_out + a_w
+            inputs = (act(layer_out),)
 
     return inputs[0]
 

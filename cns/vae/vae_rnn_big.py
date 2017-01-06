@@ -33,7 +33,7 @@ tf.set_random_seed(10)
 
 target_sr = 5000
 
-epochs = 1000
+epochs = 100
 lrate = 1e-03
 seq_size = 2000
 
@@ -41,7 +41,7 @@ batch_size = 1
 
 weight_factor = 0.5
 
-layers_num = 2
+layers_num = 1
 
 x_transformed = 100
 
@@ -53,7 +53,7 @@ z_interm = 100
 out_interm = 100
 
 net_size = 100
-
+input_dim = 1
 
 _VAEOutputTuple = collections.namedtuple("VAEOutputTuple", ("prior_mu", "prior_sigma", "mu", "sigma", "z", "z_transformed", "output"))
 _RNNInputTuple = collections.namedtuple("RNNInputTuple", ("x", "z"))
@@ -65,12 +65,38 @@ class VAEOutputTuple(_VAEOutputTuple):
 class RNNInputTuple(_RNNInputTuple):
     __slots__ = ()
 
+def encode(x, h, generator):
+    x_t = fun(x, nout = x_transformed, act = tf.nn.relu, name = "x_transformed", weight_factor = weight_factor, layers_num = layers_num)
+
+    prior = fun(h, nout = prior_interm, act = tf.nn.relu, name = "prior", weight_factor = weight_factor, layers_num = layers_num)
+    prior_mu = fun(prior, nout = z_dim, act = tf.identity, name = "prior_mu", weight_factor = weight_factor)
+    prior_sigma = fun(prior, nout = z_dim, act = tf.nn.softplus, name = "prior_sigma", weight_factor = weight_factor)
+
+    phi = fun(x_t, nout = phi_interm, act = tf.nn.relu, name = "phi", weight_factor = weight_factor, layers_num = layers_num)
+    z_mu = fun(phi, nout = z_dim, act = tf.identity, name = "z_mu", weight_factor = weight_factor)
+    z_sigma = fun(phi, nout = z_dim, act = tf.nn.softplus, name = "z_sigma", weight_factor = weight_factor)
+
+    epsilon = tf.random_normal((batch_size, z_dim), name='epsilon')
+
+    z = tf.select(generator, prior_mu + prior_sigma * epsilon, z_mu + z_sigma * epsilon)
+
+    return z, z_mu, z_sigma, prior_mu, prior_sigma, x_t
+
+def decode(z):
+    z_t = fun(z, nout = z_interm, act = tf.nn.relu, name = "z_transformed", weight_factor = weight_factor, layers_num = layers_num)
+
+    output_t = fun(z_t, nout = out_interm, act = tf.nn.relu, name = "out_transform", weight_factor = weight_factor, layers_num = layers_num)
+    post_mu = fun(output_t, nout = input_dim, act =tf.identity, name = "out_mu", weight_factor = weight_factor)
+    post_sigma = fun(output_t, nout = input_dim, act =tf.nn.softplus, name = "out_sigma", weight_factor = weight_factor)
+    return post_mu, post_sigma, z_t
+
+
 
 class VAECell(rc.RNNCell):
-    def __init__(self, base_cell):
+    def __init__(self, base_cell, generator):
         self._base_cell = base_cell
         self._num_units = self._base_cell.state_size
-        self._generator = False
+        self._generator = generator
 
     @property
     def state_size(self):
@@ -80,59 +106,38 @@ class VAECell(rc.RNNCell):
     def output_size(self):
         return VAEOutputTuple(z_dim, z_dim, z_dim, z_dim, z_dim, z_interm, 1)
 
-    def set_generator(self, gen_flag):
-        self._generator = gen_flag
-
     def __call__(self, x, h, scope=None):
-        x_t = fun(x, nout = x_transformed, act = tf.nn.tanh, name = "x_transformed", weight_factor = weight_factor, layers_num = layers_num)
+        z, z_mu, z_sigma, prior_mu, prior_sigma, x_t = encode(x, h, self._generator)
+        post_mu, post_sigma, z_t = decode(z)
 
-        # prior, depends only on state
+        x_t_gen = fun(post_mu, nout = x_transformed, act = tf.nn.tanh, name = "x_transformed",
+            weight_factor = weight_factor, layers_num = layers_num, reuse=True
+        )
 
-        prior_t = fun(h, nout = prior_interm, act = tf.nn.tanh, name = "prior", weight_factor = weight_factor, layers_num = layers_num)
-        prior_mu_t = fun(prior_t, nout = z_dim, act = tf.identity, name = "prior_mu", weight_factor = weight_factor)
-        prior_sigma_t = fun(prior_t, nout = z_dim, act = tf.nn.softplus, name = "prior_sigma", weight_factor = weight_factor)
-
-        # phi
-        phi_t = fun(x_t, h, nout = phi_interm, act = tf.nn.tanh, name = "phi", weight_factor = weight_factor, layers_num = layers_num)
-        phi_mu_t = fun(phi_t, nout = z_dim, act = tf.identity, name = "phi_mu", weight_factor = weight_factor)
-        phi_sigma_t = fun(phi_t, nout = z_dim, act = tf.nn.softplus, name = "phi_sigma", weight_factor = weight_factor)
-
-        # z generating
-        epsilon = tf.random_normal(tf.shape(z_dim), name='epsilon')
-
-        if not self._generator:
-            z = phi_mu_t + phi_sigma_t * epsilon
-        else:
-            z = prior_mu_t + prior_sigma_t * epsilon
-
-        z_t = fun(z, nout = z_interm, act = tf.nn.tanh, name = "z_transformed", weight_factor = weight_factor, layers_num = layers_num)
-
-        output_t = fun(z_t, h, nout = out_interm, act = tf.nn.tanh, name = "out_transform", weight_factor = weight_factor, layers_num = layers_num)
-        output_mu = fun(output_t, nout = 1, act =tf.identity, name = "out_mu", weight_factor = weight_factor)
-        # output_sigma = fun(out_t, nout = 1, act = tf.nn.softplus, name = "out_sigma", weight_factor = weight_factor)
-
-        if not self._generator:
-            x_c = tf.concat_v2([x_t, z_t], 1)
-        else:
-            x_t_gen = fun(output_mu, nout = x_transformed, act = tf.nn.tanh, name = "x_transformed", weight_factor = weight_factor, layers_num = layers_num)
-            x_c = tf.concat_v2([x_t_gen, z_t], 1)
+        x_c = tf.select(
+            self._generator,
+            tf.concat_v2([x_t_gen, z_t], 1),
+            tf.concat_v2([x_t, z_t], 1)
+        )
 
         _, new_h = self._base_cell(x_c, h)
 
         return VAEOutputTuple(
-            prior_mu_t,
-            prior_sigma_t,
-            phi_mu_t,
-            phi_sigma_t,
+            prior_mu,
+            prior_sigma,
+            z_mu,
+            z_sigma,
             z,
             z_t,
-            output_mu), new_h
+            post_mu), new_h
 
 
 env = Env("vae_run")
 
+generator = tf.placeholder(tf.bool, shape=(), name="generator")
+
 # cell = VAECell(tf.nn.rnn_cell.BasicRNNCell(net_size))
-cell = VAECell(tf.nn.rnn_cell.GRUCell(net_size))
+cell = VAECell(tf.nn.rnn_cell.GRUCell(net_size), generator)
 
 input = tf.placeholder(tf.float32, shape=(seq_size, batch_size, 1), name="Input")
 state = tf.placeholder(tf.float32, [batch_size, net_size], name="state")
@@ -140,24 +145,19 @@ state = tf.placeholder(tf.float32, [batch_size, net_size], name="state")
 with tf.variable_scope("rnn") as scope:
     out, finstate = rnn.dynamic_rnn(cell, input, initial_state=state, time_major=True, scope = scope)
 
+z_prior_mu, z_prior_sigma, z_mu, z_sigma, z, z_t, post_mu = out
 
-with tf.variable_scope("rnn", reuse = True) as scope:
-    cell.set_generator(True)
-    out_gen, finstate_gen = rnn.dynamic_rnn(cell, input, initial_state=state, time_major=True, scope = scope)
-
-kl = tf.reduce_sum(
-    0.5 * (
-        2.0 * tf.log(out.prior_sigma) - 2.0 * tf.log(out.sigma) +
-       (out.sigma**2 + (out.mu - out.prior_mu)**2) / out.prior_sigma**2 - 1.0
-    ),
+kl_loss = tf.reduce_sum(
+    - 0.5 + tf.log(z_sigma) - tf.log(z_prior_sigma) +
+    0.5 * (tf.exp(2.0 * z_prior_sigma) + tf.square(z_mu - z_prior_mu)) / tf.exp(2.0 * z_sigma),
     [1, 2]
 )
 
 # error = 0.5 * tf.reduce_mean(tf.square(input_p - out_mu) / out_sigma**2 + 2 * tf.log(out_sigma) + tf.log(2 * np.pi), [1])
 
-error = tf.reduce_sum(tf.square(out.output - input), 1)
+error = tf.reduce_sum(tf.square(post_mu - input), 1)
 
-loss = tf.reduce_mean(error + kl)
+loss = tf.reduce_mean(error + kl_loss)
 
 optimizer = tf.train.AdamOptimizer(lrate)
 # optimizer = tf.train.RMSPropOptimizer(lrate)
@@ -202,7 +202,7 @@ for f in sorted(os.listdir(env.dataset())):
 def read_song(source_id, target_sr):
     song_data_raw, source_sr = lr.load(data_source[source_id])
     song_data = lr.resample(song_data_raw, source_sr, target_sr, scale=True)
-    song_data = song_data[1500:(1500+50*seq_size)] #song_data.shape[0]/10]
+    song_data = song_data[1500:(1500+2*seq_size)] #song_data.shape[0]/10]
     song_data, data_denom = norm(song_data, return_denom=True)
 
     return song_data, source_sr, data_denom
@@ -214,11 +214,12 @@ def generate(iterations=1):
     output = []
     for i in xrange(iterations):
         out_gen_v, finstate_v = sess.run([
-            out_gen,
-            finstate_gen
+            out,
+            finstate
         ], {
             input: np.zeros((seq_size, batch_size, 1)),
-            state: state_v
+            state: state_v,
+            generator: True
         })
         state_v = finstate_v
 
@@ -246,23 +247,32 @@ for e in xrange(epochs):
         sess_out = sess.run([
             finstate,
             out,
-            kl,
+            kl_loss,
             error,
             loss,
-            apply_grads
+            apply_grads,
+            z_prior_mu, z_prior_sigma, z_mu, z_sigma
             # grads,
             # grads_raw,
             # out_sigma
         ], {
             input: input_v.reshape(seq_size, batch_size, 1),
-            state: state_v
+            state: state_v,
+            generator: False
         })
 
         state_v, out_v, kl_v, error_v, loss_v, _ = sess_out[0:6]
+        z_prior_mu_v, z_prior_sigma_v, z_mu_v, z_sigma_v = sess_out[6:10]
 
         output_data.append(out_v.output.reshape(seq_size)[:(ub-lb)])
         input_data.append(input_v.reshape(seq_size)[:(ub-lb)])
-        perf.append((loss_v, np.mean(kl_v), np.mean(error_v)))
+        perf.append((
+            loss_v,
+            np.mean(kl_v),
+            np.mean(error_v),
+            np.mean(np.square(z_prior_mu_v - z_mu_v)),
+            np.mean(np.square(z_prior_sigma_v - z_sigma_v))
+        ))
 
 
     sl(np.concatenate(input_data), np.concatenate(output_data), file=pj(tmp_dir, "rec_{}.png".format(e)))
@@ -270,6 +280,8 @@ for e in xrange(epochs):
     loss_v = np.mean(map(lambda x: x[0], perf))
     kl_v = np.mean(map(lambda x: x[1], perf))
     error_v = np.mean(map(lambda x: x[2], perf))
+    mu_diff_v = np.mean(map(lambda x: x[3], perf))
+    sigma_diff_v = np.mean(map(lambda x: x[4], perf))
 
     # for g, gr, tv in zip(grads_v, grads_raw_v, tvars):
     #     vname = tv.name.replace("/", "_").replace(":","_")
@@ -286,7 +298,9 @@ for e in xrange(epochs):
     #         # sm(gr, file=fr)
 
 
-    print "Epoch {}, loss {}, KLD {}, rec.error: {}".format(e, loss_v, kl_v, error_v)
+    print "Epoch {}, loss {}, KLD {}, rec.error: {},\n\tmu diff: {}, sigma diff: {}".format(
+        e, loss_v, kl_v, error_v, mu_diff_v, sigma_diff_v
+    )
 
     if e % 10 == 0:
         sl(generate(), file=pj(tmp_dir, "generated_{}.png".format(e)))
