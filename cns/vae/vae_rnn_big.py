@@ -22,13 +22,6 @@ from tensorflow.python.framework import dtypes
 from util import sm, sl, smooth_matrix, smooth
 from util import moving_average, norm, fun, KLDivergenceGauss
 
-def xavier_init(fan_in, fan_out, constant=1):
-    low = -constant*np.sqrt(6.0/(fan_in + fan_out))
-    high = constant*np.sqrt(6.0/(fan_in + fan_out))
-    return tf.random_uniform((fan_in, fan_out),
-                             minval=low, maxval=high,
-                             dtype=tf.float32)
-
 np.random.seed(10)
 tf.set_random_seed(10)
 
