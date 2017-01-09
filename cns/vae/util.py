@@ -135,12 +135,24 @@ def fun(*args, **kwargs):
     return inputs[0]
 
 
-def KLDivergenceGauss(p_mu, log_p_sigma, q_mu, log_q_sigma):
-    return \
-        - 0.5 + log_q_sigma - log_p_sigma +
-        0.5 * (
-            tf.exp(2.0 * log_p_sigma) +
-            tf.square(p_mu - q_mu)
-        ) / tf.exp(2.0 * log_q_sigma)
+def kl_divergence_gauss(p_mu, log_p_sigma, q_mu, log_q_sigma):
+    return - tf.constant(0.5) + log_q_sigma - log_p_sigma + \
+            (tf.exp(tf.constant(2.0) * log_p_sigma) + tf.square(p_mu - q_mu)) / (tf.constant(2.0) * tf.exp(tf.constant(2.0) * log_q_sigma))
 
 
+def log_sum_exp(x, axis=None):
+    x_max = tf.reduce_max(x, axis=axis, keep_dims=True)
+    z = tf.log(tf.reduce_sum(tf.exp(x - x_max), axis, keep_dims=True)) + x_max
+    return tf.reduce_sum(z, axis)
+
+
+
+def gmm_neg_log_likelihood(y, mu, sigma, alpha):
+    y_size = len(y.get_shape().as_list())
+    mu_size = len(mu.get_shape().as_list())
+    assert mu_size <= y_size, "data is smaller than model"
+
+    log_lik = - tf.square(y - mu) / (2.0 * tf.exp(2.0 * sigma)) - 2.0 * sigma - tf.log(2.0 * np.pi)
+    
+    return - tf.log(alpha) - log_lik
+    

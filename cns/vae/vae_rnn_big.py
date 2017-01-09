@@ -20,15 +20,15 @@ from tensorflow.python.ops import array_ops
 from tensorflow.python.framework import dtypes
 
 from util import sm, sl, smooth_matrix, smooth
-from util import moving_average, norm, fun, KLDivergenceGauss
+from util import moving_average, norm, fun, kl_divergence_gauss, gmm_neg_log_likelihood
 
 np.random.seed(10)
 tf.set_random_seed(10)
 
 target_sr = 5000
 
-epochs = 100
-lrate = 1e-03
+epochs = 2000
+lrate = 1e-04
 seq_size = 2000
 
 batch_size = 1
@@ -48,8 +48,9 @@ out_interm = 100
 
 net_size = 100
 input_dim = 1
+n_mix = 10
 
-_VAEOutputTuple = collections.namedtuple("VAEOutputTuple", ("prior_mu", "prior_sigma", "mu", "sigma", "z", "z_transformed", "output"))
+_VAEOutputTuple = collections.namedtuple("VAEOutputTuple", ("prior_mu", "prior_sigma", "mu", "sigma", "post_mu", "post_sigma", "post_alpha"))
 _RNNInputTuple = collections.namedtuple("RNNInputTuple", ("x", "z"))
 
 
@@ -66,13 +67,17 @@ def encode(x, h, generator):
     prior_mu = fun(prior, nout = z_dim, act = tf.identity, name = "prior_mu", weight_factor = weight_factor)
     prior_sigma = fun(prior, nout = z_dim, act = tf.nn.softplus, name = "prior_sigma", weight_factor = weight_factor)
 
-    phi = fun(x_t, nout = phi_interm, act = tf.nn.relu, name = "phi", weight_factor = weight_factor, layers_num = layers_num)
+    phi = fun(x_t, h, nout = phi_interm, act = tf.nn.relu, name = "phi", weight_factor = weight_factor, layers_num = layers_num)
     z_mu = fun(phi, nout = z_dim, act = tf.identity, name = "z_mu", weight_factor = weight_factor)
     z_sigma = fun(phi, nout = z_dim, act = tf.nn.softplus, name = "z_sigma", weight_factor = weight_factor)
 
     epsilon = tf.random_normal((batch_size, z_dim), name='epsilon')
 
-    z = tf.select(generator, prior_mu + prior_sigma * epsilon, z_mu + z_sigma * epsilon)
+    z = tf.cond(
+        generator, 
+        lambda: prior_mu + tf.exp(prior_sigma) * epsilon, 
+        lambda: z_mu + tf.exp(z_sigma) * epsilon
+    )
 
     return z, z_mu, z_sigma, prior_mu, prior_sigma, x_t
 
@@ -80,9 +85,10 @@ def decode(z):
     z_t = fun(z, nout = z_interm, act = tf.nn.relu, name = "z_transformed", weight_factor = weight_factor, layers_num = layers_num)
 
     output_t = fun(z_t, nout = out_interm, act = tf.nn.relu, name = "out_transform", weight_factor = weight_factor, layers_num = layers_num)
-    post_mu = fun(output_t, nout = input_dim, act =tf.identity, name = "out_mu", weight_factor = weight_factor)
-    post_sigma = fun(output_t, nout = input_dim, act =tf.nn.softplus, name = "out_sigma", weight_factor = weight_factor)
-    return post_mu, post_sigma, z_t
+    post_mu = fun(output_t, nout = n_mix, act =tf.identity, name = "out_mu", weight_factor = weight_factor)
+    post_sigma = fun(output_t, nout = n_mix, act =tf.nn.softplus, name = "out_sigma", weight_factor = weight_factor)
+    post_alpha = fun(output_t, nout = n_mix, act =tf.nn.softmax, name = "out_alpha", weight_factor = weight_factor)
+    return post_mu, post_sigma, post_alpha, z_t
 
 
 
@@ -98,20 +104,23 @@ class VAECell(rc.RNNCell):
 
     @property
     def output_size(self):
-        return VAEOutputTuple(z_dim, z_dim, z_dim, z_dim, z_dim, z_interm, 1)
+        return VAEOutputTuple(z_dim, z_dim, z_dim, z_dim, n_mix, n_mix, n_mix)
 
     def __call__(self, x, h, scope=None):
         z, z_mu, z_sigma, prior_mu, prior_sigma, x_t = encode(x, h, self._generator)
-        post_mu, post_sigma, z_t = decode(z)
+        post_mu, post_sigma, post_alpha, z_t = decode(z)
 
-        x_t_gen = fun(post_mu, nout = x_transformed, act = tf.nn.tanh, name = "x_transformed",
+        epsilon_gen = tf.random_normal((batch_size, n_mix), name='epsilon_gen')
+        x_sampled = tf.reduce_sum(post_alpha*(post_mu + epsilon_gen * post_sigma), 1, keep_dims=True)
+
+        x_t_gen = fun(x_sampled, nout = x_transformed, act = tf.nn.relu, name = "x_transformed",
             weight_factor = weight_factor, layers_num = layers_num, reuse=True
         )
 
-        x_c = tf.select(
+        x_c = tf.cond(
             self._generator,
-            tf.concat_v2([x_t_gen, z_t], 1),
-            tf.concat_v2([x_t, z_t], 1)
+            lambda: tf.concat_v2([x_t_gen, z_t], 1),
+            lambda: tf.concat_v2([x_t, z_t], 1)
         )
 
         _, new_h = self._base_cell(x_c, h)
@@ -121,9 +130,9 @@ class VAECell(rc.RNNCell):
             prior_sigma,
             z_mu,
             z_sigma,
-            z,
-            z_t,
-            post_mu), new_h
+            post_mu, 
+            post_sigma, 
+            post_alpha), new_h
 
 
 env = Env("vae_run")
@@ -139,7 +148,7 @@ state = tf.placeholder(tf.float32, [batch_size, net_size], name="state")
 with tf.variable_scope("rnn") as scope:
     out, finstate = rnn.dynamic_rnn(cell, input, initial_state=state, time_major=True, scope = scope)
 
-z_prior_mu, z_prior_sigma, z_mu, z_sigma, z, z_t, post_mu = out
+z_prior_mu, z_prior_sigma, z_mu, z_sigma, post_mu, post_sigma, post_alpha = out
 
 # kl_loss = tf.reduce_sum(
 #     - 0.5 + z_sigma - z_prior_sigma +
@@ -149,15 +158,17 @@ z_prior_mu, z_prior_sigma, z_mu, z_sigma, z, z_t, post_mu = out
 
 # minimize Reverse-KL
 kl_loss = tf.reduce_sum(
-    KLDivergenceGauss(z_prior_mu, z_prior_sigma, z_mu, z_sigma),
+    kl_divergence_gauss(z_mu, z_sigma, z_prior_mu, z_prior_sigma),
     [1, 2]
 )
 
+recc_loss = tf.reduce_sum(gmm_neg_log_likelihood(input, post_mu, post_sigma, post_alpha), [1, 2])
+
 # error = 0.5 * tf.reduce_mean(tf.square(input_p - out_mu) / out_sigma**2 + 2 * tf.log(out_sigma) + tf.log(2 * np.pi), [1])
 
-error = tf.reduce_sum(tf.square(post_mu - input), 1)
+# error = tf.reduce_sum(tf.square(post_mu - input), 1)
 
-loss = tf.reduce_mean(error + kl_loss)
+loss = tf.reduce_mean(recc_loss + kl_loss)
 
 optimizer = tf.train.AdamOptimizer(lrate)
 # optimizer = tf.train.RMSPropOptimizer(lrate)
@@ -202,7 +213,7 @@ for f in sorted(os.listdir(env.dataset())):
 def read_song(source_id, target_sr):
     song_data_raw, source_sr = lr.load(data_source[source_id])
     song_data = lr.resample(song_data_raw, source_sr, target_sr, scale=True)
-    song_data = song_data[1500:(1500+2*seq_size)] #song_data.shape[0]/10]
+    song_data = song_data[1500:(1500+10*seq_size)] #song_data.shape[0]/10]
     song_data, data_denom = norm(song_data, return_denom=True)
 
     return song_data, source_sr, data_denom
@@ -222,8 +233,10 @@ def generate(iterations=1):
             generator: True
         })
         state_v = finstate_v
+        epsilon_gen_v = np.random.randn(batch_size, n_mix)
+        result_v = np.sum(out_gen_v.post_alpha*(out_gen_v.post_mu + epsilon_gen_v * out_gen_v.post_sigma), (1, 2))
 
-        output.append(out_gen_v.output.reshape(seq_size))
+        output.append(result_v)
 
     return np.concatenate(output)
 
@@ -248,7 +261,7 @@ for e in xrange(epochs):
             finstate,
             out,
             kl_loss,
-            error,
+            recc_loss,
             loss,
             apply_grads,
             z_prior_mu, z_prior_sigma, z_mu, z_sigma
@@ -263,8 +276,9 @@ for e in xrange(epochs):
 
         state_v, out_v, kl_v, error_v, loss_v, _ = sess_out[0:6]
         z_prior_mu_v, z_prior_sigma_v, z_mu_v, z_sigma_v = sess_out[6:10]
+        result_v = np.sum(out_v.post_alpha*out_v.post_mu, (1, 2))
 
-        output_data.append(out_v.output.reshape(seq_size)[:(ub-lb)])
+        output_data.append(result_v[:(ub-lb)])
         input_data.append(input_v.reshape(seq_size)[:(ub-lb)])
         perf.append((
             loss_v,
