@@ -32,5 +32,7 @@ class Env(object):
 			return pj(self._run_dir, *args)
 		return self._run_dir
 
+	def clear_pics(self, d):
+		[ os.remove(pj(d, f)) for f in os.listdir(d) if f[-4:] == ".png" ]
 
 

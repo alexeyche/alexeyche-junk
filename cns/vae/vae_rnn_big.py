@@ -21,126 +21,44 @@ from tensorflow.python.framework import dtypes
 
 from util import sm, sl, smooth_matrix, smooth
 from util import moving_average, norm, fun, kl_divergence_gauss, gmm_neg_log_likelihood
+from vae_model import VAECell
+from config import Config
 
 np.random.seed(10)
 tf.set_random_seed(10)
 
 target_sr = 5000
 
-epochs = 2000
+epochs = 1000
 lrate = 1e-04
 seq_size = 2000
 
 batch_size = 1
 
-weight_factor = 0.5
-
-layers_num = 1
-
-x_transformed = 100
-
-phi_interm = 100
-prior_interm = 100
-
-z_dim = 25
-z_interm = 100
-out_interm = 100
-
 net_size = 100
-input_dim = 1
-n_mix = 10
-
-_VAEOutputTuple = collections.namedtuple("VAEOutputTuple", ("prior_mu", "prior_sigma", "mu", "sigma", "post_mu", "post_sigma", "post_alpha"))
-_RNNInputTuple = collections.namedtuple("RNNInputTuple", ("x", "z"))
 
 
-class VAEOutputTuple(_VAEOutputTuple):
-    __slots__ = ()
+config = Config()
 
-class RNNInputTuple(_RNNInputTuple):
-    __slots__ = ()
+config.z_interm = 100
+config.phi_interm = 100
+config.prior_interm = 100
+config.out_interm = 100
+config.n_mix = 10
+config.z_dim = 25
+config.x_transformed = 100
 
-def encode(x, h, generator):
-    x_t = fun(x, nout = x_transformed, act = tf.nn.relu, name = "x_transformed", weight_factor = weight_factor, layers_num = layers_num)
+config.weight_factor = 0.5
+config.layers_num = 1
 
-    prior = fun(h, nout = prior_interm, act = tf.nn.relu, name = "prior", weight_factor = weight_factor, layers_num = layers_num)
-    prior_mu = fun(prior, nout = z_dim, act = tf.identity, name = "prior_mu", weight_factor = weight_factor)
-    prior_sigma = fun(prior, nout = z_dim, act = tf.nn.softplus, name = "prior_sigma", weight_factor = weight_factor)
-
-    phi = fun(x_t, h, nout = phi_interm, act = tf.nn.relu, name = "phi", weight_factor = weight_factor, layers_num = layers_num)
-    z_mu = fun(phi, nout = z_dim, act = tf.identity, name = "z_mu", weight_factor = weight_factor)
-    z_sigma = fun(phi, nout = z_dim, act = tf.nn.softplus, name = "z_sigma", weight_factor = weight_factor)
-
-    epsilon = tf.random_normal((batch_size, z_dim), name='epsilon')
-
-    z = tf.cond(
-        generator, 
-        lambda: prior_mu + tf.exp(prior_sigma) * epsilon, 
-        lambda: z_mu + tf.exp(z_sigma) * epsilon
-    )
-
-    return z, z_mu, z_sigma, prior_mu, prior_sigma, x_t
-
-def decode(z):
-    z_t = fun(z, nout = z_interm, act = tf.nn.relu, name = "z_transformed", weight_factor = weight_factor, layers_num = layers_num)
-
-    output_t = fun(z_t, nout = out_interm, act = tf.nn.relu, name = "out_transform", weight_factor = weight_factor, layers_num = layers_num)
-    post_mu = fun(output_t, nout = n_mix, act =tf.identity, name = "out_mu", weight_factor = weight_factor)
-    post_sigma = fun(output_t, nout = n_mix, act =tf.nn.softplus, name = "out_sigma", weight_factor = weight_factor)
-    post_alpha = fun(output_t, nout = n_mix, act =tf.nn.softmax, name = "out_alpha", weight_factor = weight_factor)
-    return post_mu, post_sigma, post_alpha, z_t
-
-
-
-class VAECell(rc.RNNCell):
-    def __init__(self, base_cell, generator):
-        self._base_cell = base_cell
-        self._num_units = self._base_cell.state_size
-        self._generator = generator
-
-    @property
-    def state_size(self):
-        return self._base_cell.state_size
-
-    @property
-    def output_size(self):
-        return VAEOutputTuple(z_dim, z_dim, z_dim, z_dim, n_mix, n_mix, n_mix)
-
-    def __call__(self, x, h, scope=None):
-        z, z_mu, z_sigma, prior_mu, prior_sigma, x_t = encode(x, h, self._generator)
-        post_mu, post_sigma, post_alpha, z_t = decode(z)
-
-        epsilon_gen = tf.random_normal((batch_size, n_mix), name='epsilon_gen')
-        x_sampled = tf.reduce_sum(post_alpha*(post_mu + epsilon_gen * post_sigma), 1, keep_dims=True)
-
-        x_t_gen = fun(x_sampled, nout = x_transformed, act = tf.nn.relu, name = "x_transformed",
-            weight_factor = weight_factor, layers_num = layers_num, reuse=True
-        )
-
-        x_c = tf.cond(
-            self._generator,
-            lambda: tf.concat_v2([x_t_gen, z_t], 1),
-            lambda: tf.concat_v2([x_t, z_t], 1)
-        )
-
-        _, new_h = self._base_cell(x_c, h)
-
-        return VAEOutputTuple(
-            prior_mu,
-            prior_sigma,
-            z_mu,
-            z_sigma,
-            post_mu, 
-            post_sigma, 
-            post_alpha), new_h
 
 
 env = Env("vae_run")
 
 generator = tf.placeholder(tf.bool, shape=(), name="generator")
 
-# cell = VAECell(tf.nn.rnn_cell.BasicRNNCell(net_size))
-cell = VAECell(tf.nn.rnn_cell.GRUCell(net_size), generator)
+cell = VAECell(tf.nn.rnn_cell.BasicRNNCell(net_size), generator, config)
+# cell = VAECell(tf.nn.rnn_cell.GRUCell(net_size), generator)
 
 input = tf.placeholder(tf.float32, shape=(seq_size, batch_size, 1), name="Input")
 state = tf.placeholder(tf.float32, [batch_size, net_size], name="state")
@@ -159,10 +77,10 @@ z_prior_mu, z_prior_sigma, z_mu, z_sigma, post_mu, post_sigma, post_alpha = out
 # minimize Reverse-KL
 kl_loss = tf.reduce_sum(
     kl_divergence_gauss(z_mu, z_sigma, z_prior_mu, z_prior_sigma),
-    [1, 2]
+    [2]
 )
 
-recc_loss = tf.reduce_sum(gmm_neg_log_likelihood(input, post_mu, post_sigma, post_alpha), [1, 2])
+recc_loss = gmm_neg_log_likelihood(input, post_mu, post_sigma, post_alpha)
 
 # error = 0.5 * tf.reduce_mean(tf.square(input_p - out_mu) / out_sigma**2 + 2 * tf.log(out_sigma) + tf.log(2 * np.pi), [1])
 
@@ -213,7 +131,7 @@ for f in sorted(os.listdir(env.dataset())):
 def read_song(source_id, target_sr):
     song_data_raw, source_sr = lr.load(data_source[source_id])
     song_data = lr.resample(song_data_raw, source_sr, target_sr, scale=True)
-    song_data = song_data[1500:(1500+10*seq_size)] #song_data.shape[0]/10]
+    song_data = song_data[1500:(1500+2*seq_size)] #song_data.shape[0]/10]
     song_data, data_denom = norm(song_data, return_denom=True)
 
     return song_data, source_sr, data_denom
@@ -233,8 +151,8 @@ def generate(iterations=1):
             generator: True
         })
         state_v = finstate_v
-        epsilon_gen_v = np.random.randn(batch_size, n_mix)
-        result_v = np.sum(out_gen_v.post_alpha*(out_gen_v.post_mu + epsilon_gen_v * out_gen_v.post_sigma), (1, 2))
+        epsilon_gen_v = np.random.randn(batch_size, config.n_mix)
+        result_v = np.sum(out_gen_v.post_alpha*(out_gen_v.post_mu + epsilon_gen_v * out_gen_v.post_sigma), 2)
 
         output.append(result_v)
 
@@ -320,7 +238,7 @@ for e in xrange(epochs):
         sl(generate(), file=pj(tmp_dir, "generated_{}.png".format(e)))
 
     if e % 100 == 0:
-        d = generate(10)
+        d = np.squeeze(generate(10))
 
         sl(d, file=pj(tmp_dir, "generated_long_{}.png".format(e)))
 
@@ -330,4 +248,4 @@ for e in xrange(epochs):
             source_sr
         )
 
-saver.save(sess, model_fname)
+# saver.save(sess, model_fname)

@@ -2,6 +2,7 @@
 import tensorflow as tf
 from matplotlib import pyplot as plt
 import numpy as np
+import math
 
 def sm(matrix, file=None):
     plt.imshow(np.squeeze(matrix).T)
@@ -94,6 +95,8 @@ def fun(*args, **kwargs):
     nout = kwargs["nout"]
     name = kwargs["name"]
 
+    config = kwargs.get("config", {})
+    kwargs.update(config)
     act = kwargs.get("act", tf.nn.tanh)
     use_bias = kwargs.get("use_bias", True)
     weight_factor = kwargs.get("weight_factor", 1.0)
@@ -152,7 +155,11 @@ def gmm_neg_log_likelihood(y, mu, sigma, alpha):
     mu_size = len(mu.get_shape().as_list())
     assert mu_size <= y_size, "data is smaller than model"
 
-    log_lik = - tf.square(y - mu) / (2.0 * tf.exp(2.0 * sigma)) - 2.0 * sigma - tf.log(2.0 * np.pi)
-    
-    return - tf.log(alpha) - log_lik
+    # sigma = tf.exp(logsigma)
+
+    ps = tf.exp(-((y - mu)**2)/(2.0*sigma**2))/(sigma*np.sqrt(2*math.pi))
+    pin = ps * alpha
+    return - tf.log(tf.reduce_sum(pin, mu_size-1))
+    # log_lik = - tf.square(y - mu) / (2.0 * tf.exp(2.0 * sigma)) - 2.0 * sigma - tf.log(2.0 * np.pi)
+    # return - tf.log(alpha) - log_lik
     
