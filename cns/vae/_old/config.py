@@ -31,9 +31,6 @@ class Config(defaultdict):
         return pprint.pformat(dictionarize(self), width=1)  # pprint doesn't work with defaultdict's
 
 
-    def __repr__(self):
-        return "ConfigInstance({})".format(str(self))
-
 def dictionarize(defdict):
     work_defdict = defdict.copy()
     for k, v in work_defdict.iteritems():

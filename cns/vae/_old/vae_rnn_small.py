@@ -28,7 +28,7 @@ np.random.seed(10)
 tf.set_random_seed(10)
 
 epochs = 1000
-lrate = 1e-03
+lrate = 1e-04
 seq_size = 60
 
 batch_size = 300
@@ -42,7 +42,7 @@ config.phi_interm = 100
 config.prior_interm = 100
 config.out_interm = 100
 config.n_mix = 10
-config.z_dim = 25
+config.z_dim = 10
 config.x_transformed = 100
 
 config.weight_factor = 0.5
@@ -53,7 +53,7 @@ env = Env("vae_run")
 
 generator = tf.placeholder(tf.bool, shape=(), name="generator")
 
-cell = VAECell(tf.nn.rnn_cell.BasicRNNCell(net_size), generator)
+cell = VAECell(tf.nn.rnn_cell.BasicRNNCell(net_size), generator, config)
 # cell = VAECell(tf.nn.rnn_cell.GRUCell(net_size), generator)
 
 input = tf.placeholder(tf.float32, shape=(seq_size, batch_size, 1), name="Input")
@@ -131,7 +131,7 @@ def generate(iterations=1):
             generator: True
         })
         state_v = finstate_v
-        epsilon_gen_v = np.random.randn(batch_size, n_mix)
+        epsilon_gen_v = np.random.randn(batch_size, config.n_mix)
         result_v = np.sum(out_gen_v.post_alpha*(out_gen_v.post_mu + epsilon_gen_v * out_gen_v.post_sigma), 2)
 
         output.append(result_v)

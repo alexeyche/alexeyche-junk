@@ -3,10 +3,8 @@ import tensorflow as tf
 from matplotlib import pyplot as plt
 import numpy as np
 import math
-import collections
-import pylab
 
-def shm(*matrices, **kwargs):
+def sm(*matrices, **kwargs):
     for m_id, matrix in enumerate(matrices):
         plt.subplot(1, len(matrices),m_id+1)
         plt.imshow(np.squeeze(matrix).T)
@@ -18,7 +16,6 @@ def shm(*matrices, **kwargs):
     else:
         plt.show()
 
-
 def smooth(signal, sigma=0.01, filter_size=50):
     lf_filter = np.exp(-np.square(0.5-np.linspace(0.0, 1.0, filter_size))/sigma)
     return np.convolve(lf_filter, signal, mode="same")
@@ -29,7 +26,7 @@ def smooth_matrix(m, sigma=0.01, filter_size=50):
         res[:, dim_idx] = smooth(m[:, dim_idx], sigma, filter_size)
     return res
 
-def shl(*vector, **kwargs):
+def sl(*vector, **kwargs):
     labels = kwargs.get("labels", [])
     for id, v in enumerate(vector):
         if len(labels) > 0:
@@ -41,35 +38,11 @@ def shl(*vector, **kwargs):
         plt.legend()
 
     if kwargs.get("file"):
+
         plt.savefig(kwargs["file"])
         plt.clf()
     else:
         plt.show()
-
-def shs(*args, **kwargs):
-    labels = kwargs.get("labels", [])
-    make_pca = kwargs.get("make_pca", True)
-
-    for a in args:
-        if make_pca and a.shape[1] > 2:
-            import sklearn.decomposition as dec
-            pca = dec.PCA(2)
-            a = pca.fit(a).transform(a)
-        
-        if len(labels) > 0:
-            plt.scatter(a[:,0], a[:,1], c=labels, cmap=pylab.cm.gist_rainbow)
-        else:
-            plt.scatter(a[:,0], a[:,1])
-    
-    if len(labels) > 0:
-        plt.legend()
-
-    if kwargs.get("file"):
-        plt.savefig(kwargs["file"])
-        plt.clf()
-    else:
-        plt.show()
-
 
 def moving_average(a, n=3) :
     ret = np.cumsum(a, dtype=float)
@@ -195,11 +168,3 @@ def gmm_neg_log_likelihood(y, mu, sigma, alpha):
     # log_lik = - tf.square(y - mu) / (2.0 * tf.exp(2.0 * sigma)) - 2.0 * sigma - tf.log(2.0 * np.pi)
     # return - tf.log(alpha) - log_lik
     
-
-
-def is_sequence(obj):
-    if isinstance(obj, basestring):
-        return False
-    return isinstance(obj, collections.Sequence)
-
-
