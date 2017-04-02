@@ -1,0 +1,1884 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"he",
+				"hebb_rule"
+			],
+			[
+				"Le",
+				"LearningRule"
+			],
+			[
+				"lay",
+				"layer_dacts"
+			],
+			[
+				"fill",
+				"fill_between"
+			],
+			[
+				"entr",
+				"entropyd	(entropy_estimators.py)"
+			],
+			[
+				"entrop",
+				"entropy_estimators	(main.py)"
+			],
+			[
+				"en",
+				"entropyd"
+			],
+			[
+				"mut",
+				"mutual_information	(entropy.py)"
+			],
+			[
+				"afa",
+				"afactor2"
+			],
+			[
+				"error",
+				"error_deriv"
+			],
+			[
+				"lin",
+				"linear_setup"
+			],
+			[
+				"erro",
+				"error_deriv"
+			],
+			[
+				"af",
+				"afactor0"
+			],
+			[
+				"err",
+				"error_deriv"
+			],
+			[
+				"Neu",
+				"NeuronColumn"
+			],
+			[
+				"act",
+				"activation	(function.py)"
+			],
+			[
+				"Seq",
+				"SequenceOperation"
+			],
+			[
+				"call",
+				"callback"
+			],
+			[
+				"_fun",
+				"_function_result_cache"
+			],
+			[
+				"Fun",
+				"FunctionResult	(model.py)"
+			],
+			[
+				"elem",
+				"element"
+			],
+			[
+				"ele",
+				"elems"
+			],
+			[
+				"_dedu",
+				"_deduce_elements"
+			],
+			[
+				"engine",
+				"engine_to_get"
+			],
+			[
+				"feed_di",
+				"feed_dict_tf"
+			],
+			[
+				"ded",
+				"deduced"
+			],
+			[
+				"feed",
+				"feed_dict"
+			],
+			[
+				"fee",
+				"feed_dict"
+			],
+			[
+				"_in",
+				"_inputs"
+			],
+			[
+				"_ss",
+				"_session"
+			],
+			[
+				"calculate",
+				"calculate_metrics"
+			],
+			[
+				"input_va",
+				"input_variable	(engine.py)"
+			],
+			[
+				"prov",
+				"provided_input	(parser.py)"
+			],
+			[
+				"seque",
+				"sequence_variables"
+			],
+			[
+				"provi",
+				"provided_input"
+			],
+			[
+				"prob",
+				"probability_output"
+			],
+			[
+				"DE",
+				"DENSITY"
+			],
+			[
+				"den",
+				"density_view	(parser.py)"
+			],
+			[
+				"Den",
+				"DensityView"
+			],
+			[
+				"var",
+				"variable"
+			],
+			[
+				"arg",
+				"arguments"
+			],
+			[
+				"find",
+				"find_callback"
+			],
+			[
+				"class",
+				"classmethod"
+			],
+			[
+				"statemnt",
+				"statement_id"
+			],
+			[
+				"el",
+				"elements"
+			],
+			[
+				"fun",
+				"function_result"
+			],
+			[
+				"func",
+				"function_result	(tf_engine.py)"
+			],
+			[
+				"dedu",
+				"deduce"
+			],
+			[
+				"bat",
+				"batch_size=100"
+			],
+			[
+				"str",
+				"structure"
+			],
+			[
+				"seq_inf",
+				"seq_infos"
+			],
+			[
+				"coll",
+				"collect_sequences"
+			],
+			[
+				"sequ",
+				"sequences"
+			],
+			[
+				"key_",
+				"key_to_find"
+			],
+			[
+				"find_",
+				"find_key"
+			],
+			[
+				"print",
+				"print_tree"
+			],
+			[
+				"hash",
+				"hashes"
+			],
+			[
+				"pri",
+				"print_tree"
+			],
+			[
+				"dep",
+				"depth_dict"
+			],
+			[
+				"colle",
+				"collect_info"
+			],
+			[
+				"t_el",
+				"t_elem"
+			],
+			[
+				"get_va",
+				"get_var_probabilities"
+			],
+			[
+				"get_var",
+				"get_var_probabilities	(parser.py)"
+			],
+			[
+				"vari",
+				"variables_tree"
+			],
+			[
+				"prin",
+				"print_rec"
+			],
+			[
+				"vara",
+				"variables"
+			],
+			[
+				"seq",
+				"sequences"
+			],
+			[
+				"Inte",
+				"IntegralType	(token.py)"
+			],
+			[
+				"seq_pr",
+				"seq_process_prev"
+			],
+			[
+				"seq_proc",
+				"seq_processing"
+			],
+			[
+				"args",
+				"args_result"
+			],
+			[
+				"statement",
+				"statement_id"
+			],
+			[
+				"depe",
+				"dependencies"
+			],
+			[
+				"_ded",
+				"_deduce_variable"
+			],
+			[
+				"get_de",
+				"get_description	(model.py)"
+			],
+			[
+				"_de",
+				"_deduce"
+			],
+			[
+				"S",
+				"Summation"
+			],
+			[
+				"z_pr",
+				"z_prior_mu_v"
+			],
+			[
+				"gen",
+				"generate_test_seq"
+			],
+			[
+				"ret_s",
+				"ret_sum"
+			],
+			[
+				"batc",
+				"batch_size	(vanilla_vae.py)"
+			],
+			[
+				"Var",
+				"VarEngine"
+			],
+			[
+				"wei",
+				"weight_factor	(function.py)"
+			],
+			[
+				"Part",
+				"PartOfSequence"
+			],
+			[
+				"parse",
+				"parser_result"
+			],
+			[
+				"Par",
+				"PartOfSequence	(parser.py)"
+			],
+			[
+				"req",
+				"request_for_output"
+			],
+			[
+				"out_va",
+				"out_var"
+			],
+			[
+				"Prin",
+				"PrintEngine"
+			],
+			[
+				"Print",
+				"PrintEngine	(print_engine.py)"
+			],
+			[
+				"sequen",
+				"sequence_ctx"
+			],
+			[
+				"__",
+				"__init__"
+			],
+			[
+				"deduce",
+				"deduce_sequence_ctx"
+			],
+			[
+				"Di",
+				"DiracDelta	(tf_engine.py)"
+			],
+			[
+				"state_va",
+				"state_var_cache"
+			],
+			[
+				"eng",
+				"engine_inputs	(parser.py)"
+			],
+			[
+				"next",
+				"next_idx"
+			],
+			[
+				"output_st",
+				"output_state"
+			],
+			[
+				"next_",
+				"next_idx"
+			],
+			[
+				"state",
+				"state_variables"
+			],
+			[
+				"get_sha",
+				"get_shape_cb"
+			],
+			[
+				"get_s",
+				"get_shape"
+			],
+			[
+				"output",
+				"output_size"
+			],
+			[
+				"iter",
+				"iterate_over_sequence	(engine.py)"
+			],
+			[
+				"elem_",
+				"elem_out"
+			],
+			[
+				"data",
+				"data_info"
+			],
+			[
+				"engin",
+				"engines	(toy_example.py)"
+			],
+			[
+				"statem",
+				"statements_met	(parser.py)"
+			],
+			[
+				"bath",
+				"batch_size"
+			],
+			[
+				"CU",
+				"CURRENT_SESSION	(tf_engine.py)"
+			],
+			[
+				"Dedu",
+				"DeduceContext"
+			],
+			[
+				"scope",
+				"scope_name"
+			],
+			[
+				"scop",
+				"scope_name"
+			],
+			[
+				"No",
+				"NotImplementedError"
+			],
+			[
+				"output_stae",
+				"output_state_variables"
+			],
+			[
+				"defa",
+				"default_ctx"
+			],
+			[
+				"output_state",
+				"output_state_vars"
+			],
+			[
+				"output_s",
+				"output_state_vars"
+			],
+			[
+				"Sequ",
+				"SequenceInfo"
+			],
+			[
+				"is",
+				"isinstance"
+			],
+			[
+				"name",
+				"namedtuple"
+			],
+			[
+				"get_ctx",
+				"get_ctx_with"
+			],
+			[
+				"densi",
+				"density_view"
+			],
+			[
+				"ret",
+				"return"
+			],
+			[
+				"get_",
+				"get_variables"
+			],
+			[
+				"get_p",
+				"get_dependencies"
+			],
+			[
+				"dens",
+				"density_view"
+			],
+			[
+				"max",
+				"max_local_statement"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "mi/entropy.py",
+			"settings":
+			{
+				"buffer_size": 7562,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "mi/main.py",
+			"settings":
+			{
+				"buffer_size": 4903,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "Python 2.7.12 (default, Nov 19 2016, 06:48:10) \n[GCC 5.4.0 20160609] on linux2\nType \"help\", \"copyright\", \"credits\" or \"license\" for more information.\n>>> \n\nimport numpy as np\nfrom act import Linear, Sigmoid, Tanh, Relu\nfrom collections import namedtuple\nfrom util import shm, shl\nimport entropy_estimators as ee\nimport entropy as ee2\nimport os\nfrom os.path import join as pj\nfrom matplotlib import pyplot as plt\n\nsmall_random_init = lambda *shape: -0.1 + 0.2*np.random.rand(*shape)\n\nnp.random.seed(1)\n\nclass LearningRule(object):\n	BP = 0\n	HEBB = 1\n\n\ndef l2_loss(y, y_t):\n	return (\n		np.mean(0.5*np.square(y - y_t)),\n		y - y_t\n	)\n\ndef cross_entropy_loss(y, y_t):\n	return (\n		- np.mean(y_t * np.log(y + 1e-08) + (1.0 - y_t) * np.log(1.0 - y + 1e-08)),\n		y - y_t\n	)\n\ndef binary_setup(x_size, y_size, batch_size):\n	y = np.random.random((10*batch_size, y_size))\n	y[y>0.1] = 0.0; y[y > 0.0] = 1.0\n	Wy = small_random_init(y_size, x_size)\n	y = y[np.where(np.sum(y, 1) != 0)]\n	y = y[:batch_size, :]\n	\n	x = np.dot(y, Wy)\n	return x, y, cross_entropy_loss\n\n\ndef linear_setup(x_size, y_size, batch_size):\n	y = np.random.randn(batch_size, y_size)\n	Wy = small_random_init(y_size, x_size)\n	x = np.dot(y, Wy)\n	return x, y, l2_loss\n\n\n\ndef non_linear_setup(x_size, y_size, batch_size):\n	y = np.random.randn(batch_size, y_size)\n	Wy = small_random_init(y_size, x_size)\n	Wx = small_random_init(x_size, x_size)\n	x = np.dot(np.dot(y, Wy), Wx)\n	\n	return x, y, l2_loss\n\n\n\nclass NeuronColumn(object):\n	class Parameters(object):\n		def __init__(self, W):\n			self.W = W\n\n	def __init__(self, size, act, weight_init = small_random_init):\n		self._size = size\n		self._act = act\n		self.p = None\n		self._weight_init = weight_init\n\n	@property\n	def size(self):\n		return self._size\n	\n\n	def _init_p(self, x):\n		return NeuronColumn.Parameters(self._weight_init(x.shape[-1], self._size))\n\n\n	def __call__(self, x):\n		if self.p is None:\n			self.p = self._init_p(x)\n\n		y_pre = np.dot(x, self.p.W)\n\n		return self._act(y_pre)\n\n	def bw(self, y):\n		assert not self.p is None\n		x_pre = np.dot(y, self.p.W.T)\n		return self._act(x_pre)\n\n\n\ntmp_dir = pj(\"{}/tmp\".format(os.environ[\"HOME\"]))\n[ os.remove(pj(tmp_dir, f)) for f in os.listdir(tmp_dir) if f.endswith(\".png\")]\n\nact = Tanh()\nlrule = LearningRule.HEBB\nlrate = 1e-03\nepochs = 100\n\n# if lrule == LearningRule.HEBB:\n# 	lrate *= 10\n\ny_size, x_size = 5, 25\n\nh_size = (30, 10)\n\n\n\nnc0 = NeuronColumn(h_size[0], act)\nnc1 = NeuronColumn(h_size[1], act)\nnc2 = NeuronColumn(y_size, Linear())\n\n\n\n# x, y, loss = linear_setup(x_size, y_size, 1000)\nx, y, loss = non_linear_setup(x_size, y_size, 1000)\n# x, y, loss = binary_setup(x_size, y_size, 1000)\n\n\n# mi = lambda a, b: np.mean([ee.mi(a, b, k = 3) for _ in xrange(1)])\nmi = lambda a, b: ee.mi(a, b, k = 3)\n# mi = lambda a, b: ee2.mutual_information((a, b), k=3)\n\n\n\n\n\ninfo, grad_stat = [], []\nfor e in xrange(epochs):\n	h0, afactor0 = nc0(x)\n	h1, afactor1 = nc1(h0)\n	y_hat, afactor2 = nc2(h1)\n\n	error, error_deriv = loss(y_hat, y)\n	if lrule == LearningRule.BP:\n		dnc2 = error_deriv * afactor2\n		dnc1 = np.dot(dnc2, nc2.p.W.T) * afactor1\n		dnc0 = np.dot(dnc1, nc1.p.W.T) * afactor0\n	\n		dW2 = - np.dot(h1.T, dnc2)\n		dW1 = - np.dot(h0.T, dnc1)\n		dW0 = - np.dot(x.T, dnc0)\n\n	elif lrule == LearningRule.HEBB:\n		def hebb_rule(x, y, f, w):\n			dw = np.zeros(w.shape)\n			for ni in xrange(dw.shape[1]):\n				for syn_i in xrange(dw.shape[0]):\n					dw[syn_i, ni] = np.sum(\n						f[:, ni] * (x[:, syn_i] * y[:, ni] - 10*y[:, ni] * y[:, ni] * w[syn_i, ni])\n					)\n			return dw\n\n		#np.dot(nc2.p.W\n		h1b, afactor2b = nc2.bw(y)\n		h0b, afactor1b = nc1.bw(h1b)\n		x_hat, afactor0b = nc0.bw(h0b)\n\n\n		dW2b = hebb_rule(y, h1b, afactor2b, nc2.p.W.T)\n		dW1b = hebb_rule(h1b, h0b, afactor1b, nc1.p.W.T)\n		dW0b = hebb_rule(h0b, x_hat, afactor0b, nc0.p.W.T)\n\n		\n		# dW2 = hebb_rule(h1, y_hat, afactor2, nc2.p.W)\n		# dW1 = hebb_rule(h0, h1, afactor1, nc1.p.W)\n		# dW0 = hebb_rule(x, h0, afactor0, nc0.p.W)\n		\n\n		# dW2 = (dW2 + dW2b.T)/2.0\n		# dW1 = (dW1 + dW1b.T)/2.0\n		# dW0 = (dW0 + dW0b.T)/2.0\n		dW2 = dW2b.T; dW0 = dW0b.T; dW1 = dW1b.T\n		# dnc2 = y_hat\n		# dnc1 = h1\n		# dnc0 = h0\n\n		# dW2 = np.dot(h1.T, dnc2) - np.dot(np.dot(y_hat.T, y_hat), nc2.p.W.T).T\n		# dW1 = np.dot(h0.T, dnc1) - np.dot(np.dot(h1.T, h1), nc1.p.W.T).T\n		# dW0 = np.dot(x.T, dnc0) - np.dot(np.dot(h0.T, h0), nc0.p.W.T).T\n\n\n	\n	nc0.p.W += lrate * dW0\n	nc1.p.W += lrate * dW1\n	nc2.p.W += lrate * dW2\n\n	# y_hat = np.abs(np.ceil(y_hat-0.5))\n\n	info.append([\n		mi(h0, x), \n		mi(h1, x), \n		mi(h0b, y),\n		mi(h1b, y), \n		#mi(np.abs(np.ceil(y_hat-0.5)), y), \n		# mi(y_hat, y),\n	])\n	grad_stat.append([\n		np.mean(dW0), \n		np.mean(dW1),\n		np.mean(dW2),\n		np.var(dW0),\n		np.var(dW1),\n		np.var(dW2),\n	])\n	print \"Epoch {}, error {}\".format(e, error)\n\n\n\ni = np.array(info)\nshl(i[:,0], i[:,1], i[:,2], i[:,3], labels=[\"xh0\", \"xh1\", \"h0y\", \"h1y\"], file=pj(tmp_dir, \"info.png\"))\n\ngs = np.array(grad_stat)\nshl(gs[:,0], gs[:,1], gs[:,2], labels=[\"m0\", \"m1\", \"m2\"], file=pj(tmp_dir, \"grad_mean.png\"))\nshl(gs[:,3], gs[:,4], gs[:,5], labels=[\"v0\", \"v1\", \"v2\"], file=pj(tmp_dir, \"grad_var.png\"))\n\nI tensorflow/stream_executor/dso_loader.cc:120] successfully opened CUDA library libcublas.so.8.0 locally\nI tensorflow/stream_executor/dso_loader.cc:120] successfully opened CUDA library libcudnn.so.5 locally\nI tensorflow/stream_executor/dso_loader.cc:120] successfully opened CUDA library libcufft.so.8.0 locally\nI tensorflow/stream_executor/dso_loader.cc:120] successfully opened CUDA library libcuda.so.1 locally\nI tensorflow/stream_executor/dso_loader.cc:120] successfully opened CUDA library libcurand.so.8.0 locally\nEpoch 0, error 0.502761073282\nEpoch 1, error 0.502672796667\nEpoch 2, error 0.502555741399\nEpoch 3, error 0.50255736677\nEpoch 4, error 0.502426199541\nEpoch 5, error 0.502430619132\nEpoch 6, error 0.502253695106\nEpoch 7, error 0.502518205164\nEpoch 8, error 0.504120112379\nEpoch 9, error 0.508812623035\nEpoch 10, error 0.512111914657\nEpoch 11, error 0.510831547563\nEpoch 12, error 0.509807204565\nEpoch 13, error 0.509565774833\nEpoch 14, error 0.509987662219\nEpoch 15, error 0.510144876138\nEpoch 16, error 0.509569869773\nEpoch 17, error 0.510818394178\nEpoch 18, error 0.508690974444\nEpoch 19, error 0.511400114662\nEpoch 20, error 0.508011827801\nEpoch 21, error 0.511397937976\nEpoch 22, error 0.508136866414\nEpoch 23, error 0.511869406989\nEpoch 24, error 0.507559492924\nEpoch 25, error 0.512035472508\nEpoch 26, error 0.507350858562\nEpoch 27, error 0.512599239319\nEpoch 28, error 0.506486590688\nEpoch 29, error 0.512224971979\nEpoch 30, error 0.507192204434\nEpoch 31, error 0.512751040089\nEpoch 32, error 0.506527497064\nEpoch 33, error 0.512390305515\nEpoch 34, error 0.507195597653\nEpoch 35, error 0.512872215334\nEpoch 36, error 0.50653824081\nEpoch 37, error 0.512470411289\nEpoch 38, error 0.507233369581\nEpoch 39, error 0.512957025793\nEpoch 40, error 0.506529675187\nEpoch 41, error 0.512502024921\nEpoch 42, error 0.507280615776\nEpoch 43, error 0.513018286208\nEpoch 44, error 0.506507830376\nEpoch 45, error 0.512506466836\nEpoch 46, error 0.507330315425\nEpoch 47, error 0.513066205293\nEpoch 48, error 0.506476817781\nEpoch 49, error 0.512495305847\nEpoch 50, error 0.507380904253\nEpoch 51, error 0.513107130122\nEpoch 52, error 0.506439178715\nEpoch 53, error 0.512474655052\nEpoch 54, error 0.507432509986\nEpoch 55, error 0.513144874342\nEpoch 56, error 0.506396297274\nEpoch 57, error 0.512447683795\nEpoch 58, error 0.50748579597\nEpoch 59, error 0.513181790078\nEpoch 60, error 0.506348792278\nEpoch 61, error 0.512415969904\nEpoch 62, error 0.507541582234\nEpoch 63, error 0.513219388852\nEpoch 64, error 0.506296819398\nEpoch 65, error 0.512380246188\nEpoch 66, error 0.507600673779\nEpoch 67, error 0.513258667844\nEpoch 68, error 0.506240297489\nEpoch 69, error 0.512340835904\nEpoch 70, error 0.507663742173\nEpoch 71, error 0.513300267544\nEpoch 72, error 0.506179087342\nEpoch 73, error 0.512297916411\nEpoch 74, error 0.507731232513\nEpoch 75, error 0.513344533717\nEpoch 76, error 0.506113143996\nEpoch 77, error 0.512251681735\nEpoch 78, error 0.507803291946\nEpoch 79, error 0.513391525686\nEpoch 80, error 0.506042651982\nEpoch 81, error 0.512202445712\nEpoch 82, error 0.507879713871\nEpoch 83, error 0.51344100121\nEpoch 84, error 0.505968137928\nEpoch 85, error 0.512150708633\nEpoch 86, error 0.507959895057\nEpoch 87, error 0.513492406028\nEpoch 88, error 0.505890540699\nEpoch 89, error 0.512097194074\nEpoch 90, error 0.508042814035\nEpoch 91, error 0.513544892328\nEpoch 92, error 0.505811214934\nEpoch 93, error 0.512042853045\nEpoch 94, error 0.508127046454\nEpoch 95, error 0.51359737964\nEpoch 96, error 0.505731854456\nEpoch 97, error 0.511988831036\nEpoch 98, error 0.508210831051\nEpoch 99, error 0.513648658486\n>>> ",
+			"settings":
+			{
+				"buffer_size": 8669,
+				"line_ending": "Unix",
+				"name": "*REPL* [python]",
+				"scratch": true
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 392.0,
+		"last_filter": "repl",
+		"selected_items":
+		[
+			[
+				"repl",
+				"SublimeREPL: Python"
+			],
+			[
+				"REPL",
+				"SublimeREPL: Python"
+			],
+			[
+				"Sublim py",
+				"SublimeREPL: Python"
+			],
+			[
+				"python",
+				"SublimeREPL: Python"
+			],
+			[
+				"pyth",
+				"SublimeREPL: Python"
+			],
+			[
+				"make",
+				"Build With: Make"
+			],
+			[
+				"rep",
+				"SublimeREPL: Python"
+			],
+			[
+				"pytohn",
+				"SublimeREPL: Python"
+			],
+			[
+				"",
+				"Package Control: Install Package"
+			],
+			[
+				"insta",
+				"Package Control: Install Package"
+			],
+			[
+				"re",
+				"SublimeREPL: Python"
+			],
+			[
+				"repl pyt",
+				"SublimeREPL: Python"
+			],
+			[
+				"remove",
+				"Package Control: Remove Package"
+			],
+			[
+				"packa",
+				"Package Control: Remove Package"
+			],
+			[
+				"instal",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 485.0
+	},
+	"console":
+	{
+		"height": 126.0,
+		"history":
+		[
+			"import urllib.request,os,hashlib; h = '2915d1851351e5ee549c20394736b442' + '8bc59f460fa1548d1514676163dafc88'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/home/alexeyche/prog/alexeyche-junk/cns/vae",
+		"/home/alexeyche/prog/alexeyche-junk/cns/seq_learn",
+		"/home/alexeyche/prog/alexeyche-junk/cns/mi",
+		"/home/alexeyche/distr/NPEET",
+		"/home/alexeyche/prog/alexeyche-junk/cns/bio_learn"
+	],
+	"file_history":
+	[
+		"/home/alexeyche/prog/alexeyche-junk/cns/mi/mi.py",
+		"/home/alexeyche/distr/NPEET/entropy_estimators.py",
+		"/home/alexeyche/prog/alexeyche-junk/cns/mi/main.py",
+		"/home/alexeyche/prog/alexeyche-junk/cns/mi/entropy.py",
+		"/home/alexeyche/prog/alexeyche-junk/cns/bio_learn/common.py",
+		"/home/alexeyche/distr/NPEET/test.py",
+		"/home/alexeyche/prog/alexeyche-junk/cns/bio_learn/spike.py",
+		"/home/alexeyche/prog/alexeyche-junk/cns/bio_learn/simple_spike.py",
+		"/home/alexeyche/prog/alexeyche-junk/cns/bio_learn/simple.py",
+		"/home/alexeyche/prog/alexeyche-junk/cns/mi/act.py",
+		"/home/alexeyche/prog/alexeyche-junk/cns/mi/act.pyc",
+		"/home/alexeyche/.config/sublime-text-3/Packages/User/SublimeREPL.sublime-settings",
+		"/home/alexeyche/prog/alexeyche-junk/cns/bio_learn/common.pyc",
+		"/home/alexeyche/prog/alexeyche-junk/cns/bio_learn/proof_mult.R",
+		"/home/alexeyche/distr/ite/demos/analytical_values/demo_c_cross_entropy.py",
+		"/home/alexeyche/distr/ite/ite/cost/x_analytical_values.py",
+		"/home/alexeyche/distr/tensorflow/tensorflow/python/ops/rnn_cell.py",
+		"/home/alexeyche/prog/vilab/examples/vae_toy.py",
+		"/home/alexeyche/prog/vilab/vilab/datasets.py",
+		"/home/alexeyche/prog/alexeyche-junk/cns/vae/config.py",
+		"/home/alexeyche/prog/vilab/vilab/config.py",
+		"/home/alexeyche/prog/alexeyche-junk/cns/vae/_old/avb_model.py",
+		"/home/alexeyche/prog/alexeyche-junk/cns/vae/_old/avb_test2.py",
+		"/home/alexeyche/prog/alexeyche-junk/cns/vae/function.py",
+		"/home/alexeyche/prog/alexeyche-junk/cns/vae/env.py",
+		"/home/alexeyche/prog/alexeyche-junk/cns/vae/_old/avb.py",
+		"/home/alexeyche/prog/vilab/vilab/api/token.py",
+		"/home/alexeyche/prog/vilab/vilab/api/sequence.py",
+		"/home/alexeyche/prog/vilab/vilab/api/variable.py",
+		"/home/alexeyche/prog/vilab/vilab/old_engines/tf_engine.py",
+		"/home/alexeyche/prog/vilab/vilab/engines/tf_engine.py",
+		"/home/alexeyche/prog/vilab/vilab/engines/engine.py",
+		"/home/alexeyche/prog/vilab/vilab/old_parser.py",
+		"/home/alexeyche/prog/vilab/vilab/deduce.py",
+		"/home/alexeyche/prog/vilab/examples/vrae_toy.py",
+		"/home/alexeyche/prog/vilab/vilab/parser.py",
+		"/home/alexeyche/prog/vilab/vilab/api/model.py",
+		"/home/alexeyche/prog/vilab/examples/vanilla_vae.py",
+		"/home/alexeyche/prog/vilab/examples/simple_rnn_test.py",
+		"/home/alexeyche/prog/vilab/vilab/api/density.py",
+		"/home/alexeyche/prog/vilab/vilab/api/function.py",
+		"/home/alexeyche/prog/vilab/vilab/api/__init__.py",
+		"/home/alexeyche/prog/vilab/vilab/api/function_result.py",
+		"/home/alexeyche/prog/vilab/examples/vae_rnn_toy.py",
+		"/home/alexeyche/prog/vilab/vilab/old_engines/engine.py",
+		"/home/alexeyche/prog/vilab_old/examples/vanilla_vae.py",
+		"/home/alexeyche/prog/vilab/vilab/engines/var_engine.py",
+		"/home/alexeyche/prog/alexeyche-junk/cns/vae/vae_model_bernoulli.py",
+		"/home/alexeyche/prog/alexeyche-junk/cns/vae/vae_rnn_bernoulli.py",
+		"/home/alexeyche/prog/vilab/examples/toy_example.py",
+		"/home/alexeyche/prog/vilab/vilab/util.py",
+		"/home/alexeyche/prog/vilab/examples/vae_rnn.py",
+		"/home/alexeyche/prog/alexeyche-junk/cns/vae/util.py",
+		"/home/alexeyche/prog/alexeyche-junk/cns/vae/vae_rnn_small.py",
+		"/home/alexeyche/prog/alexeyche-junk/cns/vae/main.py",
+		"/home/alexeyche/prog/alexeyche-junk/cns/vae/vae_model.py",
+		"/home/alexeyche/prog/alexeyche-junk/cns/vae/vae_simple.py",
+		"/home/alexeyche/prog/alexeyche-junk/cns/vae/vae_rnn.py",
+		"/home/alexeyche/prog/alexeyche-junk/cns/vae/vae_rnn_000.py",
+		"/home/alexeyche/prog/vilab/vilab/engines/print_engine.py",
+		"/home/alexeyche/prog/vilab/vilab/log.py",
+		"/home/alexeyche/prog/alexeyche-junk/cns/vae/log.py",
+		"/home/alexeyche/distr/tensorflow/tensorflow/python/ops/rnn.py",
+		"/home/alexeyche/.config/sublime-text-3/Packages/User/Default (Linux).sublime-keymap",
+		"/home/alexeyche/prog/vilab/vilab/engines/tensor.py",
+		"/home/alexeyche/prog/alexeyche-junk/cns/vae/vae_model.pyc",
+		"/home/alexeyche/prog/vilab/vilab/engines/tensorflow.py",
+		"/home/alexeyche/prog/vilab/vilab/calc.py",
+		"/home/alexeyche/prog/vilab/vilab/engine.py",
+		"/home/alexeyche/prog/vilab/examples/baseline.py",
+		"/home/alexeyche/distr/tensorflow/tensorflow/python/ops/nn.py",
+		"/home/alexeyche/prog/vilab/vilab/ordered_set.py",
+		"/home/alexeyche/distr/parmesan/build/lib.linux-x86_64-2.7/parmesan/layers/normalize.py",
+		"/home/alexeyche/distr/parmesan/examples/iw_vae.py",
+		"/home/alexeyche/distr/parmesan/build/lib.linux-x86_64-2.7/parmesan/layers/sample.py",
+		"/home/alexeyche/prog/vilab/vilab/api/model.pyc",
+		"/home/alexeyche/prog/vilab/vilab/api/__init__.pyc",
+		"/home/alexeyche/prog/vilab/vilab/api/variable.pyc",
+		"/home/alexeyche/distr/parmesan/examples/mnist_ladder.py",
+		"/home/alexeyche/distr/parmesan/examples/vae_vanilla.py",
+		"/home/alexeyche/distr/LVAE/run_models.py",
+		"/home/alexeyche/distr/parmesan/examples/iw_vae_normflow.py",
+		"/home/alexeyche/distr/parmesan/examples/vimco.py",
+		"/home/alexeyche/distr/tensorflow/tensorflow/contrib/bayesflow/python/kernel_tests/stochastic_gradient_estimators_test.py",
+		"/home/alexeyche/distr/tensorflow/tensorflow/contrib/bayesflow/python/ops/variational_inference.py",
+		"/home/alexeyche/distr/edward/examples/iwvi.py",
+		"/home/alexeyche/distr/parmesan/parmesan/layers/sample.py",
+		"/home/alexeyche/prog/vilab/vilab/api/config.py",
+		"/home/alexeyche/prog/vilab/vilab/default_config.py",
+		"/home/alexeyche/distr/tensorflow/tensorflow/contrib/distributions/python/ops/normal.py",
+		"/home/alexeyche/distr/tensorflow/tensorflow/contrib/distributions/python/ops/bernoulli.py",
+		"/home/alexeyche/distr/parmesan/build/lib.linux-x86_64-2.7/parmesan/distributions.py",
+		"/home/alexeyche/prog/alexeyche-junk/cns/vae/avb.py",
+		"/home/alexeyche/prog/alexeyche-junk/cns/vae/avb_model.py",
+		"/home/alexeyche/prog/alexeyche-junk/cns/camera_example.c",
+		"/home/alexeyche/prog/vilab/vilab/env.py",
+		"/home/alexeyche/prog/alexeyche-junk/cns/cpp/scripts/nitime_algs.py",
+		"/home/alexeyche/prog/alexeyche-junk/cns/matching_pursuit.py",
+		"/home/alexeyche/distr/tensorflow/tensorflow/contrib/distributions/python/ops/binomial.py",
+		"/home/alexeyche/distr/tensorflow/tensorflow/contrib/distributions/python/ops/bijector.py",
+		"/home/alexeyche/distr/tensorflow/tensorflow/contrib/distributions/python/ops/distribution_util.py",
+		"/home/alexeyche/distr/tensorflow/util/python/python_lib/tensorflow/python/ops/gen_nn_ops.py",
+		"/home/alexeyche/prog/alexeyche-junk/cns/bio_model/fhn_model.py",
+		"/home/alexeyche/prog/vilab/vilab/util.pyc",
+		"/home/alexeyche/prog/alexeyche-junk/cns/seq_learn/raw_rnn_usage.py",
+		"/home/alexeyche/prog/alexeyche-junk/cns/vae/avb_test0.py",
+		"/home/alexeyche/distr/tensorflow/tensorflow/contrib/distributions/python/ops/distribution.py",
+		"/home/alexeyche/prog/vilab/vilab/api/optimizer.py",
+		"/home/alexeyche/prog/vilab/vilab/api/optimizers.py",
+		"/home/alexeyche/prog/vilab/vilab/api/system.py",
+		"/home/alexeyche/prog/vilab/vilab/api/probability.py",
+		"/home/alexeyche/distr/parmesan/parmesan/datasets.py",
+		"/home/alexeyche/distr/vilab/vilab/api/variable.py",
+		"/home/alexeyche/distr/vilab/vilab/util.py",
+		"/home/alexeyche/distr/vilab/vilab/engine.py",
+		"/home/alexeyche/distr/vilab/vilab/calc.py",
+		"/home/alexeyche/distr/vilab/vilab/api/density.py",
+		"/home/alexeyche/distr/vilab/vilab/api/function.py",
+		"/home/alexeyche/distr/vilab/vilab/api/model.py",
+		"/home/alexeyche/distr/vilab/examples/vanilla_vae.py",
+		"/home/alexeyche/distr/vilab/vilab/log.py",
+		"/home/alexeyche/distr/vilab/vilab/api/__init__.py",
+		"/home/alexeyche/distr/vilab/vilab/api/common.py",
+		"/home/alexeyche/distr/vilab/test_api.py",
+		"/home/alexeyche/distr/vilab/engine.py",
+		"/home/alexeyche/distr/vilab/calc.py",
+		"/home/alexeyche/distr/vilab/vilab/api/api.py",
+		"/home/alexeyche/distr/vilab/vilab/api/functions.py"
+	],
+	"find":
+	{
+		"height": 34.0
+	},
+	"find_in_files":
+	{
+		"height": 90.0,
+		"where_history":
+		[
+			"~/prog/alexeyche-junk/cns",
+			"~/prog/vilab",
+			"~/prog/alexeyche-junk",
+			"~/prog/vilab",
+			"~/distr/tensorflow",
+			"~/distr/parmesan",
+			"~/prog/alexeyche-junk/cns/vae",
+			"~/prog/alexeyche-junk",
+			"~/distr/parmesan",
+			"~/prog/alexeyche-junk",
+			"~/prog/vilab",
+			"~/distr/tensorflow",
+			"~/prog/vilab",
+			"~/distr/parmesan",
+			"~/distr/vilab",
+			"~/distr/parmesan",
+			"~/prog/alexeyche-junk",
+			"~/prog/alexeyche-junk/cns",
+			"~/distr/tensorbayes",
+			"~/distr/vae-clustering",
+			"~/distr/learning-to-learn",
+			"~/distr/tensorbayes",
+			"~/distr/tensotbayes",
+			"~/distr/tensorflow/tensorflow",
+			"~/prog/alexeyche-junk/cns",
+			"~/prog/alexeyche-junk/cns/seq_learn",
+			"~/prog/alexeyche-junk/cns",
+			"~/distr/cle",
+			"~/prog/alexeyche-junk/cns",
+			"~/distr/tensorflow/tensorflow",
+			"~/distr/tensorflow/tensorflow/python",
+			"~/distr/tensorflow/python",
+			"~/prog/alexeyche-junk/cns",
+			"~/distr/cle",
+			"~/prog/alexeyche-junk/cns",
+			"~/distr/cle",
+			"~/distr/nips2015_vrnn",
+			"~/distr/nips_2015_vrnn",
+			"~/distr/cle",
+			"~/prog/alexeyche-junk/cns/seq_learn",
+			"~/prog/alexeyche-junk/cns",
+			"~/prog/alexeyche-junk/cns/tf",
+			"~/distr/tensorflow/tensorflow",
+			"~/distr/tensorflow",
+			"~/prog/alexeyche-junk/cns/tf",
+			"~/prog/alexeyche-junk/cns",
+			"~/prog/alexeyche-junk/cns/tf",
+			"~/prog/dnn",
+			"~/prog/alexeyche-junk",
+			"~/prog/dnn",
+			"~/prog/phd",
+			"~/prog/alexeyche-junk/cns/tf",
+			"~/prog/alexeyche-junk",
+			"~/prog/dnn",
+			"~/prog/alexeyche-junk/cns/tf",
+			"~/distr/empi",
+			"~/Downloads/ombox",
+			"~/distr/tensorflow",
+			"~/prog/dnn/R",
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": true,
+		"find_history":
+		[
+			"pj",
+			"discr",
+			"entropyfromprobs",
+			"l2_loss",
+			"linear_setup",
+			"def mi",
+			"zip2",
+			"avgdigamma",
+			"nsamples",
+			"kl",
+			"entropyd",
+			"mutual_information",
+			"test_mutual_information",
+			"discretize",
+			"hist",
+			"seq2se",
+			"cross_entropy",
+			"entropy",
+			"cross_entropy",
+			"name",
+			"VAECell",
+			"generate",
+			"act",
+			"function",
+			"log_seq",
+			"_sequence_operation",
+			"\\t",
+			"get_zero_offset",
+			"deduce_sequence",
+			"get_zero_offset",
+			"_part_of_sequence",
+			"_deduce_sequences",
+			"isinstance",
+			"get_data_slice",
+			"self._verbose",
+			"cache",
+			"def ",
+			"def _deduce",
+			"monitor_callback",
+			"requested_shape",
+			"reuse",
+			"self._inputs",
+			"logit",
+			"def _deduce",
+			"_deduce_variable_density",
+			"print",
+			"def ",
+			"DiracDeltaDistribution",
+			"sample",
+			"get_ctx_with",
+			"Ordered",
+			"provide_input",
+			"Parser.Ctx",
+			"sequence_variables",
+			"def _den",
+			"Parser.Ctx",
+			"metrics",
+			"_default",
+			"def _default",
+			"def _dens",
+			"def _de",
+			"Parser.Ctx(",
+			"Parser.Ctx\\(",
+			"get_ctx_with",
+			"DensityVi",
+			"PROBABILITY",
+			"get_ctx_with",
+			"def prob",
+			"DensityView.PROBABILITY",
+			"density_view",
+			"get_scope_",
+			"Parser.Ctx",
+			"get_ctx_wi",
+			"get_with_ct",
+			"scope",
+			"_default_callback",
+			"with_ctx",
+			"self.structure",
+			"def variable",
+			"Structu",
+			"engine\\(",
+			"Engine",
+			"get_models",
+			"self._models",
+			"set_structure",
+			"FunctionResult",
+			"get_statement_id",
+			"get_density",
+			"_deduce_variable_density",
+			"req",
+			"get_act",
+			"get_basic_function",
+			"self",
+			"self._str",
+			"def probab",
+			"self.struct",
+			"structure",
+			"requested_shape",
+			"elem_structure",
+			"requested_shape",
+			"StructuredToken",
+			"\\t",
+			"sequences",
+			"def deduce",
+			"\\t",
+			"def _ded",
+			"log_seq",
+			"print_tree",
+			"level",
+			"print_tree",
+			"print_rec",
+			"get_zero_offset",
+			"variables",
+			"print",
+			"Parser.Ctx\\(",
+			"Parser",
+			"Parser\\(",
+			"variables_stack",
+			"print",
+			"seq_init",
+			"print",
+			"get_full",
+			"h\\[t\\]",
+			"h[t]",
+			"print",
+			"strong_type_callbacks",
+			"numbers",
+			"integral"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": true,
+		"replace_history":
+		[
+			"    ",
+			"element",
+			"    ",
+			"elu",
+			"relu",
+			"tf.nn.relu",
+			"tf.nn.softplus",
+			"tf.nn.tanh",
+			"sequence_variables",
+			"has",
+			"    ",
+			"engine",
+			"self.",
+			"self.engine.",
+			"self.engine",
+			"self",
+			"",
+			"self",
+			"    ",
+			"T.nnet.softplus",
+			"T.nn.softplus",
+			"self.variable_set",
+			"FunctionResult",
+			"get_components",
+			"Probability",
+			"bf ==",
+			"logging.debug",
+			"",
+			"self._model",
+			"logging.info",
+			"self.name",
+			"    ",
+			"shape",
+			"discriminator",
+			"relu",
+			"tf.nn.tanh",
+			"weight_factor",
+			"z_interm",
+			"out_interm",
+			"        ",
+			"var    ",
+			"    ",
+			"dt",
+			"FHN",
+			"",
+			"num_units",
+			"dF",
+			"    ",
+			"filters_num",
+			"    ",
+			"",
+			"    ",
+			"",
+			"TRateNorm",
+			"Threshold: 0.25",
+			"Threshold: 0.5",
+			"Threshold: 0.1",
+			"Threshold: 0.75",
+			"2, 1",
+			"<2",
+			"ResumeHidden",
+			"GetCumulativeError",
+			"SetCumulativeError",
+			"Resume",
+			"plt.subplot(8",
+			"plt.subplot(7",
+			"plt.subplot(11",
+			"plt.subplot(7",
+			"s0_stat",
+			"dW0",
+			"    ",
+			"ChronotronRule",
+			"TChronotronRule",
+			"TRegressionCostConst",
+			"TCostFunction",
+			"Error",
+			"${1}",
+			"${1}123",
+			"$1",
+			"\\1",
+			"id",
+			"    ",
+			"c.forecast_ms",
+			"    ",
+			"TargetState",
+			"    ",
+			"depends",
+			"vertices",
+			"    ",
+			",",
+			"    ",
+			"c.seq_size",
+			"",
+			"    ",
+			"ConvDatasetInfo",
+			"ConvConfig",
+			"cfg",
+			"self.cfg",
+			"self.cfg    ",
+			"    ",
+			"self.",
+			"    ",
+			"  ",
+			"    ",
+			"match_iterations",
+			"    ",
+			"int",
+			"",
+			"size_t",
+			"Config",
+			"    ",
+			"imag",
+			"    ",
+			"imag",
+			"    ",
+			"dispatch_array",
+			"recollect_array",
+			"dispatch_array",
+			"neuron_out",
+			"neuron_in",
+			"update_gate",
+			"dt",
+			"alpha",
+			";",
+			"Second",
+			"Right",
+			"<1, 0",
+			"<1, 2"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"folders":
+	[
+		{
+			"path": "/home/alexeyche/prog/alexeyche-junk/cns/vae"
+		},
+		{
+			"path": "/home/alexeyche/prog/alexeyche-junk/cns/spike"
+		},
+		{
+			"path": "/home/alexeyche/prog/alexeyche-junk/cns/seq_learn"
+		},
+		{
+			"path": "/home/alexeyche/prog/alexeyche-junk/cns/mi"
+		},
+		{
+			"path": "/home/alexeyche/distr/NPEET"
+		},
+		{
+			"path": "/home/alexeyche/prog/alexeyche-junk/cns/bio_learn"
+		}
+	],
+	"groups":
+	[
+		{
+			"selected": 1,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "mi/entropy.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 7562,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1127,
+								1127
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "mi/main.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4903,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2819,
+								2819
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 1649.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				}
+			]
+		},
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 2,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 8669,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								8669,
+								8669
+							]
+						],
+						"settings":
+						{
+							"auto_complete": true,
+							"auto_indent": false,
+							"detect_indentation": false,
+							"gutter": false,
+							"history_arrows": true,
+							"indent_subsequent_lines": false,
+							"line_numbers": false,
+							"repl": true,
+							"repl_external_id": "python",
+							"repl_id": "3af0a30e635542a6b8d40f2212ac5bed",
+							"repl_restart_args":
+							{
+								"cmd":
+								[
+									"python",
+									"-i",
+									"-u"
+								],
+								"cwd": "$file_path",
+								"encoding": "utf8",
+								"extend_env":
+								{
+									"PYTHONIOENCODING": "utf-8"
+								},
+								"external_id": "python",
+								"syntax": "Packages/Python/Python.tmLanguage",
+								"type": "subprocess"
+							},
+							"repl_sublime2": false,
+							"smart_indent": false,
+							"spell_check": false,
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 4253.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 22.0
+	},
+	"input":
+	{
+		"height": 31.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			],
+			[
+				1,
+				0,
+				2,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			0.617113013213,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 288.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "Packages/Makefile/Make.sublime-build",
+	"project": "",
+	"replace":
+	{
+		"height": 40.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"mode",
+				"~/prog/vilab/vilab/api/model.py"
+			],
+			[
+				"lgo",
+				"log.py"
+			],
+			[
+				"",
+				"~/prog/vilab/vilab/engines/tf_engine.py"
+			],
+			[
+				"ded",
+				"~/prog/vilab/vilab/deduce.py"
+			],
+			[
+				"eng",
+				"~/prog/vilab/vilab/engine.py"
+			],
+			[
+				"varia",
+				"~/prog/vilab/vilab/api/variable.py"
+			],
+			[
+				"spike_ne",
+				"dnn/neuron/spike_neuron_impl.h"
+			],
+			[
+				"rein",
+				"dnn/reinforcement/reinforcement.h"
+			],
+			[
+				"seq",
+				"dnn/learning_rule/sequence_learning.h"
+			],
+			[
+				"fee",
+				"models/feedback_stdp/feedback_stdp.cpp"
+			],
+			[
+				"res",
+				"dnn/protos/resume_hidden_rule.proto"
+			],
+			[
+				"resume_",
+				"dnn/protos/resume_hidden_rule.proto"
+			],
+			[
+				"stdp",
+				"dnn/learning_rule/stdp.h"
+			],
+			[
+				"la",
+				"dnn/sim/layer.h"
+			],
+			[
+				"conn",
+				"dnn/connection/connection.h"
+			],
+			[
+				"config.pr",
+				"dnn/protos/config.proto"
+			],
+			[
+				"mult",
+				"dnn/protos/multiplicative_norm.proto"
+			],
+			[
+				"uni",
+				"dnn/weight_normalization/unit_norm.h"
+			],
+			[
+				"log_e",
+				"dnn/activation/log_exp.h"
+			],
+			[
+				"optima",
+				"dnn/learning_rule/optimal_stdp.h"
+			],
+			[
+				"log",
+				"dnn/activation/log_exp.h"
+			],
+			[
+				"slid",
+				"dnn/weight_normalization/sliding_ltd.h"
+			],
+			[
+				"basic",
+				"dnn/protos/basic_synapse.proto"
+			],
+			[
+				"syna",
+				"dnn/synapse/synapse.h"
+			],
+			[
+				"sim",
+				"dnn/sim/sim.h"
+			],
+			[
+				"unit",
+				"dnn/weight_normalization/unit_norm.h"
+			],
+			[
+				"proto.c",
+				"R/Rdnn/src/proto.cpp"
+			],
+			[
+				"sum",
+				"dnn/weight_normalization/sum_norm.h"
+			],
+			[
+				"sum_",
+				"dnn/weight_normalization/sum_norm.h"
+			],
+			[
+				"sim_i",
+				"dnn/sim/sim_impl.h"
+			],
+			[
+				"globl",
+				"dnn/sim/global_ctx.h"
+			],
+			[
+				"resum",
+				"dnn/learning_rule/resume_rule.h"
+			],
+			[
+				"sto",
+				"dnn/protos/stochastic.proto"
+			],
+			[
+				"resume",
+				"dnn/learning_rule/resume_rule.h"
+			],
+			[
+				"glob",
+				"dnn/sim/global_ctx.h"
+			],
+			[
+				"inte",
+				"dnn/neuron/integrate_and_fire.h"
+			],
+			[
+				"min",
+				"dnn/weight_normalization/min_max_norm.h"
+			],
+			[
+				"srm",
+				"dnn/neuron/srm_neuron.h"
+			],
+			[
+				"net",
+				"dnn/sim/network.h"
+			],
+			[
+				"entr",
+				"dnn/base/entry.h"
+			],
+			[
+				"opt",
+				"dnn/learning_rule/optimal_stdp.h"
+			],
+			[
+				"min_ma",
+				"dnn/weight_normalization/min_max_norm.h"
+			],
+			[
+				"time",
+				"ground/ts/time_series.h"
+			],
+			[
+				"matr",
+				"ground/matrix.h"
+			],
+			[
+				"cho",
+				"dnn/learning_rule/chronotron_rule.h"
+			],
+			[
+				"feee",
+				"models/feedback_stdp/feedback_stdp.cpp"
+			],
+			[
+				"string",
+				"ground/string.h"
+			],
+			[
+				"ma",
+				"ground/matrix.h"
+			],
+			[
+				"glo",
+				"dnn/sim/global_ctx.h"
+			],
+			[
+				"rand",
+				"ground/rand.h"
+			],
+			[
+				"distr",
+				"ground/protos/distr.proto"
+			],
+			[
+				"bin_s",
+				"ground/serial/bin_serial.h"
+			],
+			[
+				"global",
+				"dnn/sim/global_ctx.cpp"
+			],
+			[
+				"resume_h",
+				"dnn/protos/resume_hidden_rule.proto"
+			],
+			[
+				"serial",
+				"ground/serial/proto_serial.h"
+			],
+			[
+				"config.prot",
+				"dnn/protos/config.proto"
+			],
+			[
+				"resume.",
+				"dnn/protos/resume_rule.proto"
+			],
+			[
+				"sim.c",
+				"dnn/sim/sim.cpp"
+			],
+			[
+				"fe",
+				"models/feedback_stdp/feedback_stdp.cpp"
+			],
+			[
+				"chton",
+				"dnn/protos/chronotron_rule.proto"
+			],
+			[
+				"super",
+				"dnn/learning_rule/supervised_spike.h"
+			],
+			[
+				"ne",
+				"dnn/sim/network.h"
+			],
+			[
+				"inc",
+				"Dissertation/inclusioncontrol.tex"
+			],
+			[
+				"other",
+				"biblio/othercites.bib"
+			],
+			[
+				"conf",
+				"dnn/neuron/config.h"
+			],
+			[
+				"deter",
+				"dnn/activation/determ.h"
+			],
+			[
+				"regre",
+				"dnn/cost/regression.h"
+			],
+			[
+				"config",
+				"dnn/neuron/config.h"
+			],
+			[
+				"aco",
+				"models/acoustic_model/acoustic_model.cpp"
+			],
+			[
+				"run_s",
+				"scripts/run_sim.py"
+			],
+			[
+				"su",
+				"models/supervised_task/supervised_task.cpp"
+			],
+			[
+				"dete",
+				"dnn/activation/determ.h"
+			],
+			[
+				"sigm",
+				"dnn/activation/sigmoid.h"
+			],
+			[
+				"sup",
+				"dnn/learning_rule/supervised_spike.h"
+			],
+			[
+				"supe",
+				"models/supervised_task/supervised_task.cpp"
+			],
+			[
+				"ex",
+				"dnn/activation/exp.h"
+			],
+			[
+				"lear",
+				"dnn/learning_rule/learning_rule.h"
+			],
+			[
+				"reg",
+				"dnn/cost/regression.h"
+			],
+			[
+				"globa",
+				"dnn/sim/global_ctx.h"
+			],
+			[
+				"inp",
+				"dnn/reinforcement/input_classifier.h"
+			],
+			[
+				"spike",
+				"dnn/neuron/spike_neuron.h"
+			],
+			[
+				"regio",
+				"dnn/protos/regression.proto"
+			],
+			[
+				"std",
+				"dnn/learning_rule/stdp.h"
+			],
+			[
+				"seri",
+				"ground/serial/serial_base.h"
+			],
+			[
+				"proto_ser",
+				"ground/serial/proto_serial.h"
+			],
+			[
+				"option",
+				"dnn/protos/options.proto"
+			],
+			[
+				"spike_seq",
+				"dnn/neuron/spike_sequence_neuron.h"
+			],
+			[
+				"fed",
+				"models/feedback_stdp/feedback_stdp.cpp"
+			],
+			[
+				"regr",
+				"dnn/cost/regression.h"
+			],
+			[
+				"reinf",
+				"dnn/reinforcement/reinforcement.h"
+			],
+			[
+				"err",
+				"dnn/neuron/error_neuron.h"
+			],
+			[
+				"cha",
+				"common/characteristic.tex"
+			],
+			[
+				"intr",
+				"Dissertation/introduction.tex"
+			],
+			[
+				"sim.h",
+				"dnn/sim/sim.h"
+			],
+			[
+				"regi",
+				"registry.py"
+			],
+			[
+				"inde",
+				"templates/index.html"
+			],
+			[
+				"grap",
+				"graph.py"
+			],
+			[
+				"conv",
+				"conv_model.py"
+			],
+			[
+				"run",
+				"_old/run.py"
+			],
+			[
+				"run.py",
+				"run.py"
+			],
+			[
+				"conv.p",
+				"_old/conv.py"
+			],
+			[
+				"env",
+				"_old/env.py"
+			],
+			[
+				"mde",
+				"_old/model.py"
+			],
+			[
+				"model",
+				"model.py"
+			],
+			[
+				"spup",
+				"dnn/learning_rule/supervised_spike.h"
+			],
+			[
+				"error",
+				"ground/base/errors.h"
+			],
+			[
+				"spikew",
+				"dnn/spikework/spikework.h"
+			],
+			[
+				"spikewo",
+				"R/Rdnn/src/spikework.h"
+			],
+			[
+				"spikes",
+				"ground/ts/spikes_list.h"
+			],
+			[
+				"exp",
+				"dnn/activation/exp.h"
+			],
+			[
+				"superv",
+				"models/supervised_task/supervised_task.cpp"
+			],
+			[
+				"thre",
+				"ground/thread.h"
+			],
+			[
+				"th",
+				"ground/thread.h"
+			],
+			[
+				"ent",
+				"dnn/base/entry.h"
+			],
+			[
+				"en",
+				"dnn/base/entry.h"
+			],
+			[
+				"optio",
+				"dnn/protos/options.proto"
+			],
+			[
+				"min_m",
+				"dnn/weight_normalization/min_max_norm.h"
+			],
+			[
+				"gauss",
+				"dnn/spikework/kernel/gauss.h"
+			],
+			[
+				"epsp",
+				"dnn/spikework/kernel/epsp.h"
+			],
+			[
+				"time_s",
+				"ground/ts/time_series.h"
+			],
+			[
+				"lea",
+				"dnn/learning_rule/learning_rule.h"
+			],
+			[
+				"min_max",
+				"dnn/weight_normalization/min_max_norm.h"
+			],
+			[
+				"exp.h",
+				"dnn/activation/exp.h"
+			],
+			[
+				"log_exp",
+				"dnn/protos/log_exp.proto"
+			],
+			[
+				"sigmo",
+				"dnn/activation/sigmoid.h"
+			],
+			[
+				"spike_neur",
+				"dnn/neuron/spike_neuron_impl.h"
+			],
+			[
+				"lay",
+				"dnn/sim/layer.h"
+			],
+			[
+				"spikes_l",
+				"ground/ts/spikes_list.h"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": false,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 275.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

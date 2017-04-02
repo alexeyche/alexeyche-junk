@@ -10,7 +10,7 @@ act = Linear()
 lrate = 1e-01
 x = 0.5
 T = 1
-lrule = Learning.BP
+lrule = Learning.FA
 
 epochs = 1
 

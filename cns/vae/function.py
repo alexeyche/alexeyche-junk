@@ -1,6 +1,7 @@
 
 import numpy as np
 import tensorflow as tf
+from util import is_sequence
 
 
 def xavier_init(fan_in, fan_out, const=0.5):
@@ -53,7 +54,9 @@ def function(*args, **kwargs):
 
     if not is_sequence(size):
         size = (size,)
-    
+        if not layers_num is None:
+            size = size*layers_num
+
     if layers_num is None:
         layers_num = len(size)
     else:
