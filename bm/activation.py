@@ -11,6 +11,7 @@ class Activation(object):
 class ClipActivation(Activation):
     def __call__(self, x):
         return np.clip(x, 0.0, 1.0)
+        # return np.clip(x + 0.05*np.random.randn(*x.shape), 0.0, 1.0)
 
     def grad(self, x):
         dx = np.ones(x.shape)
@@ -29,6 +30,14 @@ class ExpActivation(Activation):
         dx[np.where(x < 0.0)] = 0.0
         dx[np.where(x > 1.0)] = 0.0
         return dx
+
+
+class SoftplusActivation(Activation):
+    def __call__(self, x):
+        return np.log(1.0 + np.exp(x))
+
+    def grad(self, x):
+        return 1.0/(1.0 + np.exp(-x))
 
 
 class SigmoidActivation(Activation):

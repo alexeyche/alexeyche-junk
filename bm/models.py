@@ -151,7 +151,7 @@ class ExpDecayHopfield(Model):
         x_s = np.mean(x[:, 2:], 1, keepdims=True) 
         I = np.concatenate([np.zeros((x.shape[0], 2)), x_s - x[:, 2:]], 1)
         
-        return x + self.act.grad(x) * (- np.dot(V, W) - b ) #+ (I - 0.1)
+        return x + self.act.grad(x) * ( - np.dot(V, W) - b ) #+ (I - 0.1)
         
 
 def test_model_grad(model, x, epsilon=1e-05, tol=1e-05, fail=True):

@@ -83,10 +83,15 @@ def safe_params(W, bias):
     f.close()
 
 W = initialize_layer(net_size, net_size)
-W = (W + W.T)/2.0
+W = (W  +W.T)/2.0
 W = make_feed_forward(W)
 
+generate_random_mask = lambda W, level: np.abs(np.ceil(level-np.random.random(W.shape))).astype(W.dtype)
+
+
 bias = np.zeros((net_size,))
+
+
 
 
 # print np.mean(W[:sl0, sl0:sl1])
@@ -99,7 +104,15 @@ safe_params(W, bias)
 
 
 w_lrates, b_lrates = make_lrate_matrices(0.05, 0.01)
-# w_lrates, b_lrates = 0.01, 0.01
+
+# mask = generate_random_mask(W, 0.30)
+# mask[:input_size, :] = 1.0
+# mask[:, :input_size] = 1.0
+
+# w_lrates *= mask
+# W *= mask
+
+# w_lrates, b_lrates = 0.1, 0.1
 
 
 act = ClipActivation()
@@ -121,7 +134,7 @@ n_batches = x_values.shape[0]/batch_size
 u_p = np.zeros((batch_size, net_size))
 u_p_v = np.zeros((batch_size, net_size))
 
-for e in xrange(50):
+for e in xrange(150):
     cost_val_stat_t, dW_stat_t, db_stat_t, acc_stat_t = 0.0, 0.0, 0.0, 0.0
 
     for index in xrange(n_train):
