@@ -6,8 +6,12 @@ def batch_inner(left, right):
     return np.asarray([np.inner(left[i], right[i]) for i in xrange(left.shape[0])])
 
 
-def initialize_layer(n_in, n_out):
-    rng = np.random.RandomState()
+def initialize_layer(n_in, n_out, seed=None):
+    if not seed is None:
+        rng = np.random.RandomState()
+    else:
+        rng = np.random.RandomState(seed)
+        
     W_values = np.asarray(
         rng.uniform(
             low=-np.sqrt(6. / (n_in + n_out)),
@@ -148,10 +152,21 @@ class ExpDecayHopfield(Model):
         V = self.act(x) if V is None else V
         W, b = self.get_p()
         
-        x_s = np.mean(x[:, 2:], 1, keepdims=True) 
-        I = np.concatenate([np.zeros((x.shape[0], 2)), x_s - x[:, 2:]], 1)
+        # from util import shm, shl
         
-        return x + self.act.grad(x) * ( - np.dot(V, W) - b ) #+ (I - 0.1)
+        # input_size, hidden_size, output_size = 2, 100, 2
+        # x_s = np.mean(x[:, input_size:(input_size+hidden_size)], 1, keepdims=True) 
+        # # shl(x_s)
+        
+        # t = 0.1
+        
+        # I = np.concatenate([
+        #     t * np.ones((x.shape[0], input_size)), 
+        #     x_s - x[:, input_size:(input_size+hidden_size)], 
+        #     t * np.ones((x.shape[0], output_size)) 
+        # ], 1)
+        
+        return x + self.act.grad(x) * ( - np.dot(V, W) - b ) #+ (I - t)
         
 
 def test_model_grad(model, x, epsilon=1e-05, tol=1e-05, fail=True):

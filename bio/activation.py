@@ -1,5 +1,5 @@
 import numpy as np
-from common_check import grad_check
+from common_check import grad_check, check_matrix
 
 class Activation(object):
     def __call__(self, x):
@@ -10,17 +10,7 @@ class Activation(object):
 
 
     def approx_grad(self, x, epsilon=1e-05):
-        dx = np.zeros(x.shape)
-        for i in xrange(dx.shape[0]):
-            for j in xrange(dx.shape[1]):
-                de = np.zeros(dx.shape)
-                de[i, j] = epsilon
-
-                lo = self(x - de)
-                ro = self(x + de)
-
-                dx[i, j] = np.sum((ro - lo)/(2.0*epsilon))
-        return dx
+        return check_matrix(x, self, epsilon=epsilon)
 
 
 class ClipActivation(Activation):
@@ -75,15 +65,13 @@ class SigmoidActivation(Activation):
 
 
 def test_act_grad(act, x, epsilon=1e-05, tol=1e-05, fail=True):
-    
-    dy = act.grad(x)
-    
-    dy_approx = act.approx_grad(x, epsilon=epsilon)
-    
-    grad_check(dy, dy_approx, "act", fail, tol)
-
-    return dy, dy_approx
-
+    return grad_check(
+        act.grad(x), 
+        act.approx_grad(x, epsilon=epsilon), 
+        "act", 
+        fail, 
+        tol
+    )
 
 
 if __name__ == '__main__':

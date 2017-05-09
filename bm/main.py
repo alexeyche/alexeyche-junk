@@ -11,6 +11,7 @@ from models import Hopfield, ExpDecayHopfield
 from activation import *
 from cost import MseCost
 from models import initialize_layer
+from opt import *
 
 
 def get_batch(d, idx, batch_size):
@@ -83,40 +84,19 @@ def safe_params(W, bias):
     f.close()
 
 W = initialize_layer(net_size, net_size)
-W = (W  +W.T)/2.0
+W = (W + W.T)/2.0
 W = make_feed_forward(W)
-
-generate_random_mask = lambda W, level: np.abs(np.ceil(level-np.random.random(W.shape))).astype(W.dtype)
-
 
 bias = np.zeros((net_size,))
 
 
-
-
-# print np.mean(W[:sl0, sl0:sl1])
-# print np.mean(W[sl0:sl1, sl1:sl2])
-
 safe_params(W, bias)
 
-# 0.00153877
-# -0.00378768
 
-
-w_lrates, b_lrates = make_lrate_matrices(0.05, 0.01)
-
-# mask = generate_random_mask(W, 0.30)
-# mask[:input_size, :] = 1.0
-# mask[:, :input_size] = 1.0
-
-# w_lrates *= mask
-# W *= mask
-
-# w_lrates, b_lrates = 0.1, 0.1
+# w_lrates, b_lrates = 0.0001, 0.0001
 
 
 act = ClipActivation()
-
 model = ExpDecayHopfield(act, W, bias)
 cost = MseCost()
 
@@ -134,10 +114,33 @@ n_batches = x_values.shape[0]/batch_size
 u_p = np.zeros((batch_size, net_size))
 u_p_v = np.zeros((batch_size, net_size))
 
-for e in xrange(150):
+w_lrates, b_lrates = make_lrate_matrices(0.1, 0.05)
+
+opt = SGDOpt([w_lrates, b_lrates])
+
+# gamma, factor = 0.99, 1.0
+# opt = MomentumOpt([ factor * lr * (1.0 - gamma) for lr in (w_lrates, b_lrates)], gamma)
+
+
+# w_lrates, b_lrates = make_lrate_matrices(0.0005, 0.00001)
+# opt = RMSPropOpt([w_lrates, b_lrates], decay_rate=0.999, eps=1e-04) 
+
+
+# beta1, beta2, factor = 0.99, 0.999, 1.0
+# opt = AdamOpt([ factor * lr * (1.0 - beta1) for lr in (w_lrates, b_lrates)], beta1=beta1, beta2=beta2, eps=1e-04) 
+
+
+
+opt.init(model.W, model.b)
+
+
+for e in xrange(200):
     cost_val_stat_t, dW_stat_t, db_stat_t, acc_stat_t = 0.0, 0.0, 0.0, 0.0
 
-    for index in xrange(n_train):
+    mom_acc, db_acc = np.zeros(model.W.shape), np.zeros(model.b.shape)
+    
+    for index in np.random.permutation(xrange(n_train)):
+    # for index in xrange(n_train):
         # u = u_p[index * batch_size: (index + 1) * batch_size]
         u = u_p.copy()
 
@@ -163,11 +166,8 @@ for e in xrange(150):
         dW = 2.0 * (dWp - dWn) / beta / batch_size
         db = (dbp - dbn) / beta / batch_size
     
-
-        model.W += - w_lrates * dW
-        model.b += - b_lrates * db
         
-        # model.W = (model.W + model.W.T)/2.0
+        model.W, model.b = opt.update((model.W, dW), (model.b, db))
 
         cost_val_stat_t += np.mean(cost_val_neg)
         dW_stat_t += np.mean(dW)
@@ -177,8 +177,7 @@ for e in xrange(150):
         # u_p[index * batch_size: (index + 1) * batch_size] = u
         u_p = u
         # shm(u[:,input_size:], u_pos[:,input_size:], file=pj(tmp_dir, "{}_{}_u.png".format(e, index)))
-        
-
+            
     cost_val_stat_v, acc_stat_v = 0.0, 0.0
 
     for index in xrange(n_valid):
