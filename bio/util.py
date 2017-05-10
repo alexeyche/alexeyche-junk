@@ -30,7 +30,8 @@ def smooth_matrix(m, sigma=0.01, filter_size=50):
     return res
 
 def shl(*vector, **kwargs):
-    plt.figure(1, figsize=(10,10))
+    plt.figure(figsize=kwargs.get("figsize", (10,10)))
+    
     labels = kwargs.get("labels", [])
     for id, v in enumerate(vector):
         if len(labels) > 0:
@@ -40,12 +41,16 @@ def shl(*vector, **kwargs):
 
     if len(labels) > 0:
         plt.legend()
+    
+    if not kwargs.get("title") is None:
+        plt.suptitle(kwargs["title"])
 
     if kwargs.get("file"):
         plt.savefig(kwargs["file"])
         plt.clf()
-    else:
+    elif kwargs.get("show", True):
         plt.show()
+    
 
 def shs(*args, **kwargs):
     labels = kwargs.get("labels", [])
