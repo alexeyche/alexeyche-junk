@@ -6,7 +6,7 @@ import collections
 import pylab
 
 def shm(*matrices, **kwargs):
-    plt.figure(1, figsize=(10,25))
+    plt.figure(1, figsize=(10,10))
     for m_id, matrix in enumerate(matrices):
         plt.subplot(len(matrices), 1, m_id+1)
         plt.imshow(np.squeeze(matrix).T, cmap='gray', origin='lower')
@@ -30,6 +30,7 @@ def smooth_matrix(m, sigma=0.01, filter_size=50):
     return res
 
 def shl(*vector, **kwargs):
+    plt.figure(1, figsize=(10,10))
     labels = kwargs.get("labels", [])
     for id, v in enumerate(vector):
         if len(labels) > 0:

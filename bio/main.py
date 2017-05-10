@@ -5,6 +5,37 @@ from functools import partial
 from activation import *
 from datasets import get_toy_data, quantize_data
 import time
+import weave
+        
+
+
+def C_step(dt, C, x, act_o, gA, gL,  gB, Y, W0):
+    code = """
+    int batch_size = NC[0];
+    int hidden_size = NC[1];
+    int input_size = Nx[0];
+    int output_size = Nact_o[1];
+
+    for (int n_id=0; n_id<hidden_size; n_id++) {
+        double input_pressure = 0.0;
+        for (int inp_id=0; inp_id<input_size; inp_id++) {
+            input_pressure +=  x(inp_id) * W0(inp_id, n_id);
+        }
+
+        for (int b_id=0; b_id<batch_size; b_id++) {
+            double output_pressure = 0.0;
+            for (int out_id=0; out_id<output_size; out_id++) {
+                output_pressure += act_o(b_id, out_id) * Y(out_id, n_id);
+            }
+
+            C(b_id, n_id) += dt * (- gL * C(b_id, n_id) + gB * (input_pressure - C(b_id, n_id)) + gA * (output_pressure - C(b_id, n_id)));
+        }
+    }
+    """
+    weave.inline(code,
+        ['dt', 'C', 'x', 'act_o', 'gA', 'gL',  'gB', 'Y', 'W0'],
+        type_converters=weave.converters.blitz,
+        compiler = 'gcc')
 
 def step(x):
     return 1 * (x >= 0)
@@ -76,12 +107,11 @@ smooth_spikes_batch = partial(smooth_spikes_batch, kernel=epsp_kernel)
 gL = 0.1
 gD = 0.6
 gB = 0.6
-gA_0, gA_2, gA_2 = 0.0, 0.05, 0.6
+gA = 0.6
 
-gA = 0.0
-
-T0, T = 0.0, 100.0      # ms
+T0, T = 0.0, 50.0      # ms
 dt = 1.0                # ms
+integration_time = int(20.0/dt)
 
 Ee = 8.0
 Ei = -8.0
@@ -108,17 +138,17 @@ hidden_size = 100
 output_size = len(y_uniq)
 
 
-batch_size = 1
+batch_size = 10
 batch_to_listen = 0
 
 L, M, N = input_size, hidden_size, output_size
 
 #######################################################################
 
-A = np.zeros((batch_size, hidden_size))         # feedback
-B = np.zeros((batch_size, hidden_size))         # feedforward
-C = np.zeros((batch_size, hidden_size))         # soma
+C = np.zeros((batch_size, hidden_size))
 U = np.zeros((batch_size, output_size))         
+A_plateau = np.zeros((Tsize, batch_size, hidden_size))
+
 
 W0 = 0.1*(np.random.uniform(size=(input_size, hidden_size)) - 0.5)
 b0 = np.zeros((hidden_size,))
@@ -126,12 +156,10 @@ W1 = 0.1*(np.random.uniform(size=(hidden_size, output_size)) - 0.5)
 b1 = np.zeros((output_size,))
 Y = np.random.uniform(size=(output_size, hidden_size)) - 0.5
 
-A_stat = np.zeros((Tsize, hidden_size))
-B_stat = np.zeros((Tsize, hidden_size))
-C_stat = np.zeros((Tsize, hidden_size))
-X_stat = np.zeros((Tsize, input_size))
-C_rates_stat = np.zeros((Tsize, hidden_size))
-U_rates_stat = np.zeros((Tsize, output_size))
+C_stat_f = np.zeros((Tsize, hidden_size))
+U_stat_f = np.zeros((Tsize, output_size))
+C_stat_t = np.zeros((Tsize, hidden_size))
+U_stat_t = np.zeros((Tsize, output_size))
 
 act_h = np.zeros((batch_size, hidden_size,))
 act_aux_h = np.zeros((batch_size, hidden_size,))
@@ -145,56 +173,82 @@ n_train = 100
 
 time_acc = 0.0
 start = time.time()
+
+def step(ti, x, target, gE, gI):
+    global act_h, act_aux_h, act_o, act_aux_o
+    global C, U, A_plateau
+    global C_stat, U_stat
+
+    B = np.dot(x, W0) + b0
+    A_plateau[ti, :] = np.dot(act_o, Y)
+
+    gA_t = gA if target else 0.0
+    
+    C += dt * (- gL * C + gB * (B - C) + gA_t * (A_plateau[ti, :] - C))
+            
+    lambda_C = act(C)
+    lambda_C_r = poisson(lambda_max * lambda_C)
+    
+    act_aux_h += koeff_epsp * lambda_C_r
+    act_h += 1.5 * koeff_epsp * act_aux_h
+
+    V = np.dot(act_h, W1) + b1
+    
+    I = gE * (Ee - U) + gI * (Ei - U) if target else 0.0
+
+    U += dt * (- gL * U + gD * (V - U) + I)
+
+    lambda_U = act(U)
+    lambda_U_r = poisson(lambda_max * lambda_U)
+    
+    act_aux_o += koeff_epsp * lambda_U_r
+    act_o += 1.5 * koeff_epsp * act_aux_o
+
+    act_o -= dt * act_o/tau_l
+    act_aux_o -= dt * act_aux_o/tau_s
+    act_h -= dt * act_h/tau_l
+    act_aux_h -= dt * act_aux_h/tau_s
+
+    
+def drop_state():
+    global act_o, act_aux_o, act_h, act_aux_h, C, U
+    act_h = np.zeros((batch_size, hidden_size,))
+    act_aux_h = np.zeros((batch_size, hidden_size,))
+
+    act_o = np.zeros((batch_size, output_size,))
+    act_aux_o = np.zeros((batch_size, output_size,))
+    C = np.zeros((batch_size, hidden_size))
+    U = np.zeros((batch_size, output_size))
+
 for xi in xrange(n_train):
-    hidden_spikes = []
-    for bi in xrange(batch_size):
-        for ni in xrange(output_size):
-            act_o[bi, ni] = 0.0
-            act_aux_o[bi, ni] = 0.0
+    drop_state()
+    for ti, t in enumerate(np.linspace(T0, T, Tsize)):
+
+        x = x_values_sm[ti, xi, :]
         
-        for ni in xrange(hidden_size):
-            act_h[bi, ni] = 0.0
-            act_aux_h[bi, ni] = 0.0
+        step(ti, x, target=False, gE=0.0, gI=0.0)
+        C_stat_f[ti] = C[batch_to_listen]
+        U_stat_f[ti] = act_o[batch_to_listen]
+
+    alpha_forward = act(np.mean(A_plateau[-integration_time:], 0))
+    
+    drop_state()
 
     y = y_hot[xi]
     gE = y
     gI = 1.0 - y
-    
+
     for ti, t in enumerate(np.linspace(T0, T, Tsize)):
         x = x_values_sm[ti, xi, :]
         
-        B = np.dot(x, W0) + b0
-        A = np.dot(act_o, Y) 
+        step(ti, x, target=True, gE=gE, gI=gI)
+        C_stat_t[ti] = C[batch_to_listen]
+        U_stat_t[ti] = act_o[batch_to_listen]
 
-        C += dt * (- gL * C + gB * (B - C) + gA * (A - C))
-
-        lambda_C = act(C)
-        lambda_C_r = poisson(lambda_max * lambda_C)
-        
-        act_aux_h += koeff_epsp * lambda_C_r
-        act_h += 1.5 * koeff_epsp * act_aux_h
-
-        V = np.dot(act_h, W1) + b1
-
-        I = gE * (Ee - U) + gI * (Ei - U)
-
-        U += dt * (- gL * U + gD * (V - U) + I)
-
-        lambda_U = act(U)
-        lambda_U_r = poisson(lambda_max * lambda_U)
-        
-        act_aux_o += koeff_epsp * lambda_U_r
-        act_o += 1.5 * koeff_epsp * act_aux_o
-        
-        C_stat[ti] = C[batch_to_listen]
-        C_rates_stat[ti] = act_h[batch_to_listen]
-        U_rates_stat[ti] = act_o[batch_to_listen]
-
-        act_o -= dt * act_o/tau_l
-        act_aux_o -= dt * act_aux_o/tau_s
-        act_h -= dt * act_h/tau_l
-        act_aux_h -= dt * act_aux_h/tau_s
+    alpha_target = act(np.mean(A_plateau[-integration_time:], 0))        
+    
+    break
 
     # print xi
-    break
+    
 print (time.time() - start)/n_train
