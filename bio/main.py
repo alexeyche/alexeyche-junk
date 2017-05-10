@@ -34,44 +34,31 @@ def one_hot(y, y_size):
     return y_oh
 
 
-def smooth_input_and_output(x_values, y_values, Tsize, lambda_max, koeff_epsp, tau_s, tau_l):
+def smooth_samples(x_values, Tsize, lambda_max, koeff_epsp, tau_s, tau_l):
     n_samples = x_values.shape[0]
     input_size = x_values.shape[1]
-    output_size = y_values.shape[1]
-
+    
     x_values_smooth = np.zeros((Tsize, n_samples, input_size), dtype=np.float32)
-    y_values_smooth = np.zeros((Tsize, n_samples, output_size), dtype=np.float32)
-
+    
     x_values_smooth_state = np.zeros((n_samples, input_size), dtype=np.float32)
-    y_values_smooth_state = np.zeros((n_samples, output_size), dtype=np.float32)
-
     x_values_smooth_aux = np.zeros((n_samples, input_size), dtype=np.float32)
-    y_values_smooth_aux = np.zeros((n_samples, output_size), dtype=np.float32)
-
+    
     for ti, t in enumerate(np.linspace(T0, T, Tsize)):
         x_realisation = poisson(lambda_max * x_values)
-        y_realisation = poisson(lambda_max * y_values)
-
+        
         x_values_smooth_aux += koeff_epsp * x_realisation
         x_values_smooth_state += 1.5 * koeff_epsp * x_values_smooth_aux
 
-        y_values_smooth_aux += koeff_epsp * y_realisation
-        y_values_smooth_state += 1.5 * koeff_epsp * y_values_smooth_aux
-
         x_values_smooth[ti, :, :] = x_values_smooth_state
-        y_values_smooth[ti, :, :] = y_values_smooth_state
-
+        
         x_values_smooth_state -= dt * x_values_smooth_state/tau_l
         x_values_smooth_aux -= dt * x_values_smooth_aux/tau_s
 
-        y_values_smooth_state -= dt * y_values_smooth_state/tau_l
-        y_values_smooth_aux -= dt * y_values_smooth_aux/tau_s
-
+        
     del x_values_smooth_aux, x_values_smooth_state
-    del y_values_smooth_aux, y_values_smooth_state
 
     gc.collect()
-    return x_values_smooth, y_values_smooth
+    return x_values_smooth
 
 tau_s = 3.0  # tau rise
 tau_l = 10.0 # tau decay
@@ -152,11 +139,12 @@ act_aux_h = np.zeros((batch_size, hidden_size,))
 act_o = np.zeros((batch_size, output_size,))
 act_aux_o = np.zeros((batch_size, output_size,))
 
-x_values_sm, y_values_sm = smooth_input_and_output(x_values, y_hot, Tsize, lambda_max, koeff_epsp, tau_s, tau_l)
+x_values_sm = smooth_samples(x_values, Tsize, lambda_max, koeff_epsp, tau_s, tau_l)
 
 n_train = 100
 
 time_acc = 0.0
+start = time.time()
 for xi in xrange(n_train):
     hidden_spikes = []
     for bi in xrange(batch_size):
@@ -171,8 +159,7 @@ for xi in xrange(n_train):
     y = y_hot[xi]
     gE = y
     gI = 1.0 - y
-
-    start = time.time()
+    
     for ti, t in enumerate(np.linspace(T0, T, Tsize)):
         x = x_values_sm[ti, xi, :]
         
@@ -208,7 +195,6 @@ for xi in xrange(n_train):
         act_h -= dt * act_h/tau_l
         act_aux_h -= dt * act_aux_h/tau_s
 
-    print xi, time.time() - start
-    time_acc += time.time() - start
-
-print time_acc/n_train
+    # print xi
+    break
+print (time.time() - start)/n_train
