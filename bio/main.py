@@ -4,6 +4,7 @@ from util import shl, shm, shs
 from functools import partial
 from activation import *
 from datasets import get_toy_data, quantize_data
+import time
 
 def step(x):
     return 1 * (x >= 0)
@@ -95,6 +96,9 @@ gA = 0.0
 T0, T = 0.0, 100.0      # ms
 dt = 1.0                # ms
 
+Ee = 8.0
+Ei = -8.0
+
 poisson = partial(poisson, dt=dt)
 
 Tsize = int(T/dt + dt)
@@ -127,48 +131,84 @@ L, M, N = input_size, hidden_size, output_size
 A = np.zeros((batch_size, hidden_size))         # feedback
 B = np.zeros((batch_size, hidden_size))         # feedforward
 C = np.zeros((batch_size, hidden_size))         # soma
+U = np.zeros((batch_size, output_size))         
 
 W0 = 0.1*(np.random.uniform(size=(input_size, hidden_size)) - 0.5)
+b0 = np.zeros((hidden_size,))
 W1 = 0.1*(np.random.uniform(size=(hidden_size, output_size)) - 0.5)
+b1 = np.zeros((output_size,))
 Y = np.random.uniform(size=(output_size, hidden_size)) - 0.5
 
 A_stat = np.zeros((Tsize, hidden_size))
 B_stat = np.zeros((Tsize, hidden_size))
 C_stat = np.zeros((Tsize, hidden_size))
 X_stat = np.zeros((Tsize, input_size))
-rates_stat = np.zeros((Tsize, hidden_size))
+C_rates_stat = np.zeros((Tsize, hidden_size))
+U_rates_stat = np.zeros((Tsize, output_size))
 
-smooth_activity = np.zeros((batch_size, hidden_size + output_size,))
-smooth_activity_aux = np.zeros((batch_size, hidden_size + output_size,))
+act_h = np.zeros((batch_size, hidden_size,))
+act_aux_h = np.zeros((batch_size, hidden_size,))
+
+act_o = np.zeros((batch_size, output_size,))
+act_aux_o = np.zeros((batch_size, output_size,))
 
 x_values_sm, y_values_sm = smooth_input_and_output(x_values, y_hot, Tsize, lambda_max, koeff_epsp, tau_s, tau_l)
 
+n_train = 100
 
-# for xi in xrange(n_train):
-#     hidden_spikes = []
-#     for ti, t in enumerate(np.linspace(T0, T, Tsize)):
-#         X = x_values_spike[ti, xi, :]
+time_acc = 0.0
+for xi in xrange(n_train):
+    hidden_spikes = []
+    for bi in xrange(batch_size):
+        for ni in xrange(output_size):
+            act_o[bi, ni] = 0.0
+            act_aux_o[bi, ni] = 0.0
         
-#         smooth_activity_aux[:input_size] += koeff_epsp * X
-#         smooth_activity[:input_size] += 1.5 * koeff_epsp * smooth_activity_aux[:input_size]
+        for ni in xrange(hidden_size):
+            act_h[bi, ni] = 0.0
+            act_aux_h[bi, ni] = 0.0
+
+    y = y_hot[xi]
+    gE = y
+    gI = 1.0 - y
+
+    start = time.time()
+    for ti, t in enumerate(np.linspace(T0, T, Tsize)):
+        x = x_values_sm[ti, xi, :]
         
+        B = np.dot(x, W0) + b0
+        A = np.dot(act_o, Y) 
 
-#         B = np.dot(smooth_activity[:input_size], W0)
+        C += dt * (- gL * C + gB * (B - C) + gA * (A - C))
 
-#         C += dt * (- gL * C + gB * (B - C) + gA * (A - C))
-
-#         lambda_C = act(C)
-#         lambda_C_r = poisson(lambda_max * lambda_C)
+        lambda_C = act(C)
+        lambda_C_r = poisson(lambda_max * lambda_C)
         
-#         smooth_activity[input_size:(input_size+hidden_size)] += koeff_epsp * lambda_C_r
+        act_aux_h += koeff_epsp * lambda_C_r
+        act_h += 1.5 * koeff_epsp * act_aux_h
 
+        V = np.dot(act_h, W1) + b1
 
-#         C_stat[ti] = C[batch_to_listen]
-#         # rates_stat[ti] = hidden_sm[batch_to_listen]
-#         X_stat[ti] = smooth_activity[:input_size]
+        I = gE * (Ee - U) + gI * (Ei - U)
 
-#         smooth_activity -= dt * smooth_activity/tau_l
-#         smooth_activity_aux -= dt * smooth_activity_aux/tau_s
+        U += dt * (- gL * U + gD * (V - U) + I)
 
-#     print xi
-#     break
+        lambda_U = act(U)
+        lambda_U_r = poisson(lambda_max * lambda_U)
+        
+        act_aux_o += koeff_epsp * lambda_U_r
+        act_o += 1.5 * koeff_epsp * act_aux_o
+        
+        C_stat[ti] = C[batch_to_listen]
+        C_rates_stat[ti] = act_h[batch_to_listen]
+        U_rates_stat[ti] = act_o[batch_to_listen]
+
+        act_o -= dt * act_o/tau_l
+        act_aux_o -= dt * act_aux_o/tau_s
+        act_h -= dt * act_h/tau_l
+        act_aux_h -= dt * act_aux_h/tau_s
+
+    print xi, time.time() - start
+    time_acc += time.time() - start
+
+print time_acc/n_train
