@@ -131,9 +131,11 @@ lambda_max = 200.0/1000.0      # 1/ms
 
 P0 = 20.0/lambda_max
 P1 = 20.0/(lambda_max * lambda_max)
+# alt
+P0 = P1
+P1 = P1/10.0
 
-
-learning_rate = 0.21
+learning_rate = 3 * 0.21
 
 act = SigmoidActivation()
 
@@ -148,13 +150,13 @@ y_hot = one_hot(y_values, len(y_uniq))
 
 input_size = x_values.shape[1]
 input_len = x_values.shape[0]
-hidden_size = 2
+hidden_size = 20
 output_size = len(y_uniq)
 
 
-batch_size = 2
+batch_size = 200
 n_train_batches = n_train/batch_size
-
+n_valid_batches = n_valid/batch_size
 batch_to_listen = 0
 
 L, M, N = input_size, hidden_size, output_size
@@ -169,16 +171,22 @@ B_psp_hist = np.zeros((Tsize, batch_size, input_size))
 C_hist = np.zeros((Tsize, batch_size, hidden_size))
 U_hist = np.zeros((Tsize, batch_size, output_size))
 lambda_U_hist = np.zeros((Tsize, batch_size, output_size))
+lambda_C_hist = np.zeros((Tsize, batch_size, hidden_size))
+lambda_U_r_hist = np.zeros((Tsize, batch_size, output_size))
+lambda_C_r_hist = np.zeros((Tsize, batch_size, hidden_size))
+
 I_hist = np.zeros((Tsize, batch_size, output_size))
 
-# W0 = 0.1*(np.random.uniform(size=(input_size, hidden_size)) - 0.5)
-W0 = np.ones((input_size, hidden_size))
+W0 = 0.1*(np.random.uniform(size=(input_size, hidden_size)) - 0.5)
+W0_start = W0.copy()
+# W0 = np.ones((input_size, hidden_size))
 b0 = np.zeros((hidden_size,))
-# W1 = 0.1*(np.random.uniform(size=(hidden_size, output_size)) - 0.5)
-W1 = np.ones((hidden_size, output_size))
+W1 = 0.1*(np.random.uniform(size=(hidden_size, output_size)) - 0.5)
+W1_start = W1.copy()
+# W1 = np.ones((hidden_size, output_size))
 b1 = np.zeros((output_size,))
-# Y = np.random.uniform(size=(output_size, hidden_size)) - 0.5
-Y = np.ones((output_size, hidden_size))
+Y = np.random.uniform(size=(output_size, hidden_size)) - 0.5
+# Y = np.ones((output_size, hidden_size))
 
 
 act_h = np.zeros((batch_size, hidden_size,))
@@ -196,8 +204,9 @@ def step(ti, x, target, gE, gI):
     global act_h, act_aux_h, act_o, act_aux_o
     global C, U, A_plateau
     global C_stat, U_stat
-    global B_psp_hist, V_psp_hist, C_hist, lambda_U_hist, I_hist
+    global B_psp_hist, V_psp_hist, C_hist, lambda_U_hist, lambda_C_hist, I_hist
     
+    B_psp_hist[ti] = x
 
     B = np.dot(x, W0) + b0
     A_plateau[ti] = np.dot(act_o, Y)
@@ -208,7 +217,9 @@ def step(ti, x, target, gE, gI):
             
     lambda_C = lambda_max * act(C)
     lambda_C_r = poisson(lambda_C)
-    
+    # lambda_C_hist[ti] = lambda_C.copy()
+    # lambda_C_r_hist[ti] = lambda_C_r.copy()
+
     act_aux_h += koeff_epsp * lambda_C_r
     act_h += 1.5 * koeff_epsp * act_aux_h
 
@@ -224,6 +235,7 @@ def step(ti, x, target, gE, gI):
 
     lambda_U_hist[ti] = lambda_max * act(U)
     lambda_U_r = poisson(lambda_U_hist[ti])
+    # lambda_U_r_hist[ti] = lambda_U_r.copy()
     
 
     act_aux_o += koeff_epsp * lambda_U_r
@@ -236,7 +248,7 @@ def step(ti, x, target, gE, gI):
 
     U_hist[ti] = U
     C_hist[ti] = C
-    B_psp_hist[ti] = x
+    
 
     
 def drop_state():
@@ -250,10 +262,10 @@ def drop_state():
     C = np.zeros((batch_size, hidden_size))
     U = np.zeros((batch_size, output_size))
 
-n_train_batches = 1
-for e in xrange(1):
-    train_error_rate, train_log_loss = 0.0, 0.0
 
+for e in xrange(1000):
+    train_error_rate, train_log_loss = 0.0, 0.0
+    
     for b_id in xrange(n_train_batches):
         l_id, r_id = (b_id*batch_size), ((b_id+1)*batch_size)
         y = y_hot[l_id:r_id]
@@ -269,12 +281,15 @@ for e in xrange(1):
             
             step(ti, x, target=False, gE=0.0, gI=0.0)
             
+        A_plateau_f = A_plateau.copy()
         V_psp_hist_f = V_psp_hist.copy()
         B_psp_hist_f = B_psp_hist.copy()
         C_hist_f = C_hist.copy()
         U_hist_f = U_hist.copy()
         lambda_U_hist_f = lambda_U_hist.copy()
-        A_plateau_f = A_plateau.copy()
+        
+        # just for stat
+        lambda_C_hist_f = lambda_C_hist.copy()
         I_hist_f = I_hist.copy()
 
         drop_state()
@@ -284,15 +299,17 @@ for e in xrange(1):
             
             step(ti, x, target=True, gE=gE, gI=gI)
 
+        A_plateau_t = A_plateau.copy()
+        lambda_U_hist_t = lambda_U_hist.copy()
         
+            
+        # just for stat
         V_psp_hist_t = V_psp_hist.copy()
         B_psp_hist_t = B_psp_hist.copy()
         C_hist_t = C_hist.copy()
         U_hist_t = U_hist.copy()
-        lambda_U_hist_t = lambda_U_hist.copy()
-        A_plateau_t = A_plateau.copy()        
+        lambda_C_hist_t = lambda_C_hist.copy()
         I_hist_t = I_hist.copy()
-        
 
         ########################################
 
@@ -307,7 +324,6 @@ for e in xrange(1):
         alpha_forward = act(np.mean(A_plateau_f[-integration_time:], 0))
         alpha_target = act(np.mean(A_plateau_t[-integration_time:], 0))        
         lambda_U_target = np.mean(lambda_U_hist_t[-integration_time:], 0)
-        
         
 
         deriv_part1 = - kD * (lambda_U_target - lambda_max * act(U_mean_f)) * act.grad(U_mean_f)
@@ -324,14 +340,46 @@ for e in xrange(1):
         W0 -= learning_rate * P0 * dW0
         b0 -= learning_rate * P0 * db0
         
-        train_log_loss += log_loss(y_values[l_id:r_id], lambda_U_f/lambda_max)
+        train_log_loss += log_loss(y_hot[l_id:r_id], lambda_U_f/lambda_max)
         train_error_rate += np.mean(np.argmax(lambda_U_f, 1) != y_values[l_id:r_id])
+
+        # print log_loss(y_hot[l_id:r_id], lambda_U_target/lambda_max)
+
+        # shl(C_hist_f[:,0,:], C_hist_f[:,1,:], show=False)
+        # shl(C_hist_t[:,0,:], C_hist_t[:,1,:])
+
+        # shl(lambda_C_hist_f[:,0,:], lambda_C_hist_f[:,1,:], show=False)
+        # shl(lambda_C_hist_t[:,0,:], lambda_C_hist_t[:,1,:])
+        
+        # shl(V_psp_hist_f[:,0,:], V_psp_hist_f[:,1,:], show=False)
+        # shl(V_psp_hist_t[:,0,:], V_psp_hist_t[:,1,:])
+        
+        # shl(I_hist_t[:,0,:], I_hist_t[:,1,:])
+        # shl(A_plateau_t[:,0,:]-C_hist_t[:,0,:], A_plateau_t[:,1,:]-C_hist_t[:,1,:])
+    
+    valid_error_rate, valid_log_loss = 0.0, 0.0
+    
+    for b_id in xrange(n_valid_batches):
+        l_id, r_id = ((n_train_batches + b_id)*batch_size), ((n_train_batches + b_id+1)*batch_size)
+
+        drop_state()
+
+        for ti, t in enumerate(np.linspace(T0, T, Tsize)):
+            x = x_values_sm[ti, l_id:r_id, :]
+            
+            step(ti, x, target=False, gE=0.0, gI=0.0)
+        
+        lambda_U_f = np.mean(lambda_U_hist[-integration_time:], 0)
+
+        valid_log_loss += log_loss(y_hot[l_id:r_id], lambda_U_f/lambda_max)
+        valid_error_rate += np.mean(np.argmax(lambda_U_f, 1) != y_values[l_id:r_id])
 
         # print b0
         # break        
     # break
-    print "Epoch {}, train error rate: {:.3f}, train ll {:.3f}".format(
-        e, train_error_rate/n_train_batches, train_log_loss/n_train_batches
+        
+    print "Epoch {}, train error {:.3f}, train ll {:.3f}, test error {:.3f}, test ll {:.3f}".format(
+        e, train_error_rate/n_train_batches, train_log_loss/n_train_batches, valid_error_rate/n_valid_batches, valid_log_loss/n_valid_batches
     )
 
 # print (time.time() - start)/n_train
