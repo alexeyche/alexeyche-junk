@@ -9,55 +9,8 @@ import weave
 from sklearn.metrics import log_loss        
 
 
-def C_step(dt, C, x, act_o, gA, gL,  gB, Y, W0):
-    code = """
-    int batch_size = NC[0];
-    int hidden_size = NC[1];
-    int input_size = Nx[0];
-    int output_size = Nact_o[1];
-
-    for (int n_id=0; n_id<hidden_size; n_id++) {
-        double input_pressure = 0.0;
-        for (int inp_id=0; inp_id<input_size; inp_id++) {
-            input_pressure +=  x(inp_id) * W0(inp_id, n_id);
-        }
-
-        for (int b_id=0; b_id<batch_size; b_id++) {
-            double output_pressure = 0.0;
-            for (int out_id=0; out_id<output_size; out_id++) {
-                output_pressure += act_o(b_id, out_id) * Y(out_id, n_id);
-            }
-
-            C(b_id, n_id) += dt * (- gL * C(b_id, n_id) + gB * (input_pressure - C(b_id, n_id)) + gA * (output_pressure - C(b_id, n_id)));
-        }
-    }
-    """
-    weave.inline(code,
-        ['dt', 'C', 'x', 'act_o', 'gA', 'gL',  'gB', 'Y', 'W0'],
-        type_converters=weave.converters.blitz,
-        compiler = 'gcc')
-
-def step(x):
-    return 1 * (x >= 0)
-
-def epsp_kernel(t, tau_s, tau_l):
-    koef = 1.0/(tau_l - tau_s)
-    return step(t) * (np.exp(-t/tau_l) - np.exp(-t/tau_s)) * koef
-
 def poisson(x, dt):
     return (dt * x > np.random.random(x.shape)).astype(np.int8)
-
-def smooth_spikes(t, sp, dim_size, kernel):
-    sp_smooth = np.zeros(dim_size)
-    for t_sp, n_id  in sp:
-        sp_smooth[n_id] += kernel(t-t_sp)
-    return sp_smooth
-
-def smooth_spikes_batch(t, sp, batch_size, dim_size, kernel):
-    sp_smooth = np.zeros((batch_size, dim_size))
-    for t_sp, b_id, n_id   in sp:
-        sp_smooth[b_id, n_id] += kernel(t-t_sp)
-    return sp_smooth
 
 def one_hot(y, y_size):
     y_oh = np.zeros((y.shape[0], y_size))
@@ -69,7 +22,7 @@ def batch_outer(left, right):
     return np.asarray([np.outer(left[i], right[i]) for i in xrange(left.shape[0])])
 
 
-def smooth_samples(x_values, Tsize, lambda_max, koeff_epsp, tau_s, tau_l):
+def smooth_samples(x_values, Tsize, lambda_max, koeff_epsp, epsp_bias, tau_s, tau_l):
     n_samples = x_values.shape[0]
     input_size = x_values.shape[1]
     
@@ -82,7 +35,7 @@ def smooth_samples(x_values, Tsize, lambda_max, koeff_epsp, tau_s, tau_l):
         x_realisation = poisson(lambda_max * x_values)
         
         x_values_smooth_aux += koeff_epsp * x_realisation
-        x_values_smooth_state += 1.5 * koeff_epsp * x_values_smooth_aux
+        x_values_smooth_state += epsp_bias * koeff_epsp * x_values_smooth_aux
 
         x_values_smooth[ti, :, :] = x_values_smooth_state
         
@@ -98,15 +51,9 @@ def smooth_samples(x_values, Tsize, lambda_max, koeff_epsp, tau_s, tau_l):
 tau_s = 3.0  # tau rise
 tau_l = 10.0 # tau decay
 
-epsp_kernel = partial(epsp_kernel, 
-    tau_s=tau_s, 
-    tau_l=tau_l
-)
 
 koeff_epsp = 1.0/(tau_l - tau_s)
-
-smooth_spikes = partial(smooth_spikes, kernel=epsp_kernel)
-smooth_spikes_batch = partial(smooth_spikes_batch, kernel=epsp_kernel)
+epsp_bias = 1.5 # magic
 
 gL = 0.1
 gD = 0.6
@@ -195,7 +142,7 @@ act_aux_h = np.zeros((batch_size, hidden_size,))
 act_o = np.zeros((batch_size, output_size,))
 act_aux_o = np.zeros((batch_size, output_size,))
 
-x_values_sm = smooth_samples(x_values, Tsize, lambda_max, koeff_epsp, tau_s, tau_l)
+x_values_sm = smooth_samples(x_values, Tsize, lambda_max, koeff_epsp, epsp_bias, tau_s, tau_l)
 
 time_acc = 0.0
 start = time.time()
@@ -220,8 +167,8 @@ def step(ti, x, target, gE, gI):
     # lambda_C_hist[ti] = lambda_C.copy()
     # lambda_C_r_hist[ti] = lambda_C_r.copy()
 
-    act_aux_h += koeff_epsp * lambda_C_r
-    act_h += 1.5 * koeff_epsp * act_aux_h
+    act_aux_h += dt * (koeff_epsp * lambda_C_r -  act_aux_h/tau_s)
+    act_h += dt * (epsp_bias * koeff_epsp * act_aux_h - act_h/tau_l)
 
     V_psp_hist[ti] = act_h
     
@@ -238,13 +185,8 @@ def step(ti, x, target, gE, gI):
     # lambda_U_r_hist[ti] = lambda_U_r.copy()
     
 
-    act_aux_o += koeff_epsp * lambda_U_r
-    act_o += 1.5 * koeff_epsp * act_aux_o
-
-    act_o -= dt * act_o/tau_l
-    act_aux_o -= dt * act_aux_o/tau_s
-    act_h -= dt * act_h/tau_l
-    act_aux_h -= dt * act_aux_h/tau_s
+    act_aux_o += koeff_epsp * lambda_U_r  -  dt * act_aux_o/tau_s
+    act_o += epsp_bias * koeff_epsp * act_aux_o - dt * act_o/tau_l
 
     U_hist[ti] = U
     C_hist[ti] = C
@@ -265,6 +207,8 @@ def drop_state():
 
 for e in xrange(1000):
     train_error_rate, train_log_loss = 0.0, 0.0
+    
+    start_time = time.time()
     
     for b_id in xrange(n_train_batches):
         l_id, r_id = (b_id*batch_size), ((b_id+1)*batch_size)
@@ -377,9 +321,9 @@ for e in xrange(1000):
         # print b0
         # break        
     # break
-        
-    print "Epoch {}, train error {:.3f}, train ll {:.3f}, test error {:.3f}, test ll {:.3f}".format(
-        e, train_error_rate/n_train_batches, train_log_loss/n_train_batches, valid_error_rate/n_valid_batches, valid_log_loss/n_valid_batches
+    end_time = time.time() 
+    print "Epoch {} ({:.3f} s), train error {:.3f}, train ll {:.3f}, test error {:.3f}, test ll {:.3f}".format(
+        e, end_time-start_time, train_error_rate/n_train_batches, train_log_loss/n_train_batches, valid_error_rate/n_valid_batches, valid_log_loss/n_valid_batches
     )
 
 # print (time.time() - start)/n_train

@@ -1,7 +1,6 @@
 
 import numpy as np
 
-from data_api import get_data
 import xgboost as xgb
 
 import sys
