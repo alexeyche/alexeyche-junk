@@ -6,7 +6,7 @@ import collections
 import pylab
 
 def shm(*matrices, **kwargs):
-    plt.figure(1, figsize=(10,10))
+    plt.figure(figsize=(10,10))
     for m_id, matrix in enumerate(matrices):
         plt.subplot(len(matrices), 1, m_id+1)
         plt.imshow(np.squeeze(matrix).T, cmap='gray', origin='lower')
@@ -15,7 +15,7 @@ def shm(*matrices, **kwargs):
     if kwargs.get("file"):
         plt.savefig(kwargs["file"])
         plt.clf()
-    else:
+    elif kwargs.get("show", True):
         plt.show()
 
 

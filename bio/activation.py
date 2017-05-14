@@ -45,7 +45,7 @@ class ExpActivation(Activation):
         return np.exp(x)
 
 
-class SoftplusActivation(Activation):
+class SoftplusActivation(Activation): 
     def __call__(self, x):
         return np.log(1.0 + np.exp(x-1.0))
 
@@ -76,6 +76,6 @@ def test_act_grad(act, x, epsilon=1e-05, tol=1e-05, fail=True):
 
 if __name__ == '__main__':
     test_act_grad(
-        ExpClipActivation(), 
+        SoftplusActivation(), 
         np.random.random((10, 10))
     )

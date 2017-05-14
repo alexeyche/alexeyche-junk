@@ -86,7 +86,7 @@ learning_rate = 3 * 0.21
 
 act = SigmoidActivation()
 
-x_values, y_values = get_toy_data(seed=2)
+x_values, y_values = get_toy_data(seed=3)
 n_train = (4 * x_values.shape[0]/5)
 n_valid = (1 * x_values.shape[0]/5)
 

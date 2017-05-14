@@ -1,0 +1,845 @@
+Python 2.7.12 (default, Nov 19 2016, 06:48:10) 
+[GCC 5.4.0 20160609] on linux2
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import gc
+import numpy as np
+from util import shl, shm, shs
+from functools import partial
+from activation import *
+from datasets import get_toy_data, quantize_data
+import time
+import weave
+from sklearn.metrics import log_loss        
+
+def poisson(x, dt):
+    return (dt * x > np.random.random(x.shape)).astype(np.int8)
+
+def one_hot(y, y_size):
+    y_oh = np.zeros((y.shape[0], y_size))
+    y_oh[np.arange(y.shape[0]), y] = 1.0
+    return y_oh
+
+
+def batch_outer(left, right):
+    return np.asarray([np.outer(left[i], right[i]) for i in xrange(left.shape[0])])
+
+
+def smooth_samples(x_values, Tsize, lambda_max, koeff_epsp, tau_s, tau_l):
+    n_samples = x_values.shape[0]
+    input_size = x_values.shape[1]
+    
+    x_values_smooth = np.zeros((Tsize, n_samples, input_size), dtype=np.float32)
+    
+    x_values_smooth_state = np.zeros((n_samples, input_size), dtype=np.float32)
+    x_values_smooth_aux = np.zeros((n_samples, input_size), dtype=np.float32)
+    
+    for ti, t in enumerate(np.linspace(T0, T, Tsize)):
+        x_realisation = poisson(lambda_max * x_values)
+        
+        x_values_smooth_aux += koeff_epsp * x_realisation
+        x_values_smooth_state += 1.5 * koeff_epsp * x_values_smooth_aux
+
+        x_values_smooth[ti, :, :] = x_values_smooth_state
+        
+        x_values_smooth_state -= dt * x_values_smooth_state/tau_l
+        x_values_smooth_aux -= dt * x_values_smooth_aux/tau_s
+
+        
+    del x_values_smooth_aux, x_values_smooth_state
+
+    gc.collect()
+    return x_values_smooth
+
+tau_s = 3.0  # tau rise
+tau_l = 10.0 # tau decay
+koeff_epsp = 1.0/(tau_l - tau_s)
+epsp_bias = 1.5
+
+gL = 0.1
+gD = 0.6
+gB = 0.6
+gA = 0.6
+
+kB = gB/(gL + gB + gA)
+kD = gD/(gL + gD)
+
+T0, T = 0.0, 50.0      # ms
+dt = 1.0                # ms
+
+int_time = 20.0
+alpha = dt/int_time
+
+Ee = 8.0
+Ei = -8.0
+
+poisson = partial(poisson, dt=dt)
+
+Tsize = int(T/dt + dt)
+
+lambda_max = 200.0/1000.0      # 1/ms
+
+P0 = 20.0/lambda_max
+P1 = 20.0/(lambda_max * lambda_max)
+# alt
+P0 = P1
+P1 = P1/10.0
+
+learning_rate = 10.0 * 0.21
+
+act = SigmoidActivation()
+
+x_values, y_values = get_toy_data(seed=2)
+n_train = (4 * x_values.shape[0]/5)
+n_valid = (1 * x_values.shape[0]/5)
+
+y_uniq = np.unique(y_values)
+y_hot = one_hot(y_values, len(y_uniq))
+
+
+input_size = x_values.shape[1]
+input_len = x_values.shape[0]
+hidden_size = 20
+output_size = len(y_uniq)
+
+
+batch_size = 400
+n_train_batches = n_train/batch_size
+n_valid_batches = n_valid/batch_size
+batch_to_listen = 0
+
+L, M, N = input_size, hidden_size, output_size
+
+#######################################################################
+
+x_values_sm = smooth_samples(x_values, Tsize, lambda_max, koeff_epsp, tau_s, tau_l)
+
+
+class RiseAndDecaySynapse(object):
+    def __init__(self, batch_size, layer_size):
+        self.Act = np.zeros((batch_size, layer_size))
+        self.Act_aux = np.zeros((batch_size, layer_size))
+        
+    def update(self, x):
+        self.Act_aux += - dt * self.Act_aux/tau_s + koeff_epsp * x 
+        self.Act += - dt * self.Act/tau_l + epsp_bias * koeff_epsp * self.Act_aux 
+
+    @property
+    def output(self):
+        return self.Act
+
+    def drop_state(self):
+        self.Act_aux = np.zeros(self.Act_aux.shape)
+        self.Act = np.zeros(self.Act.shape)
+
+class DecaySynapse(object):
+    def __init__(self, batch_size, layer_size):
+        self.Act = np.zeros((batch_size, layer_size))
+        
+    def update(self, x):
+        self.Act += - dt * self.Act/tau_l + (1.0/tau_l) * x
+
+    @property
+    def output(self):
+        return self.Act
+
+    def drop_state(self):
+        self.Act = np.zeros(self.Act.shape)
+
+
+synapse_class = DecaySynapse
+
+class HiddenLayer(object):
+    def __init__(self, batch_size, input_size, layer_size, output_size):
+        self.C = np.zeros((batch_size, layer_size))
+        self.Cm = np.zeros((batch_size, layer_size))
+        self.Am = np.zeros((batch_size, layer_size))
+        
+        self.syn = synapse_class(batch_size, layer_size)
+
+        self.W = 0.1*(np.random.uniform(size=(input_size, layer_size)) - 0.5)
+        self.b = np.zeros((layer_size,))
+        self.Y = np.random.uniform(size=(output_size, layer_size)) - 0.5
+        
+        self.Crate_m = np.zeros((batch_size, layer_size))
+        self.Psp_m = np.zeros((batch_size, input_size))
+
+    def update(self, ti, x, output_activity, target=False):
+        B = np.dot(x, self.W) + self.b
+        
+        A = np.dot(output_activity, self.Y)
+        
+        gA_t = gA if target else 0.0
+        
+        self.C += dt * (- gL * self.C + gB * (B - self.C) + gA_t * (A - self.C))
+        
+        rate = lambda_max * act(self.C)
+                
+        Cspikes = poisson(rate)
+        
+        self.syn.update(Cspikes)
+        
+        self.Cm = (1.0-alpha) * self.Cm + alpha * self.C
+        self.Crate_m = (1.0-alpha) * self.Crate_m + alpha * rate
+        self.Psp_m = (1.0-alpha) * self.Psp_m + alpha * x
+        self.Am = (1.0-alpha) * self.Am + alpha * A
+
+    def drop_state(self):
+        self.C = np.zeros(self.C.shape)
+        self.Cm = np.zeros(self.Cm.shape)
+        self.Crate_m = np.zeros(self.Crate_m.shape)
+        self.Psp_m = np.zeros(self.Psp_m.shape)
+        self.Am = np.zeros(self.Am.shape)
+        self.syn.drop_state()
+
+class OutputLayer(object):
+    def __init__(self, batch_size, input_size, layer_size):
+        self.U = np.zeros((batch_size, layer_size))
+        
+        self.syn = synapse_class(batch_size, layer_size)
+        
+        self.Urate = np.zeros((batch_size, layer_size))
+        self.W = 0.1*(np.random.uniform(size=(input_size, layer_size)) - 0.5)
+        self.b = np.zeros((layer_size,))
+
+        self.Psp_m = np.zeros((batch_size, hidden_size))
+        self.Um = np.zeros((batch_size, layer_size))
+        self.Urate_m = np.zeros((batch_size, layer_size))
+        
+    def update(self, ti, x, target, gE, gI):
+        V = np.dot(x, self.W) + self.b
+        
+        I = gE * (Ee - self.U) + gI * (Ei - self.U) if target else 0.0
+        
+        self.U += dt * (- gL * self.U + gD * (V - self.U) + I)
+        
+        rate = lambda_max * act(self.U)
+
+        spikes = poisson(rate)
+        
+        self.syn.update(spikes)
+
+        self.Um = (1.0 - alpha) * self.Um + alpha * self.U
+        self.Urate_m =  (1.0 - alpha) * self.Urate_m + alpha * rate
+        self.Psp_m = (1.0 - alpha) * self.Psp_m + alpha * x
+        
+    def drop_state(self):
+        self.U = np.zeros(self.U.shape)
+        self.Psp_m = np.zeros(self.Psp_m.shape)
+        self.Um = np.zeros(self.Um.shape)
+        self.Urate_m = np.zeros(self.Urate_m.shape)
+        self.syn.drop_state()
+
+hidden = HiddenLayer(batch_size, input_size, hidden_size, output_size)
+output = OutputLayer(batch_size, hidden_size, output_size)
+
+def step(ti, x, target, gE, gI):
+    hidden.update(ti, x, output.syn.output, target=target)
+    output.update(ti, hidden.syn.output, target=target, gE=gE, gI=gI)
+
+for e in xrange(500):
+    train_error_rate, train_log_loss = 0.0, 0.0
+    
+    start_time = time.time()
+
+    for b_id in xrange(n_train_batches):
+        l_id, r_id = (b_id*batch_size), ((b_id+1)*batch_size)
+        y = y_hot[l_id:r_id]
+        
+        gE = y
+        gI = 1.0 - y
+
+        for ti, t in enumerate(np.linspace(T0, T, Tsize)):
+            x = x_values_sm[ti, l_id:r_id, :]            
+            step(ti, x, target=False, gE=0.0, gI=0.0)
+            
+
+        Cm_f = hidden.Cm.copy()
+        Crate_m_f = hidden.Crate_m.copy()
+        BPsp_m_f = hidden.Psp_m.copy()
+        Am_f = hidden.Am.copy()
+        Um_f = output.Um.copy()
+        Urate_m_f = output.Urate_m.copy()
+        VPsp_m_f = output.Psp_m.copy()
+        
+        for ti, t in enumerate(np.linspace(T0, T, Tsize)):
+            x = x_values_sm[ti, l_id:r_id, :]
+            step(ti, x, target=True, gE=gE, gI=gI)
+            
+        Cm_t = hidden.Cm.copy()
+        Crate_m_t = hidden.Crate_m.copy()
+        BPsp_m_t = hidden.Psp_m.copy()
+        Am_t = hidden.Am.copy()
+        Um_t = output.Um.copy()
+        Urate_m_t = output.Urate_m.copy()
+        VPsp_m_t = output.Psp_m.copy()
+        
+        ########################################        
+
+        alpha_f = act(Am_f)
+        alpha_t = act(Am_t)
+
+        deriv_part1 = - kD * (Urate_m_t - Urate_m_f) * act.grad(Um_f)
+        db1 = np.mean(deriv_part1, 0)
+        dW1 = np.mean(batch_outer(VPsp_m_f, deriv_part1), 0)
+
+        output.W -= learning_rate * P1 * dW1
+        output.b -= learning_rate * P1 * db1
+
+        deriv_part0 = - kB * (alpha_t - alpha_f) * act.grad(Cm_f)
+        db0 = np.mean(deriv_part0, 0)   
+        dW0 = np.mean(batch_outer(BPsp_m_f, deriv_part0), 0)
+
+        hidden.W -= learning_rate * P0 * dW0
+        hidden.b -= learning_rate * P0 * db0
+        
+        train_log_loss += log_loss(y_hot[l_id:r_id], Urate_m_f/lambda_max)
+        train_error_rate += np.mean(np.argmax(Urate_m_f, 1) != y_values[l_id:r_id])
+
+        # print log_loss(y_hot[l_id:r_id], lambda_U_target/lambda_max)
+
+        # shl(C_hist_f[:,0,:], C_hist_f[:,1,:], show=False)
+        # shl(C_hist_t[:,0,:], C_hist_t[:,1,:])
+
+        # shl(lambda_C_hist_f[:,0,:], lambda_C_hist_f[:,1,:], show=False)
+        # shl(lambda_C_hist_t[:,0,:], lambda_C_hist_t[:,1,:])
+        
+        # shl(V_psp_hist_f[:,0,:], V_psp_hist_f[:,1,:], show=False)
+        # shl(V_psp_hist_t[:,0,:], V_psp_hist_t[:,1,:])
+        
+        # shl(I_hist_t[:,0,:], I_hist_t[:,1,:])
+        # shl(A_plateau_t[:,0,:]-C_hist_t[:,0,:], A_plateau_t[:,1,:]-C_hist_t[:,1,:])
+        # break
+    # break
+    valid_error_rate, valid_log_loss = 0.0, 0.0
+    
+    for b_id in xrange(n_valid_batches):
+        l_id, r_id = ((n_train_batches + b_id)*batch_size), ((n_train_batches + b_id+1)*batch_size)
+
+        for ti, t in enumerate(np.linspace(T0, T, Tsize)):
+            x = x_values_sm[ti, l_id:r_id, :]
+
+            step(ti, x, target=False, gE=0.0, gI=0.0)
+
+        lambda_U_f = output.Urate_m
+
+        valid_log_loss += log_loss(y_hot[l_id:r_id], lambda_U_f/lambda_max)
+        valid_error_rate += np.mean(np.argmax(lambda_U_f, 1) != y_values[l_id:r_id])
+
+    hidden.drop_state()
+    output.drop_state()
+        
+        # print b0
+        # break        
+    # break
+    end_time = time.time() 
+
+    print "Epoch {}, ({:.3f} s), train error {:.3f}, train ll {:.3f}, test error {:.3f}, test ll {:.3f}".format(
+        e, end_time-start_time, train_error_rate/n_train_batches, train_log_loss/n_train_batches, valid_error_rate/n_valid_batches, valid_log_loss/n_valid_batches
+    )
+
+# print (time.time() - start)/n_train
+
+# shl(C_stat_t, figsize=(7,7), title="Target", show=False)
+# shl(C_stat_f, figsize=(7,7), title="Forward", show=False)
+# shl(C_stat_t - C_stat_f, figsize=(7,7), title="Diff")
+Epoch 0, (0.262 s), train error 0.505, train ll 0.696, test error 0.517, test ll 0.701
+Epoch 1, (0.365 s), train error 0.509, train ll 0.696, test error 0.517, test ll 0.701
+Epoch 2, (0.255 s), train error 0.509, train ll 0.696, test error 0.517, test ll 0.701
+Epoch 3, (0.251 s), train error 0.509, train ll 0.696, test error 0.517, test ll 0.701
+Epoch 4, (0.255 s), train error 0.509, train ll 0.696, test error 0.517, test ll 0.701
+Epoch 5, (0.245 s), train error 0.509, train ll 0.696, test error 0.517, test ll 0.701
+Epoch 6, (0.250 s), train error 0.509, train ll 0.696, test error 0.517, test ll 0.700
+Epoch 7, (0.255 s), train error 0.509, train ll 0.696, test error 0.517, test ll 0.700
+Epoch 8, (0.251 s), train error 0.509, train ll 0.695, test error 0.517, test ll 0.699
+Epoch 9, (0.250 s), train error 0.509, train ll 0.695, test error 0.517, test ll 0.700
+Epoch 10, (0.245 s), train error 0.510, train ll 0.695, test error 0.517, test ll 0.698
+Epoch 11, (0.251 s), train error 0.508, train ll 0.694, test error 0.517, test ll 0.698
+Epoch 12, (0.255 s), train error 0.503, train ll 0.693, test error 0.517, test ll 0.696
+Epoch 13, (0.251 s), train error 0.495, train ll 0.692, test error 0.520, test ll 0.695
+Epoch 14, (0.250 s), train error 0.488, train ll 0.691, test error 0.517, test ll 0.694
+Epoch 15, (0.252 s), train error 0.494, train ll 0.691, test error 0.520, test ll 0.693
+Epoch 16, (0.257 s), train error 0.468, train ll 0.689, test error 0.512, test ll 0.692
+Epoch 17, (0.250 s), train error 0.468, train ll 0.688, test error 0.515, test ll 0.688
+Epoch 18, (0.253 s), train error 0.457, train ll 0.686, test error 0.515, test ll 0.689
+Epoch 19, (0.247 s), train error 0.450, train ll 0.685, test error 0.507, test ll 0.687
+Epoch 20, (0.247 s), train error 0.436, train ll 0.683, test error 0.507, test ll 0.685
+Epoch 21, (0.268 s), train error 0.426, train ll 0.681, test error 0.485, test ll 0.681
+Epoch 22, (0.250 s), train error 0.437, train ll 0.680, test error 0.477, test ll 0.677
+Epoch 23, (0.254 s), train error 0.416, train ll 0.677, test error 0.463, test ll 0.676
+Epoch 24, (0.245 s), train error 0.421, train ll 0.676, test error 0.448, test ll 0.676
+Epoch 25, (0.248 s), train error 0.394, train ll 0.672, test error 0.438, test ll 0.669
+Epoch 26, (0.253 s), train error 0.376, train ll 0.668, test error 0.395, test ll 0.668
+Epoch 27, (0.249 s), train error 0.350, train ll 0.664, test error 0.403, test ll 0.663
+Epoch 28, (0.252 s), train error 0.346, train ll 0.661, test error 0.357, test ll 0.658
+Epoch 29, (0.245 s), train error 0.335, train ll 0.657, test error 0.345, test ll 0.659
+Epoch 30, (0.251 s), train error 0.326, train ll 0.653, test error 0.338, test ll 0.651
+Epoch 31, (0.255 s), train error 0.337, train ll 0.652, test error 0.330, test ll 0.649
+Epoch 32, (0.252 s), train error 0.328, train ll 0.648, test error 0.328, test ll 0.649
+Epoch 33, (0.251 s), train error 0.319, train ll 0.645, test error 0.300, test ll 0.643
+Epoch 34, (0.340 s), train error 0.307, train ll 0.639, test error 0.280, test ll 0.636
+Epoch 35, (0.255 s), train error 0.292, train ll 0.635, test error 0.255, test ll 0.625
+Epoch 36, (0.249 s), train error 0.295, train ll 0.633, test error 0.250, test ll 0.626
+Epoch 37, (0.257 s), train error 0.279, train ll 0.626, test error 0.228, test ll 0.617
+Epoch 38, (0.246 s), train error 0.261, train ll 0.620, test error 0.260, test ll 0.617
+Epoch 39, (0.256 s), train error 0.273, train ll 0.618, test error 0.278, test ll 0.613
+Epoch 40, (0.255 s), train error 0.271, train ll 0.614, test error 0.228, test ll 0.603
+Epoch 41, (0.251 s), train error 0.253, train ll 0.612, test error 0.198, test ll 0.594
+Epoch 42, (0.255 s), train error 0.245, train ll 0.602, test error 0.258, test ll 0.603
+Epoch 43, (0.246 s), train error 0.242, train ll 0.601, test error 0.220, test ll 0.590
+Epoch 44, (0.253 s), train error 0.237, train ll 0.596, test error 0.195, test ll 0.578
+Epoch 45, (0.252 s), train error 0.228, train ll 0.590, test error 0.203, test ll 0.586
+Epoch 46, (0.254 s), train error 0.226, train ll 0.584, test error 0.215, test ll 0.574
+Epoch 47, (0.249 s), train error 0.227, train ll 0.583, test error 0.177, test ll 0.569
+Epoch 48, (0.250 s), train error 0.228, train ll 0.577, test error 0.182, test ll 0.562
+Epoch 49, (0.257 s), train error 0.206, train ll 0.567, test error 0.195, test ll 0.562
+Epoch 50, (0.251 s), train error 0.216, train ll 0.570, test error 0.163, test ll 0.554
+Epoch 51, (0.258 s), train error 0.211, train ll 0.568, test error 0.182, test ll 0.551
+Epoch 52, (0.249 s), train error 0.202, train ll 0.557, test error 0.200, test ll 0.558
+Epoch 53, (0.376 s), train error 0.195, train ll 0.553, test error 0.182, test ll 0.540
+Epoch 54, (0.282 s), train error 0.194, train ll 0.546, test error 0.180, test ll 0.536
+Epoch 55, (0.378 s), train error 0.193, train ll 0.544, test error 0.177, test ll 0.543
+Epoch 56, (0.336 s), train error 0.196, train ll 0.539, test error 0.165, test ll 0.525
+Epoch 57, (0.278 s), train error 0.175, train ll 0.532, test error 0.160, test ll 0.517
+Epoch 58, (0.415 s), train error 0.181, train ll 0.530, test error 0.152, test ll 0.510
+Epoch 59, (0.289 s), train error 0.161, train ll 0.518, test error 0.155, test ll 0.525
+Epoch 60, (0.349 s), train error 0.172, train ll 0.513, test error 0.168, test ll 0.516
+Epoch 61, (0.264 s), train error 0.174, train ll 0.517, test error 0.160, test ll 0.505
+Epoch 62, (0.348 s), train error 0.179, train ll 0.511, test error 0.145, test ll 0.495
+Epoch 63, (0.365 s), train error 0.163, train ll 0.500, test error 0.145, test ll 0.498
+Epoch 64, (0.361 s), train error 0.166, train ll 0.506, test error 0.147, test ll 0.499
+Epoch 65, (0.247 s), train error 0.154, train ll 0.499, test error 0.135, test ll 0.481
+Epoch 66, (0.359 s), train error 0.151, train ll 0.493, test error 0.133, test ll 0.479
+Epoch 67, (0.344 s), train error 0.147, train ll 0.488, test error 0.155, test ll 0.489
+Epoch 68, (0.246 s), train error 0.152, train ll 0.488, test error 0.133, test ll 0.477
+Epoch 69, (0.247 s), train error 0.152, train ll 0.485, test error 0.165, test ll 0.473
+Epoch 70, (0.246 s), train error 0.156, train ll 0.484, test error 0.115, test ll 0.459
+Epoch 71, (0.248 s), train error 0.145, train ll 0.475, test error 0.140, test ll 0.463
+Epoch 72, (0.248 s), train error 0.147, train ll 0.475, test error 0.145, test ll 0.475
+Epoch 73, (0.262 s), train error 0.156, train ll 0.474, test error 0.130, test ll 0.457
+Epoch 74, (0.293 s), train error 0.145, train ll 0.460, test error 0.138, test ll 0.460
+Epoch 75, (0.247 s), train error 0.130, train ll 0.452, test error 0.120, test ll 0.436
+Epoch 76, (0.245 s), train error 0.131, train ll 0.450, test error 0.122, test ll 0.443
+Epoch 77, (0.257 s), train error 0.142, train ll 0.453, test error 0.140, test ll 0.456
+Epoch 78, (0.317 s), train error 0.139, train ll 0.448, test error 0.100, test ll 0.433
+Epoch 79, (0.264 s), train error 0.141, train ll 0.453, test error 0.122, test ll 0.441
+Epoch 80, (0.258 s), train error 0.126, train ll 0.438, test error 0.125, test ll 0.438
+Epoch 81, (0.257 s), train error 0.136, train ll 0.445, test error 0.128, test ll 0.429
+Epoch 82, (0.245 s), train error 0.131, train ll 0.434, test error 0.115, test ll 0.426
+Epoch 83, (0.245 s), train error 0.134, train ll 0.436, test error 0.102, test ll 0.425
+Epoch 84, (0.246 s), train error 0.121, train ll 0.426, test error 0.125, test ll 0.425
+Epoch 85, (0.246 s), train error 0.130, train ll 0.429, test error 0.098, test ll 0.410
+Epoch 86, (0.246 s), train error 0.129, train ll 0.426, test error 0.138, test ll 0.431
+Epoch 87, (0.246 s), train error 0.141, train ll 0.429, test error 0.113, test ll 0.416
+Epoch 88, (0.246 s), train error 0.117, train ll 0.417, test error 0.142, test ll 0.418
+Epoch 89, (0.247 s), train error 0.126, train ll 0.421, test error 0.098, test ll 0.396
+Epoch 90, (0.246 s), train error 0.136, train ll 0.420, test error 0.117, test ll 0.410
+Epoch 91, (0.246 s), train error 0.119, train ll 0.413, test error 0.115, test ll 0.416
+Epoch 92, (0.247 s), train error 0.121, train ll 0.408, test error 0.110, test ll 0.403
+Epoch 93, (0.245 s), train error 0.126, train ll 0.410, test error 0.125, test ll 0.403
+Epoch 94, (0.248 s), train error 0.128, train ll 0.407, test error 0.122, test ll 0.416
+Epoch 95, (0.245 s), train error 0.124, train ll 0.405, test error 0.105, test ll 0.389
+Epoch 96, (0.245 s), train error 0.117, train ll 0.399, test error 0.117, test ll 0.401
+Epoch 97, (0.245 s), train error 0.119, train ll 0.406, test error 0.100, test ll 0.385
+Epoch 98, (0.246 s), train error 0.113, train ll 0.393, test error 0.107, test ll 0.394
+Epoch 99, (0.246 s), train error 0.126, train ll 0.403, test error 0.098, test ll 0.381
+Epoch 100, (0.326 s), train error 0.111, train ll 0.389, test error 0.095, test ll 0.359
+Epoch 101, (0.255 s), train error 0.117, train ll 0.386, test error 0.120, test ll 0.395
+Epoch 102, (0.245 s), train error 0.117, train ll 0.392, test error 0.120, test ll 0.376
+Epoch 103, (0.248 s), train error 0.111, train ll 0.383, test error 0.107, test ll 0.382
+Epoch 104, (0.245 s), train error 0.114, train ll 0.386, test error 0.087, test ll 0.377
+Epoch 105, (0.247 s), train error 0.112, train ll 0.378, test error 0.117, test ll 0.382
+Epoch 106, (0.246 s), train error 0.116, train ll 0.377, test error 0.095, test ll 0.372
+Epoch 107, (0.245 s), train error 0.111, train ll 0.378, test error 0.080, test ll 0.363
+Epoch 108, (0.246 s), train error 0.115, train ll 0.374, test error 0.105, test ll 0.363
+Epoch 109, (0.247 s), train error 0.122, train ll 0.388, test error 0.113, test ll 0.370
+Epoch 110, (0.246 s), train error 0.107, train ll 0.371, test error 0.075, test ll 0.344
+Epoch 111, (0.245 s), train error 0.107, train ll 0.372, test error 0.095, test ll 0.357
+Epoch 112, (0.247 s), train error 0.110, train ll 0.370, test error 0.085, test ll 0.362
+Epoch 113, (0.247 s), train error 0.109, train ll 0.369, test error 0.080, test ll 0.354
+Epoch 114, (0.246 s), train error 0.106, train ll 0.367, test error 0.095, test ll 0.368
+Epoch 115, (0.245 s), train error 0.111, train ll 0.366, test error 0.080, test ll 0.353
+Epoch 116, (0.247 s), train error 0.104, train ll 0.365, test error 0.102, test ll 0.358
+Epoch 117, (0.247 s), train error 0.102, train ll 0.366, test error 0.107, test ll 0.375
+Epoch 118, (0.246 s), train error 0.103, train ll 0.360, test error 0.090, test ll 0.343
+Epoch 119, (0.247 s), train error 0.098, train ll 0.357, test error 0.095, test ll 0.357
+Epoch 120, (0.247 s), train error 0.106, train ll 0.360, test error 0.080, test ll 0.347
+Epoch 121, (0.247 s), train error 0.111, train ll 0.354, test error 0.090, test ll 0.351
+Epoch 122, (0.247 s), train error 0.102, train ll 0.355, test error 0.085, test ll 0.350
+Epoch 123, (0.246 s), train error 0.109, train ll 0.356, test error 0.098, test ll 0.344
+Epoch 124, (0.246 s), train error 0.101, train ll 0.355, test error 0.083, test ll 0.339
+Epoch 125, (0.246 s), train error 0.103, train ll 0.357, test error 0.085, test ll 0.342
+Epoch 126, (0.246 s), train error 0.093, train ll 0.343, test error 0.100, test ll 0.344
+Epoch 127, (0.246 s), train error 0.106, train ll 0.343, test error 0.083, test ll 0.348
+Epoch 128, (0.247 s), train error 0.098, train ll 0.345, test error 0.087, test ll 0.336
+Epoch 129, (0.247 s), train error 0.105, train ll 0.347, test error 0.077, test ll 0.328
+Epoch 130, (0.247 s), train error 0.097, train ll 0.342, test error 0.077, test ll 0.331
+Epoch 131, (0.246 s), train error 0.092, train ll 0.343, test error 0.095, test ll 0.344
+Epoch 132, (0.245 s), train error 0.102, train ll 0.339, test error 0.070, test ll 0.318
+Epoch 133, (0.325 s), train error 0.098, train ll 0.336, test error 0.085, test ll 0.334
+Epoch 134, (0.245 s), train error 0.097, train ll 0.339, test error 0.092, test ll 0.327
+Epoch 135, (0.250 s), train error 0.102, train ll 0.337, test error 0.077, test ll 0.335
+Epoch 136, (0.248 s), train error 0.098, train ll 0.338, test error 0.092, test ll 0.333
+Epoch 137, (0.246 s), train error 0.086, train ll 0.332, test error 0.100, test ll 0.341
+Epoch 138, (0.245 s), train error 0.102, train ll 0.337, test error 0.077, test ll 0.336
+Epoch 139, (0.245 s), train error 0.097, train ll 0.331, test error 0.090, test ll 0.328
+Epoch 140, (0.245 s), train error 0.093, train ll 0.331, test error 0.085, test ll 0.331
+Epoch 141, (0.245 s), train error 0.101, train ll 0.329, test error 0.083, test ll 0.317
+Epoch 142, (0.250 s), train error 0.087, train ll 0.330, test error 0.095, test ll 0.334
+Epoch 143, (0.245 s), train error 0.091, train ll 0.333, test error 0.085, test ll 0.331
+Epoch 144, (0.246 s), train error 0.099, train ll 0.330, test error 0.090, test ll 0.311
+Epoch 145, (0.246 s), train error 0.086, train ll 0.319, test error 0.085, test ll 0.313
+Epoch 146, (0.245 s), train error 0.102, train ll 0.338, test error 0.068, test ll 0.301
+Epoch 147, (0.245 s), train error 0.090, train ll 0.321, test error 0.085, test ll 0.317
+Epoch 148, (0.246 s), train error 0.094, train ll 0.324, test error 0.080, test ll 0.310
+Epoch 149, (0.246 s), train error 0.098, train ll 0.328, test error 0.077, test ll 0.324
+Epoch 150, (0.246 s), train error 0.096, train ll 0.325, test error 0.092, test ll 0.321
+Epoch 151, (0.245 s), train error 0.092, train ll 0.322, test error 0.083, test ll 0.306
+Epoch 152, (0.246 s), train error 0.085, train ll 0.318, test error 0.080, test ll 0.310
+Epoch 153, (0.249 s), train error 0.095, train ll 0.321, test error 0.085, test ll 0.304
+Epoch 154, (0.246 s), train error 0.086, train ll 0.313, test error 0.085, test ll 0.321
+Epoch 155, (0.245 s), train error 0.087, train ll 0.311, test error 0.072, test ll 0.300
+Epoch 156, (0.245 s), train error 0.091, train ll 0.318, test error 0.068, test ll 0.307
+Epoch 157, (0.246 s), train error 0.090, train ll 0.314, test error 0.083, test ll 0.311
+Epoch 158, (0.245 s), train error 0.078, train ll 0.302, test error 0.087, test ll 0.307
+Epoch 159, (0.245 s), train error 0.094, train ll 0.318, test error 0.077, test ll 0.303
+Epoch 160, (0.246 s), train error 0.082, train ll 0.312, test error 0.090, test ll 0.303
+Epoch 161, (0.246 s), train error 0.094, train ll 0.314, test error 0.070, test ll 0.311
+Epoch 162, (0.245 s), train error 0.091, train ll 0.311, test error 0.083, test ll 0.300
+Epoch 163, (0.246 s), train error 0.086, train ll 0.306, test error 0.080, test ll 0.310
+Epoch 164, (0.245 s), train error 0.094, train ll 0.316, test error 0.077, test ll 0.305
+Epoch 165, (0.247 s), train error 0.076, train ll 0.296, test error 0.070, test ll 0.284
+Epoch 166, (0.330 s), train error 0.091, train ll 0.307, test error 0.090, test ll 0.305
+Epoch 167, (0.245 s), train error 0.087, train ll 0.305, test error 0.062, test ll 0.296
+Epoch 168, (0.246 s), train error 0.091, train ll 0.309, test error 0.068, test ll 0.293
+Epoch 169, (0.247 s), train error 0.079, train ll 0.302, test error 0.092, test ll 0.314
+Epoch 170, (0.246 s), train error 0.084, train ll 0.305, test error 0.077, test ll 0.295
+Epoch 171, (0.246 s), train error 0.091, train ll 0.305, test error 0.095, test ll 0.309
+Epoch 172, (0.246 s), train error 0.091, train ll 0.308, test error 0.075, test ll 0.317
+Epoch 173, (0.246 s), train error 0.087, train ll 0.302, test error 0.077, test ll 0.297
+Epoch 174, (0.245 s), train error 0.086, train ll 0.302, test error 0.068, test ll 0.285
+Epoch 175, (0.249 s), train error 0.091, train ll 0.296, test error 0.077, test ll 0.287
+Epoch 176, (0.245 s), train error 0.084, train ll 0.298, test error 0.080, test ll 0.298
+Epoch 177, (0.249 s), train error 0.090, train ll 0.306, test error 0.085, test ll 0.299
+Epoch 178, (0.248 s), train error 0.083, train ll 0.300, test error 0.077, test ll 0.289
+Epoch 179, (0.264 s), train error 0.084, train ll 0.297, test error 0.077, test ll 0.290
+Epoch 180, (0.327 s), train error 0.079, train ll 0.292, test error 0.090, test ll 0.307
+Epoch 181, (0.376 s), train error 0.077, train ll 0.291, test error 0.075, test ll 0.295
+Epoch 182, (0.245 s), train error 0.085, train ll 0.295, test error 0.072, test ll 0.293
+Epoch 183, (0.245 s), train error 0.086, train ll 0.301, test error 0.083, test ll 0.290
+Epoch 184, (0.245 s), train error 0.080, train ll 0.293, test error 0.072, test ll 0.285
+Epoch 185, (0.255 s), train error 0.084, train ll 0.293, test error 0.075, test ll 0.282
+Epoch 186, (0.290 s), train error 0.082, train ll 0.295, test error 0.077, test ll 0.282
+Epoch 187, (0.249 s), train error 0.085, train ll 0.292, test error 0.085, test ll 0.296
+Epoch 188, (0.322 s), train error 0.089, train ll 0.293, test error 0.070, test ll 0.284
+Epoch 189, (0.373 s), train error 0.084, train ll 0.291, test error 0.080, test ll 0.299
+Epoch 190, (0.259 s), train error 0.087, train ll 0.288, test error 0.085, test ll 0.289
+Epoch 191, (0.253 s), train error 0.075, train ll 0.282, test error 0.070, test ll 0.279
+Epoch 192, (0.247 s), train error 0.076, train ll 0.284, test error 0.068, test ll 0.273
+Epoch 193, (0.246 s), train error 0.089, train ll 0.287, test error 0.072, test ll 0.280
+Epoch 194, (0.246 s), train error 0.087, train ll 0.287, test error 0.062, test ll 0.273
+Epoch 195, (0.250 s), train error 0.084, train ll 0.289, test error 0.072, test ll 0.293
+Epoch 196, (0.247 s), train error 0.084, train ll 0.289, test error 0.068, test ll 0.279
+Epoch 197, (0.246 s), train error 0.073, train ll 0.277, test error 0.060, test ll 0.268
+Epoch 198, (0.246 s), train error 0.076, train ll 0.272, test error 0.075, test ll 0.280
+Epoch 199, (0.333 s), train error 0.078, train ll 0.282, test error 0.058, test ll 0.271
+Epoch 200, (0.245 s), train error 0.082, train ll 0.282, test error 0.068, test ll 0.272
+Epoch 201, (0.247 s), train error 0.082, train ll 0.283, test error 0.080, test ll 0.281
+Epoch 202, (0.248 s), train error 0.084, train ll 0.282, test error 0.075, test ll 0.285
+Epoch 203, (0.247 s), train error 0.083, train ll 0.280, test error 0.068, test ll 0.272
+Epoch 204, (0.246 s), train error 0.081, train ll 0.278, test error 0.070, test ll 0.269
+Epoch 205, (0.247 s), train error 0.086, train ll 0.280, test error 0.080, test ll 0.283
+Epoch 206, (0.245 s), train error 0.074, train ll 0.282, test error 0.075, test ll 0.287
+Epoch 207, (0.247 s), train error 0.074, train ll 0.285, test error 0.085, test ll 0.276
+Epoch 208, (0.246 s), train error 0.079, train ll 0.274, test error 0.075, test ll 0.275
+Epoch 209, (0.248 s), train error 0.084, train ll 0.279, test error 0.060, test ll 0.267
+Epoch 210, (0.245 s), train error 0.070, train ll 0.275, test error 0.075, test ll 0.283
+Epoch 211, (0.246 s), train error 0.078, train ll 0.280, test error 0.072, test ll 0.279
+Epoch 212, (0.246 s), train error 0.076, train ll 0.282, test error 0.075, test ll 0.267
+Epoch 213, (0.245 s), train error 0.071, train ll 0.268, test error 0.070, test ll 0.270
+Epoch 214, (0.246 s), train error 0.084, train ll 0.276, test error 0.058, test ll 0.271
+Epoch 215, (0.245 s), train error 0.073, train ll 0.276, test error 0.075, test ll 0.264
+Epoch 216, (0.246 s), train error 0.079, train ll 0.275, test error 0.080, test ll 0.268
+Epoch 217, (0.246 s), train error 0.084, train ll 0.279, test error 0.075, test ll 0.272
+Epoch 218, (0.247 s), train error 0.076, train ll 0.279, test error 0.062, test ll 0.269
+Epoch 219, (0.248 s), train error 0.081, train ll 0.278, test error 0.068, test ll 0.272
+Epoch 220, (0.246 s), train error 0.082, train ll 0.275, test error 0.062, test ll 0.273
+Epoch 221, (0.246 s), train error 0.076, train ll 0.269, test error 0.077, test ll 0.274
+Epoch 222, (0.246 s), train error 0.081, train ll 0.270, test error 0.077, test ll 0.280
+Epoch 223, (0.246 s), train error 0.081, train ll 0.270, test error 0.077, test ll 0.269
+Epoch 224, (0.249 s), train error 0.070, train ll 0.275, test error 0.075, test ll 0.273
+Epoch 225, (0.248 s), train error 0.081, train ll 0.274, test error 0.083, test ll 0.284
+Epoch 226, (0.246 s), train error 0.071, train ll 0.266, test error 0.072, test ll 0.265
+Epoch 227, (0.248 s), train error 0.074, train ll 0.266, test error 0.070, test ll 0.263
+Epoch 228, (0.247 s), train error 0.078, train ll 0.271, test error 0.062, test ll 0.271
+Epoch 229, (0.245 s), train error 0.074, train ll 0.269, test error 0.090, test ll 0.288
+Epoch 230, (0.246 s), train error 0.076, train ll 0.283, test error 0.068, test ll 0.269
+Epoch 231, (0.246 s), train error 0.073, train ll 0.271, test error 0.077, test ll 0.270
+Epoch 232, (0.336 s), train error 0.071, train ll 0.266, test error 0.072, test ll 0.251
+Epoch 233, (0.246 s), train error 0.072, train ll 0.272, test error 0.065, test ll 0.253
+Epoch 234, (0.245 s), train error 0.080, train ll 0.275, test error 0.075, test ll 0.260
+Epoch 235, (0.245 s), train error 0.085, train ll 0.278, test error 0.075, test ll 0.268
+Epoch 236, (0.246 s), train error 0.070, train ll 0.262, test error 0.072, test ll 0.266
+Epoch 237, (0.245 s), train error 0.079, train ll 0.269, test error 0.065, test ll 0.248
+Epoch 238, (0.245 s), train error 0.069, train ll 0.263, test error 0.062, test ll 0.269
+Epoch 239, (0.246 s), train error 0.080, train ll 0.268, test error 0.058, test ll 0.263
+Epoch 240, (0.246 s), train error 0.076, train ll 0.264, test error 0.060, test ll 0.269
+Epoch 241, (0.245 s), train error 0.079, train ll 0.273, test error 0.077, test ll 0.272
+Epoch 242, (0.245 s), train error 0.070, train ll 0.263, test error 0.065, test ll 0.250
+Epoch 243, (0.246 s), train error 0.068, train ll 0.259, test error 0.065, test ll 0.258
+Epoch 244, (0.246 s), train error 0.077, train ll 0.271, test error 0.070, test ll 0.259
+Epoch 245, (0.245 s), train error 0.075, train ll 0.262, test error 0.068, test ll 0.247
+Epoch 246, (0.245 s), train error 0.071, train ll 0.259, test error 0.062, test ll 0.264
+Epoch 247, (0.245 s), train error 0.073, train ll 0.269, test error 0.065, test ll 0.276
+Epoch 248, (0.246 s), train error 0.071, train ll 0.263, test error 0.070, test ll 0.261
+Epoch 249, (0.245 s), train error 0.073, train ll 0.259, test error 0.058, test ll 0.274
+Epoch 250, (0.246 s), train error 0.078, train ll 0.259, test error 0.068, test ll 0.277
+Epoch 251, (0.245 s), train error 0.071, train ll 0.258, test error 0.055, test ll 0.253
+Epoch 252, (0.245 s), train error 0.077, train ll 0.261, test error 0.072, test ll 0.266
+Epoch 253, (0.246 s), train error 0.070, train ll 0.260, test error 0.065, test ll 0.257
+Epoch 254, (0.245 s), train error 0.078, train ll 0.267, test error 0.068, test ll 0.254
+Epoch 255, (0.245 s), train error 0.066, train ll 0.258, test error 0.065, test ll 0.253
+Epoch 256, (0.247 s), train error 0.071, train ll 0.260, test error 0.060, test ll 0.262
+Epoch 257, (0.258 s), train error 0.076, train ll 0.264, test error 0.080, test ll 0.269
+Epoch 258, (0.269 s), train error 0.068, train ll 0.259, test error 0.072, test ll 0.255
+Epoch 259, (0.248 s), train error 0.067, train ll 0.256, test error 0.065, test ll 0.278
+Epoch 260, (0.343 s), train error 0.076, train ll 0.258, test error 0.068, test ll 0.247
+Epoch 261, (0.264 s), train error 0.077, train ll 0.260, test error 0.075, test ll 0.279
+Epoch 262, (0.300 s), train error 0.074, train ll 0.263, test error 0.070, test ll 0.251
+Epoch 263, (0.304 s), train error 0.081, train ll 0.267, test error 0.083, test ll 0.271
+Epoch 264, (0.300 s), train error 0.068, train ll 0.256, test error 0.077, test ll 0.272
+Epoch 265, (0.356 s), train error 0.078, train ll 0.257, test error 0.062, test ll 0.259
+Epoch 266, (0.292 s), train error 0.067, train ll 0.259, test error 0.060, test ll 0.266
+Epoch 267, (0.295 s), train error 0.070, train ll 0.255, test error 0.087, test ll 0.266
+Epoch 268, (0.290 s), train error 0.069, train ll 0.256, test error 0.062, test ll 0.272
+Epoch 269, (0.271 s), train error 0.073, train ll 0.262, test error 0.055, test ll 0.241
+Epoch 270, (0.251 s), train error 0.073, train ll 0.251, test error 0.062, test ll 0.261
+Epoch 271, (0.252 s), train error 0.083, train ll 0.262, test error 0.065, test ll 0.269
+Epoch 272, (0.298 s), train error 0.064, train ll 0.253, test error 0.085, test ll 0.261
+Epoch 273, (0.294 s), train error 0.077, train ll 0.254, test error 0.065, test ll 0.244
+Epoch 274, (0.292 s), train error 0.068, train ll 0.248, test error 0.060, test ll 0.249
+Epoch 275, (0.256 s), train error 0.071, train ll 0.256, test error 0.058, test ll 0.252
+Epoch 276, (0.249 s), train error 0.066, train ll 0.256, test error 0.068, test ll 0.255
+Epoch 277, (0.254 s), train error 0.076, train ll 0.257, test error 0.070, test ll 0.269
+Epoch 278, (0.245 s), train error 0.067, train ll 0.256, test error 0.055, test ll 0.242
+Epoch 279, (0.250 s), train error 0.062, train ll 0.252, test error 0.065, test ll 0.254
+Epoch 280, (0.255 s), train error 0.070, train ll 0.253, test error 0.083, test ll 0.276
+Epoch 281, (0.247 s), train error 0.073, train ll 0.255, test error 0.065, test ll 0.257
+Epoch 282, (0.255 s), train error 0.061, train ll 0.250, test error 0.068, test ll 0.255
+Epoch 283, (0.251 s), train error 0.067, train ll 0.252, test error 0.058, test ll 0.262
+Epoch 284, (0.245 s), train error 0.064, train ll 0.245, test error 0.075, test ll 0.267
+Epoch 285, (0.254 s), train error 0.073, train ll 0.256, test error 0.052, test ll 0.243
+Epoch 286, (0.296 s), train error 0.068, train ll 0.250, test error 0.055, test ll 0.240
+Epoch 287, (0.252 s), train error 0.066, train ll 0.255, test error 0.062, test ll 0.250
+Epoch 288, (0.253 s), train error 0.064, train ll 0.247, test error 0.077, test ll 0.258
+Epoch 289, (0.257 s), train error 0.071, train ll 0.255, test error 0.062, test ll 0.240
+Epoch 290, (0.266 s), train error 0.068, train ll 0.249, test error 0.070, test ll 0.251
+Epoch 291, (0.251 s), train error 0.070, train ll 0.252, test error 0.080, test ll 0.248
+Epoch 292, (0.254 s), train error 0.064, train ll 0.246, test error 0.060, test ll 0.247
+Epoch 293, (0.269 s), train error 0.068, train ll 0.246, test error 0.058, test ll 0.252
+Epoch 294, (0.258 s), train error 0.070, train ll 0.250, test error 0.062, test ll 0.248
+Epoch 295, (0.263 s), train error 0.068, train ll 0.251, test error 0.070, test ll 0.252
+Epoch 296, (0.251 s), train error 0.071, train ll 0.253, test error 0.060, test ll 0.248
+Epoch 297, (0.249 s), train error 0.074, train ll 0.256, test error 0.070, test ll 0.256
+Epoch 298, (0.337 s), train error 0.072, train ll 0.258, test error 0.058, test ll 0.254
+Epoch 299, (0.262 s), train error 0.068, train ll 0.246, test error 0.065, test ll 0.255
+Epoch 300, (0.249 s), train error 0.064, train ll 0.252, test error 0.075, test ll 0.251
+Epoch 301, (0.254 s), train error 0.073, train ll 0.249, test error 0.062, test ll 0.257
+Epoch 302, (0.253 s), train error 0.068, train ll 0.249, test error 0.077, test ll 0.257
+Epoch 303, (0.246 s), train error 0.073, train ll 0.247, test error 0.072, test ll 0.257
+Epoch 304, (0.256 s), train error 0.071, train ll 0.253, test error 0.065, test ll 0.258
+Epoch 305, (0.251 s), train error 0.069, train ll 0.250, test error 0.058, test ll 0.245
+Epoch 306, (0.256 s), train error 0.070, train ll 0.249, test error 0.058, test ll 0.239
+Epoch 307, (0.249 s), train error 0.069, train ll 0.248, test error 0.077, test ll 0.255
+Epoch 308, (0.249 s), train error 0.073, train ll 0.251, test error 0.068, test ll 0.241
+Epoch 309, (0.260 s), train error 0.077, train ll 0.257, test error 0.062, test ll 0.243
+Epoch 310, (0.255 s), train error 0.068, train ll 0.246, test error 0.068, test ll 0.254
+Epoch 311, (0.254 s), train error 0.064, train ll 0.245, test error 0.062, test ll 0.251
+Epoch 312, (0.246 s), train error 0.073, train ll 0.245, test error 0.077, test ll 0.264
+Epoch 313, (0.247 s), train error 0.060, train ll 0.238, test error 0.058, test ll 0.251
+Epoch 314, (0.251 s), train error 0.065, train ll 0.239, test error 0.070, test ll 0.245
+Epoch 315, (0.254 s), train error 0.067, train ll 0.239, test error 0.050, test ll 0.237
+Epoch 316, (0.253 s), train error 0.068, train ll 0.235, test error 0.068, test ll 0.245
+Epoch 317, (0.245 s), train error 0.062, train ll 0.242, test error 0.060, test ll 0.241
+Epoch 318, (0.250 s), train error 0.069, train ll 0.242, test error 0.060, test ll 0.240
+Epoch 319, (0.251 s), train error 0.064, train ll 0.242, test error 0.065, test ll 0.242
+Epoch 320, (0.253 s), train error 0.071, train ll 0.246, test error 0.055, test ll 0.246
+Epoch 321, (0.251 s), train error 0.063, train ll 0.241, test error 0.072, test ll 0.240
+Epoch 322, (0.244 s), train error 0.068, train ll 0.240, test error 0.070, test ll 0.242
+Epoch 323, (0.252 s), train error 0.068, train ll 0.240, test error 0.060, test ll 0.242
+Epoch 324, (0.250 s), train error 0.066, train ll 0.233, test error 0.045, test ll 0.225
+Epoch 325, (0.253 s), train error 0.066, train ll 0.251, test error 0.055, test ll 0.255
+Epoch 326, (0.248 s), train error 0.073, train ll 0.250, test error 0.055, test ll 0.244
+Epoch 327, (0.256 s), train error 0.071, train ll 0.248, test error 0.058, test ll 0.242
+Epoch 328, (0.255 s), train error 0.065, train ll 0.245, test error 0.062, test ll 0.232
+Epoch 329, (0.247 s), train error 0.059, train ll 0.244, test error 0.065, test ll 0.245
+Epoch 330, (0.262 s), train error 0.064, train ll 0.240, test error 0.058, test ll 0.250
+Epoch 331, (0.324 s), train error 0.069, train ll 0.249, test error 0.075, test ll 0.262
+Epoch 332, (0.252 s), train error 0.064, train ll 0.245, test error 0.058, test ll 0.239
+Epoch 333, (0.252 s), train error 0.067, train ll 0.243, test error 0.062, test ll 0.237
+Epoch 334, (0.251 s), train error 0.071, train ll 0.247, test error 0.048, test ll 0.238
+Epoch 335, (0.251 s), train error 0.066, train ll 0.240, test error 0.070, test ll 0.268
+Epoch 336, (0.246 s), train error 0.069, train ll 0.239, test error 0.060, test ll 0.235
+Epoch 337, (0.252 s), train error 0.062, train ll 0.238, test error 0.062, test ll 0.245
+Epoch 338, (0.250 s), train error 0.060, train ll 0.246, test error 0.068, test ll 0.247
+Epoch 339, (0.254 s), train error 0.064, train ll 0.241, test error 0.060, test ll 0.244
+Epoch 340, (0.249 s), train error 0.066, train ll 0.236, test error 0.062, test ll 0.236
+Epoch 341, (0.246 s), train error 0.065, train ll 0.240, test error 0.062, test ll 0.234
+Epoch 342, (0.254 s), train error 0.064, train ll 0.238, test error 0.052, test ll 0.242
+Epoch 343, (0.248 s), train error 0.064, train ll 0.243, test error 0.062, test ll 0.240
+Epoch 344, (0.253 s), train error 0.062, train ll 0.231, test error 0.058, test ll 0.236
+Epoch 345, (0.247 s), train error 0.069, train ll 0.249, test error 0.065, test ll 0.239
+Epoch 346, (0.246 s), train error 0.070, train ll 0.239, test error 0.052, test ll 0.240
+Epoch 347, (0.258 s), train error 0.066, train ll 0.238, test error 0.070, test ll 0.245
+Epoch 348, (0.250 s), train error 0.065, train ll 0.240, test error 0.055, test ll 0.228
+Epoch 349, (0.252 s), train error 0.062, train ll 0.238, test error 0.068, test ll 0.246
+Epoch 350, (0.245 s), train error 0.066, train ll 0.238, test error 0.055, test ll 0.236
+Epoch 351, (0.334 s), train error 0.066, train ll 0.238, test error 0.068, test ll 0.248
+Epoch 352, (0.252 s), train error 0.071, train ll 0.238, test error 0.072, test ll 0.235
+Epoch 353, (0.253 s), train error 0.066, train ll 0.238, test error 0.050, test ll 0.220
+Epoch 354, (0.248 s), train error 0.060, train ll 0.232, test error 0.058, test ll 0.228
+Epoch 355, (0.263 s), train error 0.067, train ll 0.241, test error 0.060, test ll 0.235
+Epoch 356, (0.266 s), train error 0.058, train ll 0.239, test error 0.058, test ll 0.243
+Epoch 357, (0.351 s), train error 0.062, train ll 0.233, test error 0.055, test ll 0.246
+Epoch 358, (0.251 s), train error 0.066, train ll 0.237, test error 0.062, test ll 0.231
+Epoch 359, (0.249 s), train error 0.065, train ll 0.242, test error 0.058, test ll 0.236
+Epoch 360, (0.411 s), train error 0.064, train ll 0.239, test error 0.065, test ll 0.245
+Epoch 361, (0.305 s), train error 0.064, train ll 0.231, test error 0.068, test ll 0.243
+Epoch 362, (0.269 s), train error 0.064, train ll 0.240, test error 0.072, test ll 0.270
+Epoch 363, (0.258 s), train error 0.068, train ll 0.232, test error 0.060, test ll 0.243
+Epoch 364, (0.356 s), train error 0.063, train ll 0.235, test error 0.062, test ll 0.248
+Epoch 365, (0.256 s), train error 0.063, train ll 0.230, test error 0.072, test ll 0.251
+Epoch 366, (0.272 s), train error 0.066, train ll 0.235, test error 0.055, test ll 0.233
+Epoch 367, (0.270 s), train error 0.063, train ll 0.235, test error 0.055, test ll 0.225
+Epoch 368, (0.254 s), train error 0.068, train ll 0.237, test error 0.070, test ll 0.227
+Epoch 369, (0.252 s), train error 0.061, train ll 0.236, test error 0.060, test ll 0.237
+Epoch 370, (0.254 s), train error 0.062, train ll 0.234, test error 0.062, test ll 0.241
+Epoch 371, (0.250 s), train error 0.068, train ll 0.237, test error 0.068, test ll 0.261
+Epoch 372, (0.276 s), train error 0.067, train ll 0.242, test error 0.055, test ll 0.243
+Epoch 373, (0.252 s), train error 0.063, train ll 0.235, test error 0.055, test ll 0.241
+Epoch 374, (0.266 s), train error 0.066, train ll 0.243, test error 0.058, test ll 0.228
+Epoch 375, (0.256 s), train error 0.068, train ll 0.237, test error 0.043, test ll 0.229
+Epoch 376, (0.257 s), train error 0.066, train ll 0.234, test error 0.062, test ll 0.243
+Epoch 377, (0.258 s), train error 0.064, train ll 0.227, test error 0.062, test ll 0.247
+Epoch 378, (0.250 s), train error 0.058, train ll 0.233, test error 0.058, test ll 0.247
+Epoch 379, (0.300 s), train error 0.074, train ll 0.238, test error 0.055, test ll 0.231
+Epoch 380, (0.303 s), train error 0.068, train ll 0.227, test error 0.070, test ll 0.249
+Epoch 381, (0.309 s), train error 0.062, train ll 0.232, test error 0.065, test ll 0.246
+Epoch 382, (0.300 s), train error 0.062, train ll 0.226, test error 0.065, test ll 0.250
+Epoch 383, (0.251 s), train error 0.062, train ll 0.225, test error 0.062, test ll 0.234
+Epoch 384, (0.252 s), train error 0.063, train ll 0.241, test error 0.058, test ll 0.234
+Epoch 385, (0.248 s), train error 0.063, train ll 0.230, test error 0.077, test ll 0.249
+Epoch 386, (0.297 s), train error 0.069, train ll 0.237, test error 0.065, test ll 0.241
+Epoch 387, (0.251 s), train error 0.062, train ll 0.228, test error 0.060, test ll 0.240
+Epoch 388, (0.253 s), train error 0.064, train ll 0.232, test error 0.055, test ll 0.217
+Epoch 389, (0.247 s), train error 0.062, train ll 0.223, test error 0.072, test ll 0.251
+Epoch 390, (0.276 s), train error 0.062, train ll 0.234, test error 0.058, test ll 0.240
+Epoch 391, (0.298 s), train error 0.062, train ll 0.232, test error 0.060, test ll 0.231
+Epoch 392, (0.275 s), train error 0.063, train ll 0.231, test error 0.058, test ll 0.241
+Epoch 393, (0.247 s), train error 0.064, train ll 0.231, test error 0.060, test ll 0.253
+Epoch 394, (0.253 s), train error 0.063, train ll 0.230, test error 0.060, test ll 0.227
+Epoch 395, (0.247 s), train error 0.069, train ll 0.236, test error 0.058, test ll 0.250
+Epoch 396, (0.247 s), train error 0.064, train ll 0.232, test error 0.060, test ll 0.235
+Epoch 397, (0.336 s), train error 0.066, train ll 0.232, test error 0.065, test ll 0.234
+Epoch 398, (0.252 s), train error 0.066, train ll 0.235, test error 0.060, test ll 0.246
+Epoch 399, (0.251 s), train error 0.068, train ll 0.237, test error 0.055, test ll 0.232
+Epoch 400, (0.246 s), train error 0.063, train ll 0.235, test error 0.062, test ll 0.232
+Epoch 401, (0.252 s), train error 0.058, train ll 0.231, test error 0.060, test ll 0.232
+Epoch 402, (0.252 s), train error 0.060, train ll 0.222, test error 0.060, test ll 0.234
+Epoch 403, (0.253 s), train error 0.064, train ll 0.226, test error 0.068, test ll 0.230
+Epoch 404, (0.250 s), train error 0.062, train ll 0.231, test error 0.060, test ll 0.232
+Epoch 405, (0.245 s), train error 0.059, train ll 0.228, test error 0.058, test ll 0.226
+Epoch 406, (0.254 s), train error 0.061, train ll 0.228, test error 0.050, test ll 0.232
+Epoch 407, (0.255 s), train error 0.062, train ll 0.232, test error 0.068, test ll 0.242
+Epoch 408, (0.255 s), train error 0.066, train ll 0.228, test error 0.065, test ll 0.241
+Epoch 409, (0.247 s), train error 0.063, train ll 0.235, test error 0.068, test ll 0.239
+Epoch 410, (0.247 s), train error 0.060, train ll 0.228, test error 0.065, test ll 0.248
+Epoch 411, (0.255 s), train error 0.059, train ll 0.224, test error 0.062, test ll 0.233
+Epoch 412, (0.250 s), train error 0.062, train ll 0.229, test error 0.052, test ll 0.234
+Epoch 413, (0.254 s), train error 0.065, train ll 0.231, test error 0.062, test ll 0.245
+Epoch 414, (0.247 s), train error 0.066, train ll 0.230, test error 0.058, test ll 0.223
+Epoch 415, (0.249 s), train error 0.058, train ll 0.228, test error 0.062, test ll 0.231
+Epoch 416, (0.253 s), train error 0.064, train ll 0.227, test error 0.065, test ll 0.252
+Epoch 417, (0.251 s), train error 0.065, train ll 0.231, test error 0.055, test ll 0.243
+Epoch 418, (0.252 s), train error 0.066, train ll 0.233, test error 0.058, test ll 0.228
+Epoch 419, (0.246 s), train error 0.066, train ll 0.224, test error 0.065, test ll 0.234
+Epoch 420, (0.252 s), train error 0.069, train ll 0.237, test error 0.055, test ll 0.226
+Epoch 421, (0.253 s), train error 0.059, train ll 0.218, test error 0.055, test ll 0.231
+Epoch 422, (0.253 s), train error 0.058, train ll 0.228, test error 0.060, test ll 0.226
+Epoch 423, (0.251 s), train error 0.062, train ll 0.230, test error 0.052, test ll 0.238
+Epoch 424, (0.247 s), train error 0.066, train ll 0.233, test error 0.058, test ll 0.236
+Epoch 425, (0.251 s), train error 0.059, train ll 0.229, test error 0.072, test ll 0.246
+Epoch 426, (0.251 s), train error 0.059, train ll 0.226, test error 0.060, test ll 0.221
+Epoch 427, (0.256 s), train error 0.067, train ll 0.233, test error 0.062, test ll 0.243
+Epoch 428, (0.253 s), train error 0.065, train ll 0.237, test error 0.060, test ll 0.240
+Epoch 429, (0.245 s), train error 0.066, train ll 0.228, test error 0.060, test ll 0.225
+Epoch 430, (0.325 s), train error 0.064, train ll 0.236, test error 0.050, test ll 0.217
+Epoch 431, (0.254 s), train error 0.060, train ll 0.220, test error 0.070, test ll 0.245
+Epoch 432, (0.255 s), train error 0.060, train ll 0.224, test error 0.058, test ll 0.226
+Epoch 433, (0.250 s), train error 0.062, train ll 0.225, test error 0.050, test ll 0.239
+Epoch 434, (0.253 s), train error 0.059, train ll 0.226, test error 0.072, test ll 0.253
+Epoch 435, (0.252 s), train error 0.067, train ll 0.228, test error 0.052, test ll 0.236
+Epoch 436, (0.251 s), train error 0.062, train ll 0.234, test error 0.052, test ll 0.237
+Epoch 437, (0.251 s), train error 0.067, train ll 0.227, test error 0.048, test ll 0.220
+Epoch 438, (0.246 s), train error 0.062, train ll 0.229, test error 0.055, test ll 0.230
+Epoch 439, (0.253 s), train error 0.064, train ll 0.225, test error 0.065, test ll 0.229
+Epoch 440, (0.252 s), train error 0.058, train ll 0.222, test error 0.062, test ll 0.242
+Epoch 441, (0.254 s), train error 0.059, train ll 0.222, test error 0.068, test ll 0.226
+Epoch 442, (0.253 s), train error 0.064, train ll 0.229, test error 0.062, test ll 0.221
+Epoch 443, (0.247 s), train error 0.066, train ll 0.226, test error 0.065, test ll 0.240
+Epoch 444, (0.258 s), train error 0.057, train ll 0.226, test error 0.060, test ll 0.230
+Epoch 445, (0.250 s), train error 0.062, train ll 0.223, test error 0.062, test ll 0.239
+Epoch 446, (0.255 s), train error 0.063, train ll 0.227, test error 0.052, test ll 0.228
+Epoch 447, (0.246 s), train error 0.062, train ll 0.225, test error 0.068, test ll 0.229
+Epoch 448, (0.247 s), train error 0.062, train ll 0.234, test error 0.052, test ll 0.242
+Epoch 449, (0.254 s), train error 0.058, train ll 0.227, test error 0.058, test ll 0.221
+Epoch 450, (0.255 s), train error 0.056, train ll 0.234, test error 0.065, test ll 0.240
+Epoch 451, (0.256 s), train error 0.063, train ll 0.232, test error 0.060, test ll 0.247
+Epoch 452, (0.245 s), train error 0.066, train ll 0.235, test error 0.058, test ll 0.234
+Epoch 453, (0.251 s), train error 0.061, train ll 0.227, test error 0.052, test ll 0.226
+Epoch 454, (0.254 s), train error 0.056, train ll 0.223, test error 0.062, test ll 0.241
+Epoch 455, (0.252 s), train error 0.061, train ll 0.231, test error 0.058, test ll 0.231
+Epoch 456, (0.254 s), train error 0.065, train ll 0.232, test error 0.058, test ll 0.226
+Epoch 457, (0.249 s), train error 0.066, train ll 0.225, test error 0.065, test ll 0.237
+Epoch 458, (0.253 s), train error 0.057, train ll 0.222, test error 0.062, test ll 0.237
+Epoch 459, (0.253 s), train error 0.063, train ll 0.223, test error 0.062, test ll 0.230
+Epoch 460, (0.255 s), train error 0.055, train ll 0.222, test error 0.058, test ll 0.227
+Epoch 461, (0.248 s), train error 0.055, train ll 0.218, test error 0.052, test ll 0.231
+Epoch 462, (0.246 s), train error 0.061, train ll 0.226, test error 0.062, test ll 0.237
+Epoch 463, (0.344 s), train error 0.061, train ll 0.226, test error 0.070, test ll 0.228
+Epoch 464, (0.249 s), train error 0.066, train ll 0.229, test error 0.068, test ll 0.235
+Epoch 465, (0.255 s), train error 0.060, train ll 0.229, test error 0.058, test ll 0.255
+Epoch 466, (0.246 s), train error 0.061, train ll 0.223, test error 0.058, test ll 0.236
+Epoch 467, (0.251 s), train error 0.057, train ll 0.227, test error 0.058, test ll 0.236
+Epoch 468, (0.253 s), train error 0.062, train ll 0.228, test error 0.060, test ll 0.228
+Epoch 469, (0.252 s), train error 0.064, train ll 0.228, test error 0.070, test ll 0.233
+Epoch 470, (0.252 s), train error 0.059, train ll 0.229, test error 0.058, test ll 0.229
+Epoch 471, (0.246 s), train error 0.055, train ll 0.222, test error 0.065, test ll 0.239
+Epoch 472, (0.250 s), train error 0.059, train ll 0.226, test error 0.060, test ll 0.237
+Epoch 473, (0.253 s), train error 0.056, train ll 0.215, test error 0.055, test ll 0.228
+Epoch 474, (0.255 s), train error 0.058, train ll 0.221, test error 0.060, test ll 0.232
+Epoch 475, (0.249 s), train error 0.061, train ll 0.226, test error 0.050, test ll 0.229
+Epoch 476, (0.245 s), train error 0.062, train ll 0.226, test error 0.055, test ll 0.227
+Epoch 477, (0.253 s), train error 0.059, train ll 0.224, test error 0.062, test ll 0.225
+Epoch 478, (0.254 s), train error 0.057, train ll 0.215, test error 0.058, test ll 0.222
+Epoch 479, (0.255 s), train error 0.062, train ll 0.224, test error 0.058, test ll 0.234
+Epoch 480, (0.246 s), train error 0.063, train ll 0.231, test error 0.068, test ll 0.238
+Epoch 481, (0.252 s), train error 0.064, train ll 0.224, test error 0.050, test ll 0.216
+Epoch 482, (0.255 s), train error 0.061, train ll 0.220, test error 0.062, test ll 0.223
+Epoch 483, (0.254 s), train error 0.059, train ll 0.229, test error 0.058, test ll 0.226
+Epoch 484, (0.255 s), train error 0.059, train ll 0.223, test error 0.060, test ll 0.237
+Epoch 485, (0.246 s), train error 0.062, train ll 0.223, test error 0.062, test ll 0.244
+Epoch 486, (0.253 s), train error 0.058, train ll 0.218, test error 0.068, test ll 0.228
+Epoch 487, (0.254 s), train error 0.058, train ll 0.218, test error 0.062, test ll 0.243
+Epoch 488, (0.252 s), train error 0.062, train ll 0.232, test error 0.058, test ll 0.223
+Epoch 489, (0.254 s), train error 0.068, train ll 0.223, test error 0.065, test ll 0.236
+Epoch 490, (0.245 s), train error 0.061, train ll 0.225, test error 0.055, test ll 0.224
+Epoch 491, (0.254 s), train error 0.068, train ll 0.234, test error 0.058, test ll 0.230
+Epoch 492, (0.251 s), train error 0.061, train ll 0.225, test error 0.050, test ll 0.218
+Epoch 493, (0.253 s), train error 0.063, train ll 0.233, test error 0.062, test ll 0.232
+Epoch 494, (0.250 s), train error 0.060, train ll 0.226, test error 0.052, test ll 0.233
+Epoch 495, (0.250 s), train error 0.059, train ll 0.228, test error 0.048, test ll 0.215
+Epoch 496, (0.321 s), train error 0.056, train ll 0.225, test error 0.070, test ll 0.231
+Epoch 497, (0.254 s), train error 0.061, train ll 0.221, test error 0.055, test ll 0.230
+Epoch 498, (0.257 s), train error 0.067, train ll 0.224, test error 0.060, test ll 0.221
+Epoch 499, (0.245 s), train error 0.064, train ll 0.228, test error 0.060, test ll 0.229
+>>> 
