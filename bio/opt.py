@@ -55,15 +55,13 @@ class NesterovMomentumOpt(Optimization):
 			yield param - self.gamma * self.prev_moments[pi] + (1.0 + self.gamma) * self.moments[pi]
 
 class SGDOpt(Optimization):
-	def __init__(self, learning_rates):
+	def __init__(self, parameters, learning_rates):
 		self.learning_rates = learning_rates
+		self.parameters = parameters
 	
-	def init(self, *params):
-		pass
-
-	def update(self, *param_and_dparam):
-		for pi, (param, dparam) in enumerate(param_and_dparam):
-			yield param - self.learning_rates[pi] * dparam
+	def update(self, *dparams):
+		for pi, dparam in enumerate(dparams):
+			self.parameters[pi] -=self.learning_rates[pi] * dparam
 
 
 class AdagradOpt(Optimization):
@@ -104,29 +102,28 @@ class RMSPropOpt(Optimization):
 
 
 class AdamOpt(Optimization):
-	def __init__(self, learning_rates, beta1=0.9, beta2=0.999, eps=1e-05):
+	def __init__(self, parameters, learning_rates, beta1=0.9, beta2=0.999, eps=1e-05):
+		assert len(parameters) == len(learning_rates)
+		
+		self.parameters = parameters
 		self.learning_rates = learning_rates
 		
 		self.eps = eps
 		
 		self.beta1 = beta1
 		self.beta2 = beta2
-		
-		self.m = []
-		self.v = []
 
-	def init(self, *params):
-		self.m = [np.zeros(p.shape) for p in params]
-		self.v = [np.zeros(p.shape) for p in params]
-		
-	def update(self, *param_and_dparam):
-		assert len(self.m) == len(param_and_dparam) and len(self.v) == len(param_and_dparam)
+		self.m = [np.zeros(p.shape) for p in self.parameters]
+		self.v = [np.zeros(p.shape) for p in self.parameters]
 
-		for pi, (param, dparam) in enumerate(param_and_dparam):
+	def update(self, *dparams):
+		assert len(self.m) == len(dparams) and len(self.v) == len(self.parameters)
+		
+		for pi, dparam  in enumerate(dparams):
 			self.m[pi] = self.m[pi] * self.beta1  + (1.0 - self.beta1) * dparam
 			self.v[pi] = self.v[pi] * self.beta2  + (1.0 - self.beta2) * np.square(dparam)
 			
-			yield param - self.learning_rates[pi] * self.m[pi] / (np.sqrt(self.v[pi]) + self.eps)
+			self.parameters[pi] -= self.learning_rates[pi] * self.m[pi] / (np.sqrt(self.v[pi]) + self.eps)
 
 
 
