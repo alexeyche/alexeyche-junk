@@ -36,19 +36,20 @@ kB = gB/(gL + gB + gA)
 
 T = np.linspace(T0, Tmax, Tsize)
 
-vol = .10
-lag = 10
-df = pd.DataFrame(np.random.randn(Tsize+lag-1) * np.sqrt(vol) * np.sqrt(1 / 252.)).cumsum()
-x_vec = np.squeeze(df.rolling(lag).mean().dropna().values.copy())
-x_vec = x_vec-np.mean(x_vec)
+# vol = .30
+# lag = 30
+# df = pd.DataFrame(np.random.randn(Tsize+lag-1) * np.sqrt(vol) * np.sqrt(1 / 252.)).cumsum()
+# x_vec = np.squeeze(df.rolling(lag).mean().dropna().values.copy())
+# x_vec = x_vec-np.mean(x_vec)
 
-# x_vec = np.sin(T/10.0)
+x_vec = np.sin(T/10.0)
+
 
 
 W = 0.1*(np.random.uniform(size=(filter_size, layer_size)) - 0.5)
 b = np.zeros((layer_size,))
 
-Y = 0.1*(np.random.uniform(size=(filter_size, layer_size)) - 0.5)
+Y = np.random.uniform(size=(filter_size, layer_size)) - 0.5
 F = 0.1*(np.random.uniform(size=(layer_size, filter_size)) - 0.5)
 act = SigmoidActivation()
 cost = MseCost()
@@ -62,7 +63,7 @@ rate_test = poisson(np.random.random((Tsize, layer_size))*0.1, dt)
 C = np.zeros((layer_size,))
 
 # lrates = [1.0, 1.0, 1e-01, 0.0]
-lrates = [1.0, 1.0, 0.01]
+lrates = [2.0, 2.0, 0.1]
 params = [W, b, F]
 
 # beta1, beta2, factor = 0.9, 0.99, 1.0
@@ -75,12 +76,13 @@ params = [W, b, F]
 opt = SGDOpt(parameters=params, learning_rates=lrates)
 
 
+real_vec = poisson(0.1*np.random.random((Tsize, layer_size)), dt)
 
-for e in xrange(1):
+for e in xrange(200):
     x_f_vec = np.zeros((Tsize, layer_size))
     rate_vec = np.zeros((Tsize, layer_size))
     C_vec = np.zeros((Tsize, layer_size))
-    real_vec = np.zeros((Tsize, layer_size))
+    # real_vec = np.zeros((Tsize, layer_size))
     
     
 
@@ -95,39 +97,21 @@ for e in xrange(1):
 
     real_acc = np.zeros((filter_size, layer_size))
 
-    dW_m = np.zeros(W.shape)
-    db_m = np.zeros(b.shape)
+    def run(ti, target=False):
+        global C, error_acc, real_acc, real_vec, C_vec, rate_vec
+        global dF_m, rate_m, Am, Cm, xm, APsp_m
 
-    rhythm = np.sin(T/50.0)
-
-    gA_t_vec = np.zeros((Tsize,))
-    APsp_vec = np.zeros((Tsize, filter_size))
-    ap_vec = np.zeros((Tsize, layer_size))
-    apr_vec = np.zeros((Tsize, layer_size))
-    deriv_part_vec = np.zeros((Tsize, layer_size))
-    x_psp_vec = np.zeros((Tsize, filter_size))
-
-    error_acc = 0.0
-    for ti, t in enumerate(T):
         xi = ti + filter_size
-        rv = rhythm[ti]
-        b_rv = rv/2.0 + 0.5
-        
+
         x = x_vec_pad[(xi-filter_size):xi]
-        x_psp_vec[ti] = x
 
-        gA_t = gA * b_rv
+        gA_t = gA if target else 0.0
         
-        gA_t_vec[ti] = gA_t
-
         B = np.dot(x, W) + b
         
         x_actual = x_vec_hat[(xi-filter_size):xi]
+        APsp = x if target else x_actual
         
-        APsp = b_rv * x + (1.0 - b_rv) * x_actual
-        
-        APsp_vec[ti] = APsp
-
         A = np.dot(APsp, Y)
         
         C += dt * (- gL * C + gB * (B - C) + gA_t * (A - C))
@@ -144,34 +128,51 @@ for e in xrange(1):
         de = cost.grad(x_vec_hat[xi], x_vec_pad[xi])        
         dF = real_acc.T * de
 
-        # dF_m = (1.0-alpha_long) * dF_m + alpha_long * dF
+        dF_m = (1.0-alpha_long) * dF_m + alpha_long * dF
         rate_m = (1.0-alpha) * rate_m + alpha * rate
         Am = (1.0-alpha) * Am + alpha * A
         Cm = (1.0-alpha) * Cm + alpha * C
         xm = (1.0-alpha) * xm + alpha * x
         APsp_m = (1.0-alpha) * APsp_m + alpha * APsp
 
-        apical = act(Am) # -1 forward, +1 target 
-
-        ap_vec[ti] = apical
-        apr_vec[ti] = rv*apical
-
-        deriv_part = - rv * kB * apical * act.grad(Cm)
-        deriv_part_vec[ti] = deriv_part
-
-        # db_m += 0.001 * deriv_part
-        # dW_m += 0.001 * np.outer(xm, deriv_part)
-        dF_m += 0.001 * dF
-
         real_vec[ti] = real
         C_vec[ti] = C
         rate_vec[ti] = rate
 
+    error_acc = 0.0
+    for ti, t in enumerate(T):
+        run(ti, target=False)
+        
+    Am_f = Am.copy()
+    C_vec_f = C_vec.copy()
+    Cm_f = Cm.copy()
+    xm_f = xm.copy()
+    real_acc_f = real_acc.copy()
+    APsp_m_f = APsp_m.copy()
 
-    # deriv_party = kB * (alpha_t - alpha_f) * act.grad(Am_f)
-    # dY = np.outer(APsp_m_f, deriv_party)
+    error_acc = 0.0
+    for ti, t in enumerate(T):
+        run(ti, target=True)
 
-    opt.update(dW_m, db_m, dF_m)
+    Am_t = Am.copy()
+    C_vec_t = C_vec.copy()
+    Cm_t = Cm.copy()
+    real_acc_t = real_acc.copy()
+    APsp_m_t = APsp_m.copy()
+    
+    ##
+
+    alpha_f = act(Am_f)
+    alpha_t = act(Am_t)
+    
+    deriv_part = - kB * (alpha_t - alpha_f) * act.grad(Cm_f)
+    db = deriv_part
+    dW = np.outer(xm_f, deriv_part)
+
+    deriv_party = kB * (alpha_t - alpha_f) * act.grad(Am_f)
+    dY = np.outer(APsp_m_f, deriv_party)
+
+    opt.update(dW, db, dF_m)
 
     print "Epoch {}, error {:.3f}".format(e, error_acc/len(T))
 
