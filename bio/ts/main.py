@@ -1,179 +1,305 @@
-
-
+import gc
 import numpy as np
-import pandas as pd
-from matplotlib import pyplot as plt
-
-from util import shl, shm
+from util import shl, shm, shs
+from functools import partial
 from activation import *
-from cost import MseCost
+from datasets import get_toy_data, quantize_data
+import time
+import weave
+from sklearn.metrics import log_loss        
 from opt import * 
 
 def poisson(x, dt):
     return (dt * x > np.random.random(x.shape)).astype(np.int8)
 
-def batch_inner(left, right):
-    return np.asarray([np.inner(left[i], right[i]) for i in xrange(left.shape[0])])
+def batch_outer(left, right):
+    return np.asarray([np.outer(left[i], right[i]) for i in xrange(left.shape[0])])
 
-np.random.seed(1)
 
-Tmax = 1000.0
-dt = 1.0
-filter_size = 50
-T0 = filter_size*dt
-layer_size = 25
-Tsize = int(Tmax/dt)
-lambda_max = 200.0/1000.0      # 1/ms
-int_time = 20.0
-alpha = dt/int_time
-alpha_long = dt/(2.0 * Tmax)
+tau_s = 3.0  # tau rise
+tau_l = 10.0 # tau decay
+koeff_epsp = 1.0/(tau_l - tau_s)
+
+
+
+class RiseAndDecaySynapse(object):
+    def __init__(self, batch_size, layer_size):
+        self.Act = np.zeros((batch_size, layer_size))
+        self.Act_aux = np.zeros((batch_size, layer_size))
+        self.epsp_bias = 1.5
+        
+    def update(self, x):
+        self.Act_aux += - dt * self.Act_aux/tau_s + koeff_epsp * x 
+        self.Act += - dt * self.Act/tau_l + self.epsp_bias * koeff_epsp * self.Act_aux 
+
+    @property
+    def output(self):
+        return self.Act
+
+    def reset(self):
+        self.Act_aux = np.zeros(self.Act_aux.shape)
+        self.Act = np.zeros(self.Act.shape)
+
+class DecaySynapse(object):
+    def __init__(self, batch_size, layer_size):
+        self.Act = np.zeros((batch_size, layer_size))
+        
+    def update(self, x):
+        self.Act += - dt * self.Act/tau_l + (1.0/tau_l) * x
+
+    @property
+    def output(self):
+        return self.Act
+
+    def reset(self):
+        self.Act = np.zeros(self.Act.shape)
+
+synapse_class = DecaySynapse
+
+def smooth_spikes(data):
+    x_values_sm = np.zeros(data.shape)
+
+    inp_syn = synapse_class(1, data.shape[1])
+    for ti in xrange(Tsize):
+        inp_syn.update(np.expand_dims(data[ti], 0))
+        x_values_sm[ti] = inp_syn.output
+    return x_values_sm
+
 gL = 0.1
 gD = 0.6
 gB = 0.6
 gA = 0.6
+
 kB = gB/(gL + gB + gA)
+kD = gD/(gL + gD)
 
+T0, T = 0.0, 1000.0      # ms
+dt = 1.0                # ms
 
-T = np.linspace(T0, Tmax, Tsize)
+int_time = 10.0
+alpha = dt/int_time
 
-vol = .10
-lag = 10
-df = pd.DataFrame(np.random.randn(Tsize+lag-1) * np.sqrt(vol) * np.sqrt(1 / 252.)).cumsum()
-x_vec = np.squeeze(df.rolling(lag).mean().dropna().values.copy())
-x_vec = x_vec-np.mean(x_vec)
+Ee = 8.0
+Ei = -8.0
 
-# x_vec = np.sin(T/10.0)
+poisson = partial(poisson, dt=dt)
 
+Tsize = int(T/dt + dt)
 
-W = 0.1*(np.random.uniform(size=(filter_size, layer_size)) - 0.5)
-b = np.zeros((layer_size,))
+lambda_max = 200.0/1000.0      # 1/ms
 
-Y = 0.1*(np.random.uniform(size=(filter_size, layer_size)) - 0.5)
-F = 0.1*(np.random.uniform(size=(layer_size, filter_size)) - 0.5)
+lr1 = 20.0/lambda_max
+lr0 = 20.0/(lambda_max * lambda_max)
+
+# act = SoftplusActivation()
 act = SigmoidActivation()
-cost = MseCost()
 
-x_vec_pad = np.pad(x_vec, (filter_size, filter_size), 'constant')
 
-F_start = F.copy()
+input_size = 50
+output_size = input_size
+x_values = np.zeros((Tsize, input_size))
+for ti in xrange(0, Tsize, 5):
+    x_values[ti, ti % input_size] = 1.0
 
-rate_test = poisson(np.random.random((Tsize, layer_size))*0.1, dt)
 
-C = np.zeros((layer_size,))
 
-# lrates = [1.0, 1.0, 1e-01, 0.0]
-lrates = [1.0, 1.0, 0.01]
-params = [W, b, F]
+# np.random.seed(1)
+# np.random.random((Tsize, ))
 
-# beta1, beta2, factor = 0.9, 0.99, 1.0
+
+input_size = x_values.shape[1]
+input_len = x_values.shape[0]
+hidden_size = 20
+output_size = input_size
+
+
+batch_size = 1
+
+L, M, N = input_size, hidden_size, output_size
+
+x_values_sm = smooth_spikes(x_values)
+
+#######################################################################
+
+
+
+class HiddenLayer(object):
+    def __init__(self, batch_size, input_size, layer_size, output_size):
+        self.C = np.zeros((batch_size, layer_size))
+        self.C_aux = np.zeros((batch_size, layer_size))
+        
+        self.Chist = np.zeros((Tsize*2, batch_size, layer_size))
+        self.Crate_hist = np.zeros((Tsize*2, batch_size, layer_size))
+        self.spikes_hist = np.zeros((Tsize*2, batch_size, layer_size))
+        self.Ahist = np.zeros((Tsize*2, batch_size, layer_size))
+
+        self.syn = synapse_class(batch_size, layer_size)
+
+        self.W = 0.1*(np.random.uniform(size=(input_size, layer_size)) - 0.5)
+        self.b = np.zeros((layer_size,))
+        self.Y = np.random.uniform(size=(output_size, layer_size)) - 0.5
+        
+        self.Crate_m = np.zeros((batch_size, layer_size))
+        self.Psp_m = np.zeros((batch_size, input_size))
+        self.Cm = np.zeros((batch_size, layer_size))
+        self.Am = np.zeros((batch_size, layer_size))
+        self.APsp_m = np.zeros((batch_size, output_size))
+
+    def update(self, ti, x, output_activity, target=False):
+        hi = ti if not target else Tsize + ti
+        B = np.dot(x, self.W) + self.b
+        
+        A = np.dot(output_activity, self.Y)
+        
+        self.Ahist[hi] = A
+
+        gA_t = gA if target else 0.0
+        
+        self.C += dt * (- gL * self.C + gB * (B - self.C) + gA_t * (A - self.C))
+        # self.C += dt * (self.C - np.power(self.C, 3.0)/3.0 - self.C_aux + gB * (B - self.C) + gA_t * (A - self.C))
+        # self.C_aux += dt * (0.08 * (self.C  - 0.8 * self.C_aux))
+
+        self.Chist[hi] = self.C
+
+        rate = lambda_max * act(self.C)
+        self.Crate_hist[hi] = rate
+
+        spikes = poisson(rate)
+        self.spikes_hist[hi] = spikes
+
+        self.syn.update(spikes)
+        
+        self.Cm = (1.0-alpha) * self.Cm + alpha * self.C
+        self.Crate_m = (1.0-alpha) * self.Crate_m + alpha * rate
+        self.Psp_m = (1.0-alpha) * self.Psp_m + alpha * x
+        self.Am = (1.0-alpha) * self.Am + alpha * A
+        self.APsp_m = (1.0 - alpha) * self.APsp_m + alpha * output_activity
+
+    def reset(self):
+        self.C = np.zeros(self.C.shape)
+        self.Cm = np.zeros(self.Cm.shape)
+        self.Crate_m = np.zeros(self.Crate_m.shape)
+        self.Psp_m = np.zeros(self.Psp_m.shape)
+        self.Am = np.zeros(self.Am.shape)
+        self.APsp_m = np.zeros(self.APsp_m.shape)
+        self.syn.reset()
+
+class OutputLayer(object):
+    def __init__(self, batch_size, input_size, layer_size):
+        self.U = np.zeros((batch_size, layer_size))
+
+        self.Uhist = np.zeros((Tsize, batch_size, layer_size))
+        self.Urate_hist = np.zeros((Tsize, batch_size, layer_size))
+        self.spikes_hist = np.zeros((Tsize, batch_size, layer_size))
+
+        self.syn = synapse_class(batch_size, layer_size)
+        
+        self.Urate = np.zeros((batch_size, layer_size))
+        self.W = 0.1*(np.random.uniform(size=(input_size, layer_size)) - 0.5)
+        self.b = np.zeros((layer_size,))
+
+        self.Psp_m = np.zeros((batch_size, input_size))
+        self.Um = np.zeros((batch_size, layer_size))
+        self.Urate_m = np.zeros((batch_size, layer_size))
+        
+    def update(self, ti, x, rhythm_val, gE, gI):
+        b_rv = rhythm_val/2.0 + 0.5
+
+        V = np.dot(x, self.W) + self.b
+        
+        I = (gE * (Ee - self.U) + gI * (Ei - self.U)) * b_rv
+        
+        self.U += dt * (- gL * self.U + gD * (V - self.U) + I)
+        self.Uhist[ti] = self.U
+
+        rate = lambda_max * act(self.U)
+        self.Urate_hist[ti] = rate
+
+        spikes = poisson(rate)
+        self.spikes_hist[ti] = spikes
+        
+        self.syn.update(spikes)
+
+        self.Um = (1.0 - alpha) * self.Um + alpha * self.U
+        self.Urate_m =  (1.0 - alpha) * self.Urate_m + alpha * rate
+        self.Psp_m = (1.0 - alpha) * self.Psp_m + alpha * x
+        
+    def reset(self):
+        self.U = np.zeros(self.U.shape)
+        self.Psp_m = np.zeros(self.Psp_m.shape)
+        self.Um = np.zeros(self.Um.shape)
+        self.Urate_m = np.zeros(self.Urate_m.shape)
+        self.syn.reset()
+
+# hidden = HiddenLayer(batch_size, input_size, hidden_size, output_size)
+output = OutputLayer(batch_size, input_size, output_size)
+
+
+opt = SGDOpt([output.W, output.b], [100.0, 0.0])
+
+# beta1, beta2, factor = 0.99, 0.999, 10.0
 # opt = AdamOpt(
-#     parameters=params, 
-#     learning_rates=[factor * lr * (1.0 - beta1) * (1.0 - beta2) for lr in lrates],
+#     [ factor * lr * (1.0 - beta1) * (1.0 - beta2) for lr in lrates], 
 #     beta1=beta1, beta2=beta2, eps=1e-05
 # )
 
-opt = SGDOpt(parameters=params, learning_rates=lrates)
 
+Tvec = np.linspace(T0, T, Tsize)
+
+rhythm = np.zeros(Tsize)
+w = 200
+sign = 1.0
+for ti, t in enumerate(Tvec):
+
+    if ti % w == 0 and ti > 0:
+        sign = -sign
+    rhythm[ti] = sign
 
 
 for e in xrange(1):
-    x_f_vec = np.zeros((Tsize, layer_size))
-    rate_vec = np.zeros((Tsize, layer_size))
-    C_vec = np.zeros((Tsize, layer_size))
-    real_vec = np.zeros((Tsize, layer_size))
-    
-    
+    # rhythm = np.sin(Tvec/50.0)
 
-    rate_m = np.zeros((layer_size,))
-    Am = np.zeros((layer_size,))
-    dF_m = np.zeros(F.shape)
-    Cm = np.zeros(C.shape)
-    xm = np.zeros((filter_size,))
-    APsp_m = np.zeros((filter_size,))
 
-    x_vec_hat = np.zeros(x_vec_pad.shape)
+    start_time = time.time()
 
-    real_acc = np.zeros((filter_size, layer_size))
+    db1_vec = np.zeros((Tsize, output_size))
+    dW1_vec = np.zeros((Tsize, input_size, output_size))
 
-    dW_m = np.zeros(W.shape)
-    db_m = np.zeros(b.shape)
+    for ti, t in enumerate(Tvec):
+        x = x_values_sm[ti, :]
+        rhythm_val = rhythm[ti]
 
-    rhythm = np.sin(T/50.0)
+        output.update(ti, x, rhythm_val, gE=x, gI=-x)
 
-    gA_t_vec = np.zeros((Tsize,))
-    APsp_vec = np.zeros((Tsize, filter_size))
-    ap_vec = np.zeros((Tsize, layer_size))
-    apr_vec = np.zeros((Tsize, layer_size))
-    deriv_part_vec = np.zeros((Tsize, layer_size))
-    x_psp_vec = np.zeros((Tsize, filter_size))
 
-    error_acc = 0.0
-    for ti, t in enumerate(T):
-        xi = ti + filter_size
-        rv = rhythm[ti]
-        b_rv = rv/2.0 + 0.5
+        deriv_part1 = - kD * rhythm_val * output.Urate_m * act.grad(output.Um)
+
+        db1 = np.mean(deriv_part1, 0)
+        dW1 = np.mean(batch_outer(output.Psp_m, deriv_part1), 0)
         
-        x = x_vec_pad[(xi-filter_size):xi]
-        x_psp_vec[ti] = x
+        db1_vec[ti] = db1
+        dW1_vec[ti] = dW1
+        if ti == 200:
+            break        
 
-        gA_t = gA * b_rv
-        
-        gA_t_vec[ti] = gA_t
+    dW1 = np.mean(dW1_vec, 0)
+    db1 = np.mean(db1_vec, 0) 
+    opt.update(dW1, db1)
 
-        B = np.dot(x, W) + b
-        
-        x_actual = x_vec_hat[(xi-filter_size):xi]
-        
-        APsp = b_rv * x + (1.0 - b_rv) * x_actual
-        
-        APsp_vec[ti] = APsp
-
-        A = np.dot(APsp, Y)
-        
-        C += dt * (- gL * C + gB * (B - C) + gA_t * (A - C))
-
-        rate = lambda_max * act(C)
-        real = poisson(rate, dt)
-        
-        real_acc = np.concatenate([np.expand_dims(real, 0), real_acc[:-1]])
-
-        x_vec_hat[xi] = np.sum(batch_inner(real_acc.T, F))
-
-        error_acc += cost(x_vec_hat[xi], x_vec_pad[xi])
-        
-        de = cost.grad(x_vec_hat[xi], x_vec_pad[xi])        
-        dF = real_acc.T * de
-
-        # dF_m = (1.0-alpha_long) * dF_m + alpha_long * dF
-        rate_m = (1.0-alpha) * rate_m + alpha * rate
-        Am = (1.0-alpha) * Am + alpha * A
-        Cm = (1.0-alpha) * Cm + alpha * C
-        xm = (1.0-alpha) * xm + alpha * x
-        APsp_m = (1.0-alpha) * APsp_m + alpha * APsp
-
-        apical = act(Am) # -1 forward, +1 target 
-
-        ap_vec[ti] = apical
-        apr_vec[ti] = rv*apical
-
-        deriv_part = - rv * kB * apical * act.grad(Cm)
-        deriv_part_vec[ti] = deriv_part
-
-        # db_m += 0.001 * deriv_part
-        # dW_m += 0.001 * np.outer(xm, deriv_part)
-        dF_m += 0.001 * dF
-
-        real_vec[ti] = real
-        C_vec[ti] = C
-        rate_vec[ti] = rate
+    error = np.sum(np.square((x_values_sm - smooth_spikes(np.squeeze(output.spikes_hist)))))
 
 
-    # deriv_party = kB * (alpha_t - alpha_f) * act.grad(Am_f)
-    # dY = np.outer(APsp_m_f, deriv_party)
+    # output.reset()
+            
+    end_time = time.time() 
 
-    opt.update(dW_m, db_m, dF_m)
+    print "Epoch {}, ({:.2f}s), train error {:.3f}".format(
+        e, 
+        end_time-start_time, 
+        error
+    )
 
-    print "Epoch {}, error {:.3f}".format(e, error_acc/len(T))
 
-# shl(x_vec_hat[100:500], x_vec_pad[100:500], show=False)
-# shm(real_vec[:300])
+# shl(C_stat_t, figsize=(7,7), title="Target", show=False)
+# shl(C_stat_f, figsize=(7,7), title="Forward", show=False)
+# shl(C_stat_t - C_stat_f, figsize=(7,7), title="Diff")
