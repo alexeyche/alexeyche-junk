@@ -6,7 +6,7 @@ import collections
 import pylab
 
 def shm(*matrices, **kwargs):
-    plt.figure(figsize=(10,10))
+    plt.figure(figsize=kwargs.get("figsize", (10,7)))
     for m_id, matrix in enumerate(matrices):
         plt.subplot(len(matrices), 1, m_id+1)
         plt.imshow(np.squeeze(matrix).T, cmap='gray', origin='lower')
