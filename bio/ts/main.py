@@ -88,10 +88,10 @@ gA = 0.6
 kB = gB/(gL + gB + gA)
 kD = gD/(gL + gD)
 
-T0, T = 0.0, 1000.0      # ms
+T0, T = 0.0, 400.0      # ms
 dt = 1.0                # ms
 
-int_time = 10.0
+int_time = 5.0
 alpha = dt/int_time
 
 Ee = 8.0
@@ -109,18 +109,19 @@ lr0 = 20.0/(lambda_max * lambda_max)
 # act = SoftplusActivation()
 act = SigmoidActivation()
 
-input_size = 50
-output_size = 50
+input_size = 300
+output_size = 25
 x_values = np.zeros((Tsize, output_size))
 for ti in xrange(0, Tsize, 5):
     x_values[ti, ti % output_size] = 1.0
 
 
+# input_values = np.zeros((Tsize, input_size))
+# for ti in xrange(0, Tsize, 5):
+#     input_values[ti, input_size - (ti % input_size)-1] = 1.0
 
-# np.random.seed(1)
-# np.random.random((Tsize, ))
 # input_values = x_values.copy()
-input_values = poisson(0.05*np.random.random((Tsize, input_size)))
+input_values = poisson(0.02*np.random.random((Tsize, input_size)))
 
 hidden_size = 20
 
@@ -208,6 +209,7 @@ class OutputLayer(object):
         self.Ihist = np.zeros((Tsize, batch_size, layer_size))
         self.Urate_hist = np.zeros((Tsize, batch_size, layer_size))
         self.spikes_hist = np.zeros((Tsize, batch_size, layer_size))
+        self.Psp_hist = np.zeros((Tsize, batch_size, input_size))
 
         self.syn = synapse_class(batch_size, layer_size)
         
@@ -243,6 +245,8 @@ class OutputLayer(object):
         self.Urate_m =  (1.0 - alpha) * self.Urate_m + alpha * rate
         self.Psp_m = x # (1.0 - alpha) * self.Psp_m + alpha * x
         
+        self.Psp_hist[ti] = x.copy()
+
     def reset(self):
         self.U = np.zeros(self.U.shape)
         self.Psp_m = np.zeros(self.Psp_m.shape)
@@ -253,15 +257,15 @@ class OutputLayer(object):
 # hidden = HiddenLayer(batch_size, input_size, hidden_size, output_size)
 output = OutputLayer(batch_size, input_size, output_size)
 
-lrates = [2.0, 0.02]
-opt = SGDOpt([output.W, output.b], lrates)
+lrates = [500.0, 100.0]
+# opt = SGDOpt([output.W, output.b], lrates)
 
-# beta1, beta2, factor = 0.99, 0.999, 10.0
-# opt = AdamOpt(
-#     [output.W, output.b],
-#     [ factor * lr * (1.0 - beta1) * (1.0 - beta2) for lr in lrates], 
-#     beta1=beta1, beta2=beta2, eps=1e-05
-# )
+beta1, beta2, factor = 0.99, 0.999, 10.0
+opt = AdamOpt(
+    [output.W, output.b],
+    [ factor * lr * (1.0 - beta1) * (1.0 - beta2) for lr in lrates], 
+    beta1=beta1, beta2=beta2, eps=1e-05
+)
 
 
 Tvec = np.linspace(T0, T, Tsize)
@@ -276,11 +280,20 @@ spike_target = np.reshape(
     np.floor(output.Urate_hist/lambda_max + 0.5),
     (Tsize * batch_size, output_size)
 )
+baseline = False
 
-for e in xrange(50):
-    # rhythm = np.sin(Tvec/(50.0/5.0))
-    # rhythm = np.sin(Tvec/(50.0/5.0) + np.random.randn() * 100) 
-    rhythm = square_window(Tsize, 100.0)
+theta = 10.0 
+per_epoch_shift = 5
+
+st = []
+rh = []
+for e in xrange(500):
+    rhythm = np.sin(2.0 * np.pi * Tvec * theta/T + e * per_epoch_shift/(2.0*np.pi)) # ((e % lf) * (T/theta)/lf)/(2.0*np.pi))
+    
+    # rh.append(rhythm)
+    # print "Shift is {}".format((e % lf) * (T/5.0)/lf)
+    # rhythm = np.sin(Tvec/(30.0/5.0) + np.random.randn() * 100) 
+    # rhythm = square_window(Tsize + 50, 10.0)[(e % 50):((e % 50 ) + Tsize)]
     # rhythm = np.ones(Tsize)
 
     start_time = time.time()
@@ -288,21 +301,38 @@ for e in xrange(50):
     db1_vec = np.zeros((Tsize, output_size))
     dW1_vec = np.zeros((Tsize, input_size, output_size))
 
-    for ti, t in enumerate(Tvec):
-        run(output, ti, rhythm[ti], input_values_sm[ti], x_values_sm[ti], x_values_neg_sm[ti])
-        
-        deriv_part1 = - kD * rhythm[ti] * output.Urate_m * act.grad(output.Um)
+    if baseline:
+        for ti, t in enumerate(Tvec):
+            run(output, ti, -1.0, input_values_sm[ti], x_values_sm[ti], x_values_neg_sm[ti])
+        Uneg = output.Urate_hist.copy()
 
-        db1 = np.mean(deriv_part1, 0)
-        dW1 = np.mean(batch_outer(output.Psp_m, deriv_part1), 0)
+        for ti, t in enumerate(Tvec):
+            run(output, ti, 1.0, input_values_sm[ti], x_values_sm[ti], x_values_neg_sm[ti])
+        Upos = output.Urate_hist.copy()
+
+
+        db1_vec = np.squeeze(- kD * (Upos - Uneg) * act.grad(output.Uhist))   
+        dW1_vec = batch_outer(np.squeeze(output.Psp_hist), db1_vec)
+    else:
+        for ti, t in enumerate(Tvec):
+            run(output, ti, rhythm[ti], input_values_sm[ti], x_values_sm[ti], x_values_neg_sm[ti])
+            
+            deriv_part1 = - kD * rhythm[ti] * output.Urate_m * act.grad(output.Um)
+
+            db1 = np.mean(deriv_part1, 0)
+            dW1 = np.mean(batch_outer(output.Psp_m, deriv_part1), 0)
+            
+            db1_vec[ti] = db1
+            dW1_vec[ti] = dW1
         
-        opt.update(dW1, db1)
-        
-        db1_vec[ti] = db1
-        dW1_vec[ti] = dW1
+    db1 = np.mean(db1_vec, 0)
+    dW1 = np.mean(dW1_vec, 0)
     
-    # for ti, t in enumerate(Tvec):
-    #     run(output, ti, -1.0, input_values_sm[ti], 0.0, 0.0)
+    opt.update(dW1, db1)
+        
+    
+    for ti, t in enumerate(Tvec):
+        output.update(ti, input_values_sm[ti], -1.0, gE=0.0, gI=0.0)
 
     error = np.sum(np.square((np.squeeze(x_values_sm) - smooth_spikes(np.squeeze(output.spikes_hist)))))
 
@@ -317,10 +347,13 @@ for e in xrange(50):
         error,
         ll
     )
+    # st.append((db1_vec, dW1_vec))
+    output.reset()
 
+# shl(np.asarray(rh).T)
 # shl(output.Urate_hist[:200,0,0:10], figsize=(10,7), show=False)
-shm(output.spikes_hist[0:400], show=False)
-shm(output.Urate_hist[0:400])
+# shm(output.spikes_hist[0:400], show=False)
+shm(output.spikes_hist[0:400], output.Urate_hist[0:400], input_values_sm[0:400])
 
 # shm(db1_vec[:200], figsize=(10,7), show=False)
 
