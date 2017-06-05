@@ -254,23 +254,17 @@ output = OutputLayer(batch_size, hidden_size, output_size)
 
 Y_start = hidden.Y.copy()
 
-lrates = [lr0, lr0, lr0, lr1, lr1]
+lrates = [lr0, lr0, 0.0, lr1, lr1]
 
-# opt = SGDOpt(lrates)
+opt = SGDOpt([hidden.W, hidden.b, hidden.Y, output.W, output.b], lrates)
 
-beta1, beta2, factor = 0.99, 0.999, 10.0
-opt = AdamOpt(
-    [ factor * lr * (1.0 - beta1) * (1.0 - beta2) for lr in lrates], 
-    beta1=beta1, beta2=beta2, eps=1e-05
-)
+# beta1, beta2, factor = 0.99, 0.999, 10.0
+# opt = AdamOpt(
+#     [hidden.W, hidden.b, hidden.Y, output.W, output.b],
+#     [ factor * lr * (1.0 - beta1) * (1.0 - beta2) for lr in lrates], 
+#     beta1=beta1, beta2=beta2, eps=1e-05
+# )
 
-opt.init(
-    hidden.W,
-    hidden.b,
-    hidden.Y,
-    output.W,
-    output.b,
-)
 
 def step(ti, x, target=False, gE=0.0, gI=0.0):
     hidden.update(ti, x, output.syn.output, target=target)
@@ -289,7 +283,7 @@ for e in xrange(100):
         gI = 1.0 - y
 
         for ti, t in enumerate(np.linspace(T0, T, Tsize)):
-            x = x_values_sm[ti, l_id:r_id, :]            
+            x = x_values_sm[ti, l_id:r_id, :]
             step(ti, x)
             
         Cm_f = hidden.Cm.copy()
@@ -330,18 +324,12 @@ for e in xrange(100):
         deriv_party = kB * (alpha_t - alpha_f) * act.grad(Am_f)
         dY = np.mean(batch_outer(APsp_m_f, deriv_party), 0)
         
-        (
-            hidden.W, 
-            hidden.b, 
-            hidden.Y, 
-            output.W, 
-            output.b
-        ) = opt.update(
-            (hidden.W, dW0),
-            (hidden.b, db0),
-            (hidden.Y, dY),
-            (output.W, dW1),            
-            (output.b, db1),
+        opt.update(
+            dW0,
+            db0,
+            dY,
+            dW1,
+            db1,
         )
 
         ########################################

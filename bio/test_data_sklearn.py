@@ -45,7 +45,7 @@ classifiers = [
 
 # model = DecisionTreeClassifier()
 for model_name, model in zip(names, classifiers):
-    x_values, y_values = get_toy_data(seed=2)
+    x_values, y_values = get_toy_data()
 
 
     n_train = (4 * x_values.shape[0]/5)

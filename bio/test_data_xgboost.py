@@ -6,7 +6,7 @@ import xgboost as xgb
 import sys
 from datasets import get_toy_data
 
-x_values, y_values = get_toy_data(seed=2)
+x_values, y_values = get_toy_data()
 
 n_train = (4 * x_values.shape[0]/5)
 n_valid = (1 * x_values.shape[0]/5)

@@ -1,5 +1,6 @@
 import numpy as np
 from common_check import grad_check, check_matrix
+import tensorflow as tf
 
 class Activation(object):
     def __call__(self, x):
@@ -62,6 +63,9 @@ class SigmoidActivation(Activation):
     def grad(self, x):
         v = 1.0/(1.0 + np.exp(-x))
         return v * (1.0 - v)
+
+    def tf_call(self, x):
+        return tf.sigmoid(x)
 
 
 def test_act_grad(act, x, epsilon=1e-05, tol=1e-05, fail=True):
