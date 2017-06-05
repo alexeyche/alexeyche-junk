@@ -2,6 +2,9 @@
 import tensorflow as tf
 from tensorflow.contrib.rnn import RNNCell as RNNCell
 
+def batch_outer(left, right):
+    return tf.matmul(tf.expand_dims(left, 2), tf.expand_dims(right, 1))
+
 
 class DnnCell(RNNCell):
     def __init__(self, size_tuple, act, is_output_cell, c):
@@ -20,7 +23,10 @@ class DnnCell(RNNCell):
             input_size,
             state_size, 
             state_size,
-            state_size
+            state_size,
+            (input_size, state_size),
+            state_size,
+            # (feedback_size, state_size),
         ) + ((state_size, ) if not self._is_output_cell else tuple())
 
     @property
@@ -45,7 +51,7 @@ class DnnCell(RNNCell):
                 initializer=tf.zeros_initializer()
             ),
             tf.get_variable("Wfb", [feedback_size, state_size], 
-                initializer=tf.uniform_unit_scaling_initializer(factor=c.weight_init_factor)
+                initializer=tf.uniform_unit_scaling_initializer(factor=10.0*c.weight_init_factor)
             ),
         )
 
@@ -60,11 +66,10 @@ class DnnCell(RNNCell):
             
             input_feedforward, input_feedback, modulation = input
             
-            basal_state, basal_state_m, soma_state, soma_state_m, rate_m = state[:5]
+            basal_state, basal_state_m, soma_state, soma_state_m, rate_m, dW, dbias = state[:7] #, dWfb = state[:8]
             
             new_basal_state = basal_state + c.dt * (- basal_state/c.tau_syn + input_feedforward)
             
-
             ff = ((bias_ff + tf.matmul(new_basal_state, Wff)) - soma_state)/c.tau_b
             
             if self._is_output_cell:
@@ -75,12 +80,13 @@ class DnnCell(RNNCell):
             else:
                 apical = tf.matmul(input_feedback, Wfb)
                 
-                apical_m = state[5]
+                apical_m = state[-1]
                 
                 new_apical_m = (1.0 - c.alpha) * apical_m + c.alpha * apical
                 
                 fb = (apical - soma_state)/c.tau_a
-            
+
+
             new_soma_state = soma_state + c.dt * (- soma_state/c.tau_c + ff + modulation * fb)
             
             rate = c.lambda_max * self._act(new_soma_state)
@@ -97,6 +103,20 @@ class DnnCell(RNNCell):
             new_soma_state_m = (1.0 - c.alpha) * soma_state_m + c.alpha * new_soma_state
             new_rate_m = (1.0 - c.alpha) * rate_m + c.alpha * rate
 
+            bipolar_mod = 2.0 * (modulation - 0.5)
+            
+            target_rate = new_rate_m if self._is_output_cell else new_apical_m
+
+            grad = tf.gradients([rate], [new_soma_state])[0]
+
+            deriv_part = - bipolar_mod * target_rate * grad
+            
+            dbias += deriv_part
+            dW += batch_outer(new_basal_state_m, deriv_part)
+            
+            # if not self._is_output_cell:
+            #     dWfb += batch_outer(input_feedback, - bipolar_mod * new_apical_m)
+            
             return (
                 rate, 
                 spikes,
@@ -105,7 +125,10 @@ class DnnCell(RNNCell):
                 new_basal_state_m, 
                 new_soma_state, 
                 new_soma_state_m, 
-                new_rate_m
+                new_rate_m,
+                dW,
+                dbias,
+                # dWfb,
             ) + ((new_apical_m, ) if not self._is_output_cell else tuple())
 
 

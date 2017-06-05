@@ -254,7 +254,7 @@ output = OutputLayer(batch_size, hidden_size, output_size)
 
 Y_start = hidden.Y.copy()
 
-lrates = [lr0, lr0, 0.0, lr1, lr1]
+lrates = [lr0, lr0, lr0, lr1, lr1]
 
 opt = SGDOpt([hidden.W, hidden.b, hidden.Y, output.W, output.b], lrates)
 

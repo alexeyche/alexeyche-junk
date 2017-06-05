@@ -5,8 +5,8 @@ import time
 from util import shl, shm, shs
 from datasets import get_toy_data
 
-from tensorflow.python.ops import rnn
-# import tensorflow.contrib.rnn as rnn
+# from tensorflow.python.ops import rnn
+import tensorflow.contrib.rnn as rnn
 
 
 import tensorflow as tf
@@ -101,27 +101,42 @@ modulation = tf.placeholder(tf.float32, (None, num_steps, 1))
 
 state = tuple(
     tuple(
-        tf.placeholder(tf.float32, (None, size)) 
+        tf.placeholder(tf.float32, (None,) + (size if type(size) is tuple else (size,)))
         for size in cell.state_size
     ) 
     for cell in net.cells
 ) + (tf.placeholder(tf.float32, (None, output_size)),)
 
 
+# out, finstate = rnn.dynamic_rnn(net, (x, y, modulation), initial_state=state, dtype=tf.float32)
 
-# x_list = tf.unstack(x, num_steps, 1)
-# y_list = tf.unstack(y, num_steps, 1)
 
-# modulation_list = tf.unstack(modulation, num_steps, 1)
+x_list = tf.unstack(x, num_steps, 1)
+y_list = tf.unstack(y, num_steps, 1)
 
-out, finstate = rnn.dynamic_rnn(net, (x, y, modulation), initial_state=state, dtype=tf.float32)
+modulation_list = tf.unstack(modulation, num_steps, 1)
 
-# x_list = tf.unstack(x, num_steps, 1)
-# y_list = tf.unstack(y, num_steps, 1)
+out, finstate = rnn.static_rnn(net, zip(x_list, y_list, modulation_list), initial_state=state, dtype=tf.float32)
 
-# modulation_list = tf.unstack(modulation, num_steps, 1)
 
-# out, finstate = rnn.static_rnn(net, zip(x_list, y_list, modulation_list), initial_state=state, dtype=tf.float32)
+optimizer = tf.train.AdamOptimizer(0.01)
+# optimizer = tf.train.GradientDescentOptimizer(10.0)
+
+grads_and_vars = []
+for li, s in enumerate(finstate[:-1]):
+    grads_and_vars += [
+        (tf.reduce_mean(s[5], 0)/num_steps, net.cells[li]._params[0]),
+        (tf.reduce_mean(s[6], 0)/num_steps, net.cells[li]._params[1]),
+    ]
+
+    # if li < len(net.cells)-1:
+    #     grads_and_vars.append(
+    #         (tf.reduce_mean(s[7], 0)/num_steps, net.cells[li]._params[2]),
+    #     )
+    
+
+apply_grads_step = optimizer.apply_gradients(grads_and_vars)
+
 
 
 init = tf.global_variables_initializer()
@@ -130,7 +145,7 @@ init = tf.global_variables_initializer()
 
 
 get_zero_state = lambda: tuple(
-    np.zeros((batch_size, t.get_shape().as_list()[1])) 
+    np.zeros((batch_size,) + tuple(t.get_shape().as_list()[1:])) 
     for tup in state[:-1] for t in tup
 ) + (
     np.zeros((batch_size, output_size)),
@@ -143,79 +158,44 @@ input_values = poisson_samples(x_values, num_steps, c.lambda_max, c.dt)
 sess = tf.Session()
 sess.run(init)
 
-def run(mod, l_id, r_id):
+def run(mod, l_id, r_id, state_value=None, apply_grads=True):
+    if state_value is None:
+        state_value = get_zero_state() 
     y_v = np.tile(y_hot[l_id:r_id], num_steps).reshape(batch_size, num_steps, output_size)
 
-    out_v, state_v = sess.run(
-        (out, finstate), 
+    outs = sess.run(
+        (out, finstate) + ((apply_grads_step,) if apply_grads else tuple()), 
     {
         x: input_values[l_id:r_id],
         y: y_v,
         modulation: mod * np.ones((batch_size, num_steps, 1)),
-        state: get_zero_state()
+        state: state_value
     })
 
-    return out_v, state_v[:-1]
+    return outs[0], outs[1]
 
 for e in xrange(100):
     start_time = time.time()
     
     train_log_loss, train_error_rate, test_log_loss, test_error_rate = 0.0, 0.0, 0.0, 0.0
 
-    updates = []
-        
     for b_id in xrange(n_train_batches):
         l_id, r_id = (b_id*batch_size), ((b_id+1)*batch_size)
         
-        
         out_f, sf = run(0.0, l_id, r_id)
-        out_t, st = run(1.0, l_id, r_id)
-        
-        for sf_i, st_i, cell in zip(sf[:-1], st[:-1], net.cells[:-1]):
-            Wff, bias_ff, Wfb = cell.params
-
-            basal_state_f, basal_state_m_f, soma_state_f, soma_state_m_f, rate_m_f, apical_m_f = sf_i
-            basal_state_t, basal_state_m_t, soma_state_t, soma_state_m_t, rate_m_t, apical_m_t = st_i
-
-            alpha_f = act(apical_m_f)
-            alpha_t = act(apical_m_t)
-
-            deriv_part = - (alpha_t - alpha_f) * act.grad(soma_state_m_f)
-            d_bias_ff = np.mean(deriv_part, 0)
-            d_Wff = np.mean(batch_outer(basal_state_m_f, deriv_part), 0)
-        
-            updates += [
-                (Wff, 10.0 * d_Wff),
-                (bias_ff, 10.0 * d_bias_ff),
-            ]
+        out_t, st = run(1.0, l_id, r_id, state_value=sf)
             
-            
-        Wff, bias_ff, _ = net.cells[-1].params
-
-        basal_state_o_f, basal_state_m_o_f, soma_state_o_f, soma_state_m_o_f, rate_m_o_f = sf[-1]
-        basal_state_o_t, basal_state_m_o_t, soma_state_o_t, soma_state_m_o_t, rate_m_o_t = st[-1]
-
-        deriv_part = - (rate_m_o_t - rate_m_o_f) * act.grad(soma_state_m_o_f)
-        d_bias_ff = np.mean(deriv_part, 0)
-        d_Wff = np.mean(batch_outer(basal_state_m_o_f, deriv_part), 0)
-
-        updates += [
-            (Wff, 0.1 * d_Wff),
-            (bias_ff, 0.1 * d_bias_ff),
-        ]
-        
+        rate_m_o_f = sf[-2][4]
         
         train_log_loss += log_loss(y_hot[l_id:r_id], rate_m_o_f/c.lambda_max)
         train_error_rate += np.mean(np.argmax(rate_m_o_f, 1) != y_values[l_id:r_id])
 
-    sess.run(tuple(tf.assign_sub(ref, sub) for ref, sub in updates))
-
     for b_id in xrange(n_train_batches, n_train_batches+n_test_batches):
         l_id, r_id = (b_id*batch_size), ((b_id+1)*batch_size)
         
-        out_v, state_v = run(0.0, l_id, r_id)
+        out_v, state_v = run(0.0, l_id, r_id, apply_grads=False)
 
-        rate_m_o = state_v[-1][-1]
+        rate_m_o = state_v[-2][4]
 
         test_log_loss += log_loss(y_hot[l_id:r_id], rate_m_o/c.lambda_max)
         test_error_rate += np.mean(np.argmax(rate_m_o, 1) != y_values[l_id:r_id])
@@ -233,7 +213,7 @@ for e in xrange(100):
     )
 
 
-l0, l1 = out_f
+# l0, l1 = out_f
 
-rate0, spike0 = l0
-rate1, spike1 = l1
+# rate0, spike0 = l0
+# rate1, spike1 = l1
