@@ -35,7 +35,7 @@ Tvec = np.linspace(T0, T, num_steps)
 c = Config()
 
 c.batch_size = batch_size
-c.lambda_max = 200.0/1000.0      # 1/ms
+c.lambda_max = 500.0/1000.0      # 1/ms
 
 c.weight_init_factor = 0.1
 c.dt = dt
@@ -60,26 +60,26 @@ np.random.seed(10)
 
 ### data
 
-input_size = 100
+input_size = 300
 hidden_size = 50
-output_size = 1
+output_size = 20
 
 
 input_values = np.zeros((num_steps, input_size))
 x_values = np.zeros((num_steps, output_size))
 
 
-# input_values = poisson(0.02*np.random.random((num_steps, input_size)), c.dt)
-
-for ti in xrange(0, num_steps, 5):
-    input_values[ti, input_size - (ti % input_size)-1] = 1.0
-
-
-
-x_values[num_steps/2,0] = 1.0
+input_values = poisson(0.02*np.random.random((num_steps, input_size)), c.dt)
 
 # for ti in xrange(0, num_steps, 5):
-#     x_values[ti, ti % output_size] = 1.0
+#     input_values[ti, input_size - (ti % input_size)-1] = 1.0
+
+
+
+# x_values[num_steps/2,0] = 1.0
+
+for ti in xrange(0, num_steps, 5):
+    x_values[ti, ti % output_size] = 1.0
 
 
 
@@ -156,9 +156,7 @@ input_values_b = np.expand_dims(input_values, 0)
 x_values_sm = np.asarray([smooth(x_values[:,ni]) for ni in xrange(output_size)]).T
 x_values_sm_b = np.expand_dims(x_values_sm, 0)
 
-
-dw_grads, db_grads = [], []
-for e in xrange(200):
+for e in xrange(500):
     rhythm = np.sin(2.0 * np.pi * Tvec * c.theta/T + e * c.per_epoch_shift/(2.0*np.pi))
     rhythm = (rhythm + 1.0)/2.0
 
@@ -189,9 +187,6 @@ for e in xrange(200):
     duration = time.time() - start_time
 
     error = np.sum(np.square(out_v_test[-1][0]/c.lambda_max - x_values_sm_b))
-
-    dw_grads.append(state_v[0][5])
-    db_grads.append(state_v[0][6])
 
     print "Epoch {} ({:.2f}s), train error {:.3f}".format(
         e, 

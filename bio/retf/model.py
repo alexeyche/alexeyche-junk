@@ -6,10 +6,17 @@ def batch_outer(left, right):
     return tf.matmul(tf.expand_dims(left, 2), tf.expand_dims(right, 1))
 
 
+def sigmoid_deriv(x):
+    s = tf.sigmoid(x)
+    return s * (1.0 - s)
+
 class DnnCell(RNNCell):
-    def __init__(self, size_tuple, act, is_output_cell, c):
+    def __init__(self, size_tuple, is_output_cell, c):
         self._size_tuple = size_tuple
-        self._act = act
+        
+        self._act = tf.sigmoid
+        self._act_deriv = sigmoid_deriv
+
         self._is_output_cell = is_output_cell
         self._c = c
 
@@ -105,14 +112,15 @@ class DnnCell(RNNCell):
 
             bipolar_mod = 2.0 * (modulation - 0.5)
             
+
             target_rate = new_rate_m if self._is_output_cell else new_apical_m
 
             grad = tf.gradients([rate], [new_soma_state])[0]
 
-            deriv_part = - bipolar_mod * target_rate * grad
+            deriv_part = - bipolar_mod * target_rate * self._act_deriv(new_rate_m)
             
             dbias += deriv_part
-            dW += batch_outer(new_basal_state_m, deriv_part)
+            dW += batch_outer(new_basal_state, deriv_part)
             
             # if not self._is_output_cell:
             #     dWfb += batch_outer(input_feedback, - bipolar_mod * new_apical_m)
