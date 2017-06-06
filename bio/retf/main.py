@@ -26,9 +26,6 @@ def one_hot(y, y_size):
     y_oh[np.arange(y.shape[0]), y] = 1.0
     return y_oh
 
-def batch_outer(left, right):
-    return np.asarray([np.outer(left[i], right[i]) for i in xrange(left.shape[0])])
-
 
 def poisson_samples(x_values, Tsize, lambda_max, dt):
     n_samples = x_values.shape[0]
@@ -101,7 +98,7 @@ modulation = tf.placeholder(tf.float32, (None, num_steps, 1))
 
 state = tuple(
     tuple(
-        tf.placeholder(tf.float32, (None,) + (size if type(size) is tuple else (size,)))
+        tf.placeholder(tf.float32, (None,) + (size if isinstance(size, tuple) else (size,)))
         for size in cell.state_size
     ) 
     for cell in net.cells
