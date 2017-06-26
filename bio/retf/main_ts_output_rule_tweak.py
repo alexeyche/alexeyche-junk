@@ -20,7 +20,24 @@ def smooth(signal, sigma=0.005, filter_size=50):
     lf_filter = np.exp(-np.square(0.5-np.linspace(0.0, 1.0, filter_size))/sigma)
     return np.convolve(lf_filter, signal, mode="same")
 
+def square_window(Tsize, w):
+    rhythm = np.zeros(Tsize)
+    sign = 1.0
+    for ti in xrange(Tsize):
+        if ti % w == 0 and ti > 0:
+            if sign == 1.0:
+                sign = 0.0
+            else:
+                sign = 1.0
+        rhythm[ti] = sign
+    return rhythm
 
+def act_grad(x):
+    v = 1.0/(1.0 + np.exp(-x))
+    return v * (1.0 - v)
+
+def batch_outer(left, right):
+    return np.asarray([np.outer(left[i], right[i]) for i in xrange(left.shape[0])])
 
 batch_size = 1
 
@@ -51,7 +68,7 @@ c.lrate = 0.01
 
 ## ts related
 
-c.theta = 5.0 
+c.theta = 0.001
 c.per_epoch_shift = 3
 
 
@@ -156,45 +173,83 @@ input_values_b = np.expand_dims(input_values, 0)
 x_values_sm = np.asarray([smooth(x_values[:,ni]) for ni in xrange(output_size)]).T
 x_values_sm_b = np.expand_dims(x_values_sm, 0)
 
-
-dw_grads, db_grads = [], []
-for e in xrange(200):
-    rhythm = np.sin(2.0 * np.pi * Tvec * c.theta/T + e * c.per_epoch_shift/(2.0*np.pi))
-    rhythm = (rhythm + 1.0)/2.0
-
-    rhythm_b = np.expand_dims(np.expand_dims(rhythm, 0), 2)
+for i in xrange(1):
+    dw_grads, db_grads, r = [], [], []
     
-    start_time = time.time()
-
-    
-    out_v, state_v, _ = sess.run(
-        (out, finstate, apply_grads_step,),
+    out_v_t, state_v_t = sess.run(
+        (out, finstate),
     {
         x: input_values_b,
         y: x_values_sm_b,
-        modulation: rhythm_b,
+        modulation: np.ones((batch_size, num_steps,1)),
         state: get_zero_state() 
     })
 
-
-    out_v_test, state_v_test = sess.run(
-        (out, finstate,),
+    out_v_f, state_v_f = sess.run(
+        (out, finstate),
     {
         x: input_values_b,
         y: x_values_sm_b,
-        modulation: np.zeros((batch_size, num_steps, 1)),
+        modulation: np.zeros((batch_size, num_steps,1)),
         state: get_zero_state() 
     })
 
-    duration = time.time() - start_time
+    dbias_bl = np.squeeze(-(out_v_t[-1][0] - out_v_f[-1][0]))
+    
+    dw_bl = np.mean(np.squeeze(batch_outer(np.squeeze(out_v_t[-1][2]), dbias_bl)), 0)
 
-    error = np.sum(np.square(out_v_test[-1][0]/c.lambda_max - x_values_sm_b))
+    for e in xrange(50):
+        # rhythm = np.sin(2.0 * np.pi * Tvec * c.theta/T + e * c.per_epoch_shift/(2.0*np.pi))
+        # rhythm = (rhythm + 1.0)/2.0
+        rhythm = square_window(num_steps + 50, 5)[(e % 50):((e % 50 ) + num_steps)]    
 
-    dw_grads.append(state_v[0][5])
-    db_grads.append(state_v[0][6])
+        rhythm_b = np.expand_dims(np.expand_dims(rhythm, 0), 2)
+        
+        start_time = time.time()
+
+
+        
+        out_v, state_v = sess.run(
+            (out, finstate),
+        {
+            x: input_values_b,
+            y: x_values_sm_b,
+            modulation: rhythm_b,
+            state: get_zero_state() 
+        })
+
+
+        out_v_test, state_v_test = sess.run(
+            (out, finstate,),
+        {
+            x: input_values_b,
+            y: x_values_sm_b,
+            modulation: np.zeros((batch_size, num_steps, 1)),
+            state: get_zero_state() 
+        })
+
+        duration = time.time() - start_time
+
+        error = np.sum(np.square(out_v_test[-1][0]/c.lambda_max - x_values_sm_b))
+
+        dw_grads.append(state_v[0][5])
+        db_grads.append(state_v[0][6])
+        r.append(rhythm)
 
     print "Epoch {} ({:.2f}s), train error {:.3f}".format(
-        e, 
+        i, 
         duration, 
         error
     )
+
+    r = np.asarray(r)
+    dw_grads = np.asarray(dw_grads)
+    db_grads = np.asarray(db_grads)
+    dw_grads_m = np.mean(dw_grads, 0)
+    
+    # dw_grads_m = 2.0*dw_bl
+    # db_grads = 2.0*dbias_bl
+    
+    sess.run(tf.assign_sub(net.cells[-1].params[0], 10.0*dw_grads_m.reshape(input_size, output_size)))
+    sess.run(tf.assign_sub(net.cells[-1].params[1], 10.0*np.mean(db_grads).reshape(1)))
+

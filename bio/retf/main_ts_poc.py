@@ -76,11 +76,11 @@ input_values = poisson(0.02*np.random.random((num_steps, input_size)), c.dt)
 
 
 
-# x_values[num_steps/2,0] = 1.0
 
 for ti in xrange(0, num_steps, 5):
     x_values[ti, ti % output_size] = 1.0
 
+# x_values[num_steps/2,0] = 1.0
 
 
 

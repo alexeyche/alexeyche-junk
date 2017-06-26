@@ -86,8 +86,8 @@ tf.set_random_seed(10)
 act = SigmoidActivation()
 
 net = DnnNet(
-    DnnCell((input_size, state_size, output_size), act=act.tf_call, is_output_cell=False, c=c),
-    DnnCell((state_size, output_size, output_size), act=act.tf_call, is_output_cell=True, c=c),
+    DnnCell((input_size, state_size, output_size), is_output_cell=False, c=c),
+    DnnCell((state_size, output_size, output_size), is_output_cell=True, c=c),
 )
 
 
@@ -116,7 +116,7 @@ modulation_list = tf.unstack(modulation, num_steps, 1)
 out, finstate = rnn.static_rnn(net, zip(x_list, y_list, modulation_list), initial_state=state, dtype=tf.float32)
 
 
-optimizer = tf.train.AdamOptimizer(0.01)
+optimizer = tf.train.AdamOptimizer(0.005)
 # optimizer = tf.train.GradientDescentOptimizer(10.0)
 
 grads_and_vars = []
