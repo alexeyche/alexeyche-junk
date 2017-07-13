@@ -42,6 +42,7 @@ def norm(f):
 class Learning(object):
     BP = 0
     FA = 1
-    OJA = 2
-    OJA_FEED = 3
+    HEBB = 2
+    OJA = 3
+    OJA_FEED = 4
 
