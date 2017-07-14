@@ -25,7 +25,7 @@ class Sigmoid(Act):
         v = self(x)
         return v * (1.0 - v)
 
-def get_oja_deriv(x, y, W, dy):
+def oja_rule(x, y, W, dy):
     assert W.shape[0] == len(x), "x, {} != {}".format(W.shape[0], len(x))
     assert W.shape[1] == len(y), "y, {} != {}".format(W.shape[1], len(y))
 

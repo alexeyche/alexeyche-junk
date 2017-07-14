@@ -1,7 +1,7 @@
 
 
 import numpy as np
-from fb_common import Sigmoid, Linear, get_oja_deriv, norm, Learning
+from fb_common import Sigmoid, Linear, oja_rule, norm, Learning
 from util import shl, shm, shs
 
 def smooth(signal, sigma=0.01, filter_size=50):
@@ -12,18 +12,10 @@ np.random.seed(5)
 
 act = Linear()
 
-
 in_size = 3
 hidden_size0 = 1
 fb_size0 = 1
 out_size = 1
-
-
-tau_mem = 1.0
-dt = 1.0
-
-# lrate = 1e-01  # BP, FA
-lrate = 1e-02
 
 
 T = 100
@@ -58,8 +50,11 @@ FB0 = -0.1 + 0.2*np.random.randn(fb_size0, hidden_size0)
 
 stats_ep = []
 
-lrule = Learning.BP
-epochs = 1
+lrate = 1e-01  # BP, FA
+# lrate = 5e-02
+
+lrule = Learning.HEBB
+epochs = 300
 
 for epoch in xrange(epochs):
 	records = []
@@ -72,16 +67,16 @@ for epoch in xrange(epochs):
 		fb0 = fb0_s[ti, :]
 		y_t = y_t_s[ti, :]
 
-		U0 += dt * ( - U0/tau_mem  + np.dot(x, W0) + np.dot(fb0, FB0))
+		U0 = np.dot(x, W0) + np.dot(fb0, FB0)
 		a0 = act(U0)
 		
-		U1 += dt * ( - U1/tau_mem  + np.dot(a0, W1))
+		U1 = np.dot(a0, W1)
 		y = act(U1)
 
 		e = y - y_t
 		error = 0.5 * np.inner(e, e)
 
-		F0 += dt * ( - F0/tau_mem + np.dot(e, B0))
+		F0 = np.dot(e, B0)
 		
 		fb0_s[min(ti+1, fb0_s.shape[0]-1), :] = F0.copy()
 
@@ -96,9 +91,10 @@ for epoch in xrange(epochs):
 
 			dW0 = - np.outer(x, dh0)
 			dW1 = - np.outer(a0, e)
+		
 		elif lrule == Learning.HEBB:
-			dW0 = corr0.T.copy()
-			dW1 = corr1.T.copy()
+			dW0 = oja_rule(x, U0, W0, act.deriv(a0))
+			dW1 = - np.outer(a0, e)
 
 		else:
 			raise NotImplementedError
@@ -137,7 +133,8 @@ for epoch in xrange(epochs):
 	stats_ep.append((
 		corr0s, corr1s
 	))
-	if epoch % 5 == 0 or epoch == epochs-1:
+	
+	if epoch % 25 == 0 or epoch == epochs-1:
 		print "{}, Epoch {}, error {}".format(lrule, epoch, np.mean(error_s))
 
 corr0ss = np.concatenate([r[0] for r in stats_ep])
