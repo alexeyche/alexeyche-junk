@@ -31,13 +31,10 @@ def oja_rule(x, y, W, dy):
 
     dW = np.zeros(W.shape)
     for ni in xrange(len(y)):
+        # dW[:, ni] = y[ni] * x
         dW[:, ni] = y[ni] * (x - y[ni] * W[:, ni]) * dy[ni]
     return dW
 
-def norm(f):
-    # return np.asarray([ f[ri, :] * n for ri, n in enumerate(np.sqrt(np.sum(f ** 2, 1))) ])
-    return np.asarray([ f[:, ci] / n for ci, n in enumerate(np.sqrt(np.sum(f ** 2, 0)+1e-07)) ]).T
-    # return f
 
 class Learning(object):
     BP = 0
@@ -45,4 +42,10 @@ class Learning(object):
     HEBB = 2
     OJA = 3
     OJA_FEED = 4
+
+
+def norm(f):
+    return np.asarray([ f[ri, :] * n for ri, n in enumerate(np.sqrt(np.sum(f ** 2, 1)+1e-07)) ])
+    # return np.asarray([ f[:, ci] / n for ci, n in enumerate(np.sqrt(np.sum(f ** 2, 0)+1e-07)) ]).T
+    # return f
 
