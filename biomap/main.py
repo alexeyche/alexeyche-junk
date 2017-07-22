@@ -31,7 +31,7 @@ for i in xrange(dw.shape[0]):
 vv = x - np.dot(y, w.T)
 dw2 = np.dot(y.T, vv).T
 
-# dw2 = np.asarray([y[n] * v[:, n] for n in xrange(v.shape[1])]).T
+dw2 = np.asarray([y[n] * v[:, n] for n in xrange(v.shape[1])]).T
 	
 
 
@@ -54,7 +54,6 @@ dw2 = np.dot(y.T, vv).T
 # 		dws.append(dw - np.mean(dw))
 # 	return dws
 
-# dog_init = lambda shape, dtype, partition_info: build_dog(shape[0], shape[1], amp_neg=0.0)
 
 # input_size = 10
 # layer_size = 10
