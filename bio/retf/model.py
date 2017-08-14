@@ -55,7 +55,7 @@ class DnnCell(RNNCell):
         return self._params
     
 
-    def _init_parameters(self, input_size, state_size, feedback_size):        
+    def _init_parameters(self, input_size, state_size, feedback_size):
         c = self._c
         
         return (
