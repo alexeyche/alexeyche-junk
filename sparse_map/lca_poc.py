@@ -63,15 +63,12 @@ class LCACell(RNNCell):
             F = self._params[0]
             
             Fc = tf.matmul(tf.transpose(F), F) - tf.eye(self._layer_size)
-            
-            #### logic
-            
+
             x_flat = tf.reshape(x, (batch_size, filter_len * input_size))
             
-            drive = tf.matmul(x_flat, F)
-            feedback = tf.matmul(a, Fc)
-            
-            du = - u + drive - feedback
+            #### logic
+                        
+            du = - u + tf.matmul(x_flat, F) - tf.matmul(a, Fc)
             new_u = u + c.epsilon * du / c.tau
             new_a = tf.nn.relu(new_u - c.lam)
             
@@ -217,6 +214,10 @@ x_v = np.asarray([
     1.0*np.sin(T/10.0),
     1.0*np.sin(20+T/10.0),
 ]).T.reshape(Tsize, batch_size, 1)
+
+# for ti in xrange(filter_len, x_v.shape[0]):
+#     x_v_part = x_v[(ti-filter_len):ti].copy()
+#     x_v[(ti-filter_len):ti] = x_v_part/np.sqrt(np.sum(np.square(x_v_part), 0) + 1e-08)
 
 for e in xrange(epochs):
     state_v = get_zero_state()
