@@ -83,7 +83,9 @@ lam = 1.0
 act = sigmoid
 batch_size = 1
 
-F = np.random.randn(filter_size, layer_size)
+# F = np.random.randn(filter_size, layer_size)
+# F = norm(F)
+F = 1.0 * (np.random.uniform(size=(filter_size, layer_size)) - 0.5)
 F = norm(F)
 
 u = np.zeros((batch_size, layer_size,))
@@ -100,11 +102,10 @@ Sd = lambda x: 2.0 * x / (np.square(x) + 1)
 fb_vec = np.zeros((Tsize, batch_size, layer_size))
 
 
-for e in xrange(100):
+for e in xrange(4):
     x_hat_vec = np.zeros((Tsize+filter_size, batch_size,))
 
     Fc = np.dot(F.T, F) - np.eye(layer_size)
-    np.fill_diagonal(Fc, 0.0)
 
     dF = np.zeros(F.shape)
     for ti, t in enumerate(T):
@@ -132,11 +133,11 @@ for e in xrange(100):
 
         u_vec[ti] = u.copy()
         a_vec[ti] = a.copy()
-        x_hat_vec[(xi-filter_size):xi] += np.dot(F, a.T)/filter_size #np.sum(batch_inner(F.T, np.squeeze(a_acc, 1).T), 0)/tau
+        x_hat_vec[(xi-filter_size):xi] += np.dot(F, a.T)/tau
         fb_vec[ti] = np.dot(a, Fc)
 
     # shm(dF)    
-    F += 0.05 * dF
+    F += 0.1 * dF
     # F = norm(F)
     print "Epoch {}, MSE {}".format(e, np.mean(np.square(x_hat_vec[50:-50] - x_vec_pad[50:-100])))
 

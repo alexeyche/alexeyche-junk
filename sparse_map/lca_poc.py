@@ -46,7 +46,7 @@ class LCACell(RNNCell):
     def _init_parameters(self):
         return (
             tf.get_variable("F", [self._filter_len * self._input_size, self._layer_size], 
-                initializer=tf.uniform_unit_scaling_initializer(factor=c.weight_init_factor)
+                initializer=tf.random_uniform_initializer(-0.5, 0.5) #tf.uniform_unit_scaling_initializer(factor=c.weight_init_factor)
             ),
         )
 
@@ -109,31 +109,30 @@ def normalize_weights(net):
             ops.append(tf.assign(F, tf.nn.l2_normalize(F, 0)))
         else:
             ops.append(tf.identity(F))
+            # ops.append(tf.assign(F, tf.nn.l2_normalize(F, 0)))
     return tf.group(*ops)
 
 
 lrate = 0.1
-epochs = 100
+epochs = 50
 
-tf.set_random_seed(1)
-np.random.seed(1)
+tf.set_random_seed(3)
+np.random.seed(3)
 
 input_size = 1
-seq_size = 250
+seq_size = 350
 batch_size = 2
 layer_size = 25
 filter_len = 50
 
 dt = 1.0
-T0, Tmax = 0.0, seq_size * dt
-Tsize = int(Tmax/dt)
 
 c = Config()
-c.lam = 1.0
+c.lam = 0.2
 c.weight_init_factor = 1.0
 c.epsilon = 1.0
 c.tau = 5.0
-c.grad_accum_rate = 1.0/Tmax
+c.grad_accum_rate = 1.0/seq_size
 c.simple_hebb = True
 
 
@@ -205,25 +204,32 @@ else:
 env.clear_pics(env.run())
 
 
-T = np.linspace(T0, Tmax, Tsize)
+T = np.linspace(filter_len*dt, seq_size*dt - 2*filter_len, int((seq_size-2*filter_len)/dt))
 # x_v = np.asarray([
 #     1.0*np.sin(T/10.0),
 # ]).T.reshape(Tsize, batch_size, 1)
 
+
+x_v = np.pad(np.sin(T/10.0), (filter_len, filter_len), 'constant')
+x_v2 = np.pad(np.sin(T/10.0 + 10.0), (filter_len, filter_len), 'constant')
+
 x_v = np.asarray([
-    1.0*np.sin(T/10.0),
-    1.0*np.sin(20+T/10.0),
-]).T.reshape(Tsize, batch_size, 1)
+    x_v, x_v2
+]).T.reshape(x_v.shape[0], batch_size, 1)
 
-# for ti in xrange(filter_len, x_v.shape[0]):
-#     x_v_part = x_v[(ti-filter_len):ti].copy()
-#     x_v[(ti-filter_len):ti] = x_v_part/np.sqrt(np.sum(np.square(x_v_part), 0) + 1e-08)
 
-for e in xrange(epochs):
+l2_norm = lambda x: np.sqrt(np.sum(np.square(x), 0))
+x_v_n = np.asarray([l2_norm(x_v[(ti-filter_len):ti]) for ti in xrange(filter_len, x_v.shape[0])])
+x_v[filter_len:-filter_len] = x_v[filter_len:-filter_len]/x_v_n[(filter_len/2):-(filter_len/2)]
+
+
+sess.run(tf.assign(net._cells[0].F_flat, tf.nn.l2_normalize(net._cells[0].F_flat, 0)))
+
+for e in xrange(500):
     state_v = get_zero_state()
-
-    u_v, a_v, x_hat_v, finstate_v, _, F_v = sess.run(
-        (u, a, x_hat, finstate, apply_grads_step, net._cells[0].F_flat), 
+    
+    u_v, a_v, x_hat_v, finstate_v, F_v, _ = sess.run(
+        (u, a, x_hat, finstate, net._cells[0].F_flat, apply_grads_step), 
         {
             input: x_v,
             state: state_v,
@@ -234,10 +240,13 @@ for e in xrange(epochs):
     x_hat_f_v = np.zeros((seq_size, batch_size, input_size))
     for ti in xrange(x_hat_v.shape[0]):
         left_ti = max(0, ti-filter_len)
-        x_hat_f_v[left_ti:ti] += np.transpose(x_hat_v[ti,:, :(ti-left_ti), :], (1, 0, 2))/filter_len
+        x_hat_f_v[left_ti:ti] += np.transpose(x_hat_v[ti,:, :(ti-left_ti), :], (1, 0, 2))/(filter_len/1.5)
 
-
+    # x_hat_f_v = x_hat_f_v/35.0
     print "Epoch {}, MSE {}".format(e, np.mean(np.square(x_hat_f_v[filter_len:-filter_len] - x_v[filter_len:-filter_len])))
 
-shl(x_v[filter_len:-filter_len,0], x_hat_f_v[filter_len:-filter_len,0], show=False)
-shm(a_v[:,0,:])
+shl(x_hat_f_v, x_v, show=False)
+shm(a_v[:,0,:], a_v[:,1,:])
+
+# import cPickle
+# cPickle.dump(sess.run(net._cells[0].F_flat), open("/Users/aleksei/tmp/F.pickle", "w"))
