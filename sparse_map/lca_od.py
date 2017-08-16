@@ -12,28 +12,45 @@ from env import Env
 from model import LCACell, normalize_weights
 from tensorflow.contrib.rnn import MultiRNNCell
 
-def norm(w):
-    return np.asarray([w[:,i]/np.sqrt(np.sum(np.square(w[:,i]))) for i in xrange(w.shape[1])]).T
+import scipy.io
 
+import numpy as np
 
+def svd_whiten(X):
 
+    U, s, Vt = np.linalg.svd(X, full_matrices=False)
 
-lrate = 0.1
+    # U and Vt are the singular matrices, and s contains the singular values.
+    # Since the rows of both U and Vt are orthonormal vectors, then U * Vt
+    # will be white
+    X_white = np.dot(U, Vt)
+
+    return X_white
+
+ds = scipy.io.loadmat("{}/datasets/outlier_detection/thyroid.mat".format(os.environ["HOME"]))
+
+X = ds["X"]
+y = ds["y"]
+
+assert X.shape[0] % 4 == 0
+
+lrate = 0.001
 epochs = 50
 
 tf.set_random_seed(3)
 np.random.seed(3)
 
-input_size = 1
-seq_size = 350
-batch_size = 2
-layer_size = 25
-filter_len = 50
+input_size = X.shape[1]
+data_size = X.shape[0]
+batch_size = 1
+seq_size = data_size/batch_size
+layer_size = 100
+filter_len = 100
 
 dt = 1.0
 
 c = Config()
-c.lam = 0.2
+c.lam = 0.01
 c.weight_init_factor = 1.0
 c.epsilon = 1.0
 c.tau = 5.0
@@ -94,7 +111,7 @@ apply_grads_step = tf.group(
 sess = tf.Session()
 saver = tf.train.Saver()
 
-env = Env("lca_poc")
+env = Env("lca_od")
 
 
 model_fname = env.run("model.ckpt")
@@ -109,45 +126,46 @@ else:
 env.clear_pics(env.run())
 
 
-T = np.linspace(filter_len*dt, seq_size*dt - 2*filter_len, int((seq_size-2*filter_len)/dt))
-# x_v = np.asarray([
-#     1.0*np.sin(T/10.0),
-# ]).T.reshape(Tsize, batch_size, 1)
+l2_norm = lambda x: np.sqrt(np.maximum(np.sum(np.square(x)), 1e-10))
+
+X = (X - np.mean(X, 0))/np.std(X,0)
+X = svd_whiten(X)
+
+# for ti in xrange(0, data_size):
+#     X[max(ti-filter_len, 0):ti] = X[max(ti-filter_len, 0):ti]/l2_norm(X[max(ti-filter_len, 0):ti])
 
 
-d0 = np.pad(np.sin(T/10.0), (filter_len, filter_len), 'constant')
-d1 = np.pad(np.sin(T/10.0 + 10.0), (filter_len, filter_len), 'constant')
-
-x_v = np.asarray([d0, d1]).T.reshape(d0.shape[0], batch_size, 1)
-
-# x_v = x_v/np.sqrt(np.mean(np.square(x_v), 0))
-
-l2_norm = lambda x: np.sqrt(np.sum(np.square(x), 0))
-x_v_n = np.asarray([l2_norm(x_v[(ti-filter_len):ti]) for ti in xrange(filter_len, x_v.shape[0])])
-x_v[filter_len:-filter_len] = x_v[filter_len:-filter_len]/x_v_n[(filter_len/2):-(filter_len/2)]
+# X_norm = np.asarray([l2_norm(X[(ti-filter_len):ti]) for ti in xrange(filter_len, X.shape[0])])
+# X[filter_len:-filter_len] = X[filter_len:-filter_len]/X_norm[(filter_len/2):-(filter_len/2)]
 
 
-sess.run(tf.assign(net._cells[0].F_flat, tf.nn.l2_normalize(net._cells[0].F_flat, 0)))
+F_v0 = sess.run(tf.assign(net._cells[0].F_flat, tf.nn.l2_normalize(net._cells[0].F_flat, 0)))
 
-for e in xrange(100):
+
+X = X.reshape((data_size, 1, input_size))
+
+for e in xrange(500):
     state_v = get_zero_state()
-    
-    u_v, a_v, x_hat_v, finstate_v, F_v, _ = sess.run(
+
+    u_v, a_v, X_hat_raw, finstate_v, F_v, _ = sess.run(
         (u, a, x_hat, finstate, net._cells[0].F_flat, apply_grads_step), 
         {
-            input: x_v,
+            input: X,
             state: state_v,
             sequence_length: np.asarray([seq_size]*batch_size)
         }
     )
     
-    x_hat_f_v = np.zeros((seq_size, batch_size, input_size))
-    for ti in xrange(x_hat_v.shape[0]):
+    X_hat = np.zeros((seq_size, batch_size, input_size))
+    for ti in xrange(X_hat_raw.shape[0]):
         left_ti = max(0, ti-filter_len)
-        x_hat_f_v[left_ti:ti] += np.transpose(x_hat_v[ti,:, :(ti-left_ti), :], (1, 0, 2))
+        X_hat[left_ti:ti] += np.transpose(X_hat_raw[ti,:, :(ti-left_ti), :], (1, 0, 2))
 
     # x_hat_f_v = x_hat_f_v/35.0
-    print "Epoch {}, MSE {}".format(e, np.mean(np.square(x_hat_f_v[filter_len:-filter_len] - x_v[filter_len:-filter_len])))
+    print "Epoch {}, MSE {}".format(e, np.mean(np.square(X_hat[filter_len:-filter_len] - X[filter_len:-filter_len])))
 
-shl(x_hat_f_v, x_v, show=False)
-shm(a_v[:,0,:], a_v[:,1,:])
+# F_v = F_v.reshape(filter_len, input_size, layer_size)
+# F_v0 = F_v0.reshape(filter_len, input_size, layer_size)
+
+# shl(x_hat_f_v, x_v, show=False)
+# shm(a_v[:,0,:], a_v[:,1,:])
