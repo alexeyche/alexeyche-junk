@@ -57,22 +57,25 @@ class LCACell(RNNCell):
                 self._params = self._init_parameters()
 
             x = input[0]
-            batch_size, filter_len, input_size = x.get_shape().as_list()
 
+            batch_size, filter_len, input_size = x.get_shape().as_list()
+            
             u, a, dF = state
             F = self._params[0]
             
             Fc = tf.matmul(tf.transpose(F), F) - tf.eye(self._layer_size)
 
             x_flat = tf.reshape(x, (batch_size, filter_len * input_size))
-            
+
             #### logic
                         
             du = - u + tf.matmul(x_flat, F) - tf.matmul(a, Fc)
+            
             new_u = u + c.epsilon * du / c.tau
             new_a = tf.nn.relu(new_u - c.lam)
             
             #### learning
+            
             if c.simple_hebb:
                 new_dF = dF + c.grad_accum_rate * (
                     tf.matmul(tf.transpose(x_flat), new_a)
@@ -85,9 +88,7 @@ class LCACell(RNNCell):
 
             
             x_hat_flat = tf.matmul(new_a, tf.transpose(F))
-
-            # x_hat = tf.reshape(x_hat_flat, (batch_size, filter_len, input_size))
-            # print x_hat.get_shape() 
+            
             return (new_u, new_a, x_hat_flat), (new_u, new_a, new_dF)
 
     @property
@@ -210,13 +211,12 @@ T = np.linspace(filter_len*dt, seq_size*dt - 2*filter_len, int((seq_size-2*filte
 # ]).T.reshape(Tsize, batch_size, 1)
 
 
-x_v = np.pad(np.sin(T/10.0), (filter_len, filter_len), 'constant')
-x_v2 = np.pad(np.sin(T/10.0 + 10.0), (filter_len, filter_len), 'constant')
+d0 = np.pad(np.sin(T/10.0), (filter_len, filter_len), 'constant')
+d1 = np.pad(np.sin(T/10.0 + 10.0), (filter_len, filter_len), 'constant')
 
-x_v = np.asarray([
-    x_v, x_v2
-]).T.reshape(x_v.shape[0], batch_size, 1)
+x_v = np.asarray([d0, d1]).T.reshape(d0.shape[0], batch_size, 1)
 
+# x_v = x_v/np.sqrt(np.mean(np.square(x_v), 0))
 
 l2_norm = lambda x: np.sqrt(np.sum(np.square(x), 0))
 x_v_n = np.asarray([l2_norm(x_v[(ti-filter_len):ti]) for ti in xrange(filter_len, x_v.shape[0])])
@@ -225,7 +225,7 @@ x_v[filter_len:-filter_len] = x_v[filter_len:-filter_len]/x_v_n[(filter_len/2):-
 
 sess.run(tf.assign(net._cells[0].F_flat, tf.nn.l2_normalize(net._cells[0].F_flat, 0)))
 
-for e in xrange(500):
+for e in xrange(100):
     state_v = get_zero_state()
     
     u_v, a_v, x_hat_v, finstate_v, F_v, _ = sess.run(
@@ -240,13 +240,10 @@ for e in xrange(500):
     x_hat_f_v = np.zeros((seq_size, batch_size, input_size))
     for ti in xrange(x_hat_v.shape[0]):
         left_ti = max(0, ti-filter_len)
-        x_hat_f_v[left_ti:ti] += np.transpose(x_hat_v[ti,:, :(ti-left_ti), :], (1, 0, 2))/(filter_len/1.5)
+        x_hat_f_v[left_ti:ti] += np.transpose(x_hat_v[ti,:, :(ti-left_ti), :], (1, 0, 2))
 
     # x_hat_f_v = x_hat_f_v/35.0
     print "Epoch {}, MSE {}".format(e, np.mean(np.square(x_hat_f_v[filter_len:-filter_len] - x_v[filter_len:-filter_len])))
 
 shl(x_hat_f_v, x_v, show=False)
 shm(a_v[:,0,:], a_v[:,1,:])
-
-# import cPickle
-# cPickle.dump(sess.run(net._cells[0].F_flat), open("/Users/aleksei/tmp/F.pickle", "w"))
