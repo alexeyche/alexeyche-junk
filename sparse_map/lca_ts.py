@@ -16,7 +16,28 @@ from scikits.statsmodels.tsa.arima_process import arma_generate_sample
 
 from util import *
 
+def whiten(X,fudge=1E-18):
 
+   # the matrix X should be observations-by-components
+
+   # get the covariance matrix
+   Xcov = np.dot(X.T,X)
+
+   # eigenvalue decomposition of the covariance matrix
+   d, V = np.linalg.eigh(Xcov)
+
+   # a fudge factor can be used so that eigenvectors associated with
+   # small eigenvalues do not get overamplified.
+   D = np.diag(1. / np.sqrt(d+fudge))
+
+   # whitening matrix
+   W = np.dot(np.dot(V, D), V.T)
+
+   # multiply by the whitening matrix
+   X_white = np.dot(X, W)
+
+   return X_white, W
+   
 def generate_ts(n):
 	alphas = np.array([0.1, -0.1, 0.3, -0.1, 0.8])
 	betas = np.array([0.5, -0.3, 0.1])
@@ -27,7 +48,7 @@ def generate_ts(n):
 	return arma_generate_sample(ar=ar, ma=ma, nsample=n, burnin=1000)
 
 
-lrate = 0.1
+lrate = 0.01
 epochs = 50
 
 tf.set_random_seed(3)
@@ -37,12 +58,12 @@ input_size = 1
 seq_size = 2000
 batch_size = 1
 layer_size = 25
-filter_len = 50
+filter_len = 10
 
 dt = 1.0
 
 c = Config()
-c.lam = 0.25
+c.lam = 0.015
 c.weight_init_factor = 1.0
 c.epsilon = 1.0
 c.tau = 5.0
@@ -125,6 +146,9 @@ x_v = generate_ts(seq_size)
 
 x_v = (x_v - np.mean(x_v))/np.cov(x_v)
 
+# x_v = np.diff(x_v)
+# x_v = np.pad(x_v, (0, 1), 'constant')
+
 x_v = x_v.reshape((seq_size, batch_size, input_size))
 
 # l2_norm = lambda x: np.sqrt(np.sum(np.square(x), 0))
@@ -134,7 +158,7 @@ x_v = x_v.reshape((seq_size, batch_size, input_size))
 
 sess.run(tf.group(*[tf.assign(cell.F_flat, tf.nn.l2_normalize(cell.F_flat, 0)) for cell in net._cells]))
 
-for e in xrange(10):
+for e in xrange(1):
     state_v = get_zero_state()
     
     u_v, a_v, x_hat_v, finstate_v, F_v, _ = sess.run(
@@ -166,4 +190,4 @@ for e in xrange(10):
 
 
 # shl(x_hat_f_v, x_v, show=False)
-# shm(a_v[200:300,0,:])
+shm(a_v[0:300,0,:])
