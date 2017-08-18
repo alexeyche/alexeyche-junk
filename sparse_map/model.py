@@ -25,7 +25,7 @@ class LCACell(RNNCell):
 
     @property
     def state_size(self):
-        return (self._layer_size, self._layer_size, self._layer_size)
+        return (self._layer_size, self._layer_size, self._layer_size, self._layer_size)
 
     @property
     def output_size(self):
@@ -49,7 +49,7 @@ class LCACell(RNNCell):
             
             batch_size, filter_len, input_size = x.get_shape().as_list()
             
-            u, a, dF = state
+            u, a, a_m, dF = state
             F = self._params[0]
             
             Fc = tf.matmul(tf.transpose(F), F) - tf.eye(self._layer_size)
@@ -61,7 +61,12 @@ class LCACell(RNNCell):
             du = - u + tf.matmul(x_flat, F) - tf.matmul(a, Fc)
             
             new_u = u + c.epsilon * du / c.tau
-            new_a = tf.nn.relu(new_u - c.lam)
+            
+            # threshold = a_m
+            threshold = c.lam
+            
+            new_a = tf.nn.relu(new_u - threshold)
+            new_a_m = (1.0 - 1.0/c.tau_m) * a_m + (1.0/c.tau_m) * new_a
             
             #### learning
             
@@ -78,7 +83,7 @@ class LCACell(RNNCell):
             
             x_hat_flat = tf.matmul(new_a, tf.transpose(F))
             
-            return (new_u, new_a, x_hat_flat), (new_u, new_a, new_dF)
+            return (new_u, new_a, x_hat_flat), (new_u, new_a, new_a_m, new_dF)
 
     @property
     def F(self):

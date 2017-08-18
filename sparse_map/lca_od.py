@@ -56,7 +56,7 @@ c.epsilon = 1.0
 c.tau = 5.0
 c.grad_accum_rate = 1.0/seq_size
 c.simple_hebb = True
-
+c.tau_m = 100.0
 
 input = tf.placeholder(tf.float32, shape=(seq_size, batch_size, input_size), name="Input")
 sequence_length = tf.placeholder(shape=(batch_size,), dtype=tf.int32)
@@ -69,6 +69,7 @@ state = tuple(
     tuple((
         tf.placeholder(tf.float32, [batch_size, cell.layer_size], name="u"),
         tf.placeholder(tf.float32, [batch_size, cell.layer_size], name="a"),
+        tf.placeholder(tf.float32, [batch_size, cell.layer_size], name="a_m"),
         tf.placeholder(tf.float32, [batch_size, cell.filter_len*cell.input_size, cell.layer_size], name="dF"),
     )) for cell in net._cells
 )
