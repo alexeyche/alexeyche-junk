@@ -10,28 +10,14 @@ from env import Env
 
 from model import LCACell, normalize_weights
 from tensorflow.contrib.rnn import MultiRNNCell
-
-import scikits.statsmodels.tsa.api as smt
-from scikits.statsmodels.tsa.arima_process import arma_generate_sample
-
-from util import *
+from ts_pp import white_ts, generate_ts
 
 
-def generate_ts(n):
-	alphas = np.array([0.1, -0.1, 0.3, -0.1, 0.8])
-	betas = np.array([0.5, -0.3, 0.1])
-
-	ar = np.r_[1, -alphas]
-	ma = np.r_[1, betas]
-
-	return arma_generate_sample(ar=ar, ma=ma, nsample=n, burnin=1000)
-
-
-lrate = 0.1
+lrate = 0.01
 epochs = 50
 
-tf.set_random_seed(3)
-np.random.seed(3)
+tf.set_random_seed(4)
+np.random.seed(4)
 
 input_size = 1
 seq_size = 2000
@@ -42,7 +28,7 @@ filter_len = 50
 dt = 1.0
 
 c = Config()
-c.lam = 0.25
+c.lam = 0.4
 c.weight_init_factor = 1.0
 c.epsilon = 1.0
 c.tau = 5.0
@@ -84,8 +70,8 @@ u, a, x_hat_flat = u_ta.stack(), a_ta.stack(), x_hat_flat_ta.stack()
 x_hat = tf.reshape(x_hat_flat, (seq_size, batch_size, filter_len, input_size))
 
 
-optimizer = tf.train.AdamOptimizer(lrate)
-# optimizer = tf.train.GradientDescentOptimizer(lrate)
+# optimizer = tf.train.AdamOptimizer(lrate)
+optimizer = tf.train.GradientDescentOptimizer(lrate)
 
 grads_and_vars = []
 for li, s in enumerate(finstate):
@@ -100,13 +86,12 @@ apply_grads_step = tf.group(
     normalize_weights(net)
 )
 
-
+#####################################
 
 sess = tf.Session()
 saver = tf.train.Saver()
 
 env = Env("lca_poc")
-
 
 model_fname = env.run("model.ckpt")
 if os.path.exists(model_fname):
@@ -119,11 +104,11 @@ else:
 
 env.clear_pics(env.run())
 
-
+#####################################
 
 x_v = generate_ts(seq_size)
-
 x_v = (x_v - np.mean(x_v))/np.cov(x_v)
+x_v, W_filt = white_ts(x_v, filter_len)
 
 x_v = x_v.reshape((seq_size, batch_size, input_size))
 
@@ -134,7 +119,7 @@ x_v = x_v.reshape((seq_size, batch_size, input_size))
 
 sess.run(tf.group(*[tf.assign(cell.F_flat, tf.nn.l2_normalize(cell.F_flat, 0)) for cell in net._cells]))
 
-for e in xrange(10):
+for e in xrange(50):
     state_v = get_zero_state()
     
     u_v, a_v, x_hat_v, finstate_v, F_v, _ = sess.run(
@@ -166,4 +151,6 @@ for e in xrange(10):
 
 
 # shl(x_hat_f_v, x_v, show=False)
-# shm(a_v[200:300,0,:])
+shm(a_v[0:300,0,:], show=False)
+shl(x_hat_f_v[:500], x_v[:500])
+

@@ -32,9 +32,10 @@ class LCACell(RNNCell):
         return (self._layer_size, self._layer_size, self._filter_len * self._input_size)
 
     def _init_parameters(self):
+        c = self._c
         return (
             tf.get_variable("F", [self._filter_len * self._input_size, self._layer_size], 
-                initializer=tf.random_uniform_initializer(-0.5, 0.5) #tf.uniform_unit_scaling_initializer(factor=c.weight_init_factor)
+                initializer=tf.uniform_unit_scaling_initializer(factor=c.weight_init_factor)
             ),
         )
 
