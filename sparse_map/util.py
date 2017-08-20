@@ -4,6 +4,7 @@ import numpy as np
 import math
 import collections
 import pylab
+from scipy import signal
 
 def shm(*matrices, **kwargs):
     plt.figure(figsize=kwargs.get("figsize", (10,7)))
@@ -75,6 +76,18 @@ def shs(*args, **kwargs):
         plt.clf()
     elif kwargs.get("show", True):
         plt.show()
+
+
+def shp(*args, **kwargs):
+    fs = kwargs.get("fs", 100)
+    f, Pxx_den = signal.periodogram(args[0], fs)
+
+    plt.semilogy(f, Pxx_den)
+    plt.ylim([1e-7, 1e2])
+    plt.xlabel('frequency [Hz]')
+    plt.ylabel('PSD [V**2/Hz]')
+    plt.show()
+
 
 
 def moving_average(a, n=3) :
