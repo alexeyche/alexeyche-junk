@@ -58,12 +58,12 @@ input_size = 1
 seq_size = 2000
 batch_size = 1
 layer_size = 25
-filter_len = 10
+filter_len = 25
 
 dt = 1.0
 
 c = Config()
-c.lam = 0.2
+c.lam = 0.05
 c.weight_init_factor = 0.1
 c.epsilon = 1.0
 c.tau = 5.0
@@ -145,9 +145,10 @@ env.clear_pics(env.run())
 x_orig = generate_ts(seq_size)
 x_v = x_orig.copy()
 # x_v, Ww = white_ts(x_v, filter_len)
-c.lam = 0.05
-x_v = np.concatenate([np.asarray([0.0]), np.diff(x_v)])
-# x_v = np.pad(x_v, (0, 1), 'constant')
+
+# c.lam = 0.05
+# x_v = np.concatenate([np.asarray([0.0]), np.diff(x_v)])
+# # x_v = np.pad(x_v, (0, 1), 'constant')
 
 x_v = x_v.reshape((seq_size, batch_size, input_size))
 
@@ -158,7 +159,7 @@ x_v = x_v.reshape((seq_size, batch_size, input_size))
 
 sess.run(tf.group(*[tf.assign(cell.F_flat, tf.nn.l2_normalize(cell.F_flat, 0)) for cell in net._cells]))
 
-for e in xrange(5):
+for e in xrange(100):
     state_v = get_zero_state()
     
     u_v, a_v, x_hat_v, finstate_v, F_v, _ = sess.run(
@@ -189,5 +190,5 @@ for e in xrange(5):
 # 	a_m_v[ti] = a_m.copy()
 
 
-# shl(x_hat_f_v, x_v, show=False)
-# shm(a_v[0:1000,0,:])
+shl(x_hat_f_v, x_v, show=True)
+# shm(a_v[0:500,0,:])

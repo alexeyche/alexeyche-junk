@@ -59,6 +59,7 @@ class LCACell(RNNCell):
 
             #### logic
                         
+            # du = - u + tf.matmul(x_flat, F) - 3.0*tf.matmul(a, Fc) - 20.0*a_m
             du = - u + tf.matmul(x_flat, F) - tf.matmul(a, Fc)
             
             new_u = u + c.epsilon * du / c.tau
@@ -66,7 +67,7 @@ class LCACell(RNNCell):
             # threshold = a_m
             threshold = c.lam
             
-            new_a = tf.nn.relu(new_u - threshold)
+            new_a = tf.nn.relu(new_u - threshold) 
             new_a_m = (1.0 - 1.0/c.tau_m) * a_m + (1.0/c.tau_m) * new_a
             
             #### learning
