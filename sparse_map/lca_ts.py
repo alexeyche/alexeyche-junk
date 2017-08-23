@@ -1,6 +1,7 @@
 import os
 
 import tensorflow as tf
+import pandas as pd
 
 from util import *
 
@@ -13,6 +14,8 @@ from tensorflow.contrib.rnn import MultiRNNCell
 
 import scikits.statsmodels.tsa.api as smt
 from scikits.statsmodels.tsa.arima_process import arma_generate_sample
+
+from ts_pp import white_ts 
 
 from util import *
 
@@ -37,16 +40,13 @@ def whiten(X,fudge=1E-18):
    X_white = np.dot(X, W)
 
    return X_white, W
-   
-def generate_ts(n):
-	alphas = np.array([0.1, -0.1, 0.3, -0.1, 0.8])
-	betas = np.array([0.5, -0.3, 0.1])
+  
 
-	ar = np.r_[1, -alphas]
-	ma = np.r_[1, betas]
-
-	return arma_generate_sample(ar=ar, ma=ma, nsample=n, burnin=1000)
-
+def generate_ts(n, vol=0.3, lag=30):
+    df = pd.DataFrame(np.random.randn(n) * np.sqrt(vol)).cumsum()
+    df = df.rolling(window=lag, min_periods=1).mean()
+    x = df.values[:,0]
+    return (x - np.mean(x))/np.cov(x)
 
 lrate = 0.01
 epochs = 50
@@ -63,13 +63,13 @@ filter_len = 10
 dt = 1.0
 
 c = Config()
-c.lam = 0.015
-c.weight_init_factor = 1.0
+c.lam = 0.2
+c.weight_init_factor = 0.1
 c.epsilon = 1.0
 c.tau = 5.0
 c.grad_accum_rate = 1.0/seq_size
 c.simple_hebb = True
-c.tau_m = 100.0
+c.tau_m = 200.0
 
 
 input = tf.placeholder(tf.float32, shape=(seq_size, batch_size, input_size), name="Input")
@@ -142,11 +142,11 @@ env.clear_pics(env.run())
 
 
 
-x_v = generate_ts(seq_size)
-
-x_v = (x_v - np.mean(x_v))/np.cov(x_v)
-
-# x_v = np.diff(x_v)
+x_orig = generate_ts(seq_size)
+x_v = x_orig.copy()
+# x_v, Ww = white_ts(x_v, filter_len)
+c.lam = 0.05
+x_v = np.concatenate([np.asarray([0.0]), np.diff(x_v)])
 # x_v = np.pad(x_v, (0, 1), 'constant')
 
 x_v = x_v.reshape((seq_size, batch_size, input_size))
@@ -158,7 +158,7 @@ x_v = x_v.reshape((seq_size, batch_size, input_size))
 
 sess.run(tf.group(*[tf.assign(cell.F_flat, tf.nn.l2_normalize(cell.F_flat, 0)) for cell in net._cells]))
 
-for e in xrange(1):
+for e in xrange(5):
     state_v = get_zero_state()
     
     u_v, a_v, x_hat_v, finstate_v, F_v, _ = sess.run(
@@ -190,4 +190,4 @@ for e in xrange(1):
 
 
 # shl(x_hat_f_v, x_v, show=False)
-shm(a_v[0:300,0,:])
+# shm(a_v[0:1000,0,:])

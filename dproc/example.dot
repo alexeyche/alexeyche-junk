@@ -1,0 +1,5 @@
+digraph Main {
+	A -> B [deps="123+123"]
+	A -> D
+	B -> C
+}
