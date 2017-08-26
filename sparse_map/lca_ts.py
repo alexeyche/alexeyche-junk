@@ -94,13 +94,13 @@ get_zero_state = lambda: tuple(
 )
 
 
-(u_ta, a_ta, x_hat_flat_ta), finstate, _ = tf.nn.raw_rnn(
+(u_ta, a_ta, a_m_ta, x_hat_flat_ta), finstate, _ = tf.nn.raw_rnn(
     net, 
     rnn_with_hist_loop_fn(input, sequence_length, state, filter_len)
 )
 
 
-u, a, x_hat_flat = u_ta.stack(), a_ta.stack(), x_hat_flat_ta.stack()
+u, a, a_m, x_hat_flat = u_ta.stack(), a_ta.stack(), a_m_ta.stack(), x_hat_flat_ta.stack()
 
 x_hat = tf.reshape(x_hat_flat, (seq_size, batch_size, filter_len, input_size))
 
@@ -159,11 +159,11 @@ x_v = x_v.reshape((seq_size, batch_size, input_size))
 
 sess.run(tf.group(*[tf.assign(cell.F_flat, tf.nn.l2_normalize(cell.F_flat, 0)) for cell in net._cells]))
 
-for e in xrange(100):
+for e in xrange(1):
     state_v = get_zero_state()
     
-    u_v, a_v, x_hat_v, finstate_v, F_v, _ = sess.run(
-        (u, a, x_hat, finstate, net._cells[0].F_flat, apply_grads_step), 
+    u_v, a_v, a_m_v, x_hat_v, finstate_v, F_v, _ = sess.run(
+        (u, a, a_m, x_hat, finstate, net._cells[0].F_flat, apply_grads_step), 
         {
             input: x_v,
             state: state_v,
@@ -191,4 +191,5 @@ for e in xrange(100):
 
 
 shl(x_hat_f_v, x_v, show=True)
-# shm(a_v[0:500,0,:])
+# shl(a_v[:500])
+shm(a_v[0:500,0,:])
