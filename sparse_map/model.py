@@ -3,13 +3,21 @@ import tensorflow as tf
 
 from tensorflow.contrib.rnn import RNNCell as RNNCell
 
+def poisson(rate):
+    return tf.cast(tf.less(tf.random_uniform(rate.get_shape()), rate), rate.dtype)
+
+def exp_poisson(u, dt=0.001):
+    return poisson(dt * tf.exp(u))
+                
+
 class LCACell(RNNCell):
-    def __init__(self, input_size, layer_size, filter_len, c):
+    def __init__(self, input_size, layer_size, filter_len, c, act):
         self._layer_size = layer_size
         self._filter_len = filter_len
         self._input_size = input_size
         self._c = c
         self._params = None
+        self._act = act
 
     @property
     def layer_size(self):
@@ -60,15 +68,19 @@ class LCACell(RNNCell):
             #### logic
                         
             # du = - u + tf.matmul(x_flat, F) - 3.0*tf.matmul(a, Fc) - 20.0*a_m
-            du = - u + tf.matmul(x_flat, F) - tf.matmul(a, Fc) - a_m
+            du = - u + tf.matmul(x_flat, F) - tf.matmul(a, Fc) 
             
+            if c.adaptive:
+                du  = du - a_m
+
             new_u = u + c.epsilon * du / c.tau
             
             # threshold = a_m
             threshold = c.lam
             
-            new_a = 2.0*tf.nn.relu(new_u - threshold)
-            new_a_m = a_m + c.epsilon *(10.0 * new_a - a_m)/c.tau_m
+            # new_a = tf.nn.relu()
+            new_a = c.act_factor * self._act(new_u - threshold)
+            new_a_m = a_m + c.epsilon *(c.adapt * new_a - a_m)/c.tau_m
             # new_a_m = (1.0 - 1.0/c.tau_m) * a_m + (1.0/c.tau_m) * new_a
             
             #### learning

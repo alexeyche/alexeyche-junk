@@ -2,60 +2,33 @@ import os
 
 import tensorflow as tf
 import pandas as pd
-
+from functools import partial
+import time
 from util import *
 
 from hist_rnn import rnn_with_hist_loop_fn
 from config import Config
 from env import Env
 
-from model import LCACell, normalize_weights
+from model import LCACell, normalize_weights, exp_poisson
 from tensorflow.contrib.rnn import MultiRNNCell
 
 import scikits.statsmodels.tsa.api as smt
 from scikits.statsmodels.tsa.arima_process import arma_generate_sample
 
-from ts_pp import white_ts 
+from ts_pp import white_ts, generate_ts
 
 from util import *
 
-def whiten(X,fudge=1E-18):
-
-   # the matrix X should be observations-by-components
-
-   # get the covariance matrix
-   Xcov = np.dot(X.T,X)
-
-   # eigenvalue decomposition of the covariance matrix
-   d, V = np.linalg.eigh(Xcov)
-
-   # a fudge factor can be used so that eigenvectors associated with
-   # small eigenvalues do not get overamplified.
-   D = np.diag(1. / np.sqrt(d+fudge))
-
-   # whitening matrix
-   W = np.dot(np.dot(V, D), V.T)
-
-   # multiply by the whitening matrix
-   X_white = np.dot(X, W)
-
-   return X_white, W
-  
-
-def generate_ts(n, vol=0.3, lag=30):
-    df = pd.DataFrame(np.random.randn(n) * np.sqrt(vol)).cumsum()
-    df = df.rolling(window=lag, min_periods=1).mean()
-    x = df.values[:,0]
-    return (x - np.mean(x))/np.cov(x)
 
 lrate = 0.01
-epochs = 50
+epochs = 100
 
-tf.set_random_seed(3)
-np.random.seed(3)
+tf.set_random_seed(1)
+np.random.seed(1)
 
 input_size = 1
-seq_size = 2000
+seq_size = 500
 batch_size = 1
 layer_size = 25
 filter_len = 25
@@ -63,20 +36,22 @@ filter_len = 25
 dt = 1.0
 
 c = Config()
-c.lam = 0.05
-c.weight_init_factor = 0.1
+c.lam = 0.01
+c.weight_init_factor = 0.5
 c.epsilon = 1.0
 c.tau = 5.0
 c.grad_accum_rate = 1.0/seq_size
 c.simple_hebb = True
 c.tau_m = 200.0
-
+c.adapt = 5.0
+c.act_factor = 1.0
+c.adaptive = False
 
 input = tf.placeholder(tf.float32, shape=(seq_size, batch_size, input_size), name="Input")
 sequence_length = tf.placeholder(shape=(batch_size,), dtype=tf.int32)
 
 net = MultiRNNCell([
-    LCACell(input_size, layer_size, filter_len, c),
+    LCACell(input_size, layer_size, filter_len, c, tf.nn.relu),
 ])
 
 state = tuple(
@@ -104,6 +79,34 @@ u, a, a_m, x_hat_flat = u_ta.stack(), a_ta.stack(), a_m_ta.stack(), x_hat_flat_t
 
 x_hat = tf.reshape(x_hat_flat, (seq_size, batch_size, filter_len, input_size))
 
+reshape_batch = 100
+x_hat_var = tf.Variable(tf.zeros((seq_size, batch_size, input_size), dtype=tf.float32))
+x_hat_f = x_hat_var
+for rbi in xrange(1, seq_size, reshape_batch):
+    fut_border = max(seq_size, rbi+reshape_batch)-seq_size
+    x_hat_slice = tf.slice(
+        x_hat, 
+        [rbi, 0, 0, 0], 
+        [reshape_batch-fut_border, batch_size, filter_len, input_size]
+    )
+
+    for ti, xx in enumerate(tf.unstack(x_hat_slice)):
+        ti = rbi + ti
+        left_ti = max(0, ti-filter_len)
+        
+        xx_sliced = tf.slice(xx, (0,0,0), (batch_size, ti-left_ti, input_size))
+        xx_sliced = tf.transpose(xx_sliced, (1, 0, 2))/(c.tau*2)
+        
+        x_hat_f = tf.scatter_add(x_hat_f, range(left_ti, ti), xx_sliced)
+        
+
+gg = tf.gradients(x_hat_f, [net._cells[0].F_flat])
+
+# x_hat_f, _ = tf.tuple(
+#     [tf.identity(x_hat_f), tf.variables_initializer([x_hat_var])]
+# )
+
+# tf.no_op(tf.variables_initializer([x_hat_var]))
 
 optimizer = tf.train.AdamOptimizer(lrate)
 # optimizer = tf.train.GradientDescentOptimizer(lrate)
@@ -140,10 +143,19 @@ else:
 
 env.clear_pics(env.run())
 
+x_v = np.zeros((seq_size, batch_size, input_size))
+
+for bi in xrange(batch_size):
+    for ni in xrange(input_size):
+        x_v[:,bi,ni] = generate_ts(seq_size)
+
+# x_orig = generate_ts(seq_size)
+
+# T = np.linspace(filter_len*dt, seq_size*dt - 2*filter_len, int((seq_size-2*filter_len)/dt))
+# x_orig = np.pad(np.sin(T/10.0), (filter_len, filter_len), 'constant')
 
 
-x_orig = generate_ts(seq_size)
-x_v = x_orig.copy()
+# x_v = x_orig.copy()
 # x_v, Ww = white_ts(x_v, filter_len)
 
 # c.lam = 0.05
@@ -159,25 +171,46 @@ x_v = x_v.reshape((seq_size, batch_size, input_size))
 
 sess.run(tf.group(*[tf.assign(cell.F_flat, tf.nn.l2_normalize(cell.F_flat, 0)) for cell in net._cells]))
 
-for e in xrange(1):
+for e in xrange(epochs):
+    start_time = time.time()
     state_v = get_zero_state()
     
-    u_v, a_v, a_m_v, x_hat_v, finstate_v, F_v, _ = sess.run(
-        (u, a, a_m, x_hat, finstate, net._cells[0].F_flat, apply_grads_step), 
+    u_v, a_v, a_m_v, x_hat_v, x_hat_f_v, finstate_v, F_v, gg_v, _ = sess.run(
+        (
+            u, 
+            a, 
+            a_m, 
+            x_hat, 
+            x_hat_f, 
+            finstate, 
+            net._cells[0].F_flat, 
+            gg,
+            apply_grads_step, 
+        ), 
         {
             input: x_v,
             state: state_v,
             sequence_length: np.asarray([seq_size]*batch_size)
         }
     )
-    
-    x_hat_f_v = np.zeros((seq_size, batch_size, input_size))
-    for ti in xrange(x_hat_v.shape[0]):
-        left_ti = max(0, ti-filter_len)
-        x_hat_f_v[left_ti:ti] += np.transpose(x_hat_v[ti,:, :(ti-left_ti), :], (1, 0, 2))/(c.tau * 2)
 
-    # x_hat_f_v = x_hat_f_v/35.0
-    print "Epoch {}, MSE {}".format(e, np.mean(np.square(x_hat_f_v[filter_len:-filter_len] - x_v[filter_len:-filter_len])))
+    sess.run(tf.variables_initializer([x_hat_var]))
+
+    end_time = time.time()
+    
+    
+    # x_hat_f_v2 = np.zeros((seq_size, batch_size, input_size))
+    # for ti in xrange(x_hat_v.shape[0]):
+    #     left_ti = max(0, ti-filter_len)
+    #     x_hat_f_v2[left_ti:ti] += np.transpose(x_hat_v[ti,:, :(ti-left_ti), :], (1, 0, 2))/(c.tau * 2)
+
+    # error = np.mean(np.square(x_hat_f_v[filter_len:-filter_len] - x_v[filter_len:-filter_len]))
+    error = 0.0
+    print "Epoch {} ({}), MSE {:}".format(
+        e, 
+        round(end_time-start_time, 3), 
+        error
+    )
 
 
 
@@ -190,6 +223,6 @@ for e in xrange(1):
 # 	a_m_v[ti] = a_m.copy()
 
 
-shl(x_hat_f_v, x_v, show=True)
+# shl(x_hat_f_v, x_v, show=True)
 # shl(a_v[:500])
-shm(a_v[0:500,0,:])
+# shm(a_v[0:500,0,:])

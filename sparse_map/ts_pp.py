@@ -4,6 +4,8 @@ from scikits.statsmodels.tsa.arima_process import arma_generate_sample
 from scipy import signal
 import matplotlib.pyplot as plt
 
+import pandas as pd
+
 from util import *
 
 def whiten(X,fudge=1E-18):
@@ -27,15 +29,21 @@ def whiten(X,fudge=1E-18):
    X_white = np.dot(X, W)
 
    return X_white, W
-   
-def generate_ts(n):
-	alphas = np.array([0.1, -0.1, 0.3, -0.1, 0.8])
-	betas = np.array([0.5, -0.3, 0.1])
 
-	ar = np.r_[1, -alphas]
-	ma = np.r_[1, betas]
+def generate_ts(n, vol=0.3, lag=30):
+    df = pd.DataFrame(np.random.randn(n) * np.sqrt(vol)).cumsum()
+    df = df.rolling(window=lag, min_periods=1).mean()
+    x = df.values[:,0]
+    return (x - np.mean(x))/np.cov(x)
 
-	return arma_generate_sample(ar=ar, ma=ma, nsample=n, burnin=1000)
+# def generate_ts(n):
+# 	alphas = np.array([0.1, -0.1, 0.3, -0.1, 0.8])
+# 	betas = np.array([0.5, -0.3, 0.1])
+
+# 	ar = np.r_[1, -alphas]
+# 	ma = np.r_[1, betas]
+
+# 	return arma_generate_sample(ar=ar, ma=ma, nsample=n, burnin=1000)
 
 def l2_norm(x, axis=0):
    return np.sqrt(np.maximum(np.sum(np.square(x), axis), 1e-10))
@@ -90,4 +98,4 @@ if __name__ == '__main__':
    x_w2 = filter_ts(x_w, np.linalg.inv(W))
 
    shl(x, x_w2/500.0)
-   # shp(x_w)
+   shp(x_w)
