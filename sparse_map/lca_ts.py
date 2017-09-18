@@ -21,15 +21,16 @@ from ts_pp import white_ts, generate_ts
 from util import *
 
 
+
 lrate = 0.01
-epochs = 100
+epochs = 1
 
 tf.set_random_seed(1)
 np.random.seed(1)
 
-input_size = 1
+input_size = 2
 seq_size = 500
-batch_size = 1
+batch_size = 3
 layer_size = 25
 filter_len = 25
 
@@ -42,10 +43,43 @@ c.epsilon = 1.0
 c.tau = 5.0
 c.grad_accum_rate = 1.0/seq_size
 c.simple_hebb = True
-c.tau_m = 200.0
+c.tau_m = 50.0
 c.adapt = 5.0
 c.act_factor = 1.0
 c.adaptive = False
+
+
+def transform_output(x_hat_flat):
+    input_ta = tf.TensorArray(dtype=tf.float32, size=seq_size, tensor_array_name="input") #, clear_after_read=False)
+    input_ta = input_ta.unstack(x_hat_flat)
+
+    i = tf.constant(0, dtype=tf.int32, name="i")
+    output_ta = tf.TensorArray(dtype=tf.float32, size=seq_size, tensor_array_name="output")
+
+    def _time_step(i, input_ta_t, output_ta_t):
+        left_i = tf.maximum(0, i-filter_len)
+
+        x_t_flat = input_ta_t.read(i)
+        x_t = tf.reshape(x_t_flat, (batch_size, filter_len, input_size))
+        
+        x_t_sliced = tf.slice(x_t, (0,0,0), (batch_size, i-left_i, input_size))
+        x_t_sliced = tf.pad(x_t_sliced, [[0,0], [filter_len - (i-left_i), 0], [0,0]])
+        
+        x_t_sliced = tf.transpose(x_t_sliced, (1, 0, 2))/(c.tau*2)
+        
+
+        output_ta_t = output_ta_t.write(i, x_t_sliced)
+        return i+1, input_ta_t, output_ta_t
+
+    _, _, output_final_ta = tf.while_loop(
+        cond=lambda i, *_: i < seq_size,
+        body=_time_step,
+        loop_vars=(i, input_ta, output_ta),
+    )
+
+    return output_final_ta.stack()
+
+
 
 input = tf.placeholder(tf.float32, shape=(seq_size, batch_size, input_size), name="Input")
 sequence_length = tf.placeholder(shape=(batch_size,), dtype=tf.int32)
@@ -79,28 +113,33 @@ u, a, a_m, x_hat_flat = u_ta.stack(), a_ta.stack(), a_m_ta.stack(), x_hat_flat_t
 
 x_hat = tf.reshape(x_hat_flat, (seq_size, batch_size, filter_len, input_size))
 
-reshape_batch = 100
-x_hat_var = tf.Variable(tf.zeros((seq_size, batch_size, input_size), dtype=tf.float32))
-x_hat_f = x_hat_var
-for rbi in xrange(1, seq_size, reshape_batch):
-    fut_border = max(seq_size, rbi+reshape_batch)-seq_size
-    x_hat_slice = tf.slice(
-        x_hat, 
-        [rbi, 0, 0, 0], 
-        [reshape_batch-fut_border, batch_size, filter_len, input_size]
-    )
+####
 
-    for ti, xx in enumerate(tf.unstack(x_hat_slice)):
-        ti = rbi + ti
-        left_ti = max(0, ti-filter_len)
-        
-        xx_sliced = tf.slice(xx, (0,0,0), (batch_size, ti-left_ti, input_size))
-        xx_sliced = tf.transpose(xx_sliced, (1, 0, 2))/(c.tau*2)
-        
-        x_hat_f = tf.scatter_add(x_hat_f, range(left_ti, ti), xx_sliced)
+x_hat_f = transform_output(x_hat_flat)
+
+if False:
+    reshape_batch = 100
+    x_hat_var = tf.Variable(tf.zeros((seq_size, batch_size, input_size), dtype=tf.float32))
+    x_hat_f = x_hat_var
+    for rbi in xrange(1, seq_size, reshape_batch):
+        fut_border = max(seq_size, rbi+reshape_batch)-seq_size
+        x_hat_slice = tf.slice(
+            x_hat, 
+            [rbi, 0, 0, 0], 
+            [reshape_batch-fut_border, batch_size, filter_len, input_size]
+        )
+
+        for ti, xx in enumerate(tf.unstack(x_hat_slice)):
+            ti = rbi + ti
+            left_ti = max(0, ti-filter_len)
+            
+            xx_sliced = tf.slice(xx, (0,0,0), (batch_size, ti-left_ti, input_size))
+            xx_sliced = tf.transpose(xx_sliced, (1, 0, 2))/(c.tau*2)
+            
+            x_hat_f = tf.scatter_add(x_hat_f, range(left_ti, ti), xx_sliced)
         
 
-gg = tf.gradients(x_hat_f, [net._cells[0].F_flat])
+# gg = tf.gradients(x_hat_f, [net._cells[0].F_flat])
 
 # x_hat_f, _ = tf.tuple(
 #     [tf.identity(x_hat_f), tf.variables_initializer([x_hat_var])]
@@ -175,7 +214,7 @@ for e in xrange(epochs):
     start_time = time.time()
     state_v = get_zero_state()
     
-    u_v, a_v, a_m_v, x_hat_v, x_hat_f_v, finstate_v, F_v, gg_v, _ = sess.run(
+    u_v, a_v, a_m_v, x_hat_v, x_hat_f_v, finstate_v, F_v, _ = sess.run(
         (
             u, 
             a, 
@@ -184,7 +223,6 @@ for e in xrange(epochs):
             x_hat_f, 
             finstate, 
             net._cells[0].F_flat, 
-            gg,
             apply_grads_step, 
         ), 
         {
@@ -194,15 +232,14 @@ for e in xrange(epochs):
         }
     )
 
-    sess.run(tf.variables_initializer([x_hat_var]))
+    # sess.run(tf.variables_initializer([x_hat_var]))
 
     end_time = time.time()
     
-    
-    # x_hat_f_v2 = np.zeros((seq_size, batch_size, input_size))
-    # for ti in xrange(x_hat_v.shape[0]):
-    #     left_ti = max(0, ti-filter_len)
-    #     x_hat_f_v2[left_ti:ti] += np.transpose(x_hat_v[ti,:, :(ti-left_ti), :], (1, 0, 2))/(c.tau * 2)
+    x_hat_f_v2 = np.zeros((seq_size, batch_size, input_size))
+    for ti in xrange(x_hat_v.shape[0]):
+        left_ti = max(0, ti-filter_len)
+        x_hat_f_v2[left_ti:ti] += np.transpose(x_hat_v[ti,:, :(ti-left_ti), :], (1, 0, 2))/(c.tau * 2)
 
     # error = np.mean(np.square(x_hat_f_v[filter_len:-filter_len] - x_v[filter_len:-filter_len]))
     error = 0.0
