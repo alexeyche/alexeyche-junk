@@ -34,11 +34,11 @@ class LCACell(RNNCell):
 
     @property
     def state_size(self):
-        return (self._layer_size, self._layer_size, self._layer_size, self._layer_size)
+        return (self._layer_size, self._layer_size, self._layer_size, self._layer_size, self._layer_size, self._layer_size)
 
     @property
     def output_size(self):
-        return (self._layer_size, self._layer_size, self._layer_size, self._filter_len * self._input_size)
+        return (self._layer_size, self._layer_size, self._layer_size, self._filter_len * self._input_size, self._layer_size)
 
     def _init_parameters(self):
         if self._Finput is not None: return (self._Finput, )
@@ -48,6 +48,9 @@ class LCACell(RNNCell):
             tf.get_variable("F", [self._filter_len * self._input_size, self._layer_size], 
                 initializer=tf.uniform_unit_scaling_initializer(factor=c.weight_init_factor)
             ),
+            tf.get_variable("Fc", [self._layer_size, self._layer_size], 
+                initializer=tf.uniform_unit_scaling_initializer(factor=c.weight_init_factor)
+            )
         )
 
     def __call__(self, input, state, scope=None):
@@ -61,51 +64,62 @@ class LCACell(RNNCell):
             
             batch_size, filter_len, input_size = x.get_shape().as_list()
             
-            u, a, a_m, dF = state
+            u, a, a_m, fb_m, dF, dFc = state
+            
             F = self._params[0]
             
-            Fc = tf.matmul(tf.transpose(F), F) - tf.eye(self._layer_size)
+            # Fc = tf.matmul(tf.transpose(F), F) - tf.eye(self._layer_size)
+            Fc = self._params[1]
 
             x_flat = tf.reshape(x, (batch_size, filter_len * input_size))
 
             #### logic
                         
-            # du = - u + tf.matmul(x_flat, F) - 3.0*tf.matmul(a, Fc) - 20.0*a_m
-            du = - u + tf.matmul(x_flat, F) - tf.matmul(a, Fc) 
+            new_fb = tf.matmul(a, Fc) 
+            du = - u + tf.matmul(x_flat, F)
             
+            if c.smooth_feedback:
+                du = du - fb_m
+            else:
+                du = du - new_fb
+            
+
             if c.adaptive:
                 du  = du - a_m
 
-            du = tf.clip_by_value(du, -5.0, 5.0)
+            # du = tf.clip_by_value(du, -5.0, 5.0)
             
             new_u = u + c.epsilon * du / c.tau
             
-            new_u = tf.clip_by_value(new_u, -5.0, 5.0)
+            # new_u = tf.clip_by_value(new_u, -5.0, 5.0)
 
-            threshold = a_m
-            # threshold = c.lam
-            
+            if c.adaptive_threshold:
+                threshold = a_m
+            else:
+                threshold = c.lam
+       
             # new_a = tf.nn.relu()
             new_a = c.act_factor * self._act(new_u - threshold)
             new_a_m = a_m + c.epsilon *(c.adapt * new_a - a_m)/c.tau_m
-            # new_a_m = (1.0 - 1.0/c.tau_m) * a_m + (1.0/c.tau_m) * new_a
-            
+            new_fb_m = fb_m + c.epsilon * (c.fb_factor * new_fb - fb_m)/c.tau_fb
+
             #### learning
             
-            if c.simple_hebb:
-                new_dF = dF + c.grad_accum_rate * (
-                    tf.matmul(tf.transpose(x_flat), new_a)
-                )
-            else:
-                new_dF = dF + c.grad_accum_rate * (
-                    tf.matmul(tf.transpose(x_flat), new_a) 
-                    - tf.matmul(F, tf.matmul(tf.transpose(new_a), new_a))
-                )
-
             
             x_hat_flat = tf.matmul(new_a, tf.transpose(F))
             
-            return (new_u, new_a, new_a_m, x_hat_flat), (new_u, new_a, new_a_m, new_dF)
+            error_part = x_hat_flat - x_flat
+            
+            new_dF = dF + c.grad_accum_rate * tf.matmul(tf.transpose(error_part), new_a)
+            
+            new_dFc = dFc + c.grad_accum_rate * ( - tf.matmul(
+                tf.transpose(new_a), new_a
+            ))
+            
+            # for v in (new_u, new_a, new_a_m, new_dF, new_dFc):
+                # print v.get_name(), v.get_shape()
+
+            return (new_u, new_a, new_a_m, x_hat_flat, fb_m), (new_u, new_a, new_a_m, new_fb_m, new_dF, new_dFc)
 
     @property
     def F(self):
@@ -117,6 +131,10 @@ class LCACell(RNNCell):
         assert self._params is not None
         return self._params[0]
 
+    @property
+    def Fc(self):
+        assert self._params is not None
+        return self._params[1]
 
 
 class LCAScalarCell(RNNCell):

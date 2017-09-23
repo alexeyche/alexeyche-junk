@@ -24,7 +24,7 @@ from util import *
 lrate = 0.005
 # lrate *= 100.0
 
-epochs = 1
+epochs = 100
 
 seed = 5
 tf.set_random_seed(seed)
@@ -37,7 +37,7 @@ layer_size = 100
 
 c = Config()
 
-c.weight_init_factor = 0.5
+c.weight_init_factor = 0.3
 c.epsilon = 1.0
 c.tau = 5.0
 c.grad_accum_rate = 1.0
@@ -115,7 +115,7 @@ else:
 
 apply_grads_step = tf.group(
     optimizer.apply_gradients(grads_and_vars),
-    # normalize_weights(net)
+    normalize_weights(net)
 )
 
 
@@ -163,8 +163,9 @@ x_v = x_v.reshape((seq_size, batch_size, input_size))
 # x_v[filter_len:-filter_len] = x_v[filter_len:-filter_len]/x_v_n[(filter_len/2):-(filter_len/2)]
 
 
-sess.run(tf.group(*[tf.assign(cell.F, tf.nn.l2_normalize(cell.F, 0)) for cell in net._cells]))
-sess.run(tf.group(*[tf.assign(cell.Fc, tf.matmul(tf.transpose(cell.F), cell.F) - tf.eye(cell.F.get_shape()[1].value)) for cell in net._cells]))
+# sess.run(tf.group(*[tf.assign(cell.F, tf.nn.l2_normalize(cell.F, 0)) for cell in net._cells]))
+# sess.run(tf.group(*[tf.assign(cell.Fc, tf.matmul(tf.transpose(cell.F), cell.F) - tf.eye(cell.F.get_shape()[1].value)) for cell in net._cells]))
+sess.run(tf.group(*[tf.assign(cell.Fc, tf.matrix_set_diag(tf.matmul(tf.transpose(cell.F), cell.F), tf.zeros(cell.F.get_shape()[1].value))) for cell in net._cells]))
 
 for e in xrange(epochs):
     start_time = time.time()

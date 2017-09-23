@@ -31,10 +31,10 @@ X[np.where(y)[0]] = (X[np.where(y)[0]-1] + X[np.where(y)[0]+1])/2.0
 
 
 # assert X.shape[0] % 4 == 0
-lrate = 0.001
+lrate = 0.0001
 # lrate *= 100.0
 
-epochs = 1
+epochs = 100
 
 seed = 7
 tf.set_random_seed(seed)
@@ -50,22 +50,22 @@ layer_size = 100
 
 c = Config()
 
-c.weight_init_factor = 0.5
+c.weight_init_factor = 0.3
 c.epsilon = 1.0
 c.tau = 5.0
 c.grad_accum_rate = 1.0
 
 c.lam = 0.05
-c.adaptive_threshold = True
+c.adaptive_threshold = False
 
 c.tau_m = 200.0
 c.adapt = 5.0
 c.act_factor = 1.0
-c.adaptive = True
+c.adaptive = False
 
 c.tau_fb = 10.0
 c.fb_factor = 2.0
-c.smooth_feedback = True
+c.smooth_feedback = False
 
 
 hand_grad = False
@@ -143,8 +143,9 @@ x_v = X.reshape((seq_size, batch_size, input_size))
 # x_v = (x_v - np.mean(x_v, 0))
 # x_v = (x_v - np.mean(x_v, 0))/np.std(x_v, 0)
 
-sess.run(tf.group(*[tf.assign(cell.F, tf.nn.l2_normalize(cell.F, 0)) for cell in net._cells]))
-sess.run(tf.group(*[tf.assign(cell.Fc, tf.matmul(tf.transpose(cell.F), cell.F) - tf.eye(cell.F.get_shape()[1].value)) for cell in net._cells]))
+# sess.run(tf.group(*[tf.assign(cell.F, tf.nn.l2_normalize(cell.F, 0)) for cell in net._cells]))
+# sess.run(tf.group(*[tf.assign(cell.Fc, tf.matmul(tf.transpose(cell.F), cell.F) - tf.eye(cell.F.get_shape()[1].value)) for cell in net._cells]))
+sess.run(tf.group(*[tf.assign(cell.Fc, tf.matrix_set_diag(tf.matmul(tf.transpose(cell.F), cell.F), tf.zeros(cell.F.get_shape()[1].value))) for cell in net._cells]))
 
 state_v = get_zero_state()
     
