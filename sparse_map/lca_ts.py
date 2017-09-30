@@ -105,7 +105,7 @@ get_zero_state = lambda: tuple(
 
 (u_ta, a_ta, a_m_ta, x_hat_flat_ta), finstate, _ = tf.nn.raw_rnn(
     net, 
-    rnn_with_hist_loop_fn(input, sequence_length, state, filter_len)
+    rnn_with_hist_loop_fn((input,), sequence_length, state, filter_len)
 )
 
 

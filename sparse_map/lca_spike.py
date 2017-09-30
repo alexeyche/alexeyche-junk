@@ -21,10 +21,10 @@ from ts_pp import white_ts, generate_ts
 from util import *
 
 
-lrate = 0.1
+lrate = 0.01
 # lrate *= 100.0
 
-epochs = 1000
+epochs = 500
 
 seed = 5
 tf.set_random_seed(seed)
@@ -91,20 +91,20 @@ get_zero_state = lambda: tuple(
 
 # (a, u, a_m, x_hat, fb), finstate = tf.nn.dynamic_rnn(net, (input, ), initial_state=state, time_major=True)
 
-(u_ta, a_ta, a_m_ta, x_hat_flat_ta, fb_m_ta), finstate, _ = tf.nn.raw_rnn(
+(a_ta, u_ta, a_m_ta, x_hat_flat_ta, fb_m_ta), finstate, _ = tf.nn.raw_rnn(
     net, 
-    rnn_with_hist_loop_fn(input, sequence_length, state, filter_len)
+    rnn_with_hist_loop_fn((input,), sequence_length, state, filter_len)
 )
 
 (
-    u, 
-    a,
+    a, 
+    u,
     a_m, 
     x_hat_flat, 
     fb
 ) = (
-    u_ta.stack(), 
     a_ta.stack(), 
+    u_ta.stack(), 
     a_m_ta.stack(), 
     x_hat_flat_ta.stack(), 
     fb_m_ta.stack()
@@ -170,11 +170,13 @@ x_v = np.zeros((seq_size, batch_size, input_size))
 x_v_sm = np.zeros((seq_size, batch_size, input_size))
 
 for bi in xrange(batch_size):
-    for si in xrange(0, seq_size, 5):
-        x_v[si, bi, si % input_size] = 1.0
-
+    # for si in xrange(0, seq_size, 5):
+        # x_v[si, bi, si % input_size] = 1.0
+    for si in xrange(seq_size):
+        for ni in xrange(input_size):
+            if np.random.random() < 0.005:
+                x_v[si, bi, ni] = 1.0
     x_v_sm[:, bi, :] = smooth_matrix(x_v[:, bi, :])
-    
 
 
 # sess.run(tf.group(*[tf.assign(cell.F_flat, tf.nn.l2_normalize(cell.F_flat, 0)) for cell in net._cells]))
@@ -232,3 +234,41 @@ except KeyboardInterrupt:
 # shl(a_v[:500, 0, :])
 shm(a_v[100:500,0,:])
 shm(x_hat_f_v2[:,0,:], x_v[:,0,:])
+
+
+x2_v = np.zeros((seq_size, batch_size, input_size))
+x2_v_sm = np.zeros((seq_size, batch_size, input_size))
+
+for bi in xrange(batch_size):
+    # for si in xrange(0, seq_size, 5):
+        # x_v[si, bi, si % input_size] = 1.0
+    for si in xrange(seq_size):
+        for ni in xrange(input_size):
+            if np.random.random() < 0.005:
+                x2_v[si, bi, ni] = 1.0
+    x2_v_sm[:, bi, :] = smooth_matrix(x2_v[:, bi, :])
+
+a2_v, x2_hat_v = sess.run(
+    [a, x_hat], 
+    {
+        input: x2_v, 
+        state: get_zero_state(), 
+        sequence_length: np.asarray([seq_size]*batch_size)
+    }
+)
+
+x2_hat_f_v = np.zeros((seq_size, batch_size, input_size))
+for ti in xrange(x2_hat_v.shape[0]):
+    left_ti = max(0, ti-filter_len)
+    x2_hat_f_v[left_ti:ti] += np.transpose(x2_hat_v[ti,:, :(ti-left_ti), :], (1, 0, 2))/c.tau
+
+x2_hat_f_v_sm = x2_hat_f_v.copy()
+for bi in xrange(batch_size):
+    x2_hat_f_v_sm[:, bi, :] = smooth_matrix(x2_hat_f_v[:, bi, :])
+
+shm(x2_hat_f_v[:,0,:], x2_v[:,0,:])
+# error = np.mean(np.square(x2_hat_f_v_sm[filter_len:-filter_len] - x2_v_sm[filter_len:-filter_len]))
+error_line = np.sum(np.square(x_hat_f_v2_sm[filter_len:-filter_len] - x_v_sm[filter_len:-filter_len]), 2)
+error_line2 = np.sum(np.square(x2_hat_f_v_sm[filter_len:-filter_len] - x2_v_sm[filter_len:-filter_len]), 2)
+shl(error_line, error_line2)
+

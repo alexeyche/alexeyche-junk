@@ -18,14 +18,18 @@ def cat_hist(hist, new, dim):
 
 def rnn_with_hist_loop_fn(inputs, sequence_length, initial_state, window):
     batch_size = sequence_length.get_shape()[0]
-    input_shape = inputs.get_shape().as_list()
+    input_shape = inputs[0].get_shape().as_list()
     assert len(input_shape) == 3, "Expecting input with shape [T, batch_size, dim_size]"
     assert input_shape[1] == batch_size, "Expecting sequence length with shape [batch_size] according to input"
     max_time = input_shape[0]
-    input_size = input_shape[2]
-
-    inputs_ta = tf.TensorArray(dtype=tf.float32, size=max_time)
-    inputs_ta = inputs_ta.unstack(inputs)
+    
+    input_sizes = tuple(input.get_shape()[2].value for input in inputs)
+    
+    
+    inputs_ta = tuple(
+        tf.TensorArray(dtype=tf.float32, size=max_time).unstack(input)
+        for input in inputs
+    )
 
     def loop_fn(time, cell_output, cell_state, loop_state):
         emit_output = cell_output  # == None for time == 0
@@ -38,20 +42,24 @@ def rnn_with_hist_loop_fn(inputs, sequence_length, initial_state, window):
         elements_finished = (time >= sequence_length)
         
         finished = tf.reduce_all(elements_finished)
+        next_inputs = tuple(
+            tf.cond(
+                finished,
+                lambda: tf.zeros([batch_size, input_size], dtype=tf.float32),
+                lambda: input_ta.read(time)
+            )
+            for input_size, input_ta in zip(input_sizes, inputs_ta)
+        )
         
-        next_input = tf.cond(
-            finished,
-            lambda: tf.zeros([batch_size, input_size], dtype=tf.float32),
-            lambda: inputs_ta.read(time))
-
+        next_inputs = tuple(
+            tf.pad(tf.expand_dims(next_input, 1), [[0,0], [window-1, 0], [0,0]]) if loop_state is None 
+            else cat_hist(loop_state[input_id], next_input, 1)
+            for input_id, next_input in enumerate(next_inputs)
+        )
         
-        if loop_state is None:
-            next_input = tf.expand_dims(next_input, 1)
-            next_input = tf.pad(next_input, [[0,0], [window-1, 0], [0,0]])
-        else:
-            next_input = cat_hist(loop_state, next_input, 1)
+        print next_inputs
         
-        next_loop_state = next_input
+        next_loop_state = next_inputs
         
-        return (elements_finished, (next_input,), next_cell_state, emit_output, next_loop_state)
+        return (elements_finished, next_inputs, next_cell_state, emit_output, next_loop_state)
     return loop_fn

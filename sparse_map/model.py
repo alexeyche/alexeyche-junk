@@ -58,7 +58,7 @@ class LCACell(RNNCell):
             ### init
             if self._params is None:
                 self._params = self._init_parameters()
-
+            
             x = input[0]
             c = self._c
             
@@ -116,10 +116,7 @@ class LCACell(RNNCell):
                 tf.transpose(new_a), new_a
             ))
             
-            # for v in (new_u, new_a, new_a_m, new_dF, new_dFc):
-                # print v.get_name(), v.get_shape()
-
-            return (new_u, new_a, new_a_m, x_hat_flat, fb_m), (new_u, new_a, new_a_m, new_fb_m, new_dF, new_dFc)
+            return (new_a, new_u, new_a_m, x_hat_flat, fb_m), (new_u, new_a, new_a_m, new_fb_m, new_dF, new_dFc)
 
     @property
     def F(self):
