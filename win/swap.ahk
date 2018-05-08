@@ -16,3 +16,4 @@ LAlt & l::Send ^l
 LAlt & LButton::Send ^{LButton 1}
 !+Left::Send ^+{Left}
 !+Right::Send ^+{Right}
+!Space::Send #{Space}
