@@ -16,8 +16,11 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
+from sklearn.neural_network import MLPClassifier
 
-from datasets import ToyDataset
+from datasets import *
+
+
 
 import numpy as np
 
@@ -31,7 +34,8 @@ names = [
     "Neural net",
     "AdaBoost",
     "Naive Bayes", 
-    "QDA"
+    "QDA",
+    "MLPClassifier"
 ]
 
 classifiers = [
@@ -44,10 +48,20 @@ classifiers = [
     MLPClassifier(max_iter=1000),
     AdaBoostClassifier(),
     GaussianNB(),
-    QuadraticDiscriminantAnalysis()
+    QuadraticDiscriminantAnalysis(),
+    MLPClassifier(
+        solver="adam",
+        activation="relu",
+        hidden_layer_sizes=(100,),
+        alpha=0.0,
+        learning_rate="constant",
+        learning_rate_init=0.001,
+        max_iter=1000
+    )
 ]
 
-ds = ToyDataset()
+np.random.seed(11)
+ds = XorDataset()
 
 # model = DecisionTreeClassifier()
 for model_name, model in zip(names, classifiers):

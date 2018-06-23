@@ -12,7 +12,10 @@ DEFAULT_FIG_SIZE = (7,7)
 def xavier_init(fan_in, fan_out, const=1.0):
     low = -const * np.sqrt(6.0 / (fan_in + fan_out))
     high = const * np.sqrt(6.0 / (fan_in + fan_out))
-    return (low + np.random.random((fan_in, fan_out)) * (high - low)).astype(np.float32)
+    return (
+        (low + np.random.random((fan_in, fan_out)) * (high - low)).astype(np.float32),
+        (low + np.random.random((fan_out,)) * (high - low)).astype(np.float32)
+    )
 
 
 

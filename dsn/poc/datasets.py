@@ -248,7 +248,7 @@ class ToyDataset(Dataset):
         return self._xt_v, self._yt_v
 
 
-class XorDataset(Dataset):
+class XorDatasetSmall(Dataset):
     def __init__(self):
         self._x_v = np.asarray([
             [0.0, 0.0],
@@ -297,6 +297,105 @@ class XorDataset(Dataset):
     def test_data(self):        
         return self._x_v, self._y_v
 
+
+class XorDataset(Dataset):
+    def __init__(self):
+        sd = 0.2
+        x_v = np.concatenate([
+            sd*np.random.randn(200, 2).astype(np.float32),
+            [0.0, 1.0] + sd*np.random.randn(200, 2).astype(np.float32),
+            [1.0, 0.0] + sd*np.random.randn(200, 2).astype(np.float32),
+            [1.0, 1.0] + sd*np.random.randn(200, 2).astype(np.float32),
+        ], )
+        y_v = one_hot_encode(np.concatenate([
+            np.zeros((200,), dtype=np.float32),
+            np.ones((200,), dtype=np.float32),
+            np.ones((200,), dtype=np.float32),
+            np.zeros((200,), dtype=np.float32),
+        ]), 2)
+
+        ids = np.random.permutation(x_v.shape[0])
+        x_v = x_v[ids]
+        y_v = y_v[ids]
+
+        test_prop = x_v.shape[0]/4
+
+        self._xt_v = x_v[:test_prop]
+        self._yt_v = y_v[:test_prop]
+
+        self._x_v = x_v[test_prop:]
+        self._y_v = y_v[test_prop:]
+
+        self._train_batch_size = 200
+        self._test_batch_size = 200
+        self._i = 0
+        self._it = 0
+
+    @property
+    def train_shape(self):
+        return self._x_v.shape, self._y_v.shape
+
+
+    @property
+    def test_shape(self):
+        return self._xt_v.shape, self._yt_v.shape
+
+
+    def next_train_batch(self):
+        tup_to_return = (
+            self._x_v[self._i * self._train_batch_size:(self._i + 1) * self.train_batch_size],
+            self._y_v[self._i * self._train_batch_size:(self._i + 1) * self.train_batch_size]
+        )
+        self._i += 1
+        if self._i >= self.train_batches_num:
+            self._i = 0
+        return tup_to_return
+
+
+    def next_test_batch(self):
+        tup_to_return = (
+            self._xt_v[self._it * self._test_batch_size:(self._it + 1) * self._test_batch_size],
+            self._yt_v[self._it * self._test_batch_size:(self._it + 1) * self._test_batch_size]
+        )
+        self._it += 1
+        if self._it >= self.test_batches_num:
+            self._it = 0
+        return tup_to_return
+
+
+    @property
+    def train_batch_size(self):
+        return self._train_batch_size
+
+
+    @property
+    def test_batch_size(self):
+        return self._test_batch_size
+
+
+    @property
+    def train_batches_num(self):
+        return self._x_v.shape[0]/self._train_batch_size
+
+
+    @property
+    def test_batches_num(self):
+        return self._xt_v.shape[0] / self._test_batch_size
+
+
+    @property
+    def task_type(self):
+        return TaskType.CLASSIFICATION
+
+
+    @property
+    def train_data(self):
+        return self._x_v, self._y_v
+
+
+    @property
+    def test_data(self):
+        return self._xt_v, self._yt_v
 
 
 def whiten(X,fudge=1E-18):
