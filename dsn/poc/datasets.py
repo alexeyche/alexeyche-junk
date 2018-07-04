@@ -318,7 +318,7 @@ class XorDataset(Dataset):
         x_v = x_v[ids]
         y_v = y_v[ids]
 
-        test_prop = x_v.shape[0]/4
+        test_prop = x_v.shape[0] // 4
 
         self._xt_v = x_v[:test_prop]
         self._yt_v = y_v[:test_prop]

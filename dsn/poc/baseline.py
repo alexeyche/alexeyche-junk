@@ -18,7 +18,7 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from sklearn.neural_network import MLPClassifier
 
-from datasets import *
+from poc.datasets import *
 
 
 
@@ -77,10 +77,10 @@ for model_name, model in zip(names, classifiers):
 
     predicted = model.predict(x_test)
 
-    print '%s, predicting, classification error=%f' % (
+    print('%s, predicting, classification error=%f' % (
         model_name,
         sum( int(predicted[i]) != y_test[i] for i in range(len(y_test))) / float(len(y_test)) 
-    )
+    ))
 
 # >>> np.mean(ds._x_v)
 # 0.026144806425465482

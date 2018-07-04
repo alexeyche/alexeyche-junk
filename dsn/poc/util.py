@@ -7,6 +7,9 @@ import pylab
 from scipy import signal
 import pandas as pd
 
+from scipy.sparse import csr_matrix, coo_matrix
+
+
 DEFAULT_FIG_SIZE = (7,7)
 
 def xavier_init(fan_in, fan_out, const=1.0):
@@ -16,6 +19,18 @@ def xavier_init(fan_in, fan_out, const=1.0):
         (low + np.random.random((fan_in, fan_out)) * (high - low)).astype(np.float32),
         (low + np.random.random((fan_out,)) * (high - low)).astype(np.float32)
     )
+
+
+def sparse_xavier_init(fan_in, fan_out, const=1.0, epsilon=20):
+    W, b = xavier_init(fan_in, fan_out, const)
+    p = epsilon * (float(fan_in) + fan_out)/(fan_in * fan_out)
+
+    mask = np.random.random((fan_in, fan_out)) < p
+
+    W *= mask.astype(np.float32)
+    print("Sparsity level is {:.4f}" % np.mean(np.equal(W, 0.0)))
+
+    return coo_matrix(W), b
 
 
 
