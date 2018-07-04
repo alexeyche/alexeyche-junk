@@ -28,7 +28,7 @@ def sparse_xavier_init(fan_in, fan_out, const=1.0, epsilon=20):
     mask = np.random.random((fan_in, fan_out)) < p
 
     W *= mask.astype(np.float32)
-    print("Sparsity level is {:.4f}" % np.mean(np.equal(W, 0.0)))
+    print("Sparsity level is {:.4f}".format(np.mean(np.equal(W, 0.0))))
 
     return coo_matrix(W), b
 
