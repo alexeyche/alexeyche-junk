@@ -114,11 +114,11 @@ class Dataset(object):
 
     @property
     def train_batches_num(self):
-        return self.train_shape[0][0]/self.train_batch_size
+        return self.train_shape[0][0] // self.train_batch_size
 
     @property
     def test_batches_num(self):
-        return self.test_shape[0][0]/self.test_batch_size
+        return self.test_shape[0][0] // self.test_batch_size
 
     @property
     def task_type(self):
@@ -137,7 +137,11 @@ class MNISTDataset(Dataset):
         from tensorflow.examples.tutorials.mnist import input_data
 
         self._data = input_data.read_data_sets(
-            "{}/tmp/MNIST_data/".format(os.environ["HOME"]),
+            "{}/tmp/MNIST_data/".format(
+                os.environ["HOME"]
+                if "HOME" in os.environ else
+                os.environ["HOMEPATH"]
+            ),
             one_hot=True
         )
         self._train_batch_size = 200

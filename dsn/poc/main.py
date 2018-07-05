@@ -9,11 +9,10 @@ ds = MNISTDataset()
 (_, input_size), (_, output_size) = ds.train_shape
 
 lil_epsilon = 1.0
-big_epsilon = 10.0
+big_epsilon = 100.0
 weight_factor = 1.0
-layer_size = 100 #(100, 100)
 threshold = 0.1
-net_structure = (500, 500, output_size)
+net_structure = (2000, 2000, output_size)
 
 tf.set_random_seed(2)
 
@@ -43,11 +42,13 @@ n = Network(
 	output_act=tf.nn.sigmoid,
 	output_act_deriv=output_act_deriv,
 	loss_deriv=loss_deriv,
-	sparse=False
+	sparse=True,
+    lil_epsilon=lil_epsilon,
+    big_epsilon=big_epsilon,
 )
 
 
-opt = tf.train.AdamOptimizer(learning_rate=0.0001)
+opt = tf.train.AdamOptimizer(learning_rate=0.001)
 
 a, u, da, dp = n.build_model(x, y)
 
@@ -56,7 +57,7 @@ apply_grad_step = opt.apply_gradients(zip(flatten(dp), flatten(n.po)))
 
 square_loss = tf.reduce_sum(tf.square(a[-1] - y))
 class_error_rate = tf.reduce_mean(tf.cast(tf.not_equal(tf.argmax(a[-1], 1), tf.argmax(y, 1)), tf.float32))
-sparsity = tf.reduce_mean([tf.reduce_mean(tf.cast(tf.not_equal(aa, 0.0), tf.float32)) for aa in a[:-1]])
+sparsity = tf.reduce_mean([tf.reduce_mean(tf.cast(tf.equal(aa, 0.0), tf.float32)) for aa in a[:-1]])
 
 sess = tf.Session()
 sess.run(tf.global_variables_initializer())
@@ -71,8 +72,8 @@ train_metrics, test_metrics = (
     np.zeros((epochs, METRIC_SIZE))
 )
 
-for epoch in xrange(epochs):
-    for _ in xrange(ds.train_batches_num):
+for epoch in range(epochs):
+    for _ in range(ds.train_batches_num):
         xv, yv = ds.next_train_batch()
         
         av, uv, dav, dpv, square_loss_v, class_error_rate_v, sparsity_v, _ = sess.run(
@@ -87,7 +88,7 @@ for epoch in xrange(epochs):
         )
         
 
-    for _ in xrange(ds.test_batches_num):
+    for _ in range(ds.test_batches_num):
         xtv, ytv = ds.next_test_batch()
         
         atv, utv, datv, dptv, square_loss_t_v, class_error_rate_t_v, sparsity_t_v = sess.run(
