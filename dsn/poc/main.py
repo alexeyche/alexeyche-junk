@@ -1,35 +1,47 @@
+
 from poc.datasets import *
-import tensorflow as tf
+from poc.util import *
+from sklearn.datasets.samples_generator import make_blobs
 
 def flatten(p):
     return [pp for param in p for pp in param]
 
-def init_parameters(input_size,net_structure,weight_factor):
-    params = []
-    for fan_in, fan_out in zip((input_size,) + net_structure[:-1], net_structure):
-        Winit, binit = xavier_init(fan_in, fan_out, const=weight_factor)
-        W = tf.Variable(Winit.T, name="W")
-        b = tf.Variable(binit, name="b")
 
-        params.append((W, b))
-
-    return params
-
-
-ds = XorDataset()
-
-(_, input_size), (_, output_size) = ds.train_shape
-
+input_size = 20
+output_size = 20
 weight_factor = 1.0
 threshold = 0.1
-net_structure = (100, output_size)
+layer_size = 200
 
-x = tf.placeholder(tf.float32, shape=(None, input_size), name="x")
-y = tf.placeholder(tf.float32, shape=(None, output_size), name="y")
+sparsity = 0.95
+batch_size = 300
+dt = 0.2
+num_iters = 100
 
-f = tf.nn.relu
+
+centers = [[1, 1], [-1, -1], [1, -1]]
+x, labels_true = make_blobs(n_samples=batch_size, centers=centers, cluster_std=0.5, random_state=0)
+x = quantize_data(x, input_size)
 
 
-p = init_parameters(input_size, net_structure, weight_factor=weight_factor)
+
+
+W, _ = sparse_xavier_init(layer_size, layer_size, const=weight_factor, p=1.0-sparsity)
+
+
+u = np.zeros((batch_size, layer_size))
+uh = np.zeros((num_iters, batch_size, layer_size))
+
+
+
+for ti in xrange(num_iters):
+	u[:, :input_size] = x
+
+
+	u += dt * (W.dot(u.T).T - u)
+
+	uh[ti] = u.copy()
+
+# shs(x, labels=(labels_true,))
 
 
