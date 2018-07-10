@@ -33,8 +33,8 @@ def quantize_data(x, dest_size):
     
     min_vals = np.min(x, 0)
     max_vals = np.max(x, 0)
-    for xi in xrange(x.shape[0]):
-        for di in xrange(dim_size):
+    for xi in range(x.shape[0]):
+        for di in range(dim_size):
             v01 = (x[xi, di] - min_vals[di]) / (max_vals[di] - min_vals[di])
             x_out[xi, int(di * size_per_dim + v01 * (size_per_dim-1))] = 1.0
     return x_out

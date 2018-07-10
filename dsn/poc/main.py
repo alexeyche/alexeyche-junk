@@ -3,8 +3,14 @@ from poc.datasets import *
 from poc.util import *
 from sklearn.datasets.samples_generator import make_blobs
 
+from scipy.sparse import linalg
+
 def flatten(p):
     return [pp for param in p for pp in param]
+
+def norm(W, axis=1):
+    return W / np.linalg.norm(W, 2, axis=axis, keepdims=True)
+
 
 
 input_size = 20
@@ -15,33 +21,43 @@ layer_size = 200
 
 sparsity = 0.95
 batch_size = 300
-dt = 0.2
-num_iters = 100
-
+beta = 0.0
+num_iters = 0
+K = layer_size // 20
 
 centers = [[1, 1], [-1, -1], [1, -1]]
 x, labels_true = make_blobs(n_samples=batch_size, centers=centers, cluster_std=0.5, random_state=0)
 x = quantize_data(x, input_size)
-
-
+x = np.concatenate((x, np.zeros((batch_size, layer_size-x.shape[1])),), 1)
 
 
 W, _ = sparse_xavier_init(layer_size, layer_size, const=weight_factor, p=1.0-sparsity)
+W = norm(W.todense())
+
+
 
 
 u = np.zeros((batch_size, layer_size))
+u[np.random.random((batch_size, layer_size))<np.expand_dims(np.tile(K/layer_size, batch_size), 1)] = 1.0
+
 uh = np.zeros((num_iters, batch_size, layer_size))
 
 
-
-for ti in xrange(num_iters):
-	u[:, :input_size] = x
+u = np.random.random((batch_size, layer_size))
 
 
-	u += dt * (W.dot(u.T).T - u)
+for ti in range(num_iters):
+    new_u = x + np.dot(u, W)
 
-	uh[ti] = u.copy()
+    # W += beta * np.dot(u.T, new_u) / batch_size
+    # W = norm(W)
 
+    uh[ti] = new_u.copy()
+    u = new_u
+
+    ind = np.argpartition(u, -K, axis=1)[:, -K:]
+
+    print(ti)
 # shs(x, labels=(labels_true,))
 
 
