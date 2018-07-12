@@ -379,12 +379,12 @@ class XorDataset(Dataset):
 
     @property
     def train_batches_num(self):
-        return self._x_v.shape[0]/self._train_batch_size
+        return self._x_v.shape[0] // self._train_batch_size
 
 
     @property
     def test_batches_num(self):
-        return self._xt_v.shape[0] / self._test_batch_size
+        return self._xt_v.shape[0] // self._test_batch_size
 
 
     @property

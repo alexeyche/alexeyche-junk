@@ -1,126 +1,130 @@
-
 from poc.datasets import *
-from poc.util import *
-from sklearn.datasets.samples_generator import make_blobs
-
-
-def norm(W):
-    delim = np.linalg.norm(W, 2, axis=0, keepdims=True)
-    delim[np.where(delim == 0)] = 1.0
-    return W / delim
-
-def act(u, K):
-    a = np.zeros(u.shape)
-    batch_size = u.shape[0]
-
-    bidx = np.arange(0, batch_size)
-    ind = np.argpartition(u, -K, axis=1)[:, -K:]
-
-    a[np.expand_dims(bidx, 1), ind] = 1.0
-    a[np.where(np.abs(u) < 1e-10)] = 0.0
-    return a
+from poc.__scrap_tf__.common import *
 
 
 class Layer(object):
-    def __init__(s, batch_size, input_size, layer_size, output_size, epochs, weight_factor, sparsity, K, lrate):
-        s.batch_size = batch_size
-        s.input_size = input_size
-        s.layer_size = layer_size
-        s.output_size = output_size
-        s.weight_factor = weight_factor
-        s.sparsity = sparsity
-        s.K = K
-        s.lrate = lrate
+    def __init__(s, input_size, layer_size, output_size, act, weight_factor):
+        W, b = xavier_init(input_size, layer_size, weight_factor)
 
-        s.W, _ = sparse_xavier_init(input_size, layer_size, const=weight_factor, p=1.0-sparsity)
-        s.W = np.asarray(s.W.todense())
+        s.act = act
+        s.params = [
+            tf.Variable(W),
+            tf.Variable(b),
+        ]
 
-        # s.W, _ = xavier_init(input_size, layer_size, const=weight_factor)
-
-        s.Winit = s.W.copy()
-        
-        s.uh = np.zeros((epochs, batch_size, layer_size))
-        s.ah = np.zeros((epochs, batch_size, layer_size))
-        s.dah = np.zeros((epochs, 1))
-
-        s.act = lambda x: act(x, K)
-
-    def run(s, epoch, x):
-        s.u = np.dot(x, s.W)
-        s.a = s.act(s.u)
-
-        s.dW = np.dot(x.T, s.a) / s.batch_size
-        s.W += s.lrate * s.dW
-        # s.W = norm(s.W)
-
-        s.uh[epoch] = s.u.copy()
-        s.ah[epoch] = s.a.copy()
-        
-        if epoch > 0:
-            s.dah[epoch] = np.mean(np.not_equal(s.ah[epoch], s.ah[epoch-1]))
+    def run(s, x, y):
+        W, b = s.params
+        s.u = tf.matmul(x, W)
+        s.a = s.act(b + s.u)
 
 
-input_size = 20
-output_size = 20
-weight_factor = 0.1
-layer_size = 100
+def run_net(net, d):
+    for li, l in enumerate(net):
+        inp = d if li == 0 else net[li-1].a
+        l.run(inp, None)
 
-sparsity = 0.95
-batch_size = 300
-K = layer_size // 20
-dt = 0.01
-reg = 0.0
-epochs = 1000
 
-lrate = 0.1
+np.random.seed(11)
+ds = MNISTDataset()
 
-epochs = 1000
+(_, input_size), (_, output_size) = ds.train_shape
 
-net = [
-    Layer(
-        batch_size, 
-        input_size, 
-        layer_size, 
-        layer_size, 
-        epochs, 
-        weight_factor, 
-        sparsity, 
-        K,
-        lrate
-    ),
-    Layer(
-        batch_size, 
-        layer_size, 
-        layer_size, 
-        layer_size, 
-        epochs, 
-        weight_factor, 
-        sparsity, 
-        K,
-        lrate
-    )
+weight_factor = 1.0
+threshold = 0.1
+
+tf.set_random_seed(2)
+
+
+x = tf.placeholder(tf.float32, shape=(None, input_size), name="x")
+y = tf.placeholder(tf.float32, shape=(None, output_size), name="y")
+
+
+layer_size = 500
+
+
+ff_net = [
+    Layer(input_size, layer_size, output_size, tf.nn.relu, weight_factor),
+    Layer(layer_size, layer_size, layer_size, tf.nn.relu, weight_factor),
+    Layer(layer_size, output_size, output_size, tf.nn.sigmoid, weight_factor)
 ]
 
-np.random.seed(4)
+fb_net = [
+    Layer(output_size, layer_size, layer_size, tf.nn.relu, weight_factor),
+    Layer(layer_size, layer_size, layer_size, tf.nn.relu, weight_factor),
+    Layer(layer_size, input_size, input_size, tf.nn.sigmoid, weight_factor)
+]
+
+# fb_net[1].params[0] = tf.transpose(ff_net[0].params[0])
 
 
-
-centers = [[1, 1], [-1, -1], [1, -1]]
-x, labels_true = make_blobs(n_samples=batch_size, centers=centers, cluster_std=0.5, random_state=0)
-x = quantize_data(x, input_size)
+run_net(ff_net, x)
+run_net(fb_net, y)
 
 
-for epoch in range(epochs):
-    for li, l in enumerate(net):
-        inp = x if li == 0 else net[li-1].a
-            
-        l.run(epoch, inp)
+a_ff = tuple([l.a for l in ff_net])
+a_fb = tuple([l.a for l in fb_net])
+
+dW0 = tf.matmul(tf.transpose(x), a_fb[1] - a_ff[0])
+dW1 = tf.matmul(tf.transpose(a_ff[0]), a_fb[0] - a_ff[1])
+dW2 = tf.matmul(tf.transpose(a_ff[1]), y - a_ff[2])
+
+opt = tf.train.AdamOptimizer(learning_rate=0.0001)
 
 
-    print("{} {:.4f} {:.4f}, {:.4f} {:.4f}".format(
-        epoch,
-        np.linalg.norm(net[0].dW),
-        np.linalg.norm(net[1].dW),
-        net[0].dah[epoch, 0],
-        net[1].dah[epoch, 0],
-    ))
+class_error_rate = tf.reduce_mean(
+    tf.cast(tf.not_equal(tf.argmax(a_ff[-1], 1), tf.argmax(y, 1)), tf.float32)
+)
+
+apply_grad_step = opt.apply_gradients([
+    (-dW0, ff_net[0].params[0]),
+    (-dW1, ff_net[1].params[0]),
+    (-dW2, ff_net[2].params[0]),
+])
+
+sess = tf.Session()
+sess.run(tf.global_variables_initializer())
+
+epochs = 1000
+print_freq = 1
+train_metrics, test_metrics = (
+    np.zeros((epochs, 1)),
+    np.zeros((epochs, 1))
+)
+
+for epoch in range(100):
+    for _ in range(ds.train_batches_num):
+        xv, yv = ds.next_train_batch()
+
+        a_ff_v, a_fb_v, class_error_rate_v, _ = sess.run((
+            a_ff,
+            a_fb,
+            class_error_rate,
+            apply_grad_step
+        ), {
+            x: xv,
+            y: yv
+        })
+
+        train_metrics[epoch] += class_error_rate_v / ds.train_batches_num
+
+    for _ in range(ds.test_batches_num):
+        xtv, ytv = ds.next_test_batch()
+
+        at_ff_v, at_fb_v, class_error_rate_t_v = sess.run((
+            a_ff,
+            a_fb,
+            class_error_rate,
+        ), {
+            x: xtv,
+            y: ytv
+        })
+
+        test_metrics[epoch] += class_error_rate_t_v / ds.test_batches_num
+
+    if epoch % print_freq == 0:
+        print("Epoch {}, train {:.4f}, test {:.4f}".format(
+            epoch,
+            class_error_rate_v,
+            class_error_rate_t_v,
+        ))
+
