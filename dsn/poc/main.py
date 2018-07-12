@@ -54,7 +54,8 @@ fb_net = [
     Layer(layer_size, input_size, input_size, tf.nn.sigmoid, weight_factor)
 ]
 
-# fb_net[1].params[0] = tf.transpose(ff_net[0].params[0])
+fb_net[1].params[0] = tf.transpose(ff_net[1].params[0])
+fb_net[2].params[0] = tf.transpose(ff_net[0].params[0])
 
 
 run_net(ff_net, x)
@@ -68,7 +69,7 @@ dW0 = tf.matmul(tf.transpose(x), a_fb[1] - a_ff[0])
 dW1 = tf.matmul(tf.transpose(a_ff[0]), a_fb[0] - a_ff[1])
 dW2 = tf.matmul(tf.transpose(a_ff[1]), y - a_ff[2])
 
-opt = tf.train.AdamOptimizer(learning_rate=0.0001)
+opt = tf.train.GradientDescentOptimizer(learning_rate=0.0001)
 
 
 class_error_rate = tf.reduce_mean(
