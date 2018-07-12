@@ -9,20 +9,7 @@ def norm(W):
     delim[np.where(delim == 0)] = 1.0
     return W / delim
 
-
-input_size = 20
-output_size = 20
-weight_factor = 0.1
-layer_size = 200
-
-sparsity = 0.99
-batch_size = 300
-beta = 0.01
-K = 20
-dt = 0.01
-
-
-def act(u):
+def act(u, K):
     a = np.zeros(u.shape)
     batch_size = u.shape[0]
 
@@ -34,6 +21,86 @@ def act(u):
     return a
 
 
+class Layer(object):
+    def __init__(s, batch_size, input_size, layer_size, output_size, epochs, weight_factor, sparsity, K, lrate):
+        s.batch_size = batch_size
+        s.input_size = input_size
+        s.layer_size = layer_size
+        s.output_size = output_size
+        s.weight_factor = weight_factor
+        s.sparsity = sparsity
+        s.K = K
+        s.lrate = lrate
+
+        s.W, _ = sparse_xavier_init(input_size, layer_size, const=weight_factor, p=1.0-sparsity)
+        s.W = np.asarray(s.W.todense())
+
+        # s.W, _ = xavier_init(input_size, layer_size, const=weight_factor)
+
+        s.Winit = s.W.copy()
+        
+        s.uh = np.zeros((epochs, batch_size, layer_size))
+        s.ah = np.zeros((epochs, batch_size, layer_size))
+        s.dah = np.zeros((epochs, 1))
+
+        s.act = lambda x: act(x, K)
+
+    def run(s, epoch, x):
+        s.u = np.dot(x, s.W)
+        s.a = s.act(s.u)
+
+        s.dW = np.dot(x.T, s.a) / s.batch_size
+        s.W += s.lrate * s.dW
+        # s.W = norm(s.W)
+
+        s.uh[epoch] = s.u.copy()
+        s.ah[epoch] = s.a.copy()
+        
+        if epoch > 0:
+            s.dah[epoch] = np.mean(np.not_equal(s.ah[epoch], s.ah[epoch-1]))
+
+
+input_size = 20
+output_size = 20
+weight_factor = 0.1
+layer_size = 100
+
+sparsity = 0.95
+batch_size = 300
+K = layer_size // 20
+dt = 0.01
+reg = 0.0
+epochs = 1000
+
+lrate = 0.1
+
+epochs = 1000
+
+net = [
+    Layer(
+        batch_size, 
+        input_size, 
+        layer_size, 
+        layer_size, 
+        epochs, 
+        weight_factor, 
+        sparsity, 
+        K,
+        lrate
+    ),
+    Layer(
+        batch_size, 
+        layer_size, 
+        layer_size, 
+        layer_size, 
+        epochs, 
+        weight_factor, 
+        sparsity, 
+        K,
+        lrate
+    )
+]
+
 np.random.seed(4)
 
 
@@ -43,63 +110,17 @@ x, labels_true = make_blobs(n_samples=batch_size, centers=centers, cluster_std=0
 x = quantize_data(x, input_size)
 
 
-W0, _ = sparse_xavier_init(input_size, layer_size, const=weight_factor, p=1.0-sparsity)
-# W0 = norm(np.asarray(W0.todense()))
-W0 = np.asarray(W0.todense())
-
-W1, _ = sparse_xavier_init(layer_size, layer_size, const=weight_factor, p=1.0-sparsity)
-# W1 = norm(np.asarray(W1.todense()))
-W1 = np.asarray(W1.todense())
-
-W2, _ = sparse_xavier_init(layer_size, layer_size, const=weight_factor, p=1.0-sparsity)
-# W2 = norm(np.asarray(W2.todense()))
-W2 = np.asarray(W2.todense())
-
-lrate = 0.00001
-
-epochs = 3
-
-u0h = np.zeros((epochs, batch_size, layer_size))
-u1h = np.zeros((epochs, batch_size, layer_size))
-u2h = np.zeros((epochs, batch_size, layer_size))
-
-a0h = np.zeros((epochs, batch_size, layer_size))
-a1h = np.zeros((epochs, batch_size, layer_size))
-a2h = np.zeros((epochs, batch_size, layer_size))
-
 for epoch in range(epochs):
-    u0 = np.dot(x, W0)
-    a0 = act(u0)
+    for li, l in enumerate(net):
+        inp = x if li == 0 else net[li-1].a
+            
+        l.run(epoch, inp)
 
-    u1 = np.dot(a0, W1)
-    a1 = act(u1)
 
-    u2 = np.dot(a1, W2)
-    a2 = act(u2)
-
-    dW0 = np.dot(x.T, a0) / batch_size
-    dW1 = np.dot(a0.T, a1) / batch_size
-    dW2 = np.dot(a1.T, a2) / batch_size
-
-    W0 += lrate * dW0
-    W1 += lrate * dW1
-    W2 += lrate * dW2
-
-    # W0 = norm(W0)
-    # W1 = norm(W1)
-    # W2 = norm(W2)
-
-    u0h[epoch] = u0.copy()
-    u1h[epoch] = u1.copy()
-    u2h[epoch] = u2.copy()
-
-    a0h[epoch] = a0.copy()
-    a1h[epoch] = a1.copy()
-    a2h[epoch] = a2.copy()
-
-    print("{} {:.4f} {:.4f} {:.4f}".format(
+    print("{} {:.4f} {:.4f}, {:.4f} {:.4f}".format(
         epoch,
-        np.linalg.norm(dW0),
-        np.linalg.norm(dW1),
-        np.linalg.norm(dW2),
+        np.linalg.norm(net[0].dW),
+        np.linalg.norm(net[1].dW),
+        net[0].dah[epoch, 0],
+        net[1].dah[epoch, 0],
     ))
