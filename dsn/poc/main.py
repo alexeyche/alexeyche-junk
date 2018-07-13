@@ -24,15 +24,19 @@ def run_net(net, d):
         l.run(inp, None)
 
 
-np.random.seed(11)
-ds = MNISTDataset()
+seed = 10
+np.random.seed(seed)
+tf.set_random_seed(seed)
+
+ds = ToyDataset()
+# ds = MNISTDataset()
 
 (_, input_size), (_, output_size) = ds.train_shape
 
 weight_factor = 1.0
 threshold = 0.1
 
-tf.set_random_seed(2)
+
 
 
 x = tf.placeholder(tf.float32, shape=(None, input_size), name="x")
@@ -65,67 +69,95 @@ run_net(fb_net, y)
 a_ff = tuple([l.a for l in ff_net])
 a_fb = tuple([l.a for l in fb_net])
 
-dW0 = tf.matmul(tf.transpose(x), a_fb[1] - a_ff[0])
-dW1 = tf.matmul(tf.transpose(a_ff[0]), a_fb[0] - a_ff[1])
-dW2 = tf.matmul(tf.transpose(a_ff[1]), y - a_ff[2])
+# dW0 = tf.matmul(tf.transpose(x), a_fb[1] - a_ff[0])
+# dW1 = tf.matmul(tf.transpose(a_ff[0]), a_fb[0] - a_ff[1])
+# dW2 = tf.matmul(tf.transpose(a_ff[1]), y - a_ff[2])
 
-opt = tf.train.GradientDescentOptimizer(learning_rate=0.0001)
+opt = tf.train.GradientDescentOptimizer(learning_rate=0.001)
+# opt = tf.train.AdamOptimizer(learning_rate=0.001)
+
+loss = (
+    tf.reduce_sum(tf.square(a_fb[1] - a_ff[0]))
+    + tf.reduce_sum(tf.square(a_fb[0] - a_ff[1]))
+    # + tf.reduce_sum(tf.square(y - a_ff[2]))
+)
+
+apply_grad_step = opt.minimize(loss, var_list=flatten([l.params for l in ff_net]))
+
+# apply_grad_step = opt.apply_gradients([
+#     (-dW0, ff_net[0].params[0]),
+#     (-dW1, ff_net[1].params[0]),
+#     (-dW2, ff_net[2].params[0]),
+# ])
 
 
 class_error_rate = tf.reduce_mean(
     tf.cast(tf.not_equal(tf.argmax(a_ff[-1], 1), tf.argmax(y, 1)), tf.float32)
 )
 
-apply_grad_step = opt.apply_gradients([
-    (-dW0, ff_net[0].params[0]),
-    (-dW1, ff_net[1].params[0]),
-    (-dW2, ff_net[2].params[0]),
-])
 
 sess = tf.Session()
 sess.run(tf.global_variables_initializer())
 
 epochs = 1000
-print_freq = 1
+print_freq = 100
 train_metrics, test_metrics = (
-    np.zeros((epochs, 1)),
-    np.zeros((epochs, 1))
+    np.zeros((epochs, 4)),
+    np.zeros((epochs, 4))
 )
 
-for epoch in range(100):
+for epoch in range(1):
     for _ in range(ds.train_batches_num):
         xv, yv = ds.next_train_batch()
 
-        a_ff_v, a_fb_v, class_error_rate_v, _ = sess.run((
+        a_ff_v, a_fb_v, class_error_rate_v, loss_v, _ = sess.run((
             a_ff,
             a_fb,
             class_error_rate,
+            loss,
             apply_grad_step
         ), {
             x: xv,
             y: yv
         })
 
-        train_metrics[epoch] += class_error_rate_v / ds.train_batches_num
+        train_metrics[epoch] += (
+            class_error_rate_v / ds.train_batches_num,
+            np.linalg.norm(a_fb_v[1] - a_ff_v[0]) / ds.train_batches_num,  
+            np.linalg.norm(a_fb_v[0] - a_ff_v[1]) / ds.train_batches_num, 
+            loss_v / ds.train_batches_num
+        )
 
     for _ in range(ds.test_batches_num):
         xtv, ytv = ds.next_test_batch()
 
-        at_ff_v, at_fb_v, class_error_rate_t_v = sess.run((
+        at_ff_v, at_fb_v, class_error_rate_t_v, loss_t_v = sess.run((
             a_ff,
             a_fb,
             class_error_rate,
+            loss,
         ), {
             x: xtv,
             y: ytv
         })
 
-        test_metrics[epoch] += class_error_rate_t_v / ds.test_batches_num
+        test_metrics[epoch] += (
+            class_error_rate_t_v / ds.test_batches_num,
+            np.linalg.norm(at_fb_v[1] - at_ff_v[0]) / ds.test_batches_num,  
+            np.linalg.norm(at_fb_v[0] - at_ff_v[1]) / ds.test_batches_num, 
+            loss_t_v / ds.test_batches_num
+        )
 
     if epoch % print_freq == 0:
-        print("Epoch {}, train {:.4f}, test {:.4f}".format(
+        print("Epoch {}, train {:.4f} {:.4f} {:.4f} {:.4f}, test {:.4f} {:.4f} {:.4f} {:.4f}".format(
             epoch,
-            class_error_rate_v,
-            class_error_rate_t_v,
+            train_metrics[epoch][0],
+            train_metrics[epoch][1],
+            train_metrics[epoch][2],
+            train_metrics[epoch][3],
+            test_metrics[epoch][0],
+            test_metrics[epoch][1],
+            test_metrics[epoch][2],
+            test_metrics[epoch][3],
         ))
 

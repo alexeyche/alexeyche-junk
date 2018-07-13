@@ -61,7 +61,8 @@ classifiers = [
 ]
 
 np.random.seed(11)
-ds = XorDataset()
+# ds = XorDataset()
+ds = ToyDataset()
 
 # model = DecisionTreeClassifier()
 for model_name, model in zip(names, classifiers):

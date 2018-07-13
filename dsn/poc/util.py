@@ -12,6 +12,11 @@ from scipy.sparse import csr_matrix, coo_matrix
 
 DEFAULT_FIG_SIZE = (7,7)
 
+def flatten(p):
+    return [pp for param in p for pp in param]
+
+
+
 def xavier_init(fan_in, fan_out, const=1.0):
     low = -const * np.sqrt(6.0 / (fan_in + fan_out))
     high = const * np.sqrt(6.0 / (fan_in + fan_out))
