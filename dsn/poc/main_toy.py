@@ -24,6 +24,15 @@ class Relu(object):
         dadx[np.where(x > 0.0)] = 1.0
         return dadx
 
+class Linear(object):
+    def __call__(self, x):
+        return x
+
+    def deriv(self, x):
+        if hasattr(x, "shape"):
+            return np.ones(x.shape)
+        return 1.0
+
 
 
 def init_parameters(
@@ -55,17 +64,15 @@ def init_network(net_structure, batch_size, test_batch_size):
 
 
 np.random.seed(11)
-ds = ToyDataset()
 
-(_, input_size), (_, output_size) = ds.train_shape
+input_size, output_size = 2, 2
 
-input_size=input_size
-batch_size=ds.train_batch_size
-test_batch_size=ds.test_batch_size
-net_structure=(100, output_size)
+batch_size = 4
+test_batch_size = 4
+net_structure=(20, output_size)
 fb_net_structure = net_structure[:-1] + (input_size,)
 weight_factor=1.0
-net_act=Relu()
+net_act=Linear()
 output_act=Sigmoid()
 deriv_loss = lambda x, y: x - y
 loss = lambda x, y: np.linalg.norm(x - y)/2.0
@@ -88,8 +95,8 @@ p_fb, dp_fb, da_fb = init_parameters(
 m, a, mt, at = init_network(net_structure, batch_size, test_batch_size)
 m_fb, a_fb, mt_fb, at_fb = init_network(fb_net_structure, batch_size, test_batch_size)
 
-# opt = SGDOptimizer(flatten(p), learning_rate_init=0.0001)
-opt = AdamOptimizer(flatten(p), learning_rate_init=0.001)
+opt = SGDOptimizer(flatten(p), learning_rate_init=0.001)
+# opt = AdamOptimizer(flatten(p), learning_rate_init=0.001)
 
 
 def run_backprop(x, y):
@@ -101,7 +108,6 @@ def run_backprop(x, y):
             deriv_loss(a[-1], y) if li == len(net_structure) - 1 else
             np.dot(da[li + 1], p[li + 1][0].T)
         )
-        
 
         dp[li][0][:] = np.dot(layer_input.T, da[li] * act.deriv(m[li]))
         dp[li][1][:] = np.sum(da[li], 0).T
@@ -127,10 +133,14 @@ def run_matchprop(x, y):
 
 def run_ch(a_neg, a_pos):
     for li, (a_n, a_p) in enumerate(zip(a_neg, a_pos)):
+        act = net_act if li < len(net_structure) - 1 else output_act
+        layer_input = x if li == 0 else a[li - 1]
+
         if li == len(net_structure) - 1:
-            da[li][:] = a[li] - y
+            # da[li][:] = a[li] - y
+            pass
         else:
-            da[li][:] = a[li] - a_fb[len(net_structure)-2-li]
+            da[li][:] = a_n[li] - a_p[li]
 
         dp[li][0][:] = np.dot(layer_input.T, da[li] * act.deriv(m[li]))
         dp[li][1][:] = np.sum(da[li], 0).T
@@ -147,8 +157,8 @@ def run_net(x, p, mem, act):
         act[li] = f(mem[li][:])
 
 
-def run_rec_net(x, y, p, mem, act, lam=0.1, positive=False):
-    for _ in xrange(5):
+def run_rec_net(x, y, p, mem, act, lam=0.1, positive=False, iter=1):
+    for _ in range(iter):
         for li, (W, b) in enumerate(p):
             inp = x if li == 0 else act[li-1]
             f = net_act if li < len(net_structure)-1 else output_act
@@ -185,34 +195,47 @@ train_metrics, test_metrics = (
     np.zeros((epochs, METRIC_SIZE))
 )
 
+
+x = np.asarray([
+    [0.0, 0.0],
+    [0.0, 1.0],
+    [1.0, 0.0],
+    [1.0, 1.0]
+], dtype=np.float32)
+y = one_hot_encode(np.asarray([
+    [0.0],
+    [1.0],
+    [1.0],
+    [0.0]
+], dtype=np.float32), 2)
+
 p_fb[1] = (p[0][0].T, p_fb[1][1])
 
-print_freq = 100
-for epoch in xrange(epochs):
-    for _ in xrange(ds.train_batches_num):
-        x, y = ds.next_train_batch()
-        # run_net(x, p, m, a)
-        
-        # run_backprop(x, y)
-        # dp_bp = [(dW.copy(), db.copy()) for dW, db in dp]
-        # da_bp = [dda.copy() for dda in da]
 
-        # run_net(y, p_fb, m_fb, a_fb)
-        # run_matchprop(x, y)
-        
-        run_rec_net(x, y, p, m, a, lam=0.1, positive=False)
-        a_neg = a.copy()
+print_freq = 10
+for epoch in range(epochs):
 
-        run_rec_net(x, y, p, m, a, lam=0.1, positive=True)
-        
-        run_ch(a_neg, a)
+    run_net(x, p, m, a)
 
-        calc_metrics(train_metrics, epoch, a, y, ds.train_batches_num)
+    run_backprop(x, y)
+    dp_bp = [(dW.copy(), db.copy()) for dW, db in dp]
+    da_bp = [dda.copy() for dda in da]
 
-    # for _ in xrange(ds.test_batches_num):
-    #     xt, yt = ds.next_test_batch()
-    #     run_net(xt, p, mt, at)
-    #     calc_metrics(test_metrics, epoch, at, yt, ds.test_batches_num)
+    run_net(y, p_fb, m_fb, a_fb)
+    run_matchprop(x, y)
+
+    # run_rec_net(x, y, p, m, a, lam=1.0, positive=True, iter=5)
+    # a_pos = a.copy()
+    #
+    # run_rec_net(x, y, p, m, a, lam=1.0, positive=False, iter=5)
+    #
+    # run_ch(a, a_pos)
+    #
+    calc_metrics(train_metrics, epoch, a, y, 1)
+
+
+    run_net(x, p, mt, at)
+    calc_metrics(test_metrics, epoch, at, y, 1)
 
     p_fb[1] = (p[0][0].T, p_fb[1][1])
 

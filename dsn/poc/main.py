@@ -1,6 +1,20 @@
 from poc.datasets import *
 from poc.__scrap_tf__.common import *
 
+def relu_deriv(x):
+    a = tf.nn.relu(x)
+    return tf.gradients(a, [x])[0]
+
+def sigmoid_deriv(x):
+    v = tf.sigmoid(x)
+    return v * (1.0 - v)
+
+
+def ltd(a_ff, a_fb):
+    ltd = tf.zeros(tf.shape(a_ff))
+    ltd = tf.where(a_fb < 1e-10, a_ff, ltd)
+    return ltd
+
 
 class Layer(object):
     def __init__(s, input_size, layer_size, output_size, act, weight_factor):
@@ -28,13 +42,13 @@ seed = 10
 np.random.seed(seed)
 tf.set_random_seed(seed)
 
-ds = ToyDataset()
-# ds = MNISTDataset()
+# ds = ToyDataset()
+# ds = XorDataset()
+ds = MNISTDataset()
 
 (_, input_size), (_, output_size) = ds.train_shape
 
-weight_factor = 1.0
-threshold = 0.1
+weight_factor = 0.1
 
 
 
@@ -43,7 +57,7 @@ x = tf.placeholder(tf.float32, shape=(None, input_size), name="x")
 y = tf.placeholder(tf.float32, shape=(None, output_size), name="y")
 
 
-layer_size = 500
+layer_size = 1000
 
 
 ff_net = [
@@ -58,63 +72,60 @@ fb_net = [
     Layer(layer_size, input_size, input_size, tf.nn.sigmoid, weight_factor)
 ]
 
-fb_net[1].params[0] = tf.transpose(ff_net[1].params[0])
-fb_net[2].params[0] = tf.transpose(ff_net[0].params[0])
-
+for ff_l, fb_l in zip(ff_net, reversed(fb_net)):
+    fb_l.params[0] = tf.transpose(ff_l.params[0])
+    fb_l.params[1] = tf.zeros(fb_l.params[1].get_shape())
 
 run_net(ff_net, x)
 run_net(fb_net, y)
 
+net_a_ff = [l.a for l in ff_net]
+net_a_fb = [l.a for l in fb_net]
 
-a_ff = tuple([l.a for l in ff_net])
-a_fb = tuple([l.a for l in fb_net])
 
-# dW0 = tf.matmul(tf.transpose(x), a_fb[1] - a_ff[0])
-# dW1 = tf.matmul(tf.transpose(a_ff[0]), a_fb[0] - a_ff[1])
-# dW2 = tf.matmul(tf.transpose(a_ff[1]), y - a_ff[2])
+grads_and_vars = []
+for li, (inp, a_ff, a_fb) in enumerate(zip([x] + net_a_ff[:-1], net_a_ff, reversed([y] + net_a_fb[:-1]))):
+    if li < len(ff_net)-1:
+        du = (a_fb - ltd(a_ff, a_fb)) * relu_deriv(ff_net[li].u)
+    else:
+        du = (a_fb - a_ff) * sigmoid_deriv(ff_net[li].u)
 
-opt = tf.train.GradientDescentOptimizer(learning_rate=0.001)
-# opt = tf.train.AdamOptimizer(learning_rate=0.001)
+    dW = tf.matmul(tf.transpose(inp), du)
+    db = tf.reduce_sum(du, 0)
 
-loss = (
-    tf.reduce_sum(tf.square(a_fb[1] - a_ff[0]))
-    + tf.reduce_sum(tf.square(a_fb[0] - a_ff[1]))
-    # + tf.reduce_sum(tf.square(y - a_ff[2]))
-)
+    grads_and_vars.append((-dW, ff_net[li].params[0]))
+    grads_and_vars.append((-db, ff_net[li].params[1]))
 
-apply_grad_step = opt.minimize(loss, var_list=flatten([l.params for l in ff_net]))
 
-# apply_grad_step = opt.apply_gradients([
-#     (-dW0, ff_net[0].params[0]),
-#     (-dW1, ff_net[1].params[0]),
-#     (-dW2, ff_net[2].params[0]),
-# ])
+# opt = tf.train.GradientDescentOptimizer(learning_rate=0.0001)
+opt = tf.train.AdamOptimizer(learning_rate=0.00001)
+
+apply_grad_step = opt.apply_gradients(grads_and_vars)
 
 
 class_error_rate = tf.reduce_mean(
-    tf.cast(tf.not_equal(tf.argmax(a_ff[-1], 1), tf.argmax(y, 1)), tf.float32)
+    tf.cast(tf.not_equal(tf.argmax(net_a_ff[-1], 1), tf.argmax(y, 1)), tf.float32)
 )
 
 
 sess = tf.Session()
 sess.run(tf.global_variables_initializer())
 
-epochs = 1000
-print_freq = 100
+epochs = 200
+print_freq = 5
 train_metrics, test_metrics = (
-    np.zeros((epochs, 4)),
-    np.zeros((epochs, 4))
+    np.zeros((epochs, 1)),
+    np.zeros((epochs, 1))
 )
 
-for epoch in range(1):
+for epoch in range(epochs):
     for _ in range(ds.train_batches_num):
         xv, yv = ds.next_train_batch()
 
-        a_ff_v, a_fb_v, class_error_rate_v, loss_v, _ = sess.run((
-            a_ff,
-            a_fb,
+        a_ff_v, a_fb_v, class_error_rate_v, _ = sess.run((
+            net_a_ff,
+            net_a_fb,
             class_error_rate,
-            loss,
             apply_grad_step
         ), {
             x: xv,
@@ -122,42 +133,29 @@ for epoch in range(1):
         })
 
         train_metrics[epoch] += (
-            class_error_rate_v / ds.train_batches_num,
-            np.linalg.norm(a_fb_v[1] - a_ff_v[0]) / ds.train_batches_num,  
-            np.linalg.norm(a_fb_v[0] - a_ff_v[1]) / ds.train_batches_num, 
-            loss_v / ds.train_batches_num
+            class_error_rate_v / ds.train_batches_num
         )
 
     for _ in range(ds.test_batches_num):
         xtv, ytv = ds.next_test_batch()
 
-        at_ff_v, at_fb_v, class_error_rate_t_v, loss_t_v = sess.run((
-            a_ff,
-            a_fb,
-            class_error_rate,
-            loss,
+        at_ff_v, at_fb_v, class_error_rate_t_v = sess.run((
+            net_a_ff,
+            net_a_fb,
+            class_error_rate
         ), {
             x: xtv,
             y: ytv
         })
 
         test_metrics[epoch] += (
-            class_error_rate_t_v / ds.test_batches_num,
-            np.linalg.norm(at_fb_v[1] - at_ff_v[0]) / ds.test_batches_num,  
-            np.linalg.norm(at_fb_v[0] - at_ff_v[1]) / ds.test_batches_num, 
-            loss_t_v / ds.test_batches_num
+            class_error_rate_t_v / ds.test_batches_num
         )
 
     if epoch % print_freq == 0:
-        print("Epoch {}, train {:.4f} {:.4f} {:.4f} {:.4f}, test {:.4f} {:.4f} {:.4f} {:.4f}".format(
+        print("Epoch {}, train {:.4f}, test {:.4f}".format(
             epoch,
             train_metrics[epoch][0],
-            train_metrics[epoch][1],
-            train_metrics[epoch][2],
-            train_metrics[epoch][3],
             test_metrics[epoch][0],
-            test_metrics[epoch][1],
-            test_metrics[epoch][2],
-            test_metrics[epoch][3],
         ))
 

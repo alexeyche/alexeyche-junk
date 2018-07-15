@@ -47,12 +47,12 @@ def get_toy_data(dest_dim, size, n_classes=2, seed=2):
     x_values, y_values = make_classification(
         n_samples=size,
         n_features=dest_dim, 
-        n_informative=dest_dim/2, 
+        n_informative=dest_dim // 2,
         n_redundant=0, 
         n_repeated=0,
         n_clusters_per_class=2,
         n_classes=n_classes,
-        random_state=seed
+        random_state=np.random.RandomState(seed)
     )
     # return 0.01*np.log(1.0 + np.exp(x_values)), y_values.astype(np.int32)
     return x_values, y_values.astype(np.int32)
@@ -209,7 +209,7 @@ class ToyDataset(Dataset):
         x_v, target_v = get_toy_data_baseline()
         y_v = one_hot_encode(target_v)
 
-        test_prop = x_v.shape[0]/5
+        test_prop = x_v.shape[0] // 5
 
         self._xt_v = x_v[:test_prop]
         self._yt_v = y_v[:test_prop]
