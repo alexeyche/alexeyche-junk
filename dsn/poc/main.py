@@ -3,12 +3,13 @@ from poc.__scrap_tf__.common import *
 
 def relu_deriv(x):
     a = tf.nn.relu(x)
-    return tf.gradients(a, [x])[0]
+    da = tf.where(a > 0.0, tf.ones(tf.shape(a)), tf.zeros(tf.shape(a)))
+    return da
+
 
 def sigmoid_deriv(x):
     v = tf.sigmoid(x)
     return v * (1.0 - v)
-
 
 def ltd(a_ff, a_fb):
     ltd = tf.zeros(tf.shape(a_ff))
@@ -28,8 +29,8 @@ class Layer(object):
 
     def run(s, x, y):
         W, b = s.params
-        s.u = tf.matmul(x, W)
-        s.a = s.act(b + s.u)
+        s.u = tf.matmul(x, W) + b
+        s.a = s.act(s.u)
 
 
 def run_net(net, d):
@@ -44,6 +45,7 @@ tf.set_random_seed(seed)
 
 # ds = ToyDataset()
 # ds = XorDataset()
+# ds = XorDatasetSmall()
 ds = MNISTDataset()
 
 (_, input_size), (_, output_size) = ds.train_shape
@@ -52,24 +54,23 @@ weight_factor = 0.1
 
 
 
-
 x = tf.placeholder(tf.float32, shape=(None, input_size), name="x")
 y = tf.placeholder(tf.float32, shape=(None, output_size), name="y")
 
 
-layer_size = 1000
+layer_size = 500
 
 
 ff_net = [
     Layer(input_size, layer_size, output_size, tf.nn.relu, weight_factor),
-    Layer(layer_size, layer_size, layer_size, tf.nn.relu, weight_factor),
-    Layer(layer_size, output_size, output_size, tf.nn.sigmoid, weight_factor)
+    # Layer(layer_size, layer_size, layer_size, tf.nn.relu, weight_factor),
+    Layer(layer_size, output_size, output_size, tf.nn.relu, weight_factor)
 ]
 
 fb_net = [
     Layer(output_size, layer_size, layer_size, tf.nn.relu, weight_factor),
-    Layer(layer_size, layer_size, layer_size, tf.nn.relu, weight_factor),
-    Layer(layer_size, input_size, input_size, tf.nn.sigmoid, weight_factor)
+    # Layer(layer_size, layer_size, layer_size, tf.nn.relu, weight_factor),
+    Layer(layer_size, input_size, input_size, tf.nn.relu, weight_factor)
 ]
 
 for ff_l, fb_l in zip(ff_net, reversed(fb_net)):
@@ -82,13 +83,28 @@ run_net(fb_net, y)
 net_a_ff = [l.a for l in ff_net]
 net_a_fb = [l.a for l in fb_net]
 
-
+dus = []
 grads_and_vars = []
+deb = []
 for li, (inp, a_ff, a_fb) in enumerate(zip([x] + net_a_ff[:-1], net_a_ff, reversed([y] + net_a_fb[:-1]))):
     if li < len(ff_net)-1:
-        du = (a_fb - ltd(a_ff, a_fb)) * relu_deriv(ff_net[li].u)
+        du = (
+            (a_fb - ltd(a_ff, a_fb)) * relu_deriv(ff_net[li].u)
+        )
+
+        # du = (
+        #     (ltd(a_ff, a_fb) - tf.nn.relu(tf.matmul(y, tf.transpose(ff_net[li + 1].params[0])))) * relu_deriv(ff_net[li].u)
+        # )
+
+        # de = (net_a_ff[li+1] - y) #* relu_deriv(ff_net[li+1].u)
+        # du = (
+        #      tf.matmul(de, tf.transpose(ff_net[li + 1].params[0])) * relu_deriv(ff_net[li].u)
+        # )
     else:
-        du = (a_fb - a_ff) * sigmoid_deriv(ff_net[li].u)
+        # du = (a_fb - a_ff) * sigmoid_deriv(ff_net[li].u)
+        du = (a_fb - a_ff) #* relu_deriv(ff_net[li].u)
+
+    dus.append(du)
 
     dW = tf.matmul(tf.transpose(inp), du)
     db = tf.reduce_sum(du, 0)
@@ -97,8 +113,9 @@ for li, (inp, a_ff, a_fb) in enumerate(zip([x] + net_a_ff[:-1], net_a_ff, revers
     grads_and_vars.append((-db, ff_net[li].params[1]))
 
 
+
 # opt = tf.train.GradientDescentOptimizer(learning_rate=0.0001)
-opt = tf.train.AdamOptimizer(learning_rate=0.00001)
+opt = tf.train.AdamOptimizer(learning_rate=0.0001)
 
 apply_grad_step = opt.apply_gradients(grads_and_vars)
 
@@ -111,12 +128,36 @@ class_error_rate = tf.reduce_mean(
 sess = tf.Session()
 sess.run(tf.global_variables_initializer())
 
+# xv, yv = ds.next_train_batch()
+#
+# loss = tf.square(ff_net[-1].a - y) / 2.0
+#
+# g_and_v = tf.gradients(loss, [
+#     ff_net[0].params[0],
+#     ff_net[1].params[0],
+# ])
+#
+# du_r = tf.gradients(loss, [ff_net[0].u, ff_net[1].u])
+#
+# g_and_v_bp, dus_v, du_r_v, a0v, a1v, deb_v = sess.run([
+#     g_and_v,
+#     dus,
+#     du_r,
+#     net_a_ff,
+#     net_a_fb,
+#     deb,
+# ], {x: xv, y: yv})
+#
+
+
+
 epochs = 200
 print_freq = 5
 train_metrics, test_metrics = (
     np.zeros((epochs, 1)),
     np.zeros((epochs, 1))
 )
+
 
 for epoch in range(epochs):
     for _ in range(ds.train_batches_num):

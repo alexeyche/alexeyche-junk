@@ -23,7 +23,7 @@ f, fprime = relu, relu_prime
 # f, fprime = sigmoid, sigmoid_prime
 # f, fprime = linear, linear_prime
 
-np.random.seed(10)
+np.random.seed(12)
 batch_size = 200
 
 sd = 0.2
@@ -79,26 +79,26 @@ b1 = 0.1 * (np.random.random((output_size,)) - 0.5)
 lrate = 0.0001
 # lrate = 1.0  # sigmoid
 
-for epoch in range(3000):
+for epoch in range(1):
     u0 = np.dot(x, W0) + b0
     a0 = f(u0)
 
     u1 = np.dot(a0, W1) + b1
     a1 = f(u1)
 
-    de = y - a1
+    de = (y - a1)
 
     du0 = np.dot(de, W1.T) * fprime(u0)
 
     a0_mp = f(np.dot(y, W1.T))
 
-    a0_silent_mp = np.where(a0_mp == 0)
+    a0_silent_mp = np.where(a0_mp < 1e-10)
     a0_ltd = np.zeros((a0.shape))
     a0_ltd[a0_silent_mp] = a0[a0_silent_mp]
 
     du0_mp = (a0_mp - a0_ltd) * fprime(u0)
 
-    du0 = du0_mp
+    # du0 = du0_mp
 
     dW1 = np.dot(a0.T, de)
     db1 = np.sum(de, 0)
