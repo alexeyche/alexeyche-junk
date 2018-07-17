@@ -39,7 +39,7 @@ def run_net(net, d):
         l.run(inp, None)
 
 
-seed = 10
+seed = 12
 np.random.seed(seed)
 tf.set_random_seed(seed)
 
@@ -59,6 +59,8 @@ y = tf.placeholder(tf.float32, shape=(None, output_size), name="y")
 
 
 layer_size = 500
+
+
 
 
 ff_net = [
@@ -102,7 +104,7 @@ for li, (inp, a_ff, a_fb) in enumerate(zip([x] + net_a_ff[:-1], net_a_ff, revers
         # )
     else:
         # du = (a_fb - a_ff) * sigmoid_deriv(ff_net[li].u)
-        du = (a_fb - a_ff) #* relu_deriv(ff_net[li].u)
+        du = (a_fb - a_ff) * relu_deriv(ff_net[li].u)
 
     dus.append(du)
 
@@ -114,8 +116,8 @@ for li, (inp, a_ff, a_fb) in enumerate(zip([x] + net_a_ff[:-1], net_a_ff, revers
 
 
 
-# opt = tf.train.GradientDescentOptimizer(learning_rate=0.0001)
-opt = tf.train.AdamOptimizer(learning_rate=0.0001)
+opt = tf.train.GradientDescentOptimizer(learning_rate=0.0001)
+# opt = tf.train.AdamOptimizer(learning_rate=0.001)
 
 apply_grad_step = opt.apply_gradients(grads_and_vars)
 
@@ -124,6 +126,9 @@ class_error_rate = tf.reduce_mean(
     tf.cast(tf.not_equal(tf.argmax(net_a_ff[-1], 1), tf.argmax(y, 1)), tf.float32)
 )
 
+loss = tf.square(ff_net[-1].a - y) / 2.0
+
+real_grad_step = opt.minimize(loss)
 
 sess = tf.Session()
 sess.run(tf.global_variables_initializer())
@@ -139,15 +144,16 @@ sess.run(tf.global_variables_initializer())
 #
 # du_r = tf.gradients(loss, [ff_net[0].u, ff_net[1].u])
 #
-# g_and_v_bp, dus_v, du_r_v, a0v, a1v, deb_v = sess.run([
+# g_and_v_bp, dus_v, du_r_v, a0v, a1v, deb_v, g_and_v_mp = sess.run([
 #     g_and_v,
 #     dus,
 #     du_r,
 #     net_a_ff,
 #     net_a_fb,
 #     deb,
+#     grads_and_vars,
 # ], {x: xv, y: yv})
-#
+
 
 
 
@@ -167,7 +173,7 @@ for epoch in range(epochs):
             net_a_ff,
             net_a_fb,
             class_error_rate,
-            apply_grad_step
+            apply_grad_step,
         ), {
             x: xv,
             y: yv

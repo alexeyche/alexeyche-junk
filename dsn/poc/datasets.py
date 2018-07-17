@@ -260,12 +260,12 @@ class XorDatasetSmall(Dataset):
             [1.0, 0.0],
             [1.0, 1.0]
         ], dtype=np.float32)
-        self._y_v = np.asarray([
+        self._y_v = one_hot_encode(np.asarray([
             [0.0],
             [1.0],
             [1.0],
             [0.0]
-        ], dtype=np.float32)
+        ], dtype=np.float32))
 
     @property
     def train_shape(self):

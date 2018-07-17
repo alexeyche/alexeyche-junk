@@ -12,7 +12,9 @@ def sigmoid_prime(x):
 relu = lambda x: np.maximum(x, 0.0)
 def relu_prime(x):
     dadx = np.zeros(x.shape)
-    dadx[np.where(x > 0.0)] = 1.0
+    # dadx[np.where(x > 0.0)] = 1.0
+    a = relu(x)
+    dadx[np.where(a > 0.0)] = 1.0
     return dadx
 
 linear = lambda x: x
@@ -26,44 +28,44 @@ f, fprime = relu, relu_prime
 np.random.seed(12)
 batch_size = 200
 
-sd = 0.2
-x = np.concatenate([
-    np.random.randn(batch_size, 2).astype(np.float32),
-    [0.0, 1.0] + sd*np.random.randn(200, 2).astype(np.float32),
-    [1.0, 0.0] + sd*np.random.randn(200, 2).astype(np.float32),
-    [1.0, 1.0] + sd*np.random.randn(200, 2).astype(np.float32),
-], )
-y = one_hot_encode(np.concatenate([
-    np.zeros((200,), dtype=np.float32),
-    np.ones((200,), dtype=np.float32),
-    np.ones((200,), dtype=np.float32),
-    np.zeros((200,), dtype=np.float32),
-]), 2)
+# sd = 0.2
+# x = np.concatenate([
+#     np.random.randn(batch_size, 2).astype(np.float32),
+#     [0.0, 1.0] + sd*np.random.randn(200, 2).astype(np.float32),
+#     [1.0, 0.0] + sd*np.random.randn(200, 2).astype(np.float32),
+#     [1.0, 1.0] + sd*np.random.randn(200, 2).astype(np.float32),
+# ], )
+# y = one_hot_encode(np.concatenate([
+#     np.zeros((200,), dtype=np.float32),
+#     np.ones((200,), dtype=np.float32),
+#     np.ones((200,), dtype=np.float32),
+#     np.zeros((200,), dtype=np.float32),
+# ]), 2)
+#
+# ids = np.random.permutation(x.shape[0])
+# x = x[ids]
+# y = y[ids]
+#
+# test_prop = x.shape[0] // 4
+#
+# xt = x[:test_prop]
+# yt = y[:test_prop]
+# x = x[test_prop:]
+# y = y[test_prop:]
 
-ids = np.random.permutation(x.shape[0])
-x = x[ids]
-y = y[ids]
 
-test_prop = x.shape[0] // 4
-
-xt = x[:test_prop]
-yt = y[:test_prop]
-x = x[test_prop:]
-y = y[test_prop:]
-
-
-# x = np.asarray([
-#     [0.0, 0.0],
-#     [0.0, 1.0],
-#     [1.0, 0.0],
-#     [1.0, 1.0]
-# ], dtype=np.float32)
-# y = one_hot_encode(np.asarray([
-#     [0.0],
-#     [1.0],
-#     [1.0],
-#     [0.0]
-# ], dtype=np.float32), 2)
+x = np.asarray([
+    [0.0, 0.0],
+    [0.0, 1.0],
+    [1.0, 0.0],
+    [1.0, 1.0]
+], dtype=np.float32)
+y = one_hot_encode(np.asarray([
+    [0.0],
+    [1.0],
+    [1.0],
+    [0.0]
+], dtype=np.float32), 2)
 
 
 
@@ -84,7 +86,7 @@ for epoch in range(1):
     a0 = f(u0)
 
     u1 = np.dot(a0, W1) + b1
-    a1 = f(u1)
+    a1 = sigmoid(u1)
 
     de = (y - a1)
 
@@ -112,14 +114,14 @@ for epoch in range(1):
     b0 += lrate * db0
     b1 += lrate * db1
 
-
-    ut0 = np.dot(xt, W0) + b0
-    at0 = f(ut0)
-
-    ut1 = np.dot(at0, W1) + b1
-    at1 = f(ut1)
-
-    err_rate = np.mean(np.not_equal(np.argmax(at1, 1), np.argmax(yt, 1)))
-
-    if epoch % 100 == 0:
-        print("{} {:.4f} {:.4f}".format(epoch, np.linalg.norm(de), err_rate))
+    #
+    # ut0 = np.dot(xt, W0) + b0
+    # at0 = f(ut0)
+    #
+    # ut1 = np.dot(at0, W1) + b1
+    # at1 = f(ut1)
+    #
+    # err_rate = np.mean(np.not_equal(np.argmax(at1, 1), np.argmax(yt, 1)))
+    #
+    # if epoch % 100 == 0:
+    #     print("{} {:.4f} {:.4f}".format(epoch, np.linalg.norm(de), err_rate))
