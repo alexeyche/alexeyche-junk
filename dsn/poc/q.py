@@ -4,6 +4,10 @@ from poc.datasets import *
 from poc.util import *
 
 
+def safe_log(x):
+    return np.log(x + 1e-05)
+
+
 def ltd(a, a_mp):
     a_silent_mp = np.where(a_mp < 1e-10)
     a_ltd = np.zeros((a.shape))
@@ -14,6 +18,8 @@ sigmoid = lambda x: 1.0/(1.0 + np.exp(-x))
 def sigmoid_prime(x):
     v = sigmoid(x)
     return v * (1.0 - v)
+
+sigmoid_inv = lambda x: np.log(x/(1.0 - x + 1e-09) + 1e-09)
 
 relu = lambda x: np.maximum(x, 0.0)
 def relu_prime(x):
@@ -39,20 +45,28 @@ y = one_hot_encode(np.asarray([
     [0.0]
 ], dtype=np.float32), 2)
 
-f, fprime = linear, linear_prime
+
+# f, fprime, finv = sigmoid, sigmoid_prime, sigmoid_inv
+f, fprime, finv = relu, relu_prime, sigmoid_inv
+
+# f, fprime = linear, linear_prime
 
 
-input_size = 2
-layer_size = 50
-output_size = 2
 
-w_sd = 0.1
-w_b = 0.0
+input_size = x.shape[1]
+layer_size = 10
+output_size = y.shape[1]
+batch_size = x.shape[0]
 
-W0 = w_sd * (np.random.random((input_size, layer_size)) - w_b)
-W1 = w_sd * (np.random.random((layer_size, layer_size)) - w_b)
-W2 = w_sd * (np.random.random((layer_size, output_size)) - w_b)
+wf = 0.01
+#
+# W0 = wf * (np.random.random((input_size, layer_size)) - 0.5)
+# W1 = wf * (np.random.random((layer_size, layer_size)) - 0.5)
+# W2 = wf * (np.random.random((layer_size, output_size)) - 0.5)
 
+W0 = random_orth((input_size, layer_size))
+W1 = random_orth((layer_size, layer_size))
+W2 = random_orth((layer_size, output_size))
 
 
 u0 = np.dot(x, W0)
@@ -64,17 +78,15 @@ a1 = f(u1)
 u2 = np.dot(a1, W2)
 a2 = f(u2)
 
-a1_mp = f(np.dot(y, W2.T))
 
-du1_mp = (a1_mp - ltd(a1, a1_mp))
+du2 = y - a2
+du1 = np.dot(du2, W2.T) #* fprime(u1)
+du0 = np.dot(du1, W1.T) #* fprime(u0)
 
-# du1_mp = (a1_mp - ltd(a1, a1_mp)) * fprime(u1)
 
-a0_mp = f(np.dot(a1_mp, W1.T))
-du0_mp = (a0_mp - a0)
+a2_fb = y
+a1_fb = f(np.dot(a2_fb, W2.T))
+a0_fb = f(np.dot(a1_fb, W1.T))
 
-de = (y - a2)
 
-a1_bp = np.dot(de, W2.T)
-a0_bp = np.dot(a1_bp, W1.T)
-
+print(np.linalg.norm(y - f(np.dot(np.dot(finv(y), W2.T), W2))))

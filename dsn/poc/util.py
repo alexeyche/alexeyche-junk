@@ -15,6 +15,15 @@ DEFAULT_FIG_SIZE = (7,7)
 def flatten(p):
     return [pp for param in p for pp in param]
 
+def random_orth(shape):
+    import scipy as sp
+    max_shape = max(shape[0], shape[1])
+
+    shape_to_gen = (max_shape, max_shape)
+    Q, _ = sp.linalg.qr(np.random.randn(*shape_to_gen))
+
+    return Q[:shape[0], :shape[1]]
+
 
 
 def xavier_init(fan_in, fan_out, const=1.0):
@@ -177,7 +186,7 @@ def moving_average(a, n=3) :
     return np.pad(v, [0, n-1], 'constant')
 
 def norm(data, axis=0):
-    data_denom = np.sqrt(np.sum(data ** 2, axis=axis))
+    data_denom = np.sqrt(np.sum(data ** 2, keepdims=True, axis=axis))
     data = data/data_denom
     return data
 
