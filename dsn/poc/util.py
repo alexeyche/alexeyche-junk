@@ -24,7 +24,38 @@ def random_orth(shape):
 
     return Q[:shape[0], :shape[1]]
 
+def random_pos_orth(shape):
+    rows, cols = shape
+    A = np.zeros((rows, cols), dtype=np.float32)
 
+    if rows <= cols:
+        v = np.arange(0, cols)
+        ss = cols // rows
+        for rid in range(rows):
+            cid = np.random.choice(v, ss)
+            v = np.setdiff1d(v, cid)
+            Av = np.ones(len(cid))
+            A[rid, cid] = Av
+        return A / (ss / np.sqrt(ss))
+    else:
+        ss = rows // cols
+        vr = np.arange(0, rows)
+        vc = np.arange(0, cols)
+        rids = np.random.choice(vr, ss)
+
+        for rid in rids:
+            if len(vc) == 0:
+                break
+            cid = np.random.choice(vc, 1)
+            vc = np.setdiff1d(vc, cid)
+            Av = np.ones(len(cid))
+            A[rid, cid] = Av
+        return A
+
+def random_pos_sparse(shape, p):
+    W = np.random.random(shape).astype(np.float32)
+    mask = np.random.random(shape) >= p
+    return W*mask.astype(np.float32)
 
 def xavier_init(fan_in, fan_out, const=1.0):
     low = -const * np.sqrt(6.0 / (fan_in + fan_out))

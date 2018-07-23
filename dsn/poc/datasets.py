@@ -186,8 +186,9 @@ class MNISTDataset(Dataset):
 
     # @property
     # def train_batches_num(self):
-    #     return self._train_batch_size
-
+    #     return 10
+    #     # return self._train_batch_size
+    #
     # @property
     # def test_batches_num(self):
     #     return 10 # TODO
