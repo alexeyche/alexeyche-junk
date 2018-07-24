@@ -88,12 +88,12 @@ wf = 0.01
 # W1 = random_pos_sparse((layer_size, layer_size), p=0.1)
 # W2 = random_pos_sparse((layer_size, output_size), p=0.1)
 
-W0 = np.random.random((input_size, layer_size))
-W1 = np.random.random((layer_size, layer_size))
-W2 = np.random.random((layer_size, output_size))
+W0 = random_sparse((input_size, layer_size), p=0.5) 
+W1 = random_sparse((layer_size, layer_size), p=0.5)
+W2 = random_sparse((layer_size, output_size), p=0.5)
 
 
-for epoch in range(1000):
+for epoch in range(1):
     u0 = np.dot(x, W0)
     a0 = f(u0)
 
@@ -118,21 +118,20 @@ for epoch in range(1000):
     du0_fb = (a0_fb - a0) * fprime(u0)
 
 
-    dW0 = np.dot(x.T, du0)
-    dW1 = np.dot(a0.T, du1)
-    dW2 = np.dot(a1.T, du2)
+    dW0 = np.dot(x.T, du0_fb)
+    dW1 = np.dot(a0.T, du1_fb)
+    dW2 = np.dot(a1.T, du2_fb)
 
     W0 += 0.1 * dW0
     W1 += 0.1 * dW1
     W2 += 0.1 * dW2
 
 
-    print("{} {:.4f} {:.4f} {:.4f} {:.4f}".format(
+    print("{} {:.4f} {:.4f} {:.4f}".format(
         epoch,
         np.linalg.norm(du2),
-        np.linalg.norm(np.dot(W0, W0.T) - np.eye(W0.shape[0])),
-        np.linalg.norm(np.dot(W1, W1.T) - np.eye(W1.shape[0])),
-        np.linalg.norm(np.dot(W2, W2.T) - np.eye(W2.shape[0])),
+        np.linalg.norm(f(np.dot(a0_fb, W1)) - a1_fb),
+        np.linalg.norm(f(np.dot(a1_fb, W2)) - a2_fb),
     ))
 
 # W1c = W1.copy()

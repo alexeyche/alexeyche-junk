@@ -57,6 +57,13 @@ def random_pos_sparse(shape, p):
     mask = np.random.random(shape) >= p
     return W*mask.astype(np.float32)
 
+
+def random_sparse(shape, p):
+    W = np.random.random(shape).astype(np.float32) - 0.5
+    mask = np.random.random(shape) >= p
+    return W*mask.astype(np.float32)
+
+
 def xavier_init(fan_in, fan_out, const=1.0):
     low = -const * np.sqrt(6.0 / (fan_in + fan_out))
     high = const * np.sqrt(6.0 / (fan_in + fan_out))
