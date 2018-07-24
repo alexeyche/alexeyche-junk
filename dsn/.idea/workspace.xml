@@ -11,11 +11,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="main_simple_tf.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="main_simple_tf.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/poc/main_simple_tf.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="765">
-              <caret line="48" selection-start-line="46" selection-end-line="48" />
+              <caret line="61" lean-forward="true" selection-start-line="61" selection-end-line="61" />
               <folding>
                 <element signature="e#2#28#0" expanded="true" />
               </folding>
@@ -26,8 +26,8 @@
       <file leaf-file-name="main_spike_tf.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/poc/main_spike_tf.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1122">
-              <caret line="66" column="7" lean-forward="true" selection-start-line="66" selection-start-column="7" selection-end-line="66" selection-end-column="7" />
+            <state relative-caret-position="859">
+              <caret line="66" column="7" selection-start-line="66" selection-start-column="7" selection-end-line="66" selection-end-column="7" />
               <folding>
                 <element signature="e#1#27#0" expanded="true" />
               </folding>
@@ -38,20 +38,8 @@
       <file leaf-file-name="q.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/poc/q.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="723">
-              <caret line="83" lean-forward="true" selection-start-line="80" selection-end-line="83" />
-              <folding>
-                <element signature="e#1#19#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="qlearn.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/poc/qlearn.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="230">
-              <caret line="102" column="23" lean-forward="true" selection-start-line="102" selection-start-column="23" selection-end-line="102" selection-end-column="23" />
+            <state relative-caret-position="315">
+              <caret line="83" selection-start-line="80" selection-end-line="83" />
               <folding>
                 <element signature="e#1#19#0" expanded="true" />
               </folding>
@@ -62,8 +50,8 @@
       <file leaf-file-name="util.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/poc/util.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="187">
-              <caret line="19" column="24" lean-forward="true" selection-start-line="19" selection-start-column="24" selection-end-line="19" selection-end-column="24" />
+            <state relative-caret-position="17">
+              <caret line="67" column="4" selection-start-line="67" selection-start-column="4" selection-end-line="67" selection-end-column="4" />
               <folding>
                 <element signature="e#1#37#0" expanded="true" />
               </folding>
@@ -96,6 +84,10 @@
       <find>apply_grad_step</find>
       <find>norm</find>
       <find>seed</find>
+      <find>plt.close</find>
+      <find>shm</find>
+      <find>shl</find>
+      <find>weight_factor</find>
     </findStrings>
   </component>
   <component name="IdeDocumentHistory">
@@ -108,14 +100,15 @@
         <option value="$PROJECT_DIR$/poc/__scrap__mp0__/main_simple_tf.py" />
         <option value="$PROJECT_DIR$/poc/__scrap__mp0__/q.py" />
         <option value="$PROJECT_DIR$/poc/pos_tf_poc.py" />
-        <option value="$PROJECT_DIR$/poc/main_simple_tf.py" />
         <option value="$PROJECT_DIR$/poc/qsimple_tf.py" />
         <option value="$PROJECT_DIR$/poc/datasets.py" />
         <option value="$PROJECT_DIR$/poc/log" />
         <option value="$PROJECT_DIR$/poc/main_spike_tf.py" />
-        <option value="$PROJECT_DIR$/poc/util.py" />
         <option value="$PROJECT_DIR$/poc/q.py" />
+        <option value="$PROJECT_DIR$/poc/util.py" />
         <option value="$PROJECT_DIR$/poc/qlearn.py" />
+        <option value="$PROJECT_DIR$/poc/qlearn_example.py" />
+        <option value="$PROJECT_DIR$/poc/main_simple_tf.py" />
       </list>
     </option>
   </component>
@@ -185,7 +178,25 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.qlearn">
+  <component name="RunManager" selected="Python.main_simple_tf">
+    <configuration name="main_simple_tf" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="dsn" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/poc" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/poc/main_simple_tf.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="true" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+    </configuration>
     <configuration name="main_spike_tf" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="dsn" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -240,7 +251,7 @@
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
     </configuration>
-    <configuration name="qsimple_tf" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration name="qlearn_example" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="dsn" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -252,44 +263,26 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/poc/qsimple_tf.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="true" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-    </configuration>
-    <configuration name="util" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <module name="dsn" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/poc" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/poc/util.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/poc/qlearn_example.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="true" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
     </configuration>
     <list>
-      <item itemvalue="Python.util" />
       <item itemvalue="Python.qlearn" />
-      <item itemvalue="Python.qsimple_tf" />
       <item itemvalue="Python.main_spike_tf" />
       <item itemvalue="Python.q" />
+      <item itemvalue="Python.qlearn_example" />
+      <item itemvalue="Python.main_simple_tf" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.qlearn" />
-        <item itemvalue="Python.qlearn" />
-        <item itemvalue="Python.qlearn" />
-        <item itemvalue="Python.qlearn" />
-        <item itemvalue="Python.qlearn" />
+        <item itemvalue="Python.main_simple_tf" />
+        <item itemvalue="Python.main_simple_tf" />
+        <item itemvalue="Python.main_simple_tf" />
+        <item itemvalue="Python.main_simple_tf" />
+        <item itemvalue="Python.main_simple_tf" />
       </list>
     </recent_temporary>
   </component>
@@ -310,12 +303,12 @@
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.11145833" />
+      <window_info content_ui="combo" id="Project" order="0" weight="0.11145833" />
       <window_info anchor="bottom" id="TODO" order="5" />
       <window_info anchor="bottom" id="Event Log" order="6" side_tool="true" weight="0.32943678" />
       <window_info anchor="bottom" id="Version Control" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Python Console" order="8" />
-      <window_info anchor="right" id="Run" order="3" weight="0.4375" />
+      <window_info active="true" anchor="right" id="Run" order="3" visible="true" weight="0.4375" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Terminal" order="9" />
       <window_info id="Favorites" order="2" side_tool="true" />
@@ -328,6 +321,25 @@
       <window_info anchor="bottom" id="Cvs" order="3" weight="0.25" />
       <window_info anchor="bottom" id="Find" order="1" />
     </layout>
+    <layout-to-restore>
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="4" weight="0.4" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.11145833" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="bottom" id="TODO" order="5" />
+      <window_info anchor="bottom" id="Version Control" order="7" show_stripe_button="false" />
+      <window_info active="true" anchor="right" id="Run" order="3" visible="true" weight="0.4375" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Debug" order="2" weight="0.4" />
+      <window_info anchor="bottom" id="Terminal" order="9" />
+      <window_info anchor="bottom" id="Event Log" order="6" side_tool="true" weight="0.32943678" />
+      <window_info anchor="bottom" id="Cvs" order="3" weight="0.25" />
+      <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info anchor="bottom" id="Find" order="1" />
+      <window_info anchor="bottom" id="Python Console" order="8" />
+    </layout-to-restore>
   </component>
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
@@ -338,20 +350,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/poc/__scrap__mp0__/main_toy.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2822">
-          <caret line="169" column="68" selection-start-line="169" selection-start-column="63" selection-end-line="169" selection-end-column="68" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/poc/act.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
-          <caret line="10" column="35" selection-start-line="10" selection-start-column="35" selection-end-line="10" selection-end-column="35" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/poc/baseline.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="680">
@@ -656,30 +654,44 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/poc/main_simple_tf.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="765">
-          <caret line="48" selection-start-line="46" selection-end-line="48" />
-          <folding>
-            <element signature="e#2#28#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/poc/main_spike_tf.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1122">
-          <caret line="66" column="7" lean-forward="true" selection-start-line="66" selection-start-column="7" selection-end-line="66" selection-end-column="7" />
+        <state relative-caret-position="859">
+          <caret line="66" column="7" selection-start-line="66" selection-start-column="7" selection-end-line="66" selection-end-column="7" />
           <folding>
             <element signature="e#1#27#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python36/Lib/tkinter/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17">
+          <caret line="3500" selection-start-line="3500" selection-end-line="3500" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/poc/qlearn_example.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="425">
+          <caret line="26" selection-start-line="26" selection-end-line="26" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/poc/qlearn.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="391">
+          <caret line="23" column="35" selection-start-line="23" selection-end-line="23" selection-end-column="35" />
+          <folding>
+            <element signature="e#1#19#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/poc/q.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="723">
-          <caret line="83" lean-forward="true" selection-start-line="80" selection-end-line="83" />
+        <state relative-caret-position="315">
+          <caret line="83" selection-start-line="80" selection-end-line="83" />
           <folding>
             <element signature="e#1#19#0" expanded="true" />
           </folding>
@@ -688,20 +700,20 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/poc/util.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="19" column="24" lean-forward="true" selection-start-line="19" selection-start-column="24" selection-end-line="19" selection-end-column="24" />
+        <state relative-caret-position="17">
+          <caret line="67" column="4" selection-start-line="67" selection-start-column="4" selection-end-line="67" selection-end-column="4" />
           <folding>
             <element signature="e#1#37#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/poc/qlearn.py">
+    <entry file="file://$PROJECT_DIR$/poc/main_simple_tf.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="230">
-          <caret line="102" column="23" lean-forward="true" selection-start-line="102" selection-start-column="23" selection-end-line="102" selection-end-column="23" />
+        <state relative-caret-position="765">
+          <caret line="61" lean-forward="true" selection-start-line="61" selection-end-line="61" />
           <folding>
-            <element signature="e#1#19#0" expanded="true" />
+            <element signature="e#2#28#0" expanded="true" />
           </folding>
         </state>
       </provider>

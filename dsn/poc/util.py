@@ -7,6 +7,7 @@ import pylab
 from scipy import signal
 import pandas as pd
 
+
 from scipy.sparse import csr_matrix, coo_matrix
 
 
@@ -125,7 +126,6 @@ def shm(matrix, **kwargs):
     plt.imshow(np.squeeze(matrix).T, cmap='gray', origin='lower')
     plt.colorbar()
 
-
 def gauss_filter(filter_size, sigma):
     return np.exp(-np.square(0.5-np.linspace(0.0, 1.0, filter_size))/sigma)
 
@@ -176,7 +176,6 @@ def shl(*vector, **kwargs):
         plt.clf()
     elif kwargs.get("show", True):
         plt.show()
-    
 
 def shs(*args, **kwargs):
     labels = kwargs.get("labels", [])

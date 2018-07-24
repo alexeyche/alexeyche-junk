@@ -39,6 +39,8 @@ threshold_prime = lambda x: 1.0/np.square(1.0 + np.abs(x - threshold_value))
 linear = lambda x: x
 linear_prime = lambda x: 1.0
 
+np.random.seed(11)
+
 # x = np.asarray([
 #     [0.0, 0.0],
 #     [0.0, 1.0],
@@ -88,19 +90,21 @@ wf = 0.01
 # W1 = random_pos_sparse((layer_size, layer_size), p=0.1)
 # W2 = random_pos_sparse((layer_size, output_size), p=0.1)
 
-W0 = random_sparse((input_size, layer_size), p=0.5) 
-W1 = random_sparse((layer_size, layer_size), p=0.5)
-W2 = random_sparse((layer_size, output_size), p=0.5)
+W0 = np.random.random((input_size, layer_size),) - 0.5
+W1 = np.random.random((layer_size, layer_size),) - 0.5
+W2 = np.random.random((layer_size, output_size),) - 0.5
 
-
-for epoch in range(1):
-    u0 = np.dot(x, W0)
+noise = 0.0
+epochs = 1000
+metrics = np.zeros((epochs,1))
+for epoch in range(epochs):
+    u0 = np.dot(x, W0) + np.random.random((batch_size, layer_size))*noise
     a0 = f(u0)
 
-    u1 = np.dot(a0, W1)
+    u1 = np.dot(a0, W1) + np.random.random((batch_size, layer_size))*noise
     a1 = f(u1)
 
-    u2 = np.dot(a1, W2)
+    u2 = np.dot(a1, W2) + np.random.random((batch_size, output_size))*noise
     a2 = f(u2)
 
 
@@ -122,18 +126,21 @@ for epoch in range(1):
     dW1 = np.dot(a0.T, du1_fb)
     dW2 = np.dot(a1.T, du2_fb)
 
-    W0 += 0.1 * dW0
-    W1 += 0.1 * dW1
-    W2 += 0.1 * dW2
+    W0 += 0.2 * dW0
+    W1 += 0.2 * dW1
+    W2 += 0.2 * dW2
 
+    metrics[epoch] = (np.linalg.norm(du2), )
+    if epoch % 100 == 0:
+        print("{} {:.4f} {:.4f} {:.4f} {:.4f}".format(
+            epoch,
+            np.linalg.norm(du2),
+            np.linalg.norm(f(np.dot(x, W0)) - a0_fb),
+            np.linalg.norm(f(np.dot(a0_fb, W1)) - a1_fb),
+            np.linalg.norm(f(np.dot(a1_fb, W2)) - a2_fb),
+        ))
 
-    print("{} {:.4f} {:.4f} {:.4f}".format(
-        epoch,
-        np.linalg.norm(du2),
-        np.linalg.norm(f(np.dot(a0_fb, W1)) - a1_fb),
-        np.linalg.norm(f(np.dot(a1_fb, W2)) - a2_fb),
-    ))
-
+# shl(metrics)
 # W1c = W1.copy()
 # W1[np.where(np.random.random(W1.shape) < 0.05)] = 0.5
 # shm(f(np.dot(np.dot(a0, W1), W1.T)), a0)
