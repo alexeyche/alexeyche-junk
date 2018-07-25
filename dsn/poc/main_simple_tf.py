@@ -40,16 +40,16 @@ y = tf.placeholder(tf.float32, shape=(None, output_size), name="y")
 
 
 weight_factor = 0.5
-layer_size = 1000
+layer_size = 500
 
-W0v = random_sparse((input_size, layer_size), p=0.75)
-W1v = random_sparse((layer_size, layer_size), p=0.75)
-W2v = random_sparse((layer_size, output_size), p=0.75)
+# W0v = random_sparse((input_size, layer_size), p=0.75)
+# W1v = random_sparse((layer_size, layer_size), p=0.75)
+# W2v = random_sparse((layer_size, output_size), p=0.75)
 
 
-# W0v, b0v = xavier_init(input_size, layer_size, const=weight_factor)
-# W1v, b1v = xavier_init(layer_size, layer_size, const=weight_factor)
-# W2v, b2v = xavier_init(layer_size, output_size, const=weight_factor)
+W0v, b0v = xavier_init(input_size, layer_size, const=weight_factor)
+W1v, b1v = xavier_init(layer_size, layer_size, const=weight_factor)
+W2v, b2v = xavier_init(layer_size, output_size, const=weight_factor)
 
 
 # W0v = random_orth((input_size, layer_size)).astype(np.float32)
@@ -57,8 +57,8 @@ W2v = random_sparse((layer_size, output_size), p=0.75)
 # W2v = random_orth((layer_size, output_size)).astype(np.float32)
 
 
-b0v = np.zeros((layer_size,)).astype(np.float32)
-b1v = np.zeros((layer_size,)).astype(np.float32)
+# b0v = np.zeros((layer_size,)).astype(np.float32)
+# b1v = np.zeros((layer_size,)).astype(np.float32)
 
 # b0v = np.random.random((layer_size,)).astype(np.float32) - 0.5
 # b1v = np.random.random((layer_size,)).astype(np.float32) - 0.5
@@ -89,13 +89,16 @@ a2_fb = y
 u1_fb = tf.matmul(a2_fb, tf.transpose(W2))
 a1_fb = threshold(u1_fb)
 
+y_t = threshold(tf.matmul(a1_fb, W2))
+y_t_l = tf.nn.l2_loss(y-y_t)
+
 u0_fb = tf.matmul(a1_fb, tf.transpose(W1))
 a0_fb = threshold(u0_fb)
 
 
 
-du0_mp = a0_fb - a0
-du1_mp = a1_fb - a1
+du0_mp = (a0_fb - a0)
+du1_mp = (a1_fb - a1)
 du2_mp = y - a2
 
 loss = tf.reduce_sum(tf.square(a2 - y) / 2.0)
@@ -154,12 +157,13 @@ for epoch in range(epochs):
     for _ in range(ds.train_batches_num):
         xv, yv = ds.next_train_batch()
 
-        u, a, loss_v, class_error_rate_v, gr0, _ = sess.run([
+        u, a, loss_v, class_error_rate_v, gr0, y_t_l_v, _  = sess.run([
             [u0, u1],
             [a0, a1],
             loss,
             class_error_rate,
             gr,
+            y_t_l,
             apply_grad_step,
         ], {x: xv, y: yv})
 
@@ -185,10 +189,11 @@ for epoch in range(epochs):
 
 
     if epoch % 5 == 0:
-        print("{}, train {:.4f} {:.4f}, test {:.4f} {:.4f}".format(
+        print("{}, train {:.4f} {:.4f}, test {:.4f} {:.4f} | {:.4f}".format(
             epoch,
             train_metrics[epoch][0],
             train_metrics[epoch][1],
             test_metrics[epoch][0],
             test_metrics[epoch][1],
+            y_t_l_v,
         ))
