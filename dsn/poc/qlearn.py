@@ -8,6 +8,20 @@ def safe_log(x):
     return np.log(x + 1e-05)
 
 
+def threshold_k(u):
+    K = int(u.shape[1] * 0.1)
+    # K = 1
+    a = np.zeros(u.shape)
+    batch_size = u.shape[0]
+
+    bidx = np.arange(0, batch_size)
+    ind = np.argpartition(u, -K, axis=1)[:, -K:]
+
+    a[np.expand_dims(bidx, 1), ind] = 1.0
+    a[np.where(np.abs(u) < 1e-10)] = 0.0
+    return a
+
+
 def ltd(a, a_mp):
     a_silent_mp = np.where(a_mp < 1e-10)
     a_ltd = np.zeros((a.shape))
@@ -60,18 +74,19 @@ np.random.seed(11)
 # f, fprime, finv = sigmoid, sigmoid_prime, sigmoid_inv
 # f, fprime, finv = relu, relu_prime, sigmoid_inv
 
-f, fprime = threshold, threshold_prime
+# f, fprime = threshold, threshold_prime
+f, fprime = threshold_k, threshold_prime
 
 # f, fprime = linear, linear_prime
 
 # np.random.seed(10)
 
 x = f(np.random.random((10, 20)))
-xl = np.dot(x, np.random.random((20, 10)))/5.0
+xl = np.dot(x, np.random.random((20, 10)))
 y = f(xl)
 
 input_size = x.shape[1]
-layer_size = 100
+layer_size = 20
 output_size = y.shape[1]
 batch_size = x.shape[0]
 
@@ -86,19 +101,19 @@ wf = 0.01
 # W1 = random_orth((layer_size, layer_size))
 # W2 = random_orth((layer_size, output_size))
 
-# W0 = random_pos_sparse((input_size, layer_size), p=0.1)
-# W1 = random_pos_sparse((layer_size, layer_size), p=0.1)
-# W2 = random_pos_sparse((layer_size, output_size), p=0.1)
+# W0 = random_pos_sparse((input_size, layer_size), p=0.75)
+# W1 = random_pos_sparse((layer_size, layer_size), p=0.75)
+# W2 = random_pos_sparse((layer_size, output_size), p=0.75)
 
 W0 = np.random.random((input_size, layer_size),) - 0.5
 W1 = np.random.random((layer_size, layer_size),) - 0.5
-W2 = np.random.random((layer_size, output_size),) - 0.5
+W2 = np.random.random((layer_size, output_size),)- 0.5
 
 noise = 0.0
-epochs = 1000
+epochs = 1
 metrics = np.zeros((epochs,1))
 for epoch in range(epochs):
-    u0 = np.dot(x, W0) + np.random.random((batch_size, layer_size))*noise
+    u0 = np.dot(x, W0)
     a0 = f(u0)
 
     u1 = np.dot(a0, W1) + np.random.random((batch_size, layer_size))*noise
@@ -125,10 +140,10 @@ for epoch in range(epochs):
     dW0 = np.dot(x.T, du0_fb)
     dW1 = np.dot(a0.T, du1_fb)
     dW2 = np.dot(a1.T, du2_fb)
-
-    W0 += 0.2 * dW0
-    W1 += 0.2 * dW1
-    W2 += 0.2 * dW2
+    #
+    # W0 += 0.2 * dW0
+    # W1 += 0.2 * dW1
+    # W2 += 0.2 * dW2
 
     metrics[epoch] = (np.linalg.norm(du2), )
     if epoch % 100 == 0:
