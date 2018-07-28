@@ -40,9 +40,10 @@ def random_pos_orth(shape):
         return A / (ss / np.sqrt(ss))
     else:
         ss = rows // cols
+
         vr = np.arange(0, rows)
         vc = np.arange(0, cols)
-        rids = np.random.choice(vr, ss)
+        rids = np.random.choice(vr, rows)
 
         for rid in rids:
             if len(vc) == 0:
@@ -52,6 +53,9 @@ def random_pos_orth(shape):
             Av = np.ones(len(cid))
             A[rid, cid] = Av
         return A
+
+
+
 
 def random_pos_sparse(shape, p):
     W = np.random.random(shape).astype(np.float32)

@@ -3,43 +3,67 @@
 from poc.util import *
 import numpy as np
 
+def threshold_k(u, pk):
+    K = int(u.shape[1] * pk)
+    # K = 1
+    a = np.zeros(u.shape)
+    batch_size = u.shape[0]
 
-threshold_value = 0.0
-def threshold(x):
-    a = np.zeros(x.shape)
-    a[np.where(x >= threshold_value)] = 1.0
+    bidx = np.arange(0, batch_size)
+    ind = np.argpartition(u, -K, axis=1)[:, -K:]
+
+    a[np.expand_dims(bidx, 1), ind] = 1.0
+    a[np.where(np.abs(u) < 1e-10)] = 0.0
     return a
 
-linear = lambda x: x
-relu = lambda x: np.maximum(x, 0.0)
 
-f = threshold
+# relu = lambda x: np.maximum(x, 0.0)
 
+
+
+input_size = 100
+batch_size = 100
+
+
+average = 10
+k = 0.1
+
+f = lambda x: threshold_k(x, k)
 # f = linear
 # f = relu
 
-input_size = 10
-batch_size = 5
 
-layer_size = 100
+layer_sizes = range(10, 200, 10)
+layer_size = 50
+p = 0.9
 
-W = np.random.random((input_size, layer_size),) - 0.5
+# for li, layer_size in enumerate(layer_sizes):
+m = 0.0
 
-x = f(np.random.random((batch_size, input_size))-0.5)
+for _ in range(average):
+    W = np.random.random((input_size, layer_size),)
 
-a_t = f(np.random.random((batch_size, layer_size))-0.5)
+    # W = random_orth((input_size, layer_size,), )
+    # W = random_orth((layer_size, input_size, ), ).T
 
+    # W = random_pos_sparse((input_size, layer_size), p=p)
 
-for epoch in range(1000):
-    a = f(np.dot(x, W))
-    x_t = f(np.dot(a, W.T))
+    # W = random_pos_orth((input_size, layer_size), )
+    # W = random_pos_orth((layer_size, input_size), ).T
 
-    du = a_t - a
+    a = f(np.random.random((batch_size, layer_size)))
 
-    dW = np.dot(x.T, du)
+    x = f(np.dot(a, W.T))
+    a_t = f(np.dot(x, W))
 
-    W += 0.1 * dW
+    a_t_m = a_t.copy()
+    a_t_m[np.where(np.abs(a_t_m) < 1e-10)] = -1
 
-    if epoch % 100 == 0:
-        print("{} {:.4f}, ta {:.4f}".format(epoch, np.linalg.norm(du), np.linalg.norm(x_t - x)))
+    a_m = a.copy()
+    a_m[np.where(np.abs(a_m) < 1e-10)] = -10
 
+    m += np.mean(np.equal(a_t_m, a_m)) / np.mean(a_t) / float(average)
+
+print(layer_size, p, m, np.linalg.norm(np.dot(W,W.T) - np.eye(input_size)))
+
+# shm(a.T, a_t.T, a_t.T-a.T)

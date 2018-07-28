@@ -105,9 +105,9 @@ wf = 0.01
 # W1 = random_pos_sparse((layer_size, layer_size), p=0.75)
 # W2 = random_pos_sparse((layer_size, output_size), p=0.75)
 
-W0 = np.random.random((input_size, layer_size),) - 0.5
-W1 = np.random.random((layer_size, layer_size),) - 0.5
-W2 = np.random.random((layer_size, output_size),)- 0.5
+W0 = np.random.random((input_size, layer_size),) #- 0.5
+W1 = np.random.random((layer_size, layer_size),) #- 0.5
+W2 = np.random.random((layer_size, output_size),)#- 0.5
 
 noise = 0.0
 epochs = 1
@@ -124,8 +124,8 @@ for epoch in range(epochs):
 
 
     du2 = y - a2
-    du1 = np.dot(du2, W2.T) * fprime(u1)
-    du0 = np.dot(du1, W1.T) * fprime(u0)
+    du1 = np.dot(du2, W2.T) #* fprime(u1)
+    du0 = np.dot(du1, W1.T) #* fprime(u0)
 
 
     a2_fb = y
@@ -133,20 +133,20 @@ for epoch in range(epochs):
     a0_fb = f(np.dot(a1_fb, W1.T))
 
     du2_fb = y - a2
-    du1_fb = (a1_fb - a1) * fprime(u1)
-    du0_fb = (a0_fb - a0) * fprime(u0)
+    du1_fb = (a1_fb - a1) #* fprime(u1)
+    du0_fb = (a0_fb - a0) #* fprime(u0)
 
 
     dW0 = np.dot(x.T, du0_fb)
     dW1 = np.dot(a0.T, du1_fb)
     dW2 = np.dot(a1.T, du2_fb)
     #
-    # W0 += 0.2 * dW0
-    # W1 += 0.2 * dW1
-    # W2 += 0.2 * dW2
+    W0 += 0.2 * dW0
+    W1 += 0.2 * dW1
+    W2 += 0.2 * dW2
 
     metrics[epoch] = (np.linalg.norm(du2), )
-    if epoch % 100 == 0:
+    if epoch % 1 == 0:
         print("{} {:.4f} {:.4f} {:.4f} {:.4f}".format(
             epoch,
             np.linalg.norm(du2),
