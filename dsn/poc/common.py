@@ -5,9 +5,11 @@ def safe_log(x):
     return np.log(x + 1e-05)
 
 
-def threshold_k(u):
+def threshold_k_10(u):
     K = int(u.shape[1] * 0.1)
-    # K = 1
+    return threshold_k(u, K)
+
+def threshold_k(u, K):
     a = np.zeros(u.shape)
     batch_size = u.shape[0]
 
@@ -53,3 +55,13 @@ def threshold_prime(x, threshold_value = 0.7):
 
 linear = lambda x: x
 linear_prime = lambda x: 1.0
+
+
+def number_of_equal_act(a, a_t):
+    a_t_m = a_t.copy()
+    a_t_m[np.where(np.abs(a_t_m) < 1e-10)] = -1
+
+    a_m = a.copy()
+    a_m[np.where(np.abs(a_m) < 1e-10)] = -10
+
+    return np.mean(np.equal(a_t_m, a_m)) / np.mean(a_t)

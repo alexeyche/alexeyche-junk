@@ -6,8 +6,8 @@ from poc.util import *
 from poc.common import *
 
 
-np.random.seed(11)
-
+# np.random.seed(11)
+#
 # x = np.asarray([
 #     [0.0, 0.0],
 #     [0.0, 1.0],
@@ -43,12 +43,6 @@ layer_size = 20
 output_size = y.shape[1]
 batch_size = x.shape[0]
 
-wf = 0.01
-
-# W0 = wf * (np.random.random((input_size, layer_size)) - 0.5)
-# W1 = wf * (np.random.random((layer_size, layer_size)) - 0.5)
-# W2 = wf * (np.random.random((layer_size, output_size)) - 0.5)
-#
 
 # W0 = random_orth((input_size, layer_size))
 # W1 = random_orth((layer_size, layer_size))
@@ -58,21 +52,21 @@ wf = 0.01
 # W1 = random_pos_sparse((layer_size, layer_size), p=0.75)
 # W2 = random_pos_sparse((layer_size, output_size), p=0.75)
 
-W0 = np.random.random((input_size, layer_size),) #- 0.5
-W1 = np.random.random((layer_size, layer_size),) #- 0.5
-W2 = np.random.random((layer_size, output_size),)#- 0.5
+W0 = np.random.random((input_size, layer_size),) - 0.5
+W1 = np.random.random((layer_size, layer_size),) - 0.5
+W2 = np.random.random((layer_size, output_size),)- 0.5
 
 noise = 0.0
-epochs = 1
+epochs = 100
 metrics = np.zeros((epochs,1))
 for epoch in range(epochs):
     u0 = np.dot(x, W0)
     a0 = f(u0)
 
-    u1 = np.dot(a0, W1) + np.random.random((batch_size, layer_size))*noise
+    u1 = np.dot(a0, W1)
     a1 = f(u1)
 
-    u2 = np.dot(a1, W2) + np.random.random((batch_size, output_size))*noise
+    u2 = np.dot(a1, W2)
     a2 = f(u2)
 
 
@@ -94,9 +88,9 @@ for epoch in range(epochs):
     dW1 = np.dot(a0.T, du1_fb)
     dW2 = np.dot(a1.T, du2_fb)
     #
-    W0 += 0.2 * dW0
-    W1 += 0.2 * dW1
-    W2 += 0.2 * dW2
+    W0 += 0.05 * dW0
+    W1 += 0.05 * dW1
+    W2 += 0.05 * dW2
 
     metrics[epoch] = (np.linalg.norm(du2), )
     if epoch % 1 == 0:

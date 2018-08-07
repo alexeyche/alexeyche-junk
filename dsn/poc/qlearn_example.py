@@ -2,6 +2,7 @@
 
 from poc.util import *
 import numpy as np
+from poc.common import number_of_equal_act
 
 def threshold_k(u, pk):
     K = int(u.shape[1] * pk)
@@ -34,14 +35,14 @@ f = lambda x: threshold_k(x, k)
 
 
 layer_sizes = range(10, 200, 10)
-layer_size = 50
+layer_size = 100
 p = 0.9
 
 # for li, layer_size in enumerate(layer_sizes):
 m = 0.0
 
 for _ in range(average):
-    W = np.random.random((input_size, layer_size),)
+    # W = np.random.random((input_size, layer_size),)
 
     # W = random_orth((input_size, layer_size,), )
     # W = random_orth((layer_size, input_size, ), ).T
@@ -49,20 +50,15 @@ for _ in range(average):
     # W = random_pos_sparse((input_size, layer_size), p=p)
 
     # W = random_pos_orth((input_size, layer_size), )
-    # W = random_pos_orth((layer_size, input_size), ).T
+    W = random_pos_orth((layer_size, input_size), ).T
 
     a = f(np.random.random((batch_size, layer_size)))
 
     x = f(np.dot(a, W.T))
     a_t = f(np.dot(x, W))
 
-    a_t_m = a_t.copy()
-    a_t_m[np.where(np.abs(a_t_m) < 1e-10)] = -1
 
-    a_m = a.copy()
-    a_m[np.where(np.abs(a_m) < 1e-10)] = -10
-
-    m += np.mean(np.equal(a_t_m, a_m)) / np.mean(a_t) / float(average)
+    m += number_of_equal_act(a, a_t) / float(average)
 
 print(layer_size, p, m, np.linalg.norm(np.dot(W,W.T) - np.eye(input_size)))
 
