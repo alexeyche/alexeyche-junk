@@ -20,6 +20,10 @@ def threshold_k(u, K):
     a[np.where(np.abs(u) < 1e-10)] = 0.0
     return a
 
+def threshold_p(u, p):
+    K = int(u.shape[1] * p)
+    return threshold_k(u, K)
+
 
 def ltd(a, a_mp):
     a_silent_mp = np.where(a_mp < 1e-10)

@@ -27,8 +27,8 @@ from poc.common import *
 # f, fprime, finv = sigmoid, sigmoid_prime, sigmoid_inv
 # f, fprime, finv = relu, relu_prime, sigmoid_inv
 
-# f, fprime = threshold, threshold_prime
-f, fprime = threshold_k, threshold_prime
+f, fprime = threshold, threshold_prime
+# f, fprime = threshold_k, threshold_prime
 
 # f, fprime = linear, linear_prime
 
