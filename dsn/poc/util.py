@@ -232,7 +232,6 @@ def norm(data, axis=0):
     return data
 
 
-
 def generate_dct_dictionary(l, size):
     p = np.asarray(xrange(l))
     filters = np.zeros((l, size))

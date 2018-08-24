@@ -27,16 +27,21 @@ from poc.common import *
 # f, fprime, finv = sigmoid, sigmoid_prime, sigmoid_inv
 # f, fprime, finv = relu, relu_prime, sigmoid_inv
 
-f, fprime = threshold, threshold_prime
+f, fprime = lambda x: threshold(x, 0.5), lambda x: threshold_prime(x, 0.5)
 # f, fprime = threshold_k, threshold_prime
 
 # f, fprime = linear, linear_prime
 
 # np.random.seed(10)
 
-x = f(np.random.random((10, 20)))
-xl = np.dot(x, np.random.random((20, 10)))
-y = f(xl)
+# x = f(np.random.random((100, 20)))
+# xl = np.dot(x, np.random.random((20, 10))-0.5)
+# y = f(xl)
+
+x = (np.random.random((100, 20)) < 0.1).astype(np.float32)
+y = (np.random.random((100, 10)) < 0.1).astype(np.float32)
+
+
 
 input_size = x.shape[1]
 layer_size = 20
@@ -57,7 +62,7 @@ W1 = np.random.random((layer_size, layer_size),) - 0.5
 W2 = np.random.random((layer_size, output_size),)- 0.5
 
 noise = 0.0
-epochs = 100
+epochs = 5000
 metrics = np.zeros((epochs,1))
 for epoch in range(epochs):
     u0 = np.dot(x, W0)
@@ -71,8 +76,8 @@ for epoch in range(epochs):
 
 
     du2 = y - a2
-    du1 = np.dot(du2, W2.T) #* fprime(u1)
-    du0 = np.dot(du1, W1.T) #* fprime(u0)
+    du1 = np.dot(du2, W2.T) * fprime(u1)
+    du0 = np.dot(du1, W1.T) * fprime(u0)
 
 
     a2_fb = y
@@ -80,20 +85,20 @@ for epoch in range(epochs):
     a0_fb = f(np.dot(a1_fb, W1.T))
 
     du2_fb = y - a2
-    du1_fb = (a1_fb - a1) #* fprime(u1)
-    du0_fb = (a0_fb - a0) #* fprime(u0)
+    du1_fb = (a1_fb - a1) * fprime(u1)
+    du0_fb = (a0_fb - a0) * fprime(u0)
 
 
-    dW0 = np.dot(x.T, du0_fb)
-    dW1 = np.dot(a0.T, du1_fb)
-    dW2 = np.dot(a1.T, du2_fb)
+    dW0 = np.dot(x.T, du0)
+    dW1 = np.dot(a0.T, du1)
+    dW2 = np.dot(a1.T, du2)
     #
     W0 += 0.05 * dW0
     W1 += 0.05 * dW1
     W2 += 0.05 * dW2
 
     metrics[epoch] = (np.linalg.norm(du2), )
-    if epoch % 1 == 0:
+    if epoch % 100 == 0:
         print("{} {:.4f} {:.4f} {:.4f} {:.4f}".format(
             epoch,
             np.linalg.norm(du2),

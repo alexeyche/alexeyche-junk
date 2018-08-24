@@ -23,7 +23,7 @@ batch_size = x.shape[0]
 m_lam = 0.99
 
 # f = relu
-f = lambda x: threshold(x, 0.25)
+f = lambda x: threshold(x, 0.5)
 # f = lambda x: threshold_p(x, 0.1)
 
 sd = 0.5
@@ -35,12 +35,12 @@ R1 = sd * (np.random.random((output_size, layer_size)) - 0.5)
 
 
 params = (W0, R0, W1, R1)
-opt = SGDOptimizer(params, learning_rate_init=0.001)
+opt = SGDOptimizer(params, learning_rate_init=0.0001)
 # opt = AdamOptimizer(params, learning_rate_init=0.005)
 
 a0m = np.zeros((layer_size,))
 
-for epoch in range(1):
+for epoch in range(3000):
     a0 = f(np.dot(x, W0))
     a1 = f(np.dot(a0, W1))
 
@@ -53,15 +53,21 @@ for epoch in range(1):
 
     a0m = m_lam * a0m + (1.0-m_lam) * np.mean(a0, 0)
 
-    dW0 = np.dot(x.T, a0_fb - a0)
-    dR0 = np.dot(a0.T, x_fb - x)
+    dW0 = np.dot((x-x_fb).T, a0)
+    dR0 = np.dot(a0.T, x - x_fb)
 
-    dW1 = np.dot(a0.T, a1_fb - a1)
-    dR1 = np.dot(a1.T, a0_fb - a0)
+    dW1 = np.dot((a0-a0_fb).T, a1)
+    dR1 = np.dot(a1.T, a0-a0_fb)
+
+    # dW1 = np.dot(a0.T, a1_fb - a1)
+    # dW0 = np.dot(x.T, a0_fb - a0)
+    #
+    # dR1 = np.dot(a1_fb.T, a0 - a0_fb)
+    # dR0 = np.dot(a0_fb.T, x - x_fb)
 
     opt.update_params((-dW0, -dR0, -dW1, -dR1))
 
-    if epoch % 1 == 0:
+    if epoch % 100 == 0:
         print("{} {:.4f} {:.4f} & {:.4f} {:.4f}, |dW0| = {:.4f}, |dR0| = {:.4f}, |dW1| = {:.4f}, |dR1| = {:.4f}".format(
             epoch,
             np.linalg.norm(x - x_fb), number_of_equal_act(x_fb, x),
