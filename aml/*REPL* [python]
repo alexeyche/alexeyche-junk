@@ -1,8 +1,0 @@
-Python 2.7.15 (default, Jun 17 2018, 12:46:58) 
-[GCC 4.2.1 Compatible Apple LLVM 9.1.0 (clang-902.0.39.2)] on darwin
-Type "help", "copyright", "credits" or "license" for more information.
->>> >>> Feature.from_series(data["TotalCharges"])
-Feature(name=TotalCharges, data_size=7043, stat=
-	{'missing_data_ratio': 0.047564958114439872,
-	 'type': dtype('float64')})
->>> 
