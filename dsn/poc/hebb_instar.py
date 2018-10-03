@@ -4,6 +4,8 @@ from poc.common import *
 from poc.util import *
 
 
+# If 0 in input, you can get an error in MSE (duh)
+
 def unit_vector(data, axis=0):
     data_denom = np.sqrt(np.sum(data ** 2, keepdims=True, axis=axis))
     non_null = np.where(data_denom > 1e-10)
@@ -19,7 +21,7 @@ def angle(x, y):
         )
     ))
 
-np.random.seed(12)
+# np.random.seed(12)
 
 x = (np.random.random((5, 10)) < 0.1).astype(np.float32)
 y = (np.random.random((5, 10)) < 0.1).astype(np.float32)
@@ -32,12 +34,10 @@ output_size = y.shape[1]
 batch_size = x.shape[0]
 num_iters = 1000
 threshold_value = 0.1
+K = 1  # 2 also seem to work
 
 W = np.random.random((input_size, layer_size),) - 0.5
 W = norm(W)
-
-# Wo = np.random.random((layer_size, output_size),) - 0.5
-# Wo = norm(Wo)
 
 Wo = np.zeros((layer_size, output_size),)
 
@@ -49,11 +49,9 @@ uh = np.zeros((num_iters, batch_size, layer_size))
 Wh = np.zeros((num_iters, input_size, layer_size))
 angle_h = np.zeros((num_iters, 2))
 
-# it seems that output should be initialized as zero
-
 for iter in range(num_iters):
     u = np.dot(x, W)
-    a = threshold(u, threshold_value)
+    a = threshold_k(u, K)
 
     uo = np.dot(a, Wo)
     ao = threshold(uo, threshold_value)
@@ -73,12 +71,9 @@ for iter in range(num_iters):
 
     for oi in range(output_size):
         angle_o += angle(a, Wo[:, oi]) / output_size
-        for ni in range(layer_size):
 
-            # dWo[ni, oi] = np.inner(a[:, ni], y[:, oi] - ao[:, oi])  # Delta
-            # dWo[ni, oi] = np.inner(a[:, ni], y[:, oi] - Wo[ni, oi]) # Grossberg
-            dWo[ni, oi] = np.sum(a[:, ni] * (y[:, oi] - Wo[ni, oi]))  # Grossberg
-            # dWo[ni, oi] = np.inner(y[:, oi], (a[:, oi] - Wo[ni, oi]))  # ???
+        for ni in range(layer_size):
+            dWo[ni, oi] = np.sum(a[:, ni] * (y[:, oi] - Wo[ni, oi]))
 
     W += 0.01 * dW
     Wo += 0.001 * dWo
@@ -87,7 +82,14 @@ for iter in range(num_iters):
     angle_h[iter, 0] = angle_l
     angle_h[iter, 1] = angle_o
 
-    print("{} |dW| {:.4f} |dWo| {:.4f} angles {:.4f} {:.4f}".format(iter, np.linalg.norm(dW), np.linalg.norm(dWo), angle_l, angle_o))
+    print("{} |dW| {:.4f} |dWo| {:.4f} angles {:.4f} {:.4f} MSE {:.4f}".format(
+        iter, 
+        np.linalg.norm(dW), 
+        np.linalg.norm(dWo), 
+        angle_l, 
+        angle_o,
+        np.linalg.norm(y - ao)
+    ))
 
 
-shl(angle_h)
+# shl(angle_h)
