@@ -54,6 +54,13 @@ class Config(defaultdict):
                 setattr(dst, k, v)
         return dst
 
+
+    def merge_instances(*c):
+        res = Config()
+        for cc in c:
+            res.update(cc)
+        return res
+
 def dictionarize(defdict):
     work_defdict = defdict.copy()
     for k, v in work_defdict.iteritems():
