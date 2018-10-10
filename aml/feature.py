@@ -16,8 +16,6 @@ def dformat(d):
     return pprint.pformat(d, width=1)
 
 
-        
-
 class Feature(object):
 
     @staticmethod
@@ -25,8 +23,14 @@ class Feature(object):
         return Feature(series.name, series.values)
 
     @staticmethod
-    def merge_instances(*inst):
+    def default_st():
         st = Config()
+        return st
+
+
+    @staticmethod
+    def merge_instances(*inst):
+        st = Feature.default_st()
         for f in inst:
             st.update(f.st)
         return Feature(inst[-1].name, inst[-1].data, st)
@@ -35,7 +39,7 @@ class Feature(object):
         assert len(data.shape) == 1, "Data should be one dimensional"
         self.name = name
         self.data = data
-        self.st = st if not st is None else Config()
+        self.st = st if st is not None else Feature.default_st()
 
     def __getattr__(self, n):
         if n in self.__dict__: return self.__dict__[n]
@@ -47,7 +51,7 @@ class Feature(object):
 
     def __eq__(self, other):
         return (
-            self.name == other.name and 
+            self.name == other.name and
             np.all(self.data == other.data)
         )
 
@@ -57,7 +61,7 @@ class Feature(object):
 
     def __repr__(self):
         return "Feature(name={}, data_size={}, stat=\n{})".format(
-            self.name, 
+            self.name,
             self.data.shape[0],
             "\n".join(["\t{}".format(ss) for ss in str(self.st).split("\n")])
         )
@@ -67,11 +71,11 @@ class Feature(object):
         ax = fig.add_subplot(111)
         assert len(self.data.shape) == 1, "density plots are only relevant for 1-d feature"
 
-        if not split_by is None:
+        if split_by is not None:
             assert split_by.categorical, \
                 "Split by feature `{}` should be categorical one".format(split_by.name)
 
-            if self.categorical: 
+            if self.categorical:
                 cats = sorted(self.cats.keys())
                 np.sum(self.cats.values())
                 ind = np.arange(len(cats))
@@ -80,10 +84,10 @@ class Feature(object):
                 rects_arr = []
                 for cat in split_by.cats:
                     idx = np.where(split_by.data == cat)
-                    
+
                     unique, counts = np.unique(self.data[idx], return_counts=True)
                     split_hist = dict([
-                        (u, c / float(np.sum(counts))) 
+                        (u, c / float(np.sum(counts)))
                         for (u, c) in zip(unique, counts)
                     ])
                     logger.info(
@@ -111,23 +115,23 @@ class Feature(object):
                     data.append(self.data[idx])
 
                 ax.hist(
-                    data, 
-                    bins=hist_bins, 
-                    normed=True, 
+                    data,
+                    bins=hist_bins,
+                    normed=True,
                     label=[
                         "{}: {}".format(split_by.name, k)
                         for k in split_by.cats.keys()
                     ]
                 )
                 ax.legend()
-            
+
             ax.set_title(
                 "Histogram side by side plot, `{}` split by `{}`".format(self.name, split_by.name)
             )
             ax.set_xlabel(self.name)
             ax.set_ylabel("Normalized `{}`".format(self.name))
         else:
-            if self.categorical: 
+            if self.categorical:
                 cats = sorted(self.cats.keys())
                 total = np.sum(self.cats.values())
                 ind = np.arange(len(cats))
@@ -142,8 +146,8 @@ class Feature(object):
                 ax.set_xticks(ind + width / len(cats))
             else:
                 ax.hist(
-                    self.data, 
-                    bins=hist_bins, 
+                    self.data,
+                    bins=hist_bins,
                     normed=True
                 )
                 ax.set_title(

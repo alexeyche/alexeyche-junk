@@ -71,7 +71,10 @@ def dictionarize(defdict):
 
 def read_config(config_file):
     config_module = imp.load_source('config', config_file)
-    configs = [ config_module.__dict__.get(a) for a in dir(config_module) if isinstance(config_module.__dict__.get(a), Config) ]
+    configs = [
+        config_module.__dict__.get(a)
+        for a in dir(config_module) if isinstance(config_module.__dict__.get(a), Config)
+    ]
     if len(configs) == 0:
         raise Exception("Failed to find any instances of Config in {}".format(config_file))
     if len(configs) > 1:

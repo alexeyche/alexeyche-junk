@@ -24,8 +24,6 @@ FLOAT_PRECISION = np.float64
 CATEGORY_SIZE_UPPER_BOUND = 50
 
 
-
-
 logger = logging.getLogger("transform")
 
 
@@ -40,22 +38,22 @@ def feature_parse_and_clean(data):
 
         if st.missing_data_ratio >= NAN_RATIO_UPPER_BOUND:
             raise ValueError("Ratio of NaN values is too high: {}".format(st.missing_data_ratio))
-        return s, st 
-    
+        return s, st
+
     s = pd.Series(data)
     st = Config()
     if data.dtype in set((np.dtype('O'), np.dtype('S'), np.dtype('U'))):
         float_regex = re.compile("^\d+?\.\d+?$")
-        cardinal_regex = re.compile("^\d+?$")  # TODO
-        
+        # cardinal_regex = re.compile("^\d+?$")  # TODO
+
         v = s.apply(lambda x: not float_regex.match(x) is None)
         vh = v.value_counts()
 
-        float_parse_count = vh[True] if True in vh else 0
+        # float_parse_count = vh[True] if True in vh else 0
         non_float_parse_count = vh[False] if False in vh else 0
-        
+
         ratio_non_float = non_float_parse_count / float(v.shape[0])
-        
+
         if ratio_non_float > 0.95:
             # Data looks like a non float
             sf = s.apply(lambda x: np.nan if not float_regex.match(x) is None else str(x))
@@ -63,7 +61,7 @@ def feature_parse_and_clean(data):
             max_string_size = s.apply(lambda x: len(x)).max()
             st.type = np.dtype("|S{}".format(max_string_size))
             return (
-                sf.values, 
+                sf.values,
                 st
             )
 
@@ -75,7 +73,7 @@ def feature_parse_and_clean(data):
             st.type = np.dtype(FLOAT_PRECISION)
             s, st = process_nan(s, st)
             return (
-                s.values.astype(FLOAT_PRECISION), 
+                s.values.astype(FLOAT_PRECISION),
                 st
             )
 
@@ -83,7 +81,7 @@ def feature_parse_and_clean(data):
         s, st = process_nan(s, st)
         st.type = np.dtype(np.dtype("int64"))
         return (
-            s.values.astype(FLOAT_PRECISION), 
+            s.values.astype(FLOAT_PRECISION),
             st
         )
 
@@ -91,7 +89,7 @@ def feature_parse_and_clean(data):
         s, st = process_nan(s, st)
         st.type = np.dtype(FLOAT_PRECISION)
         return (
-            s.values.astype(FLOAT_PRECISION), 
+            s.values.astype(FLOAT_PRECISION),
             st
         )
 
@@ -108,7 +106,7 @@ def feature_summary(data):
 
     if len(unique) < CATEGORY_SIZE_UPPER_BOUND:
         cats = dict([(cat, c)for cat, c in zip(unique, counts)])
-        
+
         st.summary = Config.from_dictionary(pd.Series(data).describe().to_dict())
 
         st.cats = cats
@@ -117,7 +115,7 @@ def feature_summary(data):
         st.summary = Config.from_dictionary(pd.Series(data).describe().to_dict())
         st.cats = None
         st.categorical = False
-        
+
     return st
 
 
@@ -127,8 +125,10 @@ def expected_feature(categorical, n_cats=None):
     def expected_feature_decorator(func):
         @wraps(func)
         def wrapper(self, f):
-            assert not categorical or f.categorical, "Expected categorical feature"
-            assert n_cats is None or len(f.cats) == n_cats, "Expected {} categories".format(n_cats)
+            assert not categorical or f.categorical, \
+                "Expected categorical feature"
+            assert n_cats is None or len(f.cats) == n_cats, \
+                "Expected {} categories".format(n_cats)
             return func(self, f)
         return wrapper
     return expected_feature_decorator
@@ -144,7 +144,7 @@ class Transform(Operation):
 
     def transform_single(self, f):
         raise NotImplementedError
-    
+
     def do(self, f):
         return self.transform(f)
 
@@ -162,7 +162,7 @@ class TParseAndClean(Transform):
 class TSummary(Transform):
     def transform_single(self, f):
         st = feature_summary(f.data)
-        
+
         return Feature.merge_instances(
             f,
             Feature(f.name, f.data, st)
@@ -201,7 +201,7 @@ class TStandardScaler(Transform):
         )
         if one_dim_f:
             res_data = res_data.reshape(-1)
-        
+
         return Feature.merge_instances(
             f,
             Feature(f.name, res_data)
@@ -224,16 +224,16 @@ def feature_pool_clean(features):
         not_nan_mask &= pd.Series(f.data).notnull()
 
     not_nan_hist = not_nan_mask.value_counts()
-    
+
     non_nan_count = not_nan_hist[True] if True in not_nan_hist else 0
     nan_count = not_nan_hist[False] if False in not_nan_hist else 0
     st.pool_missing_data_ratio = nan_count / float(nan_count + non_nan_count)
-    
+
     if st.pool_missing_data_ratio >= NAN_RATIO_UPPER_BOUND:
         raise ValueError("Ratio of NaN values is too high: {}".format(st.pool_missing_data_ratio))
-    
+
     logger.info("feature_pool_clean(): Missing data ratio {:.4f}".format(st.pool_missing_data_ratio))
-    
+
     for f in features:
         f.st.update(st)
     return TClean(not_nan_mask).transform(features)
@@ -246,9 +246,9 @@ def one_hot_encode(f):
     res_data[np.arange(f.data.shape[0]), cat_ids] = 1.0
     fp = [
         Feature(
-            f.name + "_{}".format(c), 
+            f.name + "_{}".format(c),
             res_data[:, c_id]
-        ) 
+        )
         for c, c_id in cats.iteritems()
     ]
     return fp
@@ -266,7 +266,6 @@ class TPreprocessPool(Transform):
     def transform(self, fp):
         for f in fp:
             assert not f.categorical or len(f.cats) >= 2, "Found less than 2 categories: {}".format(f)
-            transform = None
             if f.categorical and len(f.cats) == 2: # binary
                 yield TBinarize().transform_single(f)
 
@@ -288,7 +287,7 @@ class TCleanRedundantFeatures(Transform):
         m = pd.DataFrame(
             np.asarray([f.data for f in fp]).T, columns=[f.name for f in fp]
         ).corr()
-        
+
         np.fill_diagonal(m.values, 0.0)
 
         def corr_f(pred):
@@ -310,14 +309,13 @@ class TCleanRedundantFeatures(Transform):
                     comment_str += ", leaving `{}`".format(pos_left)
                 if neg_left:
                     comment_str += ", leaving `{}`".format(neg_left)
-                
+
                 logger.warn(
                     "Getting rid of redudant feature (correlation is almost |1.0|): {}{}".format(
-                        f.name, 
+                        f.name,
                         comment_str
                     )
                 )
 
             else:
                 yield f
-

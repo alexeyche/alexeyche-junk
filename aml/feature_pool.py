@@ -13,7 +13,6 @@ from matplotlib import pyplot as plt
 logger = logging.getLogger("feature_pool")
 
 class FeaturePool(object):
-    
     @staticmethod
     def from_dataframe(df):
         return FeaturePool([Feature.from_series(s) for _, s in df.iteritems()])
@@ -24,7 +23,7 @@ class FeaturePool(object):
 
     @staticmethod
     def to_array(fp):
-        return np.asarray([f.data for f in fp]).T        
+        return np.asarray([f.data for f in fp]).T
 
     def __init__(self, features):
         self.features = features
@@ -33,11 +32,11 @@ class FeaturePool(object):
         return iter(self.features)
 
     def __getitem__(self, idx):
-    	if isinstance(idx, basestring):
-    		r = [f for f in self.features if f.name == idx]
-    		assert len(r) > 0, "Feature name not found: `{}`".format(idx)
-    		assert len(r) == 1, "Found duplicate names for: `{}`".format(idx)
-    		return r[0]
+        if isinstance(idx, basestring):
+            r = [f for f in self.features if f.name == idx]
+            assert len(r) > 0, "Feature name not found: `{}`".format(idx)
+            assert len(r) == 1, "Found duplicate names for: `{}`".format(idx)
+            return r[0]
         return self.features[idx]
 
     def __repr__(self):
@@ -49,22 +48,22 @@ class FeaturePool(object):
     def pca(self, plot=True, split_by=None):
         assert plot or split_by is None, \
             "`split_by` option doesn't make sense without `plot` == True"
-        
         pca = PCA(n_components = 2)
+        
+        if split_by is not None:
+            X = FeaturePool.to_array(FeaturePool([f for f in self.features if f.name != split_by]))
+        else:
+            X = FeaturePool.to_array(self)
+
         pc = pca.fit_transform(X)
         if plot:
-            if not split_by is None:
-                X = FeaturePool.to_array(FeaturePool([f for f in self.features if f.name != split_by]))
-            else:
-                X = FeaturePool.to_array(self)
-
             fig = plt.figure(figsize=(7, 7))
             ax = fig.add_subplot(111)
-            if not split_by is None:
-                ax.scatter(pc[:,0], pc[:,1], c=self[split_by].data)
+            if split_by is not None:
+                ax.scatter(pc[:, 0], pc[:, 1], c=self[split_by].data)
             else:
-                ax.scatter(pc[:,0], pc[:,1])
-            if not split_by is None:
+                ax.scatter(pc[:, 0], pc[:, 1])
+            if split_by is not None:
                 ax.set_title(
                     "PCA for a feature pool splitted by feature ``".format(split_by)
                 )
@@ -72,7 +71,6 @@ class FeaturePool(object):
                 ax.set_title(
                     "PCA for a feature pool"
                 )
-            
             fig.show()
         return pc
 
@@ -82,8 +80,7 @@ class FeaturePool(object):
         if plot:
             import seaborn as sns
 
-            f = plt.figure(figsize=(7,7))
-            
+            f = plt.figure(figsize=(7, 7))
             g = sns.heatmap(corrmat, vmax=.8, square=True)
             g.set_yticklabels(g.get_yticklabels(), rotation = 'horizontal', fontsize = 8)
             g.set_xticklabels(g.get_xticklabels(), rotation = 'vertical', fontsize = 8)

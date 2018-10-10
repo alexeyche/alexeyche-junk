@@ -41,10 +41,14 @@ def add_coloring_to_emit_ansi(fn):
 
     return new
 
-logging.basicConfig(stream=sys.stderr, level=logging.DEBUG, format="%(asctime)s | %(levelname)s | %(name)s: %(message)s")
-logging.StreamHandler.emit = add_coloring_to_emit_ansi(logging.StreamHandler.emit)
 
-
+logging.basicConfig(
+    stream=sys.stderr,
+    level=logging.DEBUG, format="%(asctime)s | %(levelname)s | %(message)s"
+)
+logging.StreamHandler.emit = add_coloring_to_emit_ansi(
+    logging.StreamHandler.emit
+)
 
 
 AML_WD = pj(os.environ["HOME"], "aml")
@@ -56,6 +60,7 @@ data = pd.read_csv(pj(AML_WD, "datasets/WA_Fn-UseC_-Telco-Customer-Churn.csv"))
 
 fp = FeaturePool.from_dataframe(data)
 
+
 t = Pipeline(
     TParseAndClean(),
     TSummary(),
@@ -63,18 +68,12 @@ t = Pipeline(
     TPreprocessPool(),
     TSummary(),
     TCleanRedundantFeatures(),
-    
-    VClassificationReport(
-        models=(
-            MLogReg(target="Churn"),
-        ),
-        metrics=(
-            AUCMetric(), 
-            F1Metric(),
-        ),
-    )
+    MPool(
+        MLogReg(target="Churn"),
+        MLogReg(target="Churn"),
+        test_size=0.25
+    ),
+    VClassificationReport()
 )
 
 r = t.run(fp)
-
-

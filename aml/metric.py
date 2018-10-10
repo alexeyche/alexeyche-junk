@@ -13,7 +13,13 @@ from sklearn.metrics import f1_score
 logger = logging.getLogger("metric")
 
 
-class Metric(object):    
+class Metric(object):
+    def name(self):
+        return self.__class__.__name__
+
+    def __repr__(self):
+        return self.__class__.__name__
+
     def __call__(self, y_true, y_score):
         raise NotImplementedError
 
