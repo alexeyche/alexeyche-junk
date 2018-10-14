@@ -60,6 +60,7 @@ data = pd.read_csv(pj(AML_WD, "datasets/WA_Fn-UseC_-Telco-Customer-Churn.csv"))
 
 fp = FeaturePool.from_dataframe(data)
 
+seed = 10 # MLogReg, 0.77 AUC
 
 t = Pipeline(
     TParseAndClean(),
@@ -68,12 +69,20 @@ t = Pipeline(
     TPreprocessPool(),
     TSummary(),
     TCleanRedundantFeatures(),
-    MPool(
-        MLogReg(target="Churn"),
-        MLogReg(target="Churn"),
-        test_size=0.25
-    ),
+    TTrainTestSplit(test_size=0.3, random_state=seed),
+    TSummary(),
+    TSetTarget(name="Churn"),
+    TOverSampling(random_state=seed),
+    MLogReg(random_state=seed),
+    # TFeatureElimination(
+    #     MDecisionTree(maximum_depth=3),
+    #     num_of_features=10
+    # ),
+    # MPool(
+    #     MLogReg(),
+    #     MDecisionTree(maximum_depth=3),
+    # ),
     VClassificationReport()
 )
 
-r = t.run(fp)
+mo = t.run(fp)

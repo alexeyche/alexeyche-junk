@@ -5,19 +5,25 @@ import pandas as pd
 from matplotlib import pyplot as plt
 import re
 import itertools
-from config import Config
 import logging
 import sys
 import pprint
-from feature import Feature
 from functools import wraps
 import collections
+from collections import OrderedDict
+
+from feature import Feature
+from feature import SplitType
+from feature import FeatureType
+from feature_pool import FeaturePool
+from operation import Operation
+from config import Config
 
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import StandardScaler
-
-
-from operation import Operation
+from sklearn.model_selection import train_test_split
+from imblearn.over_sampling import SMOTE
+from sklearn.feature_selection import RFE
 
 NAN_RATIO_UPPER_BOUND = 0.25
 FLOAT_PRECISION = np.float64
@@ -282,10 +288,18 @@ class TPreprocessPool(Transform):
 
 
 
+def feature_pool_to_array(fp, st=None, ft=None):
+    return np.asarray([
+        f.data
+        for f in fp
+        if (st is None or st == f.split_type) and
+           (ft is None or ft == f.feature_type)
+    ]).T
+
 class TCleanRedundantFeatures(Transform):
     def transform(self, fp):
         m = pd.DataFrame(
-            np.asarray([f.data for f in fp]).T, columns=[f.name for f in fp]
+            feature_pool_to_array(fp), columns=[f.name for f in fp]
         ).corr()
 
         np.fill_diagonal(m.values, 0.0)
@@ -319,3 +333,97 @@ class TCleanRedundantFeatures(Transform):
 
             else:
                 yield f
+
+class TTrainTestSplit(Transform):
+    def __init__(self, test_size = 0.25, random_state=None):
+        self.test_size = test_size
+        self.random_state = random_state
+
+    def transform(self, fp):
+        train_a, test_a = train_test_split(
+            feature_pool_to_array(fp),
+            test_size = self.test_size,
+            random_state = self.random_state,
+        )
+
+        for f_id, f in enumerate(fp):
+            yield Feature.apply_config(
+                Feature(f.name, train_a[:, f_id], f.st),
+                split_type=SplitType.TRAIN
+            )
+
+        for f_id, f in enumerate(fp):
+            yield Feature.apply_config(
+                Feature(f.name, test_a[:, f_id], f.st),
+                split_type=SplitType.TEST
+            )
+
+
+class TSetTarget(Transform):
+    def __init__(self, name):
+        self.name = name
+
+    def transform_single(self, f):
+        if f.name == self.name:
+            return Feature.apply_config(
+                f,
+                feature_type=FeatureType.TARGET
+            )
+        else:
+            return Feature.apply_config(
+                f,
+                feature_type=FeatureType.PREDICTOR
+            )
+
+
+class TOverSampling(Transform):
+    def __init__(self, random_state = 0):
+        self.random_state = random_state
+
+    def transform(self, fp):
+        fm, train_x, train_y = FeaturePool.to_train_arrays(fp)
+
+        os = SMOTE(random_state = self.random_state)
+        os_train_x, os_train_y = os.fit_sample(train_x, train_y[:, 0])
+        os_train_y = os_train_y.reshape((os_train_y.shape[0], 1))
+        for f in FeaturePool.from_train_arrays(fm, os_train_x, os_train_y):
+            yield Feature.apply_config(f, is_over_sampled=True)
+        for f in fp:
+            if f.split_type == SplitType.TEST:
+                yield f
+
+
+class TFeatureElimination(Transform):
+    def __init__(self, model, num_of_features):
+        self.model = model
+        self.num_of_features = num_of_features
+        self._inst = RFE(self.model._inst, self.num_of_features)
+
+    def transform(self, fp):
+        fm, train_x, train_y = FeaturePool.to_train_arrays(fp)
+        train_fm = fm.predictors()
+
+        m = self._inst.fit(train_x, train_y.ravel())
+
+        assert len(train_fm) == len(m.support_), \
+            "Size of output of RFE does not equals to the metadata {} != {}".format(
+                len(train_fm),
+                len(m.support_)
+            )
+
+        supp = set([
+            f.name
+            for f, support in zip(train_fm, m.support_)
+            if support
+        ])
+
+        for f in fp:
+            if f.is_predictor:
+                if f.name in supp:
+                    yield f
+                else:
+                    logger.info("TFeatureElimination: eliminating feature `{}`".format(f.name))
+            else:
+                yield f
+
+

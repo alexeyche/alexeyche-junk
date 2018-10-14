@@ -28,13 +28,13 @@ class Pipeline(object):
                 assert isinstance(d, FeaturePool), \
                     "Expecting `FeaturePool`, got {}".format(d)
 
-                d = op(d.features)
+                d = op(d)
 
             elif isinstance(op, Validation):
-                assert isinstance(d, types.GeneratorType), \
-                    "Expecting generator of `Model.Output`, got {}".format(d)
-                
-                d = [op(m) for m in d]
+                assert isinstance(d, Model.Output), \
+                    "Expecting Model.Output for validation, got {}".format(d)
+
+                d = op(d)
             else:
                 raise ValueError("Failed to dispatch operation: `{}`".format(op))
         return d

@@ -5,68 +5,41 @@ import logging
 
 from operation import Operation
 from feature_pool import FeaturePool
+from feature import FeatureType
 
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
 
 logger = logging.getLogger("model")
-
-class Split(object):
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-    def __repr__(self):
-        return "Split(x={}, y={})".format(self.x.shape, self.y.shape)
-
 
 
 class Model(Operation):
     class Output(object):
-        def __init__(self, model, train, test):
-            self.model = model
-            self.train = train
-            self.test = test
+        def __init__(self, models, fp):
+            self.models = models
+            self.fp = FeaturePool(fp)
 
+        def __repr__(self):
+            return "Model.Output(models=({},), num_of_features={})".format(
+                ", ".join([str(m) for m in self.models]), len(self.fp)
+            )
 
-    DEFAULT_TEST_SIZE = 0.25
-
-    def __init__(self, target, test_size):
-        self.test_size = test_size
-        self.target = target
+    @property
+    def name(self):
+        return self.__class__.__name__
 
     @staticmethod
-    def split_features(_f, target, test_size):
-        fp = FeaturePool(_f)
+    def output_single_model(m, fp):
+        return Model.Output((m, ), fp)
 
-        train_a, test_a = train_test_split(
-            FeaturePool.to_array(fp),
-            test_size = test_size
-        )
+    def do(self, fp):
+        _, train_x, train_y = fp.train_arrays()
+        model = self.train(train_x, train_y)
 
-        cid_x = [f_id for f_id, f in enumerate(fp) if f.name != target]
-        cid_y = [ft_id for ft_id, ft in enumerate(fp) if ft.name == target]
+        return Model.output_single_model(model, fp)
 
-        assert len(cid_y) > 0, \
-            "Failed to find target feature with name `{}`".format(target)
-        assert len(cid_x) > 0, \
-            "Train data is empty"
-
-        train = Split(train_a[:, cid_x], train_a[:, cid_y])
-        test = Split(test_a[:, cid_x], test_a[:, cid_y])
-        return train, test
-        
-    def do(self, f):
-        """
-        Returns:
-            gen(model_instance, train_features, test_features)
-        """
-        train, test = Model.split_features(f, self.target, self.test_size)
-        
-        model = self.train(train)
-
-        yield Model.Output(model, train, test)
-
-    def train(self, train):
+    def train(self, train_x, train_y):
         """
         Returns:
             model_instance generator
@@ -77,39 +50,21 @@ class Model(Operation):
 class MPool(Model):
     def __init__(self, *models, **kwargs):
         self.models = models
-        targets = set([m.target for m in self.models])
-        assert len(targets) == 1, \
-            "Need one unique target to work with models pool"
 
-        target = targets.pop()
+    def do(self, fp):
+        _, train_x, train_y = fp.train_arrays()
 
-        super(MPool, self).__init__(
-            test_size = kwargs.get("test_size", Model.DEFAULT_TEST_SIZE),
-            target = target
+        return Model.Output(
+            [
+                m.train(train_x, train_y)
+                for m in self.models
+            ],
+            fp
         )
-
-
-
-    def do(self, f):
-        """
-        Returns:
-            (model_instance, train_features, test_features)
-        """
-        train, test = Model.split_features(f, self.target, self.test_size)
-        
-        for m in self.models:
-            model = m.train(train)
-            yield Model.Output(model, train, test)
-
 
 
 class MLogReg(Model):
-    def __init__(self, target, test_size=Model.DEFAULT_TEST_SIZE):
-        super(MLogReg, self).__init__(
-            target = target,
-            test_size = test_size
-        )
-
+    def __init__(self, random_state=None):
         self._inst = LogisticRegression(
             C=1.0,  # Like in support vector machines, smaller values specify stronger regularization.
             class_weight=None,
@@ -120,19 +75,20 @@ class MLogReg(Model):
             multi_class='ovr',
             n_jobs=None,
             penalty='l2',
-            random_state=None,
+            random_state=random_state,
             solver='newton-cg',
             tol=0.0001,
             verbose=1,
             warm_start=False
         )
 
+    @property
     def importance(self):
         return self._inst.coef_.ravel()
 
 
-    def train(self, train):
-        self._inst.fit(train.x, train.y[:, 0])
+    def train(self, train_x, train_y):
+        self._inst.fit(train_x, train_y[:, 0])
         return self
 
 
@@ -143,5 +99,91 @@ class MLogReg(Model):
         return self._inst.predict_proba(test_a)
 
 
+
+class MDecisionTree(Model):
+    def __init__(
+        self,
+        maximum_depth,
+        criterion="gini",
+        split_type="best",
+    ):
+        self._inst = DecisionTreeClassifier(
+            max_depth=maximum_depth,
+            splitter=split_type,
+            criterion=criterion,
+        )
+        self._column_names = None
+        self._target_name = None
+
+    @property
+    def importance(self):
+        return self._inst.feature_importances_.ravel()
+
+    def do(self, fp):
+        fm, train_x, train_y = FeaturePool.to_train_arrays(fp)
+
+        # for plotting mostly
+        self._column_names = [
+            f.name
+            for f in fm
+            if f.feature_type == FeatureType.PREDICTOR
+        ]
+        target_names = [
+            f.name
+            for f in fm
+            if f.feature_type == FeatureType.TARGET
+        ]
+        assert len(target_names) == 1
+        self._target_name = target_names[0]
+        ##############
+
+        model = self.train(train_x, train_y)
+
+        return Model.output_single_model(model, fp)
+
+
+    def train(self, train_x, train_y):
+        self._inst.fit(train_x, train_y[:, 0])
+        return self
+
+    def predict(self, test_a):
+        return self._inst.predict(test_a)
+
+    def predict_prob(self, test_a):
+        return self._inst.predict_proba(test_a)
+
+    def plot(self):
+        # veery dirty, didn't find another way :C
+        from sklearn.tree import export_graphviz
+        from sklearn import tree
+        from graphviz import Source
+        import pydot
+        from StringIO import StringIO
+        import subprocess as sub
+        import tempfile
+
+        assert self._column_names is not None
+        assert self._target_name is not None
+
+        new_file, filename = tempfile.mkstemp(suffix=".png")
+
+        dotfile = StringIO()
+
+        tree.export_graphviz(
+            self._inst,
+            out_file=dotfile,
+            rounded=True,
+            proportion = False,
+            feature_names = self._column_names,
+            precision = 2,
+            class_names = [
+                "Not {}".format(self._target_name),
+                self._target_name
+            ],
+            filled = True
+        )
+        v = pydot.graph_from_dot_data(dotfile.getvalue())[0]
+        v.write_png(filename)
+        sub.call(["open", filename])
 
 

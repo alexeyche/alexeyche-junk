@@ -4,3 +4,6 @@ numpy
 matplotlib
 pylab
 scipy
+imblearn
+graphviz
+pydot

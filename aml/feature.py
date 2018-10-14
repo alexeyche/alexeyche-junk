@@ -16,16 +16,77 @@ def dformat(d):
     return pprint.pformat(d, width=1)
 
 
-class Feature(object):
+class SplitType(object):
+    NONE = "none"
+    TRAIN = "train"
+    TEST = "test"
 
+class FeatureType(object):
+    NONE = "none"
+    PREDICTOR = "predictor"
+    TARGET = "target"
+
+
+
+class FeatureMeta(object):
+    def __init__(self, name, st):
+        self.name = name
+        self.st = st
+
+    def __getattr__(self, n):
+        if n in self.st: return self.st[n]
+        raise KeyError("Failed to find attribute: `{}`".format(n))
+
+    def __repr__(self):
+        return "FeatureMeta(name={}, stat=\n{})".format(
+            self.name,
+            "\n".join(["\t{}".format(ss) for ss in str(self.st).split("\n")])
+        )
+
+    @property
+    def has_data(self):
+        return False
+
+    @property
+    def is_predictor(self):
+        return self.feature_type == FeatureType.PREDICTOR
+
+    @property
+    def is_target(self):
+        return self.feature_type == FeatureType.TARGET
+
+    @property
+    def is_train(self):
+        return self.split_type == SplitType.TRAIN
+
+    @property
+    def is_test(self):
+        return self.split_type == SplitType.TEST
+
+
+class Feature(FeatureMeta):
     @staticmethod
     def from_series(series):
         return Feature(series.name, series.values)
 
     @staticmethod
+    def from_array(fm, array):
+        return Feature(fm.name, array, fm.st)
+
+    @staticmethod
     def default_st():
         st = Config()
+        st.split_type = SplitType.NONE
+        st.feature_type = FeatureType.NONE
         return st
+
+    @staticmethod
+    def apply_config(inst, **conf):
+        return Feature(
+            inst.name,
+            inst.data,
+            Config.merge_instances(inst.st, Config.from_dictionary(conf))
+        )
 
 
     @staticmethod
@@ -37,9 +98,11 @@ class Feature(object):
 
     def __init__(self, name, data, st=None):
         assert len(data.shape) == 1, "Data should be one dimensional"
-        self.name = name
+        super(Feature, self).__init__(
+            name,
+            st if st is not None else Feature.default_st()
+        )
         self.data = data
-        self.st = st if st is not None else Feature.default_st()
 
     def __getattr__(self, n):
         if n in self.__dict__: return self.__dict__[n]
@@ -58,6 +121,11 @@ class Feature(object):
     @property
     def data_size(self):
         return self.data.shape[0]
+
+
+    @property
+    def has_data(self):
+        return True
 
     def __repr__(self):
         return "Feature(name={}, data_size={}, stat=\n{})".format(

@@ -1,14 +1,19 @@
 import numpy as np
 import logging
 
-from sklearn.metrics import confusion_matrix
-from sklearn.metrics import classification_report
-from sklearn.utils.multiclass import unique_labels
-from metric import *
 import pandas as pd
 from tabulate import tabulate
 
+from metric import *
 from operation import Operation
+from feature_pool import FeaturePool
+from model import Model
+
+from sklearn.metrics import confusion_matrix
+from sklearn.metrics import classification_report
+from sklearn.utils.multiclass import unique_labels
+
+
 
 
 logger = logging.getLogger("validation")
@@ -42,8 +47,14 @@ class Validation(Operation):
         self.metrics = metrics
 
     def do(self, mo):
-        self.validate(mo.model, mo.test)
-        return None
+        _, test_x, test_y = mo.fp.test_arrays()
+        return Model.Output(
+            [
+                self.validate(m, test_x, test_y)
+                for m in mo.models
+            ],
+            mo.fp
+        )
 
 
 class VClassificationReport(Validation):
@@ -56,21 +67,23 @@ class VClassificationReport(Validation):
             )
         )
 
-    def validate(self, model, test):
-        pred_test_y = model.predict(test.x)
-        cr = classification_report(test.y, pred_test_y, output_dict=True)
-        cm = confusion_matrix(test.y, pred_test_y)
+    def validate(self, model, test_x, test_y):
+        pred_test_y = model.predict(test_x)
+        cr = classification_report(test_y, pred_test_y, output_dict=True)
+        cm = confusion_matrix(test_y, pred_test_y)
 
         mvals = []
         mnames = []
         for metric in self.metrics:
-            v = metric(test.y, pred_test_y)
+            v = metric(test_y, pred_test_y)
             mvals.append(v)
             mnames.append(metric.name())
 
-        labs = unique_labels(test.y)
+        labs = unique_labels(test_y)
 
         report = "\n"
+        report += "\tClassificationReport for `{}`\n".format(model.name)
+        report += "\n"
         report += pretty_df("Report", pd.DataFrame(cr).transpose())
         report += "\n\n"
         report += pretty_table("Metric results", mvals, ["Metric"], mnames)
@@ -78,3 +91,4 @@ class VClassificationReport(Validation):
         report += pretty_table("Confusion matrix", cm, labs, labs)
 
         logger.info("VClassificationReport: \n{}".format(report))
+        return model

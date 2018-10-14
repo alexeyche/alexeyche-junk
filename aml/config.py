@@ -54,7 +54,7 @@ class Config(defaultdict):
                 setattr(dst, k, v)
         return dst
 
-
+    @staticmethod
     def merge_instances(*c):
         res = Config()
         for cc in c:
