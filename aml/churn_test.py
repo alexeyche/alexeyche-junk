@@ -18,7 +18,7 @@ from transform import *
 from model import *
 from metric import *
 from validation import *
-
+from plot_utils import *
 
 def add_coloring_to_emit_ansi(fn):
     # add methods we need to the class
@@ -60,7 +60,7 @@ data = pd.read_csv(pj(AML_WD, "datasets/WA_Fn-UseC_-Telco-Customer-Churn.csv"))
 
 fp = FeaturePool.from_dataframe(data)
 
-seed = 10 # MLogReg, 0.77 AUC
+seed = 0
 
 t = Pipeline(
     TParseAndClean(),
@@ -73,16 +73,32 @@ t = Pipeline(
     TSummary(),
     TSetTarget(name="Churn"),
     TOverSampling(random_state=seed),
-    MLogReg(random_state=seed),
+    # TLambda(lambda x: TSelectKBest(num_of_features=3).plot(x)),
+
     # TFeatureElimination(
-    #     MDecisionTree(maximum_depth=3),
+    #     MLogReg(),
     #     num_of_features=10
     # ),
-    # MPool(
-    #     MLogReg(),
-    #     MDecisionTree(maximum_depth=3),
-    # ),
+    MPool(
+        MDecisionTree(maximum_depth=3),
+        MLogReg(random_state=seed),
+        MKNNClassifier(),
+        MRandomForestClassifier(random_state=seed),
+        MNaiveBayes(),
+        MSVC(),
+        MLGMBClassifier(random_state=seed),
+        MXGBoostClassifier(random_state=seed),
+    ),
     VClassificationReport()
 )
 
-mo = t.run(fp)
+o = t.run(fp)
+
+o.fp.importance(o.models[-1])
+
+
+
+
+
+
+

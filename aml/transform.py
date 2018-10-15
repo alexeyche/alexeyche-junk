@@ -18,12 +18,15 @@ from feature import FeatureType
 from feature_pool import FeaturePool
 from operation import Operation
 from config import Config
+from plot_utils import plot_importance
 
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from imblearn.over_sampling import SMOTE
 from sklearn.feature_selection import RFE
+from sklearn.feature_selection import chi2
+from sklearn.feature_selection import SelectKBest as SKLearnSelectKBest
 
 NAN_RATIO_UPPER_BOUND = 0.25
 FLOAT_PRECISION = np.float64
@@ -386,11 +389,16 @@ class TOverSampling(Transform):
         os = SMOTE(random_state = self.random_state)
         os_train_x, os_train_y = os.fit_sample(train_x, train_y[:, 0])
         os_train_y = os_train_y.reshape((os_train_y.shape[0], 1))
+
         for f in FeaturePool.from_train_arrays(fm, os_train_x, os_train_y):
             yield Feature.apply_config(f, is_over_sampled=True)
         for f in fp:
             if f.split_type == SplitType.TEST:
                 yield f
+
+
+
+
 
 
 class TFeatureElimination(Transform):
@@ -399,7 +407,7 @@ class TFeatureElimination(Transform):
         self.num_of_features = num_of_features
         self._inst = RFE(self.model._inst, self.num_of_features)
 
-    def transform(self, fp):
+    def fit_model(self, fp):
         fm, train_x, train_y = FeaturePool.to_train_arrays(fp)
         train_fm = fm.predictors()
 
@@ -410,10 +418,13 @@ class TFeatureElimination(Transform):
                 len(train_fm),
                 len(m.support_)
             )
+        return m
 
+    def transform(self, fp):
+        m = self.fit_model(fp)
         supp = set([
             f.name
-            for f, support in zip(train_fm, m.support_)
+            for f, support in zip(FeaturePool(fp).train_predictors(), m.support_)
             if support
         ])
 
@@ -426,4 +437,69 @@ class TFeatureElimination(Transform):
             else:
                 yield f
 
+class TSelectKBest(Transform):
+    def __init__(self, num_of_features):
+        self._inst = SKLearnSelectKBest(
+            score_func=chi2,
+            k=num_of_features
+        )
 
+    def fit_model(self, fp):
+        fp = FeaturePool(fp)
+        p = (
+            fp.train_split()
+              .predictors()
+              .filter(lambda f: f.categorical)
+        )
+        x = p.array()
+        y = (
+            fp.train_split()
+              .targets()
+              .array()
+        )
+
+        return self._inst.fit(x, y)
+
+    def plot(self, fp):
+        m = self.fit_model(fp)
+
+        preds = np.asarray(
+            fp.train_predictors()
+              .filter(lambda f: f.categorical)
+              .names()
+        )
+
+        plot_importance(m.scores_, preds)
+
+
+    def transform(self, fp):
+        m = self.fit_model(fp)
+        p = (
+            fp.train_split()
+              .predictors()
+              .filter(lambda f: f.categorical)
+        )
+        supp = set([
+            f.name
+            for f, support in zip(p, m.get_support())
+            if support
+        ])
+
+        for f in fp:
+            if f.is_predictor:
+                if f.name in supp:
+                    yield f
+                else:
+                    logger.info("TSelectKBest: eliminating feature `{}`".format(f.name))
+            else:
+                yield f
+
+
+class TLambda(Transform):
+    def __init__(self, callback):
+        self.callback = callback
+
+    def transform(self, fp):
+        self.callback(FeaturePool(fp))
+        for f in fp:
+            yield f

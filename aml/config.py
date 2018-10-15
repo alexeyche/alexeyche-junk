@@ -1,5 +1,5 @@
 
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 import types
 import imp
 import pprint
@@ -39,13 +39,13 @@ class Config(defaultdict):
         dst = Config()
 
         for k, v in d.iteritems():
-            if type(v) is dict:
+            if type(v) is dict or type(v) is OrderedDict:
                 v = Config.from_dictionary(v)
                 setattr(dst, k, v)
             elif type(v) is list:
                 dst_list = []
                 for vv in v:
-                    if type(vv) is dict:
+                    if type(vv) is dict or type(v) is OrderedDict:
                         vv = Config.from_dictionary(vv)
                     dst_list.append(vv)
 

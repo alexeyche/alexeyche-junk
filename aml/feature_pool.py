@@ -8,9 +8,12 @@ from itertools import chain
 from config import Config
 from feature import Feature
 from feature import FeatureMeta
+from plot_utils import plot_importance
 
 from sklearn.decomposition import PCA
 from matplotlib import pyplot as plt
+
+
 
 
 logger = logging.getLogger("feature_pool")
@@ -231,3 +234,13 @@ class FeaturePool(object):
             f.show()
 
         return corrmat
+
+    def importance(self, m, plot=True):
+        preds = np.asarray(self.train_predictors().names())
+        importance = m.importance
+
+        assert len(preds) == len(importance), \
+            "Importance vector does not correspond to the FeaturePool"
+
+        plot_importance(importance, preds)
+
