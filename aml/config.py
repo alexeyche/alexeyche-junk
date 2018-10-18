@@ -3,7 +3,10 @@ from collections import defaultdict, OrderedDict
 import types
 import imp
 import pprint
-import StringIO
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 
 class Config(defaultdict):
     def __init__(self, *args, **kwargs):
@@ -38,7 +41,7 @@ class Config(defaultdict):
     def from_dictionary(d):
         dst = Config()
 
-        for k, v in d.iteritems():
+        for k, v in d.items():
             if type(v) is dict or type(v) is OrderedDict:
                 v = Config.from_dictionary(v)
                 setattr(dst, k, v)
@@ -63,7 +66,7 @@ class Config(defaultdict):
 
 def dictionarize(defdict):
     work_defdict = defdict.copy()
-    for k, v in work_defdict.iteritems():
+    for k, v in work_defdict.items():
         if isinstance(v, Config):
             work_defdict[k] = dictionarize(v)
     return dict(work_defdict)

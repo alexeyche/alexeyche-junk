@@ -106,7 +106,7 @@ class VClassificationReport(Validation):
         report += "\n\n"
         report += pretty_table(
             "Metric results",
-            validation_metrics.values(),
+            list(validation_metrics.values()),
             ["Metric"],
             validation_metrics.keys()
         )

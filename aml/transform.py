@@ -258,7 +258,7 @@ def one_hot_encode(f):
             f.name + "_{}".format(c),
             res_data[:, c_id]
         )
-        for c, c_id in cats.iteritems()
+        for c, c_id in cats.items()
     ]
     return fp
 
@@ -344,7 +344,7 @@ class TTrainTestSplit(Transform):
 
     def transform(self, fp):
         train_a, test_a = train_test_split(
-            feature_pool_to_array(fp),
+            FeaturePool(fp).array(),
             test_size = self.test_size,
             random_state = self.random_state,
         )

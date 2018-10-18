@@ -4,6 +4,8 @@ import numpy as np
 import os
 from os.path import join as pj
 import pandas as pd
+import matplotlib as mpl
+mpl.use('Qt5Agg')
 from matplotlib import pyplot as plt
 import logging
 import sys
@@ -44,7 +46,7 @@ def add_coloring_to_emit_ansi(fn):
 
 logging.basicConfig(
     stream=sys.stderr,
-    level=logging.DEBUG, format="%(asctime)s | %(levelname)s | %(message)s"
+    level=logging.INFO, format="%(asctime)s | %(levelname)s | %(message)s"
 )
 logging.StreamHandler.emit = add_coloring_to_emit_ansi(
     logging.StreamHandler.emit
@@ -57,10 +59,35 @@ AML_WD = pj(os.environ["HOME"], "aml")
 # https://www.kaggle.com/pavanraj159/telecom-customer-churn-prediction
 data = pd.read_csv(pj(AML_WD, "datasets/WA_Fn-UseC_-Telco-Customer-Churn.csv"))
 
+# replace 'No internet service' to No for the following columns
+replace_cols = [
+    'OnlineSecurity', 'OnlineBackup', 'DeviceProtection',
+    'TechSupport', 'StreamingTV', 'StreamingMovies'
+]
+
+for i in replace_cols:
+    data[i] = data[i].replace({'No internet service': 'No'})
+
+data["SeniorCitizen"] = data["SeniorCitizen"].replace({1: "Yes", 0: "No"})
+
+def tenure_lab(data):
+    if data["tenure"] <= 12:
+        return "Tenure_0-12"
+    elif (data["tenure"] > 12) & (data["tenure"] <= 24):
+        return "Tenure_12-24"
+    elif (data["tenure"] > 24) & (data["tenure"] <= 48):
+        return "Tenure_24-48"
+    elif (data["tenure"] > 48) & (data["tenure"] <= 60):
+        return "Tenure_48-60"
+    elif data["tenure"] > 60:
+        return "Tenure_gt_60"
+data["tenure_group"] = data.apply(lambda data: tenure_lab(data), axis = 1)
+
+
 
 fp = FeaturePool.from_dataframe(data)
 
-seed = 0
+seed = 1
 
 t = Pipeline(
     TParseAndClean(),
@@ -68,7 +95,7 @@ t = Pipeline(
     TCleanPool(),
     TPreprocessPool(),
     TSummary(),
-    TCleanRedundantFeatures(),
+    # TCleanRedundantFeatures(),
     TTrainTestSplit(test_size=0.3, random_state=seed),
     TSummary(),
     TSetTarget(name="Churn"),
@@ -79,22 +106,23 @@ t = Pipeline(
     #     MLogReg(),
     #     num_of_features=10
     # ),
-    MPool(
-        MDecisionTree(maximum_depth=3),
-        MLogReg(random_state=seed),
-        MKNNClassifier(),
-        MRandomForestClassifier(random_state=seed),
-        MNaiveBayes(),
-        MSVC(),
-        MLGMBClassifier(random_state=seed),
-        MXGBoostClassifier(random_state=seed),
-    ),
-    VClassificationReport()
+    # MPool(
+    #     MDecisionTree(maximum_depth=3),
+    #     MLogReg(random_state=seed),
+    #     MKNNClassifier(),
+    #     MRandomForestClassifier(random_state=seed),
+    #     MNaiveBayes(),
+    #     MSVC(),
+    #     MLGMBClassifier(random_state=seed),
+    #     MXGBoostClassifier(random_state=seed),
+    # ),
+    MXGBoostClassifier(random_state=seed),
+    VClassificationReport(),
 )
 
-o = t.run(fp)
+rfp = t.run(fp)
 
-o.fp.importance(o.models[-1])
+# o.fp.importance(o.models[-1])
 
 
 

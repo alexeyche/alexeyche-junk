@@ -1,4 +1,8 @@
 
+from __future__ import annotations
+import matplotlib as mpl
+mpl.use('Qt5Agg')
+
 import numpy as np
 import pandas as pd
 import logging
@@ -31,25 +35,25 @@ def gen_feature_pool_from_array(fm, d):
 class FeaturePool(object):
 
     @staticmethod
-    def from_dataframe(df):
-        return FeaturePool([Feature.from_series(s) for _, s in df.iteritems()])
+    def from_dataframe(df) -> FeaturePool:  # noqa
+        return FeaturePool([Feature.from_series(s) for _, s in df.items()])
 
     @staticmethod
-    def to_test_arrays(fp_list):
+    def to_test_arrays(fp_list) -> FeaturePool:  # noqa
         assert isinstance(fp_list, list) or isinstance(fp_list, tuple), \
             "Expecting list or tuple got {}".format(fp_list)
 
         return FeaturePool(fp_list).test_arrays()
 
     @staticmethod
-    def to_train_arrays(fp_list):
+    def to_train_arrays(fp_list) -> FeaturePool:  # noqa
         assert isinstance(fp_list, list) or isinstance(fp_list, tuple), \
             "Expecting list or tuple got {}".format(fp_list)
 
         return FeaturePool(fp_list).train_arrays()
 
     @staticmethod
-    def from_train_arrays(fm, train_x, train_y):
+    def from_train_arrays(fm, train_x, train_y) -> FeaturePool:  # noqa
         return FeaturePool(
             list(chain(
                 gen_feature_pool_from_array(fm.train_predictors(), train_x),
@@ -174,7 +178,7 @@ class FeaturePool(object):
         return iter(self.features)
 
     def __getitem__(self, idx):
-        if isinstance(idx, basestring):
+        if isinstance(idx, str):
             r = [f for f in self.features if f.name == idx]
             assert len(r) > 0, "Feature name not found: `{}`".format(idx)
             assert len(r) == 1, "Found duplicate names for: `{}`".format(idx)

@@ -3,7 +3,6 @@ from matplotlib import pyplot as plt
 import numpy as np
 import math
 import collections
-import pylab
 from scipy import signal
 import pandas as pd
 
@@ -122,7 +121,7 @@ def shm(matrix, **kwargs):
 
 def shl(*vector, **kwargs):
     plt.figure(figsize=kwargs.get("figsize", DEFAULT_FIG_SIZE))
-    
+
     labels = kwargs.get("labels", [])
     for id, v in enumerate(vector):
         if len(labels) > 0:
@@ -132,7 +131,7 @@ def shl(*vector, **kwargs):
 
     if len(labels) > 0:
         plt.legend()
-    
+
     if not kwargs.get("title") is None:
         plt.suptitle(kwargs["title"])
 
@@ -147,18 +146,18 @@ def shs(*args, **kwargs):
     make_pca = kwargs.get("make_pca", True)
 
     plt.figure(figsize=kwargs.get("figsize", DEFAULT_FIG_SIZE))
-    
+
     for id, a in enumerate(args):
         if make_pca and a.shape[1] > 2:
             import sklearn.decomposition as dec
             pca = dec.PCA(2)
             a = pca.fit(a).transform(a)
-           
+
         if len(labels) > 0:
             plt.scatter(a[:, 0], a[:, 1], c=labels[id])
         else:
             plt.scatter(a[:, 0], a[:, 1])
-    
+
     if len(labels) > 0:
         plt.legend()
 
@@ -183,7 +182,7 @@ def shp(*args, **kwargs):
 
 
 def is_sequence(obj):
-    if isinstance(obj, basestring):
+    if isinstance(obj, str):
         return False
     return isinstance(obj, collections.Sequence)
 

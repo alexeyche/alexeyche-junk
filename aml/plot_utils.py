@@ -40,7 +40,10 @@ def plot_tree(model, fp):
     from sklearn import tree
     from graphviz import Source
     import pydot
-    from StringIO import StringIO
+    try:
+        from StringIO import StringIO
+    except ImportError:
+        from io import StringIO
     import subprocess as sub
     import tempfile
 
@@ -69,3 +72,6 @@ def plot_tree(model, fp):
     v = pydot.graph_from_dot_data(dotfile.getvalue())[0]
     v.write_png(filename)
     sub.call(["open", filename])
+
+
+
