@@ -33,6 +33,9 @@ def gen_feature_pool_from_array(fm, d):
 
 
 class FeaturePool(object):
+    @staticmethod
+    def from_array(fm, x):
+        return FeaturePool(list(gen_feature_pool_from_array(fm, x)))
 
     @staticmethod
     def from_dataframe(df) -> FeaturePool:  # noqa
@@ -84,8 +87,9 @@ class FeaturePool(object):
         assert self.has_data(), "Expecting FeaturePool with data"
 
         shape = set(self.apply(lambda x: x.data.shape))
+        assert len(shape) != 0, "FeaturePool is empty"
         assert len(shape) == 1, \
-            "Shape of FeaturePool is not unique, consider different splits: test_split(), train_split()"
+            "Shape of FeaturePool is not unique: {}. Consider different splits: test_split(), train_split()".format(shape)
 
         return np.asarray(self.apply(lambda f: f.data)).T
 
@@ -214,7 +218,7 @@ class FeaturePool(object):
                 ax.scatter(pc[:, 0], pc[:, 1])
             if split_by is not None:
                 ax.set_title(
-                    "PCA for a feature pool splitted by feature ``".format(split_by)
+                    "PCA for a feature pool splitted by feature `{}`".format(split_by)
                 )
             else:
                 ax.set_title(
@@ -223,20 +227,23 @@ class FeaturePool(object):
             fig.show()
         return pc
 
-    def corr(self, plot=True):
+    def corr(self, by_target=None, plot=True):
         assert self.has_data(), "Expecting FeaturePool with data"
 
         corrmat = self.dataframe().corr()
 
         if plot:
-            import seaborn as sns
+            if by_target is None:
+                import seaborn as sns
 
-            f = plt.figure(figsize=(7, 7))
-            g = sns.heatmap(corrmat, vmax=.8, square=True)
-            g.set_yticklabels(g.get_yticklabels(), rotation = 'horizontal', fontsize = 8)
-            g.set_xticklabels(g.get_xticklabels(), rotation = 'vertical', fontsize = 8)
-            f.show()
-
+                f = plt.figure(figsize=(7, 7))
+                g = sns.heatmap(corrmat, vmax=.8, square=True)
+                g.set_yticklabels(g.get_yticklabels(), rotation = 'horizontal', fontsize = 8)
+                g.set_xticklabels(g.get_xticklabels(), rotation = 'vertical', fontsize = 8)
+                f.show()
+            else:
+                df = corrmat[by_target].sort_values(ascending = False)
+                plot_importance(df, df.index.values, title="Feature correlations")
         return corrmat
 
     def importance(self, m, plot=True):
@@ -247,4 +254,9 @@ class FeaturePool(object):
             "Importance vector does not correspond to the FeaturePool"
 
         plot_importance(importance, preds)
+
+    def plot(self, name, split_by=None):
+        f = self[name]
+        split_by_f = self[split_by] if split_by is not None else None
+        return f.plot(split_by=split_by_f)
 

@@ -5,7 +5,7 @@ import matplotlib.cm as cm
 import numpy as np
 from matplotlib import pyplot as plt
 
-def plot_importance(values, labels):
+def plot_importance(values, labels, title="Feature importances"):
     color_map = cm.ScalarMappable(
         norm=mpl.colors.Normalize(
             vmin=np.min(values),
@@ -17,6 +17,7 @@ def plot_importance(values, labels):
     indices = np.asarray(
         tuple(reversed(np.argsort(values)[::-1]))
     )
+    labels = np.asarray(labels)
 
     fig = plt.figure(figsize=(7, 7))
     ax = fig.add_subplot(111)
@@ -28,10 +29,9 @@ def plot_importance(values, labels):
     ax.set_yticklabels(labels[indices], fontsize="x-small")
     ax.set_yticks(range(len(labels)))
     ax.set_ylim([-1, len(labels)])
-    ax.set_title(
-        "Feature importances"
-    )
+    ax.set_title(title)
     fig.show()
+
 
 
 def plot_tree(model, fp):

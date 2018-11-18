@@ -27,6 +27,8 @@ from imblearn.over_sampling import SMOTE
 from sklearn.feature_selection import RFE
 from sklearn.feature_selection import chi2
 from sklearn.feature_selection import SelectKBest as SKLearnSelectKBest
+from sklearn.preprocessing import MinMaxScaler
+from umap import UMAP
 
 NAN_RATIO_UPPER_BOUND = 0.25
 FLOAT_PRECISION = np.float64
@@ -36,7 +38,7 @@ CATEGORY_SIZE_UPPER_BOUND = 50
 logger = logging.getLogger("transform")
 
 
-def feature_parse_and_clean(data):
+def feature_parse(data):
     assert isinstance(data, np.ndarray), "Data should be ndarray"
 
     def process_nan(s, st):
@@ -101,7 +103,13 @@ def feature_parse_and_clean(data):
             s.values.astype(FLOAT_PRECISION),
             st
         )
-
+    elif data.dtype in set((np.dtype("uint8"),)):
+        s, st = process_nan(s, st)
+        st.type = np.dtype(np.dtype("uint8"))
+        return (
+            s.values.astype(FLOAT_PRECISION),
+            st
+        )
     else:
         raise ValueError("Unable to recognize numpy type: {}".format(data.dtype))
 
@@ -159,9 +167,9 @@ class Transform(Operation):
 
 
 
-class TParseAndClean(Transform):
+class TParse(Transform):
     def transform_single(self, f):
-        data, st = feature_parse_and_clean(f.data)
+        data, st = feature_parse(f.data)
         return Feature.merge_instances(
             f,
             Feature(f.name, data, st)
@@ -186,16 +194,6 @@ class TClean(Transform):
         return Feature.merge_instances(
             f,
             Feature(f.name, f.data[self.positive_mask])
-        )
-
-
-class TBinarize(Transform):
-    @expected_feature(categorical=True, n_cats=2)
-    def transform_single(self, f):
-        le = LabelEncoder()
-        return Feature.merge_instances(
-            f,
-            Feature(f.name, le.fit_transform(f.data))
         )
 
 
@@ -271,12 +269,30 @@ class TCleanPool(Transform):
             yield ff
 
 
+class TLabelEncoder(Transform):
+    def transform(self, fp):
+        for f in fp:
+            if f.categorical and len(f.cats) > 2: # categorical
+                yield self.transform_single(f)
+            else:
+                yield f
+
+    @expected_feature(categorical=True)
+    def transform_single(self, f):
+        le = LabelEncoder()
+        return Feature.merge_instances(
+            f,
+            Feature(f.name, le.fit_transform(f.data))
+        )
+
+
+
 class TPreprocessPool(Transform):
     def transform(self, fp):
         for f in fp:
             assert not f.categorical or len(f.cats) >= 2, "Found less than 2 categories: {}".format(f)
             if f.categorical and len(f.cats) == 2: # binary
-                yield TBinarize().transform_single(f)
+                yield TLabelEncoder().transform_single(f)
 
             elif f.categorical and len(f.cats) > 2: # categorical
                 for hot_f in one_hot_encode(f):
@@ -300,6 +316,9 @@ def feature_pool_to_array(fp, st=None, ft=None):
     ]).T
 
 class TCleanRedundantFeatures(Transform):
+    def __init__(self, correlation_bound=0.9999):
+        self.correlation_bound = correlation_bound
+
     def transform(self, fp):
         m = pd.DataFrame(
             feature_pool_to_array(fp), columns=[f.name for f in fp]
@@ -317,8 +336,8 @@ class TCleanRedundantFeatures(Transform):
             return redundant_f, left
 
         # TODO: make it just |1.0|
-        r_pos_set, pos_left = corr_f(lambda x: x >= 1.0 - 1e-09)
-        r_neg_set, neg_left = corr_f(lambda x: x <= -1.0 + 1e-09)
+        r_pos_set, pos_left = corr_f(lambda x: x >= self.correlation_bound)
+        r_neg_set, neg_left = corr_f(lambda x: x <= -self.correlation_bound)
         for f in fp:
             if f.name in r_pos_set | r_neg_set:
                 comment_str = ""
@@ -366,18 +385,21 @@ class TSetTarget(Transform):
     def __init__(self, name):
         self.name = name
 
-    def transform_single(self, f):
-        if f.name == self.name:
-            return Feature.apply_config(
-                f,
-                feature_type=FeatureType.TARGET
-            )
-        else:
-            return Feature.apply_config(
-                f,
-                feature_type=FeatureType.PREDICTOR
-            )
-
+    def transform(self, fp):
+        found_feature = False
+        for f in fp:
+            if f.name == self.name:
+                yield Feature.apply_config(
+                    f,
+                    feature_type=FeatureType.TARGET
+                )
+                found_feature = True
+            else:
+                yield Feature.apply_config(
+                    f,
+                    feature_type=FeatureType.PREDICTOR
+                )
+        assert found_feature, "Feature `{}` is not found in the FeaturePool".format(self.name)
 
 class TOverSampling(Transform):
     def __init__(self, random_state = 0):
@@ -405,7 +427,10 @@ class TFeatureElimination(Transform):
     def __init__(self, model, num_of_features):
         self.model = model
         self.num_of_features = num_of_features
-        self._inst = RFE(self.model._inst, self.num_of_features)
+        self._inst = RFE(
+            self.model.create_instance(**self.model.model_options),
+            self.num_of_features
+        )
 
     def fit_model(self, fp):
         fm, train_x, train_y = FeaturePool.to_train_arrays(fp)
@@ -503,3 +528,111 @@ class TLambda(Transform):
         self.callback(FeaturePool(fp))
         for f in fp:
             yield f
+
+class TMinMaxScaler(Transform):
+    def __init__(self, feature_range):
+        self.feature_range = feature_range
+
+    def transform(self, fp):
+        fm = FeaturePool(fp).meta()
+        x = FeaturePool(fp).array()
+
+        scaler = MinMaxScaler(feature_range = self.feature_range)
+        scaler.fit(x)
+        for f in FeaturePool.from_array(fm, scaler.transform(x)):
+            yield f
+
+
+class TUmap(Transform):
+    """
+    n_neighbors:
+        This determines the number of neighboring points used in local approximations
+        of manifold structure. Larger values will result in more global structure being
+        preserved at the loss of detailed local structure.
+        In general this parameter should often be in the range 5 to 50,
+        with a choice of 10 to 15 being a sensible default.
+    min_dist:
+        This controls how tightly the embedding is allowed compress points together.
+        Larger values ensure embedded points are more evenly distributed, while smaller
+        values allow the algorithm to optimise more accurately with regard to local structure.
+        Sensible values are in the range 0.001 to 0.5, with 0.1 being a reasonable default.
+    metric:
+        This determines the choice of metric used to measure distance in the input space.
+        A wide variety of metrics are already coded, and a user defined function can be passed
+        as long as it has been JITd by numba.
+    """
+
+    def __init__(
+        self,
+        n_neighbors=15,
+        min_dist=0.1,
+        metric="euclidean",
+        n_components=2,
+        spread=1.0,
+        random_state=None
+    ):
+        self._inst = UMAP(
+            n_neighbors = n_neighbors,
+            min_dist = min_dist,
+            metric = metric,
+            n_components=n_components,
+            spread=spread,
+        )
+
+
+    def transform(self, fp):
+        x = FeaturePool(fp).array()
+        logger.info("TUmap: starting UMAP transform ...")
+        x_emb = self._inst.fit_transform(x)
+        logger.info("TUamp: Done")
+
+        for f_id in range(x_emb.shape[1]):
+            yield Feature(
+                "UMAP feature #{}".format(f_id),
+                x_emb[:, f_id]
+            )
+
+    @staticmethod
+    def plot_embedding(efp: FeaturePool, split_by=None):
+        x = efp.array()
+        assert x.shape[1] == 2, "Embedding is expected to be with the size 2 to plot, got {}".format(x.shape[1])
+        fig = plt.figure(figsize=(7, 7))
+        ax = fig.add_subplot(111)
+        if split_by is not None:
+            d = split_by.data
+            ax.scatter(x[:, 0], x[:, 1], c=d, alpha=0.5)
+        else:
+            ax.scatter(x[:, 0], x[:, 1], alpha=0.5)
+        if split_by is not None:
+            ax.set_title(
+                "UMAP for a feature pool splitted by feature `{}`".format(split_by.name)
+            )
+        else:
+            ax.set_title(
+                "UMAP for a feature pool"
+            )
+        fig.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

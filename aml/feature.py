@@ -9,6 +9,7 @@ from config import Config
 import logging
 import sys
 import pprint
+import seaborn as sns
 
 logger = logging.getLogger("feature")
 
@@ -176,32 +177,27 @@ class Feature(FeatureMeta):
                 ax.set_xticklabels(cats)
                 ax.set_xticks(ind + width / len(cats))
                 ax.legend(tuple("{}: {}".format(split_by.name, c) for c in split_by.cats))
+                ax.set_title(
+                    "Histogram side by side plot, `{}` split by `{}`".format(self.name, split_by.name)
+                )
+                ax.set_xlabel(self.name)
+                ax.set_ylabel("Normalized `{}`".format(self.name))
+
             else:
-                data = []
+                ax = None
                 for c in split_by.cats:
                     idx = np.where(split_by.data == c)
-                    data.append(self.data[idx])
+                    ax = sns.kdeplot(self.data[idx], shade=True, ax=ax)
 
-                ax.hist(
-                    data,
-                    bins=hist_bins,
-                    normed=True,
-                    label=[
-                        "{}: {}".format(split_by.name, k)
-                        for k in split_by.cats.keys()
-                    ]
-                )
-                ax.legend()
+                ax.set_ylabel("Density")
+                ax.set_xlabel(self.name)
+                ax.set_title("Distribution side by side plot, `{}` split by `{}`".format(self.name, split_by.name))
+                ax.legend(tuple("{}: {}".format(split_by.name, c) for c in split_by.cats), loc='upper right')
 
-            ax.set_title(
-                "Histogram side by side plot, `{}` split by `{}`".format(self.name, split_by.name)
-            )
-            ax.set_xlabel(self.name)
-            ax.set_ylabel("Normalized `{}`".format(self.name))
         else:
             if self.categorical:
-                cats = sorted(self.cats.keys())
-                total = np.sum(self.cats.values())
+                cats = sorted(list(self.cats.keys()))
+                total = np.sum(list(self.cats.values()))
                 ind = np.arange(len(cats))
                 inc_width = 0.0
                 width = 0.1
@@ -212,6 +208,7 @@ class Feature(FeatureMeta):
 
                 ax.set_xticklabels(cats)
                 ax.set_xticks(ind + width / len(cats))
+
             else:
                 ax.hist(
                     self.data,

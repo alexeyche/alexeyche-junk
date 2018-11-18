@@ -2,6 +2,7 @@
 
 import numpy as np
 import os
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 from os.path import join as pj
 import pandas as pd
 import matplotlib as mpl
@@ -57,18 +58,18 @@ AML_WD = pj(os.environ["HOME"], "aml")
 
 
 # https://www.kaggle.com/pavanraj159/telecom-customer-churn-prediction
-data = pd.read_csv(pj(AML_WD, "datasets/WA_Fn-UseC_-Telco-Customer-Churn.csv"))
+telcom = pd.read_csv(pj(AML_WD, "datasets/WA_Fn-UseC_-Telco-Customer-Churn.csv"))
 
-# replace 'No internet service' to No for the following columns
 replace_cols = [
     'OnlineSecurity', 'OnlineBackup', 'DeviceProtection',
     'TechSupport', 'StreamingTV', 'StreamingMovies'
 ]
 
 for i in replace_cols:
-    data[i] = data[i].replace({'No internet service': 'No'})
+    telcom[i] = telcom[i].replace({'No internet service': 'No'})
 
-data["SeniorCitizen"] = data["SeniorCitizen"].replace({1: "Yes", 0: "No"})
+# eplace values
+telcom["SeniorCitizen"] = telcom["SeniorCitizen"].replace({1: "Yes", 0: "No"})
 
 def tenure_lab(data):
     if data["tenure"] <= 12:
@@ -81,51 +82,96 @@ def tenure_lab(data):
         return "Tenure_48-60"
     elif data["tenure"] > 60:
         return "Tenure_gt_60"
-data["tenure_group"] = data.apply(lambda data: tenure_lab(data), axis = 1)
+
+telcom["tenure_group"] = telcom.apply(lambda telcom: tenure_lab(telcom), axis = 1)
+
+# telcom = telcom.drop("tenure", axis=1)
+# # telcom = telcom.drop("TotalCharges", axis=1)
+# telcom = telcom.drop("customerID", axis=1)
+# telcom.TotalCharges = pd.to_numeric(telcom.TotalCharges, errors='coerce')
+# telcom['Churn'].replace(to_replace='Yes', value=1, inplace=True)
+# telcom['Churn'].replace(to_replace='No', value=0, inplace=True)
+# telcom = pd.get_dummies(telcom)
+# telcom.dropna(inplace = True)
 
 
+fp = FeaturePool.from_dataframe(telcom)
 
-fp = FeaturePool.from_dataframe(data)
+seed = 5
 
-seed = 1
-
-t = Pipeline(
-    TParseAndClean(),
-    TSummary(),
+clean = Pipeline(
+    TParse(),
     TCleanPool(),
+    TSummary(),
+)
+
+te = Pipeline(
     TPreprocessPool(),
     TSummary(),
-    # TCleanRedundantFeatures(),
+    TCleanRedundantFeatures(correlation_bound=0.99),
+)
+
+cfp = clean.run(fp)
+pfp = te.run(cfp)
+
+umap = TUmap(n_neighbors=15, min_dist=0.1, spread=10.0, metric="minkowski", random_state=1)
+
+efp = FeaturePool(tuple(f for f in umap(pfp.features)))
+
+TUmap.plot_embedding(efp, split_by=TLabelEncoder().transform_single(cfp["Contract"]))
+
+
+t = Pipeline(
+    TPreprocessPool(),
+    TSummary(),
+    TCleanRedundantFeatures(correlation_bound=0.99),
     TTrainTestSplit(test_size=0.3, random_state=seed),
     TSummary(),
     TSetTarget(name="Churn"),
-    TOverSampling(random_state=seed),
+    # TOverSampling(random_state=seed),
     # TLambda(lambda x: TSelectKBest(num_of_features=3).plot(x)),
 
     # TFeatureElimination(
     #     MLogReg(),
     #     num_of_features=10
     # ),
+    MLogReg(random_state=seed),
     # MPool(
     #     MDecisionTree(maximum_depth=3),
-    #     MLogReg(random_state=seed),
+    #     MLogReg(),
     #     MKNNClassifier(),
-    #     MRandomForestClassifier(random_state=seed),
+    #     MRandomForestClassifier(),
     #     MNaiveBayes(),
     #     MSVC(),
-    #     MLGMBClassifier(random_state=seed),
-    #     MXGBoostClassifier(random_state=seed),
+    #     MLGMBClassifier(),
+    #     MXGBoostClassifier(),
+    #     MCatBoost(),
+    #     random_state=seed
     # ),
-    MXGBoostClassifier(random_state=seed),
     VClassificationReport(),
 )
 
-rfp = t.run(fp)
 
-# o.fp.importance(o.models[-1])
+# For error analysis
+# cfp = clean.run(fp)
+# mo = t.run(cfp)
 
 
+# fm, test_x, test_y = mo.fp.test_arrays()
+# test_y = test_y[:, 0]
 
+# pred_test_y = mo.models[0].predict(test_x)
+# print("Accuracy: ", np.mean(test_y == pred_test_y))
+# x_res = test_x[np.where(test_y != pred_test_y)]
+# y_res = np.expand_dims(test_y[np.where(test_y != pred_test_y)], 1)
+
+# fp_res = FeaturePool.from_test_arrays(fm, x_res, y_res)
+
+
+# plot_importance(
+#     mo.models[0].importance,
+#     mo.fp.train_predictors().names()
+# )
 
 
 

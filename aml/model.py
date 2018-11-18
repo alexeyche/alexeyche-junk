@@ -18,6 +18,7 @@ from sklearn.svm import SVC
 
 from lightgbm import LGBMClassifier
 from xgboost import XGBClassifier
+from catboost import CatBoostClassifier
 
 
 logger = logging.getLogger("model")
@@ -57,7 +58,7 @@ class Model(Operation):
 
         return Model.output_single_model(model, fp)
 
-    def create_model(self, **model_options):
+    def create_instance(self, **model_options):
         raise NotImplementedError
 
 
@@ -134,6 +135,10 @@ class MPool(Model):
     def __init__(self, *models, **kwargs):
         super(MPool, self).__init__()
         self.models = models
+        if len(kwargs) > 0:
+            for m in self.models:
+                m.model_options.update(kwargs)
+
 
     def do(self, fp):
         _, train_x, train_y = fp.train_arrays()
@@ -159,16 +164,18 @@ class MDecisionTree(Model):
         maximum_depth,
         criterion="gini",
         split_type="best",
+        random_state=None
     ):
         return DecisionTreeClassifier(
             max_depth=maximum_depth,
             splitter=split_type,
             criterion=criterion,
+            random_state=random_state,
         )
 
 
 class MKNNClassifier(Model):
-    def create_instance(self):
+    def create_instance(self, **kwargs):
         return KNeighborsClassifier(
             algorithm='auto',
             leaf_size=10,
@@ -186,10 +193,10 @@ class MRandomForestClassifier(Model):
         return RandomForestClassifier(
             bootstrap=True,
             class_weight=None,
-            criterion='entropy',
-            max_depth=3,
+            criterion='gini',
+            max_depth=None,
             max_features='auto',
-            max_leaf_nodes=None,
+            max_leaf_nodes=30,  # ! influence
             min_impurity_decrease=0.0,
             min_impurity_split=None,
             min_samples_leaf=1,
@@ -205,7 +212,7 @@ class MRandomForestClassifier(Model):
 
 
 class MNaiveBayes(Model):
-    def create_instance(self):
+    def create_instance(self, random_state=None):
         return GaussianNB(
             priors=None,
             var_smoothing=1e-09
@@ -215,20 +222,20 @@ class MNaiveBayes(Model):
 class MSVC(Model):
     def create_instance(self, random_state=None):
         return SVC(
-            C=1.0,
-            cache_size=200,
-            class_weight=None,
-            coef0=0.0,
-            decision_function_shape='ovr',
-            degree=3,
-            gamma=1.0,
+            # C=1.0,
+            # cache_size=200,
+            # class_weight=None,
+            # coef0=0.0,
+            # decision_function_shape='ovr',
+            # degree=3,
+            # gamma=1.0,
             kernel='linear',
-            max_iter=-1,
-            probability=True,
-            random_state=random_state,
-            shrinking=True,
-            tol=0.001,
-            verbose=False
+            # max_iter=-1,
+            # probability=True,
+            # random_state=random_state,
+            # shrinking=True,
+            # tol=0.001,
+            # verbose=False
         )
 
 
@@ -262,13 +269,37 @@ class MLGMBClassifier(Model):
 class MXGBoostClassifier(Model):
     def create_instance(self, random_state=None):
         return XGBClassifier(
-            base_score=0.5, booster='gbtree', colsample_bylevel=1,
-            colsample_bytree=1, gamma=0, learning_rate=0.9, max_delta_step=0,
-            max_depth = 7, min_child_weight=1, missing=None, n_estimators=100,
-            n_jobs=1, nthread=None, objective='binary:logistic', random_state=0,
-            reg_alpha=0, reg_lambda=1, scale_pos_weight=1, seed=None,
-            silent=True, subsample=1
+            base_score=0.5,
+            booster='gbtree',
+            colsample_bylevel=1,
+            colsample_bytree=1,
+            gamma=0,
+            learning_rate=0.01,
+            max_delta_step=0,
+            max_depth = 7,
+            min_child_weight=1,
+            missing=None,
+            n_estimators=100,
+            n_jobs=1,
+            nthread=None,
+            objective='binary:logistic',
+            random_state=0,
+            reg_alpha=0,
+            reg_lambda=1,
+            scale_pos_weight=1,
+            seed=None,
+            silent=True,
+            subsample=1
         )
 
-
+class MCatBoost(Model):
+    def create_instance(self, random_state=None):
+        return CatBoostClassifier(
+            iterations=2,
+            depth=5,
+            loss_function='Logloss',
+            random_state=random_state,
+            l2_leaf_reg=None,
+            subsample=None
+        )
 
