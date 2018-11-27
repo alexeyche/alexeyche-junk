@@ -5,6 +5,10 @@ from os.path import join as pj
 import pandas as pd
 import os
 from fe_env import *
+from transform import *
+
+import logging
+import sys
 
 from sklearn.model_selection import train_test_split
 
@@ -14,7 +18,14 @@ from sklearn.metrics import f1_score
 
 from sklearn.linear_model import SGDClassifier
 
-
+root = logging.getLogger()
+root.setLevel(logging.DEBUG)
+handler = logging.StreamHandler(sys.stdout)
+handler.setLevel(logging.DEBUG)
+handler.setFormatter(
+    logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+)
+root.addHandler(handler)
 
 seed = None
 np.random.seed(seed)
@@ -28,11 +39,12 @@ ds = pd.read_csv(
 x, y = ds.drop("target", axis=1), ds["target"]
 
 transforms = (
+    TLog,
     TSin,
     TExp,
     TSqrt,
-    TLog,
     TTanh,
+    TSum
 )
 
 metric = roc_auc_score
@@ -45,13 +57,6 @@ def random_policy(nN, nA, epsilon):
         return A
     return policy_fn
 
-# def random_policy(nN, nA, epsilon):
-#     def policy_fn(observation):
-#         A = np.ones((nN, nA), dtype=float) * epsilon / (nA * nN)
-#         best_action = np.unravel_index(np.argmax(np.zeros((nN, nA))), A.shape)
-#         A[best_action] += (1.0 - epsilon)
-#         return A
-#     return policy_fn
 
 
 def evaluate(xm):
@@ -60,7 +65,6 @@ def evaluate(xm):
         test_size = 0.25,
         random_state = seed,
     )
-
 
     cf = SGDClassifier(random_state=seed, max_iter=1000, tol=1e-03)
     cf.fit(x_train, y_train)
@@ -75,18 +79,23 @@ def choice(probs):
     )
 
 
-fe = FeatureEngineering(x, evaluate, transforms)
+fe = FeatureEngineering(x, evaluate, transforms, max_steps=10)
 
 max_iter = 10
 
 r_h = np.zeros((max_iter, ))
+obs = []
 for iter_id in range(max_iter):
     policy = random_policy(fe.num_of_nodes, fe.num_of_transforms, epsilon)
     probs = policy(None)
     node_id, action_id = choice(probs)
 
-    obs, r, done, _ = fe.step(node_id, action_id)
+    o, r, done, _ = fe.step(node_id, action_id)
     r_h[iter_id] = r
+    obs.append(o)
+
+obs = np.asarray(obs)
+fe.plot()
 
 # num_episodes = 100
 

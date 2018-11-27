@@ -20,7 +20,7 @@ class FiltersTest(unittest.TestCase):
         xf = f(x)
         self.assertEqual(xf.shape[1], 10)
 
-    def test_no_greater_than(self):
+    def test_less_than(self):
         x = pd.DataFrame(
             np.concatenate(
                 (
@@ -31,7 +31,7 @@ class FiltersTest(unittest.TestCase):
             )
         )
 
-        f = Filters.no_greater_than(10.0)
+        f = Filters.less_than(10.0)
         xf = f(x)
         self.assertEqual(xf.shape[1], 5)
         self.assertAlmostEqual(np.mean(xf.values), 5.0)
