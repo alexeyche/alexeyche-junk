@@ -248,61 +248,130 @@ void DMaxentLoss1_test() {
 }
 
 
+void DMaxentLoss2_test() {
+    TVecF sums = {1000,101172.864051531,10240137.609583,1036877504.896428,105034307931.022,
+                  10644348066181.16, 1079178179395168.0,109459991792955584.0,
+                  11107280307688728576.0};
+    TFloat min = 97.59915093074763;
+    TFloat max = 106.9324489018609;
 
+    TVecF powerChebyMoments = powerSumsToChebyMoments(sums, min, max);
 
-void vec_op(TVecF &x, const TVecF& y, std::function<void(TFloat&, TFloat)> op) {
-    ENSURE(x.size() == y.size(), "sizes should correspond");
-    for (TSize xid=0; xid < x.size(); ++xid) {
-        op(x[xid], y[xid]);
-    }
+    TVecF l0(powerChebyMoments.size(), 0.0);
+    l0[0] = std::log(1.0 / sums[0]);
+
+    DMaxentLoss loss(powerChebyMoments, 1024);
+
+    // std::cerr << loss.compute(l0) << "\n";
+    // for (const auto& g: loss.grad) { std:: cout << g << ","; }
+    // std::cerr << "\n";
+    // double exp = 4.045732273553991;
+
+    // ENSURE(
+    //     std::abs(v - exp) < std::numeric_limits<TFloat>::epsilon(),
+    //     "DMaxentLoss0_test failed"
+    // );
 }
 
-void optimize(TVecF& l0, DMaxentLoss& loss, TFloat tol, TSize maxIter) {
+
+struct Parameters {
+    TSize gridSize = 1024;
+    TSize maxIter = 100;
+    TFloat tolerance = 1e-08;
+    TFloat learningRate = 0.01;
     TFloat beta1 = 0.9;
     TFloat beta2 = 0.999;
-    TFloat learningRate = 0.01;
     TFloat epsilon = 0.001;
+};
 
+void optimize(TVecF& l0, DMaxentLoss& loss, Parameters p) {
     TVecF m = TVecF(l0.size(), 0.0);
     TVecF v = TVecF(l0.size(), 0.0);
 
-    for (TSize iter=0; iter<maxIter; ++iter) {
-        double value = loss.compute(l0);
+    double value = std::numeric_limits<TFloat>::max();
+    for (TSize iter=0; iter<p.maxIter; ++iter) {
+        double newValue = loss.compute(l0);
+        if (std::abs(newValue - value) < p.tolerance) {
+            std::cerr << "Converged on iteration #" << iter-1 << "\n";
+            break;
+        }
+        value = newValue;
 
         for (TSize xid=0; xid < l0.size(); ++xid) {
-            m[xid] = beta1 * m[xid] + (1.0 - beta1) * loss.grad[xid];
-            v[xid] = beta2 * v[xid] + (1.0 - beta2) * loss.grad[xid] * loss.grad[xid];
+            m[xid] = p.beta1 * m[xid] + (1.0 - p.beta1) * loss.grad[xid];
+            v[xid] = p.beta2 * v[xid] + (1.0 - p.beta2) * loss.grad[xid] * loss.grad[xid];
 
-            TFloat weightGrad = m[xid] / (sqrt(v[xid]) + epsilon);
-            // std::cout << weightGrad << ", ";
+            TFloat weightGrad = m[xid] / (sqrt(v[xid]) + p.epsilon);
+            // std::cerr << weightGrad << ", ";
 
-            // std::cout << loss.grad[xid] << ", ";
-            l0[xid] += - learningRate * weightGrad;
+            // std::cerr << loss.grad[xid] << ", ";
+            l0[xid] += - p.learningRate * weightGrad;
         }
 
-        // std::cout << "\n";
-
-        // vec_op(l0, loss.grad, [](double& x, double y) {
-        //     x += - 0.0001 * y;
-        // });
-
-        std::cout << "Iteration #" << iter << ": " << value << "\n";
+        if (iter % 100 == 0) {
+            std::cerr << "Iteration #" << iter << ": " << value << "\n";
+        }
     }
 
 }
 
-void run(TVecF powerSums, TFloat min, TFloat max) {
-    TVecF powerChebyMoments = powerSumsToChebyMoments(powerSums, min, max);
+TVecF get_quantiles(
+    TVecF quantiles,
+    DMaxentLoss loss,
+    TFloat min,
+    TFloat max,
+    Parameters p)
+{
+    TFloat center = (max + min)/2.0;
+    TFloat scale = (max - min)/2.0;
 
-    TInt gridSize = 1024;
-    DMaxentLoss loss(powerChebyMoments, gridSize);
+    TVecF xs(p.gridSize);
+    for (TSize xs_id = 0; xs_id<p.gridSize; ++xs_id) {
+        double scaledX = xs_id * 2.0 / (p.gridSize-1.0) - 1.0;
+        xs[xs_id] = scaledX * scale + center;
+    }
+    TVecF cdf(p.gridSize);
+    cdf[0] = 0.0;
+    for (TSize cdf_id = 1 ; cdf_id < p.gridSize; ++cdf_id) {
+        cdf[cdf_id] = cdf[cdf_id-1] + loss.weights[cdf_id];
+    }
 
-    TVecF l0(powerSums.size(), 0.0);
-    l0[0] = std::log(1.0 / gridSize);
-    std::cout << loss.compute(l0) << "\n";
-    // optimize(l0, loss, 1e-06, 1000);
+    TVecF ans(quantiles.size());
+    for (TSize q_id=0; q_id < quantiles.size(); ++q_id) {
+
+        TFloat lastRank;
+        TFloat curRank = 0.0;
+        TSize targetIdx = p.gridSize - 1;
+        for (TSize curIdx = 0; curIdx<p.gridSize; ++curIdx) {
+            lastRank = curRank;
+            curRank = cdf[curIdx];
+            if (curRank >= quantiles[q_id]) {
+                targetIdx = curIdx;
+                break;
+            }
+        }
+        ans[q_id] = xs[targetIdx];
+    }
+    return ans;
 }
 
+TVecF run(TFloat min, TFloat max, TVecF powerSums, Parameters p, TVecF quantiles) {
+    TVecF powerChebyMoments = powerSumsToChebyMoments(powerSums, min, max);
+
+    DMaxentLoss loss(powerChebyMoments, p.gridSize);
+
+    TVecF l0(powerSums.size(), 0.0);
+    l0[0] = std::log(1.0 / p.gridSize);
+    optimize(l0, loss, p);
+    return get_quantiles(quantiles, loss, min, max, p);
+}
+
+
+#include <string>
+#include <sstream>
+#include <algorithm>
+#include <iterator>
+#include <cstdlib>
 
 
 
@@ -312,22 +381,60 @@ int main(int argc, const char** argv) {
     powerSumsToChebyMoments_test();
     DMaxentLoss0_test();
     DMaxentLoss1_test();
+    DMaxentLoss2_test();
 
-    // TVecF sums = {1000,4616.627711851067,21313.65542468823,98400.94770643908,
-    //                  454306.4464091641,2097523.412883016,9684407.540596521,
-    //                  44714424.09630082,206457465.9479744,953283183.8847713,
-    //                  4401712592.228215,20324967717.45339,93852641598.89296,
-    //                  433382741898.2874,2001267865937.076};
-    // TFloat min = 4.580868793901161;
-    // TFloat max = 4.672197316422162;
+    const char* gridSize = std::getenv("GRID_SIZE");
+    const char* maxIter = std::getenv("MAX_ITER");
+    const char* tolerance = std::getenv("TOLERANCE");
+    const char* learningRate = std::getenv("LEARNING_RATE");
+    const char* beta1 = std::getenv("BETA1");
+    const char* beta2 = std::getenv("BETA2");
+    const char* epsilon = std::getenv("EPSILON");
 
-    TVecF sums = {1000,101172.864051531,10240137.609583,1036877504.896428,105034307931.022,
-                  10644348066181.16, 1079178179395168.0,109459991792955584.0,
-                  11107280307688728576.0};
+    Parameters p;
+    if (gridSize != NULL) { p.gridSize = std::stof(gridSize); }
+    if (maxIter != NULL) { p.maxIter = std::stoi(maxIter); }
+    if (tolerance != NULL) { p.tolerance = std::stof(tolerance); }
+    if (learningRate != NULL) { p.learningRate = std::stof(learningRate); }
+    if (beta1 != NULL) { p.beta1 = std::stof(beta1); }
+    if (beta2 != NULL) { p.beta2 = std::stof(beta2); }
+    if (epsilon != NULL) { p.epsilon = std::stof(epsilon); }
 
-                                // 1.127591878416511e+21,1.145222240347376e+23,1.163651385521531e+25,
-                                // 1.182913146584308e+27,1.203042997951893e+29,1.224078137992483e+31};
-    TFloat min = 97.59915093074763;
-    TFloat max = 106.9324489018609;
-    run(sums, min, max);
+    TFloat min;
+    TFloat max;
+    TVecF powerSums;
+
+    bool firstLine = true;
+    TVecF quantiles;
+    for (std::string line; std::getline(std::cin, line);) {
+        if (firstLine) {
+            firstLine = false;
+
+            std::vector<std::string> cont;
+
+            std::istringstream iss(line);
+            std::copy(
+                std::istream_iterator<std::string>(iss),
+                std::istream_iterator<std::string>(),
+                std::back_inserter(cont)
+            );
+
+            min = std::stof(cont[0]);
+            max = std::stof(cont[1]);
+
+            for (TSize i=2; i<cont.size(); ++i) {
+                powerSums.push_back(std::stof(cont[i]));
+            }
+        } else {
+            quantiles.push_back(std::stof(line));
+        }
+    }
+
+    TVecF x = run(min, max, powerSums, p, quantiles);
+
+    for(int i = 1; i < x.size() - 1; ++i) {
+        TFloat pdf = (quantiles[i+1] - quantiles[i-1]) / (x[i+1] - x[i-1]);
+
+        std::cout << x[i] << " " << quantiles[i] << " " << pdf << "\n";
+    }
 }
