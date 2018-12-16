@@ -8,6 +8,7 @@ import tempfile
 import logging
 from collections import defaultdict
 from transform import TIdentity
+from transform import Transform
 
 class Node(object):
     class Features(object):
@@ -35,6 +36,10 @@ class Node(object):
             )
         )
 
+    @property
+    def name(self):
+        return "{}{}".format(self.transformation.__name__, self.id)
+
     def __eq__(self, a):
         return self.id == a.id
 
@@ -59,9 +64,16 @@ class FeatureEngineering(object):
         self.nodes = [
             Node(0, TIdentity, None)
         ]
+        self.cache = {}
 
-    def __init__(self, dataset, evaluate, transformations, max_steps):
-        self.transformations = transformations
+
+    def __init__(self, dataset, evaluate, max_steps, transformations=None):
+        self.cache = {}
+        self.transformations = (
+            transformations
+            if transformations is not None else
+            Transform.ALL_TRANSFORMS
+        )
         self.evaluate_callback = evaluate
         self.dataset = dataset
         self.max_steps = max_steps
@@ -121,17 +133,25 @@ class FeatureEngineering(object):
 
         def apply_ts(nodes_visited):
             D = self.dataset
+            node_key = ""
             for n in nodes_visited:
                 if n.transformation.is_semigroup:
                     global_ops[n.transformation][n] = D
                 else:
-                    D_new = n.transformation(D)
+
+                    node_key += "{},".format(n.transformation.name)
+                    D_new = self.cache.get(node_key)
+                    if D_new is None and D is not None:
+                        D_new = n.transformation(D)
+                        self.cache[node_key] = D_new
+                    else:
+                        log.debug("Cache hit for {}".format(node_key))
+
                     if D_new is None:
                         n.features.feature_counts = 0
-                        break
                     else:
                         n.features.feature_counts = D_new.shape[1]
-                        D = D_new
+                    D = D_new
             return D
 
         res = self.traverse(apply_ts)
@@ -141,14 +161,27 @@ class FeatureEngineering(object):
                 global_op,
                 ",".join([str(n) for n in node_to_arg.keys()])
             ))
+            node_key = "{} {}".format(
+                global_op,
+                ",".join([n.name for n, _ in node_to_arg.items()])
+            )
+            D = self.cache.get(node_key)
+            if D is None:
+                D = global_op(*[v for v in node_to_arg.values() if v is not None])
+                self.cache[node_key] = D
+            else:
+                log.debug("Cache hit for {}".format(node_key))
 
-            D = global_op(*list(node_to_arg.values()))
-            res.append(D)
-            for n in node_to_arg.keys():
-                n.features.feature_counts = D.shape[1]
+            if D is not None:
+                res.append(D)
+                for n in node_to_arg.keys():
+                    n.features.feature_counts = D.shape[1]
+            else:
+                for n in node_to_arg.keys():
+                    n.features.feature_counts = 0
 
         if concat:
-            return np.concatenate(res, axis=1)
+            return np.concatenate([r for r in res if r is not None], axis=1)
         else:
             return res
 
@@ -157,7 +190,12 @@ class FeatureEngineering(object):
         return self.evaluate_callback(result)
 
 
-    def get_observations(self, n):
+    @property
+    def state_space_size(self):
+        return 7
+
+
+    def get_observation(self, n):
         assert n.features.feature_counts is not None, \
             "Node {} has empty feature counts".format(n)
 
@@ -179,7 +217,7 @@ class FeatureEngineering(object):
             self.statistics.reward_moments[n.transformation.name]
         )
 
-        return np.asarray((
+        s = np.asarray((
             n.features.reward,
             r1 / r0,
             tused,
@@ -190,6 +228,17 @@ class FeatureEngineering(object):
             # is_t_feature_sel,
             # feature_type,
         ))
+
+        assert s.shape[0] == self.state_space_size, \
+            "unexpected state space size"
+        return s
+
+    def get_observations(self):
+        def _cb(nodes_visited):
+            return self.get_observation(nodes_visited[-1])
+
+        return np.asarray(self.traverse(_cb))
+
 
     def step(self, node_id, action):
         assert node_id < len(self.nodes)
@@ -205,7 +254,7 @@ class FeatureEngineering(object):
         )
         self.statistics.reward_moments[t.name] = count + 1.0, sum + r
 
-        obs = self.get_observations(n)
+        obs = self.get_observations()
         self.steps_done += 1
         return obs, r, done, {}
 
