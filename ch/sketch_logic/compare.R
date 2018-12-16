@@ -79,12 +79,14 @@ generate_data <- function(type, q_probs) {
     return(list(x, df))
   }
   if (type == 2) {
-    x = rnorm(num_points, 100 + 4*rbinom(num_points, 1, 0.3))
+    mean = 100.0
+    mean_shift = 4.0
+    x = rnorm(num_points, mean + mean_shift*rbinom(num_points, 1, 0.3))
     df = data.frame(
       x = seq(min(x), max(x), length.out=length(q_probs)-2)
     )
-    df$pdf = 0.7*dnorm(df$x, 100, 1) + 0.3*dnorm(df$x, 100 + 4, 1)
-    df$cdf = 0.7*pnorm(df$x, 100, 1) + 0.3*pnorm(df$x, 100 + 4, 1)
+    df$pdf = 0.7*dnorm(df$x, mean, 1) + 0.3*dnorm(df$x, mean + mean_shift, 1)
+    df$cdf = 0.7*pnorm(df$x, mean, 1) + 0.3*pnorm(df$x, mean + mean_shift, 1)
     return(list(x, df))
   }
   stop("unknown type")
@@ -92,16 +94,17 @@ generate_data <- function(type, q_probs) {
 
 
 Sys.setenv(
-  LEARNING_RATE="0.01",
-  MAX_ITER="1000",
-  TOLERANCE="1e-10",
-  GRID_SIZE="1024",
-  BETA1="0.9",
-  BETA2="0.999",
+  LEARNING_RATE="0.001",
+  MAX_ITER="20000",
+  TOLERANCE="1e-18",
+  GRID_SIZE="4048",
+  PROGRESS_ITERATION="10000",
+  BETA1="0.999",
+  BETA2="0.9999",
   EPSILON="1e-03"
 )
 
-num_points = 10000
+num_points = 500000
 num_powers = 5
 q = seq(0.0, 1.0, 0.005)
 

@@ -6,7 +6,7 @@
 #include <functional>
 #include <iostream>
 #include <limits>
-
+#include "lbfgs.h"
 
 
 using TFloat = double;
@@ -282,9 +282,11 @@ struct Parameters {
     TFloat beta1 = 0.9;
     TFloat beta2 = 0.999;
     TFloat epsilon = 0.001;
+    TSize progressIteration = 1000;
 };
 
-void optimize(TVecF& l0, DMaxentLoss& loss, Parameters p) {
+
+void optimize_adam(TVecF& l0, DMaxentLoss& loss, Parameters p) {
     TVecF m = TVecF(l0.size(), 0.0);
     TVecF v = TVecF(l0.size(), 0.0);
 
@@ -308,11 +310,63 @@ void optimize(TVecF& l0, DMaxentLoss& loss, Parameters p) {
             l0[xid] += - p.learningRate * weightGrad;
         }
 
-        if (iter % 100 == 0) {
+        if ((p.progressIteration > 0) && (iter % p.progressIteration == 0)) {
             std::cerr << "Iteration #" << iter << ": " << value << "\n";
         }
     }
 
+}
+
+
+double _evaluate(void *instance, const lbfgsfloatval_t *x, lbfgsfloatval_t *g, const int n, const lbfgsfloatval_t) {
+    DMaxentLoss* loss = reinterpret_cast<DMaxentLoss*>(instance);
+    TVecF l0(x, x+n);
+
+    double value = loss->compute(l0);
+
+    for (TSize gid=0; gid<n; ++gid) {
+        g[gid] = loss->grad[gid];
+    }
+    return value;
+}
+
+int _progress(
+    void *instance,
+    const lbfgsfloatval_t *x,
+    const lbfgsfloatval_t *g,
+    const lbfgsfloatval_t fx,
+    const lbfgsfloatval_t xnorm,
+    const lbfgsfloatval_t gnorm,
+    const lbfgsfloatval_t step,
+    int n,
+    int k,
+    int ls)
+{
+    if (k % 1 == 0) {
+        std::cerr << "Iteration #" <<  k << ": " << fx
+            << ", xnorm = " << xnorm
+            << ", gnorm =" << gnorm
+            << ", step = " << step << "\n";
+    }
+    return 0;
+}
+
+void optimize_lbfgs(TVecF& l0, DMaxentLoss& loss, Parameters p) {
+    TSize N = loss.dim;
+
+    lbfgs_parameter_t _p;
+    lbfgs_parameter_init(&_p);
+
+    _p.delta = p.tolerance;
+    _p.max_iterations = p.maxIter;
+    _p.past = 5;
+    _p.m = 20;
+
+    TFloat fx;
+    TFloat *m_x = lbfgs_malloc(N);
+
+    int ret = lbfgs(N, m_x, &fx, _evaluate, _progress, &loss, &_p);
+    std::cerr << "L-BFGS optimization terminated with status code = " << ret << "\n";
 }
 
 TVecF get_quantiles(
@@ -362,7 +416,8 @@ TVecF run(TFloat min, TFloat max, TVecF powerSums, Parameters p, TVecF quantiles
 
     TVecF l0(powerSums.size(), 0.0);
     l0[0] = std::log(1.0 / p.gridSize);
-    optimize(l0, loss, p);
+    optimize_adam(l0, loss, p);
+    // optimize_lbfgs(l0, loss, p);
     return get_quantiles(quantiles, loss, min, max, p);
 }
 
@@ -390,6 +445,7 @@ int main(int argc, const char** argv) {
     const char* beta1 = std::getenv("BETA1");
     const char* beta2 = std::getenv("BETA2");
     const char* epsilon = std::getenv("EPSILON");
+    const char* progressIteration = std::getenv("PROGRESS_ITERATION");
 
     Parameters p;
     if (gridSize != NULL) { p.gridSize = std::stof(gridSize); }
@@ -399,6 +455,7 @@ int main(int argc, const char** argv) {
     if (beta1 != NULL) { p.beta1 = std::stof(beta1); }
     if (beta2 != NULL) { p.beta2 = std::stof(beta2); }
     if (epsilon != NULL) { p.epsilon = std::stof(epsilon); }
+    if (progressIteration != NULL) { p.progressIteration = std::stoi(progressIteration); }
 
     TFloat min;
     TFloat max;
