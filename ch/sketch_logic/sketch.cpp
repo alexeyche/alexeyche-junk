@@ -438,60 +438,60 @@ int main(int argc, const char** argv) {
     DMaxentLoss1_test();
     DMaxentLoss2_test();
 
-    const char* gridSize = std::getenv("GRID_SIZE");
-    const char* maxIter = std::getenv("MAX_ITER");
-    const char* tolerance = std::getenv("TOLERANCE");
-    const char* learningRate = std::getenv("LEARNING_RATE");
-    const char* beta1 = std::getenv("BETA1");
-    const char* beta2 = std::getenv("BETA2");
-    const char* epsilon = std::getenv("EPSILON");
-    const char* progressIteration = std::getenv("PROGRESS_ITERATION");
+    // const char* gridSize = std::getenv("GRID_SIZE");
+    // const char* maxIter = std::getenv("MAX_ITER");
+    // const char* tolerance = std::getenv("TOLERANCE");
+    // const char* learningRate = std::getenv("LEARNING_RATE");
+    // const char* beta1 = std::getenv("BETA1");
+    // const char* beta2 = std::getenv("BETA2");
+    // const char* epsilon = std::getenv("EPSILON");
+    // const char* progressIteration = std::getenv("PROGRESS_ITERATION");
 
-    Parameters p;
-    if (gridSize != NULL) { p.gridSize = std::stof(gridSize); }
-    if (maxIter != NULL) { p.maxIter = std::stoi(maxIter); }
-    if (tolerance != NULL) { p.tolerance = std::stof(tolerance); }
-    if (learningRate != NULL) { p.learningRate = std::stof(learningRate); }
-    if (beta1 != NULL) { p.beta1 = std::stof(beta1); }
-    if (beta2 != NULL) { p.beta2 = std::stof(beta2); }
-    if (epsilon != NULL) { p.epsilon = std::stof(epsilon); }
-    if (progressIteration != NULL) { p.progressIteration = std::stoi(progressIteration); }
+    // Parameters p;
+    // if (gridSize != NULL) { p.gridSize = std::stof(gridSize); }
+    // if (maxIter != NULL) { p.maxIter = std::stoi(maxIter); }
+    // if (tolerance != NULL) { p.tolerance = std::stof(tolerance); }
+    // if (learningRate != NULL) { p.learningRate = std::stof(learningRate); }
+    // if (beta1 != NULL) { p.beta1 = std::stof(beta1); }
+    // if (beta2 != NULL) { p.beta2 = std::stof(beta2); }
+    // if (epsilon != NULL) { p.epsilon = std::stof(epsilon); }
+    // if (progressIteration != NULL) { p.progressIteration = std::stoi(progressIteration); }
 
-    TFloat min;
-    TFloat max;
-    TVecF powerSums;
+    // TFloat min;
+    // TFloat max;
+    // TVecF powerSums;
 
-    bool firstLine = true;
-    TVecF quantiles;
-    for (std::string line; std::getline(std::cin, line);) {
-        if (firstLine) {
-            firstLine = false;
+    // bool firstLine = true;
+    // TVecF quantiles;
+    // for (std::string line; std::getline(std::cin, line);) {
+    //     if (firstLine) {
+    //         firstLine = false;
 
-            std::vector<std::string> cont;
+    //         std::vector<std::string> cont;
 
-            std::istringstream iss(line);
-            std::copy(
-                std::istream_iterator<std::string>(iss),
-                std::istream_iterator<std::string>(),
-                std::back_inserter(cont)
-            );
+    //         std::istringstream iss(line);
+    //         std::copy(
+    //             std::istream_iterator<std::string>(iss),
+    //             std::istream_iterator<std::string>(),
+    //             std::back_inserter(cont)
+    //         );
 
-            min = std::stof(cont[0]);
-            max = std::stof(cont[1]);
+    //         min = std::stof(cont[0]);
+    //         max = std::stof(cont[1]);
 
-            for (TSize i=2; i<cont.size(); ++i) {
-                powerSums.push_back(std::stof(cont[i]));
-            }
-        } else {
-            quantiles.push_back(std::stof(line));
-        }
-    }
+    //         for (TSize i=2; i<cont.size(); ++i) {
+    //             powerSums.push_back(std::stof(cont[i]));
+    //         }
+    //     } else {
+    //         quantiles.push_back(std::stof(line));
+    //     }
+    // }
 
-    TVecF x = run(min, max, powerSums, p, quantiles);
+    // TVecF x = run(min, max, powerSums, p, quantiles);
 
-    for(int i = 1; i < x.size() - 1; ++i) {
-        TFloat pdf = (quantiles[i+1] - quantiles[i-1]) / (x[i+1] - x[i-1]);
+    // for(int i = 1; i < x.size() - 1; ++i) {
+    //     TFloat pdf = (quantiles[i+1] - quantiles[i-1]) / (x[i+1] - x[i-1]);
 
-        std::cout << x[i] << " " << quantiles[i] << " " << pdf << "\n";
-    }
+    //     std::cout << x[i] << " " << quantiles[i] << " " << pdf << "\n";
+    // }
 }
